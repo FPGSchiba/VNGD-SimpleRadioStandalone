@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
-    class NetworkMessage
+    public class NetworkMessage
     {
         public enum MessageType
         {
@@ -20,11 +20,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public MessageType MsgType { get; set; }
 
-        public RadioUpdate RadioUpdate { get; set; }
+        public DCSRadios ClientRadioUpdate { get; set; }
 
         public List<SRClient> Clients { get; set; }
 
-        public long LastUpdate { get; set; }
+     
     }
 
        

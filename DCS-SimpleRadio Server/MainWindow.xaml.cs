@@ -26,9 +26,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        ServerListener serverListener;
+        UDPVoiceRouter serverListener;
 
         ConcurrentDictionary<String, SRClient> connectedClients = new ConcurrentDictionary<string, SRClient>();
+        private ServerSync serverSync;
 
         public MainWindow()
         {
@@ -39,6 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             if(serverListener!=null)
             {
+                serverSync.RequestStop();
                 serverListener.RequestStop();
                 serverListener = null;
                 button.Content = "Start Server";
@@ -47,9 +49,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
 
                 button.Content = "Stop Server";
-                serverListener = new ServerListener(clientsList);
+                serverListener = new UDPVoiceRouter(connectedClients);
                 Thread listenerThread = new Thread(serverListener.Listen);
                 listenerThread.Start();
+
+               
+                serverSync = new ServerSync(connectedClients);
+                Thread serverSyncThread = new Thread(serverSync.StartListening);
+                serverSyncThread.Start();
             }
         }
     }

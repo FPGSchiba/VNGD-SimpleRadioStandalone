@@ -17,6 +17,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading.Tasks;
 using FragLabs.Audio.Codecs;
+using System.Threading;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -25,6 +26,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        WaveIn _waveIn;
+        WaveOut _waveOut;
+        BufferedWaveProvider _playBuffer;
+        OpusEncoder _encoder;
+        OpusDecoder _decoder;
+        int _segmentFrames;
+        int _bytesPerSegment;
+        volatile bool _stop = true;
+
+        ClientSync client;
+
+        String guid;
+        UDPVoiceHandler voiceSender;
+
+        System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient> clients = new System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -41,104 +58,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             if (WaveOut.DeviceCount > 0)
                 speakers.SelectedIndex = 0;
+
+            guid = Guid.NewGuid().ToString();
         }
-
-
-        WaveIn _waveIn;
-        WaveOut _waveOut;
-        BufferedWaveProvider _playBuffer;
-        OpusEncoder _encoder;
-        OpusDecoder _decoder;
-        int _segmentFrames;
-        int _bytesPerSegment;
-        Boolean _stop = true;
-
-        IPAddress address;
-        UdpClient listener;
-
 
         void StartEncoding()
         {
-            _segmentFrames = 960 / 4;
-            _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
-            //    _encoder.Bitrate = 8192;
-            _decoder = OpusDecoder.Create(24000, 1);
-            _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
-
-            _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-            _waveIn.BufferMilliseconds = 20;
-            _waveIn.DeviceNumber = mic.SelectedIndex;
-            _waveIn.DataAvailable += _waveIn_DataAvailable;
-            _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
-
-            _playBuffer = new BufferedWaveProvider(new WaveFormat(48000, 16, 1));
-
-            _waveOut = new WaveOut();
-            _waveOut.DesiredLatency = 75; //50ms latency
-            _waveOut.DeviceNumber = speakers.SelectedIndex;
-            _waveOut.Init(_playBuffer);
-
-            _waveOut.Play();
-     
-
-            _stop = false;
-
             IPAddress ipAddr;
-
-            if(IPAddress.TryParse(this.serverIp.Text.Trim(),out ipAddr))
+            if (IPAddress.TryParse(this.serverIp.Text.Trim(), out ipAddr))
             {
-                 listener = new UdpClient(5000);
-                listener.AllowNatTraversal(true);
-                IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5000);
-              
-                address = ipAddr;
+                _stop = false;
 
-                Task.Factory.StartNew(() =>
-                {
-                    using (listener)
-                    {
-                        while (!_stop)
-                        {
-                            byte[] bytes = listener.Receive(ref groupEP);
+                _segmentFrames = 960 / 4;
+                _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
+                //    _encoder.Bitrate = 8192;
+                _decoder = OpusDecoder.Create(24000, 1);
+                _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
-                            int length = 0;
-                            try
-                            {
-                                int len;
-                                bytes = _decoder.Decode(bytes, bytes.Length, out len);
+                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
+                _waveIn.BufferMilliseconds = 20;
+                _waveIn.DeviceNumber = mic.SelectedIndex;
+                _waveIn.DataAvailable += _waveIn_DataAvailable;
+                _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
 
-                                _playBuffer.AddSamples(bytes, 0, len);
+                _playBuffer = new BufferedWaveProvider(new WaveFormat(48000, 16, 1));
 
-                                length = len;
-                                //    Console.WriteLine("received");
-                            }
-                            catch (Exception e) { }
+                _waveOut = new WaveOut();
+                _waveOut.DesiredLatency = 75; //50ms latency
+                _waveOut.DeviceNumber = speakers.SelectedIndex;
+                _waveOut.Init(_playBuffer);
 
-                            //       Console.WriteLine("received bytes " + length);
-                            //    Console.WriteLine("received");
-                        }
+                _waveOut.Play();
 
-                        try
-                        {
-                            listener.Close();
-                        }
-                        catch (Exception e) { }
+                voiceSender = new UDPVoiceHandler(clients, guid, ipAddr, _decoder, _playBuffer);
+                Thread voiceSenderThread = new Thread(voiceSender.Listen);
 
-                    }
-
-                });
+                voiceSenderThread.Start();
 
                 _waveIn.StartRecording();
             }
             else
             {
-                startStop_Click(null,null);
+                //invalid IP
             }
 
-           
+
+
         }
 
-     
+
 
         byte[] _notEncodedBuffer = new byte[0];
         void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
@@ -152,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 soundBuffer[i + _notEncodedBuffer.Length] = e.Buffer[i];
 
             int byteCap = _bytesPerSegment;
-      //      Console.WriteLine("{0} ByteCao", byteCap);
+            //      Console.WriteLine("{0} ByteCao", byteCap);
             int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
             int segmentsEnd = segmentCount * byteCap;
             int notEncodedCount = soundBuffer.Length - segmentsEnd;
@@ -171,29 +139,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 int len;
                 byte[] buff = _encoder.Encode(segment, segment.Length, out len);
 
-                Send(buff, len);
+                if (voiceSender != null)
+                    voiceSender.Send(buff, len);
             }
-        }
-
-
-
-
-        private void Send(byte[] bytes, int len)
-        {
-            try
-            {
-       
-             //   UdpClient client = new UdpClient();
-             //   listener.AllowNatTraversal(true);
-                IPEndPoint ip = new IPEndPoint(this.address, 5000);
-
-                listener.Send(bytes, len, ip);
-            //    client.Close();
-            }
-            catch (Exception e) { }
-
-      //      Console.WriteLine("sent");
-
         }
 
         void StopEncoding()
@@ -210,28 +158,78 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _decoder.Dispose();
             _decoder = null;
 
+
             _stop = true;
         }
 
         private void startStop_Click(object sender, RoutedEventArgs e)
         {
-            if(!_stop)
+            if (!_stop)
             {
-                startStop.Content = "Start";
-                StopEncoding();
-                _stop = true;
-
-                try
-                {
-                    listener.Close();
-                }
-                catch (Exception ex) { }
+                stop();
             }
             else
             {
-                startStop.Content = "Stop";
-                StartEncoding();
-                _stop = false;
+                IPAddress ipAddr;
+
+                if (IPAddress.TryParse(this.serverIp.Text.Trim(), out ipAddr))
+                {
+                    client = new ClientSync(clients, guid);
+                    client.TryConnect(new IPEndPoint(ipAddr, 5002), ConnectCallback);
+
+                    startStop.Content = "Connecting...";
+
+                }
+                else
+                {
+                    //invalid ID
+
+                }
+
+            }
+        }
+        private void stop()
+        {
+            startStop.Content = "Start";
+            try
+            {
+                StopEncoding();
+            }
+            catch (Exception ex) { }
+
+            _stop = true;
+
+            if (client != null)
+            {
+                client.Disconnect();
+                client = null;
+            }
+
+
+            if (voiceSender != null)
+            {
+                voiceSender.RequestStop();
+                voiceSender = null;
+            }
+
+
+        }
+
+        private void ConnectCallback(bool result)
+        {
+            if (result)
+            {
+                if (_stop)
+                {
+                    startStop.Content = "Stop";
+                    StartEncoding();
+                    _stop = false;
+                }
+
+            }
+            else
+            {
+                stop();
             }
 
         }
