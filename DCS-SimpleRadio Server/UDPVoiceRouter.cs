@@ -17,10 +17,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     class UDPVoiceRouter
     {
-        // private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         UdpClient listener;
 
-        ConcurrentDictionary<IPEndPoint, int> udpClients = new ConcurrentDictionary<IPEndPoint, int>();
+        ConcurrentDictionary<String, IPEndPoint> udpClients = new ConcurrentDictionary<String, IPEndPoint>();
 
         private volatile bool stop;
         private ConcurrentDictionary<String, SRClient> clientsList;
@@ -32,13 +32,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public void Listen()
         {
-            listener = new UdpClient(5010);
-            listener.AllowNatTraversal(true);
 
+            listener = new UdpClient();
+            listener.AllowNatTraversal(true);
+            listener.ExclusiveAddressUse = false;
+            listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
             while (!stop)
             {
                 try
                 {
+                  
                     IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
                     byte[] rawBytes = listener.Receive(ref groupEP);
 
@@ -48,16 +51,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                     if (clientsList.ContainsKey(guid))
                     {
-                        udpClients[groupEP] = groupEP.Port;
+                        udpClients[guid] = groupEP;
                         SendToOthers(rawBytes, groupEP);
                     }
                     else
                     {
-                        int port;
-                        udpClients.TryRemove(groupEP, out port);
+                        IPEndPoint port;
+                        udpClients.TryRemove(guid, out port);
+                      //  logger.Info("Removing  "+guid+" From UDP pool");
                     }
+                  
                 }
-                catch (Exception e) { }
+                catch (Exception e) {
+                  //  logger.Error(e,"Error receving audio UDP for client " + e.Message);
+                }
             }
 
             try
@@ -79,38 +86,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void SendToOthers(byte[] bytes, IPEndPoint ignoreEndpoint)
         {
-            try
-            {
-                //      Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
-                //      {
-                //          this.clientsList.Text += ("\n " + address.ToString() + ":" + port);
-                //          //Update UI here
-                //      }));
 
-                foreach (var client in udpClients)
+
+            //      Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
+            //      {
+            //          this.clientsList.Text += ("\n " + address.ToString() + ":" + port);
+            //          //Update UI here
+            //      }));
+
+            foreach (var client in udpClients)
+            {
+                try
                 {
                     if (!client.Key.Equals(ignoreEndpoint))
                     {
-                        IPEndPoint ip = client.Key;
+                        IPEndPoint ip = client.Value;
                         listener.Send(bytes, bytes.Length, ip);
                     }
                     else
                     {
                         //DEBUG@
-                        IPEndPoint ip = client.Key;
+                        IPEndPoint ip = client.Value;
                         listener.Send(bytes, bytes.Length, ip);
 
                     }
+                }
+                catch (Exception e)
+                {
+                    //      IPEndPoint ip = client.Value;
+                 //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
+                    //  udpClients.TryRemove(guid, out port);
+
 
                 }
+            }
+
+            //  listener.Close();
 
 
-                //  listener.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error sending audio UDP " + e.Message);
-            }
 
             //    Console.WriteLine("sent");
         }

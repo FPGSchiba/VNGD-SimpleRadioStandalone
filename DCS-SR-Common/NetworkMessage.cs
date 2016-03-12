@@ -16,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             SYNC,
         }
 
-        public string ClientGuid { get; set;} 
+        public string ClientGuid { get; set; }
 
         public MessageType MsgType { get; set; }
 
@@ -24,9 +24,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public List<SRClient> Clients { get; set; }
 
-     
+
     }
 
-       
-    
+
+
 }

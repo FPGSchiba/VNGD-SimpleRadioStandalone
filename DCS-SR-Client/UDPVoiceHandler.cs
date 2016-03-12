@@ -37,14 +37,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             this.guid = guid;
             this.address = address;
-
-            listener = new UdpClient();
-            listener.AllowNatTraversal(true);
         }
 
         public void Listen()
         {
-
+            listener = new UdpClient();
+            listener.AllowNatTraversal(true);
 
             while (!stop)
             {
@@ -54,11 +52,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //   listener.Client.ReceiveTimeout = 3000;
 
                     byte[] bytes = listener.Receive(ref groupEP);
-                    HandleAudio(bytes);
+
+                    if(bytes!=null && bytes.Length > 0)
+                    {
+
+                        HandleAudio(bytes);
+                    }
+                
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error Rec: " + e.Message);
+                    logger.Error(e, "error listening for UDP Voip");
+                  
                 }
             }
 
@@ -78,20 +83,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception e) { }
         }
 
+        private SRClient IsClientMetaDataValid(string clientGuid)
+        {
+            if (clientsList.ContainsKey(clientGuid))
+            {
+                SRClient client = clientsList[guid];
+
+                if (client != null && client.ClientRadios != null && client.ClientRadios.isCurrent())
+                {
+                    return client;
+                }
+            }
+            return null;
+        }
+
         private void HandleAudio(byte[] audioBytes)
         {
             //check if we should play audio
-            SRClient myClient = clientsList[guid];
 
-            if (myClient != null && myClient.ClientRadios != null && myClient.ClientRadios.isCurrent())
+            SRClient myClient = IsClientMetaDataValid(guid);
+
+            if (myClient != null)
             {
                 //last 36 bytes are guid!
                 String recievingGuid = Encoding.ASCII.GetString(
                 audioBytes, audioBytes.Length - 36, 36);
 
-                SRClient receivingClient = clientsList[recievingGuid];
+                SRClient receivingClient = IsClientMetaDataValid(recievingGuid);
 
-                if (receivingClient != null && receivingClient.ClientRadios != null && receivingClient.ClientRadios.isCurrent())
+                if (receivingClient != null)
                 {
                     RadioInformation receivingRadio = CanHear(myClient.ClientRadios, receivingClient.ClientRadios);
                     if (receivingRadio != null)
@@ -108,20 +128,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         Buffer.BlockCopy(decoded, 0, sampleBuffer, 0, len);
 
                         //volume!
-                        for (int i=0; i< sampleBuffer.Length; i++)
-                        {
-                           
-                            sampleBuffer[i] = (short)( volume * sampleBuffer[i] );
-                        }
+                        //for (int i=0; i< sampleBuffer.Length; i++)
+                        //{
+
+                        //    sampleBuffer[i] = (short)( volume * sampleBuffer[i] );
+                        //}
                         //convert back to bytes
-                        
+
                         Buffer.BlockCopy(sampleBuffer, 0, decoded, 0, sampleBuffer.Length);
 
                         _playBuffer.AddSamples(decoded, 0, len);
-
-                       
                     }
-
                 }
             }
         }
@@ -139,7 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         RadioInformation receivingRadio = myClient.radios[i];
 
-                        if(receivingRadio!=null)
+                        if (receivingRadio != null)
                         {
 
                             //handle INTERCOM Modulation is 2
@@ -151,8 +168,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 return receivingRadio;
 
                             }
-                            else if(receivingRadio.frequency == transmittingRadio.frequency 
-                                && receivingRadio.modulation == transmittingRadio.modulation 
+                            else if (receivingRadio.frequency == transmittingRadio.frequency
+                                && receivingRadio.modulation == transmittingRadio.modulation
                                 && receivingRadio.frequency > 1)
                             {
                                 SendUpdateToGUI(i, false);
@@ -181,50 +198,54 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             //TODO only send when transmit is pressed
             //TODO only send when a radio is actually selected!
-            try
+
+            SRClient myClient = IsClientMetaDataValid(guid);
+
+            if (myClient != null && !stop)
             {
 
-                //append guid
+                try
+                {
 
-                byte[] combinedBytes = new byte[len + 36];
-                System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len);
-                System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len, 36);
+                    //append guid
+
+                    byte[] combinedBytes = new byte[len + 36];
+                    System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len);
+                    System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len, 36);
 
 
 
-                //   UdpClient myClient = new UdpClient();
-                //   listener.AllowNatTraversal(true);
-                IPEndPoint ip = new IPEndPoint(this.address, 5010);
+                    //   UdpClient myClient = new UdpClient();
+                    //   listener.AllowNatTraversal(true);
+                    IPEndPoint ip = new IPEndPoint(this.address, 5010);
 
-                listener.Send(combinedBytes, combinedBytes.Length, ip);
-                //    myClient.Close();
+                    listener.Send(combinedBytes, combinedBytes.Length, ip);
+                    //    myClient.Close();
+                }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine("Exception Handling Message " + e.Message);
+                }
             }
-            catch (Exception e)
-            {
-
-                Console.WriteLine("Exception Handling Message " + e.Message);
-            }
-
-            //      Console.WriteLine("sent");
-
         }
 
         private void SendUpdateToGUI(int radio, bool secondary)
         {
             return; //TODO fix the string format?!
-            string str = String.Format("{\"radio\":{0}, \"secondary\": {1} }\r\n", radio,secondary ? "true" : "false");
-            byte[] bytes = Encoding.ASCII.GetBytes(str);
-            //multicast
-            try
-            {
+            //string str = String.Format("{\"radio\": {0} , \"secondary\": {1} }\r\n", radio, secondary ? "true" : "false");
+            //byte[] bytes = Encoding.ASCII.GetBytes(str);
+            ////multicast
+            //try
+            //{
 
-                UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35025);
+            //    UdpClient client = new UdpClient();
+            //    IPEndPoint ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35025);
 
-                client.Send(bytes, bytes.Length, ip);
-                client.Close();
-            }
-            catch (Exception e) { }
+            //    client.Send(bytes, bytes.Length, ip);
+            //    client.Close();
+            //}
+            //catch (Exception e) { }
 
         }
 

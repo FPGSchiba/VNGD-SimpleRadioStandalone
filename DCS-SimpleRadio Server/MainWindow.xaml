@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ciribob"
         mc:Ignorable="d"
-        Title="DCS-SimpleRadio Server" Height="290" Width="320">
+        ResizeMode="CanMinimize"
+        Title="DCS-SimpleRadio Server" Height="90" Width="240">
     <Grid>
-        <TextBox x:Name="clientsList" HorizontalAlignment="Left" Height="238" Margin="175,10,0,0" VerticalAlignment="Top" Width="129"/>
-        <Button x:Name="button" Content="Start Server" HorizontalAlignment="Left" Margin="50,10,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <Button x:Name="button" Content="Start Server" HorizontalAlignment="Left" Margin="18,18,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <Label x:Name="clientsLabel" Content="Clients:" HorizontalAlignment="Left" Margin="106,15,0,0" VerticalAlignment="Top" Width="55"/>
+        <Label x:Name="clientsCount" Content="0" HorizontalAlignment="Left" Margin="166,15,0,0" VerticalAlignment="Top" Width="35"/>
 
     </Grid>
 </Window>

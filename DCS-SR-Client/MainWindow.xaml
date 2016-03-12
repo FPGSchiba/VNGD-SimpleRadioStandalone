@@ -5,22 +5,91 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DCS_SR_Client"
         mc:Ignorable="d"
-        Title="DCS-SimpleRadio Client" Height="300" Width="220">
+        ResizeMode="CanMinimize"
+        Title="DCS-SimpleRadio Client" Height="300" Width="500">
 
-    <StackPanel Margin="10">
-        
-        <Label x:Name="micLabel" Content="Microphone" HorizontalAlignment="Center"/>
-        <ComboBox x:Name="mic" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
-        
-        <Label x:Name="speakerLabel" Content="Speakers" HorizontalAlignment="Center"/>
-        <ComboBox x:Name="speakers" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
-        
-        <Label x:Name="serverIpLabel" Content="Server IP" HorizontalAlignment="Center"/>
-        <TextBox x:Name="serverIp" Height="23" TextWrapping="Wrap" Text="127.0.0.1" Width="150" MaxLines="1"/>
-        <Button x:Name="startStop" Content="Connect" HorizontalAlignment="Center"  Width="75" Margin="0,10,0,0" Click="startStop_Click"/>
+    <TabControl>
+        <TabItem Header="General">
+            <StackPanel Margin="10">
+
+                <GroupBox x:Name="groupBox" Header="Setup">
+                    <StackPanel Margin="0">
+                        <Label x:Name="micLabel" Content="Microphone" HorizontalAlignment="Center"/>
+                        <ComboBox x:Name="mic" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
+
+                        <Label x:Name="speakerLabel" Content="Speakers" HorizontalAlignment="Center"/>
+                        <ComboBox x:Name="speakers" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
+
+                        <Label x:Name="serverIpLabel" Content="Server IP" HorizontalAlignment="Center"/>
+                        <TextBox x:Name="serverIp" Height="23" TextWrapping="Wrap" Text="127.0.0.1" Width="150" MaxLines="1"/>
+                        <Button x:Name="startStop" Content="Connect" HorizontalAlignment="Center"  Width="75" Margin="0,10,0,0" Click="startStop_Click"/>
+                    </StackPanel>
+                </GroupBox>
+              
+
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Controls" >
+            <GroupBox x:Name="controlsGroupBox" Header="Controls">
+                <Grid    >
+                    
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    
+                    
+
+                    <Label Grid.Column="1" Grid.Row="0"  x:Name="deviceLabel" Content="Device" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                    <Label Grid.Column="2" Grid.Row="0"  x:Name="buttonLabel" Content="Button" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+
+                    <Label Grid.Column="0" Grid.Row="1"  x:Name="ptt1TextLabe" Content="Select Radio 1" VerticalContentAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="1"  x:Name="ptt1Device" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"   />
+                    <TextBox Grid.Column="2" Grid.Row="1"  x:Name="ptt1Text" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"  />
+                    <Button Grid.Column="3" Grid.Row="1"  x:Name="ptt1Button" Content="Set "/>
+                    <Button  Grid.Column="4" Grid.Row="1" x:Name="ptt1ButtonClear" Content="Clear"/>
 
 
-    </StackPanel>
+                    <Label Grid.Column="0" Grid.Row="2"  x:Name="ptt2TextLabel" Content="Select Radio 2" VerticalContentAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="2"  x:Name="ptt2Device" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"   />
+                    <TextBox Grid.Column="2" Grid.Row="2"  x:Name="ptt2Text" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"  />
+                    <Button Grid.Column="3" Grid.Row="2"  x:Name="ptt2Button" Content="Set "/>
+                    <Button  Grid.Column="4" Grid.Row="2" x:Name="ptt2ButtonClear" Content="Clear"/>
 
+                    <Label Grid.Column="0" Grid.Row="3"  x:Name="ptt3TextLabel" Content="Select Radio 3" VerticalContentAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="3"  x:Name="ptt3Device" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"   />
+                    <TextBox Grid.Column="2" Grid.Row="3"  x:Name="ptt3Text" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"  />
+                    <Button Grid.Column="3" Grid.Row="3"  x:Name="ptt3Button" Content="Set "/>
+                    <Button  Grid.Column="4" Grid.Row="3" x:Name="ptt3ButtonClear" Content="Clear"/>
+
+                    <Label Grid.Column="0" Grid.Row="4"  x:Name="pttCommonLabel" Content="Common PTT" VerticalContentAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="4"  x:Name="pttCommonDevice" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"   />
+                    <TextBox Grid.Column="2" Grid.Row="4"  x:Name="pttCommonText" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="False"  Text="None"  />
+                    <Button Grid.Column="3" Grid.Row="4"  x:Name="pttCommonButton" Content="Set" Click="pttCommonButton_Click"/>
+                    <Button  Grid.Column="4" Grid.Row="4" x:Name="pttCommonClear" Content="Clear"/>
+
+
+
+                </Grid>
+            </GroupBox>
+        </TabItem>
+       
+    </TabControl>
+
+   
+    
+    
 
 </Window>

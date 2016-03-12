@@ -10,9 +10,9 @@ namespace RadioGui
     {
         public enum CmdType
         {
-            FREQUENCY=1,
-            VOLUME=2,
-            SELECT=3,
+            FREQUENCY = 1,
+            VOLUME = 2,
+            SELECT = 3,
             TOGGLE_MUTE_NON_RADIO = 4,
             TOGGLE_FORCE_RADIO_ON = 5
         }

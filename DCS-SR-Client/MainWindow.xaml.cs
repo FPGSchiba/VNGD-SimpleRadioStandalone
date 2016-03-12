@@ -18,6 +18,12 @@ using System.Net;
 using System.Threading.Tasks;
 using FragLabs.Audio.Codecs;
 using System.Threading;
+using NLog.Config;
+using NLog.Targets;
+using NLog;
+using System.ComponentModel;
+using SharpDX.DirectInput;
+using SharpDX.Multimedia;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -40,6 +46,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         String guid;
         UDPVoiceHandler voiceSender;
 
+        InputDeviceManager inputManager;
+
         System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient> clients = new System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient>();
 
         public MainWindow()
@@ -60,6 +68,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 speakers.SelectedIndex = 0;
 
             guid = Guid.NewGuid().ToString();
+            SetupLogging();
+            LoadInputSettings();
+
+            inputManager = new InputDeviceManager(this);
+
+                    
+
+        }
+
+       
+
+        private void SetupLogging()
+        {
+
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+
+            // Step 2. Create targets and add them to the configuration 
+            var consoleTarget = new ColoredConsoleTarget();
+            config.AddTarget("console", consoleTarget);
+
+            var fileTarget = new FileTarget();
+            config.AddTarget("file", fileTarget);
+
+            // Step 3. Set target properties 
+            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            fileTarget.FileName = "${basedir}/clientlog.txt";
+            fileTarget.Layout = "${message}";
+
+            // Step 4. Define rules
+            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+            config.LoggingRules.Add(rule1);
+
+            var rule2 = new LoggingRule("*", LogLevel.Debug, fileTarget);
+            config.LoggingRules.Add(rule2);
+
+            // Step 5. Activate the configuration
+            LogManager.Configuration = config;
+        }
+
+        void LoadInputSettings()
+        {
+            //TODO load input settings
         }
 
         void StartEncoding()
@@ -79,9 +130,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _waveIn.BufferMilliseconds = 20;
                 _waveIn.DeviceNumber = mic.SelectedIndex;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
+                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(48000, 16, 1);
 
-                _playBuffer = new BufferedWaveProvider(new WaveFormat(48000, 16, 1));
+                _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
                 _waveOut = new WaveOut();
                 _waveOut.DesiredLatency = 75; //50ms latency
@@ -109,6 +160,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
         byte[] _notEncodedBuffer = new byte[0];
+
+
         void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
             byte[] soundBuffer = new byte[e.BytesRecorded + _notEncodedBuffer.Length];
@@ -231,6 +284,39 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 stop();
             }
+
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            stop();
+
+        }
+
+        private void pttCommonButton_Click(object sender, RoutedEventArgs e)
+        {
+            pttCommonClear.IsEnabled = false;
+            pttCommonButton.IsEnabled = false;
+
+
+            inputManager.AssignButton((InputDevice device) =>
+            {
+                pttCommonClear.IsEnabled = true;
+                pttCommonButton.IsEnabled = true;
+
+                pttCommonDevice.Text = device.Device;
+                pttCommonText.Text = device.Button.ToString();
+               
+                Console.WriteLine(device.Button + " " + device.Device);
+
+                //inputManager.StartDetectPTT(device, (bool pressed) => {
+                //    Console.WriteLine("PTT: "+pressed);
+
+                //});
+
+            });
 
         }
     }

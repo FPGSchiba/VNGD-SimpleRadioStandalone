@@ -20,6 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     class ClientSync
     {
+        public delegate void ConnectCallback(Boolean result);
         private static Logger logger = LogManager.GetCurrentClassLogger();
         TcpClient tcpClient;
         ConnectCallback callback;
@@ -33,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             this.guid = guid;
         }
 
-        public delegate void ConnectCallback(Boolean result);
+        
 
         public void TryConnect(IPEndPoint endpoint, ConnectCallback callback)
         {
@@ -57,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                     if (tcpClient.Connected)
                     {
-                       
+
                         radioSync.Listen();
 
                         tcpClient.NoDelay = true;
@@ -68,7 +69,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 catch (SocketException ex)
                 {
-                    Console.WriteLine("Client Exception: "+ex.Message);
+              
+                    logger.Error(ex, "error connecting to server");
                 }
 
             }
@@ -121,17 +123,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 switch (lastRadioTransmit.MsgType)
                                 {
                                     case NetworkMessage.MessageType.RADIO_UPDATE:
-                                        Console.WriteLine("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
+                                        logger.Info("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
 
-                                        clients[lastRadioTransmit.ClientGuid] = new SRClient() { ClientGuid = lastRadioTransmit.ClientGuid,ClientRadios = lastRadioTransmit.ClientRadioUpdate, LastUpdate = System.Environment.TickCount };
-                                     
+                                        clients[lastRadioTransmit.ClientGuid] = new SRClient() { ClientGuid = lastRadioTransmit.ClientGuid, ClientRadios = lastRadioTransmit.ClientRadioUpdate, LastUpdate = System.Environment.TickCount };
+
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
-                                        Console.WriteLine("Recevied: " + NetworkMessage.MessageType.SYNC);
+                                        logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
-                                        if(lastRadioTransmit.Clients !=null)
+                                        if (lastRadioTransmit.Clients != null)
                                         {
-                                            foreach(var client in lastRadioTransmit.Clients)
+                                            foreach (var client in lastRadioTransmit.Clients)
                                             {
                                                 client.LastUpdate = System.Environment.TickCount;
                                                 clients[client.ClientGuid] = client;
@@ -140,113 +142,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                         break;
                                     default:
-                                        Console.WriteLine("Recevied unknown " + line);
-                                        break;
-                                }
-                            }
-                        } catch (Exception ex)
-                        {
-                            Console.WriteLine("Client Exception reading: " + ex.Message);
-                        }
-
-                        // do something with line
-
-                    }
-                }catch(Exception ex)
-                {
-                    Console.WriteLine("Client Exception reading Disconnecting: " + ex.Message);
-                }
-                }
-        }
-
-        /* private void ClientSyncLoop()
-        {
-            using (NetworkStream stream = tcpClient.GetStream())
-            {
-                //start the loop off by sending a SYNC Request
-                SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.SYNC, ClientRadioUpdate = new DCSRadios() });
-
-
-                byte[] buffer = new byte[1024];
-                int read;
-
-                StringBuilder strBuffer = new StringBuilder();
-                try
-                {
-
-
-                    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-
-                        strBuffer.Append(Encoding.ASCII.GetString(
-                           buffer, 0, read));
-                        if (read == buffer.Length && ((char)buffer[buffer.Length - 1]) != '\n')
-                        {
-                            //read more! back to the top
-                            continue;
-                        }
-
-                        try
-                        {
-                            NetworkMessage lastRadioTransmit = JsonConvert.DeserializeObject<NetworkMessage>(strBuffer.ToString());
-                            //TODO: test malformed JSON
-                            if (lastRadioTransmit != null)
-                            {
-                                switch (lastRadioTransmit.MsgType)
-                                {
-                                    case NetworkMessage.MessageType.RADIO_UPDATE:
-                                        Console.WriteLine("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
-                                        break;
-                                    case NetworkMessage.MessageType.SYNC:
-                                        Console.WriteLine("Recevied: " + NetworkMessage.MessageType.SYNC);
-                                        break;
-                                    default:
-                                        Console.WriteLine("Recevied unknown " + strBuffer.ToString());
+                                        logger.Warn("Recevied unknown " + line);
                                         break;
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Client Exception reading: " + ex.Message);
+                            logger.Error(ex, "Client exception reading from socket ");
+                       
                         }
 
-                        strBuffer.Clear();
+                        // do something with line
 
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Client Exception reading: " + ex.Message);
+                    logger.Error(ex, "Client exception reading - Disconnecting ");
+                  
                 }
-                /*
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-
-                    
-
-                    // do something with line
-
-                }
-                
-
-
             }
-        } */
+        }
+
+   
 
         private void SendToServer(NetworkMessage message)
         {
             try
             {
-                byte[] json = System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message)+"\n");
+                byte[] json = System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
-                tcpClient.GetStream().Write(json,0,json.Length);
+                tcpClient.GetStream().Write(json, 0, json.Length);
                 //Need to flush?
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error sending to server " + ex.Message);
+                logger.Error(ex, "Client exception sending so server");
+               
                 Disconnect();
             }
         }
@@ -256,14 +189,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                if(tcpClient!=null)
+                if (tcpClient != null)
                 {
-                   
+
                     tcpClient.Close(); // this'll stop the socket blocking
                 }
-                
-            }catch(Exception ex) { }
 
+            }
+            catch (Exception ex) { }
+
+            logger.Warn("Disconnecting from server");
 
             //CallOnMain(false);
         }

@@ -26,6 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public byte[] buffer = new byte[BufferSize];
         // Received data string.
         public StringBuilder sb = new StringBuilder();
+
+        public string guid = null;
     }
 
     class ServerSync
@@ -45,15 +47,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             this.clients = connectedClients;
         }
 
-        public  void StartListening()
+        public void StartListening()
         {
 
             IPAddress ipAddress = new IPAddress(0);
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 5002);
 
             // Create a TCP/IP socket.
-             listener = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
+            listener = new Socket(AddressFamily.InterNetwork,
+               SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.
             try
@@ -67,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    Console.WriteLine("Waiting for a connection...");
+                    logger.Info("Waiting for a connection...");
                     listener.BeginAccept(
                         new AsyncCallback(AcceptCallback),
                         listener);
@@ -79,86 +81,138 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception e)
             {
-                Console.WriteLine("Server Listen error "+ e.ToString());
+                logger.Error(e, "Server Listen error");
+
             }
         }
 
-        public  void AcceptCallback(IAsyncResult ar)
+        public void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.
             allDone.Set();
 
-            // Get the socket that handles the client request.
-            Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
-            handler.NoDelay = true;
+            try
+            {
+                // Get the socket that handles the client request.
+                Socket listener = (Socket)ar.AsyncState;
+                Socket handler = listener.EndAccept(ar);
+                handler.NoDelay = true;
 
-            // Create the state object.
-            StateObject state = new StateObject();
-            state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReadCallback), state);
+                // Create the state object.
+                StateObject state = new StateObject();
+                state.workSocket = handler;
+                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReadCallback), state);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error accepting socket");
+            }
+
+
         }
 
-        public  void ReadCallback(IAsyncResult ar)
+        public void HandleDisconnect(StateObject state)
         {
-            String content = String.Empty;
+            logger.Info("Disconnecting Client");
+
+            if (state != null && state.guid != null)
+            {
+                //removed
+                SRClient client;
+                clients.TryRemove(state.guid, out client);
+
+                logger.Info("Removed Client " + state.guid);
+
+            }
+
+            try
+            {
+                state.workSocket.Close();
+            }
+            catch (Exception ex)
+            {
+                logger.Info(ex, "Exception closing socket after disconnect");
+            }
+
+        }
+
+        public void ReadCallback(IAsyncResult ar)
+        {
 
             // Retrieve the state object and the handler socket
             // from the asynchronous state object.
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
-         
-            // Read data from the client socket. 
-            int bytesRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0)
+            try
             {
-                // There  might be more data, so store the data received so far.
-                state.sb.Append(Encoding.ASCII.GetString(
-                    state.buffer, 0, bytesRead));
 
-                content = state.sb.ToString();
-                if (content.EndsWith("\n"))
+
+
+                // Read data from the client socket. 
+                int bytesRead = handler.EndReceive(ar);
+
+                if (bytesRead > 0)
                 {
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                       content.Length, content);
+                    // There  might be more data, so store the data received so far.
+                    state.sb.Append(Encoding.ASCII.GetString(
+                        state.buffer, 0, bytesRead));
 
-                    try
+                    String content = state.sb.ToString();
+                    if (content.EndsWith("\n"))
                     {
-                        NetworkMessage message = JsonConvert.DeserializeObject<NetworkMessage>(content);
+                        //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
+                        //   content.Length, content);
 
-                        HandleMessage(state,message);
+                        try
+                        {
+                            NetworkMessage message = JsonConvert.DeserializeObject<NetworkMessage>(content);
 
-                    }catch(Exception ex)
-                    {
-                        Console.WriteLine("Server - Client Exception reading: " + ex.Message);
+                            HandleMessage(state, message);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex, "Server - Client Exception reading");
+                         
+                        }
+
+                        //clear the state buffer
+                        state.sb.Clear();
+
+                        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                   new AsyncCallback(ReadCallback), state);
+
                     }
-
-                    //clear the state buffer
-                    state.sb.Clear();
-
-                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-               new AsyncCallback(ReadCallback), state);
-
+                    else
+                    {
+                        // Not all data received. Get more.
+                        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                        new AsyncCallback(ReadCallback), state);
+                    }
                 }
                 else
                 {
-                    // Not all data received. Get more.
-                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReadCallback), state);
+                    HandleDisconnect(state);
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error reading from socket. Disconnecting ");
+
+                HandleDisconnect(state);
             }
         }
 
-        public  void HandleMessage(StateObject state,NetworkMessage message)
+        public void HandleMessage(StateObject state, NetworkMessage message)
         {
             try
             {
                 var clientIp = (IPEndPoint)state.workSocket.RemoteEndPoint;
 
-                Console.WriteLine("Received From " + clientIp.Address + " " + clientIp.Port);
-                Console.WriteLine("Recevied: " + message.MsgType);
+                logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
+                logger.Info("Recevied: " + message.MsgType);
 
                 switch (message.MsgType)
                 {
@@ -171,18 +225,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         clients[message.ClientGuid] = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket };
 
+                        state.guid = message.ClientGuid;
+
                         HandleRadioSync(clientIp, state.workSocket, message);
 
                         break;
                     default:
-                        Console.WriteLine("Recevied unknown message type");
+                        logger.Warn("Recevied unknown message type");
                         break;
                 }
-                
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception Handling Message "+ex.Message);
+                logger.Error(ex, "Exception Handling Message " + ex.Message);
             }
         }
 
@@ -211,8 +267,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void HandleRadioSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
-            
-         
+
+
 
             NetworkMessage replyMessage = new NetworkMessage();
             replyMessage.MsgType = NetworkMessage.MessageType.SYNC;
@@ -234,17 +290,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 // Convert the string data to byte data using ASCII encoding.
                 byte[] byteData = System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
-            // Begin sending the data to the remote device.
-            handler.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), handler);
+                // Begin sending the data to the remote device.
+                handler.BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(SendCallback), handler);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception Sending Message " + ex.Message);
+                logger.Error(ex, "Exception Sending Message " + ex.Message);
             }
         }
 
-        private static  void SendCallback(IAsyncResult ar)
+        private static void SendCallback(IAsyncResult ar)
         {
             try
             {
@@ -253,15 +309,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 // Complete sending the data to the remote device.
                 int bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.", bytesSent);
+                //  Console.WriteLine("Sent {0} bytes to client.", bytesSent);
 
-          //      handler.Shutdown(SocketShutdown.Both);
-           //     handler.Close();
+                //      handler.Shutdown(SocketShutdown.Both);
+                //     handler.Close();
 
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception SendCallback "+e.ToString());
+                logger.Error(e, "Exception SendCallback ");
             }
         }
 
@@ -269,12 +325,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             try
             {
+
+
                 listener.Close();
+
+                clients.Clear();
 
             }
             catch (Exception ex) { }
         }
 
-       
+
     }
 }

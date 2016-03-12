@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
-    public class RadioInformation 
+    public class RadioInformation
     {
         public string name = "";
         public double frequency = 1;
@@ -64,7 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         // override object.Equals
         public override bool Equals(object compare)
         {
-       
+
             if (compare == null || GetType() != compare.GetType())
             {
                 return false;
@@ -97,10 +97,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 return false;
             }
 
+            for(int i =0;i<3;i++)
+            {
+                RadioInformation radio1 = this.radios[i];
+                RadioInformation radio2 = compareRadio.radios[i];
+
+                if(radio1!=null && radio2 !=null)
+                {
+                    if(!radio1.Equals(radio2))
+                    {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         }
 
-      
+
         public bool isCurrent()
         {
             return this.lastUpdate > (System.Environment.TickCount - 10000);

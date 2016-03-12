@@ -1,5 +1,6 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     class RadioSyncServer
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private UdpClient listener;
         private volatile bool _stop = false;
 
@@ -89,8 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         }
                         catch (Exception e)
                         {
-
-                            Console.WriteLine("Exception Handling DCS  Message " + e.Message);
+                            logger.Error(e, "Exception Handling DCS  Message");
+                          
                         }
                     }
 
@@ -100,7 +103,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception stoping DCS listener " + e.Message);
+                        logger.Error(e, "Exception stoping DCS listener ");
+                      
                     }
 
                 }
