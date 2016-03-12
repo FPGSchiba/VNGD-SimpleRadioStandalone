@@ -93,6 +93,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />
     <Compile Include="InputDeviceManager.cs" />
     <Compile Include="RadioSyncServer.cs" />

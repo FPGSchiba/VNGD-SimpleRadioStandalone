@@ -21,8 +21,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private volatile bool detectPTT = false;
 
+        public InputConfiguration InputConfig { get; set; }
+
         public InputDeviceManager(Window window)
         {
+            InputConfig = new InputConfiguration();
             directInput = new DirectInput();
             var deviceInstances = directInput.GetDevices();
 
@@ -146,58 +149,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
 
-                    callback(new InputDevice() { Device = device, Button = button, InstanceGUID = deviceGuid });
+                    callback(new InputDevice() { DeviceName = device, Button = button, InstanceGUID = deviceGuid });
 
                 }));
             });
         }
 
-        public void StartDetectPTT(InputDevice device, DetectPTTCallback callback)
+        public void StartDetectPTT(DetectPTTCallback callback)
         {
             detectPTT = true;
             //detect the state of all current buttons
             Task.Run(() =>
             {
-                for (int i = 0; i < this.inputDevices.Count; i++)
+                while (detectPTT)
                 {
+                    InputDevice device = InputConfig.PTTCommon;
 
-                    if (this.inputDevices[i].Information.InstanceGuid.Equals(device.InstanceGUID))
+                    if (device != null)
                     {
-                        if (this.inputDevices[i] is Joystick)
+                        for (int i = 0; i < this.inputDevices.Count; i++)
                         {
 
-                            while (detectPTT)
+                            if (this.inputDevices[i].Information.InstanceGuid.Equals(device.InstanceGUID))
                             {
-                                Thread.Sleep(100);
-                                this.inputDevices[i].Poll();
-                                var state = (this.inputDevices[i] as Joystick).GetCurrentState();
+                                if (this.inputDevices[i] is Joystick)
+                                {
+                                    this.inputDevices[i].Poll();
+                                    var state = (this.inputDevices[i] as Joystick).GetCurrentState();
 
-                                callback(state.Buttons[device.Button]);
+                                    callback(state.Buttons[device.Button]);
+                                    break;
+                                }
+                                else if (this.inputDevices[i] is Keyboard)
+                                {
+                                    this.inputDevices[i].Poll();
+                                    var state = (this.inputDevices[i] as Keyboard).GetCurrentState();
 
-                            }
-
-                        }
-                        else if (this.inputDevices[i] is Keyboard)
-                        {
-                            while (detectPTT)
-                            {
-
-                                Thread.Sleep(100);
-                                this.inputDevices[i].Poll();
-                                var state = (this.inputDevices[i] as Keyboard).GetCurrentState();
-
-                                callback(state.IsPressed(state.AllKeys[device.Button]));
+                                    callback(state.IsPressed(state.AllKeys[device.Button]));
+                                    break;
+                                }
+                           
                             }
                         }
-
-
-                        return;
                     }
+
+                    Thread.Sleep(100);
                 }
 
             });
         }
-        private void StopPTT()
+        public void StopPTT()
         {
             detectPTT = false;
         }

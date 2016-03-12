@@ -69,11 +69,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             guid = Guid.NewGuid().ToString();
             SetupLogging();
-            LoadInputSettings();
+           
 
             inputManager = new InputDeviceManager(this);
+            LoadInputSettings();
 
-                    
+
+
 
         }
 
@@ -95,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Step 3. Set target properties 
             consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
             fileTarget.FileName = "${basedir}/clientlog.txt";
-            fileTarget.Layout = "${message}";
+            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
             // Step 4. Define rules
             var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
@@ -111,6 +113,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         void LoadInputSettings()
         {
             //TODO load input settings
+
+            if(inputManager.InputConfig.PTTCommon !=null)
+            {
+                pttCommonText.Text = inputManager.InputConfig.PTTCommon.Button.ToString();
+                pttCommonDevice.Text = inputManager.InputConfig.PTTCommon.DeviceName;
+            }
+           
         }
 
         void StartEncoding()
@@ -120,14 +129,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _stop = false;
 
-                _segmentFrames = 960 / 4;
+                _segmentFrames = 960 / 2;
                 _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
                 _decoder = OpusDecoder.Create(24000, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 20;
+                _waveIn.BufferMilliseconds = 50;
                 _waveIn.DeviceNumber = mic.SelectedIndex;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(48000, 16, 1);
@@ -141,7 +150,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _waveOut.Play();
 
-                voiceSender = new UDPVoiceHandler(clients, guid, ipAddr, _decoder, _playBuffer);
+                voiceSender = new UDPVoiceHandler(clients, guid, ipAddr, _decoder, _playBuffer, inputManager);
                 Thread voiceSenderThread = new Thread(voiceSender.Listen);
 
                 voiceSenderThread.Start();
@@ -274,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 if (_stop)
                 {
-                    startStop.Content = "Stop";
+                    startStop.Content = "Disconnect";
                     StartEncoding();
                     _stop = false;
                 }
@@ -306,10 +315,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 pttCommonClear.IsEnabled = true;
                 pttCommonButton.IsEnabled = true;
 
-                pttCommonDevice.Text = device.Device;
+                pttCommonDevice.Text = device.DeviceName;
                 pttCommonText.Text = device.Button.ToString();
+
+                inputManager.InputConfig.PTTCommon = device;
+                inputManager.InputConfig.WriteInputRegistry("common", device);
                
-                Console.WriteLine(device.Button + " " + device.Device);
+            //    Console.WriteLine(device.Button + " " + device.Device);
 
                 //inputManager.StartDetectPTT(device, (bool pressed) => {
                 //    Console.WriteLine("PTT: "+pressed);

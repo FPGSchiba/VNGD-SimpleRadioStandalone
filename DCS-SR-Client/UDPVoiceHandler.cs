@@ -26,8 +26,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private OpusDecoder _decoder;
         private BufferedWaveProvider _playBuffer;
         private string guid;
+        private InputDeviceManager inputManager;
 
-        public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, OpusDecoder _decoder, BufferedWaveProvider _playBuffer)
+        private volatile bool ptt = false;
+
+        public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, OpusDecoder _decoder, BufferedWaveProvider _playBuffer, InputDeviceManager inputManager)
         {
             this._decoder = _decoder;
             this._playBuffer = _playBuffer;
@@ -37,12 +40,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             this.guid = guid;
             this.address = address;
+
+            this.inputManager = inputManager;
         }
+
+      
 
         public void Listen()
         {
             listener = new UdpClient();
             listener.AllowNatTraversal(true);
+
+            //open ports by sending
+            try
+            {
+                IPEndPoint ip = new IPEndPoint(this.address, 5010);
+
+                byte[] bytes = new byte[5];
+              
+                listener.Send(bytes, 5, ip);
+            }
+            catch (Exception ex) { }
+            
+
+            this.inputManager.StartDetectPTT((bool pressed) =>
+            {
+                ptt = pressed;
+            });
 
             while (!stop)
             {
@@ -81,6 +105,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 listener.Close();
             }
             catch (Exception e) { }
+
+            inputManager.StopPTT();
         }
 
         private SRClient IsClientMetaDataValid(string clientGuid)
@@ -199,33 +225,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //TODO only send when transmit is pressed
             //TODO only send when a radio is actually selected!
 
-            SRClient myClient = IsClientMetaDataValid(guid);
-
-            if (myClient != null && !stop)
+            if (ptt)
             {
+                SRClient myClient = IsClientMetaDataValid(guid);
 
-                try
+                if (myClient != null && !stop)
                 {
 
-                    //append guid
+                    try
+                    {
 
-                    byte[] combinedBytes = new byte[len + 36];
-                    System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len);
-                    System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len, 36);
+                        //append guid
+
+                        byte[] combinedBytes = new byte[len + 36];
+                        System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len);
+                        System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len, 36);
 
 
 
-                    //   UdpClient myClient = new UdpClient();
-                    //   listener.AllowNatTraversal(true);
-                    IPEndPoint ip = new IPEndPoint(this.address, 5010);
+                        //   UdpClient myClient = new UdpClient();
+                        //   listener.AllowNatTraversal(true);
+                        IPEndPoint ip = new IPEndPoint(this.address, 5010);
 
-                    listener.Send(combinedBytes, combinedBytes.Length, ip);
-                    //    myClient.Close();
-                }
-                catch (Exception e)
-                {
+                        listener.Send(combinedBytes, combinedBytes.Length, ip);
+                        //    myClient.Close();
+                    }
+                    catch (Exception e)
+                    {
 
-                    Console.WriteLine("Exception Handling Message " + e.Message);
+                        Console.WriteLine("Exception Handling Message " + e.Message);
+                    }
                 }
             }
         }

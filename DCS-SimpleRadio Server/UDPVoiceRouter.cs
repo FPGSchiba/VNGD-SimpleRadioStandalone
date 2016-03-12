@@ -20,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private static Logger logger = LogManager.GetCurrentClassLogger();
         UdpClient listener;
 
-        ConcurrentDictionary<String, IPEndPoint> udpClients = new ConcurrentDictionary<String, IPEndPoint>();
+    //    ConcurrentDictionary<String, IPEndPoint> udpClients = new ConcurrentDictionary<String, IPEndPoint>();
 
         private volatile bool stop;
         private ConcurrentDictionary<String, SRClient> clientsList;
@@ -51,13 +51,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                     if (clientsList.ContainsKey(guid))
                     {
-                        udpClients[guid] = groupEP;
-                        SendToOthers(rawBytes, groupEP);
+                        clientsList[guid].voipPort = groupEP;
+                      
+                        SendToOthers(rawBytes, guid);
                     }
                     else
                     {
-                        IPEndPoint port;
-                        udpClients.TryRemove(guid, out port);
+                       
                       //  logger.Info("Removing  "+guid+" From UDP pool");
                     }
                   
@@ -84,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         }
 
 
-        private void SendToOthers(byte[] bytes, IPEndPoint ignoreEndpoint)
+        private void SendToOthers(byte[] bytes, String guid)
         {
 
 
@@ -94,21 +94,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             //          //Update UI here
             //      }));
 
-            foreach (var client in udpClients)
+            foreach (var client in clientsList)
             {
                 try
                 {
-                    if (!client.Key.Equals(ignoreEndpoint))
+                    if (!client.Key.Equals(guid))
                     {
-                        IPEndPoint ip = client.Value;
-                        listener.Send(bytes, bytes.Length, ip);
+                        IPEndPoint ip = client.Value.voipPort;
+
+                        if(ip != null)
+                        {
+                            listener.Send(bytes, bytes.Length, ip);
+                        }
+                        
                     }
                     else
                     {
-                        //DEBUG@
-                        IPEndPoint ip = client.Value;
-                        listener.Send(bytes, bytes.Length, ip);
 
+                        IPEndPoint ip = client.Value.voipPort;
+
+                        if (ip != null)
+                        {
+                            listener.Send(bytes, bytes.Length, ip);
+                        }
                     }
                 }
                 catch (Exception e)
