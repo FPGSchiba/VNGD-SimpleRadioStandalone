@@ -65,6 +65,7 @@
     </ApplicationDefinition>
     <Compile Include="UDPVoiceRouter.cs" />
     <Compile Include="ServerSync.cs" />
+    <Compile Include="UDPVoiceRouterv2.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
