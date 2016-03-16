@@ -93,6 +93,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ClientAudio.cs" />
+    <Compile Include="DejitterBuffer.cs" />
     <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />
     <Compile Include="InputDeviceManager.cs" />

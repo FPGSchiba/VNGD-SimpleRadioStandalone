@@ -129,14 +129,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _stop = false;
 
-                _segmentFrames = 960 / 2;
+                _segmentFrames = 960; //960 frames is 20 ms of audio
                 _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
                 _decoder = OpusDecoder.Create(24000, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 50;
+                _waveIn.BufferMilliseconds = 20;
                 _waveIn.DeviceNumber = mic.SelectedIndex;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(48000, 16, 1);
@@ -144,7 +144,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
                 _waveOut = new WaveOut();
-                _waveOut.DesiredLatency = 75; //50ms latency
+                _waveOut.DesiredLatency = 75; //75ms latency in output buffer
                 _waveOut.DeviceNumber = speakers.SelectedIndex;
                 _waveOut.Init(_playBuffer);
 
