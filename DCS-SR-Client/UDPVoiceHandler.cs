@@ -40,7 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private DejitterBuffer jitter = new DejitterBuffer();
 
-        private Object _bufferLock = new Object();
+        //private Object _bufferLock = new Object();
+        private static readonly Object _bufferLock = new Object();
 
 
         public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, OpusDecoder _decoder, BufferedWaveProvider _playBuffer, InputDeviceManager inputManager)
@@ -99,6 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                     if (bytes != null && bytes.Length > 0)
                     {
+
                         encodedAudio.Add(bytes);
 
 
@@ -157,7 +159,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                        encodedAudio.TryTake(out encodedOpusAudio, 100000, stopFlag.Token);
                   //  encodedOpusAudio = encodedAudio.Take();
 
-                   if(encodedOpusAudio!=null && encodedOpusAudio.Length > 0)
+                    long time = GetTickCount64(); //should add at the receive instead
+
+                    if (encodedOpusAudio!=null && encodedOpusAudio.Length > 0)
                     { 
                     //  process
                     // check if we should play audio
@@ -182,13 +186,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     //- 36 so we ignore the UUID
                                     byte[] decoded = _decoder.Decode(encodedOpusAudio, encodedOpusAudio.Length - 36, out len);
 
+                                
+                                
+                                  
+
                                     if (len > 0)
                                     {
+                                        byte[] tmp = new byte[len];
+                                        Array.Copy(decoded, tmp, len);
+
                                         //ALL GOOD!
                                         //create marker for bytes
                                         ClientAudio audio = new ClientAudio();
                                         audio.ClientGUID = recievingGuid;
-                                        audio.PCMAudio = decoded;
+                                        audio.PCMAudio = tmp;
                                         audio.ReceiveTime = GetTickCount64();
 
                                         lock (jitter)
@@ -209,6 +220,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         }
 
+    
+
         private void PlayAudio()
         {
             while (!stop)
@@ -220,7 +233,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         byte[] mixDown = jitter.MixDown();
 
-                        _playBuffer.AddSamples(mixDown, 0, mixDown.Length);
+                        if(mixDown!=null)
+                        {
+                            _playBuffer.DiscardOnBufferOverflow = true;
+                            _playBuffer.AddSamples(mixDown, 0, mixDown.Length);
+                        }
+                       
                     }
                 }
             }
