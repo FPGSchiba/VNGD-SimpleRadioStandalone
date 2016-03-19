@@ -39,7 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private CancellationTokenSource stopFlag = new CancellationTokenSource();
 
         private DejitterBuffer jitter = new DejitterBuffer();
-        ;
+        
         private static readonly Object _bufferLock = new Object();
 
 
