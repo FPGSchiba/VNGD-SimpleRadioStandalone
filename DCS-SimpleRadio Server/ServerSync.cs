@@ -41,10 +41,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         ConcurrentDictionary<String, SRClient> clients = new ConcurrentDictionary<String, SRClient>();
 
+        SRClient[] clientIndexList;
+        int clientIndexCount = 0;
 
-        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients)
+        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients, SRClient[] clientIndexList)
         {
             this.clients = connectedClients;
+            this.clientIndexList = clientIndexList;
+         //   this.clientIndexList.Capacity = 100000;
         }
 
         public void StartListening()
@@ -122,7 +126,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 SRClient client;
                 clients.TryRemove(state.guid, out client);
 
-                logger.Info("Removed Client " + state.guid);
+                if (client!=null)
+                {
+                    clientIndexList[client.ClientId] = null;
+                    logger.Info("Removed Client " + state.guid);
+                }
+
+              
 
             }
 
@@ -223,7 +233,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
-                        clients[message.ClientGuid] = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket };
+             
+                        int index = Interlocked.Increment(ref clientIndexCount);
+
+                        SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket, ClientId=index };
+
+                        //add to fast lsit
+                        clientIndexList[srClient.ClientId] = srClient;
+
+                        //add to proper list
+                        clients[message.ClientGuid] = srClient;
 
                         state.guid = message.ClientGuid;
 
@@ -244,23 +263,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void HandleRadioUpdate(NetworkMessage message)
         {
-            var client = clients[message.ClientGuid];
-
-            if (client != null)
+            if(clients.ContainsKey(message.ClientGuid))
             {
-                client.ClientRadios = message.ClientRadioUpdate;
-            }
+                var client = clients[message.ClientGuid];
 
-            //send update to everyone
+                if (client != null)
+                {
+                    client.ClientRadios = message.ClientRadioUpdate;
+                    //send update to everyone
 
-            NetworkMessage replyMessage = new NetworkMessage();
-            replyMessage.MsgType = NetworkMessage.MessageType.RADIO_UPDATE;
-            replyMessage.ClientGuid = client.ClientGuid;
-            replyMessage.ClientRadioUpdate = message.ClientRadioUpdate;
+                    NetworkMessage replyMessage = new NetworkMessage();
+                    replyMessage.MsgType = NetworkMessage.MessageType.RADIO_UPDATE;
+                    replyMessage.ClientGuid = client.ClientGuid;
+                    replyMessage.ClientRadioUpdate = message.ClientRadioUpdate;
 
-            foreach (var clientToSent in this.clients)
-            {
-                Send(clientToSent.Value.ClientSocket, replyMessage);
+                    foreach (var clientToSent in this.clients)
+                    {
+                        Send(clientToSent.Value.ClientSocket, replyMessage);
+                    }
+                }
             }
         }
 

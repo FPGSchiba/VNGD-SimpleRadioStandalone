@@ -32,15 +32,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private string guid;
         private InputDeviceManager inputManager;
 
-        private volatile bool ptt = true;
+        private volatile bool ptt = false;
 
         BlockingCollection<byte[]> encodedAudio = new BlockingCollection<byte[]>();
 
         private CancellationTokenSource stopFlag = new CancellationTokenSource();
 
         private DejitterBuffer jitter = new DejitterBuffer();
-
-        //private Object _bufferLock = new Object();
+        ;
         private static readonly Object _bufferLock = new Object();
 
 
@@ -58,8 +57,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             this.inputManager = inputManager;
         }
 
-
-
         public void Listen()
         {
             listener = new UdpClient();
@@ -73,12 +70,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             Thread audioThread = new Thread(PlayAudio);
             audioThread.Start();
 
+            //send to open ports
             try
             {
                 IPEndPoint ip = new IPEndPoint(this.address, 5010);
-
                 byte[] bytes = new byte[5];
-
                 listener.Send(bytes, 5, ip);
             }
             catch (Exception ex) { }
@@ -100,10 +96,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                     if (bytes != null && bytes.Length > 0)
                     {
-
                         encodedAudio.Add(bytes);
-
-
                     }
 
                 }
@@ -185,10 +178,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     int len;
                                     //- 36 so we ignore the UUID
                                     byte[] decoded = _decoder.Decode(encodedOpusAudio, encodedOpusAudio.Length - 36, out len);
-
-                                
-                                
-                                  
 
                                     if (len > 0)
                                     {
@@ -299,11 +288,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void Send(byte[] bytes, int len)
         {
-            //TODO only send when transmit is pressed
-            //TODO only send when a radio is actually selected!
+         
 
-            //if (ptt)
-            //{
+            if (ptt)
+            {
             //    SRClient myClient = IsClientMetaDataValid(guid);
 
             //    if (myClient != null && !stop)
@@ -333,7 +321,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Console.WriteLine("Exception Handling Message " + e.Message);
             }
             //    }
-            //}
+           }
         }
 
         private void SendUpdateToGUI(int radio, bool secondary)

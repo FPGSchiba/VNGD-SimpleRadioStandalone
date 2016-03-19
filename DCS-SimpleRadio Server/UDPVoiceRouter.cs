@@ -24,18 +24,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private volatile bool stop;
         private ConcurrentDictionary<String, SRClient> clientsList;
+        private SRClient[] clientListLookup;
 
-        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList)
+        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList, SRClient[] clientListLookup)
         {
             this.clientsList = clientsList;
+            this.clientListLookup = clientListLookup;
         }
+
+    
 
         public void Listen()
         {
 
             listener = new UdpClient();
             listener.AllowNatTraversal(true);
-            listener.ExclusiveAddressUse = false;
+            listener.ExclusiveAddressUse = true;
             listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
             while (!stop)
             {
@@ -43,23 +47,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                   
                     IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
-                    byte[] rawBytes = listener.Receive(ref groupEP);
+                     byte[] rawBytes = listener.Receive(ref groupEP);
 
-                    //last 36 bytes are guid!
-                    String guid = Encoding.ASCII.GetString(
-                    rawBytes, rawBytes.Length - 36, 36);
+                    Task.Run(() => {
 
-                    if (clientsList.ContainsKey(guid))
-                    {
-                        clientsList[guid].voipPort = groupEP;
-                      
-                        SendToOthers(rawBytes, guid);
-                    }
-                    else
-                    {
-                       
-                      //  logger.Info("Removing  "+guid+" From UDP pool");
-                    }
+                        //last 36 bytes are guid!
+                        String guid = Encoding.ASCII.GetString(
+                        rawBytes, rawBytes.Length - 36, 36);
+
+                        if (clientsList.ContainsKey(guid))
+                        {
+                            clientsList[guid].voipPort = groupEP;
+
+                            SendToOthers(rawBytes, guid);
+                        }
+                        else
+                        {
+
+                            //  logger.Info("Removing  "+guid+" From UDP pool");
+                        }
+                    });
+
                   
                 }
                 catch (Exception e) {
@@ -115,7 +123,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                            listener.Send(bytes, bytes.Length, ip);
+                         //   listener.Send(bytes, bytes.Length, ip);
+                      //      listener.Send(bytes, bytes.Length, ip);
                         }
                     }
                 }

@@ -125,7 +125,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     case NetworkMessage.MessageType.RADIO_UPDATE:
                                         logger.Info("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
 
-                                        clients[lastRadioTransmit.ClientGuid] = new SRClient() { ClientGuid = lastRadioTransmit.ClientGuid, ClientRadios = lastRadioTransmit.ClientRadioUpdate, LastUpdate = System.Environment.TickCount };
+                                        if(clients.ContainsKey(lastRadioTransmit.ClientGuid))
+                                        {
+                                            SRClient srClient = clients[lastRadioTransmit.ClientGuid];
+                                            srClient.ClientRadios = lastRadioTransmit.ClientRadioUpdate;
+                                            srClient.LastUpdate = System.Environment.TickCount;
+                                          
+                                        }
+
+
+                                  
 
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
@@ -136,6 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             foreach (var client in lastRadioTransmit.Clients)
                                             {
                                                 client.LastUpdate = System.Environment.TickCount;
+                                                
                                                 clients[client.ClientGuid] = client;
                                             }
                                         }
