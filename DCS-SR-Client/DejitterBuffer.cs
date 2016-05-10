@@ -161,13 +161,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 clientBuffers.Clear();
                 return mixDownByteArray;
-
-
             }
             else if(clientBuffers.Count() == 1)
             {
+               
+                var res =  clientBuffers.Values.First().ToArray();
                 clientBuffers.Clear();
-                return clientBuffers.Values.First().ToArray();
+                return res;
             }
 
             return new byte[0];

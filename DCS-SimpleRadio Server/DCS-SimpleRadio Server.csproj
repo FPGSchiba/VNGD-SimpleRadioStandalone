@@ -63,7 +63,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="UDPHeliosServer.cs" />
     <Compile Include="UDPVoiceRouter.cs" />
     <Compile Include="ServerSync.cs" />
     <Compile Include="UDPVoiceRouterv2.cs" />

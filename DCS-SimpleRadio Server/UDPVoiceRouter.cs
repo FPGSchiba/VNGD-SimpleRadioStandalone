@@ -41,6 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             listener.AllowNatTraversal(true);
             listener.ExclusiveAddressUse = true;
             listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
+            startPing();
             while (!stop)
             {
                 try
@@ -48,25 +49,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                   
                     IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
                      byte[] rawBytes = listener.Receive(ref groupEP);
+                    if (rawBytes.Length > 36)
+                    {
 
-                    Task.Run(() => {
 
-                        //last 36 bytes are guid!
-                        String guid = Encoding.ASCII.GetString(
-                        rawBytes, rawBytes.Length - 36, 36);
-
-                        if (clientsList.ContainsKey(guid))
-                        {
-                            clientsList[guid].voipPort = groupEP;
-
-                            SendToOthers(rawBytes, guid);
-                        }
-                        else
+                        Task.Run(() =>
                         {
 
-                            //  logger.Info("Removing  "+guid+" From UDP pool");
-                        }
-                    });
+                            //last 36 bytes are guid!
+                            String guid = Encoding.ASCII.GetString(
+                            rawBytes, rawBytes.Length - 36, 36);
+
+                            if (clientsList.ContainsKey(guid))
+                            {
+                                clientsList[guid].voipPort = groupEP;
+
+                                SendToOthers(rawBytes, guid);
+                            }
+                            else
+                            {
+
+                                //  logger.Info("Removing  "+guid+" From UDP pool");
+                            }
+                        });
+                    }
 
                   
                 }
@@ -89,6 +95,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 listener.Close();
             }
             catch (Exception e) { }
+        }
+
+        private void startPing()
+        {
+            Task.Run(() =>
+            {
+                byte[] message = { 1, 2, 3, 4, 5 };
+                while (!stop)
+                {
+
+                    logger.Info("Pinging Clients");
+                    try
+                    {
+                        foreach (var client in clientsList)
+                        {
+                            try
+                            {
+
+                                IPEndPoint ip = client.Value.voipPort;
+
+                                if (ip != null)
+                                {
+                                    listener.Send(message, message.Length, ip);
+                                    //      listener.Send(bytes, bytes.Length, ip);
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                //      IPEndPoint ip = client.Value;
+                                //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
+                                //  udpClients.TryRemove(guid, out port);
+
+
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        //      IPEndPoint ip = client.Value;
+                        //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
+                        //  udpClients.TryRemove(guid, out port);
+
+
+                    }
+
+                    Thread.Sleep(10 * 1000);
+                    
+                }
+            });
         }
 
 
@@ -123,7 +179,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                         //   listener.Send(bytes, bytes.Length, ip);
+                      //      listener.Send(bytes, bytes.Length, ip);
                       //      listener.Send(bytes, bytes.Length, ip);
                         }
                     }
@@ -138,10 +194,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 }
             }
 
-            //  listener.Close();
-
-
-
+            //  listener.Close()
             //    Console.WriteLine("sent");
         }
     }

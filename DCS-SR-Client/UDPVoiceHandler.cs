@@ -85,6 +85,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 ptt = pressed;
             });
 
+            startPing();
+
             while (!stop)
             {
                 try
@@ -94,7 +96,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                     byte[] bytes = listener.Receive(ref groupEP);
 
-                    if (bytes != null && bytes.Length > 0)
+                    if (bytes != null && bytes.Length > 36)
                     {
                         encodedAudio.Add(bytes);
                     }
@@ -323,6 +325,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //    }
            }
         }
+
+        private void startPing()
+        {
+            Task.Run(() =>
+            {
+                byte[] message = { 1, 2, 3, 4, 5 };
+                while (!stop)
+                {
+                    logger.Info("Pinging Server");
+                    try
+                    {
+                        Send(message, message.Length);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
+                    Thread.Sleep(10 * 1000);
+                }
+            });
+        }
+
 
         private void SendUpdateToGUI(int radio, bool secondary)
         {
