@@ -27,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         IPEndPoint serverEndpoint;
         String guid;
         private ConcurrentDictionary<string, SRClient> clients;
+        int clientId = 0;
 
         public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid)
         {
@@ -99,6 +100,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void ClientSyncLoop()
         {
+            //clear the clietns list
+            clients.Clear();
+            clientId = 0; //used to index stream readers
+
             using (StreamReader reader = new StreamReader(tcpClient.GetStream(), Encoding.UTF8))
             {
 
@@ -125,8 +130,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     case NetworkMessage.MessageType.RADIO_UPDATE:
                                         logger.Info("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
 
-                                        clients[lastRadioTransmit.ClientGuid] = new SRClient() { ClientGuid = lastRadioTransmit.ClientGuid, ClientRadios = lastRadioTransmit.ClientRadioUpdate, LastUpdate = System.Environment.TickCount };
-
+                                        if(clients.ContainsKey(lastRadioTransmit.ClientGuid))
+                                        {
+                                            SRClient srClient = clients[lastRadioTransmit.ClientGuid];
+                                            srClient.ClientRadios = lastRadioTransmit.ClientRadioUpdate;
+                                            srClient.LastUpdate = System.Environment.TickCount;
+                                          
+                                        }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
                                         logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
@@ -163,6 +173,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                   
                 }
             }
+            //clear the clietns list
+            clients.Clear();
         }
 
    

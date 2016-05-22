@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    class InputDeviceManager : IDisposable
+    public class InputDeviceManager : IDisposable
     {
         private DirectInput directInput;
         List<Device> inputDevices = new List<Device>();

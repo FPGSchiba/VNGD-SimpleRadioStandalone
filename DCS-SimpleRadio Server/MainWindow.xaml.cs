@@ -34,6 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         UDPVoiceRouter serverListener;
 
         ConcurrentDictionary<String, SRClient> connectedClients = new ConcurrentDictionary<string, SRClient>();
+        SRClient[] clientList = new SRClient[1024 * 1024];
         private ServerSync serverSync;
 
         volatile bool stop = false;
@@ -117,12 +118,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
 
                 button.Content = "Stop Server";
-                serverListener = new UDPVoiceRouter(connectedClients);
+                serverListener = new UDPVoiceRouter(connectedClients, clientList);
                 Thread listenerThread = new Thread(serverListener.Listen);
                 listenerThread.Start();
 
 
-                serverSync = new ServerSync(connectedClients);
+                serverSync = new ServerSync(connectedClients, clientList);
                 Thread serverSyncThread = new Thread(serverSync.StartListening);
                 serverSyncThread.Start();
             }
