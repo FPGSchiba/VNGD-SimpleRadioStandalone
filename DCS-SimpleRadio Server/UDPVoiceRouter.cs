@@ -20,8 +20,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private static Logger logger = LogManager.GetCurrentClassLogger();
         UdpClient listener;
 
-    //    ConcurrentDictionary<String, IPEndPoint> udpClients = new ConcurrentDictionary<String, IPEndPoint>();
-
         private volatile bool stop;
         private ConcurrentDictionary<String, SRClient> clientsList;
         private SRClient[] clientListLookup;
@@ -31,8 +29,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             this.clientsList = clientsList;
             this.clientListLookup = clientListLookup;
         }
-
-    
 
         public void Listen()
         {
@@ -51,8 +47,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                      byte[] rawBytes = listener.Receive(ref groupEP);
                     if (rawBytes.Length > 36)
                     {
-
-
                         Task.Run(() =>
                         {
 
@@ -68,13 +62,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             }
                             else
                             {
-
+                                SRClient value;
+                                clientsList.TryRemove(guid, out value);
                                 //  logger.Info("Removing  "+guid+" From UDP pool");
                             }
                         });
                     }
-
-                  
                 }
                 catch (Exception e) {
                   //  logger.Error(e,"Error receving audio UDP for client " + e.Message);
@@ -127,17 +120,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 //      IPEndPoint ip = client.Value;
                                 //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
                                 //  udpClients.TryRemove(guid, out port);
-
-
+                                SRClient value;
+                                clientsList.TryRemove(client.Key, out value);
                             }
                         }
                     }
                     catch (Exception e)
                     {
-                        //      IPEndPoint ip = client.Value;
-                        //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
-                        //  udpClients.TryRemove(guid, out port);
-
 
                     }
 
@@ -149,14 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
 
         private void SendToOthers(byte[] bytes, String guid)
-        {
-
-
-            //      Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
-            //      {
-            //          this.clientsList.Text += ("\n " + address.ToString() + ":" + port);
-            //          //Update UI here
-            //      }));
+        { 
 
             foreach (var client in clientsList)
             {
@@ -179,7 +161,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                      //      listener.Send(bytes, bytes.Length, ip);
+                       
                       //      listener.Send(bytes, bytes.Length, ip);
                         }
                     }
@@ -187,15 +169,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 catch (Exception e)
                 {
                     //      IPEndPoint ip = client.Value;
-                 //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
-                    //  udpClients.TryRemove(guid, out port);
-
-
+                    //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
+                    SRClient value;
+                    clientsList.TryRemove(guid,out value);
                 }
             }
 
-            //  listener.Close()
-            //    Console.WriteLine("sent");
         }
     }
 }

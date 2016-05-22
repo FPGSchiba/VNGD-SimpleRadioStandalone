@@ -28,7 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private byte[] guidAsciiBytes;
         private IPAddress address;
         private OpusDecoder _decoder;
-        private BufferedWaveProvider _playBuffer;
+        private AudioManager audioManager;
         private string guid;
         private InputDeviceManager inputManager;
 
@@ -37,16 +37,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         BlockingCollection<byte[]> encodedAudio = new BlockingCollection<byte[]>();
 
         private CancellationTokenSource stopFlag = new CancellationTokenSource();
-
-        private DejitterBuffer jitter = new DejitterBuffer();
-        
+             
         private static readonly Object _bufferLock = new Object();
 
 
-        public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, OpusDecoder _decoder, BufferedWaveProvider _playBuffer, InputDeviceManager inputManager)
+        public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, OpusDecoder _decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
             this._decoder = _decoder;
-            this._playBuffer = _playBuffer;
+            this.audioManager = audioManager;
 
             this.clientsList = clientsList;
             guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
@@ -67,9 +65,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             decoderThread.Start();
 
             //open ports by sending
-            Thread audioThread = new Thread(PlayAudio);
-            audioThread.Start();
-
             //send to open ports
             try
             {
@@ -183,8 +178,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                     if (len > 0)
                                     {
+                                        //this needs loads of optimisation, making copies everywhere!
                                         byte[] tmp = new byte[len];
                                         Array.Copy(decoded, tmp, len);
+
+                                      //  float[] floatPCM = bytesToFloats(tmp);
+
+                                        //now make back into bytes now we've achieved floats...
+                                        // create a byte array and copy the floats into it...
+                                       // var floatByteArray = new byte[floatPCM.Length * 4];
+                                        //Buffer.BlockCopy(floatPCM, 0, floatByteArray, 0, floatByteArray.Length);
+
 
                                         //ALL GOOD!
                                         //create marker for bytes
@@ -193,10 +197,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         audio.PCMAudio = tmp;
                                         audio.ReceiveTime = GetTickCount64();
 
-                                        lock (jitter)
-                                        {
-                                            jitter.AddAudio(audio);
-                                        }
+                                        //TODO throw away audio for each client that is before the latest receive time!
+                                        audioManager.addClientAudio(audio);
                                     }
                                 }
                             }
@@ -211,30 +213,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         }
 
-    
 
-        private void PlayAudio()
+        //convert 16bit PCM to floats
+        private static float[] bytesToFloats(byte[] bytes)
         {
-            while (!stop)
+            float[] floats = new float[bytes.Length / 2];
+            for (int i = 0; i < bytes.Length; i += 2)
             {
-                lock (jitter)
-                {
-                    //if 
-                    if (jitter.IsReady())
-                    {
-                        byte[] mixDown = jitter.MixDown();
-
-                        if(mixDown!=null)
-                        {
-                            _playBuffer.DiscardOnBufferOverflow = true;
-                            _playBuffer.AddSamples(mixDown, 0, mixDown.Length);
-                        }
-                       
-                    }
-                }
+                floats[i / 2] = bytes[i] | (bytes[i + 1] < 128 ? (bytes[i + 1] << 8) : ((bytes[i + 1] - 256) << 8));
             }
-
+            return floats;
         }
+
 
 
         private RadioInformation CanHear(DCSRadios myClient, DCSRadios transmittingClient)

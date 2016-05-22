@@ -233,18 +233,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
-             
-                        int index = Interlocked.Increment(ref clientIndexCount);
+                        if(!clients.ContainsKey(message.ClientGuid))
+                        {
+                            int index = Interlocked.Increment(ref clientIndexCount);
 
-                        SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket, ClientId=index };
+                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket, ClientId = index };
 
-                        //add to fast lsit
-                        clientIndexList[srClient.ClientId] = srClient;
+                            //add to fast lsit
+                            clientIndexList[srClient.ClientId] = srClient;
 
-                        //add to proper list
-                        clients[message.ClientGuid] = srClient;
+                            //add to proper list
+                            clients[message.ClientGuid] = srClient;
 
-                        state.guid = message.ClientGuid;
+                            state.guid = message.ClientGuid;
+                        }
+                        else
+                        {
+
+                        }
 
                         HandleRadioSync(clientIp, state.workSocket, message);
 

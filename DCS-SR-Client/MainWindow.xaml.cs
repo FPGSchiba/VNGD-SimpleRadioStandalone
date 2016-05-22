@@ -24,6 +24,7 @@ using NLog;
 using System.ComponentModel;
 using SharpDX.DirectInput;
 using SharpDX.Multimedia;
+using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -32,23 +33,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        WaveIn _waveIn;
-        WaveOut _waveOut;
-        BufferedWaveProvider _playBuffer;
-        OpusEncoder _encoder;
-        OpusDecoder _decoder;
-        int _segmentFrames;
-        int _bytesPerSegment;
-        volatile bool _stop = true;
 
         ClientSync client;
 
         String guid;
-        UDPVoiceHandler voiceSender;
 
         InputDeviceManager inputManager;
 
+        AudioManager audioManager;
+
         System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient> clients = new System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient>();
+
+        bool _stop = true;
 
         public MainWindow()
         {
@@ -74,8 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             inputManager = new InputDeviceManager(this);
             LoadInputSettings();
 
-
-
+            audioManager = new AudioManager(clients);
 
         }
 
@@ -122,108 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
            
         }
 
-        void StartEncoding()
-        {
-            IPAddress ipAddr;
-            if (IPAddress.TryParse(this.serverIp.Text.Trim(), out ipAddr))
-            {
-                _stop = false;
 
-                _segmentFrames = 960; //960 frames is 20 ms of audio
-                _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
-                //    _encoder.Bitrate = 8192;
-                _decoder = OpusDecoder.Create(24000, 1);
-                _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
-
-                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 60;
-                _waveIn.DeviceNumber = mic.SelectedIndex;
-                _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(48000, 16, 1);
-
-                _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
-               
-
-                _waveOut = new WaveOut();
-                _waveOut.DesiredLatency = 100; //75ms latency in output buffer
-                _waveOut.DeviceNumber = speakers.SelectedIndex;
-                _waveOut.Init(_playBuffer);
-
-                _waveOut.Play();
-
-                voiceSender = new UDPVoiceHandler(clients, guid, ipAddr, _decoder, _playBuffer, inputManager);
-                Thread voiceSenderThread = new Thread(voiceSender.Listen);
-
-                voiceSenderThread.Start();
-
-                _waveIn.StartRecording();
-            }
-            else
-            {
-                //invalid IP
-            }
-
-
-
-        }
-
-
-
-        byte[] _notEncodedBuffer = new byte[0];
-
-
-        void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            byte[] soundBuffer = new byte[e.BytesRecorded + _notEncodedBuffer.Length];
-
-            for (int i = 0; i < _notEncodedBuffer.Length; i++)
-                soundBuffer[i] = _notEncodedBuffer[i];
-
-            for (int i = 0; i < e.BytesRecorded; i++)
-                soundBuffer[i + _notEncodedBuffer.Length] = e.Buffer[i];
-
-            int byteCap = _bytesPerSegment;
-            //      Console.WriteLine("{0} ByteCao", byteCap);
-            int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
-            int segmentsEnd = segmentCount * byteCap;
-            int notEncodedCount = soundBuffer.Length - segmentsEnd;
-            _notEncodedBuffer = new byte[notEncodedCount];
-            for (int i = 0; i < notEncodedCount; i++)
-            {
-                _notEncodedBuffer[i] = soundBuffer[segmentsEnd + i];
-            }
-
-            for (int i = 0; i < segmentCount; i++)
-            {
-                byte[] segment = new byte[byteCap];
-                for (int j = 0; j < segment.Length; j++)
-                    segment[j] = soundBuffer[(i * byteCap) + j];
-
-                int len;
-                byte[] buff = _encoder.Encode(segment, segment.Length, out len);
-
-                if (voiceSender != null)
-                    voiceSender.Send(buff, len);
-            }
-        }
-
-        void StopEncoding()
-        {
-            _waveIn.StopRecording();
-            _waveIn.Dispose();
-            _waveIn = null;
-            _waveOut.Stop();
-            _waveOut.Dispose();
-            _waveOut = null;
-            _playBuffer = null;
-            _encoder.Dispose();
-            _encoder = null;
-            _decoder.Dispose();
-            _decoder = null;
-
-
-            _stop = true;
-        }
 
         private void startStop_Click(object sender, RoutedEventArgs e)
         {
@@ -239,6 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     client = new ClientSync(clients, guid);
                     client.TryConnect(new IPEndPoint(ipAddr, 5002), ConnectCallback);
+                   
 
                     startStop.Content = "Connecting...";
 
@@ -256,7 +151,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             startStop.Content = "Start";
             try
             {
-                StopEncoding();
+                audioManager.StopEncoding();
             }
             catch (Exception ex) { }
 
@@ -269,13 +164,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
 
-            if (voiceSender != null)
-            {
-                voiceSender.RequestStop();
-                voiceSender = null;
-            }
-
-
         }
 
         private void ConnectCallback(bool result)
@@ -285,7 +173,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (_stop)
                 {
                     startStop.Content = "Disconnect";
-                    StartEncoding();
+                   
+                        audioManager.StartEncoding(mic.SelectedIndex,speakers.SelectedIndex, guid,inputManager, IPAddress.Parse(this.serverIp.Text.Trim()));
                     _stop = false;
                 }
 
