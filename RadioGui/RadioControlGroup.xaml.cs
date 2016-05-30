@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Ciribob.DCS.SimpleRadio.Standalone;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,7 @@ namespace RadioGui
         const double MHz = 1000000;
         public int radioId;
         private bool dragging;
-        private RadioUpdate lastUpdate = null;
+        private DCSPlayerRadioInfo lastUpdate = null;
 
         private RadioTransmit lastActive = null;
 
@@ -71,13 +73,13 @@ namespace RadioGui
         {
 
             //only send update if the aircraft doesnt have its own radio system, i.e FC3
-            if (lastUpdate!=null && !lastUpdate.hasRadio)
+            if (lastUpdate!=null && lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
                 byte[] bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
                 //multicast
                 send("239.255.50.10", 5060, bytes);
                 //unicast
-                send("127.0.0.1", 5061, bytes);
+              //  send("127.0.0.1", 5061, bytes);
             }
         
         }
@@ -142,7 +144,7 @@ namespace RadioGui
         }
 
 
-        internal void update(RadioUpdate lastUpdate, TimeSpan elapsedSpan)
+        internal void update(DCSPlayerRadioInfo lastUpdate, TimeSpan elapsedSpan)
         {
             this.lastUpdate = lastUpdate;
             if (elapsedSpan.TotalSeconds > 10)
@@ -177,7 +179,7 @@ namespace RadioGui
                     radioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
-                RadioInformation currentRadio = lastUpdate.radios[this.radioId];
+                var currentRadio = lastUpdate.radios[this.radioId];
 
                 if(currentRadio.modulation == 2) //intercom
                 {
@@ -193,7 +195,7 @@ namespace RadioGui
                 }
                 radioLabel.Content = lastUpdate.radios[this.radioId].name;
 
-                if (lastUpdate.hasRadio)
+                if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
                     
                     radioVolume.IsEnabled = false;
@@ -209,6 +211,23 @@ namespace RadioGui
                     //reset dragging just incase
                     this.dragging = false;
                 
+                }
+                else if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
+                {
+
+                    radioVolume.IsEnabled = true;
+
+                    up10.IsEnabled = false;
+                    up1.IsEnabled = false;
+                    up01.IsEnabled = false;
+
+                    down10.IsEnabled = false;
+                    down1.IsEnabled = false;
+                    down01.IsEnabled = false;
+
+                    //reset dragging just incase
+                    this.dragging = false;
+
                 }
                 else
                 {

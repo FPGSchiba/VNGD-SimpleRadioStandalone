@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Ciribob.DCS.SimpleRadio.Standalone;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace RadioGui
 {
     /// <summary>
@@ -41,7 +44,7 @@ namespace RadioGui
 
         private volatile bool end;
 
-        private RadioUpdate lastUpdate;
+        private DCSPlayerRadioInfo lastUpdate;
 
         private DateTime lastUpdateTime = new DateTime(0L);
 
@@ -75,8 +78,6 @@ namespace RadioGui
 
             SetupActiveRadio();
             SetupRadioStatus();
-
-            SetupHotKeyListener();
 
         }
 
@@ -131,7 +132,7 @@ namespace RadioGui
                             udpClient.Client.ReceiveTimeout = 10000;
                             var receivedResults = udpClient.Receive(ref remoteEndPoint);
 
-                            lastUpdate = JsonConvert.DeserializeObject<RadioUpdate>(Encoding.UTF8.GetString(receivedResults));
+                            lastUpdate = JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(receivedResults));
 
                             lastUpdateTime = DateTime.Now;
 
@@ -165,30 +166,6 @@ namespace RadioGui
                             //check if current
                             long elapsedTicks = DateTime.Now.Ticks - lastUpdateTime.Ticks;
                             TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
-
-                            if (lastUpdate.allowNonPlayers)
-                            {
-                                this.muteStatusNonUsers.Fill = new SolidColorBrush(Colors.Red);
-                                this.muteStatusNonUsers.ToolTip = "Mute Non Players OFF";
-                            }
-                            else
-                            {
-                                this.muteStatusNonUsers.Fill = new SolidColorBrush(Colors.Green);
-                                this.muteStatusNonUsers.ToolTip = "Mute Non Players ON";
-                            }
-
-                            if (lastUpdate.caMode)
-                            {
-                                this.caModeStatus.Fill = new SolidColorBrush(Colors.Green);
-                                this.caModeStatus.ToolTip = "Radio ON - CA / JTAC / Spectator Mode";
-
-                            }
-                            else
-                            {
-                                this.caModeStatus.Fill = new SolidColorBrush(Colors.Red);
-                                this.caModeStatus.ToolTip = "Radio OFF - CA / JTAC / Spectator Mode";
-                            }
-
 
                             radio1.update(lastUpdate, elapsedSpan);
                             radio2.update(lastUpdate, elapsedSpan);
@@ -277,68 +254,6 @@ namespace RadioGui
 
         }
 
-        private void SetupHotKeyListener()
-        {
-            //setup UDP
-            this.hotkeyClient = new UdpClient();
-            this.hotkeyClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            this.hotkeyClient.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            IPAddress multicastaddress = IPAddress.Parse("239.255.50.10");
-            this.hotkeyClient.JoinMulticastGroup(multicastaddress);
-
-            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, HotkeyClientClientPort);
-            this.hotkeyClient.Client.Bind(localEp);
-
-            Task.Run(() =>
-            {
-                using (hotkeyClient)
-                {
-
-                    while (!end)
-                    {
-                        try
-                        {
-                            //IPEndPoint object will allow us to read datagrams sent from any source.
-                            var remoteEndPoint = new IPEndPoint(IPAddress.Any, HotkeyClientClientPort);
-                            hotkeyClient.Client.ReceiveTimeout = 10000;
-                            var receivedResults = hotkeyClient.Receive(ref remoteEndPoint);
-
-                            var hotKeyStr = System.Text.Encoding.UTF8.GetString(receivedResults).Trim();
-
-                            if (hotKeyStr.Contains("DCS-SR-TOGGLE-STATUS"))
-                            {
-                                Application.Current.Dispatcher.Invoke(new Action(() =>
-                                {
-
-                                    if (this.WindowState == WindowState.Normal)
-                                    {
-
-                                        this.WindowState = WindowState.Minimized;
-                                    }
-                                    else
-                                    {
-                                        this.WindowState = WindowState.Normal;
-                                    }
-
-                                }));
-
-
-
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            // Console.Out.WriteLine(e.ToString());
-                        }
-                    }
-
-                    this.hotkeyClient.Close();
-                }
-            });
-        }
-
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
@@ -403,17 +318,6 @@ namespace RadioGui
             }
             catch (Exception e) { }
 
-        }
-
-        private void Button_ToggleMute(object sender, RoutedEventArgs e)
-        {
-            SendUDPCommand(RadioCommand.CmdType.TOGGLE_MUTE_NON_RADIO);
-        }
-
-
-        private void Button_Toggle_CA_Mode(object sender, RoutedEventArgs e)
-        {
-            SendUDPCommand(RadioCommand.CmdType.TOGGLE_FORCE_RADIO_ON);
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)

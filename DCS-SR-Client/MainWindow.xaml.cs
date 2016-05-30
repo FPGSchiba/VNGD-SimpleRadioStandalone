@@ -229,16 +229,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 pttCommonDevice.Text = device.DeviceName;
                 pttCommonText.Text = device.Button.ToString();
 
+                device.InputBind = InputDevice.InputBinding.PTT;
+
                 inputManager.InputConfig.inputDevices[0] = device;
                 inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
-               
-            //    Console.WriteLine(device.Button + " " + device.Device);
-
-                //inputManager.StartDetectPTT(device, (bool pressed) => {
-                //    Console.WriteLine("PTT: "+pressed);
-
-                //});
-
+              
             });
 
         }
@@ -256,6 +251,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ptt1Device.Text = device.DeviceName;
                 ptt1Text.Text = device.Button.ToString();
+                device.InputBind = InputDevice.InputBinding.SWITCH_1;
 
                 inputManager.InputConfig.inputDevices[1] = device;
                 inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_1, device);
@@ -276,6 +272,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ptt2Device.Text = device.DeviceName;
                 ptt2Text.Text = device.Button.ToString();
+                device.InputBind = InputDevice.InputBinding.SWITCH_2;
 
                 inputManager.InputConfig.inputDevices[2] = device;
                 inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_2, device);
@@ -297,6 +294,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ptt3Device.Text = device.DeviceName;
                 ptt3Text.Text = device.Button.ToString();
+                device.InputBind = InputDevice.InputBinding.SWITCH_3;
 
                 inputManager.InputConfig.inputDevices[3] = device;
                 inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_3, device);

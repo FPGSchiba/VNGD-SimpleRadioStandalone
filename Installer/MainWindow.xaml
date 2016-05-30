@@ -1,0 +1,28 @@
+﻿<Window x:Class="Installer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      
+        ResizeMode="NoResize"
+        xmlns:local="clr-namespace:Installer"
+        mc:Ignorable="d"
+        Title="DCS-SimpleRadio Installer" Height="276.934" Width="450">
+    <Grid Name="containerPanel">
+        <Label x:Name="intro" FontSize="20" Content="DCS-SimpleRadio Standalone Installer / Updater" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
+
+        <Label x:Name="step2" FontSize="20" Content="Step 1: Pick Install Location" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="422"/>
+
+        <TextBox x:Name="srPath" HorizontalAlignment="Left" Height="23" Margin="10,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Text="C:\Program Files\DCS-SimpleRadio" />
+        <Button x:Name="srPathButton" Content="Locate" HorizontalAlignment="Left" Margin="337,87,0,0" VerticalAlignment="Top" Width="75" Click="Set_Install_Path"/>
+
+        <Label x:Name="step3" FontSize="20" Content="Step 2: Pick DCS Version" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="422"/>
+
+
+        <Button x:Name="button1" Content="Install / Update for DCS Release" HorizontalAlignment="Left" Margin="18,162,0,0" VerticalAlignment="Top" Width="185" Click="Install_Release"/>
+        <Button x:Name="button1_Copy" Content="Install / Update DCS Open Alpha" HorizontalAlignment="Left" Margin="239,162,0,0" VerticalAlignment="Top" Width="185" Click="Install_Beta"/>
+        <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="40" Margin="221,157,0,0" VerticalAlignment="Top" Width="5"/>
+        <Button x:Name="button1_Copy2" Content="Remove DCS-SimpleRadio Standalone" HorizontalAlignment="Left" Margin="114,211,0,0" VerticalAlignment="Top" Width="220" Click="Remove_Plugin" />
+
+    </Grid>
+</Window>
