@@ -29,6 +29,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public delegate void SendRadioUpdate();
 
+        private long lastSent = 0;
+
         public RadioSyncServer(SendRadioUpdate send)
         {
             updateDelegate = send;
@@ -180,6 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             //sync with others
                             if (ShouldSendUpdate(message))
                             {
+                                lastSent = System.Environment.TickCount;
                                 this.updateDelegate();
                             }
                         }
@@ -267,7 +270,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private bool ShouldSendUpdate(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if(System.Environment.TickCount - dcsPlayerRadioInfo.lastUpdate < 4000)
+            if(System.Environment.TickCount - lastSent < 4000)
             {
                 return false;
             }
