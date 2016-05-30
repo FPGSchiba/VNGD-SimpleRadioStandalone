@@ -23,8 +23,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonIgnore]
         public long LastUpdate { get; set; }
-
-
-        public int ClientId { get; set; }
     }
 }

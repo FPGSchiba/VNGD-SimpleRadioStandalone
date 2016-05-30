@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -11,30 +12,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
-        public InputDevice PTTCommon { get; set; }
+        public InputDevice[] inputDevices = new InputDevice[4];
 
-        public InputDevice SelectRadio1 { get; set; }
-
-        public InputDevice SelectRadio2 { get; set; }
-
-        public InputDevice SelectRadio3 { get; set; }
 
         public InputConfiguration()
         {
             //load from registry
             //    PTTCommon = ReadInputRegistry("common");
- 
-            PTTCommon = ReadInputRegistry("common");
+
+            inputDevices[0] = ReadInputRegistry(InputBinding.PTT);
+            inputDevices[1] = ReadInputRegistry(InputBinding.SWITCH_1);
+            inputDevices[2] = ReadInputRegistry(InputBinding.SWITCH_2);
+            inputDevices[3] = ReadInputRegistry(InputBinding.SWITCH_3);
 
         }
 
-        public InputDevice ReadInputRegistry(String key)
+        public InputDevice ReadInputRegistry(InputBinding bind)
         {
             InputDevice device = new InputDevice();
             try
             {
-            
 
+                string key = bind.ToString();
 
 
             string deviceName = (string)Registry.GetValue(REG_PATH,
@@ -53,6 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 device.DeviceName = deviceName;
                 device.Button = button;
                 device.InstanceGUID = Guid.Parse(guid);
+                device.InputBind = bind;
 
                 return device;
             }
@@ -64,10 +64,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return null;
         }
 
-        public void WriteInputRegistry(String key,InputDevice device)
+        public void WriteInputRegistry(InputBinding bind, InputDevice device)
         {
             try
             {
+                string key = bind.ToString();
                 Registry.SetValue(REG_PATH,
             key + "_name",
             device.DeviceName);

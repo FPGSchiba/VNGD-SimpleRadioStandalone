@@ -33,21 +33,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
     class ServerSync
     {
 
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
         // Thread signal.
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        public static ManualResetEvent _allDone = new ManualResetEvent(false);
 
         Socket listener;
 
-        ConcurrentDictionary<String, SRClient> clients = new ConcurrentDictionary<String, SRClient>();
+        ConcurrentDictionary<String, SRClient> _clients = new ConcurrentDictionary<String, SRClient>();
 
-        SRClient[] clientIndexList;
-        int clientIndexCount = 0;
-
-        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients, SRClient[] clientIndexList)
+        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients)
         {
-            this.clients = connectedClients;
-            this.clientIndexList = clientIndexList;
+            this._clients = connectedClients;
+           
          //   this.clientIndexList.Capacity = 100000;
         }
 
@@ -70,22 +67,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 while (true)
                 {
                     // Set the event to nonsignaled state.
-                    allDone.Reset();
+                    _allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    logger.Info("Waiting for a connection...");
+                    _logger.Info("Waiting for a connection...");
                     listener.BeginAccept(
                         new AsyncCallback(AcceptCallback),
                         listener);
 
                     // Wait until a connection is made before continuing.
-                    allDone.WaitOne();
+                    _allDone.WaitOne();
                 }
 
             }
             catch (Exception e)
             {
-                logger.Error(e, "Server Listen error");
+                _logger.Error(e, "Server Listen error");
 
             }
         }
@@ -93,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.
-            allDone.Set();
+            _allDone.Set();
 
             try
             {
@@ -110,7 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error accepting socket");
+                _logger.Error(ex, "Error accepting socket");
             }
 
 
@@ -118,18 +115,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public void HandleDisconnect(StateObject state)
         {
-            logger.Info("Disconnecting Client");
+            _logger.Info("Disconnecting Client");
 
             if (state != null && state.guid != null)
             {
                 //removed
                 SRClient client;
-                clients.TryRemove(state.guid, out client);
+                _clients.TryRemove(state.guid, out client);
 
                 if (client!=null)
                 {
-                    clientIndexList[client.ClientId] = null;
-                    logger.Info("Removed Client " + state.guid);
+                  
+                    _logger.Info("Removed Client " + state.guid);
                 }
 
               
@@ -142,7 +139,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception ex)
             {
-                logger.Info(ex, "Exception closing socket after disconnect");
+                _logger.Info(ex, "Exception closing socket after disconnect");
             }
 
         }
@@ -184,7 +181,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         }
                         catch (Exception ex)
                         {
-                            logger.Error(ex, "Server - Client Exception reading");
+                            _logger.Error(ex, "Server - Client Exception reading");
                          
                         }
 
@@ -209,7 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error reading from socket. Disconnecting ");
+                _logger.Error(ex, "Error reading from socket. Disconnecting ");
 
                 HandleDisconnect(state);
             }
@@ -221,8 +218,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 var clientIp = (IPEndPoint)state.workSocket.RemoteEndPoint;
 
-                logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
-                logger.Info("Recevied: " + message.MsgType);
+              //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
+               // logger.Info("Recevied: " + message.MsgType);
 
                 switch (message.MsgType)
                 {
@@ -233,17 +230,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
-                        if(!clients.ContainsKey(message.ClientGuid))
+                        if(!_clients.ContainsKey(message.ClientGuid))
                         {
-                            int index = Interlocked.Increment(ref clientIndexCount);
-
-                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket, ClientId = index };
-
-                            //add to fast lsit
-                            clientIndexList[srClient.ClientId] = srClient;
+                        
+                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket };
 
                             //add to proper list
-                            clients[message.ClientGuid] = srClient;
+                            _clients[message.ClientGuid] = srClient;
 
                             state.guid = message.ClientGuid;
                         }
@@ -256,22 +249,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         break;
                     default:
-                        logger.Warn("Recevied unknown message type");
+                        _logger.Warn("Recevied unknown message type");
                         break;
                 }
 
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Exception Handling Message " + ex.Message);
+                _logger.Error(ex, "Exception Handling Message " + ex.Message);
             }
         }
 
         private void HandleRadioUpdate(NetworkMessage message)
         {
-            if(clients.ContainsKey(message.ClientGuid))
+            if(_clients.ContainsKey(message.ClientGuid))
             {
-                var client = clients[message.ClientGuid];
+                var client = _clients[message.ClientGuid];
 
                 if (client != null)
                 {
@@ -283,7 +276,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     replyMessage.ClientGuid = client.ClientGuid;
                     replyMessage.ClientRadioUpdate = message.ClientRadioUpdate;
 
-                    foreach (var clientToSent in this.clients)
+                    foreach (var clientToSent in this._clients)
                     {
                         Send(clientToSent.Value.ClientSocket, replyMessage);
                     }
@@ -302,7 +295,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             replyMessage.Clients = new List<SRClient>();
 
-            foreach (var clientToSent in this.clients)
+            foreach (var clientToSent in this._clients)
             {
                 replyMessage.Clients.Add(clientToSent.Value);
             }
@@ -323,7 +316,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Exception Sending Message " + ex.Message);
+                _logger.Error(ex, "Exception Sending Message " + ex.Message);
             }
         }
 
@@ -344,7 +337,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception e)
             {
-                logger.Error(e, "Exception SendCallback ");
+                _logger.Error(e, "Exception SendCallback ");
             }
         }
 
@@ -356,7 +349,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 listener.Close();
 
-                clients.Clear();
+                _clients.Clear();
 
             }
             catch (Exception ex) { }

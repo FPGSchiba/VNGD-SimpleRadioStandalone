@@ -109,10 +109,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             //TODO load input settings
 
-            if(inputManager.InputConfig.PTTCommon !=null)
+            if(inputManager.InputConfig.inputDevices != null)
             {
-                pttCommonText.Text = inputManager.InputConfig.PTTCommon.Button.ToString();
-                pttCommonDevice.Text = inputManager.InputConfig.PTTCommon.DeviceName;
+                if(inputManager.InputConfig.inputDevices[0] !=null)
+                {
+                    pttCommonText.Text = inputManager.InputConfig.inputDevices[0].Button.ToString();
+                    pttCommonDevice.Text = inputManager.InputConfig.inputDevices[0].DeviceName;
+                }
+
+
+                if (inputManager.InputConfig.inputDevices[1] != null)
+                {
+                    ptt1Text.Text = inputManager.InputConfig.inputDevices[1].Button.ToString();
+                    ptt1Device.Text = inputManager.InputConfig.inputDevices[1].DeviceName;
+                }
+                if (inputManager.InputConfig.inputDevices[2] != null)
+                {
+                    ptt2Text.Text = inputManager.InputConfig.inputDevices[2].Button.ToString();
+                    ptt2Device.Text = inputManager.InputConfig.inputDevices[2].DeviceName;
+                }
+
+                if (inputManager.InputConfig.inputDevices[3] != null)
+                {
+                    ptt3Text.Text = inputManager.InputConfig.inputDevices[3].Button.ToString();
+                    ptt3Device.Text = inputManager.InputConfig.inputDevices[3].DeviceName;
+                }
             }
            
         }
@@ -208,8 +229,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 pttCommonDevice.Text = device.DeviceName;
                 pttCommonText.Text = device.Button.ToString();
 
-                inputManager.InputConfig.PTTCommon = device;
-                inputManager.InputConfig.WriteInputRegistry("common", device);
+                inputManager.InputConfig.inputDevices[0] = device;
+                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
                
             //    Console.WriteLine(device.Button + " " + device.Device);
 
@@ -217,6 +238,68 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //    Console.WriteLine("PTT: "+pressed);
 
                 //});
+
+            });
+
+        }
+
+        private void ptt1_Click(object sender, RoutedEventArgs e)
+        {
+            ptt1ButtonClear.IsEnabled = false;
+            ptt1ButtonClear.IsEnabled = false;
+
+
+            inputManager.AssignButton((InputDevice device) =>
+            {
+                ptt1ButtonClear.IsEnabled = true;
+                ptt1ButtonClear.IsEnabled = true;
+
+                ptt1Device.Text = device.DeviceName;
+                ptt1Text.Text = device.Button.ToString();
+
+                inputManager.InputConfig.inputDevices[1] = device;
+                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_1, device);
+
+            });
+
+        }
+        private void ptt2_Click(object sender, RoutedEventArgs e)
+        {
+            ptt2ButtonClear.IsEnabled = false;
+            ptt2ButtonClear.IsEnabled = false;
+
+
+            inputManager.AssignButton((InputDevice device) =>
+            {
+                ptt2ButtonClear.IsEnabled = true;
+                ptt2ButtonClear.IsEnabled = true;
+
+                ptt2Device.Text = device.DeviceName;
+                ptt2Text.Text = device.Button.ToString();
+
+                inputManager.InputConfig.inputDevices[2] = device;
+                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_2, device);
+
+            });
+
+        }
+
+        private void ptt3_Click(object sender, RoutedEventArgs e)
+        {
+            ptt3ButtonClear.IsEnabled = false;
+            ptt3ButtonClear.IsEnabled = false;
+
+
+            inputManager.AssignButton((InputDevice device) =>
+            {
+                ptt3ButtonClear.IsEnabled = true;
+                ptt3ButtonClear.IsEnabled = true;
+
+                ptt3Device.Text = device.DeviceName;
+                ptt3Text.Text = device.Button.ToString();
+
+                inputManager.InputConfig.inputDevices[3] = device;
+                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_3, device);
 
             });
 
