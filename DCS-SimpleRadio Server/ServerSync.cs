@@ -128,9 +128,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                   
                     _logger.Info("Removed Client " + state.guid);
                 }
-
-              
-
             }
 
             try
@@ -223,9 +220,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 switch (message.MsgType)
                 {
-                    case NetworkMessage.MessageType.RADIO_UPDATE:
+                    case NetworkMessage.MessageType.PING:
 
-                        HandleRadioUpdate(message);
+                        HandleClientPing(message);
 
                         break;
                     case NetworkMessage.MessageType.SYNC:
@@ -233,7 +230,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         if(!_clients.ContainsKey(message.ClientGuid))
                         {
                         
-                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientRadios = message.ClientRadioUpdate, ClientSocket = state.workSocket };
+                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientSocket = state.workSocket };
 
                             //add to proper list
                             _clients[message.ClientGuid] = srClient;
@@ -242,7 +239,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         }
                         else
                         {
-
+                            //Do nothiing
                         }
 
                         HandleRadioSync(clientIp, state.workSocket, message);
@@ -260,7 +257,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        private void HandleRadioUpdate(NetworkMessage message)
+        private void HandleClientPing(NetworkMessage message)
         {
             if(_clients.ContainsKey(message.ClientGuid))
             {
@@ -268,13 +265,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 if (client != null)
                 {
-                    client.ClientRadios = message.ClientRadioUpdate;
+                    client.LastUpdate = System.Environment.TickCount;
                     //send update to everyone
 
                     NetworkMessage replyMessage = new NetworkMessage();
-                    replyMessage.MsgType = NetworkMessage.MessageType.RADIO_UPDATE;
+                    replyMessage.MsgType = NetworkMessage.MessageType.PING;
                     replyMessage.ClientGuid = client.ClientGuid;
-                    replyMessage.ClientRadioUpdate = message.ClientRadioUpdate;
 
                     foreach (var clientToSent in this._clients)
                     {
@@ -330,9 +326,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 // Complete sending the data to the remote device.
                 int bytesSent = handler.EndSend(ar);
                 //  Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-
-                //      handler.Shutdown(SocketShutdown.Both);
-                //     handler.Close();
 
             }
             catch (Exception e)
