@@ -95,6 +95,7 @@
     </ApplicationDefinition>
     <Compile Include="AudioManager.cs" />
     <Compile Include="ClientAudio.cs" />
+    <Compile Include="ClientAudioProvider.cs" />
     <Compile Include="DejitterBuffer.cs" />
     <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />

@@ -15,14 +15,14 @@ Keeps radio information in Sync Between DCS and
 **/
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
-    class RadioSyncServer
+    public class RadioSyncServer
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private UdpClient listener;
         private volatile bool _stop = false;
 
-        private volatile DCSRadios clientRadio = new DCSRadios();
+        public static volatile DCSRadios clientRadio = new DCSRadios();
 
         private SendRadioUpdate updateDelegate;
 
@@ -74,6 +74,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                             DCSRadios message = JsonConvert.DeserializeObject<DCSRadios>((Encoding.ASCII.GetString(
                bytes, 0, bytes.Length)));
+
+                            //TODO - Handle volume levels
+                            //TODO - Select Radio
+                            //TODO - 
 
                             if(ShouldSendUpdate(message))
                             {

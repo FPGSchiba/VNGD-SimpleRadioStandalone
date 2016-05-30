@@ -33,63 +33,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         volatile bool _stop = true;
 
         byte[] _notEncodedBuffer = new byte[0];
-        private UDPVoiceHandler udpVoiceHandler;
-        private MixingSampleProvider mixing;
+        UDPVoiceHandler udpVoiceHandler;
+        MixingSampleProvider mixing;
 
         public AudioManager(ConcurrentDictionary<String, SRClient> clientsList)
         {
             this.clientsList = clientsList;
-
         }
 
-
-      
         internal void addClientAudio(ClientAudio audio)
         {
             //16bit PCM Audio
-           //Clean  - remove if we havent received audio in a while
-           // If we have recieved audio, create a new buffered audio and read it
-           if(clientsBufferedAudio.ContainsKey(audio.ClientGUID))
+            //Clean  - remove if we havent received audio in a while
+            // If we have recieved audio, create a new buffered audio and read it
+            ClientAudioProvider client = null;
+           if (clientsBufferedAudio.ContainsKey(audio.ClientGUID))
            {
-                ClientAudioProvider client = clientsBufferedAudio[audio.ClientGUID];
+                client = clientsBufferedAudio[audio.ClientGUID];
                 client.lastUpdate = GetTickCount64();
-
-                client.bufferedWaveProvider.AddSamples(audio.PCMAudio,0,audio.PCMAudio.Length);
-
             }
             else
             {
-                ClientAudioProvider client = new ClientAudioProvider();
+                client = new ClientAudioProvider();
                 client.lastUpdate = GetTickCount64(); 
                 clientsBufferedAudio[audio.ClientGUID] = client;
                
-
-                mixing.AddMixerInput(client.pcm);
-                
-
-                client.bufferedWaveProvider.AddSamples(audio.PCMAudio, 0, audio.PCMAudio.Length);
+                mixing.AddMixerInput(client.VolumeSampleProvider);
             }
-           
+
+            client.VolumeSampleProvider.Volume = audio.Volume;
+
+            client.BufferedWaveProvider.AddSamples(audio.PCMAudio, 0, audio.PCMAudio.Length);
+
+
         }
-        private class ClientAudioProvider
-        {
-            public Pcm16BitToSampleProvider pcm;
-            public BufferedWaveProvider bufferedWaveProvider;
-            public long lastUpdate;
-
-            public ClientAudioProvider()
-            {
-                bufferedWaveProvider = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
-           //    
-                bufferedWaveProvider.DiscardOnBufferOverflow = true;
-                bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 2); //5 seconds buffer
-
-                 pcm = new Pcm16BitToSampleProvider(bufferedWaveProvider);
-
-            }
-        }
-
-
+  
         public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress)
         {
             

@@ -17,34 +17,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     class UDPVoiceRouter
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        UdpClient listener;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        UdpClient _listener;
 
-        private volatile bool stop;
-        private ConcurrentDictionary<String, SRClient> clientsList;
-        private SRClient[] clientListLookup;
+        volatile bool _stop;
+        ConcurrentDictionary<String, SRClient> _clientsList;
 
-        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList, SRClient[] clientListLookup)
+        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList)
         {
-            this.clientsList = clientsList;
-            this.clientListLookup = clientListLookup;
+            this._clientsList = clientsList;
         }
 
         public void Listen()
         {
-
-            listener = new UdpClient();
-            listener.AllowNatTraversal(true);
-            listener.ExclusiveAddressUse = true;
-            listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
-            startPing();
-            while (!stop)
+            _listener = new UdpClient();
+            _listener.AllowNatTraversal(true);
+            _listener.ExclusiveAddressUse = true;
+            _listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
+            while (!_stop)
             {
                 try
                 {
                   
                     IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
-                     byte[] rawBytes = listener.Receive(ref groupEP);
+                     byte[] rawBytes = _listener.Receive(ref groupEP);
                     if (rawBytes.Length > 36)
                     {
                         Task.Run(() =>
@@ -54,16 +50,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             String guid = Encoding.ASCII.GetString(
                             rawBytes, rawBytes.Length - 36, 36);
 
-                            if (clientsList.ContainsKey(guid))
+                            if (_clientsList.ContainsKey(guid))
                             {
-                                clientsList[guid].voipPort = groupEP;
+                                _clientsList[guid].voipPort = groupEP;
 
                                 SendToOthers(rawBytes, guid);
                             }
                             else
                             {
                                 SRClient value;
-                                clientsList.TryRemove(guid, out value);
+                                _clientsList.TryRemove(guid, out value);
                                 //  logger.Info("Removing  "+guid+" From UDP pool");
                             }
                         });
@@ -76,71 +72,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             try
             {
-                listener.Close();
+                _listener.Close();
             }
             catch (Exception e) { }
         }
         public void RequestStop()
         {
-            stop = true;
+            _stop = true;
             try
             {
-                listener.Close();
+                _listener.Close();
             }
             catch (Exception e) { }
         }
 
-        private void startPing()
-        {
-            Task.Run(() =>
-            {
-                byte[] message = { 1, 2, 3, 4, 5 };
-                while (!stop)
-                {
-
-                    logger.Info("Pinging Clients");
-                    try
-                    {
-                        foreach (var client in clientsList)
-                        {
-                            try
-                            {
-
-                                IPEndPoint ip = client.Value.voipPort;
-
-                                if (ip != null)
-                                {
-                                    listener.Send(message, message.Length, ip);
-                                    //      listener.Send(bytes, bytes.Length, ip);
-                                }
-
-                            }
-                            catch (Exception e)
-                            {
-                                //      IPEndPoint ip = client.Value;
-                                //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
-                                //  udpClients.TryRemove(guid, out port);
-                                SRClient value;
-                                clientsList.TryRemove(client.Key, out value);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-
-                    }
-
-                    Thread.Sleep(10 * 1000);
-                    
-                }
-            });
-        }
-
-
         private void SendToOthers(byte[] bytes, String guid)
         { 
 
-            foreach (var client in clientsList)
+            foreach (var client in _clientsList)
             {
                 try
                 {
@@ -150,9 +99,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if(ip != null)
                         {
-                            listener.Send(bytes, bytes.Length, ip);
+                            //TODO only send to clients on the same team?
+                            _listener.Send(bytes, bytes.Length, ip);
                         }
-                        
                     }
                     else
                     {
@@ -161,8 +110,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                       
-                      //      listener.Send(bytes, bytes.Length, ip);
+
+                       //     _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
                 }
@@ -171,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     //      IPEndPoint ip = client.Value;
                     //   logger.Error(e, "Error sending audio UDP for client " + e.Message);
                     SRClient value;
-                    clientsList.TryRemove(guid,out value);
+                    _clientsList.TryRemove(guid,out value);
                 }
             }
 

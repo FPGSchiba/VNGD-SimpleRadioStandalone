@@ -30,14 +30,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        UDPVoiceRouter serverListener;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        UDPVoiceRouter _serverListener;
 
-        ConcurrentDictionary<String, SRClient> connectedClients = new ConcurrentDictionary<string, SRClient>();
-        SRClient[] clientList = new SRClient[1024 * 1024];
-        private ServerSync serverSync;
+        ConcurrentDictionary<String, SRClient> _connectedClients = new ConcurrentDictionary<string, SRClient>();
+ 
+        private ServerSync _serverSync;
 
-        volatile bool stop = false;
+        volatile bool _stop = false;
 
         public MainWindow()
         {
@@ -53,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             Task.Run(() =>
             {
-                while (!stop)
+                while (!_stop)
                 {
                     Application.Current.Dispatcher.Invoke(new Action(() =>
 
@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                         try
                         {
 
-                            this.clientsCount.Content = connectedClients.Count().ToString();
+                            this.clientsCount.Content = _connectedClients.Count().ToString();
 
 
                         }
@@ -109,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            if (serverListener != null)
+            if (_serverListener != null)
             {
                 stopServer();
                 button.Content = "Start Server";
@@ -118,24 +118,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
 
                 button.Content = "Stop Server";
-                serverListener = new UDPVoiceRouter(connectedClients, clientList);
-                Thread listenerThread = new Thread(serverListener.Listen);
+                _serverListener = new UDPVoiceRouter(_connectedClients);
+                Thread listenerThread = new Thread(_serverListener.Listen);
                 listenerThread.Start();
 
 
-                serverSync = new ServerSync(connectedClients, clientList);
-                Thread serverSyncThread = new Thread(serverSync.StartListening);
+                _serverSync = new ServerSync(_connectedClients);
+                Thread serverSyncThread = new Thread(_serverSync.StartListening);
                 serverSyncThread.Start();
             }
         }
         private void stopServer()
         {
-            if (serverListener != null)
+            if (_serverListener != null)
             {
-                serverSync.RequestStop();
-                serverSync = null;
-                serverListener.RequestStop();
-                serverListener = null;
+                _serverSync.RequestStop();
+                _serverSync = null;
+                _serverListener.RequestStop();
+                _serverListener = null;
 
             }
         }

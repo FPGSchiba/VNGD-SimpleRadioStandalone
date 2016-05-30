@@ -10,7 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public string name = "";
         public double frequency = 1;
-        public int modulation = 0;
+        public sbyte modulation = 0;
         public float volume = 1.0f;
         public double secondaryFrequency = 1;
 
@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public long lastUpdate = 0;
         public string name = "";
         public string unit = "";
-        public int selected = 0;
+        public short selected = 0;
         public int unitId;
 
 

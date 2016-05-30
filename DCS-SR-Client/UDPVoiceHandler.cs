@@ -12,6 +12,8 @@ using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using System.Threading;
 using DCS_SR_Client;
+using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using Ciribob.DCS.SimpleRadio.Standalone.Server;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -61,7 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             listener.AllowNatTraversal(true);
 
             //start 2 audio processing threads
-            Thread decoderThread = new Thread(HandleDecodeDeJitter);
+            Thread decoderThread = new Thread(UDPAudioDecode);
             decoderThread.Start();
 
             //open ports by sending
@@ -75,12 +77,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex) { }
 
 
-            this.inputManager.StartDetectPTT((bool pressed) =>
+            this.inputManager.StartDetectPTT((bool pressed, InputBinding deviceType) =>
             {
-                ptt = pressed;
+                DCSRadios radios = RadioSyncServer.clientRadio;
+         
+                if(deviceType == InputBinding.PTT)
+                {
+                    ptt = pressed;
+                }
+                else if(pressed)
+                {
+                    switch(deviceType)
+                    {
+                        case InputBinding.SWITCH_1:
+                            radios.selected = 0;
+                            break;
+                        case InputBinding.SWITCH_2:
+                            radios.selected = 1;
+                            break;
+                        case InputBinding.SWITCH_3:
+                            radios.selected = 2;
+                            break;
+
+                    }
+                }
+                    
+                
+
+                  
             });
 
-            startPing();
 
             while (!stop)
             {
@@ -138,13 +164,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return null;
         }
 
-        private void HandleDecodeDeJitter()
+        private void UDPAudioDecode()
         {
 
             try
             {
                 while (!stop)
                 {
+                    try
+                    {
+
+                   
                     byte[] encodedOpusAudio = new byte[0];
                        encodedAudio.TryTake(out encodedOpusAudio, 100000, stopFlag.Token);
                   //  encodedOpusAudio = encodedAudio.Take();
@@ -156,53 +186,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //  process
                     // check if we should play audio
 
-              //      SRClient myClient = IsClientMetaDataValid(guid);
+                    SRClient myClient = IsClientMetaDataValid(guid);
 
-                //   if (myClient != null)
+                   if (myClient != null)
                     {
                         //last 36 bytes are guid!
                         String recievingGuid = Encoding.ASCII.GetString(
                         encodedOpusAudio, encodedOpusAudio.Length - 36, 36);
 
-            //            SRClient receivingClient = IsClientMetaDataValid(recievingGuid);
+                            double frequency = BitConverter.ToDouble(encodedOpusAudio, encodedOpusAudio.Length - 36 -1 -8); //before guid and modulation so -36 and then -1
+                            sbyte modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 36 - 1];
+                            int unitId = -1; // TODO send unitID stuff
 
-             //               if (receivingClient != null)
+                            // check the radio 
+                            RadioInformation receivingRadio = CanHear(myClient.ClientRadios, frequency, modulation, unitId);
+                           if (receivingRadio != null)
                             {
-                                //   RadioInformation receivingRadio = CanHear(myClient.ClientRadios, receivingClient.ClientRadios);
-                                ///  if (receivingRadio != null)
-                                {
-                                    //now check that the radios match
-                                    int len;
-                                    //- 36 so we ignore the UUID
-                                    byte[] decoded = _decoder.Decode(encodedOpusAudio, encodedOpusAudio.Length - 36, out len);
+                                //now check that the radios match
+                                int len;
+                                //- 36 so we ignore the UUID
+                                byte[] decoded = _decoder.Decode(encodedOpusAudio, encodedOpusAudio.Length  -36 - 1 - 8, out len);
 
-                                    if (len > 0)
-                                    {
-                                        //this needs loads of optimisation, making copies everywhere!
+                                if (len > 0)
+                                {
+                                        // for some reason if this is removed then it lags?!
                                         byte[] tmp = new byte[len];
                                         Array.Copy(decoded, tmp, len);
-
-                                      //  float[] floatPCM = bytesToFloats(tmp);
-
-                                        //now make back into bytes now we've achieved floats...
-                                        // create a byte array and copy the floats into it...
-                                       // var floatByteArray = new byte[floatPCM.Length * 4];
-                                        //Buffer.BlockCopy(floatPCM, 0, floatByteArray, 0, floatByteArray.Length);
-
 
                                         //ALL GOOD!
                                         //create marker for bytes
                                         ClientAudio audio = new ClientAudio();
-                                        audio.ClientGUID = recievingGuid;
-                                        audio.PCMAudio = tmp;
-                                        audio.ReceiveTime = GetTickCount64();
+                                    audio.ClientGUID = recievingGuid;
+                                    audio.PCMAudio = tmp;
+                                    audio.ReceiveTime = GetTickCount64();
+                                    audio.Frequency = frequency;
+                                    audio.Modulation = modulation;
+                                    audio.Volume = receivingRadio.volume;
 
-                                        //TODO throw away audio for each client that is before the latest receive time!
-                                        audioManager.addClientAudio(audio);
-                                    }
+
+                                    //TODO throw away audio for each client that is before the latest receive time!
+                                    audioManager.addClientAudio(audio);
                                 }
                             }
+                          
                         }
+                       
+                        }
+                     }catch(Exception ex)
+                    {
+                        logger.Info("Failed Decoding");
                     }
                 }
             }
@@ -213,65 +245,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         }
 
-
-        //convert 16bit PCM to floats
-        private static float[] bytesToFloats(byte[] bytes)
+        private RadioInformation CanHear(DCSRadios myClient, double frequency, sbyte modulation, int unitId)
         {
-            float[] floats = new float[bytes.Length / 2];
-            for (int i = 0; i < bytes.Length; i += 2)
+            for (int i = 0; i < 3; i++)
             {
-                floats[i / 2] = bytes[i] | (bytes[i + 1] < 128 ? (bytes[i + 1] << 8) : ((bytes[i + 1] - 256) << 8));
-            }
-            return floats;
-        }
+                RadioInformation receivingRadio = myClient.radios[i];
 
-
-
-        private RadioInformation CanHear(DCSRadios myClient, DCSRadios transmittingClient)
-        {
-
-            if (transmittingClient.selected >= 0 && transmittingClient.selected < 3)
-            {
-                RadioInformation transmittingRadio = transmittingClient.radios[transmittingClient.selected];
-
-                if (transmittingRadio != null)
+                if (receivingRadio != null)
                 {
-                    for (int i = 0; i < 3; i++)
+
+                    //handle INTERCOM Modulation is 2
+                    if (receivingRadio.modulation == 2 && modulation == 2
+                        && myClient.unitId > 0 && unitId > 0
+                        && myClient.unitId == unitId)
                     {
-                        RadioInformation receivingRadio = myClient.radios[i];
+                        SendUpdateToGUI(i, false);
+                        return receivingRadio;
 
-                        if (receivingRadio != null)
-                        {
-
-                            //handle INTERCOM Modulation is 2
-                            if (receivingRadio.modulation == 2 && transmittingRadio.modulation == 2
-                                && myClient.unitId > 0 && transmittingClient.unitId > 0
-                                && myClient.unitId == transmittingClient.unitId)
-                            {
-                                SendUpdateToGUI(i, false);
-                                return receivingRadio;
-
-                            }
-                            else if (receivingRadio.frequency == transmittingRadio.frequency
-                                && receivingRadio.modulation == transmittingRadio.modulation
-                                && receivingRadio.frequency > 1)
-                            {
-                                SendUpdateToGUI(i, false);
-                                return receivingRadio;
-                            }
-                            else if (receivingRadio.secondaryFrequency == transmittingRadio.secondaryFrequency
-                                && receivingRadio.secondaryFrequency > 100)
-                            {
-                                SendUpdateToGUI(i, true);
-                                return receivingRadio;
-
-                            }
-                        }
+                    }
+                    else if (receivingRadio.frequency == frequency
+                        && receivingRadio.modulation == modulation
+                        && receivingRadio.frequency > 1)
+                    {
+                        SendUpdateToGUI(i, false);
+                        return receivingRadio;
+                    }
+                    else if (receivingRadio.secondaryFrequency == frequency
+                        && receivingRadio.secondaryFrequency > 100)
+                    {
+                        SendUpdateToGUI(i, true);
+                        return receivingRadio;
 
                     }
                 }
-            }
 
+            }
 
             return null;
 
@@ -284,57 +292,53 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             if (ptt)
             {
-            //    SRClient myClient = IsClientMetaDataValid(guid);
 
-            //    if (myClient != null && !stop)
-            //    {
+                try
+                {
+                
+                    //append frequency - double (8bytes)
+                    //append modulation - AM / FM (1)
+                    //append guid - 36
+                    if(RadioSyncServer.clientRadio.selected >=0 && RadioSyncServer.clientRadio.selected< 3) // race condition on that variabe, maybe lock?
+                    {
+                        RadioInformation radio = RadioSyncServer.clientRadio.radios[RadioSyncServer.clientRadio.selected];
 
-            try
-            {
-
-                //append guid
-
-                byte[] combinedBytes = new byte[len + 36];
-                System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len);
-                System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len, 36);
+                        if(radio !=null)
+                        {
+                            byte[] combinedBytes = new byte[len + 8 + 1 + 36];
+                            System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
 
 
+                            byte[] freq = BitConverter.GetBytes(radio.frequency); //8 bytes
 
-                //   UdpClient myClient = new UdpClient();
-                //   listener.AllowNatTraversal(true);
-                IPEndPoint ip = new IPEndPoint(this.address, 5010);
+                            combinedBytes[len] = freq[0];
+                            combinedBytes[len + 1] = freq[1];
+                            combinedBytes[len + 2] = freq[2];
+                            combinedBytes[len + 3] = freq[3];
+                            combinedBytes[len + 4] = freq[4];
+                            combinedBytes[len + 5] = freq[5];
+                            combinedBytes[len + 6] = freq[6];
+                            combinedBytes[len + 7] = freq[7];
 
-                listener.Send(combinedBytes, combinedBytes.Length, ip);
-                //    myClient.Close();
-            }
-            catch (Exception e)
-            {
+                            //modulation
+                            combinedBytes[len + 8] = (byte)(radio.modulation); //1 byte;
 
-                Console.WriteLine("Exception Handling Message " + e.Message);
-            }
+                            System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len + 9, 36); // copy guid
+
+                            IPEndPoint ip = new IPEndPoint(this.address, 5010);
+
+                            listener.Send(combinedBytes, combinedBytes.Length, ip);
+                        }
+
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine("Exception Handling Message " + e.Message);
+                }
             //    }
            }
-        }
-
-        private void startPing()
-        {
-            Task.Run(() =>
-            {
-                byte[] message = { 1, 2, 3, 4, 5 };
-                while (!stop)
-                {
-                    logger.Info("Pinging Server");
-                    try
-                    {
-                        Send(message, message.Length);
-                    }
-                    catch (Exception e)
-                    {
-                    }
-
-                    Thread.Sleep(10 * 1000);
-                }
-            });
         }
 
 
