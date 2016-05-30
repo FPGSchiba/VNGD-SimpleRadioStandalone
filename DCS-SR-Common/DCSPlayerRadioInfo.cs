@@ -13,6 +13,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public sbyte modulation = 0;
         public float volume = 1.0f;
         public double secondaryFrequency = 1;
+        public double freqMin = 1;
+        public double freqMax = 1;
 
         public override bool Equals(object obj)
         {
@@ -42,25 +44,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 return false;
             }
+            if (freqMin != compare.freqMin)
+            {
+                return false;
+            }
+            if (freqMax != compare.freqMax)
+            {
+                return false;
+            }
+
+
 
             return true;
         }
 
     };
-    public class DCSRadios
+    public class DCSPlayerRadioInfo
     {
+        public enum AircraftRadioType
+        {
+            FULL_COCKPIT_INTEGRATION = 1,
+            PARTIAL_COCKPIT_INTEGRATION = 2,
+            NO_COCKPIT_INTEGRATION = 3,
+        }
+
+
         public long lastUpdate = 0;
         public string name = "";
         public string unit = "";
         public short selected = 0;
         public int unitId;
+       // public int side = 0; // 1 = red, 2 = blue, 0 = none
 
 
         public RadioInformation[] radios = new RadioInformation[3];
-        public bool hasRadio = false;
-        public bool allowNonPlayers = true;
-        public bool groundCommander = false;
-
+        public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION; 
+                                  //1 - Full Radio - No Switch or frequency
+                                  //2 - Partial Radio - Allow Radio Switch but no frequency
+                                  //3 - FC3 / Spectator - Allow Radio Switch + Frequency
+      
+        public DCSPlayerRadioInfo()
+        {
+            for(int i=0; i< 3; i++)
+            {
+                radios[i] = new RadioInformation();
+            }
+        }
         // override object.Equals
         public override bool Equals(object compare)
         {
@@ -70,16 +99,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 return false;
             }
 
-            DCSRadios compareRadio = compare as DCSRadios;
+            DCSPlayerRadioInfo compareRadio = compare as DCSPlayerRadioInfo;
 
-            if (groundCommander != compareRadio.groundCommander)
+            if (radioType != compareRadio.radioType)
             {
                 return false;
             }
-            if (hasRadio != compareRadio.hasRadio)
-            {
-                return false;
-            }
+            //if (side != compareRadio.side)
+            //{
+            //    return false;
+            //}
             if (!name.Equals(compareRadio.name))
             {
                 return false;

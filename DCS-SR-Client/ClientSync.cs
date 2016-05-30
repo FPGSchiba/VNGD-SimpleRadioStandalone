@@ -83,19 +83,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         }
 
-        private void ClientRadioUpdated(DCSRadios radio)
+        private void ClientRadioUpdated()
         {
-            SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.RADIO_UPDATE, ClientRadioUpdate = radio });
+            SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.PING });
 
         }
 
         private void CallOnMain(bool result)
         {
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
+            try
             {
-                callback(result);
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
+                {
+                    callback(result);
 
-            }));
+                }));
+            }
+            catch(Exception ex)
+            {
+
+            }
+           
         }
 
         private void ClientSyncLoop()
@@ -112,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
 
                     //start the loop off by sending a SYNC Request
-                    SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.SYNC, ClientRadioUpdate = new DCSRadios() });
+                    SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.SYNC });
 
 
                     string line;
@@ -127,15 +135,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             {
                                 switch (lastRadioTransmit.MsgType)
                                 {
-                                    case NetworkMessage.MessageType.RADIO_UPDATE:
-                                        logger.Info("Recevied: " + NetworkMessage.MessageType.RADIO_UPDATE);
+                                    case NetworkMessage.MessageType.PING:
+                                        logger.Info("Recevied: " + NetworkMessage.MessageType.PING);
 
                                         if(clients.ContainsKey(lastRadioTransmit.ClientGuid))
                                         {
                                             SRClient srClient = clients[lastRadioTransmit.ClientGuid];
-                                            srClient.ClientRadios = lastRadioTransmit.ClientRadioUpdate;
-                                            srClient.LastUpdate = System.Environment.TickCount;
-                                          
+                                            if(srClient!=null)
+                                            {
+                                                srClient.LastUpdate = System.Environment.TickCount;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            clients[lastRadioTransmit.ClientGuid] = new SRClient() { LastUpdate = System.Environment.TickCount, ClientGuid = lastRadioTransmit.ClientGuid};
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:

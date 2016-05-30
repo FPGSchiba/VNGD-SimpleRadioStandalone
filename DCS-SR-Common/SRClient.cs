@@ -13,8 +13,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public string ClientGuid { get; set; }
 
-        public DCSRadios ClientRadios { get; set; }
-
         [JsonIgnore]
         public Socket ClientSocket { get; set; }
 
@@ -23,5 +21,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonIgnore]
         public long LastUpdate { get; set; }
+
+        public bool isCurrent()
+        {
+            return LastUpdate > (System.Environment.TickCount - 10000); //last in game 10 seconds ago
+        }
     }
 }

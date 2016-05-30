@@ -11,7 +11,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public enum MessageType
         {
-            RADIO_UPDATE,
+         
             PING,
             SYNC,
         }
@@ -19,8 +19,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string ClientGuid { get; set; }
 
         public MessageType MsgType { get; set; }
-
-        public DCSRadios ClientRadioUpdate { get; set; }
 
         public List<SRClient> Clients { get; set; }
 

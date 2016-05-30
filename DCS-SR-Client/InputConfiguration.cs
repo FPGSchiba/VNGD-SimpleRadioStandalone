@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 string key = bind.ToString();
                 Registry.SetValue(REG_PATH,
             key + "_name",
-            device.DeviceName);
+            device.DeviceName.Replace("\0",""));
 
                 Registry.SetValue(REG_PATH,
                   key + "_button",
