@@ -2,6 +2,7 @@
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class AudioManager
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
 
@@ -73,6 +76,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             
                 _stop = false;
 
+            try
+            {
+                //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
+
+                mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
+
+                //add silence track?
+                BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
+                //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
+
+                mixing.AddMixerInput(provider);
+
+                //TODO pass all this to the audio manager
+
+                //Audio manager should start / stop and cleanup based on connection successfull and disconnect
+                //Should use listeners to synchronise all the state
+
+                _waveOut = new WaveOut();
+                _waveOut.DesiredLatency = 100; //75ms latency in output buffer
+                _waveOut.DeviceNumber = speakers;
+
+                _waveOut.Init(mixing);
+                _waveOut.Play();
+
                 _segmentFrames = 960; //960 frames is 20 ms of audio
                 _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
@@ -83,35 +110,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.BufferMilliseconds = 60;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(48000, 16, 1); // should this be 44100??
+                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1); // should this be 44100??
 
-            //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
+              
+                udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
+                Thread voiceSenderThread = new Thread(udpVoiceHandler.Listen);
 
-            mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1));
-            //add silence track?
-            BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1));
-           
-            mixing.AddMixerInput(provider);
-
-                //TODO pass all this to the audio manager
-
-                //Audio manager should start / stop and cleanup based on connection successfull and disconnect
-                //Should use listeners to synchronise all the state
-
-                _waveOut = new WaveOut();
-                _waveOut.DesiredLatency = 100; //75ms latency in output buffer
-                _waveOut.DeviceNumber = speakers;
-                _waveOut.Init(mixing);
-                _waveOut.Play();
-
-                  udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
-                  Thread voiceSenderThread = new Thread(udpVoiceHandler.Listen);
-
-                 voiceSenderThread.Start();
+                voiceSenderThread.Start();
 
                 _waveIn.StartRecording();
-        
+            }
+            catch(Exception ex)
+            {
+                logger.Error(ex, "Error starting audio Quitting!" );
 
+
+                Environment.Exit(1);
+            }
 
         }
 

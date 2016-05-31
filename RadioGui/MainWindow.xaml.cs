@@ -24,7 +24,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 
-namespace RadioGui
+namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
