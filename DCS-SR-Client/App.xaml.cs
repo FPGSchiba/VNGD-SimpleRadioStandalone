@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using NBug;
 
 namespace DCS_SR_Client
 {
@@ -13,5 +14,6 @@ namespace DCS_SR_Client
     /// </summary>
     public partial class App : Application
     {
+     
     }
 }

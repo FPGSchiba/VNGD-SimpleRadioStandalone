@@ -48,6 +48,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public MainWindow()
         {
+
+
             InitializeComponent();
 
             for (int i = 0; i < WaveIn.DeviceCount; i++)

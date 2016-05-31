@@ -2,6 +2,7 @@
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using NBug;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         public MainWindow()
         {
+          
+
             InitializeComponent();
 
             SetupLogging();
