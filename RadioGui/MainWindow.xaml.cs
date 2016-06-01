@@ -31,16 +31,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class MainWindow : Window
     {
-
-
         private UdpClient udpClient;
         private const int UdpClientBroadcastPort = 35024;
 
         private UdpClient activeRadioUdpClient;
         private const int ActiveRadioClientPort = 35025;
-
-        private UdpClient hotkeyClient;
-        private const int HotkeyClientClientPort = 35026;
 
         private volatile bool end;
 
@@ -54,7 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public MainWindow()
         {
-
             InitializeComponent();
 
             // this.SourceInitialized += MainWindow_SourceInitialized;
@@ -68,17 +62,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             this.containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
             radio1.radioId = 0;
-            //    this.radio1.radioControlContainer.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
-
             radio2.radioId = 1;
-            //    this.radio2.radioControlContainer.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
-
             radio3.radioId = 2;
-            //    this.radio3.radioControlContainer.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
             SetupActiveRadio();
             SetupRadioStatus();
-
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -96,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             int i = 0;
             foreach (Process clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Equals("dcs-simpleradio"))
+                if (clsProcess.ProcessName.ToLower().Equals("sr-overlay"))
                 {
                     i++;
                 }
@@ -122,27 +110,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 using (udpClient)
                 {
-
                     while (!end)
                     {
                         try
                         {
-                            //IPEndPoint object will allow us to read datagrams sent from any source.
-                            var remoteEndPoint = new IPEndPoint(IPAddress.Any, UdpClientBroadcastPort);
+                      //IPEndPoint object will allow us to read datagrams sent from any source.
+                      var remoteEndPoint = new IPEndPoint(IPAddress.Any, UdpClientBroadcastPort);
                             udpClient.Client.ReceiveTimeout = 10000;
                             var receivedResults = udpClient.Receive(ref remoteEndPoint);
 
                             lastUpdate = JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(receivedResults));
 
                             lastUpdateTime = DateTime.Now;
-
                         }
                         catch (Exception e)
                         {
                             Console.Out.WriteLine(e.ToString());
                         }
-
-
                     }
 
                     this.udpClient.Close();
@@ -151,31 +135,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Task.Run(() =>
             {
-
-
                 while (!end)
                 {
                     Thread.Sleep(100);
 
-                    //check 
-                    if (lastUpdate != null && lastUpdate.name != null)
+              //check
+              if (lastUpdate != null && lastUpdate.name != null)
                     {
                         Application.Current.Dispatcher.Invoke(new Action(() =>
-                        {
+                  {
+                //check if current
+                long elapsedTicks = DateTime.Now.Ticks - lastUpdateTime.Ticks;
+                      TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
 
-                            //check if current
-                            long elapsedTicks = DateTime.Now.Ticks - lastUpdateTime.Ticks;
-                            TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
-
-                            radio1.update(lastUpdate, elapsedSpan);
-                            radio2.update(lastUpdate, elapsedSpan);
-                            radio3.update(lastUpdate, elapsedSpan);
-
-                        }));
+                      radio1.update(lastUpdate, elapsedSpan);
+                      radio2.update(lastUpdate, elapsedSpan);
+                      radio3.update(lastUpdate, elapsedSpan);
+                  }));
                     }
                 }
             });
-
         }
 
         private void SetupActiveRadio()
@@ -195,17 +174,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 using (activeRadioUdpClient)
                 {
-
                     while (!end)
                     {
                         try
                         {
-                            //IPEndPoint object will allow us to read datagrams sent from any source.
-                            var remoteEndPoint = new IPEndPoint(IPAddress.Any, ActiveRadioClientPort);
+                      //IPEndPoint object will allow us to read datagrams sent from any source.
+                      var remoteEndPoint = new IPEndPoint(IPAddress.Any, ActiveRadioClientPort);
                             activeRadioUdpClient.Client.ReceiveTimeout = 10000;
                             var receivedResults = activeRadioUdpClient.Receive(ref remoteEndPoint);
 
-                            RadioTransmit lastRadioTransmit = JsonConvert.DeserializeObject<RadioTransmit>(Encoding.UTF8.GetString(receivedResults));
+                            RadioTransmit lastRadioTransmit =
+                        JsonConvert.DeserializeObject<RadioTransmit>(Encoding.UTF8.GetString(receivedResults));
                             switch (lastRadioTransmit.radio)
                             {
                                 case 0:
@@ -223,10 +202,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                         }
                         catch (Exception e)
                         {
-                            // Console.Out.WriteLine(e.ToString());
-                        }
-
-
+                      // Console.Out.WriteLine(e.ToString());
+                  }
                     }
 
                     this.activeRadioUdpClient.Close();
@@ -235,23 +212,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Task.Run(() =>
             {
-
-
                 while (!end)
                 {
                     Thread.Sleep(100);
 
                     Application.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        radio1.repaintRadioTransmit();
-                        radio2.repaintRadioTransmit();
-                        radio3.repaintRadioTransmit();
-
-                    }));
+              {
+                    radio1.repaintRadioTransmit();
+                    radio2.repaintRadioTransmit();
+                    radio3.repaintRadioTransmit();
+                }));
                 }
-
             });
-
         }
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -264,7 +236,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             base.OnClosing(e);
 
             this.end = true;
-
         }
 
         ~MainWindow()
@@ -302,22 +273,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Send("239.255.50.10", 5060, bytes);
             //unicast
             Send("127.0.0.1", 5061, bytes);
-
-
         }
+
         private void Send(String ipStr, int port, byte[] bytes)
         {
             try
             {
-
                 UdpClient client = new UdpClient();
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
             }
-            catch (Exception e) { }
-
+            catch (Exception e)
+            {
+            }
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -336,18 +306,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-
             if (sizeInfo.WidthChanged)
                 this.Width = sizeInfo.NewSize.Height * aspectRatio;
             else
                 this.Height = sizeInfo.NewSize.Width / aspectRatio;
 
             // Console.WriteLine(this.Height +" width:"+ this.Width);
-
         }
 
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
-        public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue", typeof(double), typeof(MainWindow), new UIPropertyMetadata(1.0, new PropertyChangedCallback(OnScaleValueChanged), new CoerceValueCallback(OnCoerceScaleValue)));
+
+        public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
+          typeof(double), typeof(MainWindow),
+          new UIPropertyMetadata(1.0, new PropertyChangedCallback(OnScaleValueChanged),
+            new CoerceValueCallback(OnCoerceScaleValue)));
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
@@ -376,23 +348,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected virtual void OnScaleValueChanged(double oldValue, double newValue)
         {
-
         }
 
         public double ScaleValue
         {
-            get
-            {
-                return (double)GetValue(ScaleValueProperty);
-            }
-            set
-            {
-                SetValue(ScaleValueProperty, value);
-            }
+            get { return (double)GetValue(ScaleValueProperty); }
+            set { SetValue(ScaleValueProperty, value); }
         }
+
         #endregion
-
-
     }
-
 }

@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             this.guid = guid;
         }
 
-        
+
 
         public void TryConnect(IPEndPoint endpoint, ConnectCallback callback)
         {
@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 catch (SocketException ex)
                 {
-              
+
                     logger.Error(ex, "error connecting to server");
                 }
 
@@ -99,11 +99,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 }));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
-           
+
         }
 
         private void ClientSyncLoop()
@@ -138,17 +138,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     case NetworkMessage.MessageType.PING:
                                         logger.Info("Recevied: " + NetworkMessage.MessageType.PING);
 
-                                        if(clients.ContainsKey(lastRadioTransmit.ClientGuid))
+                                        if (clients.ContainsKey(lastRadioTransmit.ClientGuid))
                                         {
                                             SRClient srClient = clients[lastRadioTransmit.ClientGuid];
-                                            if(srClient!=null)
+                                            if (srClient != null)
                                             {
                                                 srClient.LastUpdate = System.Environment.TickCount;
                                             }
                                         }
                                         else
                                         {
-                                            clients[lastRadioTransmit.ClientGuid] = new SRClient() { LastUpdate = System.Environment.TickCount, ClientGuid = lastRadioTransmit.ClientGuid};
+                                            clients[lastRadioTransmit.ClientGuid] = new SRClient() { LastUpdate = System.Environment.TickCount, ClientGuid = lastRadioTransmit.ClientGuid };
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
@@ -173,7 +173,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         catch (Exception ex)
                         {
                             logger.Error(ex, "Client exception reading from socket ");
-                       
+
                         }
 
                         // do something with line
@@ -183,14 +183,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 catch (Exception ex)
                 {
                     logger.Error(ex, "Client exception reading - Disconnecting ");
-                  
+
                 }
             }
             //clear the clietns list
             clients.Clear();
+
+            //disconnect callback
+            CallOnMain(false);
+
         }
 
-   
+
 
         private void SendToServer(NetworkMessage message)
         {
@@ -204,7 +208,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex)
             {
                 logger.Error(ex, "Client exception sending so server");
-               
+
                 Disconnect();
             }
         }

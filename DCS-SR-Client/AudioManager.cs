@@ -22,9 +22,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private static extern long GetTickCount64();
 
         ConcurrentDictionary<String, SRClient> clientsList;
-   
+
         ConcurrentDictionary<String, ClientAudioProvider> clientsBufferedAudio = new ConcurrentDictionary<string, ClientAudioProvider>();
-    
+
         WaveIn _waveIn;
         WaveOut _waveOut;
         BufferedWaveProvider _playBuffer;
@@ -50,17 +50,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //Clean  - remove if we havent received audio in a while
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-           if (clientsBufferedAudio.ContainsKey(audio.ClientGUID))
-           {
+            if (clientsBufferedAudio.ContainsKey(audio.ClientGUID))
+            {
                 client = clientsBufferedAudio[audio.ClientGUID];
                 client.lastUpdate = GetTickCount64();
             }
             else
             {
                 client = new ClientAudioProvider();
-                client.lastUpdate = GetTickCount64(); 
+                client.lastUpdate = GetTickCount64();
                 clientsBufferedAudio[audio.ClientGUID] = client;
-               
+
                 mixing.AddMixerInput(client.VolumeSampleProvider);
             }
 
@@ -70,11 +70,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
 
         }
-  
+
         public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress)
         {
-            
-                _stop = false;
+
+            _stop = false;
 
             try
             {
@@ -112,7 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1); // should this be 44100??
 
-              
+
                 udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
                 Thread voiceSenderThread = new Thread(udpVoiceHandler.Listen);
 
@@ -120,9 +120,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveIn.StartRecording();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.Error(ex, "Error starting audio Quitting!" );
+                logger.Error(ex, "Error starting audio Quitting!");
 
 
                 Environment.Exit(1);
@@ -132,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
 
 
-        
+
 
         void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
@@ -171,35 +171,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void StopEncoding()
         {
-            if(_waveIn!=null)
+            if (_waveIn != null)
             {
                 _waveIn.StopRecording();
                 _waveIn.Dispose();
                 _waveIn = null;
             }
 
-            if(_waveOut!=null)
+            if (_waveOut != null)
             {
                 _waveOut.Stop();
                 _waveOut.Dispose();
                 _waveOut = null;
             }
 
-            if(_playBuffer!=null)
+            if (_playBuffer != null)
             {
                 _playBuffer.ClearBuffer();
-                _playBuffer = null; 
+                _playBuffer = null;
             }
-        
-            
-            if(_encoder!=null)
+
+
+            if (_encoder != null)
             {
                 _encoder.Dispose();
                 _encoder = null;
 
             }
-           
-            if(_decoder!=null)
+
+            if (_decoder != null)
             {
                 _decoder.Dispose();
                 _decoder = null;

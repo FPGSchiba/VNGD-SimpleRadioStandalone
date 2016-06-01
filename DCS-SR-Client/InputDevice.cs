@@ -14,7 +14,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             SWITCH_2,
             SWITCH_3,
             PTT
-
         }
 
         public InputBinding InputBind { get; set; }
@@ -26,7 +25,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public InputDevice()
         {
-
         }
     }
 }

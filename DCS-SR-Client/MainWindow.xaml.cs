@@ -67,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             guid = Guid.NewGuid().ToString();
             SetupLogging();
-           
+
 
             inputManager = new InputDeviceManager(this);
             LoadInputSettings();
@@ -76,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         }
 
-       
+
 
         private void SetupLogging()
         {
@@ -111,9 +111,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             //TODO load input settings
 
-            if(inputManager.InputConfig.inputDevices != null)
+            if (inputManager.InputConfig.inputDevices != null)
             {
-                if(inputManager.InputConfig.inputDevices[0] !=null)
+                if (inputManager.InputConfig.inputDevices[0] != null)
                 {
                     pttCommonText.Text = inputManager.InputConfig.inputDevices[0].Button.ToString();
                     pttCommonDevice.Text = inputManager.InputConfig.inputDevices[0].DeviceName;
@@ -137,7 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     ptt3Device.Text = inputManager.InputConfig.inputDevices[3].DeviceName;
                 }
             }
-           
+
         }
 
 
@@ -156,7 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     client = new ClientSync(clients, guid);
                     client.TryConnect(new IPEndPoint(ipAddr, 5002), ConnectCallback);
-                   
+
 
                     startStop.Content = "Connecting...";
 
@@ -196,8 +196,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (_stop)
                 {
                     startStop.Content = "Disconnect";
-                   
-                        audioManager.StartEncoding(mic.SelectedIndex,speakers.SelectedIndex, guid,inputManager, IPAddress.Parse(this.serverIp.Text.Trim()));
+
+                    audioManager.StartEncoding(mic.SelectedIndex, speakers.SelectedIndex, guid, inputManager, IPAddress.Parse(this.serverIp.Text.Trim()));
                     _stop = false;
                 }
 
@@ -235,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 inputManager.InputConfig.inputDevices[0] = device;
                 inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
-              
+
             });
 
         }

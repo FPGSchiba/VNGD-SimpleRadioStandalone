@@ -65,7 +65,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //detect the state of all current buttons
             Task.Run(() =>
             {
-
                 bool[,] initial = new bool[this.inputDevices.Count, 128];
 
                 for (int i = 0; i < this.inputDevices.Count; i++)
@@ -90,7 +89,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             initial[i, j] = state.IsPressed(state.AllKeys[j]);
                         }
                     }
-
                 }
 
                 string device = string.Empty;
@@ -116,7 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 {
                                     found = true;
                                     button = j;
-                                    device = this.inputDevices[i].Information.ProductName.Trim().Replace("\0","");
+                                    device = this.inputDevices[i].Information.ProductName.Trim().Replace("\0", "");
                                     deviceGuid = this.inputDevices[i].Information.InstanceGuid;
                                     break;
                                 }
@@ -147,12 +145,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
 
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-
-                    callback(new InputDevice() { DeviceName = device, Button = button, InstanceGUID = deviceGuid });
-
-                }));
+                Application.Current.Dispatcher.Invoke(
+            new Action(
+            () => { callback(new InputDevice() { DeviceName = device, Button = button, InstanceGUID = deviceGuid }); }));
             });
         }
 
@@ -166,14 +161,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 while (detectPTT)
                 {
-
                     foreach (var device in InputConfig.inputDevices)
                     {
                         if (device != null)
                         {
                             for (int i = 0; i < this.inputDevices.Count; i++)
                             {
-
                                 if (this.inputDevices[i].Information.InstanceGuid.Equals(device.InstanceGUID))
                                 {
                                     if (this.inputDevices[i] is Joystick)
@@ -192,21 +185,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         callback(state.IsPressed(state.AllKeys[device.Button]), device.InputBind);
                                         break;
                                     }
-
                                 }
                             }
                         }
-
-
                     }
 
                     Thread.Sleep(1);
                 }
-
             });
             pttInputThread.Start();
-
         }
+
         public void StopPTT()
         {
             detectPTT = false;

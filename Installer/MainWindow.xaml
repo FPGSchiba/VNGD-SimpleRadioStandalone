@@ -7,13 +7,13 @@
         ResizeMode="NoResize"
         xmlns:local="clr-namespace:Installer"
         mc:Ignorable="d"
-        Title="DCS-SimpleRadio Installer" Height="276.934" Width="450">
+        Title="SR Installer" Height="276.934" Width="450">
     <Grid Name="containerPanel">
-        <Label x:Name="intro" FontSize="20" Content="DCS-SimpleRadio Standalone Installer / Updater" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
+        <Label x:Name="intro" FontSize="20" Content="SimpleRadio Standalone Installer / Updater" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
 
         <Label x:Name="step2" FontSize="20" Content="Step 1: Pick Install Location" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="422"/>
 
-        <TextBox x:Name="srPath" HorizontalAlignment="Left" Height="23" Margin="10,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Text="C:\Program Files\DCS-SimpleRadio" />
+        <TextBox x:Name="srPath" HorizontalAlignment="Left" Height="23" Margin="10,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Text="C:\Program Files\DCS-SimpleRadio-Standalone" />
         <Button x:Name="srPathButton" Content="Locate" HorizontalAlignment="Left" Margin="337,87,0,0" VerticalAlignment="Top" Width="75" Click="Set_Install_Path"/>
 
         <Label x:Name="step3" FontSize="20" Content="Step 2: Pick DCS Version" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="422"/>
