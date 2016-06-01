@@ -4,6 +4,5 @@
     {
         public int radio;
         public bool secondary;
-
     }
 }

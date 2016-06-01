@@ -11,7 +11,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public enum MessageType
         {
-         
+
             PING,
             SYNC,
         }

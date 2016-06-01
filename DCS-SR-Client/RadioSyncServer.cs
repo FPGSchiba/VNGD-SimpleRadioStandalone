@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 Keeps radio information in Sync Between DCS and 
 
 **/
+
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     public class RadioSyncServer
@@ -50,8 +51,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void StartRadioGUIListener()
         {
             //START GUI LISTENER
-   
-                                     
+
+
             this.radioCommandUDPListener = new UdpClient();
             this.radioCommandUDPListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             this.radioCommandUDPListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
@@ -76,16 +77,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         int length = 0;
                         try
                         {
-
                             RadioCommand message = JsonConvert.DeserializeObject<RadioCommand>((Encoding.ASCII.GetString(
-               bytes, 0, bytes.Length)));
+                                                                                             bytes, 0, bytes.Length)));
 
                             HandleRadioCommand(message);
                         }
                         catch (Exception e)
                         {
                             logger.Error(e, "Exception Handling DCS  Message");
-
                         }
                     }
 
@@ -96,28 +95,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     catch (Exception e)
                     {
                         logger.Error(e, "Exception stoping DCS listener ");
-
                     }
-
                 }
-
             });
         }
 
         private void HandleRadioCommand(RadioCommand radioCommand)
         {
-            if(radioCommand.cmdType == RadioCommand.CmdType.SELECT)
+            if (radioCommand.cmdType == RadioCommand.CmdType.SELECT)
             {
-                if(dcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION )
+                if (dcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
                     dcsPlayerRadioInfo.selected = (short)radioCommand.radio;
                 }
             }
             else if (radioCommand.cmdType == RadioCommand.CmdType.FREQUENCY)
             {
-                if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION 
-                    && radioCommand.radio >=0 
-                    && radioCommand.radio< 3 )
+                if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
+                    && radioCommand.radio >= 0
+                    && radioCommand.radio < 3)
                 {
                     //sort out the frequencies
                     var clientRadio = dcsPlayerRadioInfo.radios[radioCommand.radio];
@@ -136,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             else if (radioCommand.cmdType == RadioCommand.CmdType.VOLUME)
             {
-                if (dcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION 
+                if (dcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION
                     && radioCommand.radio >= 0
                     && radioCommand.radio < 3)
                 {
@@ -172,15 +168,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         try
                         {
-
                             DCSPlayerRadioInfo message = JsonConvert.DeserializeObject<DCSPlayerRadioInfo>((Encoding.ASCII.GetString(
-               bytes, 0, bytes.Length)));
+                                                                                                         bytes, 0, bytes.Length)));
 
-                            //update internal radio
-                            UpdateRadio(message);
+                      //update internal radio
+                      UpdateRadio(message);
 
-                            //sync with others
-                            if (ShouldSendUpdate(message))
+                      //sync with others
+                      if (ShouldSendUpdate(message))
                             {
                                 lastSent = System.Environment.TickCount;
                                 this.updateDelegate();
@@ -189,7 +184,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         catch (Exception e)
                         {
                             logger.Error(e, "Exception Handling DCS  Message");
-
                         }
                     }
 
@@ -200,21 +194,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     catch (Exception e)
                     {
                         logger.Error(e, "Exception stoping DCS listener ");
-
                     }
-
                 }
-
             });
         }
+
         private void UpdateRadio(DCSPlayerRadioInfo message)
         {
-
-            if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION) // Full radio, all from DCS
+            if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            // Full radio, all from DCS
             {
                 dcsPlayerRadioInfo = message;
             }
-            else if(message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)  // Partial radio - can select radio but the rest is from DCS
+            else if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
+            // Partial radio - can select radio but the rest is from DCS
             {
                 //update common parts
                 dcsPlayerRadioInfo.name = message.name;
@@ -235,9 +228,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
 
                 //copy over radio names, min + max
-                for(int i =0; i< dcsPlayerRadioInfo.radios.Length; i++)
+                for (int i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                 {
-                    var updateRadio =  message.radios[i];
+                    var updateRadio = message.radios[i];
 
                     var clientRadio = dcsPlayerRadioInfo.radios[i];
 
@@ -248,10 +241,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     clientRadio.secondaryFrequency = updateRadio.secondaryFrequency;
 
                     clientRadio.modulation = updateRadio.modulation;
-                
+
                     //check we're not over a limit
 
-                    if(clientRadio.frequency > clientRadio.freqMax)
+                    if (clientRadio.frequency > clientRadio.freqMax)
                     {
                         clientRadio.frequency = clientRadio.freqMax;
                     }
@@ -267,10 +260,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             SendUpdateToGUI();
         }
+
         private bool ShouldSendUpdate(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if(System.Environment.TickCount - lastSent < 4000)
+            if (System.Environment.TickCount - lastSent < 4000)
             {
                 return false;
             }
@@ -285,21 +279,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             //multicast
             send("239.255.50.10", 35024, bytes);
             //unicast
-          //  send("127.0.0.1", 5061, bytes);
+            //  send("127.0.0.1", 5061, bytes);
         }
+
         private void send(String ipStr, int port, byte[] bytes)
         {
             try
             {
-
                 UdpClient client = new UdpClient();
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
             }
-            catch (Exception e) { }
-
+            catch (Exception e)
+            {
+            }
         }
 
         public void Stop()
@@ -310,14 +305,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 this.dcsUDPListener.Close();
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
             try
             {
                 this.radioCommandUDPListener.Close();
             }
-            catch (Exception ex) { }
-
-
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

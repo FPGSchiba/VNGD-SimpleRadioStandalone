@@ -14,6 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             VOLUME = 2,
             SELECT = 3,
         }
+
         public double freq = 1;
         public int radio;
         public float volume = 1.0f;

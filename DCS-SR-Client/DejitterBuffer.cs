@@ -97,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         internal byte[] MixDown()
         {
-     
+
 
             firstPacketTime = long.MaxValue;
 
@@ -109,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 var clientBytesArray = clientBuffers.Values.ToList();
 
 
-                for (int i =0;i< clientBytesArray.Count();i++)
+                for (int i = 0; i < clientBytesArray.Count(); i++)
                 {
                     var client = clientBytesArray[i];
                     if (client.Count() > mixDownSize)
@@ -156,16 +156,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 catch (Exception Ex)
                 {
-                    logger.Warn(Ex,"Error processing audio mixdown ");
+                    logger.Warn(Ex, "Error processing audio mixdown ");
                 }
 
                 clientBuffers.Clear();
                 return mixDownByteArray;
             }
-            else if(clientBuffers.Count() == 1)
+            else if (clientBuffers.Count() == 1)
             {
-               
-                var res =  clientBuffers.Values.First().ToArray();
+
+                var res = clientBuffers.Values.First().ToArray();
                 clientBuffers.Clear();
                 return res;
             }
@@ -173,14 +173,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return new byte[0];
         }
 
-   
+
 
         //FROM: http://stackoverflow.com/a/25102339
 
         private short MixSpeakers(int speaker1, int speaker2)
         {
 
-           return (short)(speaker1 + speaker2 - ((speaker1 * speaker2) / 65535));
+            return (short)(speaker1 + speaker2 - ((speaker1 * speaker2) / 65535));
 
             //method 2
             //int tmp = speaker1 + speaker2;

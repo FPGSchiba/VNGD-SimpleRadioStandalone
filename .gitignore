@@ -257,3 +257,4 @@ _Pvt_Extensions
 *.sln.iml
 =======
 >>>>>>> 49ec92f9f197c0601077ed148a95307a47790dfd
+install-build/DCS-SimpleRadioStandalone.lua

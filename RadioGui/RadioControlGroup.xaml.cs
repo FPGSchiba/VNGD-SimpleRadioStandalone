@@ -71,32 +71,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void sendUDPUpdate(RadioCommand update)
         {
-
             //only send update if the aircraft doesnt have its own radio system, i.e FC3
-            if (lastUpdate!=null && lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (lastUpdate != null && lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
                 byte[] bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
                 //multicast
                 send("239.255.50.10", 5060, bytes);
                 //unicast
-              //  send("127.0.0.1", 5061, bytes);
+                //  send("127.0.0.1", 5061, bytes);
             }
-        
         }
+
         private void send(String ipStr, int port, byte[] bytes)
         {
             try
             {
-
                 UdpClient client = new UdpClient();
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
             }
-            catch (Exception e) { }
-
+            catch (Exception e)
+            {
+            }
         }
+
         private void sendFrequencyChange(double frequency)
         {
             RadioCommand update = new RadioCommand();
@@ -133,7 +133,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void radioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-          
             RadioCommand update = new RadioCommand();
             update.radio = this.radioId;
             update.volume = ((float)radioVolume.Value) / 100.0f;
@@ -154,7 +153,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radioFrequency.Text = "Unknown";
 
                 radioVolume.IsEnabled = false;
-               
+
                 up10.IsEnabled = false;
                 up1.IsEnabled = false;
                 up01.IsEnabled = false;
@@ -169,7 +168,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
             else
             {
-
                 if (this.radioId == lastUpdate.selected)
                 {
                     radioActive.Fill = new SolidColorBrush(Colors.Green);
@@ -181,14 +179,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 var currentRadio = lastUpdate.radios[this.radioId];
 
-                if(currentRadio.modulation == 2) //intercom
+                if (currentRadio.modulation == 2) //intercom
                 {
                     radioFrequency.Text = "INTERCOM";
                 }
                 else
                 {
-                    radioFrequency.Text = (currentRadio.frequency / MHz).ToString("0.000") + (currentRadio.modulation == 0 ? "AM" : "FM");
-                    if(currentRadio.secondaryFrequency > 100)
+                    radioFrequency.Text = (currentRadio.frequency / MHz).ToString("0.000") +
+                                          (currentRadio.modulation == 0 ? "AM" : "FM");
+                    if (currentRadio.secondaryFrequency > 100)
                     {
                         radioFrequency.Text += " G";
                     }
@@ -197,7 +196,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
-                    
                     radioVolume.IsEnabled = false;
                     up10.IsEnabled = false;
                     up1.IsEnabled = false;
@@ -206,15 +204,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     down10.IsEnabled = false;
                     down1.IsEnabled = false;
                     down01.IsEnabled = false;
-                
+
 
                     //reset dragging just incase
                     this.dragging = false;
-                
                 }
                 else if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
                 {
-
                     radioVolume.IsEnabled = true;
 
                     up10.IsEnabled = false;
@@ -227,7 +223,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     //reset dragging just incase
                     this.dragging = false;
-
                 }
                 else
                 {
@@ -245,11 +240,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     radioVolume.Value = (currentRadio.volume * 100.0);
                 }
-
-
             }
         }
-     
+
         public void setLastRadioTransmit(RadioTransmit radio)
         {
             this.lastActive = radio;
@@ -276,7 +269,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (this.lastActive.radio == this.radioId)
                     {
-                        if(this.lastActive.secondary)
+                        if (this.lastActive.secondary)
                         {
                             radioFrequency.Foreground = new SolidColorBrush(Colors.Red);
                         }

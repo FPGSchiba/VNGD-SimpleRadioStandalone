@@ -44,8 +44,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients)
         {
             this._clients = connectedClients;
-           
-         //   this.clientIndexList.Capacity = 100000;
+
+            //   this.clientIndexList.Capacity = 100000;
         }
 
         public void StartListening()
@@ -123,9 +123,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 SRClient client;
                 _clients.TryRemove(state.guid, out client);
 
-                if (client!=null)
+                if (client != null)
                 {
-                  
+
                     _logger.Info("Removed Client " + state.guid);
                 }
             }
@@ -179,7 +179,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         catch (Exception ex)
                         {
                             _logger.Error(ex, "Server - Client Exception reading");
-                         
+
                         }
 
                         //clear the state buffer
@@ -215,8 +215,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 var clientIp = (IPEndPoint)state.workSocket.RemoteEndPoint;
 
-              //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
-               // logger.Info("Recevied: " + message.MsgType);
+                //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
+                // logger.Info("Recevied: " + message.MsgType);
 
                 switch (message.MsgType)
                 {
@@ -227,9 +227,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
-                        if(!_clients.ContainsKey(message.ClientGuid))
+                        if (!_clients.ContainsKey(message.ClientGuid))
                         {
-                        
+
                             SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientSocket = state.workSocket };
 
                             //add to proper list
@@ -259,7 +259,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void HandleClientPing(NetworkMessage message)
         {
-            if(_clients.ContainsKey(message.ClientGuid))
+            if (_clients.ContainsKey(message.ClientGuid))
             {
                 var client = _clients[message.ClientGuid];
 
@@ -339,7 +339,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
 
-
+                foreach (var client in _clients)
+                {
+                    try
+                    {
+                        client.Value.ClientSocket.Close();
+                    }
+                    catch (Exception ex) { }
+                }
                 listener.Close();
 
                 _clients.Clear();

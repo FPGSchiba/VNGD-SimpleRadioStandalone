@@ -35,21 +35,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         UDPVoiceRouter _serverListener;
 
         ConcurrentDictionary<String, SRClient> _connectedClients = new ConcurrentDictionary<string, SRClient>();
- 
+
         private ServerSync _serverSync;
 
         volatile bool _stop = false;
 
         public MainWindow()
         {
-          
-
             InitializeComponent();
 
             SetupLogging();
 
             StartClientList();
-
         }
 
         private void StartClientList()
@@ -60,41 +57,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                 {
                     Application.Current.Dispatcher.Invoke(new Action(() =>
 
+              {
+                    try
                     {
-
-                        try
-                        {
-
-                            this.clientsCount.Content = _connectedClients.Count().ToString();
-
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }));
+                        this.clientsCount.Content = _connectedClients.Count().ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }));
 
                     Thread.Sleep(1000);
                 }
-
             });
         }
 
         private void SetupLogging()
         {
-
-            // Step 1. Create configuration object 
+            // Step 1. Create configuration object
             var config = new LoggingConfiguration();
 
-            // Step 2. Create targets and add them to the configuration 
+            // Step 2. Create targets and add them to the configuration
             var consoleTarget = new ColoredConsoleTarget();
             config.AddTarget("console", consoleTarget);
 
             var fileTarget = new FileTarget();
             config.AddTarget("file", fileTarget);
 
-            // Step 3. Set target properties 
+            // Step 3. Set target properties
             consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
             fileTarget.FileName = "${basedir}/serverlog.txt";
             fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
@@ -119,7 +109,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
             else
             {
-
                 button.Content = "Stop Server";
                 _serverListener = new UDPVoiceRouter(_connectedClients);
                 Thread listenerThread = new Thread(_serverListener.Listen);
@@ -131,6 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                 serverSyncThread.Start();
             }
         }
+
         private void stopServer()
         {
             if (_serverListener != null)
@@ -139,7 +129,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                 _serverSync = null;
                 _serverListener.RequestStop();
                 _serverListener = null;
-
             }
         }
 
@@ -148,13 +137,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             base.OnClosing(e);
 
             stopServer();
-
         }
     }
-
-
-
-
-
-
 }

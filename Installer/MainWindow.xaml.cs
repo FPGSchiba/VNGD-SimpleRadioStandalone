@@ -14,7 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using System.Diagnostics;
-
 using Microsoft.Win32;
 using System.IO;
 
@@ -25,21 +24,22 @@ namespace Installer
     /// </summary>
     public partial class MainWindow
     {
-        const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadio";
+        const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
 
-        const string version = "1.4.2";
+        const string version = "1.0";
 
         string currentPath;
         string currentDirectory;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            this.intro.Content = this.intro.Content + " v"+ version;
+            this.intro.Content = this.intro.Content + " v" + version;
 
             //allows click and drag anywhere on the window
             this.containerPanel.MouseLeftButtonDown += GridPanel_MouseLeftButtonDown;
-         
+
             string srPathStr = ReadSRPath();
             if (srPathStr != "")
             {
@@ -58,12 +58,12 @@ namespace Installer
             }
         }
 
-   
+
         private string ReadSRPath()
         {
             string srPath = (string)Registry.GetValue(REG_PATH,
-                "SRPathStandalone",
-                "");
+              "SRPathStandalone",
+              "");
 
             return srPath == null ? "" : srPath;
         }
@@ -71,30 +71,29 @@ namespace Installer
         private void WriteSRPath(String path)
         {
             Registry.SetValue(REG_PATH,
-                "SRPathStandalone",
-                path);
+              "SRPathStandalone",
+              path);
         }
 
         private void DeleteRegKeys()
         {
             Registry.SetValue(REG_PATH,
-                "SRPathStandalone",
-                "");
+              "SRPathStandalone",
+              "");
         }
 
-      
+
         //
         private bool Is_SimpleRadio_running()
         {
             foreach (Process clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Equals("dcs-simpleradio-standalone"))
+                if (clsProcess.ProcessName.ToLower().Equals("sr-overlay") || clsProcess.ProcessName.ToLower().Equals("sr-overlay"))
                 {
                     return true;
                 }
             }
             return false;
-
         }
 
         private void GridPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -102,7 +101,7 @@ namespace Installer
             DragMove();
         }
 
- 
+
         private void Set_Install_Path(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
@@ -119,7 +118,6 @@ namespace Installer
                 filename = filename + "DCS-SimpleRadio-Standalone\\";
 
                 srPath.Text = filename;
-
             }
         }
 
@@ -135,11 +133,10 @@ namespace Installer
 
         private void InstallSR(bool beta)
         {
-          
-
             if (this.Is_SimpleRadio_running())
             {
-                MessageBox.Show("Please close SimpleRadio Overlay before updating!", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please close SimpleRadio Overlay before updating!", "SR Standalone Installer",
+                  MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return;
             }
@@ -157,11 +154,13 @@ namespace Installer
             {
                 if (beta)
                 {
-                    MessageBox.Show("Unable to find DCS Open Beta Profile in Saved Games", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Unable to find DCS Open Beta Profile in Saved Games", "SR Standalone Installer",
+                      MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else
                 {
-                    MessageBox.Show("Unable to find DCS Profile in Saved Games", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Unable to find DCS Profile in Saved Games", "SR Standalone Installer",
+                      MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
                 return;
@@ -176,23 +175,30 @@ namespace Installer
 
             //TODO save registry settings
             WriteSRPath(this.srPath.Text);
-        
 
-            MessageBox.Show("Installation / Update Completed Succesfully!", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            MessageBox.Show("Installation / Update Completed Succesfully!", "SR Standalone Installer",
+              MessageBoxButton.OK, MessageBoxImage.Information);
 
             //open to installation location
             System.Diagnostics.Process.Start("explorer.exe", (this.srPath.Text));
         }
+
         public void InstallProgram(string path)
         {
+            if (Directory.Exists(path) && File.Exists(path + "\\SR-ClientRadio.exe"))
+            {
+                DeleteDirectory(path);
+            }
             Directory.CreateDirectory(path);
 
-            File.Delete(path + "\\DCS-SimpleRadio-Standalone.exe");
-            File.Delete(path + "\\Newtonsoft.Json.dll");
 
-            File.Copy(currentDirectory + "\\DCS-SimpleRadio\\DCS-SimpleRadio.exe", path + "\\DCS-SimpleRadio.exe");
-            File.Copy(currentDirectory + "\\DCS-SimpleRadio\\Newtonsoft.Json.dll", path + "\\Newtonsoft.Json.dll");
-
+            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll");
+            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe");
+            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe");
+            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe");
+            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe");
+            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua");
         }
 
         private void InstallScripts(string path)
@@ -206,11 +212,11 @@ namespace Installer
             {
                 String contents = File.ReadAllText(path + "\\Export.lua");
 
-                if (contents.Contains("SimpleRadioInit.lua"))
+                if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
-                    
-                    contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
-                    contents = contents.Replace("local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                    contents =
+                      contents.Replace(
+                        "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
                     contents = contents.Trim();
 
                     File.WriteAllText(path + "\\Export.lua", contents);
@@ -221,14 +227,13 @@ namespace Installer
             {
                 StreamWriter writer = File.AppendText(path + "\\Export.lua");
 
-                writer.WriteLine("\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])");
+                writer.WriteLine(
+                  "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
                 writer.Close();
             }
 
-            //now copy DCS-SimpleRadio to scripts  folder
-            Directory.CreateDirectory(path + "\\DCS-SimpleRadio");
-
-            File.Copy(currentDirectory + "\\DCS-SimpleRadio\\Scripts\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua");
+            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
+              path + "\\DCS-SimpleRadioStandalone.lua");
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
@@ -255,11 +260,10 @@ namespace Installer
 
         private void UninstallSR()
         {
-          
-
             if (this.Is_SimpleRadio_running())
             {
-                MessageBox.Show("Please close SimpleRadio Standalone Overlay before removing!", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please close SimpleRadio Standalone Overlay before removing!",
+                  "SR Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return;
             }
@@ -273,40 +277,40 @@ namespace Installer
             RemoveScripts(dcsPath + ".openalpha\\Scripts");
             RemoveScripts(dcsPath + "\\Scripts");
 
-            if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\DCS-SimpleRadio.exe")) 
+            if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\SR-ClientRadio.exe"))
             {
                 DeleteDirectory(srPath.Text);
             }
 
             DeleteRegKeys();
 
-            MessageBox.Show("DCS-SimpleRadio Standalone Removed Successfully!", "DCS-SimpleRadio Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("SR Standalone Removed Successfully!", "SR Standalone Installer",
+              MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
 
         private void RemoveScripts(string path)
         {
-          
             //does it contain an export.lua?
             if (File.Exists(path + "\\Export.lua"))
             {
                 String contents = File.ReadAllText(path + "\\Export.lua");
 
-                if (contents.Contains("SimpleRadioInit.lua"))
+                if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
-                    contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])","");
-                    contents = contents.Replace("local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                    contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                    contents =
+                      contents.Replace(
+                        "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
                     contents = contents.Trim();
 
                     File.WriteAllText(path + "\\Export.lua", contents);
                 }
             }
-           
-        
+
+            File.Delete(path + "\\DCS-SimpleRadioStandalone.lua");
         }
 
-
-    
         private void Remove_Plugin(object sender, RoutedEventArgs e)
         {
             UninstallSR();
