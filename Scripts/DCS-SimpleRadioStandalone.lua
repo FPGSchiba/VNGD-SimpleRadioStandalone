@@ -127,9 +127,9 @@ LuaExportActivityNextEvent = function(tCurrent)
             end
 
             if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5058))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
             else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5057))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
             end
 
         else
@@ -150,9 +150,9 @@ LuaExportActivityNextEvent = function(tCurrent)
             }
 
             if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5058))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
             else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5057))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
             end
 
         end

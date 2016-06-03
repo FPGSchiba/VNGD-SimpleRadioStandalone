@@ -7,13 +7,13 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DCS-SimpleRadio Server")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DCS-SimpleRadio Standalone Server")]
+[assembly: AssemblyDescription("Server for DCS-SimpleRadio Standalone")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DCS-SimpleRadio Server")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Ciribob - GitHub.com/Ciribob")]
+[assembly: AssemblyProduct("DCS-SimpleRadio Standalone")]
+[assembly: AssemblyCopyright("Copyright ©  2016 - Ciribob")]
+[assembly: AssemblyTrademark("Ciribob - GitHub.com/Ciribob")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

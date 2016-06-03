@@ -346,7 +346,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             try
             {
                 UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35025);
+                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35035);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();

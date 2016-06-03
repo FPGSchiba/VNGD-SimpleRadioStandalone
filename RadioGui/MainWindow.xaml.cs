@@ -32,10 +32,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class MainWindow : Window
     {
         private UdpClient udpClient;
-        private const int UdpClientBroadcastPort = 35024;
+        private const int UdpClientBroadcastPort = 35034;
 
         private UdpClient activeRadioUdpClient;
-        private const int ActiveRadioClientPort = 35025;
+        private const int ActiveRadioClientPort = 35035;
 
         private volatile bool end;
 
@@ -270,9 +270,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             byte[] bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
             //multicast
-            Send("239.255.50.10", 5060, bytes);
+            Send("239.255.50.10", 5070, bytes);
             //unicast
-            Send("127.0.0.1", 5061, bytes);
+           // Send("127.0.0.1", 5061, bytes);
         }
 
         private void Send(String ipStr, int port, byte[] bytes)

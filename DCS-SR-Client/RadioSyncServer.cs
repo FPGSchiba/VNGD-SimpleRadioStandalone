@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             IPAddress multicastaddress = IPAddress.Parse("239.255.50.10");
             this.radioCommandUDPListener.JoinMulticastGroup(multicastaddress);
 
-            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 5060);
+            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 5070);
             this.radioCommandUDPListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     while (!_stop)
                     {
-                        IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5057);
+                        IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5070);
                         byte[] bytes = radioCommandUDPListener.Receive(ref groupEP);
 
                         int length = 0;
@@ -152,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             IPAddress multicastaddress = IPAddress.Parse("239.255.50.10");
             this.dcsUDPListener.JoinMulticastGroup(multicastaddress);
 
-            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 5057);
+            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 5067);
             this.dcsUDPListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -163,7 +163,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     while (!_stop)
                     {
-                        IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5057);
+                        IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5067);
                         byte[] bytes = dcsUDPListener.Receive(ref groupEP);
 
                         try
@@ -277,7 +277,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             byte[] bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(dcsPlayerRadioInfo) + "\n");
             //multicast
-            send("239.255.50.10", 35024, bytes);
+            send("239.255.50.10", 35034, bytes);
             //unicast
             //  send("127.0.0.1", 5061, bytes);
         }
