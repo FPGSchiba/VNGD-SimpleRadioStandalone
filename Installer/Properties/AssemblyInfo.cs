@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Installer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DCS SR Installer")]
+[assembly: AssemblyDescription("SimpleRadio Standalone Installer")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Installer")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCompany("Ciribob -  http://github.com/ciribob")]
+[assembly: AssemblyProduct("SR Standalone")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

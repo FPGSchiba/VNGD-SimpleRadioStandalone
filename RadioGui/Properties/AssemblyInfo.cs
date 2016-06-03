@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription("Radio Status Panel for DCS-SimpleRadio Standalone")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ciribob - GitHub.com/Ciribob")]
-[assembly: AssemblyProduct("DCS-SimpleRadio Standaline")]
+[assembly: AssemblyProduct("DCS-SimpleRadio Standalone")]
 [assembly: AssemblyCopyright("Copyright ©  2016 - Ciribob")]
 [assembly: AssemblyTrademark("Ciribob - GitHub.com/Ciribob")]
 [assembly: AssemblyCulture("")]

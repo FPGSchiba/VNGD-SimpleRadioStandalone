@@ -23,6 +23,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.IO;
+using GitHubUpdate;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
@@ -47,6 +49,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             SetupLogging();
 
             StartClientList();
+
+            StartServer();
+
+            button.Content = "Stop Server";
+
+            CheckForUpdate();
         }
 
         private void StartClientList()
@@ -55,7 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
                 while (!_stop)
                 {
-                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
 
               {
                     try
@@ -70,6 +78,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                     Thread.Sleep(1000);
                 }
             });
+        }
+
+        private async void CheckForUpdate()
+        {
+            try
+            {
+                var checker = new UpdateChecker("ciribob", "DCS-SimpleRadioStandalone"); // uses Application.ProductVersion
+
+                UpdateType update = await checker.CheckUpdate();
+
+                if (update == UpdateType.None)
+                {
+                    // Up to date!
+                }
+                else
+                {
+                    MessageBoxResult result = MessageBox.Show("New Version Available!\n\nDo you want to Update?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                    // Process message box results
+                    switch (result)
+                    {
+                        case MessageBoxResult.Yes:
+                            checker.DownloadAsset("DCS-SR-Standalone.zip");
+                            break;
+                        case MessageBoxResult.No:
+
+                            break;
+                    }  
+                }
+            }
+            catch (Exception ex) { }
         }
 
         private void SetupLogging()
@@ -110,15 +149,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             else
             {
                 button.Content = "Stop Server";
-                _serverListener = new UDPVoiceRouter(_connectedClients);
-                Thread listenerThread = new Thread(_serverListener.Listen);
-                listenerThread.Start();
-
-
-                _serverSync = new ServerSync(_connectedClients);
-                Thread serverSyncThread = new Thread(_serverSync.StartListening);
-                serverSyncThread.Start();
+                StartServer();
+                
             }
+        }
+        private void StartServer()
+        {
+            _serverListener = new UDPVoiceRouter(_connectedClients);
+            Thread listenerThread = new Thread(_serverListener.Listen);
+            listenerThread.Start();
+
+
+            _serverSync = new ServerSync(_connectedClients);
+            Thread serverSyncThread = new Thread(_serverSync.StartListening);
+            serverSyncThread.Start();
         }
 
         private void stopServer()

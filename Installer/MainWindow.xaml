@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="SR Installer" Height="276.934" Width="450">
     <Grid Name="containerPanel">
-        <Label x:Name="intro" FontSize="20" Content="SimpleRadio Standalone Installer / Updater" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
+        <Label x:Name="intro" FontSize="20" Content="SimpleRadio Standalone Installer -" HorizontalAlignment="Left"  Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
 
         <Label x:Name="step2" FontSize="20" Content="Step 1: Pick Install Location" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="422"/>
 

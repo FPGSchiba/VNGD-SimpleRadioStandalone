@@ -26,14 +26,16 @@ namespace Installer
     {
         const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
 
-        const string version = "1.0";
-
         string currentPath;
         string currentDirectory;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
 
             this.intro.Content = this.intro.Content + " v" + version;
 
@@ -193,12 +195,12 @@ namespace Installer
             Directory.CreateDirectory(path);
 
 
-            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll");
-            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe");
-            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe");
-            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe");
-            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe");
-            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua");
+            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll",true);
+            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe",true);
+            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe",true);
+            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe",true);
+            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe",true);
+            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",true);
         }
 
         private void InstallScripts(string path)
@@ -231,9 +233,18 @@ namespace Installer
                   "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
                 writer.Close();
             }
+            else
+            {
+                StreamWriter writer = File.CreateText(path + "\\Export.lua");
+
+                writer.WriteLine(
+                  "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                writer.Close();
+               
+            }
 
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
-              path + "\\DCS-SimpleRadioStandalone.lua");
+              path + "\\DCS-SimpleRadioStandalone.lua",true);
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
