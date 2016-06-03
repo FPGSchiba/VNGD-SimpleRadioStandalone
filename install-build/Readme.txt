@@ -1,0 +1,1 @@
+Extract all the files from the Zip before running the Installer!

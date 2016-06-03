@@ -1,4 +1,4 @@
--- Version 1.0
+-- Version 1.0.0.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 SR = {}
