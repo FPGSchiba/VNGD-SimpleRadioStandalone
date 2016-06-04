@@ -110,6 +110,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
             });
 
+            StartPing();
+
             while (!stop)
             {
                 try
@@ -182,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                         long time = GetTickCount64(); //should add at the receive instead?
 
-                        if (encodedOpusAudio != null && encodedOpusAudio.Length > 0)
+                        if (encodedOpusAudio != null && encodedOpusAudio.Length > 36)
                         {
                             //  process
                             // check if we should play audio
@@ -201,8 +203,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 int unitId = -1; // TODO send unitID stuff
 
                                 // check the radio
+                                int radioId = -1;
                                 RadioInformation receivingRadio = CanHear(RadioSyncServer.dcsPlayerRadioInfo, frequency, modulation,
-                                  unitId);
+                                  unitId,out radioId);
                                 if (receivingRadio != null)
                                 {
                                     //now check that the radios match
@@ -225,6 +228,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         audio.Frequency = frequency;
                                         audio.Modulation = modulation;
                                         audio.Volume = receivingRadio.volume;
+                                        audio.ReceivedRadio = radioId;
 
                                         //TODO throw away audio for each client that is before the latest receive time!
                                         audioManager.addClientAudio(audio);
@@ -245,7 +249,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, int unitId)
+        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, int unitId,out int radioId)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -259,6 +263,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         && myClient.unitId == unitId)
                     {
                         SendUpdateToGUI(i, false);
+                        radioId = i;
                         return receivingRadio;
                     }
                     else if (receivingRadio.frequency == frequency
@@ -266,17 +271,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                              && receivingRadio.frequency > 1)
                     {
                         SendUpdateToGUI(i, false);
+                        radioId = i;
                         return receivingRadio;
                     }
                     else if (receivingRadio.secondaryFrequency == frequency
                              && receivingRadio.secondaryFrequency > 100)
                     {
                         SendUpdateToGUI(i, true);
+                        radioId = i;
                         return receivingRadio;
                     }
                 }
             }
-
+            radioId = -1;
             return null;
         }
 
@@ -334,6 +341,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 //    }
             }
+        }
+
+        private void StartPing()
+        {
+            Task.Run(() =>
+            {
+                byte[] message = { 1, 2, 3, 4, 5 };
+                while (!stop)
+                {
+                    logger.Info("Pinging Server");
+                    try
+                    {
+                        Send(message, message.Length);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
+                    Thread.Sleep(60 * 1000);
+                }
+            });
         }
 
 

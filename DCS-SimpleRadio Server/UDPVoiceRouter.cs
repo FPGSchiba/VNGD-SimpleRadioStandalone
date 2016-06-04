@@ -34,6 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             _listener.AllowNatTraversal(true);
             _listener.ExclusiveAddressUse = true;
             _listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
+            StartPing();
             while (!_stop)
             {
                 try
@@ -126,7 +127,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
 
         }
+
+
+        private void StartPing()
+        {
+            Task.Run(() =>
+            {
+                byte[] message = { 1, 2, 3, 4, 5 };
+                while (!_stop)
+                {
+
+                    _logger.Info("Pinging Clients");
+                    try
+                    {
+                        foreach (var client in _clientsList)
+                        {
+                            try
+                            {
+
+                                IPEndPoint ip = client.Value.voipPort;
+
+                                if (ip != null)
+                                {
+                                    _listener.Send(message, message.Length, ip);
+                          
+                                }
+
+                            }
+                            catch (Exception e)
+                            {}
+                        }
+                    }
+                    catch (Exception e)
+                    { }
+
+                    Thread.Sleep(60 * 1000);
+
+                }
+            });
+        }
+
     }
+
+
 }
 
 
