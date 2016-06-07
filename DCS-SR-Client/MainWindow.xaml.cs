@@ -26,6 +26,7 @@ using SharpDX.DirectInput;
 using SharpDX.Multimedia;
 using NAudio.Wave.SampleProviders;
 using GitHubUpdate;
+using System.Collections.Concurrent;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -35,48 +36,85 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     public partial class MainWindow : Window
     {
 
-        ClientSync client;
+        ClientSync _client;
 
-        String guid;
+        String _guid;
 
-        InputDeviceManager inputManager;
+        InputDeviceManager _inputManager;
 
-        AudioManager audioManager;
+        AudioManager _audioManager;
 
-        System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient> clients = new System.Collections.Concurrent.ConcurrentDictionary<string, Common.SRClient>();
+        ConcurrentDictionary<string, Common.SRClient> _clients = new ConcurrentDictionary<string, Common.SRClient>();
+
+        AppConfiguration _appConfig;
+        AudioPreview _audioPreview;
+
+        IPAddress _resolvedIP;
 
         bool _stop = true;
 
         public MainWindow()
         {
-
-
             InitializeComponent();
 
+            SetupLogging();
+
+            _appConfig = new AppConfiguration();
+            _guid = Guid.NewGuid().ToString();
+
+            InitAudioInput();
+
+            InitAudioOutput();
+
+            _inputManager = new InputDeviceManager(this);
+
+            LoadInputSettings();
+
+            this.serverIp.Text = _appConfig.LastServer;
+            this.microphoneBoost.Value = _appConfig.MicBoost;
+            //   this.boostAmount.Content = "Boost: " + this.microphoneBoost.Value;
+            _audioManager = new AudioManager(_clients);
+            _audioManager.Volume = (float)this.microphoneBoost.Value;
+
+            CheckForUpdate();
+
+        }
+
+
+
+        private void InitAudioInput()
+        {
             for (int i = 0; i < WaveIn.DeviceCount; i++)
             {
                 mic.Items.Add(WaveIn.GetCapabilities(i).ProductName);
             }
-            if (WaveIn.DeviceCount > 0)
+
+            if (WaveIn.DeviceCount >= _appConfig.AudioInputDeviceId && WaveIn.DeviceCount > 0)
+            {
+                mic.SelectedIndex = _appConfig.AudioInputDeviceId;
+            }
+            else if(WaveIn.DeviceCount > 0)
+            {
                 mic.SelectedIndex = 0;
+            }
+        }
+
+        private void InitAudioOutput()
+        {
             for (int i = 0; i < WaveOut.DeviceCount; i++)
             {
                 speakers.Items.Add(WaveOut.GetCapabilities(i).ProductName);
             }
-            if (WaveOut.DeviceCount > 0)
+
+            if (WaveOut.DeviceCount >= _appConfig.AudioOutputDeviceId && WaveOut.DeviceCount > 0)
+            {
+                speakers.SelectedIndex = _appConfig.AudioOutputDeviceId;
+            }
+            else if (WaveOut.DeviceCount > 0)
+            {
                 speakers.SelectedIndex = 0;
-
-            guid = Guid.NewGuid().ToString();
-            SetupLogging();
-
-
-            inputManager = new InputDeviceManager(this);
-            LoadInputSettings();
-
-            audioManager = new AudioManager(clients);
-
-            CheckForUpdate();
-
+            }
+     
         }
 
         private async void CheckForUpdate()
@@ -143,30 +181,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             //TODO load input settings
 
-            if (inputManager.InputConfig.inputDevices != null)
+            if (_inputManager.InputConfig.inputDevices != null)
             {
-                if (inputManager.InputConfig.inputDevices[0] != null)
+                if (_inputManager.InputConfig.inputDevices[0] != null)
                 {
-                    pttCommonText.Text = inputManager.InputConfig.inputDevices[0].Button.ToString();
-                    pttCommonDevice.Text = inputManager.InputConfig.inputDevices[0].DeviceName;
+                    pttCommonText.Text = _inputManager.InputConfig.inputDevices[0].Button.ToString();
+                    pttCommonDevice.Text = _inputManager.InputConfig.inputDevices[0].DeviceName;
                 }
 
 
-                if (inputManager.InputConfig.inputDevices[1] != null)
+                if (_inputManager.InputConfig.inputDevices[1] != null)
                 {
-                    ptt1Text.Text = inputManager.InputConfig.inputDevices[1].Button.ToString();
-                    ptt1Device.Text = inputManager.InputConfig.inputDevices[1].DeviceName;
+                    ptt1Text.Text = _inputManager.InputConfig.inputDevices[1].Button.ToString();
+                    ptt1Device.Text = _inputManager.InputConfig.inputDevices[1].DeviceName;
                 }
-                if (inputManager.InputConfig.inputDevices[2] != null)
+                if (_inputManager.InputConfig.inputDevices[2] != null)
                 {
-                    ptt2Text.Text = inputManager.InputConfig.inputDevices[2].Button.ToString();
-                    ptt2Device.Text = inputManager.InputConfig.inputDevices[2].DeviceName;
+                    ptt2Text.Text = _inputManager.InputConfig.inputDevices[2].Button.ToString();
+                    ptt2Device.Text = _inputManager.InputConfig.inputDevices[2].DeviceName;
                 }
 
-                if (inputManager.InputConfig.inputDevices[3] != null)
+                if (_inputManager.InputConfig.inputDevices[3] != null)
                 {
-                    ptt3Text.Text = inputManager.InputConfig.inputDevices[3].Button.ToString();
-                    ptt3Device.Text = inputManager.InputConfig.inputDevices[3].DeviceName;
+                    ptt3Text.Text = _inputManager.InputConfig.inputDevices[3].Button.ToString();
+                    ptt3Device.Text = _inputManager.InputConfig.inputDevices[3].DeviceName;
                 }
             }
 
@@ -182,21 +220,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                IPAddress ipAddr;
-
-                if (IPAddress.TryParse(this.serverIp.Text.Trim(), out ipAddr))
+                try
                 {
-                    client = new ClientSync(clients, guid);
-                    client.TryConnect(new IPEndPoint(ipAddr, 5002), ConnectCallback);
+                    //process hostname
+                    IPAddress[] ipAddr = Dns.GetHostAddresses(this.serverIp.Text.Trim());
 
+                    if (ipAddr.Length > 0)
+                    {
+                        this._resolvedIP = ipAddr[0];
 
-                    startStop.Content = "Connecting...";
+                        _client = new ClientSync(_clients, _guid);
+                        _client.TryConnect(new IPEndPoint(_resolvedIP, 5002), ConnectCallback);
 
+                        startStop.Content = "Connecting...";
+                        startStop.IsEnabled = false;
+                        mic.IsEnabled = false;
+                        speakers.IsEnabled = false;
+
+                    }
+                    else
+                    {
+                        //invalid ID
+                        MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-                else
+                catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
-                    //invalid ID
-
+                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
             }
@@ -204,18 +254,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void stop()
         {
             startStop.Content = "Start";
+            startStop.IsEnabled = true;
+            mic.IsEnabled = true;
+            speakers.IsEnabled = true;
             try
             {
-                audioManager.StopEncoding();
+                _audioManager.StopEncoding();
             }
             catch (Exception ex) { }
 
             _stop = true;
 
-            if (client != null)
+            if (_client != null)
             {
-                client.Disconnect();
-                client = null;
+                _client.Disconnect();
+                _client = null;
             }
 
 
@@ -228,8 +281,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (_stop)
                 {
                     startStop.Content = "Disconnect";
+                    startStop.IsEnabled = true;
 
-                    audioManager.StartEncoding(mic.SelectedIndex, speakers.SelectedIndex, guid, inputManager, IPAddress.Parse(this.serverIp.Text.Trim()));
+                    //save app settings
+                    _appConfig.LastServer = this.serverIp.Text.Trim();
+                    _appConfig.AudioInputDeviceId = mic.SelectedIndex;
+                    _appConfig.AudioOutputDeviceId = speakers.SelectedIndex;
+
+                    _audioManager.StartEncoding(mic.SelectedIndex, speakers.SelectedIndex, _guid, _inputManager, _resolvedIP);
                     _stop = false;
                 }
 
@@ -247,6 +306,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             stop();
 
+            if (_audioPreview != null)
+            {
+                _audioPreview.StopEncoding();
+                _audioPreview = null;
+            }
         }
 
         private void pttCommonButton_Click(object sender, RoutedEventArgs e)
@@ -255,7 +319,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             pttCommonButton.IsEnabled = false;
 
 
-            inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton((InputDevice device) =>
             {
                 pttCommonClear.IsEnabled = true;
                 pttCommonButton.IsEnabled = true;
@@ -265,8 +329,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 device.InputBind = InputDevice.InputBinding.PTT;
 
-                inputManager.InputConfig.inputDevices[0] = device;
-                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
+                _inputManager.InputConfig.inputDevices[0] = device;
+                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
 
             });
 
@@ -278,7 +342,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ptt1ButtonClear.IsEnabled = false;
 
 
-            inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton((InputDevice device) =>
             {
                 ptt1ButtonClear.IsEnabled = true;
                 ptt1ButtonClear.IsEnabled = true;
@@ -287,8 +351,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ptt1Text.Text = device.Button.ToString();
                 device.InputBind = InputDevice.InputBinding.SWITCH_1;
 
-                inputManager.InputConfig.inputDevices[1] = device;
-                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_1, device);
+                _inputManager.InputConfig.inputDevices[1] = device;
+                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_1, device);
 
             });
 
@@ -299,7 +363,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ptt2ButtonClear.IsEnabled = false;
 
 
-            inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton((InputDevice device) =>
             {
                 ptt2ButtonClear.IsEnabled = true;
                 ptt2ButtonClear.IsEnabled = true;
@@ -308,8 +372,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ptt2Text.Text = device.Button.ToString();
                 device.InputBind = InputDevice.InputBinding.SWITCH_2;
 
-                inputManager.InputConfig.inputDevices[2] = device;
-                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_2, device);
+                _inputManager.InputConfig.inputDevices[2] = device;
+                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_2, device);
 
             });
 
@@ -321,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ptt3ButtonClear.IsEnabled = false;
 
 
-            inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton((InputDevice device) =>
             {
                 ptt3ButtonClear.IsEnabled = true;
                 ptt3ButtonClear.IsEnabled = true;
@@ -330,10 +394,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ptt3Text.Text = device.Button.ToString();
                 device.InputBind = InputDevice.InputBinding.SWITCH_3;
 
-                inputManager.InputConfig.inputDevices[3] = device;
-                inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_3, device);
+                _inputManager.InputConfig.inputDevices[3] = device;
+                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_3, device);
 
             });
+
+        }
+
+        private void PreviewAudio(object sender, RoutedEventArgs e)
+        {
+            if (_audioPreview == null)
+            {
+                _audioPreview = new AudioPreview();
+                _audioPreview.StartPreview(mic.SelectedIndex, speakers.SelectedIndex);
+                _audioPreview.Volume.Volume = (float)this.microphoneBoost.Value;
+                preview.Content = "Stop Preview";
+            }
+            else
+            {
+                preview.Content = "Audio Preview";
+                _audioPreview.StopEncoding();
+                _audioPreview = null;
+            }
+
+        }
+
+        private void MicrophoneBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_audioPreview != null)
+            {
+                _audioPreview.Volume.Volume = (float)this.microphoneBoost.Value;
+            }
+            if (_audioManager != null)
+            {
+                _audioManager.Volume = (float)this.microphoneBoost.Value;
+            }
+            if (_appConfig != null)
+            {
+                _appConfig.MicBoost = (float)this.microphoneBoost.Value;
+            }
 
         }
     }

@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         ConcurrentDictionary<String, SRClient> clientsList;
 
-        ConcurrentDictionary<String, ClientAudioProvider> clientsBufferedAudio = new ConcurrentDictionary<string, ClientAudioProvider>();
+        ConcurrentDictionary<String, ClientAudioProvider> _clientsBufferedAudio = new ConcurrentDictionary<string, ClientAudioProvider>();
 
         WaveIn _waveIn;
         WaveOut _waveOut;
@@ -37,7 +37,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         byte[] _notEncodedBuffer = new byte[0];
         UDPVoiceHandler udpVoiceHandler;
-        MixingSampleProvider mixing;
+        MixingSampleProvider _mixing;
+
+        public float Volume { get; set; } = 1.0f;
 
         public AudioManager(ConcurrentDictionary<String, SRClient> clientsList)
         {
@@ -50,18 +52,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //Clean  - remove if we havent received audio in a while
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-            if (clientsBufferedAudio.ContainsKey(audio.ClientGUID))
+            if (_clientsBufferedAudio.ContainsKey(audio.ClientGUID))
             {
-                client = clientsBufferedAudio[audio.ClientGUID];
+                client = _clientsBufferedAudio[audio.ClientGUID];
                 client.lastUpdate = GetTickCount64();
             }
             else
             {
                 client = new ClientAudioProvider();
                 client.lastUpdate = GetTickCount64();
-                clientsBufferedAudio[audio.ClientGUID] = client;
+                _clientsBufferedAudio[audio.ClientGUID] = client;
 
-                mixing.AddMixerInput(client.VolumeSampleProvider);
+                _mixing.AddMixerInput(client.VolumeSampleProvider);
             }
 
             client.VolumeSampleProvider.Volume = audio.Volume;
@@ -80,13 +82,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
-                mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
+                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
 
                 //add silence track?
                 BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
                 //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
 
-                mixing.AddMixerInput(provider);
+                _mixing.AddMixerInput(provider);
 
                 //TODO pass all this to the audio manager
 
@@ -97,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.DesiredLatency = 100; //75ms latency in output buffer
                 _waveOut.DeviceNumber = speakers;
 
-                _waveOut.Init(mixing);
+                _waveOut.Init(_mixing);
                 _waveOut.Play();
 
                 _segmentFrames = 960; //960 frames is 20 ms of audio
@@ -111,7 +113,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1); // should this be 44100??
-
 
                 udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
                 Thread voiceSenderThread = new Thread(udpVoiceHandler.Listen);
@@ -157,10 +158,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             for (int i = 0; i < segmentCount; i++)
             {
+                //create segment of audio
                 byte[] segment = new byte[byteCap];
                 for (int j = 0; j < segment.Length; j++)
+                {
                     segment[j] = soundBuffer[(i * byteCap) + j];
+                }
 
+                //boost microphone volume if needed
+                if (Volume != 1.0f)
+                {
+                    for (int n = 0; n < segment.Length; n += 2)
+                    {
+                        short sample = (short)((segment[n + 1] << 8) | segment[n + 0]);
+                        // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
+                        sample = (short)(sample * this.Volume);
+                        segment[n] = (byte)(sample & 0xFF);
+                        segment[n + 1] = (byte)(sample >> 8);
+                    }
+                }
+
+                //encode as opus bytes
                 int len;
                 byte[] buff = _encoder.Encode(segment, segment.Length, out len);
 
@@ -171,6 +189,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void StopEncoding()
         {
+            if(_mixing!=null)
+            {
+                _mixing.RemoveAllMixerInputs();
+            }
+
+            _clientsBufferedAudio.Clear();
+
             if (_waveIn != null)
             {
                 _waveIn.StopRecording();

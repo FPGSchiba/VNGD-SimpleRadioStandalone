@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DCS_SR_Client"
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
-        Title="SR Client" Height="300" Width="500">
+        Title="SR Client" Height="350" Width="500">
 
     <TabControl>
         <TabItem Header="General">
@@ -16,6 +16,11 @@
                     <StackPanel Margin="0">
                         <Label x:Name="micLabel" Content="Microphone" HorizontalAlignment="Center"/>
                         <ComboBox x:Name="mic" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
+
+                        <Slider x:Name="microphoneBoost" Width="300" Maximum="6.0" Minimum="1.0" ValueChanged="MicrophoneBoost_ValueChanged" Margin="0,10,0,0"/>
+                     
+                        <Button x:Name="preview" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Preview Audio"  Margin="0,10,0,0" Click="PreviewAudio" />
+
 
                         <Label x:Name="speakerLabel" Content="Speakers" HorizontalAlignment="Center"/>
                         <ComboBox x:Name="speakers" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150"/>
