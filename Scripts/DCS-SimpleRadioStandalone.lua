@@ -1,6 +1,10 @@
 -- Version 1.0.2.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
+-- Add:
+-- local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SimpleRadioStandalone.lua]])
+-- To your Export.lua to enable Simple Radio Standalone
+-- Make sure you copy this file to the same location as the Export.lua as well.
 SR = {}
 
 SR.unicast = false -- if you've setup DCS Correctly and the plugin isn't talking to DCS,
@@ -29,139 +33,152 @@ SR.UDPSendSocket:settimeout(0)
 local _prevExport = {}
 _prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
 
+local _send  = false
+
 LuaExportActivityNextEvent = function(tCurrent)
-    local tNext = tCurrent + 0.2
+    local tNext = tCurrent + 0.1 -- for helios support
+    -- we only want to send once every 0.2 seconds 
+    -- but helios (and other exports) require data to come much faster
+    -- so we just flip a boolean every run through to reduce to 0.2 rather than 0.1 seconds
+    if _send then
+        
+        _send = false
 
-    local _status,_result = pcall(function()
+        local _status,_result = pcall(function()
 
-        local _update  =
-        {
-            name = "",
-            unit = "",
-            selected = -1,
-            unitId = -1,
-
-            radios =
-            {
-                { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000},
-                { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 },
-                { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000 }
-            },
-            radioType = 3,
-        }
-
-        local _data = LoGetSelfData()
-
-        if _data ~= nil then
-
-
-            _update.name =  _data.UnitName
-            _update.unit = _data.Name
-            _update.unitId = LoGetPlayerPlaneId()
-            --            _update.pos.x = _data.Position.x
-            --            _update.pos.y = _data.Position.z
-
-            if _update.unit == "UH-1H" then
-                _update = SR.exportRadioUH1H(_update)
-            elseif _update.unit == "SA342M" then
-                _update = SR.exportRadioSA342M(_update)
-            elseif _update.unit == "Ka-50" then
-                _update = SR.exportRadioKA50(_update)
-            elseif _update.unit == "Mi-8MT" then
-                _update = SR.exportRadioMI8(_update)
-            elseif string.find(_update.unit, "L-39")  then
-                _update = SR.exportRadioL39(_update)
-            elseif _update.unit == "A-10C" then
-                _update = SR.exportRadioA10C(_update)
-            elseif _update.unit == "F-86F Sabre" then
-                _update = SR.exportRadioF86Sabre(_update)
-            elseif _update.unit == "MiG-15bis" then
-                _update = SR.exportRadioMIG15(_update)
-            elseif _update.unit == "MiG-21Bis" then
-                _update = SR.exportRadioMIG21(_update)
-            elseif _update.unit == "P-51D" or  _update.unit == "TF-51D" then
-                _update = SR.exportRadioP51(_update)
-            elseif _update.unit == "FW-190D9" then
-                _update = SR.exportRadioFW190(_update)
-            elseif _update.unit == "Bf-109K-4" then
-                _update = SR.exportRadioBF109(_update)
-            elseif _update.unit == "C-101EB" then
-                _update = SR.exportRadioC101(_update)
-            elseif _update.unit == "Hawk" then
-                _update = SR.exportRadioHawk(_update)
-            elseif _update.unit == "M-2000C" then
-                _update = SR.exportRadioM2000C(_update)
-			elseif _update.unit == "A-10A" then
-				_update = SR.exportRadioA10A(_update)
-			elseif _update.unit == "F-15C" then
-				_update = SR.exportRadioF15C(_update)
-			elseif _update.unit == "MiG-29A" or  _update.unit == "MiG-29S" or  _update.unit == "MiG-29G" then
-				_update = SR.exportRadioMiG29(_update)
-			elseif _update.unit == "Su-27" or  _update.unit == "Su-33" then
-				_update = SR.exportRadioSU27(_update)
-			elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
-				_update = SR.exportRadioSU25(_update)
-            else
-                -- FC 3
-                _update.radios[1].name = "FC3 UHF"
-                _update.radios[1].frequency = 251.0*1000000
-                _update.radios[1].modulation = 0
-                _update.radios[1].secondaryFrequency = 243.0*1000000
-
-                _update.radios[2].name = "FC3 VHF"
-                _update.radios[2].frequency = 124.8*1000000
-                _update.radios[2].modulation = 0
-                _update.radios[2].secondaryFrequency = 121.5*1000000
-
-                _update.radios[3].name = "FC3 FM"
-                _update.radios[3].frequency = 30.0*1000000
-                _update.radios[3].modulation = 1
-
-                _update.radios[1].volume = 1.0
-                _update.radios[2].volume = 1.0
-                _update.radios[3].volume = 1.0
-
-                _update.radioType = 3
-
-                _update.selected = 1
-            end
-
-            if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
-            else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
-            end
-
-        else
-
-            --Ground Commander or spectator
             local _update  =
             {
-                name = "Unknown",
-                unit = "CA",
-                selected = 0,
+                name = "",
+                unit = "",
+                selected = -1,
+                unitId = -1,
+
                 radios =
                 {
-                    { id = 1, name = "CA UHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 200*1000000, freqMax = 400*1000000 },
-                    { id = 2, name = "CA VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 100*1000000, freqMax = 200*1000000  },
-                    { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000  }
+                    { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000},
+                    { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 },
+                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000 }
                 },
-                radioType = 3
+                radioType = 3,
             }
 
-            if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+            local _data = LoGetSelfData()
+
+            if _data ~= nil then
+
+
+                _update.name =  _data.UnitName
+                _update.unit = _data.Name
+                _update.unitId = LoGetPlayerPlaneId()
+                --            _update.pos.x = _data.Position.x
+                --            _update.pos.y = _data.Position.z
+
+                if _update.unit == "UH-1H" then
+                    _update = SR.exportRadioUH1H(_update)
+                elseif string.find(_update.unit, "SA342") then
+                    _update = SR.exportRadioSA342M(_update)
+                elseif _update.unit == "Ka-50" then
+                    _update = SR.exportRadioKA50(_update)
+                elseif _update.unit == "Mi-8MT" then
+                    _update = SR.exportRadioMI8(_update)
+                elseif string.find(_update.unit, "L-39")  then
+                    _update = SR.exportRadioL39(_update)
+                elseif _update.unit == "A-10C" then
+                    _update = SR.exportRadioA10C(_update)
+                elseif _update.unit == "F-86F Sabre" then
+                    _update = SR.exportRadioF86Sabre(_update)
+                elseif _update.unit == "MiG-15bis" then
+                    _update = SR.exportRadioMIG15(_update)
+                elseif _update.unit == "MiG-21Bis" then
+                    _update = SR.exportRadioMIG21(_update)
+                elseif _update.unit == "P-51D" or  _update.unit == "TF-51D" then
+                    _update = SR.exportRadioP51(_update)
+                elseif _update.unit == "FW-190D9" then
+                    _update = SR.exportRadioFW190(_update)
+                elseif _update.unit == "Bf-109K-4" then
+                    _update = SR.exportRadioBF109(_update)
+                elseif _update.unit == "C-101EB" then
+                    _update = SR.exportRadioC101(_update)
+                elseif _update.unit == "Hawk" then
+                    _update = SR.exportRadioHawk(_update)
+                elseif _update.unit == "M-2000C" then
+                    _update = SR.exportRadioM2000C(_update)
+			    elseif _update.unit == "A-10A" then
+				    _update = SR.exportRadioA10A(_update)
+			    elseif _update.unit == "F-15C" then
+				    _update = SR.exportRadioF15C(_update)
+			    elseif _update.unit == "MiG-29A" or  _update.unit == "MiG-29S" or  _update.unit == "MiG-29G" then
+				    _update = SR.exportRadioMiG29(_update)
+			    elseif _update.unit == "Su-27" or  _update.unit == "Su-33" then
+				    _update = SR.exportRadioSU27(_update)
+			    elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
+				    _update = SR.exportRadioSU25(_update)
+                else
+                    -- FC 3
+                    _update.radios[1].name = "FC3 UHF"
+                    _update.radios[1].frequency = 251.0*1000000
+                    _update.radios[1].modulation = 0
+                    _update.radios[1].secondaryFrequency = 243.0*1000000
+
+                    _update.radios[2].name = "FC3 VHF"
+                    _update.radios[2].frequency = 124.8*1000000
+                    _update.radios[2].modulation = 0
+                    _update.radios[2].secondaryFrequency = 121.5*1000000
+
+                    _update.radios[3].name = "FC3 FM"
+                    _update.radios[3].frequency = 30.0*1000000
+                    _update.radios[3].modulation = 1
+
+                    _update.radios[1].volume = 1.0
+                    _update.radios[2].volume = 1.0
+                    _update.radios[3].volume = 1.0
+
+                    _update.radioType = 3
+
+                    _update.selected = 1
+                end
+
+                if SR.unicast then
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+                else
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
+                end
+
             else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
+
+                --Ground Commander or spectator
+                local _update  =
+                {
+                    name = "Unknown",
+                    unit = "CA",
+                    selected = 0,
+                    radios =
+                    {
+                        { id = 1, name = "CA UHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 200*1000000, freqMax = 400*1000000 },
+                        { id = 2, name = "CA VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 100*1000000, freqMax = 200*1000000  },
+                        { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000  }
+                    },
+                    radioType = 3
+                }
+
+                if SR.unicast then
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+                else
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
+                end
+
             end
 
+        end)
+
+        if not _status then
+            SR.log('ERROR: ' .. _result)
         end
 
-    end)
-
-    if not _status then
-        SR.log('ERROR: ' .. _result)
+    else 
+        _send = true
     end
+
 
     -- Call original function if it exists
     if _prevExport.LuaExportActivityNextEvent then
@@ -545,7 +562,7 @@ function SR.exportRadioA10C(_data)
         _data.selected = -1
     end
 
-    _data.radioType = 1; -- full radio
+    _data.radioType = 2; -- Partial Radio (switched from FUll due to HOTAS controls)
 
     return _data
 end
