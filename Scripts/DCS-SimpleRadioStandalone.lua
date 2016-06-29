@@ -1,10 +1,13 @@
--- Version 1.0.2.0
+-- Version 1.0.3.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
--- Add:
--- local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SimpleRadioStandalone.lua]])
--- To your Export.lua to enable Simple Radio Standalone
--- Make sure you copy this file to the same location as the Export.lua as well.
+-- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
+
+--      local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SimpleRadioStandalone.lua]])
+
+-- 
+-- Make sure you COPY this file to the same location as the Export.lua as well.
+-- If an Export.lua doesn't exist, just create one add add the single line in
 SR = {}
 
 SR.unicast = false -- if you've setup DCS Correctly and the plugin isn't talking to DCS,

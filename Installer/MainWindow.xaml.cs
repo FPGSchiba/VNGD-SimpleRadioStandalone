@@ -42,10 +42,21 @@ namespace Installer
             //allows click and drag anywhere on the window
             this.containerPanel.MouseLeftButtonDown += GridPanel_MouseLeftButtonDown;
 
-            string srPathStr = ReadSRPath();
+            string srPathStr = ReadPath("SRPathStandalone");
             if (srPathStr != "")
             {
                 srPath.Text = srPathStr;
+            }
+
+            string scriptsPath = ReadPath("ScriptsPath");
+            if (scriptsPath != "")
+            {
+                dcsScriptsPath.Text = scriptsPath;
+            }
+            else
+            {
+                dcsScriptsPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
+
             }
 
             //To get the location the assembly normally resides on disk or the install directory
@@ -61,27 +72,32 @@ namespace Installer
         }
 
 
-        private string ReadSRPath()
+        private string ReadPath(string key)
         {
             string srPath = (string)Registry.GetValue(REG_PATH,
-              "SRPathStandalone",
+              key,
               "");
 
             return srPath == null ? "" : srPath;
         }
 
-        private void WriteSRPath(String path)
+        private void WritePath(String path, String key)
         {
             Registry.SetValue(REG_PATH,
-              "SRPathStandalone",
+              key,
               path);
         }
+
+
 
         private void DeleteRegKeys()
         {
             Registry.SetValue(REG_PATH,
               "SRPathStandalone",
               "");
+            Registry.SetValue(REG_PATH,
+             "ScriptsPath",
+             "");
         }
 
 
@@ -123,17 +139,25 @@ namespace Installer
             }
         }
 
-        private void Install_Beta(object sender, RoutedEventArgs e)
+        private void Set_Scripts_Path(object sender, RoutedEventArgs e)
         {
-            InstallSR(true);
+            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+            if (result.ToString() == "OK")
+            {
+                // Open document
+                string filename = dlg.SelectedPath;
+
+                if (!filename.EndsWith("\\"))
+                {
+                    filename = filename + "\\";
+                }
+             
+                dcsScriptsPath.Text = filename;
+            }
         }
 
         private void Install_Release(object sender, RoutedEventArgs e)
-        {
-            InstallSR(false);
-        }
-
-        private void InstallSR(bool beta)
         {
             if (this.Is_SimpleRadio_running())
             {
@@ -143,40 +167,28 @@ namespace Installer
                 return;
             }
 
-            string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
+            // string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
+            var paths = FindValidDCSFolders(dcsScriptsPath.Text);
 
-            string dcsPath = savedGamesPath + "DCS";
-
-            if (beta)
+            if (paths.Count == 0)
             {
-                dcsPath = dcsPath + ".openalpha";
-            }
-
-            if (!Directory.Exists(dcsPath))
-            {
-                if (beta)
-                {
-                    MessageBox.Show("Unable to find DCS Open Beta Profile in Saved Games", "SR Standalone Installer",
-                      MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-                    MessageBox.Show("Unable to find DCS Profile in Saved Games", "SR Standalone Installer",
-                      MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+               
+                MessageBox.Show("Unable to find DCS Profile in Saved Games!\n\nPlease check the path to Saved Games folder", "SR Standalone Installer",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                
 
                 return;
             }
-
-            string scriptsPath = dcsPath + "\\Scripts";
-
-            InstallScripts(scriptsPath);
-
+            foreach(var path in paths)
+            {
+                InstallScripts(path+"\\Scripts");
+            }
+            
             //install program
             InstallProgram(this.srPath.Text);
 
-            //TODO save registry settings
-            WriteSRPath(this.srPath.Text);
+            WritePath(this.srPath.Text, "SRPathStandalone");
+            WritePath(this.dcsScriptsPath.Text, "ScriptsPath");
 
 
             MessageBox.Show("Installation / Update Completed Succesfully!", "SR Standalone Installer",
@@ -184,6 +196,25 @@ namespace Installer
 
             //open to installation location
             System.Diagnostics.Process.Start("explorer.exe", (this.srPath.Text));
+        }
+
+        public List<String> FindValidDCSFolders(String path)
+        {
+            var paths = new List<String>();
+
+            var variants = new List<String>();
+            variants.Add("DCS");
+            variants.Add("DCS.openbeta");
+            variants.Add("DCS.openalpha");
+
+            foreach(var variant in variants)
+            {
+                if (Directory.Exists(path+"\\"+variant))
+                {
+                    paths.Add(path + "\\" + variant);
+                }
+            }
+            return paths;
         }
 
         public void InstallProgram(string path)
@@ -243,8 +274,19 @@ namespace Installer
                
             }
 
-            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
-              path + "\\DCS-SimpleRadioStandalone.lua",true);
+            try
+            {
+                File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
+             path + "\\DCS-SimpleRadioStandalone.lua", true);
+
+            }
+            catch(FileNotFoundException ex)
+            {
+                MessageBox.Show("Install files not found - Unable to install! \n\nMake sure you extract all the files in the zip then run the Installer", "Not Unzipped", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+
+            }
+           
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
@@ -326,5 +368,7 @@ namespace Installer
         {
             UninstallSR();
         }
+
+       
     }
 }

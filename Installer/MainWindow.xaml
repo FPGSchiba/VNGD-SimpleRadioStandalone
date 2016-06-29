@@ -7,7 +7,7 @@
         ResizeMode="NoResize"
         xmlns:local="clr-namespace:Installer"
         mc:Ignorable="d"
-        Title="SR Installer" Height="276.934" Width="450">
+        Title="SR Installer" Height="300" Width="450">
     <Grid Name="containerPanel">
         <Label x:Name="intro" FontSize="20" Content="SimpleRadio Standalone Installer -" HorizontalAlignment="Left"  Margin="10,3,0,0" VerticalAlignment="Top" Width="422"/>
 
@@ -16,13 +16,17 @@
         <TextBox x:Name="srPath" HorizontalAlignment="Left" Height="23" Margin="10,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Text="C:\Program Files\DCS-SimpleRadio-Standalone" />
         <Button x:Name="srPathButton" Content="Locate" HorizontalAlignment="Left" Margin="337,87,0,0" VerticalAlignment="Top" Width="75" Click="Set_Install_Path"/>
 
-        <Label x:Name="step3" FontSize="20" Content="Step 2: Pick DCS Version" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="422"/>
+        <Label x:Name="step3" FontSize="20" Content="Step 2: Locate Saved Games" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="422"/>
 
 
-        <Button x:Name="button1" Content="Install / Update for DCS Release" HorizontalAlignment="Left" Margin="18,162,0,0" VerticalAlignment="Top" Width="185" Click="Install_Release"/>
-        <Button x:Name="button1_Copy" Content="Install / Update DCS Open Alpha" HorizontalAlignment="Left" Margin="239,162,0,0" VerticalAlignment="Top" Width="185" Click="Install_Beta"/>
-        <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="40" Margin="221,157,0,0" VerticalAlignment="Top" Width="5"/>
-        <Button x:Name="button1_Copy2" Content="Remove DCS-SimpleRadio Standalone" HorizontalAlignment="Left" Margin="114,211,0,0" VerticalAlignment="Top" Width="220" Click="Remove_Plugin" />
+        <TextBox x:Name="dcsScriptsPath" HorizontalAlignment="Left" Height="23" Margin="10,160,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Text="Saved Games" />
+        <Button x:Name="dcsPathButton" Content="Locate" HorizontalAlignment="Left" Margin="337,161,0,0" VerticalAlignment="Top" Width="75" Click="Set_Scripts_Path"/>
+
+
+        <Button x:Name="button1" Content="Install / Update SimpleRadio" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" Width="197" Click="Install_Release"/>
+        <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="20" Margin="212,233,0,0" VerticalAlignment="Top" Width="5"/>
+        <Button x:Name="button1_Copy2" Content="Remove DCS-SimpleRadio Standalone" HorizontalAlignment="Left" Margin="222,233,0,0" VerticalAlignment="Top" Width="206" Click="Remove_Plugin" />
+        <Label  FontSize="20" Content="Step 3: Install Or Remove" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top" Width="422"/>
 
     </Grid>
 </Window>
