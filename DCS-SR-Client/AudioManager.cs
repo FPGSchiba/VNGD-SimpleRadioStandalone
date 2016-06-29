@@ -49,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         internal void addClientAudio(ClientAudio audio)
         {
             //16bit PCM Audio
-            //Clean  - remove if we havent received audio in a while
+            //TODO: Clean  - remove if we havent received audio in a while
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
             if (_clientsBufferedAudio.ContainsKey(audio.ClientGUID))
@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             client.VolumeSampleProvider.Volume = audio.Volume;
 
-            client.BufferedWaveProvider.AddSamples(audio.PCMAudio, 0, audio.PCMAudio.Length);
+            client.AddSamples(audio);
 
 
         }
@@ -82,10 +82,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
-                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
+                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
 
                 //add silence track?
-                BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 1));
+                BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
                 //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
 
                 _mixing.AddMixerInput(provider);
