@@ -24,7 +24,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.IO;
-using GitHubUpdate;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
@@ -54,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             button.Content = "Stop Server";
 
-            CheckForUpdate();
+            UpdaterChecker.CheckForUpdate();
         }
 
         private void StartClientList()
@@ -78,37 +77,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                     Thread.Sleep(1000);
                 }
             });
-        }
-
-        private async void CheckForUpdate()
-        {
-            try
-            {
-                var checker = new UpdateChecker("ciribob", "DCS-SimpleRadioStandalone"); // uses Application.ProductVersion
-
-                UpdateType update = await checker.CheckUpdate();
-
-                if (update == UpdateType.None)
-                {
-                    // Up to date!
-                }
-                else
-                {
-                    MessageBoxResult result = MessageBox.Show("New Version Available!\n\nDo you want to Update?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                    // Process message box results
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            checker.DownloadAsset("DCS-SR-Standalone.zip");
-                            break;
-                        case MessageBoxResult.No:
-
-                            break;
-                    }  
-                }
-            }
-            catch (Exception ex) { }
         }
 
         private void SetupLogging()

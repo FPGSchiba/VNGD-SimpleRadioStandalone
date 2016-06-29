@@ -1,32 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using NAudio.Wave;
 using System.Net.Sockets;
 using System.Net;
-using System.Threading.Tasks;
-using FragLabs.Audio.Codecs;
-using System.Threading;
 using NLog.Config;
 using NLog.Targets;
 using NLog;
 using System.ComponentModel;
-using SharpDX.DirectInput;
-using SharpDX.Multimedia;
-using NAudio.Wave.SampleProviders;
-using GitHubUpdate;
 using System.Collections.Concurrent;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -35,7 +17,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-
         ClientSync _client;
 
         String _guid;
@@ -76,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioManager = new AudioManager(_clients);
             _audioManager.Volume = (float)this.microphoneBoost.Value;
 
-            CheckForUpdate();
+            UpdaterChecker.CheckForUpdate();
 
         }
 
@@ -117,36 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
      
         }
 
-        private async void CheckForUpdate()
-        {
-            try
-            {
-                var checker = new UpdateChecker("ciribob", "DCS-SimpleRadioStandalone"); // uses Application.ProductVersion
-
-                UpdateType update = await checker.CheckUpdate();
-
-                if (update == UpdateType.None)
-                {
-                    // Up to date!
-                }
-                else
-                {
-                    MessageBoxResult result = MessageBox.Show("New Version Available!\n\nDo you want to Update?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                    // Process message box results
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            checker.DownloadAsset("DCS-SR-Standalone.zip");
-                            break;
-                        case MessageBoxResult.No:
-
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex) { }
-        }
+ 
 
         private void SetupLogging()
         {
