@@ -89,6 +89,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         }
 
+        public void ClearInputRegistry(InputBinding bind)
+        {
+            try
+            {
+                string key = bind.ToString();
+                Registry.SetValue(REG_PATH,
+            key + "_name",
+            "");
+
+                Registry.SetValue(REG_PATH,
+                  key + "_button",
+                  "");
+
+                Registry.SetValue(REG_PATH,
+                  key + "_guid",
+                  "");
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+        }
+
 
     }
 }

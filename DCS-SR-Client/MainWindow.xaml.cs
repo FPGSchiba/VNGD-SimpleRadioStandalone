@@ -353,6 +353,46 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         }
 
+        private void pttCommonButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.PTT);
+            _inputManager.InputConfig.inputDevices[0] = null;
+
+            pttCommonDevice.Text = "None";
+            pttCommonText.Text = "None";
+          
+        }
+
+        private void ptt1Clear_Click(object sender, RoutedEventArgs e)
+        {
+            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.SWITCH_1);
+            _inputManager.InputConfig.inputDevices[1] = null;
+
+            ptt1Device.Text = "None";
+            ptt1Text.Text = "None";
+
+        }
+        private void ptt2Clear_Click(object sender, RoutedEventArgs e)
+        {
+            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.SWITCH_2);
+            _inputManager.InputConfig.inputDevices[2] = null;
+
+            ptt2Device.Text = "None";
+            ptt2Text.Text = "None";
+            
+
+        }
+
+        private void ptt3Clear_Click(object sender, RoutedEventArgs e)
+        {
+            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.SWITCH_3);
+            _inputManager.InputConfig.inputDevices[3] = null;
+
+            ptt3Device.Text = "None";
+            ptt3Text.Text = "None";
+
+        }
+
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
             if (_audioPreview == null)

@@ -1,4 +1,4 @@
--- Version 1.0.3.0
+-- Version 1.0.4.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -60,7 +60,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                 {
                     { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000},
                     { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 },
-                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000 }
+                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 60*1000000 }
                 },
                 radioType = 3,
             }
@@ -159,7 +159,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     {
                         { id = 1, name = "CA UHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 200*1000000, freqMax = 400*1000000 },
                         { id = 2, name = "CA VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 100*1000000, freqMax = 200*1000000  },
-                        { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 10*1000000, freqMax = 60*1000000  }
+                        { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 60*1000000  }
                     },
                     radioType = 3
                 }

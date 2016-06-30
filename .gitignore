@@ -258,3 +258,5 @@ _Pvt_Extensions
 =======
 >>>>>>> 49ec92f9f197c0601077ed148a95307a47790dfd
 install-build/DCS-SimpleRadioStandalone.lua
+install-build/clientlog.txt
+install-build/serverlog.txt

@@ -1,22 +1,14 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -42,31 +34,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void up01_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange(MHz / 10);
+            FocusDCS();
         }
 
         private void up1_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange(MHz);
+            FocusDCS();
         }
 
         private void up10_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange(MHz * 10);
+            FocusDCS();
         }
 
         private void down10_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange(MHz * -10);
+            FocusDCS();
         }
 
         private void down1_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange(MHz * -1);
+            FocusDCS();
         }
 
         private void down01_Click(object sender, RoutedEventArgs e)
         {
             sendFrequencyChange((MHz / 10) * -1);
+            FocusDCS();
         }
 
         private void sendUDPUpdate(RadioCommand update)
@@ -79,6 +77,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 send("239.255.50.10", 5070, bytes);
                 //unicast
                 //  send("127.0.0.1", 5061, bytes);
+            }
+        }
+
+        private void FocusDCS()
+        {
+            Process[] localByName = Process.GetProcessesByName("dcs");
+
+            if (localByName != null && localByName.Length > 0)
+            {
+                WindowHelper.BringProcessToFront(localByName[0]);
             }
         }
 
@@ -114,6 +122,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             update.cmdType = RadioCommand.CmdType.SELECT;
 
             sendUDPUpdate(update);
+
+            FocusDCS();
         }
 
         private void radioFrequencyText_Click(object sender, MouseButtonEventArgs e)
@@ -123,6 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             update.cmdType = RadioCommand.CmdType.SELECT;
 
             sendUDPUpdate(update);
+            FocusDCS();
         }
 
         private void radioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -140,6 +151,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             sendUDPUpdate(update);
             this.dragging = false;
+
+            FocusDCS();
         }
 
 
@@ -179,7 +192,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 var currentRadio = lastUpdate.radios[this.radioId];
 
-                if (currentRadio.modulation == 2) //intercom
+                if (currentRadio.modulation == 3) // disabled
+                {
+                    radioActive.Fill = new SolidColorBrush(Colors.Red);
+                    radioLabel.Content = "No Radio";
+                    radioFrequency.Text = "Unknown";
+
+                    radioVolume.IsEnabled = false;
+
+                    up10.IsEnabled = false;
+                    up1.IsEnabled = false;
+                    up01.IsEnabled = false;
+
+                    down10.IsEnabled = false;
+                    down1.IsEnabled = false;
+                    down01.IsEnabled = false;
+                    return;
+
+                }
+                else if (currentRadio.modulation == 2) //intercom
                 {
                     radioFrequency.Text = "INTERCOM";
                 }

@@ -18,3 +18,5 @@ To the END of the Export.lua file in C:\Users\USERNAME\Saved Games\DCS\Scripts
 If it doesnt exist, just create the file and add the single line to it.
 
 Copy the rest of the zip file where ever you like and then run, don't forget to keep opus.dll with the rest of the .exes
+
+Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
