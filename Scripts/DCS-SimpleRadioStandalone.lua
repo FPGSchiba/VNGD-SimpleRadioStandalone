@@ -59,8 +59,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                 radios =
                 {
                     { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000},
-                    { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 },
-                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 60*1000000 }
+                    { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 200*1000000 },
+                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000 }
                 },
                 radioType = 3,
             }
@@ -157,9 +157,9 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 0,
                     radios =
                     {
-                        { id = 1, name = "CA UHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 200*1000000, freqMax = 400*1000000 },
-                        { id = 2, name = "CA VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 100*1000000, freqMax = 200*1000000  },
-                        { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 60*1000000  }
+                        { id = 1, name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000 },
+                        { id = 2, name = "CA UHF/VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000  },
+                        { id = 3, name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000  }
                     },
                     radioType = 3
                 }
@@ -916,7 +916,7 @@ function SR.exportRadioM2000C(_data)
 		_data.radios[2].secondaryFrequency = 243.0*1000000 
 	end
 
-    _data.radioType = 1; -- full radio
+    _data.radioType = 2; -- partial radio, allows hotkeys
 
     return _data
 

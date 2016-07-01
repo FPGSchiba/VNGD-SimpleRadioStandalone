@@ -1,4 +1,6 @@
-﻿using NAudio.Wave;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
+using NAudio.Dsp;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
@@ -13,6 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public VolumeSampleProvider VolumeSampleProvider { get; }
         public BufferedWaveProvider BufferedWaveProvider { get; }
         public long lastUpdate;
+      
 
         public ClientAudioProvider()
         {
@@ -22,12 +25,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             BufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 2); //2 seconds buffer
 
             Pcm16BitToSampleProvider pcm = new Pcm16BitToSampleProvider(BufferedWaveProvider);
-            VolumeSampleProvider = new VolumeSampleProvider(pcm);
+
+            RadioFilter filter = new RadioFilter(pcm);
+
+            VolumeSampleProvider = new VolumeSampleProvider(filter);
+           
         }
 
 
         public void AddSamples(ClientAudio audio)
         {
+           
             //convert to Stereo Mix
             // if radio 0 - Left channel only
             // if radio 1 - Right channel only

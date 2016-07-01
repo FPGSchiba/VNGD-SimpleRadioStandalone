@@ -129,6 +129,7 @@
     <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />
     <Compile Include="InputDeviceManager.cs" />
+    <Compile Include="RadioFilter.cs" />
     <Compile Include="RadioSyncServer.cs" />
     <Compile Include="UDPVoiceHandler.cs" />
     <Page Include="MainWindow.xaml">
