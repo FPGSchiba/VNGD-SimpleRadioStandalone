@@ -90,7 +90,91 @@
                 </Grid>
             </GroupBox>
         </TabItem>
-       
+
+        <TabItem Header="Settings" >
+            <GroupBox  Header="Settings">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0"  Content="Radio Effects" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                    <Label Grid.Column="1" Grid.Row="0"  Content="Button" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+
+                    <Label Grid.Column="0" Grid.Row="1"  Content="Radio 1 Audio Channel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                    <ToggleButton IsThreeState="true"  Grid.Column="1" Grid.Row="1" >
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Left"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content" Value="Right"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="{x:Null}">
+                                        <Setter Property="Content" Value="Both"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+
+                    </ToggleButton>
+
+                    <Label Grid.Column="0" Grid.Row="2"  Content="Radio 2 Audio Channel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                    <ToggleButton IsThreeState="true"  Grid.Column="1" Grid.Row="2" >
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Left"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content" Value="Right"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="{x:Null}">
+                                        <Setter Property="Content" Value="Both"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+
+                    </ToggleButton>
+                    <Label Grid.Column="0" Grid.Row="3"  Content="Radio 3 Audio Channel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                    <ToggleButton IsThreeState="true"  Grid.Column="1" Grid.Row="3" >
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Left"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content" Value="Right"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="{x:Null}">
+                                        <Setter Property="Content" Value="Both"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+
+                    </ToggleButton>
+                </Grid>
+            </GroupBox>
+            
+
+        </TabItem>
+
     </TabControl>
 
    
