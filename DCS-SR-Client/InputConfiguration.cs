@@ -10,7 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class InputConfiguration
     {
-        const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
+        public static readonly string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
         public InputDevice[] inputDevices = new InputDevice[4];
 

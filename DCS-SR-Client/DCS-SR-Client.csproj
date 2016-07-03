@@ -7,7 +7,7 @@
     <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DCS_SR_Client</RootNamespace>
+    <RootNamespace>Ciribob.DCS.SimpleRadio.Standalone.Client</RootNamespace>
     <AssemblyName>SR-ClientRadio</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -68,6 +68,10 @@
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -102,6 +106,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -129,8 +137,12 @@
     <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />
     <Compile Include="InputDeviceManager.cs" />
+    <Compile Include="RadioChannelConfigUI.xaml.cs">
+      <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RadioFilter.cs" />
     <Compile Include="RadioSyncServer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="UDPVoiceHandler.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -145,6 +157,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RadioChannelConfigUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

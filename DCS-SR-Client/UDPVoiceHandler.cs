@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using System.Threading;
-using DCS_SR_Client;
 using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 
