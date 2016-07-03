@@ -9,13 +9,15 @@ using NLog;
 using System.ComponentModel;
 using System.Collections.Concurrent;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using MahApps.Metro.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         ClientSync _client;
 
@@ -59,9 +61,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             UpdaterChecker.CheckForUpdate();
 
+            InitRadioEffectsToggle();
+
         }
 
-
+       
 
         private void InitAudioInput()
         {
@@ -98,7 +102,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
      
         }
 
- 
+        private void InitRadioEffectsToggle()
+        {
+            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RADIO_EFFECTS];
+            if (radioEffects == "ON")
+            {
+                RadioEffectsToggle.IsChecked = true;
+            }
+            else
+            {
+                RadioEffectsToggle.IsChecked = false;
+            }
+        }
 
         private void SetupLogging()
         {
@@ -426,6 +441,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _appConfig.MicBoost = (float)this.microphoneBoost.Value;
             }
 
+        }
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            Settings.Instance.WriteSetting(SettingType.RADIO_EFFECTS, (String)RadioEffectsToggle.Content);
+          
         }
     }
 }
