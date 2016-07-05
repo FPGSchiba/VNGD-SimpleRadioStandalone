@@ -1,4 +1,4 @@
--- Version 1.0.5.0
+-- Version 1.0.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
