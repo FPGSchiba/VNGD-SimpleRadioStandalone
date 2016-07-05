@@ -28,8 +28,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68C7B1F8-DF0E-4504-8C7D-6FEF4225466B}"
 	ProjectSection(SolutionItems) = preProject
 		Scripts\DCS-SimpleRadioStandalone.lua = Scripts\DCS-SimpleRadioStandalone.lua
+		Scripts\DCS-SRSGameGUI.lua = Scripts\DCS-SRSGameGUI.lua
 		Scripts\Export.lua = Scripts\Export.lua
-		Scripts\SimpleRadioStandaloneGameGUI.lua = Scripts\SimpleRadioStandaloneGameGUI.lua
 	EndProjectSection
 EndProject
 Global
