@@ -51,7 +51,7 @@
         <Separator Margin="0 2" Width="120"/>
      
 
-        <Slider x:Name="windowOpacitySlider" VerticalAlignment="Center"  Margin="10,2,0,0" Width="90" Minimum="0.1" Maximum="1.0" ValueChanged="windowOpacitySlider_ValueChanged" Value="1.0" ToolTip="Window Opacity" />
+        <Slider x:Name="windowOpacitySlider" VerticalAlignment="Center"  Margin="10,2,0,0" Width="90" Minimum="0.05" Maximum="1.0" ValueChanged="windowOpacitySlider_ValueChanged" Value="1.0" ToolTip="Window Opacity" />
 
     </WrapPanel>
 </Window>

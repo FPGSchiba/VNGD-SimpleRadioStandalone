@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
+using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -16,31 +18,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         WaveOut _waveOut;
         BufferedWaveProvider _playBuffer;
 
-        public VolumeWaveProvider16 Volume { get; private set; }
+        public SampleChannel Volume { get; private set; }
 
         public void StartPreview(int mic, int speakers)
         {
             try
             {
-                 _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(24000, 16, 1));
+             
+                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
+                _waveIn.BufferMilliseconds = 60;
+                _waveIn.DeviceNumber = mic;
+                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1);
+
+                var pcm = new WaveInProvider(_waveIn);
+
+                Volume = new SampleChannel(pcm);
+                
+                var filter = new RadioFilter(Volume);
 
                 _waveOut = new WaveOut();
                 _waveOut.DesiredLatency = 100; //75ms latency in output buffer
                 _waveOut.DeviceNumber = speakers;
 
-                Volume = new VolumeWaveProvider16(_playBuffer);
-                Volume.Volume = 1.0f; // seems a good max 4.5f 
+                _waveOut.Init(filter);
 
-                _waveOut.Init(Volume);
+                _waveIn.StartRecording();
                 _waveOut.Play();
 
-                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 60;
-                _waveIn.DeviceNumber = mic;
-                _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1);
-              
-                _waveIn.StartRecording();
             }
             catch (Exception ex)
             {
@@ -48,15 +52,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Environment.Exit(1);
             }
-
-        }
-
-
-
-        void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
-        {
-
-            _playBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
 
         }
 
@@ -83,6 +78,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
         }
-    
+
     }
 }
