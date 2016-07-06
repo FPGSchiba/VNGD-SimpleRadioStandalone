@@ -11,12 +11,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public enum MessageType
         {
-
+            UPDATE,
             PING,
             SYNC,
         }
 
-        public string ClientGuid { get; set; }
+        public SRClient Client { get; set; }
 
         public MessageType MsgType { get; set; }
 

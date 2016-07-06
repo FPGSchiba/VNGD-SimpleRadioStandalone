@@ -21,20 +21,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private UdpClient dcsUDPListener;
+        private UdpClient dcsGameGUIUDPListener;
         private UdpClient radioCommandUDPListener;
         private volatile bool _stop = false;
 
         public static volatile DCSPlayerRadioInfo dcsPlayerRadioInfo = new DCSPlayerRadioInfo();
 
-        private SendRadioUpdate updateDelegate;
+        public static volatile DCSPlayerSideInfo dcsPlayerSideInfo = new DCSPlayerSideInfo();
 
         public delegate void SendRadioUpdate();
+        public delegate void ClientSideUpdate();
 
         private long lastSent = 0;
 
-        public RadioSyncServer(SendRadioUpdate send)
+        private SendRadioUpdate clientRadioUpdate;
+        private ClientSideUpdate clientSideUpdate;
+
+        public RadioSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate)
         {
-            updateDelegate = send;
+            this.clientRadioUpdate = clientRadioUpdate;
+            this.clientSideUpdate = clientSideUpdate;
         }
 
         public void Listen()
@@ -45,6 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void DCSListener()
         {
             StartDCSMulticastListener();
+            StartDCSGameGUIMulticastListener();
             StartRadioGUIListener();
         }
 
@@ -74,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5070);
                         byte[] bytes = radioCommandUDPListener.Receive(ref groupEP);
 
-                        int length = 0;
+                        
                         try
                         {
                             RadioCommand message = JsonConvert.DeserializeObject<RadioCommand>((Encoding.ASCII.GetString(
@@ -178,7 +185,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                       if (ShouldSendUpdate(message))
                             {
                                 lastSent = System.Environment.TickCount;
-                                this.updateDelegate();
+                                this.clientRadioUpdate();
                             }
                         }
                         catch (Exception e)
@@ -190,6 +197,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     try
                     {
                         dcsUDPListener.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e, "Exception stoping DCS listener ");
+                    }
+                }
+            });
+        }
+
+        private void StartDCSGameGUIMulticastListener()
+        {
+            this.dcsGameGUIUDPListener = new UdpClient();
+            this.dcsGameGUIUDPListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            this.dcsGameGUIUDPListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
+
+            IPAddress multicastaddress = IPAddress.Parse("239.255.50.10");
+            this.dcsGameGUIUDPListener.JoinMulticastGroup(multicastaddress);
+
+            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 5068);
+            this.dcsGameGUIUDPListener.Client.Bind(localEp);
+            //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
+
+            Task.Factory.StartNew(() =>
+            {
+                using (dcsGameGUIUDPListener)
+                {
+                    while (!_stop)
+                    {
+                        IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5068);
+                        byte[] bytes = dcsGameGUIUDPListener.Receive(ref groupEP);
+
+                        try
+                        {
+                            DCSPlayerSideInfo playerInfo = JsonConvert.DeserializeObject<DCSPlayerSideInfo>((Encoding.ASCII.GetString(
+                                                                                                         bytes, 0, bytes.Length)));
+
+                            if(dcsPlayerSideInfo.name != playerInfo.name || dcsPlayerSideInfo.side != playerInfo.side)
+                            {
+                                dcsPlayerSideInfo = playerInfo;
+                                this.clientSideUpdate();
+                            }
+                            else
+                            {
+                                dcsPlayerSideInfo = playerInfo;
+                            }
+                          
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error(e, "Exception Handling DCS GameGUI Message");
+                        }
+                    }
+
+                    try
+                    {
+                        dcsGameGUIUDPListener.Close();
                     }
                     catch (Exception e)
                     {

@@ -27,7 +27,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         IPEndPoint serverEndpoint;
         String guid;
         private ConcurrentDictionary<string, SRClient> clients;
-        int clientId = 0;
 
         public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid)
         {
@@ -49,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void Connect()
         {
-            RadioSyncServer radioSync = new RadioSyncServer(ClientRadioUpdated);
+            RadioSyncServer radioSync = new RadioSyncServer(ClientRadioUpdated, ClientSideUpdate);
             using (tcpClient = new TcpClient())
             {
                 tcpClient.SendTimeout = 10;
@@ -85,8 +84,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void ClientRadioUpdated()
         {
-            SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.PING });
+           //DO NOTHING
+        }
 
+        private void ClientSideUpdate()
+        {
+            SendToServer(new NetworkMessage()
+            {
+                Client = new SRClient() {
+                    Coalition = RadioSyncServer.dcsPlayerSideInfo.side,
+                    Name = RadioSyncServer.dcsPlayerSideInfo.name, ClientGuid = guid
+                },
+                MsgType = NetworkMessage.MessageType.UPDATE });
         }
 
         private void CallOnMain(bool result)
@@ -110,7 +119,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             //clear the clietns list
             clients.Clear();
-            clientId = 0; //used to index stream readers
 
             using (StreamReader reader = new StreamReader(tcpClient.GetStream(), Encoding.UTF8))
             {
@@ -118,9 +126,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 try
                 {
 
-
                     //start the loop off by sending a SYNC Request
-                    SendToServer(new NetworkMessage() { ClientGuid = guid, MsgType = NetworkMessage.MessageType.SYNC });
+                    SendToServer(new NetworkMessage() {
+
+                        Client = new SRClient()
+                        {
+                            Coalition = RadioSyncServer.dcsPlayerSideInfo.side,
+                            Name = RadioSyncServer.dcsPlayerSideInfo.name,
+                            ClientGuid = guid
+                        }, MsgType = NetworkMessage.MessageType.SYNC });
 
 
                     string line;
@@ -136,19 +150,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 switch (lastRadioTransmit.MsgType)
                                 {
                                     case NetworkMessage.MessageType.PING:
-                                        logger.Info("Recevied: " + NetworkMessage.MessageType.PING);
+                                        // Do nothing for now
+                                        break;
+                                    case NetworkMessage.MessageType.UPDATE:
 
-                                        if (clients.ContainsKey(lastRadioTransmit.ClientGuid))
+                                        logger.Info("Recevied: " + NetworkMessage.MessageType.UPDATE + " From: "+lastRadioTransmit.Client.Name+ " Coalition: "+lastRadioTransmit.Client.Coalition);
+
+                                        if (clients.ContainsKey(lastRadioTransmit.Client.ClientGuid))
                                         {
-                                            SRClient srClient = clients[lastRadioTransmit.ClientGuid];
+                                            SRClient srClient = clients[lastRadioTransmit.Client.ClientGuid];
+                                            var updatedSRClient = lastRadioTransmit.Client;
                                             if (srClient != null)
                                             {
                                                 srClient.LastUpdate = System.Environment.TickCount;
+                                                srClient.Name = updatedSRClient.Name;
+                                                srClient.Coalition = updatedSRClient.Coalition;
                                             }
                                         }
                                         else
                                         {
-                                            clients[lastRadioTransmit.ClientGuid] = new SRClient() { LastUpdate = System.Environment.TickCount, ClientGuid = lastRadioTransmit.ClientGuid };
+                                            var connectedClient = lastRadioTransmit.Client;
+                                            connectedClient.LastUpdate = System.Environment.TickCount;
+                                            clients[lastRadioTransmit.Client.ClientGuid] = connectedClient;
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:

@@ -220,22 +220,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 switch (message.MsgType)
                 {
+
+                    //synonymous for now
                     case NetworkMessage.MessageType.PING:
-
-                        HandleClientPing(message);
-
+                        // Do nothing for now
+                        break;
+                    case NetworkMessage.MessageType.UPDATE:
+                        HandleRadioUpdate(message);
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
-                        if (!_clients.ContainsKey(message.ClientGuid))
+                        var srClient = message.Client;
+                        if (!_clients.ContainsKey(srClient.ClientGuid))
                         {
 
-                            SRClient srClient = new SRClient() { ClientGuid = message.ClientGuid, ClientSocket = state.workSocket };
+                            srClient.ClientSocket = state.workSocket;
 
                             //add to proper list
-                            _clients[message.ClientGuid] = srClient;
+                            _clients[srClient.ClientGuid] = srClient;
 
-                            state.guid = message.ClientGuid;
+                            state.guid = srClient.ClientGuid;
                         }
                         else
                         {
@@ -257,20 +261,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        private void HandleClientPing(NetworkMessage message)
+        private void HandleRadioUpdate(NetworkMessage message)
         {
-            if (_clients.ContainsKey(message.ClientGuid))
+            if (_clients.ContainsKey(message.Client.ClientGuid))
             {
-                var client = _clients[message.ClientGuid];
+                var client = _clients[message.Client.ClientGuid];
 
                 if (client != null)
                 {
                     client.LastUpdate = System.Environment.TickCount;
+                    client.Name = message.Client.Name;
+                    client.Coalition = message.Client.Coalition;
                     //send update to everyone
 
                     NetworkMessage replyMessage = new NetworkMessage();
-                    replyMessage.MsgType = NetworkMessage.MessageType.PING;
-                    replyMessage.ClientGuid = client.ClientGuid;
+                    replyMessage.MsgType = NetworkMessage.MessageType.UPDATE;
+                    replyMessage.Client = client;
 
                     foreach (var clientToSent in this._clients)
                     {
@@ -283,9 +289,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void HandleRadioSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
-
-
-
             NetworkMessage replyMessage = new NetworkMessage();
             replyMessage.MsgType = NetworkMessage.MessageType.SYNC;
 

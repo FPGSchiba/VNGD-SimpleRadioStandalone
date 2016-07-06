@@ -36,8 +36,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
             {
                 for (int n = 0; n < sampleCount; n++)
                 {
-                    buffer[offset + n] = _highPassFilter.Transform(buffer[offset + n]);
-                    buffer[offset + n] = _lowPassFilter.Transform(buffer[offset + n]);
+                    var audio = buffer[offset + n];
+                    if(audio!=0) // because we have silence in one channel (if a user picks radio left or right ear) we don't want to transform it or it'll play in both
+                    {
+                        audio = _highPassFilter.Transform(audio);
+                        audio = _lowPassFilter.Transform(audio);
+                        buffer[offset + n] = audio;
+                    }
+                   
                 }
             }
 

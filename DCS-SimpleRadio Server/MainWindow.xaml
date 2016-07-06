@@ -6,11 +6,12 @@
         xmlns:local="clr-namespace:Ciribob"
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
-        Title="SR Server" Height="90" Width="240">
+        Title="SR Server" Height="90" Width="330">
     <Grid>
         <Button x:Name="button" Content="Start Server" HorizontalAlignment="Left" Margin="18,18,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
         <Label x:Name="clientsLabel" Content="Clients:" HorizontalAlignment="Left" Margin="106,15,0,0" VerticalAlignment="Top" Width="55"/>
         <Label x:Name="clientsCount" Content="0" HorizontalAlignment="Left" Margin="166,15,0,0" VerticalAlignment="Top" Width="35"/>
+        <Button x:Name="clientListButton" Content="Client Admin" HorizontalAlignment="Left" Margin="206,18,0,0" VerticalAlignment="Top" Width="75" Click="ClientList_Click"/>
 
     </Grid>
 </Window>

@@ -150,5 +150,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             stopServer();
         }
+
+        private void ClientList_Click(object sender, RoutedEventArgs e)
+        {
+            ClientAdminWindow cw = new ClientAdminWindow(_connectedClients);
+            cw.ShowInTaskbar = false;
+            cw.Owner = Application.Current.MainWindow;
+            cw.Show();
+        }
     }
 }

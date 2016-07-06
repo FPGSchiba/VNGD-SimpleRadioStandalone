@@ -22,20 +22,49 @@ SRS.JSON = JSON
 SRS.UDPSendSocket = socket.udp()
 SRS.UDPSendSocket:settimeout(0)
 
-SRS.onPlayerChangeSlot = function(id)
+local _lastSent = 0;
 
+SRS.onPlayerChangeSlot = function(_id)
+
+    -- send when there are changes
+    local _myPlayerId = net.get_my_player_id()
+
+    if _id == _myPlayerId then
+        SRS.sendUpdate(net.get_my_player_id())
+    end
+  
+end
+
+SRS.onSimulationFrame = function()
+
+    local _now = DCS.getRealTime()
+
+    -- send every 10 seconds
+    if _now > _lastSent + 10.0 then
+        _lastSent = _now 
+     --    SRS.log("sending update")
+        SRS.sendUpdate(net.get_my_player_id())
+    end
+
+end
+
+SRS.sendUpdate = function(playerID)
+  
     local _update = {
         name = "",
         side = 0,
     }
 
-    _update.name = net.get_player_info(id, "name" )
-	_update.side = net.get_player_info(id,'side')
+    _update.name = net.get_player_info(playerID, "name" )
+	_update.side = net.get_player_info(playerID,"side")
 
-    SRS.log("Selected Slot  ID:"..id.." Name: ".._update.name.." Side: ".._update.side)
+    SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
     socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "239.255.50.10", 5068))
+
 end
+
+
 
 
 DCS.setUserCallbacks(SRS)
