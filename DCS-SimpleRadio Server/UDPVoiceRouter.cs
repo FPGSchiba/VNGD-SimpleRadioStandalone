@@ -22,10 +22,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         volatile bool _stop;
         ConcurrentDictionary<String, SRClient> _clientsList;
+        HashSet<IPAddress> _bannedIps;
 
         public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList)
         {
-            this._clientsList = clientsList;
+            this._clientsList = clientsList;   
         }
 
         public void Listen()

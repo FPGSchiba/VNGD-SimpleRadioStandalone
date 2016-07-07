@@ -223,6 +223,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 using (dcsGameGUIUDPListener)
                 {
+                    int count = 0;
                     while (!_stop)
                     {
                         IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5068);
@@ -233,13 +234,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             DCSPlayerSideInfo playerInfo = JsonConvert.DeserializeObject<DCSPlayerSideInfo>((Encoding.ASCII.GetString(
                                                                                                          bytes, 0, bytes.Length)));
 
-                            if(dcsPlayerSideInfo.name != playerInfo.name || dcsPlayerSideInfo.side != playerInfo.side)
+                            if(dcsPlayerSideInfo.name != playerInfo.name || dcsPlayerSideInfo.side != playerInfo.side || count > 3)
                             {
                                 dcsPlayerSideInfo = playerInfo;
                                 this.clientSideUpdate();
+                                count = 0;
                             }
                             else
                             {
+                                count++;
                                 dcsPlayerSideInfo = playerInfo;
                             }
                           

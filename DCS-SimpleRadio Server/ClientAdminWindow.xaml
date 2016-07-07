@@ -8,7 +8,23 @@
         ResizeMode="CanMinimize"
         Title="ClientAdminWindow" Height="300" Width="300">
     <Grid>
-        <ListBox x:Name="clientsListBox" HorizontalAlignment="Left" Height="224" Margin="10,35,0,0" VerticalAlignment="Top" Width="272"/>
+        <ListBox x:Name="clientsListBox" HorizontalAlignment="Left" Height="224" Margin="10,35,0,0" VerticalAlignment="Top" Width="272" MouseDown="ClientsListBox_MouseDown">
+
+            <ListBox.Resources>
+
+                <!--Defines a context menu-->
+                <ContextMenu x:Key="ClientClickMenu">
+                    <MenuItem Header="Kick" Click="MenuItemKick_Click"/>
+                    <MenuItem Header="BAN!!!" Click="MenuItemBan_Click"/>
+                </ContextMenu>
+
+                <!--Sets a context menu for each ListBoxItem in the current ListBox-->
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="ContextMenu" Value="{StaticResource ClientClickMenu}"/>
+                </Style>
+
+            </ListBox.Resources>
+        </ListBox>
         <Button x:Name="refresh" Content="Refresh" HorizontalAlignment="Left" Margin="110,10,0,0" VerticalAlignment="Top" Width="75" Click="Refresh_Click"/>
 
     </Grid>

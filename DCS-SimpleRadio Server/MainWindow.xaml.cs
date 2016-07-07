@@ -37,6 +37,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         ConcurrentDictionary<String, SRClient> _connectedClients = new ConcurrentDictionary<string, SRClient>();
 
+        private HashSet<IPAddress> _bannedIps = new HashSet<IPAddress>();
+
         private ServerSync _serverSync;
 
         volatile bool _stop = false;
@@ -47,6 +49,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             SetupLogging();
 
+            PopulateBanList();
+
             StartClientList();
 
             StartServer();
@@ -54,6 +58,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             button.Content = "Stop Server";
 
             UpdaterChecker.CheckForUpdate();
+        }
+
+        private void PopulateBanList()
+        {
+            try
+            {
+                string[] lines =  File.ReadAllLines(GetCurrentDirectory() + "\\banned.txt");
+
+                foreach(var line in lines)
+                {
+                    IPAddress ip = null;
+                    if(IPAddress.TryParse(line.Trim(), out ip))
+                    {
+                        _logger.Info("Loaded Banned IP: "+line);
+                        _bannedIps.Add(ip);
+
+                    }
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, "Unable to read banned.txt");
+            }
+            
         }
 
         private void StartClientList()
@@ -128,7 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             listenerThread.Start();
 
 
-            _serverSync = new ServerSync(_connectedClients);
+            _serverSync = new ServerSync(_connectedClients,_bannedIps);
             Thread serverSyncThread = new Thread(_serverSync.StartListening);
             serverSyncThread.Start();
         }
@@ -153,10 +182,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private void ClientList_Click(object sender, RoutedEventArgs e)
         {
-            ClientAdminWindow cw = new ClientAdminWindow(_connectedClients);
+            ClientAdminWindow cw = new ClientAdminWindow(_connectedClients, _bannedIps);
             cw.ShowInTaskbar = false;
             cw.Owner = Application.Current.MainWindow;
             cw.Show();
+        }
+
+
+
+        public static string GetCurrentDirectory()
+        {
+            //To get the location the assembly normally resides on disk or the install directory
+            var currentPath = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+
+            //once you have the path you get the directory with:
+            var currentDirectory = System.IO.Path.GetDirectoryName(currentPath);
+
+            if (currentDirectory.StartsWith("file:\\"))
+            {
+                currentDirectory = currentDirectory.Replace("file:\\", "");
+            }
+
+            return currentDirectory;
+
         }
     }
 }

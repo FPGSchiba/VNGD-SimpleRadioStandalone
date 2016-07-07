@@ -40,12 +40,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         Socket listener;
 
         ConcurrentDictionary<String, SRClient> _clients = new ConcurrentDictionary<String, SRClient>();
+        HashSet<IPAddress> _bannedIps;
 
-        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients)
+        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients, HashSet<IPAddress> _bannedIps)
         {
             this._clients = connectedClients;
-
-            //   this.clientIndexList.Capacity = 100000;
+            this._bannedIps = _bannedIps;
         }
 
         public void StartListening()
@@ -214,6 +214,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
                 var clientIp = (IPEndPoint)state.workSocket.RemoteEndPoint;
+
+                if (_bannedIps.Contains(clientIp.Address))
+                {
+                    state.workSocket.Disconnect(true);
+
+                    _logger.Warn("Disconnecting Banned Client -  " + clientIp.Address + " " + clientIp.Port);
+                    return;
+                }
 
                 //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
                 // logger.Info("Recevied: " + message.MsgType);

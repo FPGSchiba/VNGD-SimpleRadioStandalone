@@ -33,7 +33,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public override string ToString()
         {
-            return Name;
+            String side;
+
+            if(Coalition == 1)
+            {
+                side = "Red";
+            }
+            else if(Coalition == 2)
+            {
+                side = "Blue";
+            }
+            else
+            {
+                side = "Spectator";
+            }
+            return Name == "" ? "Unknown":Name + " - "+ side;
         }
     }
 }
