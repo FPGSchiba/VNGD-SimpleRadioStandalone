@@ -114,6 +114,7 @@
     <Compile Include="ClientAdminWindow.xaml.cs">
       <DependentUpon>ClientAdminWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ServerSettings.cs" />
     <Compile Include="UDPVoiceRouter.cs" />
     <Compile Include="ServerSync.cs" />
     <Page Include="ClientAdminWindow.xaml">

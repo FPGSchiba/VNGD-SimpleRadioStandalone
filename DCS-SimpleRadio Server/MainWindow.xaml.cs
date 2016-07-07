@@ -41,6 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private ServerSync _serverSync;
 
+        ServerSettings settings = ServerSettings.Instance;
+
         volatile bool _stop = false;
 
         public MainWindow()
@@ -110,29 +112,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private void SetupLogging()
         {
-            // Step 1. Create configuration object
             var config = new LoggingConfiguration();
-
-            // Step 2. Create targets and add them to the configuration
+            
             var consoleTarget = new ColoredConsoleTarget();
+            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
             config.AddTarget("console", consoleTarget);
 
             var fileTarget = new FileTarget();
-            config.AddTarget("file", fileTarget);
-
-            // Step 3. Set target properties
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
             fileTarget.FileName = "${basedir}/serverlog.txt";
             fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            config.AddTarget("file", fileTarget);
 
-            // Step 4. Define rules
             var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
             config.LoggingRules.Add(rule1);
 
-            var rule2 = new LoggingRule("*", LogLevel.Debug, fileTarget);
+            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
             config.LoggingRules.Add(rule2);
 
-            // Step 5. Activate the configuration
             LogManager.Configuration = config;
         }
 
