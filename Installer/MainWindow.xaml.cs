@@ -272,6 +272,9 @@ namespace Installer
             {
                 File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
                     path + "\\DCS-SimpleRadioStandalone.lua", true);
+
+                File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
+                    path + "\\DCS-SRSGameGUI.lua", true);
             }
             catch (FileNotFoundException ex)
             {
@@ -355,12 +358,19 @@ namespace Installer
                 }
             }
 
-            File.Delete(path + "\\DCS-SimpleRadioStandalone.lua");
+            if(File.Exists(path + "\\DCS-SimpleRadioStandalone.lua"))
+            {
+                File.Delete(path + "\\DCS-SimpleRadioStandalone.lua");
+            }
+            if (File.Exists(path + "\\DCS-SRSGameGUI.lua"))
+            {
+                File.Delete(path + "\\DCS-SRSGameGUI.lua");
+            }
         }
 
         private void Remove_Plugin(object sender, RoutedEventArgs e)
         {
             UninstallSR();
-        }
+         }
     }
 }

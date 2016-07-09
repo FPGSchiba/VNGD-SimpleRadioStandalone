@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             SetupLogging();
 
             _appConfig = new AppConfiguration();
-            _guid = Guid.NewGuid().ToString();
+            _guid = ShortGuid.NewGuid().ToString();
 
             InitAudioInput();
 

@@ -38,13 +38,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     var groupEP = new IPEndPoint(IPAddress.Any, 5010);
                     var rawBytes = _listener.Receive(ref groupEP);
-                    if (rawBytes.Length > 36)
+                    if (rawBytes.Length >= 22)
                     {
                         Task.Run(() =>
                         {
                             //last 36 bytes are guid!
                             var guid = Encoding.ASCII.GetString(
-                                rawBytes, rawBytes.Length - 36, 36);
+                                rawBytes, rawBytes.Length - 22, 22);
 
                             if (_clientsList.ContainsKey(guid))
                             {

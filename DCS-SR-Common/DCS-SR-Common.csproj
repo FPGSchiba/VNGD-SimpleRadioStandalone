@@ -60,6 +60,7 @@
     <Compile Include="RadioCommand.cs" />
     <Compile Include="RadioInformation.cs" />
     <Compile Include="RadioTransmit.cs" />
+    <Compile Include="ShortGuid.cs" />
     <Compile Include="SRClient.cs" />
     <Compile Include="UpdaterChecker.cs" />
   </ItemGroup>

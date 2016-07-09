@@ -4,6 +4,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class DCSPlayerRadioInfo
     {
+        //1 - Full Radio - No Switch or frequency
+        //2 - Partial Radio - Allow Radio Switch but no frequency
+        //3 - FC3 / Spectator - Allow Radio Switch + Frequency
         public enum AircraftRadioType
         {
             FULL_COCKPIT_INTEGRATION = 1,
@@ -11,21 +14,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             NO_COCKPIT_INTEGRATION = 3
         }
 
-
         public long lastUpdate = 0;
         public string name = "";
-        // public int side = 0; // 1 = red, 2 = blue, 0 = none
-
 
         public RadioInformation[] radios = new RadioInformation[3];
         public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION;
         public short selected = 0;
         public string unit = "";
-        public int unitId;
-        //1 - Full Radio - No Switch or frequency
-        //2 - Partial Radio - Allow Radio Switch but no frequency
-        //3 - FC3 / Spectator - Allow Radio Switch + Frequency
-
+        public UInt32 unitId;
+        public volatile  bool ptt = false;
+     
         public DCSPlayerRadioInfo()
         {
             for (var i = 0; i < 3; i++)
@@ -87,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         }
 
 
-        public bool isCurrent()
+        public bool IsCurrent()
         {
             return lastUpdate > Environment.TickCount - 10000;
         }
