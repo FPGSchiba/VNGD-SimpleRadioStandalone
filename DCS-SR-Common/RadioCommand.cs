@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class RadioCommand
     {
@@ -12,12 +6,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             FREQUENCY = 1,
             VOLUME = 2,
-            SELECT = 3,
+            SELECT = 3
         }
+
+        public CmdType cmdType;
 
         public double freq = 1;
         public int radio;
         public float volume = 1.0f;
-        public CmdType cmdType;
     }
 }

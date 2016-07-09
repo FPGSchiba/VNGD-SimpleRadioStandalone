@@ -1,115 +1,100 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class DejitterBuffer
     {
-        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
-
         //    private List<List<ClientAudio>> clientAudioBuffer = new List<List<ClientAudio>>(5);
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        private long firstPacketTime;
-
-        private Dictionary<string, List<byte>> clientBuffers = new Dictionary<string, List<byte>>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
+        private readonly long _bufferLength = 100; //in ms
 
-        private long bufferLength = 100; //in ms
+        private readonly Dictionary<string, List<byte>> _clientBuffers = new Dictionary<string, List<byte>>();
+        private long _firstPacketTime;
+
         public DejitterBuffer()
         {
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 //      clientAudioBuffer.Add(new List<ClientAudio>());
             }
 
-            firstPacketTime = long.MaxValue;  //stops audio buffer playing
+            _firstPacketTime = long.MaxValue; //stops audio buffer playing
         }
 
+        [DllImport("kernel32.dll")]
+        private static extern long GetTickCount64();
 
 
         public void AddAudio(ClientAudio audio)
         {
-            if (firstPacketTime > GetTickCount64())
+            if (_firstPacketTime > GetTickCount64())
             {
-
                 //      logger.Info("Start");
-                firstPacketTime = audio.ReceiveTime;
-                clientBuffers.Clear();
-                clientBuffers[audio.ClientGUID] = new List<byte>(1920 * 5); //asumes 5 sets worth of 20ms PCM audio
-                clientBuffers[audio.ClientGUID].AddRange(audio.PCMAudio);
-
-
+                _firstPacketTime = audio.ReceiveTime;
+                _clientBuffers.Clear();
+                _clientBuffers[audio.ClientGuid] = new List<byte>(1920*5); //asumes 5 sets worth of 20ms PCM audio
+                _clientBuffers[audio.ClientGuid].AddRange(audio.PcmAudio);
             }
             else
             {
                 //work out which buffer
-                var diff = audio.ReceiveTime - firstPacketTime;
+                var diff = audio.ReceiveTime - _firstPacketTime;
 
-                if (diff < 0 || diff > bufferLength)
+                if (diff < 0 || diff > _bufferLength)
                 {
                     //drop too early or to late
                     //TODO tune the too early? an old packet would knacker the queue
-                    logger.Warn("Dropping Packet - Diff: " + diff);
+                    Logger.Warn("Dropping Packet - Diff: " + diff);
                 }
                 else
                 {
-                    if (!clientBuffers.ContainsKey(audio.ClientGUID))
+                    if (!_clientBuffers.ContainsKey(audio.ClientGuid))
                     {
-                        clientBuffers[audio.ClientGUID] = new List<byte>();
-                        clientBuffers[audio.ClientGUID].AddRange(audio.PCMAudio);
-
-
+                        _clientBuffers[audio.ClientGuid] = new List<byte>();
+                        _clientBuffers[audio.ClientGuid].AddRange(audio.PcmAudio);
                     }
                     else
                     {
                         //   logger.Info("adding");
-                        clientBuffers[audio.ClientGUID].AddRange(audio.PCMAudio);
-
+                        _clientBuffers[audio.ClientGuid].AddRange(audio.PcmAudio);
                     }
-
                 }
-
             }
         }
 
         internal bool IsReady()
         {
-            var diff = GetTickCount64() - firstPacketTime;
+            var diff = GetTickCount64() - _firstPacketTime;
 
             //TODO check this? maybe tune 
-            if (diff >= bufferLength)
+            if (diff >= _bufferLength)
             {
-                firstPacketTime = int.MaxValue;
+                _firstPacketTime = int.MaxValue;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
 
         internal byte[] MixDown()
         {
+            _firstPacketTime = long.MaxValue;
 
+            var mixDownSize = 0;
+            var largestIndex = 0;
 
-            firstPacketTime = long.MaxValue;
-
-            int mixDownSize = 0;
-            int largestIndex = 0;
-
-            if (clientBuffers.Count() > 1)
+            if (_clientBuffers.Count() > 1)
             {
-                var clientBytesArray = clientBuffers.Values.ToList();
+                var clientBytesArray = _clientBuffers.Values.ToList();
 
 
-                for (int i = 0; i < clientBytesArray.Count(); i++)
+                for (var i = 0; i < clientBytesArray.Count(); i++)
                 {
                     var client = clientBytesArray[i];
                     if (client.Count() > mixDownSize)
@@ -130,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 clientBytesArray.RemoveAt(largestIndex);
                 try
                 {
-                    for (int i = 0; i < clientBytesArray.Count(); i++)
+                    for (var i = 0; i < clientBytesArray.Count(); i++)
                     {
                         var speaker1Bytes = clientBytesArray[i].ToArray();
                         //     var speaker2Bytes = clientBytesArray[i+1].ToArray();
@@ -138,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         var limit = speaker1Bytes.Count();
 
 
-                        limit = limit / 2;
+                        limit = limit/2;
 
                         for (int j = 0, offset = 0; j < limit; j++, offset += 2)
                         {
@@ -149,24 +134,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                             mixDownByteArray[offset] = mixdown[0];
                             mixDownByteArray[offset + 1] = mixdown[1];
-
                         }
                     }
-
                 }
-                catch (Exception Ex)
+                catch (Exception ex)
                 {
-                    logger.Warn(Ex, "Error processing audio mixdown ");
+                    Logger.Warn(ex, "Error processing audio mixdown ");
                 }
 
-                clientBuffers.Clear();
+                _clientBuffers.Clear();
                 return mixDownByteArray;
             }
-            else if (clientBuffers.Count() == 1)
+            if (_clientBuffers.Count() == 1)
             {
-
-                var res = clientBuffers.Values.First().ToArray();
-                clientBuffers.Clear();
+                var res = _clientBuffers.Values.First().ToArray();
+                _clientBuffers.Clear();
                 return res;
             }
 
@@ -174,13 +156,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         }
 
 
-
         //FROM: http://stackoverflow.com/a/25102339
 
         private short MixSpeakers(int speaker1, int speaker2)
         {
-
-            return (short)(speaker1 + speaker2 - ((speaker1 * speaker2) / 65535));
+            return (short) (speaker1 + speaker2 - speaker1*speaker2/65535);
 
             //method 2
             //int tmp = speaker1 + speaker2;
@@ -225,7 +205,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //m -= 32768;
 
             //return (short)m;
-
         }
     }
 }

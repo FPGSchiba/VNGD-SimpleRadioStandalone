@@ -1,69 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MahApps.Metro.Controls;
 using System.Diagnostics;
-using Microsoft.Win32;
 using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Input;
+using Microsoft.Win32;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Installer
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow
     {
-        const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
+        private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
+        private readonly string currentDirectory;
 
-        string currentPath;
-        string currentDirectory;
+        private readonly string currentPath;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string version = fvi.FileVersion;
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = fvi.FileVersion;
 
-            this.intro.Content = this.intro.Content + " v" + version;
+            intro.Content = intro.Content + " v" + version;
 
             //allows click and drag anywhere on the window
-            this.containerPanel.MouseLeftButtonDown += GridPanel_MouseLeftButtonDown;
+            containerPanel.MouseLeftButtonDown += GridPanel_MouseLeftButtonDown;
 
-            string srPathStr = ReadPath("SRPathStandalone");
+            var srPathStr = ReadPath("SRPathStandalone");
             if (srPathStr != "")
             {
                 srPath.Text = srPathStr;
             }
 
-            string scriptsPath = ReadPath("ScriptsPath");
+            var scriptsPath = ReadPath("ScriptsPath");
             if (scriptsPath != "")
             {
                 dcsScriptsPath.Text = scriptsPath;
             }
             else
             {
-                dcsScriptsPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
-
+                dcsScriptsPath.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+                                      "\\Saved Games\\";
             }
 
             //To get the location the assembly normally resides on disk or the install directory
-            currentPath = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            currentPath = Assembly.GetExecutingAssembly().CodeBase;
 
             //once you have the path you get the directory with:
-            currentDirectory = System.IO.Path.GetDirectoryName(currentPath);
+            currentDirectory = Path.GetDirectoryName(currentPath);
 
             if (currentDirectory.StartsWith("file:\\"))
             {
@@ -74,39 +66,39 @@ namespace Installer
 
         private string ReadPath(string key)
         {
-            string srPath = (string)Registry.GetValue(REG_PATH,
-              key,
-              "");
+            var srPath = (string) Registry.GetValue(REG_PATH,
+                key,
+                "");
 
             return srPath == null ? "" : srPath;
         }
 
-        private void WritePath(String path, String key)
+        private void WritePath(string path, string key)
         {
             Registry.SetValue(REG_PATH,
-              key,
-              path);
+                key,
+                path);
         }
-
 
 
         private void DeleteRegKeys()
         {
             Registry.SetValue(REG_PATH,
-              "SRPathStandalone",
-              "");
+                "SRPathStandalone",
+                "");
             Registry.SetValue(REG_PATH,
-             "ScriptsPath",
-             "");
+                "ScriptsPath",
+                "");
         }
 
 
         //
         private bool Is_SimpleRadio_running()
         {
-            foreach (Process clsProcess in Process.GetProcesses())
+            foreach (var clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Equals("sr-overlay") || clsProcess.ProcessName.ToLower().Equals("sr-overlay"))
+                if (clsProcess.ProcessName.ToLower().Equals("sr-overlay") ||
+                    clsProcess.ProcessName.ToLower().Equals("sr-overlay"))
                 {
                     return true;
                 }
@@ -122,12 +114,12 @@ namespace Installer
 
         private void Set_Install_Path(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+            var dlg = new FolderBrowserDialog();
+            var result = dlg.ShowDialog();
             if (result.ToString() == "OK")
             {
                 // Open document
-                string filename = dlg.SelectedPath;
+                var filename = dlg.SelectedPath;
 
                 if (!filename.EndsWith("\\"))
                 {
@@ -141,28 +133,28 @@ namespace Installer
 
         private void Set_Scripts_Path(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
+            var dlg = new FolderBrowserDialog();
+            var result = dlg.ShowDialog();
             if (result.ToString() == "OK")
             {
                 // Open document
-                string filename = dlg.SelectedPath;
+                var filename = dlg.SelectedPath;
 
                 if (!filename.EndsWith("\\"))
                 {
                     filename = filename + "\\";
                 }
-             
+
                 dcsScriptsPath.Text = filename;
             }
         }
 
         private void Install_Release(object sender, RoutedEventArgs e)
         {
-            if (this.Is_SimpleRadio_running())
+            if (Is_SimpleRadio_running())
             {
                 MessageBox.Show("Please close SimpleRadio Overlay before updating!", "SR Standalone Installer",
-                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return;
             }
@@ -172,44 +164,45 @@ namespace Installer
 
             if (paths.Count == 0)
             {
-               
-                MessageBox.Show("Unable to find DCS Profile in Saved Games!\n\nPlease check the path to Saved Games folder", "SR Standalone Installer",
+                MessageBox.Show(
+                    "Unable to find DCS Profile in Saved Games!\n\nPlease check the path to Saved Games folder",
+                    "SR Standalone Installer",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                
+
 
                 return;
             }
-            foreach(var path in paths)
+            foreach (var path in paths)
             {
-                InstallScripts(path+"\\Scripts");
+                InstallScripts(path + "\\Scripts");
             }
-            
-            //install program
-            InstallProgram(this.srPath.Text);
 
-            WritePath(this.srPath.Text, "SRPathStandalone");
-            WritePath(this.dcsScriptsPath.Text, "ScriptsPath");
+            //install program
+            InstallProgram(srPath.Text);
+
+            WritePath(srPath.Text, "SRPathStandalone");
+            WritePath(dcsScriptsPath.Text, "ScriptsPath");
 
 
             MessageBox.Show("Installation / Update Completed Succesfully!", "SR Standalone Installer",
-              MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxButton.OK, MessageBoxImage.Information);
 
             //open to installation location
-            System.Diagnostics.Process.Start("explorer.exe", (this.srPath.Text));
+            Process.Start("explorer.exe", srPath.Text);
         }
 
-        public List<String> FindValidDCSFolders(String path)
+        public List<string> FindValidDCSFolders(string path)
         {
-            var paths = new List<String>();
+            var paths = new List<string>();
 
-            var variants = new List<String>();
+            var variants = new List<string>();
             variants.Add("DCS");
             variants.Add("DCS.openbeta");
             variants.Add("DCS.openalpha");
 
-            foreach(var variant in variants)
+            foreach (var variant in variants)
             {
-                if (Directory.Exists(path+"\\"+variant))
+                if (Directory.Exists(path + "\\" + variant))
                 {
                     paths.Add(path + "\\" + variant);
                 }
@@ -226,12 +219,13 @@ namespace Installer
             Directory.CreateDirectory(path);
 
 
-            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll",true);
-            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe",true);
-            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe",true);
-            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe",true);
-            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe",true);
-            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",true);
+            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
+            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
+            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
+            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
+            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
+                true);
         }
 
         private void InstallScripts(string path)
@@ -239,17 +233,18 @@ namespace Installer
             //if scripts folder doesnt exist, create it
             Directory.CreateDirectory(path);
 
-            bool write = true;
+            var write = true;
             //does it contain an export.lua?
             if (File.Exists(path + "\\Export.lua"))
             {
-                String contents = File.ReadAllText(path + "\\Export.lua");
+                var contents = File.ReadAllText(path + "\\Export.lua");
 
                 if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
                     contents =
-                      contents.Replace(
-                        "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                        contents.Replace(
+                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
+                            "");
                     contents = contents.Trim();
 
                     File.WriteAllText(path + "\\Export.lua", contents);
@@ -258,51 +253,49 @@ namespace Installer
 
             if (write)
             {
-                StreamWriter writer = File.AppendText(path + "\\Export.lua");
+                var writer = File.AppendText(path + "\\Export.lua");
 
                 writer.WriteLine(
-                  "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                    "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
                 writer.Close();
             }
             else
             {
-                StreamWriter writer = File.CreateText(path + "\\Export.lua");
+                var writer = File.CreateText(path + "\\Export.lua");
 
                 writer.WriteLine(
-                  "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                    "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
                 writer.Close();
-               
             }
 
             try
             {
                 File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
-             path + "\\DCS-SimpleRadioStandalone.lua", true);
-
+                    path + "\\DCS-SimpleRadioStandalone.lua", true);
             }
-            catch(FileNotFoundException ex)
+            catch (FileNotFoundException ex)
             {
-                MessageBox.Show("Install files not found - Unable to install! \n\nMake sure you extract all the files in the zip then run the Installer", "Not Unzipped", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Install files not found - Unable to install! \n\nMake sure you extract all the files in the zip then run the Installer",
+                    "Not Unzipped", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
-
             }
-           
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
         //Recursive Directory Delete
         public static void DeleteDirectory(string target_dir)
         {
-            string[] files = Directory.GetFiles(target_dir);
-            string[] dirs = Directory.GetDirectories(target_dir);
+            var files = Directory.GetFiles(target_dir);
+            var dirs = Directory.GetDirectories(target_dir);
 
-            foreach (string file in files)
+            foreach (var file in files)
             {
                 File.SetAttributes(file, FileAttributes.Normal);
                 File.Delete(file);
             }
 
-            foreach (string dir in dirs)
+            foreach (var dir in dirs)
             {
                 DeleteDirectory(dir);
             }
@@ -313,19 +306,19 @@ namespace Installer
 
         private void UninstallSR()
         {
-            if (this.Is_SimpleRadio_running())
+            if (Is_SimpleRadio_running())
             {
                 MessageBox.Show("Please close SimpleRadio Standalone Overlay before removing!",
-                  "SR Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+                    "SR Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return;
             }
 
-            string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
+            var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
 
-            string dcsPath = savedGamesPath + "DCS";
+            var dcsPath = savedGamesPath + "DCS";
 
-            string scriptsPath = dcsPath + "\\Scripts";
+            var scriptsPath = dcsPath + "\\Scripts";
 
             RemoveScripts(dcsPath + ".openalpha\\Scripts");
             RemoveScripts(dcsPath + "\\Scripts");
@@ -338,7 +331,7 @@ namespace Installer
             DeleteRegKeys();
 
             MessageBox.Show("SR Standalone Removed Successfully!", "SR Standalone Installer",
-              MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
 
@@ -347,14 +340,15 @@ namespace Installer
             //does it contain an export.lua?
             if (File.Exists(path + "\\Export.lua"))
             {
-                String contents = File.ReadAllText(path + "\\Export.lua");
+                var contents = File.ReadAllText(path + "\\Export.lua");
 
                 if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
                     contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
                     contents =
-                      contents.Replace(
-                        "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                        contents.Replace(
+                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
+                            "");
                     contents = contents.Trim();
 
                     File.WriteAllText(path + "\\Export.lua", contents);
@@ -368,7 +362,5 @@ namespace Installer
         {
             UninstallSR();
         }
-
-       
     }
 }

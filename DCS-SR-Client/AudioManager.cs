@@ -1,67 +1,67 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using FragLabs.Audio.Codecs;
+using FragLabs.Audio.Codecs.Opus;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class AudioManager
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private int _bytesPerSegment;
 
-        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
+        private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
+            new ConcurrentDictionary<string, ClientAudioProvider>();
 
-        ConcurrentDictionary<String, SRClient> clientsList;
+        private OpusDecoder _decoder;
+        private OpusEncoder _encoder;
+        private MixingSampleProvider _mixing;
 
-        ConcurrentDictionary<String, ClientAudioProvider> _clientsBufferedAudio = new ConcurrentDictionary<string, ClientAudioProvider>();
+        private byte[] _notEncodedBuffer = new byte[0];
+        private BufferedWaveProvider _playBuffer;
 
-        WaveIn _waveIn;
-        WaveOut _waveOut;
-        BufferedWaveProvider _playBuffer;
-        OpusEncoder _encoder;
-        OpusDecoder _decoder;
+        private int _segmentFrames;
+        private volatile bool _stop = true;
 
-        int _segmentFrames;
-        int _bytesPerSegment;
-        volatile bool _stop = true;
+        private WaveIn _waveIn;
+        private WaveOut _waveOut;
 
-        byte[] _notEncodedBuffer = new byte[0];
-        UDPVoiceHandler udpVoiceHandler;
-        MixingSampleProvider _mixing;
+        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private UdpVoiceHandler _udpVoiceHandler;
+
+        public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
+        {
+            this._clientsList = clientsList;
+        }
 
         public float Volume { get; set; } = 1.0f;
 
-        public AudioManager(ConcurrentDictionary<String, SRClient> clientsList)
-        {
-            this.clientsList = clientsList;
-        }
+        [DllImport("kernel32.dll")]
+        private static extern long GetTickCount64();
 
-        internal void addClientAudio(ClientAudio audio)
+        internal void AddClientAudio(ClientAudio audio)
         {
             //16bit PCM Audio
             //TODO: Clean  - remove if we havent received audio in a while
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.ClientGUID))
+            if (_clientsBufferedAudio.ContainsKey(audio.ClientGuid))
             {
-                client = _clientsBufferedAudio[audio.ClientGUID];
-                client.lastUpdate = GetTickCount64();
+                client = _clientsBufferedAudio[audio.ClientGuid];
+                client.LastUpdate = GetTickCount64();
             }
             else
             {
                 client = new ClientAudioProvider();
-                client.lastUpdate = GetTickCount64();
-                _clientsBufferedAudio[audio.ClientGUID] = client;
+                client.LastUpdate = GetTickCount64();
+                _clientsBufferedAudio[audio.ClientGuid] = client;
 
                 _mixing.AddMixerInput(client.VolumeSampleProvider);
             }
@@ -69,13 +69,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             client.VolumeSampleProvider.Volume = audio.Volume;
 
             client.AddSamples(audio);
-
-
         }
 
-        public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress)
+        public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
+            IPAddress ipAddress)
         {
-
             _stop = false;
 
             try
@@ -85,7 +83,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
 
                 //add silence track?
-                BufferedWaveProvider provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
+                var provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
                 //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
 
                 _mixing.AddMixerInput(provider);
@@ -103,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.Play();
 
                 _segmentFrames = 960; //960 frames is 20 ms of audio
-                _encoder = OpusEncoder.Create(24000, 1, FragLabs.Audio.Codecs.Opus.Application.Restricted_LowLatency);
+                _encoder = OpusEncoder.Create(24000, 1, Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
                 _decoder = OpusDecoder.Create(24000, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
@@ -112,10 +110,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.BufferMilliseconds = 60;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1); // should this be 44100??
+                _waveIn.WaveFormat = new WaveFormat(24000, 16, 1); // should this be 44100??
 
-                udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
-                Thread voiceSenderThread = new Thread(udpVoiceHandler.Listen);
+                _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
+                var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                 voiceSenderThread.Start();
 
@@ -123,73 +121,69 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error starting audio Quitting!");
+                Logger.Error(ex, "Error starting audio Quitting!");
 
 
                 Environment.Exit(1);
             }
-
         }
 
 
-
-
-
-        void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
+        private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-            byte[] soundBuffer = new byte[e.BytesRecorded + _notEncodedBuffer.Length];
+            var soundBuffer = new byte[e.BytesRecorded + _notEncodedBuffer.Length];
 
-            for (int i = 0; i < _notEncodedBuffer.Length; i++)
+            for (var i = 0; i < _notEncodedBuffer.Length; i++)
                 soundBuffer[i] = _notEncodedBuffer[i];
 
-            for (int i = 0; i < e.BytesRecorded; i++)
+            for (var i = 0; i < e.BytesRecorded; i++)
                 soundBuffer[i + _notEncodedBuffer.Length] = e.Buffer[i];
 
-            int byteCap = _bytesPerSegment;
+            var byteCap = _bytesPerSegment;
             //      Console.WriteLine("{0} ByteCao", byteCap);
-            int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
-            int segmentsEnd = segmentCount * byteCap;
-            int notEncodedCount = soundBuffer.Length - segmentsEnd;
+            var segmentCount = (int) Math.Floor((decimal) soundBuffer.Length/byteCap);
+            var segmentsEnd = segmentCount*byteCap;
+            var notEncodedCount = soundBuffer.Length - segmentsEnd;
             _notEncodedBuffer = new byte[notEncodedCount];
-            for (int i = 0; i < notEncodedCount; i++)
+            for (var i = 0; i < notEncodedCount; i++)
             {
                 _notEncodedBuffer[i] = soundBuffer[segmentsEnd + i];
             }
 
-            for (int i = 0; i < segmentCount; i++)
+            for (var i = 0; i < segmentCount; i++)
             {
                 //create segment of audio
-                byte[] segment = new byte[byteCap];
-                for (int j = 0; j < segment.Length; j++)
+                var segment = new byte[byteCap];
+                for (var j = 0; j < segment.Length; j++)
                 {
-                    segment[j] = soundBuffer[(i * byteCap) + j];
+                    segment[j] = soundBuffer[i*byteCap + j];
                 }
 
                 //boost microphone volume if needed
                 if (Volume != 1.0f)
                 {
-                    for (int n = 0; n < segment.Length; n += 2)
+                    for (var n = 0; n < segment.Length; n += 2)
                     {
-                        short sample = (short)((segment[n + 1] << 8) | segment[n + 0]);
+                        var sample = (short) ((segment[n + 1] << 8) | segment[n + 0]);
                         // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                        sample = (short)(sample * this.Volume);
-                        segment[n] = (byte)(sample & 0xFF);
-                        segment[n + 1] = (byte)(sample >> 8);
+                        sample = (short) (sample*Volume);
+                        segment[n] = (byte) (sample & 0xFF);
+                        segment[n + 1] = (byte) (sample >> 8);
                     }
                 }
 
                 //encode as opus bytes
                 int len;
-                byte[] buff = _encoder.Encode(segment, segment.Length, out len);
+                var buff = _encoder.Encode(segment, segment.Length, out len);
 
-                if (udpVoiceHandler != null)
-                    udpVoiceHandler.Send(buff, len);
+                if (_udpVoiceHandler != null)
+                    _udpVoiceHandler.Send(buff, len);
             }
         }
 
         public void StopEncoding()
         {
-            if(_mixing!=null)
+            if (_mixing != null)
             {
                 _mixing.RemoveAllMixerInputs();
             }
@@ -221,20 +215,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _encoder.Dispose();
                 _encoder = null;
-
             }
 
             if (_decoder != null)
             {
                 _decoder.Dispose();
                 _decoder = null;
-
             }
-            if (udpVoiceHandler != null)
+            if (_udpVoiceHandler != null)
             {
-                udpVoiceHandler.RequestStop();
-                udpVoiceHandler = null;
-
+                _udpVoiceHandler.RequestStop();
+                _udpVoiceHandler = null;
             }
 
             _stop = true;

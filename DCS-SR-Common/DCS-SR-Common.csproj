@@ -43,6 +43,8 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,10 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DCSPlayerSideInfo.cs" />
     <Compile Include="NetworkMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DCSPlayerRadioInfo.cs" />
     <Compile Include="RadioCommand.cs" />
+    <Compile Include="RadioInformation.cs" />
     <Compile Include="RadioTransmit.cs" />
     <Compile Include="SRClient.cs" />
     <Compile Include="UpdaterChecker.cs" />

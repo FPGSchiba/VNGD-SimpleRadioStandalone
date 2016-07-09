@@ -1,31 +1,28 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
-    class UDPVoiceRouter
+    internal class UDPVoiceRouter
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        UdpClient _listener;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private UdpClient _listener;
 
-        volatile bool _stop;
-        ConcurrentDictionary<String, SRClient> _clientsList;
+        private volatile bool _stop;
+        private ServerSettings _serverSettings = ServerSettings.Instance;
 
-        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList)
+        public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList)
         {
-            this._clientsList = clientsList;
+            _clientsList = clientsList;
         }
 
         public void Listen()
@@ -39,23 +36,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 try
                 {
-
-                    IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
-                    byte[] rawBytes = _listener.Receive(ref groupEP);
+                    var groupEP = new IPEndPoint(IPAddress.Any, 5010);
+                    var rawBytes = _listener.Receive(ref groupEP);
                     if (rawBytes.Length > 36)
                     {
                         Task.Run(() =>
                         {
-
                             //last 36 bytes are guid!
-                            String guid = Encoding.ASCII.GetString(
-                            rawBytes, rawBytes.Length - 36, 36);
+                            var guid = Encoding.ASCII.GetString(
+                                rawBytes, rawBytes.Length - 36, 36);
 
                             if (_clientsList.ContainsKey(guid))
                             {
-                                _clientsList[guid].voipPort = groupEP;
+                                var client = _clientsList[guid];
+                                client.voipPort = groupEP;
 
-                                SendToOthers(rawBytes, guid);
+                                var spectatorAudio = _serverSettings.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+
+                                if (client.Coalition == 0 && spectatorAudio == "DISABLED")
+                                {
+                                   // IGNORE THE AUDIO
+                                }
+                                else
+                                {
+                                    SendToOthers(rawBytes,client );
+                                }
                             }
                             else
                             {
@@ -76,8 +81,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 _listener.Close();
             }
-            catch (Exception e) { }
+            catch (Exception e)
+            {
+            }
         }
+
         public void RequestStop()
         {
             _stop = true;
@@ -85,11 +93,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 _listener.Close();
             }
-            catch (Exception e) { }
+            catch (Exception e)
+            {
+            }
         }
 
-        private void SendToOthers(byte[] bytes, String guid)
+        private void SendToOthers(byte[] bytes, SRClient fromClient)
         {
+            var coalitionSecurity =
+                                    _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
+            var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
             {
@@ -97,9 +110,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     if (!client.Key.Equals(guid))
                     {
-                        IPEndPoint ip = client.Value.voipPort;
+                        var ip = client.Value.voipPort;
 
-                        if (ip != null)
+                        // check that either coalition radio security is disabled OR the coalitions match
+                        if (ip != null && (!coalitionSecurity || client.Value.Coalition == fromClient.Coalition))
                         {
                             //TODO only send to clients on the same team?
                             _listener.Send(bytes, bytes.Length, ip);
@@ -107,12 +121,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     }
                     else
                     {
-
-                        IPEndPoint ip = client.Value.voipPort;
+                        var ip = client.Value.voipPort;
 
                         if (ip != null)
                         {
-
                             //     _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
@@ -125,7 +137,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     _clientsList.TryRemove(guid, out value);
                 }
             }
-
         }
 
 
@@ -133,43 +144,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             Task.Run(() =>
             {
-                byte[] message = { 1, 2, 3, 4, 5 };
+                byte[] message = {1, 2, 3, 4, 5};
                 while (!_stop)
                 {
-
-                    _logger.Info("Pinging Clients");
+                    Logger.Info("Pinging Clients");
                     try
                     {
                         foreach (var client in _clientsList)
                         {
                             try
                             {
-
-                                IPEndPoint ip = client.Value.voipPort;
+                                var ip = client.Value.voipPort;
 
                                 if (ip != null)
                                 {
                                     _listener.Send(message, message.Length, ip);
-                          
                                 }
-
                             }
                             catch (Exception e)
-                            {}
+                            {
+                            }
                         }
                     }
                     catch (Exception e)
-                    { }
+                    {
+                    }
 
-                    Thread.Sleep(60 * 1000);
-
+                    Thread.Sleep(60*1000);
                 }
             });
         }
-
     }
-
-
 }
-
-

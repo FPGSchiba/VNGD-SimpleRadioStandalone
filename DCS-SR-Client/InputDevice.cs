@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -10,10 +6,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public enum InputBinding
         {
-            SWITCH_1,
-            SWITCH_2,
-            SWITCH_3,
-            PTT
+            Switch1,
+            Switch2,
+            Switch3,
+            Ptt
         }
 
         public InputBinding InputBind { get; set; }
@@ -21,10 +17,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public string DeviceName { get; set; }
 
         public int Button { get; set; }
-        public Guid InstanceGUID { get; internal set; }
-
-        public InputDevice()
-        {
-        }
+        public Guid InstanceGuid { get; internal set; }
     }
 }

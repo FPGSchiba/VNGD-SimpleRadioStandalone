@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -11,20 +6,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public enum MessageType
         {
-
+            UPDATE,
             PING,
-            SYNC,
+            SYNC
         }
 
-        public string ClientGuid { get; set; }
+        public SRClient Client { get; set; }
 
         public MessageType MsgType { get; set; }
 
         public List<SRClient> Clients { get; set; }
-
-
     }
-
-
-
 }

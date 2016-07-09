@@ -1,45 +1,40 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
-using NBug;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using System.IO;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        UDPVoiceRouter _serverListener;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        ConcurrentDictionary<String, SRClient> _connectedClients = new ConcurrentDictionary<string, SRClient>();
+        private readonly HashSet<IPAddress> _bannedIps = new HashSet<IPAddress>();
+
+        private readonly ConcurrentDictionary<string, SRClient> _connectedClients =
+            new ConcurrentDictionary<string, SRClient>();
+
+        private UDPVoiceRouter _serverListener;
 
         private ServerSync _serverSync;
 
-        volatile bool _stop = false;
+        private volatile bool _stop = false;
+
+        private ServerSettings _settings = ServerSettings.Instance;
 
         public MainWindow()
         {
@@ -47,13 +42,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             SetupLogging();
 
+            PopulateBanList();
+
+            InitRadioSecurity();
+
+            InitSpectatorAudio();
+
             StartClientList();
 
             StartServer();
 
-            button.Content = "Stop Server";
+            ServerControlButton.Content = "Stop Server";
 
             UpdaterChecker.CheckForUpdate();
+        }
+
+        private void PopulateBanList()
+        {
+            try
+            {
+                var lines = File.ReadAllLines(GetCurrentDirectory() + "\\banned.txt");
+
+                foreach (var line in lines)
+                {
+                    IPAddress ip = null;
+                    if (IPAddress.TryParse(line.Trim(), out ip))
+                    {
+                        Logger.Info("Loaded Banned IP: " + line);
+                        _bannedIps.Add(ip);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Unable to read banned.txt");
+            }
         }
 
         private void StartClientList()
@@ -62,17 +85,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
                 while (!_stop)
                 {
-                    System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
+                    Application.Current.Dispatcher.Invoke(() =>
 
-              {
-                    try
                     {
-                        this.clientsCount.Content = _connectedClients.Count().ToString();
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                }));
+                        try
+                        {
+                            ClientsCount.Content = _connectedClients.Count().ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    });
 
                     Thread.Sleep(1000);
                 }
@@ -81,59 +104,80 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private void SetupLogging()
         {
-            // Step 1. Create configuration object
             var config = new LoggingConfiguration();
 
-            // Step 2. Create targets and add them to the configuration
-            var consoleTarget = new ColoredConsoleTarget();
+            var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
             config.AddTarget("console", consoleTarget);
 
-            var fileTarget = new FileTarget();
+            var fileTarget = new FileTarget
+            {
+                FileName = "${basedir}/serverlog.txt",
+                Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"
+            };
             config.AddTarget("file", fileTarget);
 
-            // Step 3. Set target properties
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
-            fileTarget.FileName = "${basedir}/serverlog.txt";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
-
-            // Step 4. Define rules
             var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
             config.LoggingRules.Add(rule1);
 
-            var rule2 = new LoggingRule("*", LogLevel.Debug, fileTarget);
+            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
             config.LoggingRules.Add(rule2);
 
-            // Step 5. Activate the configuration
             LogManager.Configuration = config;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void ServerControlButtonClick(object sender, RoutedEventArgs e)
         {
             if (_serverListener != null)
             {
-                stopServer();
-                button.Content = "Start Server";
+                StopServer();
+                ServerControlButton.Content = "Start Server";
             }
             else
             {
-                button.Content = "Stop Server";
+                ServerControlButton.Content = "Stop Server";
                 StartServer();
-                
             }
         }
+
+        private void InitRadioSecurity()
+        {
+            var radioSecurity = ServerSettings.Instance.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY];
+            if (radioSecurity == "ON")
+            {
+                RadioSecurity.IsChecked = true;
+            }
+            else
+            {
+                RadioSecurity.IsChecked = false;
+            }
+        }
+
+        private void InitSpectatorAudio()
+        {
+            var spectatorAudio = ServerSettings.Instance.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+            if (spectatorAudio == "DISABLED")
+            {
+                SpectatorAudio.IsChecked = true;
+            }
+            else
+            {
+                SpectatorAudio.IsChecked = false;
+            }
+        }
+
         private void StartServer()
         {
             _serverListener = new UDPVoiceRouter(_connectedClients);
-            Thread listenerThread = new Thread(_serverListener.Listen);
+            var listenerThread = new Thread(_serverListener.Listen);
             listenerThread.Start();
 
 
-            _serverSync = new ServerSync(_connectedClients);
-            Thread serverSyncThread = new Thread(_serverSync.StartListening);
+            _serverSync = new ServerSync(_connectedClients, _bannedIps);
+            var serverSyncThread = new Thread(_serverSync.StartListening);
             serverSyncThread.Start();
         }
 
-        private void stopServer()
+        private void StopServer()
         {
             if (_serverListener != null)
             {
@@ -148,7 +192,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             base.OnClosing(e);
 
-            stopServer();
+            StopServer();
+        }
+
+        private void ClientList_Click(object sender, RoutedEventArgs e)
+        {
+            var cw = new ClientAdminWindow(_connectedClients, _bannedIps)
+            {
+                ShowInTaskbar = false,
+                Owner = Application.Current.MainWindow
+            };
+            cw.Show();
+        }
+
+
+        public static string GetCurrentDirectory()
+        {
+            //To get the location the assembly normally resides on disk or the install directory
+            var currentPath = Assembly.GetExecutingAssembly().CodeBase;
+
+            //once you have the path you get the directory with:
+            var currentDirectory = Path.GetDirectoryName(currentPath);
+
+            if (currentDirectory.StartsWith("file:\\"))
+            {
+                currentDirectory = currentDirectory.Replace("file:\\", "");
+            }
+
+            return currentDirectory;
+        }
+
+        private void RadioSecurity_OnClick(object sender, RoutedEventArgs e)
+        {
+            ServerSettings.Instance.WriteSetting(ServerSettingType.COALITION_AUDIO_SECURITY, (string)RadioSecurity.Content);
+        }
+
+        private void SpectatorAudio_OnClick(object sender, RoutedEventArgs e)
+        {
+            ServerSettings.Instance.WriteSetting(ServerSettingType.SPECTATORS_AUDIO_DISABLED, (string)SpectatorAudio.Content);
         }
     }
 }
