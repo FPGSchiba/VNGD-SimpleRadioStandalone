@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -11,18 +10,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker
     {
-        readonly static String VERSION = "1.0.6.0";
+        private static readonly string VERSION = "1.0.6.0";
 
-        public async static void CheckForUpdate()
+        public static async void CheckForUpdate()
         {
             try
             {
-
                 var request = WebRequest.Create("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
-                var response = (HttpWebResponse)await Task.Factory
-                    .FromAsync<WebResponse>(request.BeginGetResponse,
-                                            request.EndGetResponse,
-                                            null);
+                var response = (HttpWebResponse) await Task.Factory
+                    .FromAsync(request.BeginGetResponse,
+                        request.EndGetResponse,
+                        null);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -34,18 +32,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         //now compare major minor patch (ignore build)
                         var current = VERSION.Split('.');
 
-                        for (int i = 0; i < 3; i++)
+                        for (var i = 0; i < 3; i++)
                         {
                             if (current[i] != githubVersion[i])
                             {
-                                MessageBoxResult result = MessageBox.Show("New Version Available!\n\nDo you want to Update?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                                var result =
+                                    MessageBox.Show("New Version Available!\n\nDo you want to Update?",
+                                        "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
                                 // Process message box results
                                 switch (result)
                                 {
                                     case MessageBoxResult.Yes:
                                         //launch browser
-                                        System.Diagnostics.Process.Start(response.ResponseUri.ToString());
+                                        Process.Start(response.ResponseUri.ToString());
                                         break;
                                     case MessageBoxResult.No:
 
@@ -55,7 +55,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                             }
                         }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -63,7 +62,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 //Ignore for now
             }
         }
-
-
     }
 }

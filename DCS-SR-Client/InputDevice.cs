@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -22,9 +18,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public int Button { get; set; }
         public Guid InstanceGUID { get; internal set; }
-
-        public InputDevice()
-        {
-        }
     }
 }

@@ -1,40 +1,38 @@
 ﻿using System;
-using System.Windows;
-using NAudio.Wave;
-using System.Net.Sockets;
-using System.Net;
-using NLog.Config;
-using NLog.Targets;
-using NLog;
-using System.ComponentModel;
 using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
+using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using MahApps.Metro.Controls;
-using System.Windows.Controls.Primitives;
+using NAudio.Wave;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        ClientSync _client;
+        private readonly AppConfiguration _appConfig;
 
-        String _guid;
+        private readonly AudioManager _audioManager;
+        private AudioPreview _audioPreview;
+        private ClientSync _client;
 
-        InputDeviceManager _inputManager;
+        private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
 
-        AudioManager _audioManager;
+        private readonly string _guid;
 
-        ConcurrentDictionary<string, Common.SRClient> _clients = new ConcurrentDictionary<string, Common.SRClient>();
+        private readonly InputDeviceManager _inputManager;
 
-        AppConfiguration _appConfig;
-        AudioPreview _audioPreview;
+        private IPAddress _resolvedIP;
 
-        IPAddress _resolvedIP;
-
-        bool _stop = true;
+        private bool _stop = true;
 
         public MainWindow()
         {
@@ -53,23 +51,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             LoadInputSettings();
 
-            this.serverIp.Text = _appConfig.LastServer;
-            this.microphoneBoost.Value = _appConfig.MicBoost;
+            serverIp.Text = _appConfig.LastServer;
+            microphoneBoost.Value = _appConfig.MicBoost;
             //   this.boostAmount.Content = "Boost: " + this.microphoneBoost.Value;
             _audioManager = new AudioManager(_clients);
-            _audioManager.Volume = (float)this.microphoneBoost.Value;
+            _audioManager.Volume = (float) microphoneBoost.Value;
 
             UpdaterChecker.CheckForUpdate();
 
             InitRadioEffectsToggle();
-
         }
 
-       
 
         private void InitAudioInput()
         {
-            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            for (var i = 0; i < WaveIn.DeviceCount; i++)
             {
                 mic.Items.Add(WaveIn.GetCapabilities(i).ProductName);
             }
@@ -78,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 mic.SelectedIndex = _appConfig.AudioInputDeviceId;
             }
-            else if(WaveIn.DeviceCount > 0)
+            else if (WaveIn.DeviceCount > 0)
             {
                 mic.SelectedIndex = 0;
             }
@@ -86,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitAudioOutput()
         {
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            for (var i = 0; i < WaveOut.DeviceCount; i++)
             {
                 speakers.Items.Add(WaveOut.GetCapabilities(i).ProductName);
             }
@@ -99,12 +95,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 speakers.SelectedIndex = 0;
             }
-     
         }
 
         private void InitRadioEffectsToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RADIO_EFFECTS];
+            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RADIO_EFFECTS];
             if (radioEffects == "ON")
             {
                 RadioEffectsToggle.IsChecked = true;
@@ -117,7 +112,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SetupLogging()
         {
-
             // Step 1. Create configuration object 
             var config = new LoggingConfiguration();
 
@@ -144,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             LogManager.Configuration = config;
         }
 
-        void LoadInputSettings()
+        private void LoadInputSettings()
         {
             //TODO load input settings
 
@@ -174,9 +168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     ptt3Device.Text = _inputManager.InputConfig.inputDevices[3].DeviceName;
                 }
             }
-
         }
-
 
 
         private void startStop_Click(object sender, RoutedEventArgs e)
@@ -190,11 +182,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 try
                 {
                     //process hostname
-                    IPAddress[] ipAddr = Dns.GetHostAddresses(this.serverIp.Text.Trim());
+                    var ipAddr = Dns.GetHostAddresses(serverIp.Text.Trim());
 
                     if (ipAddr.Length > 0)
                     {
-                        this._resolvedIP = ipAddr[0];
+                        _resolvedIP = ipAddr[0];
 
                         _client = new ClientSync(_clients, _guid);
                         _client.TryConnect(new IPEndPoint(_resolvedIP, 5002), ConnectCallback);
@@ -203,21 +195,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         startStop.IsEnabled = false;
                         mic.IsEnabled = false;
                         speakers.IsEnabled = false;
-
                     }
                     else
                     {
                         //invalid ID
-                        MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
                     }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
-                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
-
             }
         }
+
         private void stop()
         {
             startStop.Content = "Start";
@@ -228,7 +221,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _audioManager.StopEncoding();
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
 
             _stop = true;
 
@@ -237,8 +232,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _client.Disconnect();
                 _client = null;
             }
-
-
         }
 
         private void ConnectCallback(bool result)
@@ -251,20 +244,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     startStop.IsEnabled = true;
 
                     //save app settings
-                    _appConfig.LastServer = this.serverIp.Text.Trim();
+                    _appConfig.LastServer = serverIp.Text.Trim();
                     _appConfig.AudioInputDeviceId = mic.SelectedIndex;
                     _appConfig.AudioOutputDeviceId = speakers.SelectedIndex;
 
-                    _audioManager.StartEncoding(mic.SelectedIndex, speakers.SelectedIndex, _guid, _inputManager, _resolvedIP);
+                    _audioManager.StartEncoding(mic.SelectedIndex, speakers.SelectedIndex, _guid, _inputManager,
+                        _resolvedIP);
                     _stop = false;
                 }
-
             }
             else
             {
                 stop();
             }
-
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -286,7 +278,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             pttCommonButton.IsEnabled = false;
 
 
-            _inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton(device =>
             {
                 pttCommonClear.IsEnabled = true;
                 pttCommonButton.IsEnabled = true;
@@ -298,9 +290,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _inputManager.InputConfig.inputDevices[0] = device;
                 _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.PTT, device);
-
             });
-
         }
 
         private void ptt1_Click(object sender, RoutedEventArgs e)
@@ -309,7 +299,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ptt1ButtonClear.IsEnabled = false;
 
 
-            _inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton(device =>
             {
                 ptt1ButtonClear.IsEnabled = true;
                 ptt1ButtonClear.IsEnabled = true;
@@ -320,17 +310,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _inputManager.InputConfig.inputDevices[1] = device;
                 _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_1, device);
-
             });
-
         }
+
         private void ptt2_Click(object sender, RoutedEventArgs e)
         {
             ptt2ButtonClear.IsEnabled = false;
             ptt2ButtonClear.IsEnabled = false;
 
 
-            _inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton(device =>
             {
                 ptt2ButtonClear.IsEnabled = true;
                 ptt2ButtonClear.IsEnabled = true;
@@ -341,9 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _inputManager.InputConfig.inputDevices[2] = device;
                 _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_2, device);
-
             });
-
         }
 
         private void ptt3_Click(object sender, RoutedEventArgs e)
@@ -352,7 +339,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ptt3ButtonClear.IsEnabled = false;
 
 
-            _inputManager.AssignButton((InputDevice device) =>
+            _inputManager.AssignButton(device =>
             {
                 ptt3ButtonClear.IsEnabled = true;
                 ptt3ButtonClear.IsEnabled = true;
@@ -363,9 +350,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _inputManager.InputConfig.inputDevices[3] = device;
                 _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.SWITCH_3, device);
-
             });
-
         }
 
         private void pttCommonButtonClear_Click(object sender, RoutedEventArgs e)
@@ -375,7 +360,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             pttCommonDevice.Text = "None";
             pttCommonText.Text = "None";
-          
         }
 
         private void ptt1Clear_Click(object sender, RoutedEventArgs e)
@@ -385,8 +369,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ptt1Device.Text = "None";
             ptt1Text.Text = "None";
-
         }
+
         private void ptt2Clear_Click(object sender, RoutedEventArgs e)
         {
             _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.SWITCH_2);
@@ -394,8 +378,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ptt2Device.Text = "None";
             ptt2Text.Text = "None";
-            
-
         }
 
         private void ptt3Clear_Click(object sender, RoutedEventArgs e)
@@ -405,7 +387,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ptt3Device.Text = "None";
             ptt3Text.Text = "None";
-
         }
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
@@ -414,7 +395,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _audioPreview = new AudioPreview();
                 _audioPreview.StartPreview(mic.SelectedIndex, speakers.SelectedIndex);
-                _audioPreview.Volume.Volume = (float)this.microphoneBoost.Value;
+                _audioPreview.Volume.Volume = (float) microphoneBoost.Value;
                 preview.Content = "Stop Preview";
             }
             else
@@ -423,34 +404,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
             }
-
         }
 
         private void MicrophoneBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_audioPreview != null)
             {
-                _audioPreview.Volume.Volume = (float)this.microphoneBoost.Value;
+                _audioPreview.Volume.Volume = (float) microphoneBoost.Value;
             }
             if (_audioManager != null)
             {
-                _audioManager.Volume = (float)this.microphoneBoost.Value;
+                _audioManager.Volume = (float) microphoneBoost.Value;
             }
             if (_appConfig != null)
             {
-                _appConfig.MicBoost = (float)this.microphoneBoost.Value;
+                _appConfig.MicBoost = (float) microphoneBoost.Value;
             }
-
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
-
-            Settings.Instance.WriteSetting(SettingType.RADIO_EFFECTS, (String)RadioEffectsToggle.Content);
-          
+            Settings.Instance.WriteSetting(SettingType.RADIO_EFFECTS, (string) RadioEffectsToggle.Content);
         }
     }
 }
-
-
-

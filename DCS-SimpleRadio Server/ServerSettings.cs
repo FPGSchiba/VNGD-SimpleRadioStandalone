@@ -1,16 +1,12 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Win32;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     public enum ServerSettingType
     {
         COALITION_SECURITY = 0,
-        SPECTATORS_AUDIO_DISABLED = 1,   
+        SPECTATORS_AUDIO_DISABLED = 1
     }
 
     public class ServerSettings
@@ -19,10 +15,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private static ServerSettings instance;
 
-        public String[] ServerSetting
+        public ServerSettings()
         {
-            get;
+            ServerSetting = new string[4];
+
+            foreach (ServerSettingType set in Enum.GetValues(typeof(ServerSettingType)))
+            {
+                ServerSetting[(int) set] = ReadSetting(set);
+            }
         }
+
+        public string[] ServerSetting { get; }
 
         public static ServerSettings Instance
         {
@@ -36,53 +39,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        public ServerSettings()
-        {
-            ServerSetting = new string[4];
-
-            foreach (ServerSettingType set in Enum.GetValues(typeof(ServerSettingType)))
-            {
-                ServerSetting[(int)set] = ReadSetting(set);
-            }
-
-        }
-
-        public String ReadSetting(ServerSettingType settingType)
+        public string ReadSetting(ServerSettingType settingType)
         {
             try
             {
-
-                string setting = (string)Registry.GetValue(REG_PATH,
+                var setting = (string) Registry.GetValue(REG_PATH,
                     settingType + "_setting",
                     "");
                 return setting;
-
             }
             catch (Exception ex)
             {
-
             }
             return null;
-
         }
 
-        public void WriteSetting(ServerSettingType settingType, String setting)
+        public void WriteSetting(ServerSettingType settingType, string setting)
         {
             try
             {
                 Registry.SetValue(REG_PATH,
-                     settingType + "_setting",
-                     setting);
+                    settingType + "_setting",
+                    setting);
 
-                ServerSetting[(int)settingType] = setting;
-
-
+                ServerSetting[(int) settingType] = setting;
             }
             catch (Exception ex)
             {
-
             }
-
         }
     }
 }

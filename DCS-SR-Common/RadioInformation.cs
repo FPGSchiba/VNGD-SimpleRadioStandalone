@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class RadioInformation
     {
-        public string name = "";
+        public double freqMax = 1;
+        public double freqMin = 1;
         public double frequency = 1;
         public sbyte modulation = 0;
-        public float volume = 1.0f;
+        public string name = "";
         public double secondaryFrequency = 1;
-        public double freqMin = 1;
-        public double freqMax = 1;
+        public float volume = 1.0f;
 
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
-            RadioInformation compare = (RadioInformation)obj;
+            var compare = (RadioInformation) obj;
 
             if (!name.Equals(compare.name))
             {
@@ -56,6 +50,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             return true;
         }
-    };
-
+    }
 }

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace FragLabs.Audio.Codecs.Opus
 {
     /// <summary>
-    /// Wraps the Opus API.
+    ///     Wraps the Opus API.
     /// </summary>
     internal class API
     {
@@ -24,7 +24,8 @@ namespace FragLabs.Audio.Codecs.Opus
         internal static extern void opus_decoder_destroy(IntPtr decoder);
 
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int opus_decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size, int decode_fec);
+        internal static extern int opus_decode(IntPtr st, byte[] data, int len, IntPtr pcm, int frame_size,
+            int decode_fec);
 
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, int value);
@@ -33,7 +34,7 @@ namespace FragLabs.Audio.Codecs.Opus
         internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, out int value);
     }
 
-    public enum Ctl : int
+    public enum Ctl
     {
         SetBitrateRequest = 4002,
         GetBitrateRequest = 4003,
@@ -42,20 +43,22 @@ namespace FragLabs.Audio.Codecs.Opus
     }
 
     /// <summary>
-    /// Supported coding modes.
+    ///     Supported coding modes.
     /// </summary>
     public enum Application
     {
         /// <summary>
-        /// Best for most VoIP/videoconference applications where listening quality and intelligibility matter most.
+        ///     Best for most VoIP/videoconference applications where listening quality and intelligibility matter most.
         /// </summary>
         Voip = 2048,
+
         /// <summary>
-        /// Best for broadcast/high-fidelity application where the decoded audio should be as close as possible to input.
+        ///     Best for broadcast/high-fidelity application where the decoded audio should be as close as possible to input.
         /// </summary>
         Audio = 2049,
+
         /// <summary>
-        /// Only use when lowest-achievable latency is what matters most. Voice-optimized modes cannot be used.
+        ///     Only use when lowest-achievable latency is what matters most. Voice-optimized modes cannot be used.
         /// </summary>
         Restricted_LowLatency = 2051
     }
@@ -63,36 +66,43 @@ namespace FragLabs.Audio.Codecs.Opus
     public enum Errors
     {
         /// <summary>
-        /// No error.
+        ///     No error.
         /// </summary>
-        OK              = 0,
+        OK = 0,
+
         /// <summary>
-        /// One or more invalid/out of range arguments.
+        ///     One or more invalid/out of range arguments.
         /// </summary>
-        BadArg          = -1,
+        BadArg = -1,
+
         /// <summary>
-        /// The mode struct passed is invalid.
+        ///     The mode struct passed is invalid.
         /// </summary>
-        BufferToSmall   = -2,
+        BufferToSmall = -2,
+
         /// <summary>
-        /// An internal error was detected.
+        ///     An internal error was detected.
         /// </summary>
-        InternalError   = -3,
+        InternalError = -3,
+
         /// <summary>
-        /// The compressed data passed is corrupted.
+        ///     The compressed data passed is corrupted.
         /// </summary>
-        InvalidPacket   = -4,
+        InvalidPacket = -4,
+
         /// <summary>
-        /// Invalid/unsupported request number.
+        ///     Invalid/unsupported request number.
         /// </summary>
-        Unimplemented   = -5,
+        Unimplemented = -5,
+
         /// <summary>
-        /// An encoder or decoder structure is invalid or already freed.
+        ///     An encoder or decoder structure is invalid or already freed.
         /// </summary>
-        InvalidState    = -6,
+        InvalidState = -6,
+
         /// <summary>
-        /// Memory allocation has failed.
+        ///     Memory allocation has failed.
         /// </summary>
-        AllocFail       = -7
+        AllocFail = -7
     }
 }

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class DCSPlayerSideInfo
     {
-        public String name = "";
+        public string name = "";
         public int side = 0;
     }
 }

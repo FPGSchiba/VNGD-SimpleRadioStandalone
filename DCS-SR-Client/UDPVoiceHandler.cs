@@ -1,49 +1,44 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using FragLabs.Audio.Codecs;
-using NAudio.Wave;
 using System.Threading;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using FragLabs.Audio.Codecs;
+using NLog;
+using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    class UDPVoiceHandler
+    internal class UDPVoiceHandler
     {
-        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        UdpClient listener;
+        private static readonly object _bufferLock = new object();
+        private readonly OpusDecoder _decoder;
+        private readonly IPAddress address;
+        private readonly AudioManager audioManager;
+        private readonly ConcurrentDictionary<string, SRClient> clientsList;
 
-        private volatile bool stop = false;
-        private ConcurrentDictionary<String, SRClient> clientsList;
-        private byte[] guidAsciiBytes;
-        private IPAddress address;
-        private OpusDecoder _decoder;
-        private AudioManager audioManager;
-        private string guid;
-        private InputDeviceManager inputManager;
+        private readonly BlockingCollection<byte[]> encodedAudio = new BlockingCollection<byte[]>();
+        private readonly string guid;
+        private readonly byte[] guidAsciiBytes;
+        private readonly InputDeviceManager inputManager;
+        private UdpClient listener;
 
-        private volatile bool ptt = false;
+        private volatile bool ptt;
 
-        BlockingCollection<byte[]> encodedAudio = new BlockingCollection<byte[]>();
+        private volatile bool stop;
 
-        private CancellationTokenSource stopFlag = new CancellationTokenSource();
-
-        private static readonly Object _bufferLock = new Object();
+        private readonly CancellationTokenSource stopFlag = new CancellationTokenSource();
 
 
         public UDPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
-          OpusDecoder _decoder, AudioManager audioManager, InputDeviceManager inputManager)
+            OpusDecoder _decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
             this._decoder = _decoder;
             this.audioManager = audioManager;
@@ -57,21 +52,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             this.inputManager = inputManager;
         }
 
+        [DllImport("kernel32.dll")]
+        private static extern long GetTickCount64();
+
         public void Listen()
         {
             listener = new UdpClient();
             listener.AllowNatTraversal(true);
 
             //start 2 audio processing threads
-            Thread decoderThread = new Thread(UDPAudioDecode);
+            var decoderThread = new Thread(UDPAudioDecode);
             decoderThread.Start();
 
             //open ports by sending
             //send to open ports
             try
             {
-                IPEndPoint ip = new IPEndPoint(this.address, 5010);
-                byte[] bytes = new byte[5];
+                var ip = new IPEndPoint(address, 5010);
+                var bytes = new byte[5];
                 listener.Send(bytes, 5, ip);
             }
             catch (Exception ex)
@@ -79,9 +77,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
 
-            this.inputManager.StartDetectPTT((bool pressed, InputBinding deviceType) =>
+            inputManager.StartDetectPTT((pressed, deviceType) =>
             {
-                DCSPlayerRadioInfo radios = RadioSyncServer.dcsPlayerRadioInfo;
+                var radios = RadioSyncServer.dcsPlayerRadioInfo;
 
                 if (deviceType == InputBinding.PTT)
                 {
@@ -93,8 +91,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         switch (deviceType)
                         {
-                      //TODO check here that we can switch radios
-                      case InputBinding.SWITCH_1:
+                            //TODO check here that we can switch radios
+                            case InputBinding.SWITCH_1:
 
                                 radios.selected = 0;
                                 break;
@@ -115,10 +113,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 try
                 {
-                    IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
+                    var groupEP = new IPEndPoint(IPAddress.Any, 5010);
                     //   listener.Client.ReceiveTimeout = 3000;
 
-                    byte[] bytes = listener.Receive(ref groupEP);
+                    var bytes = listener.Receive(ref groupEP);
 
                     if (bytes != null && bytes.Length > 36)
                     {
@@ -160,7 +158,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             if (clientsList.ContainsKey(clientGuid))
             {
-                SRClient client = clientsList[guid];
+                var client = clientsList[guid];
 
                 if (client != null && client.isCurrent())
                 {
@@ -178,49 +176,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     try
                     {
-                        byte[] encodedOpusAudio = new byte[0];
+                        var encodedOpusAudio = new byte[0];
                         encodedAudio.TryTake(out encodedOpusAudio, 100000, stopFlag.Token);
 
-                        long time = GetTickCount64(); //should add at the receive instead?
+                        var time = GetTickCount64(); //should add at the receive instead?
 
                         if (encodedOpusAudio != null && encodedOpusAudio.Length > 36)
                         {
                             //  process
                             // check if we should play audio
 
-                            SRClient myClient = IsClientMetaDataValid(guid);
+                            var myClient = IsClientMetaDataValid(guid);
 
                             if (myClient != null)
                             {
                                 //last 36 bytes are guid!
-                                String recievingGuid = Encoding.ASCII.GetString(
-                                  encodedOpusAudio, encodedOpusAudio.Length - 36, 36);
+                                var recievingGuid = Encoding.ASCII.GetString(
+                                    encodedOpusAudio, encodedOpusAudio.Length - 36, 36);
 
-                                double frequency = BitConverter.ToDouble(encodedOpusAudio, encodedOpusAudio.Length - 36 - 1 - 8);
+                                var frequency = BitConverter.ToDouble(encodedOpusAudio,
+                                    encodedOpusAudio.Length - 36 - 1 - 8);
                                 //before guid and modulation so -36 and then -1
-                                sbyte modulation = (sbyte)encodedOpusAudio[encodedOpusAudio.Length - 36 - 1];
-                                int unitId = -1; // TODO send unitID stuff
+                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 36 - 1];
+                                var unitId = -1; // TODO send unitID stuff
 
                                 // check the radio
-                                int radioId = -1;
-                                RadioInformation receivingRadio = CanHear(RadioSyncServer.dcsPlayerRadioInfo, frequency, modulation,
-                                  unitId,out radioId);
+                                var radioId = -1;
+                                var receivingRadio = CanHear(RadioSyncServer.dcsPlayerRadioInfo, frequency,
+                                    modulation,
+                                    unitId, out radioId);
                                 if (receivingRadio != null)
                                 {
                                     //now check that the radios match
                                     int len;
                                     //- 36 so we ignore the UUID
-                                    byte[] decoded = _decoder.Decode(encodedOpusAudio, encodedOpusAudio.Length - 36 - 1 - 8, out len);
+                                    var decoded = _decoder.Decode(encodedOpusAudio,
+                                        encodedOpusAudio.Length - 36 - 1 - 8, out len);
 
                                     if (len > 0)
                                     {
                                         // for some reason if this is removed then it lags?!
-                                        byte[] tmp = new byte[len];
+                                        var tmp = new byte[len];
                                         Array.Copy(decoded, tmp, len);
 
                                         //ALL GOOD!
                                         //create marker for bytes
-                                        ClientAudio audio = new ClientAudio();
+                                        var audio = new ClientAudio();
                                         audio.ClientGUID = recievingGuid;
                                         audio.PCMAudio = tmp;
                                         audio.ReceiveTime = GetTickCount64();
@@ -248,11 +249,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, int unitId,out int radioId)
+        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, int unitId,
+            out int radioId)
         {
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
-                RadioInformation receivingRadio = myClient.radios[i];
+                var receivingRadio = myClient.radios[i];
 
                 if (receivingRadio != null)
                 {
@@ -265,16 +267,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         radioId = i;
                         return receivingRadio;
                     }
-                    else if (receivingRadio.frequency == frequency
-                             && receivingRadio.modulation == modulation
-                             && receivingRadio.frequency > 1)
+                    if (receivingRadio.frequency == frequency
+                        && receivingRadio.modulation == modulation
+                        && receivingRadio.frequency > 1)
                     {
                         SendUpdateToGUI(i, false);
                         radioId = i;
                         return receivingRadio;
                     }
-                    else if (receivingRadio.secondaryFrequency == frequency
-                             && receivingRadio.secondaryFrequency > 100)
+                    if (receivingRadio.secondaryFrequency == frequency
+                        && receivingRadio.secondaryFrequency > 100)
                     {
                         SendUpdateToGUI(i, true);
                         radioId = i;
@@ -302,15 +304,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //removes race condition by assigning here with the current selected changing
                     if (currentSelected >= 0 && currentSelected < 3)
                     {
-                        RadioInformation radio = RadioSyncServer.dcsPlayerRadioInfo.radios[currentSelected];
+                        var radio = RadioSyncServer.dcsPlayerRadioInfo.radios[currentSelected];
 
                         if (radio != null)
                         {
-                            byte[] combinedBytes = new byte[len + 8 + 1 + 36];
-                            System.Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
+                            var combinedBytes = new byte[len + 8 + 1 + 36];
+                            Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
 
 
-                            byte[] freq = BitConverter.GetBytes(radio.frequency); //8 bytes
+                            var freq = BitConverter.GetBytes(radio.frequency); //8 bytes
 
                             combinedBytes[len] = freq[0];
                             combinedBytes[len + 1] = freq[1];
@@ -322,11 +324,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             combinedBytes[len + 7] = freq[7];
 
                             //modulation
-                            combinedBytes[len + 8] = (byte)(radio.modulation); //1 byte;
+                            combinedBytes[len + 8] = (byte) radio.modulation; //1 byte;
 
-                            System.Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len + 9, 36); // copy guid
+                            Buffer.BlockCopy(guidAsciiBytes, 0, combinedBytes, len + 9, 36); // copy guid
 
-                            IPEndPoint ip = new IPEndPoint(this.address, 5010);
+                            var ip = new IPEndPoint(address, 5010);
 
                             listener.Send(combinedBytes, combinedBytes.Length, ip);
 
@@ -346,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             Task.Run(() =>
             {
-                byte[] message = { 1, 2, 3, 4, 5 };
+                byte[] message = {1, 2, 3, 4, 5};
                 while (!stop)
                 {
                     logger.Info("Pinging Server");
@@ -358,7 +360,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                     }
 
-                    Thread.Sleep(60 * 1000);
+                    Thread.Sleep(60*1000);
                 }
             });
         }
@@ -367,13 +369,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private void SendUpdateToGUI(int radio, bool secondary)
         {
             //  return; //TODO fix the string format?!
-            string str = "{\"radio\": " + radio + " , \"secondary\": false }\r\n";
-            byte[] bytes = Encoding.ASCII.GetBytes(str);
+            var str = "{\"radio\": " + radio + " , \"secondary\": false }\r\n";
+            var bytes = Encoding.ASCII.GetBytes(str);
             //multicast
             try
             {
-                UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35035);
+                var client = new UdpClient();
+                var ip = new IPEndPoint(IPAddress.Parse("239.255.50.10"), 35035);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();

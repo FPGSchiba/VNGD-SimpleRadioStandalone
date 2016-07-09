@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -13,7 +9,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public string ClientGuid { get; set; }
 
-        public String Name { get; set; }
+        public string Name { get; set; }
 
         public int Coalition { get; set; }
 
@@ -28,18 +24,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public bool isCurrent()
         {
-            return LastUpdate > (System.Environment.TickCount - 10000); //last in game 10 seconds ago
+            return LastUpdate > Environment.TickCount - 10000; //last in game 10 seconds ago
         }
 
         public override string ToString()
         {
-            String side;
+            string side;
 
-            if(Coalition == 1)
+            if (Coalition == 1)
             {
                 side = "Red";
             }
-            else if(Coalition == 2)
+            else if (Coalition == 2)
             {
                 side = "Blue";
             }
@@ -47,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 side = "Spectator";
             }
-            return Name == "" ? "Unknown":Name + " - "+ side;
+            return Name == "" ? "Unknown" : Name + " - " + side;
         }
     }
 }

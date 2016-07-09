@@ -1,6 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -9,22 +7,24 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
     /// <summary>
-    /// Interaction logic for RadioControlGroup.xaml
+    ///     Interaction logic for RadioControlGroup.xaml
     /// </summary>
     public partial class RadioControlGroup : UserControl
     {
-        const double MHz = 1000000;
-        public int radioId;
+        private const double MHz = 1000000;
         private bool dragging;
-        private DCSPlayerRadioInfo lastUpdate = null;
 
-        private RadioTransmit lastActive = null;
+        private RadioTransmit lastActive;
 
         private DateTime lastActiveTime = new DateTime(0L);
+        private DCSPlayerRadioInfo lastUpdate;
+        public int radioId;
 
         public RadioControlGroup()
         {
@@ -33,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void up01_Click(object sender, RoutedEventArgs e)
         {
-            sendFrequencyChange(MHz / 10);
+            sendFrequencyChange(MHz/10);
             FocusDCS();
         }
 
@@ -45,34 +45,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void up10_Click(object sender, RoutedEventArgs e)
         {
-            sendFrequencyChange(MHz * 10);
+            sendFrequencyChange(MHz*10);
             FocusDCS();
         }
 
         private void down10_Click(object sender, RoutedEventArgs e)
         {
-            sendFrequencyChange(MHz * -10);
+            sendFrequencyChange(MHz*-10);
             FocusDCS();
         }
 
         private void down1_Click(object sender, RoutedEventArgs e)
         {
-            sendFrequencyChange(MHz * -1);
+            sendFrequencyChange(MHz*-1);
             FocusDCS();
         }
 
         private void down01_Click(object sender, RoutedEventArgs e)
         {
-            sendFrequencyChange((MHz / 10) * -1);
+            sendFrequencyChange(MHz/10*-1);
             FocusDCS();
         }
 
         private void sendUDPUpdate(RadioCommand update)
         {
             //only send update if the aircraft doesnt have its own radio system, i.e FC3
-            if (lastUpdate != null && lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (lastUpdate != null &&
+                lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                byte[] bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
+                var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
                 //multicast
                 send("239.255.50.10", 5070, bytes);
                 //unicast
@@ -82,7 +83,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void FocusDCS()
         {
-            Process[] localByName = Process.GetProcessesByName("dcs");
+            var localByName = Process.GetProcessesByName("dcs");
 
             if (localByName != null && localByName.Length > 0)
             {
@@ -90,12 +91,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
         }
 
-        private void send(String ipStr, int port, byte[] bytes)
+        private void send(string ipStr, int port, byte[] bytes)
         {
             try
             {
-                UdpClient client = new UdpClient();
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
+                var client = new UdpClient();
+                var ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
 
                 client.Send(bytes, bytes.Length, ip);
                 client.Close();
@@ -107,9 +108,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void sendFrequencyChange(double frequency)
         {
-            RadioCommand update = new RadioCommand();
+            var update = new RadioCommand();
             update.freq = frequency;
-            update.radio = this.radioId;
+            update.radio = radioId;
             update.cmdType = RadioCommand.CmdType.FREQUENCY;
 
             sendUDPUpdate(update);
@@ -117,8 +118,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void radioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            RadioCommand update = new RadioCommand();
-            update.radio = this.radioId;
+            var update = new RadioCommand();
+            update.radio = radioId;
             update.cmdType = RadioCommand.CmdType.SELECT;
 
             sendUDPUpdate(update);
@@ -128,8 +129,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void radioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            RadioCommand update = new RadioCommand();
-            update.radio = this.radioId;
+            var update = new RadioCommand();
+            update.radio = radioId;
             update.cmdType = RadioCommand.CmdType.SELECT;
 
             sendUDPUpdate(update);
@@ -138,19 +139,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void radioVolume_DragStarted(object sender, RoutedEventArgs e)
         {
-            this.dragging = true;
+            dragging = true;
         }
 
 
         private void radioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            RadioCommand update = new RadioCommand();
-            update.radio = this.radioId;
-            update.volume = ((float)radioVolume.Value) / 100.0f;
+            var update = new RadioCommand();
+            update.radio = radioId;
+            update.volume = (float) radioVolume.Value/100.0f;
             update.cmdType = RadioCommand.CmdType.VOLUME;
 
             sendUDPUpdate(update);
-            this.dragging = false;
+            dragging = false;
 
             FocusDCS();
         }
@@ -177,11 +178,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
 
                 //reset dragging just incase
-                this.dragging = false;
+                dragging = false;
             }
             else
             {
-                if (this.radioId == lastUpdate.selected)
+                if (radioId == lastUpdate.selected)
                 {
                     radioActive.Fill = new SolidColorBrush(Colors.Green);
                 }
@@ -190,7 +191,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     radioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
-                var currentRadio = lastUpdate.radios[this.radioId];
+                var currentRadio = lastUpdate.radios[radioId];
 
                 if (currentRadio.modulation == 3) // disabled
                 {
@@ -208,22 +209,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     down1.IsEnabled = false;
                     down01.IsEnabled = false;
                     return;
-
                 }
-                else if (currentRadio.modulation == 2) //intercom
+                if (currentRadio.modulation == 2) //intercom
                 {
                     radioFrequency.Text = "INTERCOM";
                 }
                 else
                 {
-                    radioFrequency.Text = (currentRadio.frequency / MHz).ToString("0.000") +
+                    radioFrequency.Text = (currentRadio.frequency/MHz).ToString("0.000") +
                                           (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secondaryFrequency > 100)
                     {
                         radioFrequency.Text += " G";
                     }
                 }
-                radioLabel.Content = lastUpdate.radios[this.radioId].name;
+                radioLabel.Content = lastUpdate.radios[radioId].name;
 
                 if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
@@ -238,7 +238,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
 
                     //reset dragging just incase
-                    this.dragging = false;
+                    dragging = false;
                 }
                 else if (lastUpdate.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
                 {
@@ -253,7 +253,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     down01.IsEnabled = false;
 
                     //reset dragging just incase
-                    this.dragging = false;
+                    dragging = false;
                 }
                 else
                 {
@@ -267,40 +267,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     down01.IsEnabled = true;
                 }
 
-                if (this.dragging == false)
+                if (dragging == false)
                 {
-                    radioVolume.Value = (currentRadio.volume * 100.0);
+                    radioVolume.Value = currentRadio.volume*100.0;
                 }
             }
         }
 
         public void setLastRadioTransmit(RadioTransmit radio)
         {
-            this.lastActive = radio;
+            lastActive = radio;
             lastActiveTime = DateTime.Now;
         }
 
         internal void repaintRadioTransmit()
         {
-            if (this.lastActive == null)
+            if (lastActive == null)
             {
-                radioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
             }
             else
             {
                 //check if current
-                long elapsedTicks = DateTime.Now.Ticks - lastActiveTime.Ticks;
-                TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
+                var elapsedTicks = DateTime.Now.Ticks - lastActiveTime.Ticks;
+                var elapsedSpan = new TimeSpan(elapsedTicks);
 
                 if (elapsedSpan.TotalSeconds > 0.5)
                 {
-                    radioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                    radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
                 else
                 {
-                    if (this.lastActive.radio == this.radioId)
+                    if (lastActive.radio == radioId)
                     {
-                        if (this.lastActive.secondary)
+                        if (lastActive.secondary)
                         {
                             radioFrequency.Foreground = new SolidColorBrush(Colors.Red);
                         }
@@ -311,7 +311,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     }
                     else
                     {
-                        radioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                        radioFrequency.Foreground =
+                            new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                     }
                 }
             }

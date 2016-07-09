@@ -1,9 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Win32;
 using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
@@ -24,29 +20,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             inputDevices[1] = ReadInputRegistry(InputBinding.SWITCH_1);
             inputDevices[2] = ReadInputRegistry(InputBinding.SWITCH_2);
             inputDevices[3] = ReadInputRegistry(InputBinding.SWITCH_3);
-
         }
 
         public InputDevice ReadInputRegistry(InputBinding bind)
         {
-            InputDevice device = new InputDevice();
+            var device = new InputDevice();
             try
             {
+                var key = bind.ToString();
 
-                string key = bind.ToString();
 
-
-                string deviceName = (string)Registry.GetValue(REG_PATH,
+                var deviceName = (string) Registry.GetValue(REG_PATH,
                     key + "_name",
                     "");
 
-                int button = (int)Registry.GetValue(REG_PATH,
-                   key + "_button",
-                   "");
+                var button = (int) Registry.GetValue(REG_PATH,
+                    key + "_button",
+                    "");
 
-                string guid = (string)Registry.GetValue(REG_PATH,
-                   key + "_guid",
-                   "");
+                var guid = (string) Registry.GetValue(REG_PATH,
+                    key + "_guid",
+                    "");
 
 
                 device.DeviceName = deviceName;
@@ -58,7 +52,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             catch (Exception ex)
             {
-
             }
 
 
@@ -69,50 +62,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                string key = bind.ToString();
+                var key = bind.ToString();
                 Registry.SetValue(REG_PATH,
-            key + "_name",
-            device.DeviceName.Replace("\0", ""));
+                    key + "_name",
+                    device.DeviceName.Replace("\0", ""));
 
                 Registry.SetValue(REG_PATH,
-                  key + "_button",
-                  device.Button);
+                    key + "_button",
+                    device.Button);
 
                 Registry.SetValue(REG_PATH,
-                  key + "_guid",
-                  device.InstanceGUID.ToString());
+                    key + "_guid",
+                    device.InstanceGUID.ToString());
             }
             catch (Exception ex)
             {
-
             }
-
         }
 
         public void ClearInputRegistry(InputBinding bind)
         {
             try
             {
-                string key = bind.ToString();
+                var key = bind.ToString();
                 Registry.SetValue(REG_PATH,
-            key + "_name",
-            "");
+                    key + "_name",
+                    "");
 
                 Registry.SetValue(REG_PATH,
-                  key + "_button",
-                  "");
+                    key + "_button",
+                    "");
 
                 Registry.SetValue(REG_PATH,
-                  key + "_guid",
-                  "");
+                    key + "_guid",
+                    "");
             }
             catch (Exception ex)
             {
-
             }
-
         }
-
-
     }
 }

@@ -2,30 +2,26 @@
 
 namespace NGuava
 {
-  //thats just for test.
+    //thats just for test.
     public class Listener
-    {   
+    {
         [Subscribe]
-        public void Send(String s)
+        public void Send(string s)
         {
             Console.WriteLine(s);
         }
 
-        public void Send2(String s)
+        public void Send2(string s)
         {
             //doing nothing.
         }
 
-        private void Send3(String s)
+        private void Send3(string s)
         {
-
         }
 
-        public virtual void Send4(String s)
+        public virtual void Send4(string s)
         {
-
         }
-
-
     }
 }

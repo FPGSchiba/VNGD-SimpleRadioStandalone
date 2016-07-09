@@ -1,9 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Win32;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -17,20 +13,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             MIC_BOOST
         }
 
-        const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
+        private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
         private int _audioInputDeviceId;
         private int _audioOutputDeviceId;
-        private String _lastServer;
+        private string _lastServer;
         private float _micBoost;
 
         public AppConfiguration()
         {
             try
             {
-                AudioInputDeviceId = (int)Registry.GetValue(REG_PATH,
-                  RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
-                  0);
+                AudioInputDeviceId = (int) Registry.GetValue(REG_PATH,
+                    RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
+                    0);
             }
             catch (Exception ex)
             {
@@ -39,9 +35,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                AudioOutputDeviceId = (int)Registry.GetValue(REG_PATH,
-                   RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
-                   0);
+                AudioOutputDeviceId = (int) Registry.GetValue(REG_PATH,
+                    RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
+                    0);
             }
             catch (Exception ex)
             {
@@ -50,10 +46,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                LastServer = (String)Registry.GetValue(REG_PATH,
+                LastServer = (string) Registry.GetValue(REG_PATH,
                     RegKeys.LAST_SERVER.ToString(),
-                   "127.0.0.1");
-
+                    "127.0.0.1");
             }
             catch (Exception ex)
             {
@@ -62,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                MicBoost = float.Parse( (String)Registry.GetValue(REG_PATH,
+                MicBoost = float.Parse((string) Registry.GetValue(REG_PATH,
                     RegKeys.MIC_BOOST.ToString(),
                     "1.0"));
             }
@@ -70,37 +65,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 MicBoost = 1.0f;
             }
-           
-           
-
-            
-
         }
 
 
         public int AudioInputDeviceId
         {
-            get
-            {
-                return _audioInputDeviceId;
-            }
+            get { return _audioInputDeviceId; }
             set
             {
                 _audioInputDeviceId = value;
 
                 Registry.SetValue(REG_PATH,
-            RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
-            _audioInputDeviceId);
-
+                    RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
+                    _audioInputDeviceId);
             }
         }
 
         public int AudioOutputDeviceId
         {
-            get
-            {
-                return _audioOutputDeviceId;
-            }
+            get { return _audioOutputDeviceId; }
             set
             {
                 _audioOutputDeviceId = value;
@@ -108,39 +91,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(REG_PATH,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     _audioOutputDeviceId);
-
             }
         }
-        public String LastServer
+
+        public string LastServer
         {
-            get
-            {
-                return _lastServer;
-            }
+            get { return _lastServer; }
             set
             {
                 _lastServer = value;
 
                 Registry.SetValue(REG_PATH,
-                 RegKeys.LAST_SERVER.ToString(),
-                _lastServer);
-
+                    RegKeys.LAST_SERVER.ToString(),
+                    _lastServer);
             }
         }
+
         public float MicBoost
         {
-            get
-            {
-                return _micBoost;
-            }
+            get { return _micBoost; }
             set
             {
                 _micBoost = value;
 
                 Registry.SetValue(REG_PATH,
-                 RegKeys.MIC_BOOST.ToString(),
-                _micBoost);
-
+                    RegKeys.MIC_BOOST.ToString(),
+                    _micBoost);
             }
         }
     }

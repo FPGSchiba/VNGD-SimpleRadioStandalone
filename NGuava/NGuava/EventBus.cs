@@ -5,12 +5,59 @@ using System.Threading;
 namespace NGuava
 {
     /// <summary>
-    /// A tool to subscribe to events and publish events.
+    ///     A tool to subscribe to events and publish events.
     /// </summary>
-    public  class EventBus : IEventBus 
+    public class EventBus : IEventBus
     {
-
         private static EventBus instance;
+
+        /// <summary>
+        ///     TODO : check the memory issues of threadLocal (Remove).
+        /// </summary>
+        private readonly ThreadLocal<Queue<EventWithHandler>> eventsToDispatch;
+
+        /// <summary>
+        ///     Finder of methods with specific attribute.
+        /// </summary>
+        private readonly IHandlerFindingStrategy finder;
+
+        /// <summary>
+        ///     MultiMap with key of event type and values os event handlers.
+        /// </summary>
+        private readonly IMultiMap<Type, EventHandler> handlersByType;
+
+        /// <summary>
+        ///     Locker of reading and writing from the MultiMap with readers writer policy.
+        /// </summary>
+        private readonly ReaderWriterLockSlim handlersByTypeLock;
+
+        /// <summary>
+        ///     Thread local boolean that prevents reenterency of thread.
+        /// </summary>
+        /// readonly
+        private readonly ThreadLocal<bool> isDispatching;
+
+        /// <summary>
+        ///     Default constructor.
+        /// </summary>
+        private EventBus() : this(new AttributeHandlerFinder())
+        {
+        }
+
+        /// <summary>
+        ///     Constructor that gets the finder of methods marked with specific atrributes.
+        /// </summary>
+        /// <param name="finder"></param>
+        private EventBus(IHandlerFindingStrategy finder)
+        {
+            //TODO : readerwriterlockslim , conccurentdictionary.
+            //Replace with ninject tools.
+            this.finder = finder;
+            handlersByType = HashMultiMap<Type, EventHandler>.Create();
+            handlersByTypeLock = new ReaderWriterLockSlim();
+            eventsToDispatch = new ThreadLocal<Queue<EventWithHandler>>(() => { return new Queue<EventWithHandler>(); });
+            isDispatching = new ThreadLocal<bool>(() => { return false; });
+        }
 
 
         public static EventBus Instance
@@ -24,54 +71,14 @@ namespace NGuava
                 return instance;
             }
         }
+
         /// <summary>
-        ///Finder of methods with specific attribute. 
-        /// </summary>
-        private readonly IHandlerFindingStrategy finder;
-        /// <summary>
-        /// MultiMap with key of event type and values os event handlers. 
-        /// </summary>
-        private readonly IMultiMap<Type, EventHandler> handlersByType;
-        /// <summary>
-        /// Locker of reading and writing from the MultiMap with readers writer policy.
-        /// </summary>
-        private readonly ReaderWriterLockSlim handlersByTypeLock;
-        /// <summary>
-        /// TODO : check the memory issues of threadLocal (Remove).
-        /// 
-        /// </summary>
-        private readonly ThreadLocal<Queue<EventWithHandler>> eventsToDispatch;
-        /// <summary>
-        /// Thread local boolean that prevents reenterency of thread.
-        /// </summary>readonly
-        private readonly ThreadLocal<Boolean> isDispatching;
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        private EventBus() : this(new AttributeHandlerFinder())
-        {
-        }
-        /// <summary>
-        /// Constructor that gets the finder of methods marked with specific atrributes.
-        /// </summary>
-        /// <param name="finder"></param>
-        private EventBus(IHandlerFindingStrategy finder)
-        {
-            //TODO : readerwriterlockslim , conccurentdictionary.
-            //Replace with ninject tools.
-            this.finder = finder;
-            handlersByType = HashMultiMap<Type, EventHandler>.Create();
-            handlersByTypeLock = new ReaderWriterLockSlim();
-            eventsToDispatch = new ThreadLocal<Queue<EventWithHandler>>(() => { return new Queue<EventWithHandler>(); });
-            isDispatching = new ThreadLocal<Boolean>(() => { return false; });                                        
-        }
-        /// <summary>
-        /// Register the instance as subscriber through atrribute subscribe.
+        ///     Register the instance as subscriber through atrribute subscribe.
         /// </summary>
         /// <param name="object">Instance to registred as subscriber to events.</param>
-        public void Register(Object @object)
+        public void Register(object @object)
         {
-            IMultiMap<Type, EventHandler> methodsInSubscriber = finder.FindAllHandlers(@object);
+            var methodsInSubscriber = finder.FindAllHandlers(@object);
             handlersByTypeLock.EnterWriteLock();
             try
             {
@@ -86,47 +93,48 @@ namespace NGuava
                 handlersByTypeLock.ExitWriteLock();
             }
         }
+
         /// <summary>
-        /// Unregister the instance as subscriber.
+        ///     Unregister the instance as subscriber.
         /// </summary>
         /// <Preconditions>
-        /// @object is not null.
-        /// The method Regiter is activated on the instance @object.
+        ///     @object is not null.
+        ///     The method Regiter is activated on the instance @object.
         /// </Preconditions>
         /// <param name="object">Instance to be unregistered</param>
-        public void UnRegister(Object @object)
+        public void UnRegister(object @object)
         {
-            IMultiMap<Type, EventHandler> methodsInListener = finder.FindAllHandlers(@object);
+            var methodsInListener = finder.FindAllHandlers(@object);
             ISet<EventHandler> eventMethodsInListner = null;
-            foreach (Type eventType in methodsInListener.Keys)
+            foreach (var eventType in methodsInListener.Keys)
             {
-               eventMethodsInListner  = methodsInListener.GetSet(eventType);
-               handlersByTypeLock.EnterWriteLock();
-               try
-               {
-                   ISet<EventHandler> currentHandlers = handlersByType.GetSet(eventType);
-                   if (!eventMethodsInListner.IsSubsetOf(currentHandlers))
-                       throw new ArgumentException("missing event handlers for an annotated method. Is " + @object.ToString() + " registered?");
-                   currentHandlers.RemoveAll<EventHandler>(eventMethodsInListner);
-               }
-               finally
-               {
-                   handlersByTypeLock.ExitWriteLock();
-               }
+                eventMethodsInListner = methodsInListener.GetSet(eventType);
+                handlersByTypeLock.EnterWriteLock();
+                try
+                {
+                    var currentHandlers = handlersByType.GetSet(eventType);
+                    if (!eventMethodsInListner.IsSubsetOf(currentHandlers))
+                        throw new ArgumentException("missing event handlers for an annotated method. Is " +
+                                                    @object + " registered?");
+                    currentHandlers.RemoveAll(eventMethodsInListner);
+                }
+                finally
+                {
+                    handlersByTypeLock.ExitWriteLock();
+                }
             }
- 
         }
+
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="event"></param>
-        public void Post(Object @event)
+        public void Post(object @event)
         {
             handlersByTypeLock.EnterReadLock();
             try
             {
                 var handlers = handlersByType.Get(@event.GetType());
-                foreach (EventHandler eventHandler in handlers)
+                foreach (var eventHandler in handlers)
                 {
                     EnqueueEvent(@event, eventHandler);
                 }
@@ -137,19 +145,22 @@ namespace NGuava
             }
             DispatchQueuedEvents();
         }
+
         /// <summary>
-        /// Entering event and handler to the queue of current  thread.
+        ///     Entering event and handler to the queue of current  thread.
         /// </summary>
         /// <param name="event">Event to enter to queue.</param>
         /// <param name="handler">Handler to enter to queue.</param>
-        private void EnqueueEvent(Object @event, EventHandler handler)
+        private void EnqueueEvent(object @event, EventHandler handler)
         {
-            eventsToDispatch.Value.Enqueue(new EventWithHandler(@event , handler));
+            eventsToDispatch.Value.Enqueue(new EventWithHandler(@event, handler));
         }
+
         /// <summary>
-        /// Dispatch all events from thread local queue.
-        /// If thread is dipatching when entring to this method , reenterency prevented and the events queued will be dispatched 
-        /// in the current run of thread on this method.
+        ///     Dispatch all events from thread local queue.
+        ///     If thread is dipatching when entring to this method , reenterency prevented and the events queued will be
+        ///     dispatched
+        ///     in the current run of thread on this method.
         /// </summary>
         private void DispatchQueuedEvents()
         {
@@ -158,8 +169,8 @@ namespace NGuava
             isDispatching.Value = true;
             try
             {
-                Queue<EventWithHandler> events = eventsToDispatch.Value;
-                EventWithHandler currentEventWithHandler = default(EventWithHandler);
+                var events = eventsToDispatch.Value;
+                var currentEventWithHandler = default(EventWithHandler);
                 while (events.Count > 0)
                 {
                     currentEventWithHandler = events.Dequeue();
@@ -172,12 +183,12 @@ namespace NGuava
                 isDispatching.Value = false;
             }
         }
+
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="event"></param>
         /// <param name="eventHandler"></param>
-        private void DispatchWithOutExceptionThrown(Object @event , EventHandler eventHandler)
+        private void DispatchWithOutExceptionThrown(object @event, EventHandler eventHandler)
         {
             try
             {

@@ -24,7 +24,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-             
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
                 _waveIn.BufferMilliseconds = 60;
                 _waveIn.DeviceNumber = mic;
@@ -33,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 var pcm = new WaveInProvider(_waveIn);
 
                 Volume = new SampleChannel(pcm);
-                
+
                 var filter = new RadioFilter(Volume);
 
                 _waveOut = new WaveOut();
@@ -44,7 +43,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveIn.StartRecording();
                 _waveOut.Play();
-
             }
             catch (Exception ex)
             {
@@ -52,7 +50,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Environment.Exit(1);
             }
-
         }
 
         public void StopEncoding()
@@ -76,8 +73,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _playBuffer.ClearBuffer();
                 _playBuffer = null;
             }
-
         }
-
     }
 }

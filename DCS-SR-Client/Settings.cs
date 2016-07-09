@@ -1,9 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Win32;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -20,10 +16,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         private static Settings instance;
 
-        public String[] UserSettings
+        public Settings()
         {
-            get;
+            UserSettings = new string[4];
+
+            foreach (SettingType set in Enum.GetValues(typeof(SettingType)))
+            {
+                UserSettings[(int) set] = ReadSetting(set);
+            }
         }
+
+        public string[] UserSettings { get; }
 
         public static Settings Instance
         {
@@ -37,56 +40,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        public Settings()
+
+        public string ReadSetting(SettingType settingType)
         {
-            UserSettings = new string[4];
-
-            foreach(SettingType set in Enum.GetValues(typeof(SettingType)))
-            {
-                UserSettings[(int)set] = ReadSetting(set);
-            }
-
-        }
-
-      
-
-        public String ReadSetting(SettingType settingType)
-        {  
             try
             {
-
-                string setting = (string)Registry.GetValue(InputConfiguration.REG_PATH,
+                var setting = (string) Registry.GetValue(InputConfiguration.REG_PATH,
                     settingType + "_setting",
                     "");
                 return setting;
-
             }
             catch (Exception ex)
             {
-
             }
             return null;
-
         }
 
-        public void WriteSetting(SettingType settingType, String setting)
+        public void WriteSetting(SettingType settingType, string setting)
         {
             try
             {
-               
-               Registry.SetValue(InputConfiguration.REG_PATH,
+                Registry.SetValue(InputConfiguration.REG_PATH,
                     settingType + "_setting",
                     setting);
 
-                UserSettings[(int)settingType] = setting;
-
-
+                UserSettings[(int) settingType] = setting;
             }
             catch (Exception ex)
             {
-
             }
-
         }
     }
 }
