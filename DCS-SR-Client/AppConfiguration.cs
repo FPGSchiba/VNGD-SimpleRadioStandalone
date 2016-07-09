@@ -13,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             MIC_BOOST
         }
 
-        private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
+        private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
         private int _audioInputDeviceId;
         private int _audioOutputDeviceId;
@@ -24,7 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                AudioInputDeviceId = (int) Registry.GetValue(REG_PATH,
+                AudioInputDeviceId = (int) Registry.GetValue(RegPath,
                     RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
                     0);
             }
@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                AudioOutputDeviceId = (int) Registry.GetValue(REG_PATH,
+                AudioOutputDeviceId = (int) Registry.GetValue(RegPath,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     0);
             }
@@ -46,7 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                LastServer = (string) Registry.GetValue(REG_PATH,
+                LastServer = (string) Registry.GetValue(RegPath,
                     RegKeys.LAST_SERVER.ToString(),
                     "127.0.0.1");
             }
@@ -57,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                MicBoost = float.Parse((string) Registry.GetValue(REG_PATH,
+                MicBoost = float.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.MIC_BOOST.ToString(),
                     "1.0"));
             }
@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _audioInputDeviceId = value;
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
                     _audioInputDeviceId);
             }
@@ -88,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _audioOutputDeviceId = value;
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     _audioOutputDeviceId);
             }
@@ -101,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _lastServer = value;
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     RegKeys.LAST_SERVER.ToString(),
                     _lastServer);
             }
@@ -114,7 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _micBoost = value;
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     RegKeys.MIC_BOOST.ToString(),
                     _micBoost);
             }

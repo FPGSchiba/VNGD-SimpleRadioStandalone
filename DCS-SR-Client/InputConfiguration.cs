@@ -6,9 +6,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class InputConfiguration
     {
-        public static readonly string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
+        public static readonly string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
-        public InputDevice[] inputDevices = new InputDevice[4];
+        public InputDevice[] InputDevices = new InputDevice[4];
 
 
         public InputConfiguration()
@@ -16,10 +16,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //load from registry
             //    PTTCommon = ReadInputRegistry("common");
 
-            inputDevices[0] = ReadInputRegistry(InputBinding.PTT);
-            inputDevices[1] = ReadInputRegistry(InputBinding.SWITCH_1);
-            inputDevices[2] = ReadInputRegistry(InputBinding.SWITCH_2);
-            inputDevices[3] = ReadInputRegistry(InputBinding.SWITCH_3);
+            InputDevices[0] = ReadInputRegistry(InputBinding.Ptt);
+            InputDevices[1] = ReadInputRegistry(InputBinding.Switch1);
+            InputDevices[2] = ReadInputRegistry(InputBinding.Switch2);
+            InputDevices[3] = ReadInputRegistry(InputBinding.Switch3);
         }
 
         public InputDevice ReadInputRegistry(InputBinding bind)
@@ -30,22 +30,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 var key = bind.ToString();
 
 
-                var deviceName = (string) Registry.GetValue(REG_PATH,
+                var deviceName = (string) Registry.GetValue(RegPath,
                     key + "_name",
                     "");
 
-                var button = (int) Registry.GetValue(REG_PATH,
+                var button = (int) Registry.GetValue(RegPath,
                     key + "_button",
                     "");
 
-                var guid = (string) Registry.GetValue(REG_PATH,
+                var guid = (string) Registry.GetValue(RegPath,
                     key + "_guid",
                     "");
 
 
                 device.DeviceName = deviceName;
                 device.Button = button;
-                device.InstanceGUID = Guid.Parse(guid);
+                device.InstanceGuid = Guid.Parse(guid);
                 device.InputBind = bind;
 
                 return device;
@@ -63,17 +63,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             try
             {
                 var key = bind.ToString();
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_name",
                     device.DeviceName.Replace("\0", ""));
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_button",
                     device.Button);
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_guid",
-                    device.InstanceGUID.ToString());
+                    device.InstanceGuid.ToString());
             }
             catch (Exception ex)
             {
@@ -85,15 +85,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             try
             {
                 var key = bind.ToString();
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_name",
                     "");
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_button",
                     "");
 
-                Registry.SetValue(REG_PATH,
+                Registry.SetValue(RegPath,
                     key + "_guid",
                     "");
             }

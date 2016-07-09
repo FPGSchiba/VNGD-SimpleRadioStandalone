@@ -8,7 +8,7 @@
         ResizeMode="CanMinimize"
         Title="ClientAdminWindow" Height="300" Width="300">
     <Grid>
-        <ListBox x:Name="clientsListBox" HorizontalAlignment="Left" Height="224" Margin="10,35,0,0"
+        <ListBox x:Name="ClientsListBox" HorizontalAlignment="Left" Height="224" Margin="10,35,0,0"
                  VerticalAlignment="Top" Width="272" MouseDown="ClientsListBox_MouseDown">
 
             <ListBox.Resources>
@@ -26,7 +26,7 @@
 
             </ListBox.Resources>
         </ListBox>
-        <Button x:Name="refresh" Content="Refresh" HorizontalAlignment="Left" Margin="110,10,0,0"
+        <Button x:Name="RefreshButton" Content="Refresh" HorizontalAlignment="Left" Margin="110,10,0,0"
                 VerticalAlignment="Top" Width="75" Click="Refresh_Click" />
 
     </Grid>

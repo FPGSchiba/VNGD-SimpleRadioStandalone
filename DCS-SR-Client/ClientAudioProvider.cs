@@ -8,8 +8,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudioProvider
     {
-        public long lastUpdate;
-        private readonly Settings settings;
+        public long LastUpdate;
+        private readonly Settings _settings;
 
 
         public ClientAudioProvider()
@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             VolumeSampleProvider = new VolumeSampleProvider(filter);
 
-            settings = Settings.Instance;
+            _settings = Settings.Instance;
         }
 
         public VolumeSampleProvider VolumeSampleProvider { get; }
@@ -35,49 +35,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void AddSamples(ClientAudio audio)
         {
             //convert to Stereo Mix
-            var settingType = SettingType.RADIO1_CHANNEL;
+            var settingType = SettingType.Radio1Channel;
 
             if (audio.ReceivedRadio == 0)
             {
-                settingType = SettingType.RADIO1_CHANNEL;
+                settingType = SettingType.Radio1Channel;
             }
             else if (audio.ReceivedRadio == 1)
             {
-                settingType = SettingType.RADIO2_CHANNEL;
+                settingType = SettingType.Radio2Channel;
             }
             else
             {
-                settingType = SettingType.RADIO3_CHANNEL;
+                settingType = SettingType.Radio3Channel;
             }
 
-            var setting = settings.UserSettings[(int) settingType];
+            var setting = _settings.UserSettings[(int) settingType];
 
             var stereoMix = new byte[0];
 
             if (setting == "Left")
             {
-                stereoMix = createLeftMix(audio);
+                stereoMix = CreateLeftMix(audio);
             }
             else if (setting == "Right")
             {
-                stereoMix = createRightMix(audio);
+                stereoMix = CreateRightMix(audio);
             }
             else
             {
-                stereoMix = createBothMix(audio);
+                stereoMix = CreateBothMix(audio);
             }
 
             BufferedWaveProvider.AddSamples(stereoMix, 0, stereoMix.Length);
         }
 
-        private byte[] createLeftMix(ClientAudio audio)
+        private byte[] CreateLeftMix(ClientAudio audio)
         {
-            var stereoMix = new byte[audio.PCMAudio.Length*2];
-            for (var i = 0; i < audio.PCMAudio.Length/2; i++)
+            var stereoMix = new byte[audio.PcmAudio.Length*2];
+            for (var i = 0; i < audio.PcmAudio.Length/2; i++)
             {
-                stereoMix[i*4] = audio.PCMAudio[i*2];
+                stereoMix[i*4] = audio.PcmAudio[i*2];
                 ;
-                stereoMix[i*4 + 1] = audio.PCMAudio[i*2 + 1];
+                stereoMix[i*4 + 1] = audio.PcmAudio[i*2 + 1];
 
                 stereoMix[i*4 + 2] = 0;
                 stereoMix[i*4 + 3] = 0;
@@ -85,30 +85,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return stereoMix;
         }
 
-        private byte[] createRightMix(ClientAudio audio)
+        private byte[] CreateRightMix(ClientAudio audio)
         {
-            var stereoMix = new byte[audio.PCMAudio.Length*2];
-            for (var i = 0; i < audio.PCMAudio.Length/2; i++)
+            var stereoMix = new byte[audio.PcmAudio.Length*2];
+            for (var i = 0; i < audio.PcmAudio.Length/2; i++)
             {
                 stereoMix[i*4] = 0;
                 stereoMix[i*4 + 1] = 0;
 
-                stereoMix[i*4 + 2] = audio.PCMAudio[i*2];
-                stereoMix[i*4 + 3] = audio.PCMAudio[i*2 + 1];
+                stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
+                stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
             }
             return stereoMix;
         }
 
-        private byte[] createBothMix(ClientAudio audio)
+        private byte[] CreateBothMix(ClientAudio audio)
         {
-            var stereoMix = new byte[audio.PCMAudio.Length*2];
-            for (var i = 0; i < audio.PCMAudio.Length/2; i++)
+            var stereoMix = new byte[audio.PcmAudio.Length*2];
+            for (var i = 0; i < audio.PcmAudio.Length/2; i++)
             {
-                stereoMix[i*4] = audio.PCMAudio[i*2];
-                stereoMix[i*4 + 1] = audio.PCMAudio[i*2 + 1];
+                stereoMix[i*4] = audio.PcmAudio[i*2];
+                stereoMix[i*4 + 1] = audio.PcmAudio[i*2 + 1];
 
-                stereoMix[i*4 + 2] = audio.PCMAudio[i*2];
-                stereoMix[i*4 + 3] = audio.PCMAudio[i*2 + 1];
+                stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
+                stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
             }
             return stereoMix;
         }

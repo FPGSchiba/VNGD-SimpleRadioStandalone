@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class AudioManager
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private int _bytesPerSegment;
 
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
@@ -33,12 +33,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private WaveIn _waveIn;
         private WaveOut _waveOut;
 
-        private readonly ConcurrentDictionary<string, SRClient> clientsList;
-        private UDPVoiceHandler udpVoiceHandler;
+        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private UdpVoiceHandler _udpVoiceHandler;
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
-            this.clientsList = clientsList;
+            this._clientsList = clientsList;
         }
 
         public float Volume { get; set; } = 1.0f;
@@ -46,22 +46,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         [DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
 
-        internal void addClientAudio(ClientAudio audio)
+        internal void AddClientAudio(ClientAudio audio)
         {
             //16bit PCM Audio
             //TODO: Clean  - remove if we havent received audio in a while
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.ClientGUID))
+            if (_clientsBufferedAudio.ContainsKey(audio.ClientGuid))
             {
-                client = _clientsBufferedAudio[audio.ClientGUID];
-                client.lastUpdate = GetTickCount64();
+                client = _clientsBufferedAudio[audio.ClientGuid];
+                client.LastUpdate = GetTickCount64();
             }
             else
             {
                 client = new ClientAudioProvider();
-                client.lastUpdate = GetTickCount64();
-                _clientsBufferedAudio[audio.ClientGUID] = client;
+                client.LastUpdate = GetTickCount64();
+                _clientsBufferedAudio[audio.ClientGuid] = client;
 
                 _mixing.AddMixerInput(client.VolumeSampleProvider);
             }
@@ -112,8 +112,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(24000, 16, 1); // should this be 44100??
 
-                udpVoiceHandler = new UDPVoiceHandler(clientsList, guid, ipAddress, _decoder, this, inputManager);
-                var voiceSenderThread = new Thread(udpVoiceHandler.Listen);
+                _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
+                var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                 voiceSenderThread.Start();
 
@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error starting audio Quitting!");
+                Logger.Error(ex, "Error starting audio Quitting!");
 
 
                 Environment.Exit(1);
@@ -176,8 +176,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 int len;
                 var buff = _encoder.Encode(segment, segment.Length, out len);
 
-                if (udpVoiceHandler != null)
-                    udpVoiceHandler.Send(buff, len);
+                if (_udpVoiceHandler != null)
+                    _udpVoiceHandler.Send(buff, len);
             }
         }
 
@@ -222,10 +222,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _decoder.Dispose();
                 _decoder = null;
             }
-            if (udpVoiceHandler != null)
+            if (_udpVoiceHandler != null)
             {
-                udpVoiceHandler.RequestStop();
-                udpVoiceHandler = null;
+                _udpVoiceHandler.RequestStop();
+                _udpVoiceHandler = null;
             }
 
             _stop = true;

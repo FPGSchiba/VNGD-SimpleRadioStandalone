@@ -16,14 +16,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
     /// </summary>
     public partial class ClientAdminWindow : Window
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly ConcurrentDictionary<string, SRClient> _connectedClients;
 
-        public ClientAdminWindow(ConcurrentDictionary<string, SRClient> _connectedClients, HashSet<IPAddress> _bannedIps)
+        public ClientAdminWindow(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> bannedIps)
         {
-            this._connectedClients = _connectedClients;
-            this._bannedIps = _bannedIps;
+            this._connectedClients = connectedClients;
+            this._bannedIps = bannedIps;
 
             InitializeComponent();
 
@@ -37,33 +37,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private void Refresh()
         {
-            clientsListBox.Items.Clear();
+            ClientsListBox.Items.Clear();
 
             foreach (var client in _connectedClients)
             {
-                var itm = new ListBoxItem();
-                itm.Content = client.Value;
+                var itm = new ListBoxItem {Content = client.Value};
 
-                clientsListBox.Items.Add(itm);
+                ClientsListBox.Items.Add(itm);
             }
         }
 
         private void ClientsListBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            clientsListBox.UnselectAll();
+            ClientsListBox.UnselectAll();
         }
 
         private void MenuItemBan_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (clientsListBox.SelectedIndex == -1)
+                if (ClientsListBox.SelectedIndex == -1)
                 {
                     return;
                 }
-                var item = (ListBoxItem) clientsListBox.Items.GetItemAt(clientsListBox.SelectedIndex);
+                var item = (ListBoxItem) ClientsListBox.Items.GetItemAt(ClientsListBox.SelectedIndex);
 
-                clientsListBox.Items.RemoveAt(clientsListBox.SelectedIndex);
+                ClientsListBox.Items.RemoveAt(ClientsListBox.SelectedIndex);
 
                 if (item != null)
                 {
@@ -76,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error kicking client");
+                Logger.Error(ex, "Error kicking client");
             }
         }
 
@@ -93,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error saving banned client");
+                Logger.Error(ex, "Error saving banned client");
             }
         }
 
@@ -102,13 +101,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             try
             {
-                if (clientsListBox.SelectedIndex == -1)
+                if (ClientsListBox.SelectedIndex == -1)
                 {
                     return;
                 }
-                var item = (ListBoxItem) clientsListBox.Items.GetItemAt(clientsListBox.SelectedIndex);
+                var item = (ListBoxItem) ClientsListBox.Items.GetItemAt(ClientsListBox.SelectedIndex);
 
-                clientsListBox.Items.RemoveAt(clientsListBox.SelectedIndex);
+                ClientsListBox.Items.RemoveAt(ClientsListBox.SelectedIndex);
 
                 if (item != null)
                 {
@@ -118,7 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error kicking client");
+                Logger.Error(ex, "Error kicking client");
             }
         }
     }

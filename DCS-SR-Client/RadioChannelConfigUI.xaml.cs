@@ -6,9 +6,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// <summary>
     ///     Interaction logic for RadioChannelConfigUI.xaml
     /// </summary>
-    public partial class RadioChannelConfigUI : UserControl
+    public partial class RadioChannelConfigUi : UserControl
     {
-        public RadioChannelConfigUI()
+        public RadioChannelConfigUi()
         {
             InitializeComponent();
 

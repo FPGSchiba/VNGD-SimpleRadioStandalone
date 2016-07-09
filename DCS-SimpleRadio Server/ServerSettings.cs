@@ -5,7 +5,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     public enum ServerSettingType
     {
-        COALITION_SECURITY = 0,
+        COALITION_AUDIO_SECURITY = 0,
         SPECTATORS_AUDIO_DISABLED = 1
     }
 

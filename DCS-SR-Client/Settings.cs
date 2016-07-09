@@ -5,16 +5,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
     public enum SettingType
     {
-        RADIO_EFFECTS = 0,
-        RADIO1_CHANNEL = 1,
-        RADIO2_CHANNEL = 2,
-        RADIO3_CHANNEL = 3
+        RadioEffects = 0,
+        Radio1Channel = 1,
+        Radio2Channel = 2,
+        Radio3Channel = 3
     }
 
 
     public class Settings
     {
-        private static Settings instance;
+        private static Settings _instance;
 
         public Settings()
         {
@@ -32,11 +32,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new Settings();
+                    _instance = new Settings();
                 }
-                return instance;
+                return _instance;
             }
         }
 
@@ -45,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             try
             {
-                var setting = (string) Registry.GetValue(InputConfiguration.REG_PATH,
+                var setting = (string) Registry.GetValue(InputConfiguration.RegPath,
                     settingType + "_setting",
                     "");
                 return setting;
@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             try
             {
-                Registry.SetValue(InputConfiguration.REG_PATH,
+                Registry.SetValue(InputConfiguration.RegPath,
                     settingType + "_setting",
                     setting);
 

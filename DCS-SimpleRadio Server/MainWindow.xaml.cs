@@ -21,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly HashSet<IPAddress> _bannedIps = new HashSet<IPAddress>();
 
@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private volatile bool _stop = false;
 
-        private ServerSettings settings = ServerSettings.Instance;
+        private ServerSettings _settings = ServerSettings.Instance;
 
         public MainWindow()
         {
@@ -44,11 +44,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             PopulateBanList();
 
+            InitRadioSecurity();
+
+            InitSpectatorAudio();
+
             StartClientList();
 
             StartServer();
 
-            button.Content = "Stop Server";
+            ServerControlButton.Content = "Stop Server";
 
             UpdaterChecker.CheckForUpdate();
         }
@@ -64,14 +68,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                     IPAddress ip = null;
                     if (IPAddress.TryParse(line.Trim(), out ip))
                     {
-                        _logger.Info("Loaded Banned IP: " + line);
+                        Logger.Info("Loaded Banned IP: " + line);
                         _bannedIps.Add(ip);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Unable to read banned.txt");
+                Logger.Error(ex, "Unable to read banned.txt");
             }
         }
 
@@ -86,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                     {
                         try
                         {
-                            clientsCount.Content = _connectedClients.Count().ToString();
+                            ClientsCount.Content = _connectedClients.Count().ToString();
                         }
                         catch (Exception ex)
                         {
@@ -102,13 +106,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             var config = new LoggingConfiguration();
 
-            var consoleTarget = new ColoredConsoleTarget();
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
             config.AddTarget("console", consoleTarget);
 
-            var fileTarget = new FileTarget();
-            fileTarget.FileName = "${basedir}/serverlog.txt";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            var fileTarget = new FileTarget
+            {
+                FileName = "${basedir}/serverlog.txt",
+                Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"
+            };
             config.AddTarget("file", fileTarget);
 
             var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
@@ -120,17 +125,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             LogManager.Configuration = config;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void ServerControlButtonClick(object sender, RoutedEventArgs e)
         {
             if (_serverListener != null)
             {
-                stopServer();
-                button.Content = "Start Server";
+                StopServer();
+                ServerControlButton.Content = "Start Server";
             }
             else
             {
-                button.Content = "Stop Server";
+                ServerControlButton.Content = "Stop Server";
                 StartServer();
+            }
+        }
+
+        private void InitRadioSecurity()
+        {
+            var radioSecurity = ServerSettings.Instance.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY];
+            if (radioSecurity == "ON")
+            {
+                RadioSecurity.IsChecked = true;
+            }
+            else
+            {
+                RadioSecurity.IsChecked = false;
+            }
+        }
+
+        private void InitSpectatorAudio()
+        {
+            var spectatorAudio = ServerSettings.Instance.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+            if (spectatorAudio == "DISABLED")
+            {
+                SpectatorAudio.IsChecked = true;
+            }
+            else
+            {
+                SpectatorAudio.IsChecked = false;
             }
         }
 
@@ -146,7 +177,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             serverSyncThread.Start();
         }
 
-        private void stopServer()
+        private void StopServer()
         {
             if (_serverListener != null)
             {
@@ -161,14 +192,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             base.OnClosing(e);
 
-            stopServer();
+            StopServer();
         }
 
         private void ClientList_Click(object sender, RoutedEventArgs e)
         {
-            var cw = new ClientAdminWindow(_connectedClients, _bannedIps);
-            cw.ShowInTaskbar = false;
-            cw.Owner = Application.Current.MainWindow;
+            var cw = new ClientAdminWindow(_connectedClients, _bannedIps)
+            {
+                ShowInTaskbar = false,
+                Owner = Application.Current.MainWindow
+            };
             cw.Show();
         }
 
@@ -187,6 +220,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
 
             return currentDirectory;
+        }
+
+        private void RadioSecurity_OnClick(object sender, RoutedEventArgs e)
+        {
+            ServerSettings.Instance.WriteSetting(ServerSettingType.COALITION_AUDIO_SECURITY, (string)RadioSecurity.Content);
+        }
+
+        private void SpectatorAudio_OnClick(object sender, RoutedEventArgs e)
+        {
+            ServerSettings.Instance.WriteSetting(ServerSettingType.SPECTATORS_AUDIO_DISABLED, (string)SpectatorAudio.Content);
         }
     }
 }

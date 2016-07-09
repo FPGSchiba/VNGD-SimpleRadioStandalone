@@ -6,28 +6,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
 {
     public class RadioFilter : ISampleProvider
     {
-        private readonly ISampleProvider source;
+        private readonly ISampleProvider _source;
         private readonly BiQuadFilter _highPassFilter = BiQuadFilter.HighPassFilter(24000, 520, 0.97f);
         private readonly BiQuadFilter _lowPassFilter = BiQuadFilter.LowPassFilter(24000, 4130, 2.0f);
-        private readonly Settings settings;
+        private readonly Settings _settings;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {
-            source = sampleProvider;
+            _source = sampleProvider;
 
-            settings = Settings.Instance;
+            _settings = Settings.Instance;
         }
 
         public WaveFormat WaveFormat
         {
-            get { return source.WaveFormat; }
+            get { return _source.WaveFormat; }
         }
 
         public int Read(float[] buffer, int offset, int sampleCount)
         {
-            var samplesRead = source.Read(buffer, offset, sampleCount);
+            var samplesRead = _source.Read(buffer, offset, sampleCount);
 
-            if (settings.UserSettings[(int) SettingType.RADIO_EFFECTS] == "ON")
+            if (_settings.UserSettings[(int) SettingType.RadioEffects] == "ON")
             {
                 for (var n = 0; n < sampleCount; n++)
                 {
