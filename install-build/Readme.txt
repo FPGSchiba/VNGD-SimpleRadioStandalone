@@ -7,6 +7,8 @@ Dedicated servers DO NOT need the installer running and will cause issues if the
 To Install Manually
 
 Copy DCS-SimpleRadioStandalone.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
+Copy DCS-SRSGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
+
 Create the folder if it doesnt exist
 
 Add:

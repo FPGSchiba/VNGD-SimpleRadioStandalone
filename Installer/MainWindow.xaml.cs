@@ -218,13 +218,14 @@ namespace Installer
             }
             Directory.CreateDirectory(path);
 
-
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
             File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
             File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
+                true);
+            File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
                 true);
         }
 
@@ -241,23 +242,25 @@ namespace Installer
 
                 if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
-                    contents =
-                        contents.Replace(
-                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
-                            "");
-                    contents = contents.Trim();
+//                    contents =
+//                        contents.Replace(
+//                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
+//                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])");
+//                    contents = contents.Trim();
+//
+//                    File.WriteAllText(path + "\\Export.lua", contents);
 
-                    File.WriteAllText(path + "\\Export.lua", contents);
+                // do nothing
                 }
-            }
+                else
+                {
+                    var writer = File.AppendText(path + "\\Export.lua");
 
-            if (write)
-            {
-                var writer = File.AppendText(path + "\\Export.lua");
-
-                writer.WriteLine(
-                    "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
-                writer.Close();
+                    writer.WriteLine(
+                        "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                    writer.Close();
+                   
+                }
             }
             else
             {
@@ -273,7 +276,7 @@ namespace Installer
                 File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
                     path + "\\DCS-SimpleRadioStandalone.lua", true);
 
-                File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
+                File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua",
                     path + "\\DCS-SRSGameGUI.lua", true);
             }
             catch (FileNotFoundException ex)
