@@ -8,42 +8,50 @@
         ResizeMode="CanMinimize"
         Title="SR Server" Height="160" Width="330">
     <Grid Margin="0,0,-6,0">
-        <Button x:Name="button" Content="Start Server" HorizontalAlignment="Left" Margin="18,18,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
-        <Label x:Name="clientsLabel" Content="Clients:" HorizontalAlignment="Left" Margin="106,15,0,0" VerticalAlignment="Top" Width="55"/>
-        <Label x:Name="clientsCount" Content="0" HorizontalAlignment="Left" Margin="166,15,0,0" VerticalAlignment="Top" Width="35"/>
-        <Button x:Name="clientListButton" Content="Client Admin" HorizontalAlignment="Left" Margin="206,18,0,0" VerticalAlignment="Top" Width="75" Click="ClientList_Click"/>
-        <ToggleButton x:Name="radioSecurity" HorizontalAlignment="Left" Margin="166,55,0,0" VerticalAlignment="Top" Width="151">
+        <Button x:Name="button" Content="Start Server" HorizontalAlignment="Left" Margin="18,18,0,0"
+                VerticalAlignment="Top" Width="75" Click="button_Click" />
+        <Label x:Name="clientsLabel" Content="Clients:" HorizontalAlignment="Left" Margin="106,15,0,0"
+               VerticalAlignment="Top" Width="55" />
+        <Label x:Name="clientsCount" Content="0" HorizontalAlignment="Left" Margin="166,15,0,0" VerticalAlignment="Top"
+               Width="35" />
+        <Button x:Name="clientListButton" Content="Client Admin" HorizontalAlignment="Left" Margin="206,18,0,0"
+                VerticalAlignment="Top" Width="75" Click="ClientList_Click" />
+        <ToggleButton x:Name="radioSecurity" HorizontalAlignment="Left" Margin="166,55,0,0" VerticalAlignment="Top"
+                      Width="151">
             <ToggleButton.Style>
                 <Style TargetType="{x:Type ToggleButton}">
-                    <Setter Property="Content" Value="ON"/>
+                    <Setter Property="Content" Value="ON" />
                     <Style.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Content" Value="ON"/>
+                            <Setter Property="Content" Value="ON" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="False">
-                            <Setter Property="Content" Value="OFF"/>
+                            <Setter Property="Content" Value="OFF" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </ToggleButton.Style>
         </ToggleButton>
-        <ToggleButton x:Name="spectatorAudio"  HorizontalAlignment="Left" Margin="166,90,0,0" VerticalAlignment="Top" Width="151" >
+        <ToggleButton x:Name="spectatorAudio" HorizontalAlignment="Left" Margin="166,90,0,0" VerticalAlignment="Top"
+                      Width="151">
             <ToggleButton.Style>
                 <Style TargetType="{x:Type ToggleButton}">
-                    <Setter Property="Content" Value="DISABLED"/>
+                    <Setter Property="Content" Value="DISABLED" />
                     <Style.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Content" Value="DISABLED"/>
+                            <Setter Property="Content" Value="DISABLED" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="False">
-                            <Setter Property="Content" Value="ENABLED"/>
+                            <Setter Property="Content" Value="ENABLED" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </ToggleButton.Style>
         </ToggleButton>
-        <Label x:Name="label" Content="Secure Coalition Radios" HorizontalAlignment="Left" Margin="18,55,0,0" VerticalAlignment="Top" Width="143"/>
-        <Label x:Name="label_Copy" Content="Spectator Audio" HorizontalAlignment="Left" Margin="18,90,0,0" VerticalAlignment="Top" Width="143"/>
+        <Label x:Name="label" Content="Secure Coalition Radios" HorizontalAlignment="Left" Margin="18,55,0,0"
+               VerticalAlignment="Top" Width="143" />
+        <Label x:Name="label_Copy" Content="Spectator Audio" HorizontalAlignment="Left" Margin="18,90,0,0"
+               VerticalAlignment="Top" Width="143" />
 
 
     </Grid>

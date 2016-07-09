@@ -1,32 +1,28 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
-    class UDPVoiceRouter
+    internal class UDPVoiceRouter
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        UdpClient _listener;
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private HashSet<IPAddress> _bannedIps;
+        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private UdpClient _listener;
 
-        volatile bool _stop;
-        ConcurrentDictionary<String, SRClient> _clientsList;
-        HashSet<IPAddress> _bannedIps;
+        private volatile bool _stop;
 
-        public UDPVoiceRouter(ConcurrentDictionary<String, SRClient> clientsList)
+        public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList)
         {
-            this._clientsList = clientsList;   
+            _clientsList = clientsList;
         }
 
         public void Listen()
@@ -40,17 +36,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 try
                 {
-
-                    IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 5010);
-                    byte[] rawBytes = _listener.Receive(ref groupEP);
+                    var groupEP = new IPEndPoint(IPAddress.Any, 5010);
+                    var rawBytes = _listener.Receive(ref groupEP);
                     if (rawBytes.Length > 36)
                     {
                         Task.Run(() =>
                         {
-
                             //last 36 bytes are guid!
-                            String guid = Encoding.ASCII.GetString(
-                            rawBytes, rawBytes.Length - 36, 36);
+                            var guid = Encoding.ASCII.GetString(
+                                rawBytes, rawBytes.Length - 36, 36);
 
                             if (_clientsList.ContainsKey(guid))
                             {
@@ -77,8 +71,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 _listener.Close();
             }
-            catch (Exception e) { }
+            catch (Exception e)
+            {
+            }
         }
+
         public void RequestStop()
         {
             _stop = true;
@@ -86,19 +83,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 _listener.Close();
             }
-            catch (Exception e) { }
+            catch (Exception e)
+            {
+            }
         }
 
-        private void SendToOthers(byte[] bytes, String guid)
+        private void SendToOthers(byte[] bytes, string guid)
         {
-
             foreach (var client in _clientsList)
             {
                 try
                 {
                     if (!client.Key.Equals(guid))
                     {
-                        IPEndPoint ip = client.Value.voipPort;
+                        var ip = client.Value.voipPort;
 
                         if (ip != null)
                         {
@@ -108,12 +106,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     }
                     else
                     {
-
-                        IPEndPoint ip = client.Value.voipPort;
+                        var ip = client.Value.voipPort;
 
                         if (ip != null)
                         {
-
                             //     _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
@@ -126,7 +122,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     _clientsList.TryRemove(guid, out value);
                 }
             }
-
         }
 
 
@@ -134,10 +129,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             Task.Run(() =>
             {
-                byte[] message = { 1, 2, 3, 4, 5 };
+                byte[] message = {1, 2, 3, 4, 5};
                 while (!_stop)
                 {
-
                     _logger.Info("Pinging Clients");
                     try
                     {
@@ -145,32 +139,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         {
                             try
                             {
-
-                                IPEndPoint ip = client.Value.voipPort;
+                                var ip = client.Value.voipPort;
 
                                 if (ip != null)
                                 {
                                     _listener.Send(message, message.Length, ip);
-                          
                                 }
-
                             }
                             catch (Exception e)
-                            {}
+                            {
+                            }
                         }
                     }
                     catch (Exception e)
-                    { }
+                    {
+                    }
 
-                    Thread.Sleep(60 * 1000);
-
+                    Thread.Sleep(60*1000);
                 }
             });
         }
-
     }
-
-
 }
-
-

@@ -62,7 +62,7 @@
     <ManifestCertificateThumbprint>EAFBC9BAF9EF6DC35C2A4E5F9C5A42423C741B97</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>RadioGui_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>RadioOverlay_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -74,7 +74,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Full Release|AnyCPU'">
     <OutputPath>bin\Full Release\</OutputPath>
@@ -171,7 +171,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="RadioGui_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

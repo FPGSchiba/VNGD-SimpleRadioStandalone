@@ -1,22 +1,17 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client;
-using NAudio.Wave;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    class AudioPreview
+    internal class AudioPreview
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        WaveIn _waveIn;
-        WaveOut _waveOut;
-        BufferedWaveProvider _playBuffer;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private BufferedWaveProvider _playBuffer;
+        private WaveIn _waveIn;
+        private WaveOut _waveOut;
 
         public SampleChannel Volume { get; private set; }
 
@@ -24,10 +19,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 60;
-                _waveIn.DeviceNumber = mic;
-                _waveIn.WaveFormat = new NAudio.Wave.WaveFormat(24000, 16, 1);
+                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
+                {
+                    BufferMilliseconds = 60,
+                    DeviceNumber = mic,
+                    WaveFormat = new WaveFormat(24000, 16, 1)
+                };
 
                 var pcm = new WaveInProvider(_waveIn);
 
@@ -35,9 +32,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 var filter = new RadioFilter(Volume);
 
-                _waveOut = new WaveOut();
-                _waveOut.DesiredLatency = 100; //75ms latency in output buffer
-                _waveOut.DeviceNumber = speakers;
+                _waveOut = new WaveOut
+                {
+                    DesiredLatency = 100,
+                    DeviceNumber = speakers
+                };
+                //75ms latency in output buffer
 
                 _waveOut.Init(filter);
 
@@ -46,7 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error starting audio Quitting!");
+                Logger.Error(ex, "Error starting audio Quitting!");
 
                 Environment.Exit(1);
             }

@@ -51,10 +51,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             StartDCSMulticastListener();
             StartDCSGameGUIMulticastListener();
-            StartRadioGUIListener();
+            StartRadioOverlayListener();
         }
 
-        private void StartRadioGUIListener()
+        private void StartRadioOverlayListener()
         {
             //START GUI LISTENER
 

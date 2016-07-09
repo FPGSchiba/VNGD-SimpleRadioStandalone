@@ -1,62 +1,56 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
-
     // State object for reading client data asynchronously
     public class StateObject
     {
-        // Client  socket.
-        public Socket workSocket = null;
         // Size of receive buffer.
         public const int BufferSize = 1024;
         // Receive buffer.
         public byte[] buffer = new byte[BufferSize];
+
+        public string guid;
         // Received data string.
         public StringBuilder sb = new StringBuilder();
-
-        public string guid = null;
+        // Client  socket.
+        public Socket workSocket;
     }
 
-    class ServerSync
+    internal class ServerSync
     {
-
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         // Thread signal.
         public static ManualResetEvent _allDone = new ManualResetEvent(false);
+        private readonly HashSet<IPAddress> _bannedIps;
 
-        Socket listener;
+        private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
 
-        ConcurrentDictionary<String, SRClient> _clients = new ConcurrentDictionary<String, SRClient>();
-        HashSet<IPAddress> _bannedIps;
+        private Socket listener;
 
-        public ServerSync(ConcurrentDictionary<String, SRClient> connectedClients, HashSet<IPAddress> _bannedIps)
+        public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps)
         {
-            this._clients = connectedClients;
+            _clients = connectedClients;
             this._bannedIps = _bannedIps;
         }
 
         public void StartListening()
         {
-
-            IPAddress ipAddress = new IPAddress(0);
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 5002);
+            var ipAddress = new IPAddress(0);
+            var localEndPoint = new IPEndPoint(ipAddress, 5002);
 
             // Create a TCP/IP socket.
             listener = new Socket(AddressFamily.InterNetwork,
-               SocketType.Stream, ProtocolType.Tcp);
+                SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.
             try
@@ -72,18 +66,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     // Start an asynchronous socket to listen for connections.
                     _logger.Info("Waiting for a connection...");
                     listener.BeginAccept(
-                        new AsyncCallback(AcceptCallback),
+                        AcceptCallback,
                         listener);
 
                     // Wait until a connection is made before continuing.
                     _allDone.WaitOne();
                 }
-
             }
             catch (Exception e)
             {
                 _logger.Error(e, "Server Listen error");
-
             }
         }
 
@@ -95,22 +87,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
                 // Get the socket that handles the client request.
-                Socket listener = (Socket)ar.AsyncState;
-                Socket handler = listener.EndAccept(ar);
+                var listener = (Socket) ar.AsyncState;
+                var handler = listener.EndAccept(ar);
                 handler.NoDelay = true;
 
                 // Create the state object.
-                StateObject state = new StateObject();
+                var state = new StateObject();
                 state.workSocket = handler;
                 handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReadCallback), state);
+                    ReadCallback, state);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Error accepting socket");
             }
-
-
         }
 
         public void HandleDisconnect(StateObject state)
@@ -125,7 +115,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 if (client != null)
                 {
-
                     _logger.Info("Removed Client " + state.guid);
                 }
             }
@@ -138,24 +127,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 _logger.Info(ex, "Exception closing socket after disconnect");
             }
-
         }
 
         public void ReadCallback(IAsyncResult ar)
         {
-
             // Retrieve the state object and the handler socket
             // from the asynchronous state object.
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
+            var state = (StateObject) ar.AsyncState;
+            var handler = state.workSocket;
 
             try
             {
-
-
-
                 // Read data from the client socket. 
-                int bytesRead = handler.EndReceive(ar);
+                var bytesRead = handler.EndReceive(ar);
 
                 if (bytesRead > 0)
                 {
@@ -163,7 +147,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     state.sb.Append(Encoding.ASCII.GetString(
                         state.buffer, 0, bytesRead));
 
-                    String content = state.sb.ToString();
+                    var content = state.sb.ToString();
                     if (content.EndsWith("\n"))
                     {
                         //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
@@ -171,29 +155,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         try
                         {
-                            NetworkMessage message = JsonConvert.DeserializeObject<NetworkMessage>(content);
+                            var message = JsonConvert.DeserializeObject<NetworkMessage>(content);
 
                             HandleMessage(state, message);
-
                         }
                         catch (Exception ex)
                         {
                             _logger.Error(ex, "Server - Client Exception reading");
-
                         }
 
                         //clear the state buffer
                         state.sb.Clear();
 
                         handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                   new AsyncCallback(ReadCallback), state);
-
+                            ReadCallback, state);
                     }
                     else
                     {
                         // Not all data received. Get more.
                         handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                        new AsyncCallback(ReadCallback), state);
+                            ReadCallback, state);
                     }
                 }
                 else
@@ -213,7 +194,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             try
             {
-                var clientIp = (IPEndPoint)state.workSocket.RemoteEndPoint;
+                var clientIp = (IPEndPoint) state.workSocket.RemoteEndPoint;
 
                 if (_bannedIps.Contains(clientIp.Address))
                 {
@@ -228,7 +209,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 switch (message.MsgType)
                 {
-
                     //synonymous for now
                     case NetworkMessage.MessageType.PING:
                         // Do nothing for now
@@ -241,17 +221,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         var srClient = message.Client;
                         if (!_clients.ContainsKey(srClient.ClientGuid))
                         {
-
                             srClient.ClientSocket = state.workSocket;
 
                             //add to proper list
                             _clients[srClient.ClientGuid] = srClient;
 
                             state.guid = srClient.ClientGuid;
-                        }
-                        else
-                        {
-                            //Do nothiing
                         }
 
                         HandleRadioSync(clientIp, state.workSocket, message);
@@ -261,7 +236,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         _logger.Warn("Recevied unknown message type");
                         break;
                 }
-
             }
             catch (Exception ex)
             {
@@ -277,16 +251,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 if (client != null)
                 {
-                    client.LastUpdate = System.Environment.TickCount;
+                    client.LastUpdate = Environment.TickCount;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     //send update to everyone
 
-                    NetworkMessage replyMessage = new NetworkMessage();
+                    var replyMessage = new NetworkMessage();
                     replyMessage.MsgType = NetworkMessage.MessageType.UPDATE;
                     replyMessage.Client = client;
 
-                    foreach (var clientToSent in this._clients)
+                    foreach (var clientToSent in _clients)
                     {
                         Send(clientToSent.Value.ClientSocket, replyMessage);
                     }
@@ -297,12 +271,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void HandleRadioSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
-            NetworkMessage replyMessage = new NetworkMessage();
+            var replyMessage = new NetworkMessage();
             replyMessage.MsgType = NetworkMessage.MessageType.SYNC;
 
             replyMessage.Clients = new List<SRClient>();
 
-            foreach (var clientToSent in this._clients)
+            foreach (var clientToSent in _clients)
             {
                 replyMessage.Clients.Add(clientToSent.Value);
             }
@@ -315,11 +289,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
                 // Convert the string data to byte data using ASCII encoding.
-                byte[] byteData = System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
+                var byteData = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
                 // Begin sending the data to the remote device.
                 handler.BeginSend(byteData, 0, byteData.Length, 0,
-                    new AsyncCallback(SendCallback), handler);
+                    SendCallback, handler);
             }
             catch (Exception ex)
             {
@@ -332,12 +306,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
                 // Retrieve the socket from the state object.
-                Socket handler = (Socket)ar.AsyncState;
+                var handler = (Socket) ar.AsyncState;
 
                 // Complete sending the data to the remote device.
-                int bytesSent = handler.EndSend(ar);
+                var bytesSent = handler.EndSend(ar);
                 //  Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-
             }
             catch (Exception e)
             {
@@ -349,23 +322,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             try
             {
-
                 foreach (var client in _clients)
                 {
                     try
                     {
                         client.Value.ClientSocket.Close();
                     }
-                    catch (Exception ex) { }
+                    catch (Exception ex)
+                    {
+                    }
                 }
                 listener.Close();
 
                 _clients.Clear();
-
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+            }
         }
-
-
     }
 }
