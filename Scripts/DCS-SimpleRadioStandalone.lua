@@ -55,7 +55,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                 unit = "",
                 selected = -1,
                 unitId = -1,
-
+                ptt = false,
                 radios =
                 {
                     { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000},
@@ -79,7 +79,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
                 elseif string.find(_update.unit, "SA342") then
-                    _update = SR.exportRadioSA342M(_update)
+                    _update = SR.exportRadioSA342(_update)
                 elseif _update.unit == "Ka-50" then
                     _update = SR.exportRadioKA50(_update)
                 elseif _update.unit == "Mi-8MT" then
@@ -155,6 +155,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     name = "Unknown",
                     unit = "CA",
                     selected = 0,
+                    ptt = false,
                     radios =
                     {
                         { id = 1, name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000 },
@@ -369,13 +370,17 @@ function SR.exportRadioUH1H(_data)
         _data.selected = -1
     end
 
+    if SR.getButtonPosition(194) >= 0.1 then
+        _data.ptt = true
+    end
+
     _data.radioType = 1; -- Full Radio
 
     return _data
 
 end
 
-function SR.exportRadioSA342M(_data)
+function SR.exportRadioSA342(_data)
 
     _data.radios[1].name = "VHF/AM Radio"
     _data.radios[1].frequency = SR.getRadioFrequency(5)
@@ -486,6 +491,10 @@ function SR.exportRadioMI8(_data)
         _data.selected = -1
     end
 
+    if SR.getButtonPosition(182) >= 0.5 or SR.getButtonPosition(225) >= 0.5 then
+        _data.ptt = true
+    end
+
     _data.radioType = 1; -- full radio
 
     return _data
@@ -512,14 +521,13 @@ function SR.exportRadioL39(_data)
     -- Intercom button depressed
     if(SR.getButtonPosition(133) > 0.5 or SR.getButtonPosition(546) > 0.5) then
         _data.selected = 1
+        _data.ptt = true
     elseif (SR.getButtonPosition(134) > 0.5 or SR.getButtonPosition(547) > 0.5) then
         _data.selected= 0
+        _data.ptt = true
     else
-        if SR.enableInternalPTT then
-            _data.selected = -1 -- PTT Not pressed
-        else
-            _data.selected = 0
-        end
+        _data.selected= 0
+         _data.ptt = false
     end
 
     _data.radioType = 1; -- full radio
@@ -596,13 +604,11 @@ function SR.exportRadioF86Sabre(_data)
 		_data.radios[1].secondaryFrequency = 243.0*1000000 
 	end
 
-    if SR.enableInternalPTT then
         -- Check PTT
-        if(SR.getButtonPosition(213)) > 0.5 then
-            _data.selected = 0
-        else
-            _data.selected = -1
-        end
+    if(SR.getButtonPosition(213)) > 0.5 then
+        _data.ptt = true
+    else
+        _data.ptt = false
     end
 
     _data.radioType = 1; -- full radio
@@ -630,13 +636,11 @@ function SR.exportRadioMIG15(_data)
 
     _data.selected = 0
 
-    if SR.enableInternalPTT then
-        -- Check PTT
-        if(SR.getButtonPosition(202)) > 0.5 then
-            _data.selected = 0
-        else
-            _data.selected = -1
-        end
+    -- Check PTT
+    if(SR.getButtonPosition(202)) > 0.5 then
+        _data.ptt = true
+    else
+        _data.ptt = false
     end
 
     _data.radioType = 1; -- full radio
@@ -664,12 +668,10 @@ function SR.exportRadioMIG21(_data)
 
     _data.selected = 0
 
-    if SR.enableInternalPTT then
-        if(SR.getButtonPosition(315)) > 0.5 then
-            _data.selected = 0
-        else
-            _data.selected = -1
-        end
+    if(SR.getButtonPosition(315)) > 0.5 then
+        _data.ptt = true
+    else
+        _data.ptt = false
     end
 
     _data.radioType = 1; -- full radio
@@ -698,12 +700,10 @@ function SR.exportRadioP51(_data)
 
     _data.selected = 0
 
-    if SR.enableInternalPTT then
-        if(SR.getButtonPosition(44)) > 0.5 then
-            _data.selected = 0
-        else
-            _data.selected = -1
-        end
+    if(SR.getButtonPosition(44)) > 0.5 then
+        _data.ptt = true
+    else
+        _data.ptt = false
     end
 
     _data.radioType = 1; -- full radio

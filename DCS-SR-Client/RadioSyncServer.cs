@@ -288,6 +288,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 //copy over the radios
                 DcsPlayerRadioInfo.radios = message.radios;
+
+                //change PTT last
+                DcsPlayerRadioInfo.ptt = message.ptt;
+
             }
             else // FC3 Radio - Take nothing from DCS, just update the last tickcount
             {
@@ -296,7 +300,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.radioType = message.radioType;
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
-
 
                 //copy over radio names, min + max
                 for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
@@ -324,6 +327,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         clientRadio.frequency = clientRadio.freqMin;
                     }
                 }
+
+                //change PTT last
+                DcsPlayerRadioInfo.ptt = message.ptt;
             }
 
             //update

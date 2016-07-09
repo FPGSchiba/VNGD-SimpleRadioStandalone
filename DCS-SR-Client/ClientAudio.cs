@@ -1,4 +1,6 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+﻿using System;
+
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudio
     {
@@ -9,5 +11,6 @@
         public double Frequency { get; internal set; }
         public short Modulation { get; internal set; }
         public float Volume { get; internal set; }
+        public UInt32 UnitId { get;  set; }
     }
 }

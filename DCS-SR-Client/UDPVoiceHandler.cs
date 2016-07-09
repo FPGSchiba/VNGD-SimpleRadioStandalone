@@ -190,15 +190,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                             if (myClient != null)
                             {
-                                //last 36 bytes are guid!
+                                //last 22 bytes are guid!
                                 var recievingGuid = Encoding.ASCII.GetString(
-                                    encodedOpusAudio, encodedOpusAudio.Length - 36, 36);
+                                    encodedOpusAudio, encodedOpusAudio.Length - 22, 22);
 
                                 var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                                    encodedOpusAudio.Length - 36 - 1 - 8);
+                                    encodedOpusAudio.Length - 22 - 4 - 1 - 8);
+
                                 //before guid and modulation so -36 and then -1
-                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 36 - 1];
-                                var unitId = -1; // TODO send unitID stuff
+                                var modulation = (sbyte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1];
+
+                                var unitId = BitConverter.ToUInt32(encodedOpusAudio,encodedOpusAudio.Length - 22 - 4); 
 
                                 // check the radio
                                 var radioId = -1;
@@ -209,9 +211,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 {
                                     //now check that the radios match
                                     int len;
-                                    //- 36 so we ignore the UUID
+                                    //- 22 so we ignore the UUID
                                     var decoded = _decoder.Decode(encodedOpusAudio,
-                                        encodedOpusAudio.Length - 36 - 1 - 8, out len);
+                                        encodedOpusAudio.Length - 22 - 4 - 1 - 8, out len);
 
                                     if (len > 0)
                                     {
@@ -229,6 +231,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         audio.Modulation = modulation;
                                         audio.Volume = receivingRadio.volume;
                                         audio.ReceivedRadio = radioId;
+                                        audio.UnitId = unitId;
 
                                         //TODO throw away audio for each client that is before the latest receive time!
                                         _audioManager.AddClientAudio(audio);
@@ -249,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, int unitId,
+        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, UInt32 unitId,
             out int radioId)
         {
             for (var i = 0; i < 3; i++)
@@ -291,7 +294,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void Send(byte[] bytes, int len)
         {
-            if (_ptt)
+            //if either PTT is true
+            if (_ptt || RadioSyncServer.DcsPlayerRadioInfo.ptt)
             {
                 try
                 {
@@ -308,9 +312,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                         if (radio != null)
                         {
-                            var combinedBytes = new byte[len + 8 + 1 + 36];
+                            var combinedBytes = new byte[len + 8 + 1 + 4 + 22];
                             Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
-
 
                             var freq = BitConverter.GetBytes(radio.frequency); //8 bytes
 
@@ -326,7 +329,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             //modulation
                             combinedBytes[len + 8] = (byte) radio.modulation; //1 byte;
 
-                            Buffer.BlockCopy(_guidAsciiBytes, 0, combinedBytes, len + 9, 36); // copy guid
+                            //unit Id
+                            var unitId = BitConverter.GetBytes(RadioSyncServer.DcsPlayerRadioInfo.unitId); //4 bytes
+                            combinedBytes[len + 9] = unitId[0];
+                            combinedBytes[len + 10] = unitId[1];
+                            combinedBytes[len + 11] = unitId[2];
+                            combinedBytes[len + 12] = unitId[3];
+
+                            Buffer.BlockCopy(_guidAsciiBytes, 0, combinedBytes, len + 8 + 1 + 4, 22); // copy short guid
 
                             var ip = new IPEndPoint(_address, 5010);
 
@@ -338,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception Handling Message " + e.Message);
+                    Console.WriteLine("Exception Handling Audio Message " + e.Message);
                 }
                 //    }
             }

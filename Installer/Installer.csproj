@@ -196,7 +196,7 @@ copy /Y "$(SolutionDir)\DCS-SR-Client\bin\Release\opus.dll"  "$(SolutionDir)\ins
 copy /Y "$(SolutionDir)\RadioOverlay\bin\Release\SR-Overlay.exe"  "$(SolutionDir)\install-build\SR-Overlay.exe" 
 copy /Y "$(SolutionDir)\Installer\bin\Release\Installer.exe" "$(SolutionDir)\install-build\Installer.exe" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SimpleRadioStandalone.lua" "$(SolutionDir)\install-build\DCS-SimpleRadioStandalone.lua" 
-
+copy /Y "$(SolutionDir)\Scripts\DCS-SRSGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRSGameGUI.lua"
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
