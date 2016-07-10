@@ -5,9 +5,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using Newtonsoft.Json;
 using NLog;
+using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
@@ -32,15 +35,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         // Thread signal.
         public static ManualResetEvent _allDone = new ManualResetEvent(false);
         private readonly HashSet<IPAddress> _bannedIps;
+        private readonly IEventAggregator _eventAggregator;
 
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
 
         private Socket listener;
 
-        public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps)
+        public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps, IEventAggregator eventAggregator)
         {
             _clients = connectedClients;
             this._bannedIps = _bannedIps;
+            _eventAggregator = eventAggregator;
+            _eventAggregator.Subscribe(this);
         }
 
         public void StartListening()
@@ -117,6 +123,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     _logger.Info("Removed Client " + state.guid);
                 }
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
             }
 
             try
@@ -227,6 +235,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             _clients[srClient.ClientGuid] = srClient;
 
                             state.guid = srClient.ClientGuid;
+
+                            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
                         }
 
                         HandleRadioSync(clientIp, state.workSocket, message);

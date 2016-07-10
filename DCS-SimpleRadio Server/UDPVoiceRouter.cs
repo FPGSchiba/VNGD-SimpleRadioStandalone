@@ -6,8 +6,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
+using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
@@ -15,14 +17,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private readonly IEventAggregator _eventAggregator;
         private UdpClient _listener;
 
         private volatile bool _stop;
         private ServerSettings _serverSettings = ServerSettings.Instance;
 
-        public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList)
+        public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {
             _clientsList = clientsList;
+            _eventAggregator = eventAggregator;
+            _eventAggregator.Subscribe(this);
         }
 
         public void Listen()
