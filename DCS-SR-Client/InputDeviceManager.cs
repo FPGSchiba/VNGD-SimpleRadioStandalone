@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using NLog;
 using SharpDX.DirectInput;
 using SharpDX.Multimedia;
 using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
@@ -19,6 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private volatile bool _detectPtt;
         private readonly DirectInput _directInput;
         private readonly List<Device> _inputDevices = new List<Device>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public InputDeviceManager(Window window)
         {
@@ -30,19 +32,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 Device device = null;
 
-                if (deviceInstance.Type == DeviceType.Keyboard)
+                //Corsair K65 Gaming Keyboard breaks... It reports as a Joystick when its a keyboard...
+                if (deviceInstance.ProductGuid != new Guid("1b171b1c-0000-0000-0000-504944564944"))
                 {
-                    device = new Keyboard(_directInput);
-                }
-                else if (deviceInstance.Usage == UsageId.GenericJoystick)
-                {
+                    //Workaround for RGB keyboard
                     device = new Joystick(_directInput, deviceInstance.ProductGuid);
-                }
-                else if (deviceInstance.Usage == UsageId.GenericGamepad)
-                {
-                    device = new Joystick(_directInput, deviceInstance.ProductGuid);
-                }
+                    Logger.Info("Found " + deviceInstance.ProductGuid + " "+deviceInstance.ProductName);
 
+                    if (deviceInstance.Type == DeviceType.Keyboard)
+                    {
+                        device = new Keyboard(_directInput);
+                    }
+                    else if (deviceInstance.Usage == UsageId.GenericJoystick)
+                    {
+                        device = new Joystick(_directInput, deviceInstance.ProductGuid);
+                    }
+                    else if (deviceInstance.Usage == UsageId.GenericGamepad)
+                    {
+                        device = new Joystick(_directInput, deviceInstance.ProductGuid);
+                    }
+
+                }
 
                 if (device != null)
                 {

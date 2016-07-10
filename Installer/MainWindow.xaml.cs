@@ -223,7 +223,7 @@ namespace Installer
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
             File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
-            File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+        //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
                 true);
             File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
