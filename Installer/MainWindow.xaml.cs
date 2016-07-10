@@ -97,8 +97,7 @@ namespace Installer
         {
             foreach (var clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Equals("sr-overlay") ||
-                    clsProcess.ProcessName.ToLower().Equals("sr-overlay"))
+                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-") )
                 {
                     return true;
                 }
@@ -189,6 +188,8 @@ namespace Installer
 
             //open to installation location
             Process.Start("explorer.exe", srPath.Text);
+
+            Environment.Exit(0);
         }
 
         public List<string> FindValidDCSFolders(string path)
@@ -338,6 +339,8 @@ namespace Installer
 
             MessageBox.Show("SR Standalone Removed Successfully!", "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
+
+            Environment.Exit(0);
         }
 
 

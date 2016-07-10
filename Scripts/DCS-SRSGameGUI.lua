@@ -59,7 +59,7 @@ SRS.sendUpdate = function(playerID)
     _update.name = net.get_player_info(playerID, "name" )
 	_update.side = net.get_player_info(playerID,"side")
 
-    SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
+    --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
     socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "239.255.50.10", 5068))
 
