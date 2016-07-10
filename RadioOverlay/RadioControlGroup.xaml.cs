@@ -87,7 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             if (localByName != null && localByName.Length > 0)
             {
-                WindowHelper.BringProcessToFront(localByName[0]);
+            //    WindowHelper.BringProcessToFront(localByName[0]);
             }
         }
 
