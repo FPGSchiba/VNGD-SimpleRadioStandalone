@@ -1,17 +1,28 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
-    public class SRClient
+    public class SRClient:INotifyPropertyChanged
     {
+      
         public string ClientGuid { get; set; }
 
         public string Name { get; set; }
 
-        public int Coalition { get; set; }
+        private int _coalition;
+        public int Coalition
+        {
+            get { return _coalition; }
+            set
+            {
+                _coalition = value;
+                PropertyChanged?.Invoke(this,new PropertyChangedEventArgs("Coalition"));
+            }
+        }
 
         [JsonIgnore]
         public Socket ClientSocket { get; set; }
@@ -21,6 +32,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonIgnore]
         public long LastUpdate { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public bool isCurrent()
         {
