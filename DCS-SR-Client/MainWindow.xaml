@@ -74,8 +74,6 @@
                     <local:InputBindingControl x:Name="Radio3" InputName="Radio 3" Grid.Row="3" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch3}"  />
                     <local:InputBindingControl x:Name="PTT" InputName="Common PTT" Grid.Row="4" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Ptt}"  />
 
-
-
                 </Grid>
                
                 

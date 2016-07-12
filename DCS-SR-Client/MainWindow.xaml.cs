@@ -41,11 +41,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitializeComponent();
 
+            Radio1.InputName = "Radio 1";
+            Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
+
+            Radio2.InputName = "Radio 2";
+            Radio2.ControlInputBinding = InputBinding.Switch2;
             Radio2.InputDeviceManager = InputManager;
+
+            Radio3.InputName = "Radio 3";
+            Radio3.ControlInputBinding = InputBinding.Switch3;
             Radio3.InputDeviceManager = InputManager;
+
+            PTT.InputName = "Common PTT";
+            PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
-           
+
             SetupLogging();
 
             _appConfig = new AppConfiguration();

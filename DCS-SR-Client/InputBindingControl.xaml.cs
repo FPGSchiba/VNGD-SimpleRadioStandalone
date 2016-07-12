@@ -40,13 +40,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
            
             InitializeComponent();
 
+          
+
+         //   LoadInputSettings();
+
+        }
+
+        public void LoadInputSettings()
+        {
+
             DeviceLabel.Content = InputName;
+            ModifierLabel.Content = InputName + " Modifier";
 
             if (ControlInputBinding == InputBinding.Ptt)
             {
                 ModifierBinding = InputBinding.ModifierPtt;
             }
-            else if(ControlInputBinding == InputBinding.Switch1)
+            else if (ControlInputBinding == InputBinding.Switch1)
             {
                 ModifierBinding = InputBinding.ModifierSwitch1;
             }
@@ -59,24 +69,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ModifierBinding = InputBinding.ModifierSwitch3;
             }
 
-         //   LoadInputSettings();
-
-        }
-
-        public void LoadInputSettings()
-        {
             if (InputDeviceManager.InputConfig.InputDevices != null)
             {
                 if (InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding] != null)
                 {
-                    Device.Text = InputDeviceManager.InputConfig.InputDevices[0].Button.ToString();
-                    DeviceText.Text = InputDeviceManager.InputConfig.InputDevices[0].DeviceName;
+                    DeviceText.Text = InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding].Button.ToString();
+                    Device.Text = InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding].DeviceName;
                 }
 
                 if (InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding] != null)
                 {
-                    ModifierDevice.Text = InputDeviceManager.InputConfig.InputDevices[1].Button.ToString();
-                    ModifierText.Text = InputDeviceManager.InputConfig.InputDevices[1].DeviceName;
+                    ModifierText.Text = InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding].Button.ToString();
+                    ModifierDevice.Text = InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding].DeviceName;
                 }
             }
         }
@@ -95,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Device.Text = device.DeviceName;
                 DeviceText.Text = device.Button.ToString();
 
-                device.InputBind = InputBinding.Ptt;
+                device.InputBind = ControlInputBinding;
 
                 InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding] = device;
                 InputDeviceManager.InputConfig.WriteInputRegistry(ControlInputBinding, device);
@@ -115,22 +119,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Modifier_Click(object sender, RoutedEventArgs e)
         {
-            DeviceClear.IsEnabled = false;
-            DeviceButton.IsEnabled = false;
-
+            ModifierButtonClear.IsEnabled = false;
+            ModifierButton.IsEnabled = false;
 
             InputDeviceManager.AssignButton(device =>
             {
-                DeviceClear.IsEnabled = true;
-                DeviceButton.IsEnabled = true;
+                ModifierButtonClear.IsEnabled = true;
+                ModifierButton.IsEnabled = true;
 
-                Device.Text = device.DeviceName;
-                DeviceText.Text = device.Button.ToString();
+                ModifierDevice.Text = device.DeviceName;
+                ModifierText.Text = device.Button.ToString();
 
-                device.InputBind = InputBinding.Ptt;
+                device.InputBind = ModifierBinding;
 
-                InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding] = device;
-                InputDeviceManager.InputConfig.WriteInputRegistry(ControlInputBinding, device);
+                InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding] = device;
+                InputDeviceManager.InputConfig.WriteInputRegistry(ModifierBinding, device);
             });
         }
 
@@ -138,11 +141,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
-            InputDeviceManager.InputConfig.ClearInputRegistry(ControlInputBinding);
-            InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding] = null;
+            InputDeviceManager.InputConfig.ClearInputRegistry(ModifierBinding);
+            InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding] = null;
 
-            Device.Text = "None";
-            DeviceText.Text = "None";
+            ModifierDevice.Text = "None";
+            ModifierText.Text = "None";
         }
 
 
