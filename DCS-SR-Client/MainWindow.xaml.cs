@@ -60,6 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             UpdaterChecker.CheckForUpdate();
 
             InitRadioEffectsToggle();
+
+            InitRadioSwitchIsPTT();
         }
 
 
@@ -107,6 +109,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 RadioEffectsToggle.IsChecked = false;
+            }
+        }
+
+        private void InitRadioSwitchIsPTT()
+        {
+            var switchIsPTT = Settings.Instance.UserSettings[(int)SettingType.RadioSwitchIsPTT];
+            if (switchIsPTT == "ON")
+            {
+                RadioSwitchIsPTT.IsChecked = true;
+            }
+            else
+            {
+                RadioSwitchIsPTT.IsChecked = false;
             }
         }
 
@@ -422,9 +437,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        private void RadioEffects_Click(object sender, RoutedEventArgs e)
         {
             Settings.Instance.WriteSetting(SettingType.RadioEffects, (string) RadioEffectsToggle.Content);
+        }
+
+        private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string)RadioSwitchIsPTT.Content);
         }
     }
 }

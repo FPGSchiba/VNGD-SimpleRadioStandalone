@@ -15,12 +15,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public delegate void DetectButton(InputDevice inputDevice);
 
-        public delegate void DetectPttCallback(bool state, InputBinding inputType);
+        public delegate void DetectPttCallback(bool[] buttonStates);
 
         private volatile bool _detectPtt;
         private readonly DirectInput _directInput;
         private readonly List<Device> _inputDevices = new List<Device>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        public static readonly HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
+        {
+             new Guid("1b171b1c-0000-0000-0000-504944564944"), //Corsair K65 Gaming keyboard  It reports as a Joystick when its a keyboard...
+             new Guid("1b091b1c-0000-0000-0000-504944564944") // Corsair K70R Gaming Keyboard
+        };
 
         public InputDeviceManager(Window window)
         {
@@ -30,37 +36,39 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             foreach (var deviceInstance in deviceInstances)
             {
-                Device device = null;
-
-                //Corsair K65 Gaming Keyboard breaks... It reports as a Joystick when its a keyboard...
-                if (deviceInstance.ProductGuid != new Guid("1b171b1c-0000-0000-0000-504944564944"))
+                //Workaround for Bad Devices that pretend to be joysticks
+                if (!IsBlackListed(deviceInstance.ProductGuid))
                 {
-                    //Workaround for RGB keyboard
-               
                     Logger.Info("Found " + deviceInstance.ProductGuid + " "+deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                     if (deviceInstance.Usage == UsageId.GenericJoystick || deviceInstance.Usage == UsageId.GenericGamepad)
                     {
                         Logger.Info("Adding " + deviceInstance.ProductGuid + " " + deviceInstance.ProductName.Trim().Replace("\0", ""));
-                        device = new Joystick(_directInput, deviceInstance.ProductGuid);
+                        var device = new Joystick(_directInput, deviceInstance.ProductGuid);
+
+                        var helper =
+                       new WindowInteropHelper(window);
+
+                        device.SetCooperativeLevel(helper.Handle,
+                            CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                        device.Acquire();
+
+                        _inputDevices.Add(device);
                     }
                 }
-
-                if (device != null)
+                else
                 {
-                    var helper =
-                        new WindowInteropHelper(window);
-
-                    device.SetCooperativeLevel(helper.Handle,
-                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                    device.Acquire();
-
-                    _inputDevices.Add(device);
+                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " " + deviceInstance.ProductName.Trim().Replace("\0", ""));
                 }
             }
         }
 
         public InputConfiguration InputConfig { get; set; }
+
+        public bool IsBlackListed(Guid device)
+        {
+            return _blacklistedDevices.Contains(device);
+        }
 
 
         public void Dispose()
@@ -149,11 +157,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void StartDetectPtt(DetectPttCallback callback)
         {
             _detectPtt = true;
+            var bindingsCount = Enum.GetValues(typeof(InputBinding)).Length;
             //detect the state of all current buttons
             var pttInputThread = new Thread(() =>
             {
                 while (_detectPtt)
                 {
+                    var buttonStates = new bool[bindingsCount];
+                    
                     foreach (var device in InputConfig.InputDevices)
                     {
                         if (device != null)
@@ -166,8 +177,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     {
                                         _inputDevices[i].Poll();
                                         var state = (_inputDevices[i] as Joystick).GetCurrentState();
-
-                                        callback(state.Buttons[device.Button], device.InputBind);
+                                        
+                                        buttonStates[(int)device.InputBind] = state.Buttons[device.Button];
                                         break;
                                     }
                                    
@@ -175,6 +186,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             }
                         }
                     }
+
+                    callback(buttonStates);
 
                     Thread.Sleep(1);
                 }

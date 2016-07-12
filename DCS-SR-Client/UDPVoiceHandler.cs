@@ -11,6 +11,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using FragLabs.Audio.Codecs;
 using NLog;
 using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -76,35 +77,46 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
             }
 
-
-            _inputManager.StartDetectPtt((pressed, deviceType) =>
+            var settings = Settings.Instance;
+            _inputManager.StartDetectPtt((pressed) =>
             {
                 var radios = RadioSyncServer.DcsPlayerRadioInfo;
 
-                if (deviceType == InputBinding.Ptt)
+                //can be overriden by PTT Settings
+                var ptt = pressed[(int)InputBinding.Ptt];
+                  
+                //check we're allowed to switch radios
+                if (radios.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
-                    _ptt = pressed;
-                }
-                else if (pressed)
-                {
-                    if (radios.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                    if (pressed[(int)InputBinding.Switch1])
+                    { 
+                        
+                        radios.selected = 0;
+                    }
+                    else if (pressed[(int)InputBinding.Switch2])
                     {
-                        switch (deviceType)
-                        {
-                            //TODO check here that we can switch radios
-                            case InputBinding.Switch1:
-
-                                radios.selected = 0;
-                                break;
-                            case InputBinding.Switch2:
-                                radios.selected = 1;
-                                break;
-                            case InputBinding.Switch3:
-                                radios.selected = 2;
-                                break;
-                        }
+                      
+                        radios.selected = 1;
+                    }
+                    else if (pressed[(int)InputBinding.Switch3])
+                    {
+                        
+                        radios.selected = 2;
                     }
                 }
+
+            var radioSwitchPtt = settings.UserSettings[(int)SettingType.RadioSwitchIsPTT] == "ON";
+
+            if (radioSwitchPtt && (pressed[(int)InputBinding.Switch1] 
+                || pressed[(int)InputBinding.Switch2] 
+                || pressed[(int)InputBinding.Switch3]))
+            {
+                    ptt = true;
+            }
+
+                //set final PTT AFTER mods
+                this._ptt = ptt;
+                
             });
 
             StartPing();

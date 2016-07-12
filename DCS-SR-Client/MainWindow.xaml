@@ -139,7 +139,7 @@
 
                     <ToggleButton Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Center"
                                   VerticalContentAlignment="Center" Name="RadioEffectsToggle"
-                                  Click="ToggleButton_Click">
+                                  Click="RadioEffects_Click">
                         <ToggleButton.Style>
                             <Style TargetType="{x:Type ToggleButton}">
                                 <Setter Property="Content" Value="ON" />
@@ -169,8 +169,33 @@
                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                     <local:RadioChannelConfigUi Grid.Column="1" Grid.Row="3" x:Name="Radio3Config"
                                                 SettingConfig="{x:Static local:SettingType.Radio3Channel}" />
+
+                    <Label Grid.Column="0" Grid.Row="4" Content="Radio Switch works PTT" HorizontalContentAlignment="Center"
+                           VerticalContentAlignment="Center" />
+
+                    <ToggleButton Grid.Column="1" Grid.Row="4" HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center" Name="RadioSwitchIsPTT"
+                                  Click="RadioSwitchPTT_Click">
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Setter Property="Content" Value="ON" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="ON" />
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content" Value="OFF" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+
+
                 </Grid>
             </GroupBox>
+            
 
 
         </TabItem>
