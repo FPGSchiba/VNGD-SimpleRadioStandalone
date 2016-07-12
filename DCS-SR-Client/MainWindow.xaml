@@ -5,6 +5,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
+                       xmlns:devices="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client"
                       mc:Ignorable="d"
                       ResizeMode="CanMinimize"
                       Title="DCS-SimpleRadio Standalone Client" Height="450" Width="500">
@@ -58,7 +59,8 @@
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
-                        <RowDefinition />
+                        
+      
                     </Grid.RowDefinitions>
 
 
@@ -67,53 +69,18 @@
                     <Label Grid.Column="2" Grid.Row="0" x:Name="ButtonLabel" Content="Button"
                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
 
-                    <Label Grid.Column="0" Grid.Row="1" x:Name="Ptt1TextLabe" Content="Select Radio 1"
-                           VerticalContentAlignment="Center" />
-                    <TextBox Grid.Column="1" Grid.Row="1" x:Name="Ptt1Device" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <TextBox Grid.Column="2" Grid.Row="1" x:Name="Ptt1Text" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <Button Grid.Column="3" Grid.Row="1" x:Name="Ptt1Button" Content="Set " Click="ptt1_Click"
-                            Style="{DynamicResource SquareButtonStyle}" />
-                    <Button Grid.Column="4" Grid.Row="1" x:Name="Ptt1ButtonClear" Content="Clear"
-                            Click="ptt1Clear_Click" Style="{DynamicResource SquareButtonStyle}" />
+                    <local:InputBindingControl x:Name="Radio1" InputName="Radio 1"  Grid.Row="1" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch1}"  />
+                    <local:InputBindingControl x:Name="Radio2" InputName="Radio 2" Grid.Row="2" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch2}"  />
+                    <local:InputBindingControl x:Name="Radio3" InputName="Radio 3" Grid.Row="3" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch3}"  />
+                    <local:InputBindingControl x:Name="PTT" InputName="Common PTT" Grid.Row="4" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Ptt}"  />
 
-
-                    <Label Grid.Column="0" Grid.Row="2" x:Name="Ptt2TextLabel" Content="Select Radio 2"
-                           VerticalContentAlignment="Center" />
-                    <TextBox Grid.Column="1" Grid.Row="2" x:Name="Ptt2Device" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <TextBox Grid.Column="2" Grid.Row="2" x:Name="Ptt2Text" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <Button Grid.Column="3" Grid.Row="2" x:Name="Ptt2Button" Content="Set " Click="ptt2_Click"
-                            Style="{DynamicResource SquareButtonStyle}" />
-                    <Button Grid.Column="4" Grid.Row="2" x:Name="Ptt2ButtonClear" Content="Clear"
-                            Click="ptt2Clear_Click" Style="{DynamicResource SquareButtonStyle}" />
-
-                    <Label Grid.Column="0" Grid.Row="3" x:Name="Ptt3TextLabel" Content="Select Radio 3"
-                           VerticalContentAlignment="Center" />
-                    <TextBox Grid.Column="1" Grid.Row="3" x:Name="Ptt3Device" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <TextBox Grid.Column="2" Grid.Row="3" x:Name="Ptt3Text" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <Button Grid.Column="3" Grid.Row="3" x:Name="Ptt3Button" Content="Set " Click="ptt3_Click"
-                            Style="{DynamicResource SquareButtonStyle}" />
-                    <Button Grid.Column="4" Grid.Row="3" x:Name="Ptt3ButtonClear" Content="Clear"
-                            Click="ptt3Clear_Click" Style="{DynamicResource SquareButtonStyle}" />
-
-                    <Label Grid.Column="0" Grid.Row="4" x:Name="PttCommonLabel" Content="Common PTT"
-                           VerticalContentAlignment="Center" />
-                    <TextBox Grid.Column="1" Grid.Row="4" x:Name="PttCommonDevice" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <TextBox Grid.Column="2" Grid.Row="4" x:Name="PttCommonText" TextAlignment="Center"
-                             VerticalContentAlignment="Center" IsEnabled="False" Text="None" />
-                    <Button Grid.Column="3" Grid.Row="4" x:Name="PttCommonButton" Content="Set"
-                            Click="pttCommonButton_Click" Style="{DynamicResource SquareButtonStyle}" />
-                    <Button Grid.Column="4" Grid.Row="4" x:Name="PttCommonClear" Content="Clear"
-                            Click="pttCommonButtonClear_Click" Style="{DynamicResource SquareButtonStyle}" />
 
 
                 </Grid>
+               
+                
+                
+                
             </GroupBox>
         </TabItem>
 

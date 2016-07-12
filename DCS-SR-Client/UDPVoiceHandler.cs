@@ -10,7 +10,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using FragLabs.Audio.Codecs;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using static Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputDevice;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client

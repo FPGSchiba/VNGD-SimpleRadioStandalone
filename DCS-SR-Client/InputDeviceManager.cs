@@ -7,7 +7,7 @@ using System.Windows.Interop;
 using NLog;
 using SharpDX.DirectInput;
 using SharpDX.Multimedia;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {

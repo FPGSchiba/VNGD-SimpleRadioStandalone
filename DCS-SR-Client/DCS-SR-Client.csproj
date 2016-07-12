@@ -106,6 +106,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -134,6 +136,9 @@
     <Compile Include="ClientAudioProvider.cs" />
     <Compile Include="DejitterBuffer.cs" />
     <Compile Include="AppConfiguration.cs" />
+    <Compile Include="InputBindingControl.xaml.cs">
+      <DependentUpon>InputBindingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InputConfiguration.cs" />
     <Compile Include="InputDevice.cs" />
     <Compile Include="InputDeviceManager.cs" />
@@ -144,6 +149,10 @@
     <Compile Include="RadioSyncServer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UDPVoiceHandler.cs" />
+    <Page Include="InputBindingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

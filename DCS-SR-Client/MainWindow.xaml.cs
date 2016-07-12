@@ -28,7 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly string _guid;
 
-        private readonly InputDeviceManager _inputManager;
+        public InputDeviceManager InputManager { get; set; }
 
         private IPAddress _resolvedIp;
 
@@ -36,8 +36,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public MainWindow()
         {
+
+            InputManager = new InputDeviceManager(this);
+
             InitializeComponent();
 
+            Radio1.InputDeviceManager = InputManager;
+            Radio2.InputDeviceManager = InputManager;
+            Radio3.InputDeviceManager = InputManager;
+            PTT.InputDeviceManager = InputManager;
+           
             SetupLogging();
 
             _appConfig = new AppConfiguration();
@@ -47,9 +55,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitAudioOutput();
 
-            _inputManager = new InputDeviceManager(this);
-
-            LoadInputSettings();
 
             ServerIp.Text = _appConfig.LastServer;
             MicrophoneBoost.Value = _appConfig.MicBoost;
@@ -153,37 +158,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             LogManager.Configuration = config;
         }
 
-        private void LoadInputSettings()
-        {
-            //TODO load input settings
-
-            if (_inputManager.InputConfig.InputDevices != null)
-            {
-                if (_inputManager.InputConfig.InputDevices[0] != null)
-                {
-                    PttCommonText.Text = _inputManager.InputConfig.InputDevices[0].Button.ToString();
-                    PttCommonDevice.Text = _inputManager.InputConfig.InputDevices[0].DeviceName;
-                }
-
-
-                if (_inputManager.InputConfig.InputDevices[1] != null)
-                {
-                    Ptt1Text.Text = _inputManager.InputConfig.InputDevices[1].Button.ToString();
-                    Ptt1Device.Text = _inputManager.InputConfig.InputDevices[1].DeviceName;
-                }
-                if (_inputManager.InputConfig.InputDevices[2] != null)
-                {
-                    Ptt2Text.Text = _inputManager.InputConfig.InputDevices[2].Button.ToString();
-                    Ptt2Device.Text = _inputManager.InputConfig.InputDevices[2].DeviceName;
-                }
-
-                if (_inputManager.InputConfig.InputDevices[3] != null)
-                {
-                    Ptt3Text.Text = _inputManager.InputConfig.InputDevices[3].Button.ToString();
-                    Ptt3Device.Text = _inputManager.InputConfig.InputDevices[3].DeviceName;
-                }
-            }
-        }
+      
 
 
         private void startStop_Click(object sender, RoutedEventArgs e)
@@ -263,7 +238,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
                     _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
 
-                    _audioManager.StartEncoding(Mic.SelectedIndex, Speakers.SelectedIndex, _guid, _inputManager,
+                    _audioManager.StartEncoding(Mic.SelectedIndex, Speakers.SelectedIndex, _guid, InputManager,
                         _resolvedIp);
                     _stop = false;
                 }
@@ -287,122 +262,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void pttCommonButton_Click(object sender, RoutedEventArgs e)
-        {
-            PttCommonClear.IsEnabled = false;
-            PttCommonButton.IsEnabled = false;
-
-
-            _inputManager.AssignButton(device =>
-            {
-                PttCommonClear.IsEnabled = true;
-                PttCommonButton.IsEnabled = true;
-
-                PttCommonDevice.Text = device.DeviceName;
-                PttCommonText.Text = device.Button.ToString();
-
-                device.InputBind = InputDevice.InputBinding.Ptt;
-
-                _inputManager.InputConfig.InputDevices[0] = device;
-                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.Ptt, device);
-            });
-        }
-
-        private void ptt1_Click(object sender, RoutedEventArgs e)
-        {
-            Ptt1ButtonClear.IsEnabled = false;
-            Ptt1ButtonClear.IsEnabled = false;
-
-
-            _inputManager.AssignButton(device =>
-            {
-                Ptt1ButtonClear.IsEnabled = true;
-                Ptt1ButtonClear.IsEnabled = true;
-
-                Ptt1Device.Text = device.DeviceName;
-                Ptt1Text.Text = device.Button.ToString();
-                device.InputBind = InputDevice.InputBinding.Switch1;
-
-                _inputManager.InputConfig.InputDevices[1] = device;
-                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.Switch1, device);
-            });
-        }
-
-        private void ptt2_Click(object sender, RoutedEventArgs e)
-        {
-            Ptt2ButtonClear.IsEnabled = false;
-            Ptt2ButtonClear.IsEnabled = false;
-
-
-            _inputManager.AssignButton(device =>
-            {
-                Ptt2ButtonClear.IsEnabled = true;
-                Ptt2ButtonClear.IsEnabled = true;
-
-                Ptt2Device.Text = device.DeviceName;
-                Ptt2Text.Text = device.Button.ToString();
-                device.InputBind = InputDevice.InputBinding.Switch2;
-
-                _inputManager.InputConfig.InputDevices[2] = device;
-                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.Switch2, device);
-            });
-        }
-
-        private void ptt3_Click(object sender, RoutedEventArgs e)
-        {
-            Ptt3ButtonClear.IsEnabled = false;
-            Ptt3ButtonClear.IsEnabled = false;
-
-
-            _inputManager.AssignButton(device =>
-            {
-                Ptt3ButtonClear.IsEnabled = true;
-                Ptt3ButtonClear.IsEnabled = true;
-
-                Ptt3Device.Text = device.DeviceName;
-                Ptt3Text.Text = device.Button.ToString();
-                device.InputBind = InputDevice.InputBinding.Switch3;
-
-                _inputManager.InputConfig.InputDevices[3] = device;
-                _inputManager.InputConfig.WriteInputRegistry(InputDevice.InputBinding.Switch3, device);
-            });
-        }
-
-        private void pttCommonButtonClear_Click(object sender, RoutedEventArgs e)
-        {
-            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.Ptt);
-            _inputManager.InputConfig.InputDevices[0] = null;
-
-            PttCommonDevice.Text = "None";
-            PttCommonText.Text = "None";
-        }
-
-        private void ptt1Clear_Click(object sender, RoutedEventArgs e)
-        {
-            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.Switch1);
-            _inputManager.InputConfig.InputDevices[1] = null;
-
-            Ptt1Device.Text = "None";
-            Ptt1Text.Text = "None";
-        }
-
-        private void ptt2Clear_Click(object sender, RoutedEventArgs e)
-        {
-            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.Switch2);
-            _inputManager.InputConfig.InputDevices[2] = null;
-
-            Ptt2Device.Text = "None";
-            Ptt2Text.Text = "None";
-        }
-
-        private void ptt3Clear_Click(object sender, RoutedEventArgs e)
-        {
-            _inputManager.InputConfig.ClearInputRegistry(InputDevice.InputBinding.Switch3);
-            _inputManager.InputConfig.InputDevices[3] = null;
-
-            Ptt3Device.Text = "None";
-            Ptt3Text.Text = "None";
-        }
+      
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
