@@ -83,40 +83,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 var radios = RadioSyncServer.DcsPlayerRadioInfo;
 
                 //can be overriden by PTT Settings
-                var ptt = pressed[(int)InputBinding.Ptt];
-                  
+                var ptt = pressed[(int)InputBinding.ModifierPtt] && pressed[(int) InputBinding.Ptt];
+
                 //check we're allowed to switch radios
                 if (radios.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
-                    if (pressed[(int)InputBinding.Switch1])
-                    { 
-                        
+                    if (pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
+                    {
                         radios.selected = 0;
                     }
-                    else if (pressed[(int)InputBinding.Switch2])
+                    else if (pressed[(int) InputBinding.ModifierSwitch2] && pressed[(int) InputBinding.Switch2])
                     {
-                      
                         radios.selected = 1;
                     }
-                    else if (pressed[(int)InputBinding.Switch3])
+                    else if (pressed[(int) InputBinding.ModifierSwitch3] && pressed[(int) InputBinding.Switch3])
                     {
-                        
                         radios.selected = 2;
                     }
                 }
 
-            var radioSwitchPtt = settings.UserSettings[(int)SettingType.RadioSwitchIsPTT] == "ON";
+                var radioSwitchPtt = settings.UserSettings[(int) SettingType.RadioSwitchIsPTT] == "ON";
 
-            if (radioSwitchPtt && (pressed[(int)InputBinding.Switch1] 
-                || pressed[(int)InputBinding.Switch2] 
-                || pressed[(int)InputBinding.Switch3]))
-            {
+                if (radioSwitchPtt && ((pressed[(int)InputBinding.ModifierSwitch1] && pressed[(int)InputBinding.Switch1])
+                                       || (pressed[(int)InputBinding.ModifierSwitch2] && pressed[(int)InputBinding.Switch2])
+                                       || (pressed[(int)InputBinding.ModifierSwitch3] && pressed[(int)InputBinding.Switch3])))
+                {
                     ptt = true;
-            }
+                }
 
                 //set final PTT AFTER mods
                 this._ptt = ptt;
-                
             });
 
             StartPing();
@@ -210,9 +206,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     encodedOpusAudio.Length - 22 - 4 - 1 - 8);
 
                                 //before guid and modulation so -36 and then -1
-                                var modulation = (sbyte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1];
+                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1];
 
-                                var unitId = BitConverter.ToUInt32(encodedOpusAudio,encodedOpusAudio.Length - 22 - 4); 
+                                var unitId = BitConverter.ToUInt32(encodedOpusAudio, encodedOpusAudio.Length - 22 - 4);
 
                                 // check the radio
                                 var radioId = -1;
@@ -235,15 +231,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                         //ALL GOOD!
                                         //create marker for bytes
-                                        var audio = new ClientAudio();
-                                        audio.ClientGuid = recievingGuid;
-                                        audio.PcmAudio = tmp;
-                                        audio.ReceiveTime = GetTickCount64();
-                                        audio.Frequency = frequency;
-                                        audio.Modulation = modulation;
-                                        audio.Volume = receivingRadio.volume;
-                                        audio.ReceivedRadio = radioId;
-                                        audio.UnitId = unitId;
+                                        var audio = new ClientAudio
+                                        {
+                                            ClientGuid = recievingGuid,
+                                            PcmAudio = tmp,
+                                            ReceiveTime = GetTickCount64(),
+                                            Frequency = frequency,
+                                            Modulation = modulation,
+                                            Volume = receivingRadio.volume,
+                                            ReceivedRadio = radioId,
+                                            UnitId = unitId
+                                        };
 
                                         //TODO throw away audio for each client that is before the latest receive time!
                                         _audioManager.AddClientAudio(audio);
@@ -307,7 +305,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void Send(byte[] bytes, int len)
         {
             //if either PTT is true
-            if (_ptt || RadioSyncServer.DcsPlayerRadioInfo.ptt)
+            if ((_ptt || RadioSyncServer.DcsPlayerRadioInfo.ptt) 
+                && RadioSyncServer.DcsPlayerRadioInfo.IsCurrent()) //can only send if DCS is connected
             {
                 try
                 {

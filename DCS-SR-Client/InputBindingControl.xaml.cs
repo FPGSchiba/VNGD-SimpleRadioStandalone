@@ -40,10 +40,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
            
             InitializeComponent();
 
-          
-
-         //   LoadInputSettings();
-
         }
 
         public void LoadInputSettings()
@@ -73,13 +69,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 if (InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding] != null)
                 {
-                    DeviceText.Text = InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding].Button.ToString();
+                    var button = InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding].Button;
+                    DeviceText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
                     Device.Text = InputDeviceManager.InputConfig.InputDevices[(int)ControlInputBinding].DeviceName;
                 }
 
                 if (InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding] != null)
                 {
-                    ModifierText.Text = InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding].Button.ToString();
+                    var button = InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding].Button;
+                    ModifierText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
                     ModifierDevice.Text = InputDeviceManager.InputConfig.InputDevices[(int)ModifierBinding].DeviceName;
                 }
             }
@@ -97,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 DeviceButton.IsEnabled = true;
 
                 Device.Text = device.DeviceName;
-                DeviceText.Text = device.Button.ToString();
+                DeviceText.Text = device.Button < 128 ? device.Button.ToString() : "POV " + (device.Button - 127); //output POV info;
 
                 device.InputBind = ControlInputBinding;
 
@@ -128,7 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ModifierButton.IsEnabled = true;
 
                 ModifierDevice.Text = device.DeviceName;
-                ModifierText.Text = device.Button.ToString();
+                ModifierText.Text = device.Button < 128 ? device.Button.ToString() : "POV " + (device.Button - 127); //output POV info;
 
                 device.InputBind = ModifierBinding;
 

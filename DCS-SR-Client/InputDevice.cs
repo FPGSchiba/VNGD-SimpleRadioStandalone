@@ -4,14 +4,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
     public enum InputBinding
     {
-        Switch1,
-        Switch2,
-        Switch3,
-        Ptt,
-        ModifierSwitch1,
-        ModifierSwitch2,
-        ModifierSwitch3,
-        ModifierPtt,
+        Switch1 = 0,
+        Switch2 = 1,
+        Switch3 = 2,
+        Ptt = 3,
+        ModifierSwitch1 = 4,
+        ModifierSwitch2 = 5,
+        ModifierSwitch3 = 6,
+        ModifierPtt = 7,
 
     }
 
@@ -24,5 +24,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public int Button { get; set; }
         public Guid InstanceGuid { get; internal set; }
+        public int ButtonValue { get; internal set; }
     }
 }

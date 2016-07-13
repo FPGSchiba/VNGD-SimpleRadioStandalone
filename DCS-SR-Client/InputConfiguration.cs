@@ -37,6 +37,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     key + "_button",
                     "");
 
+                var buttonValue = (int)Registry.GetValue(RegPath,
+                    key + "_value",
+                    "1");
+
                 var guid = (string) Registry.GetValue(RegPath,
                     key + "_guid",
                     "");
@@ -46,6 +50,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 device.Button = button;
                 device.InstanceGuid = Guid.Parse(guid);
                 device.InputBind = bind;
+                device.ButtonValue = buttonValue;
 
                 return device;
             }
@@ -69,6 +74,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(RegPath,
                     key + "_button",
                     device.Button);
+
+                Registry.SetValue(RegPath,
+                    key + "_value",
+                    device.ButtonValue);
 
                 Registry.SetValue(RegPath,
                     key + "_guid",
