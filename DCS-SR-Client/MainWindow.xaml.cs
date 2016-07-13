@@ -214,7 +214,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Stop()
         {
-            StartStop.Content = "Start";
+            StartStop.Content = "Connect";
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
