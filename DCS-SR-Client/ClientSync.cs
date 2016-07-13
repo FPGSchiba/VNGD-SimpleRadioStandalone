@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void ClientRadioUpdated()
         {
-            //DO NOTHING
+          //DO NOTHING FOR NOW
         }
 
         private void ClientSideUpdate()
@@ -155,6 +155,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                                 srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
+                                                srClient.LastUpdate = Environment.TickCount;
                                             }
                                         }
                                         else

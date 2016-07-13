@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Win32;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.InputDevice;
+using static Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputDevice;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -8,18 +9,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public static readonly string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
-        public InputDevice[] InputDevices = new InputDevice[4];
-
+        public InputDevice[] InputDevices = new InputDevice[Enum.GetValues(typeof(InputBinding)).Length];
 
         public InputConfiguration()
         {
             //load from registry
             //    PTTCommon = ReadInputRegistry("common");
-
-            InputDevices[0] = ReadInputRegistry(InputBinding.Ptt);
-            InputDevices[1] = ReadInputRegistry(InputBinding.Switch1);
-            InputDevices[2] = ReadInputRegistry(InputBinding.Switch2);
-            InputDevices[3] = ReadInputRegistry(InputBinding.Switch3);
+            foreach(var bind in Enum.GetValues(typeof(InputBinding)))
+            {
+                InputDevices[(int)bind] = ReadInputRegistry((InputBinding)bind);
+            }
         }
 
         public InputDevice ReadInputRegistry(InputBinding bind)
@@ -38,6 +37,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     key + "_button",
                     "");
 
+                var buttonValue = (int)Registry.GetValue(RegPath,
+                    key + "_value",
+                    "1");
+
                 var guid = (string) Registry.GetValue(RegPath,
                     key + "_guid",
                     "");
@@ -47,6 +50,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 device.Button = button;
                 device.InstanceGuid = Guid.Parse(guid);
                 device.InputBind = bind;
+                device.ButtonValue = buttonValue;
 
                 return device;
             }
@@ -70,6 +74,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(RegPath,
                     key + "_button",
                     device.Button);
+
+                Registry.SetValue(RegPath,
+                    key + "_value",
+                    device.ButtonValue);
 
                 Registry.SetValue(RegPath,
                     key + "_guid",

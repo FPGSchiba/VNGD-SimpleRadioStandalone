@@ -37,6 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public bool isCurrent()
         {
+            return true;
 //             if(LastUpdate > Environment.TickCount - 10000)//last in game 10 seconds ago
 //             {
 //                Console.WriteLine("NOT CURRENT!");
@@ -44,9 +45,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 //             }
 //            else
 //            {
-                return true;
+//                return true;
 //            }
-          
+
         }
 
         public override string ToString()

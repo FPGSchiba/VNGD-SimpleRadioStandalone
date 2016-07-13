@@ -8,7 +8,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         RadioEffects = 0,
         Radio1Channel = 1,
         Radio2Channel = 2,
-        Radio3Channel = 3
+        Radio3Channel = 3,
+        RadioSwitchIsPTT = 4,
     }
 
 
@@ -18,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public Settings()
         {
-            UserSettings = new string[4];
+            UserSettings = new string[Enum.GetValues(typeof(SettingType)).Length];
 
             foreach (SettingType set in Enum.GetValues(typeof(SettingType)))
             {

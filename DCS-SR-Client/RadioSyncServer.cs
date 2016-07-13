@@ -25,6 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public static volatile DCSPlayerRadioInfo DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
 
         public static volatile DCSPlayerSideInfo DcsPlayerSideInfo = new DCSPlayerSideInfo();
+
         private volatile bool _stop;
 
         private readonly SendRadioUpdate _clientRadioUpdate;
@@ -272,6 +273,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void UpdateRadio(DCSPlayerRadioInfo message)
         {
+            
             if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 // Full radio, all from DCS
             {
