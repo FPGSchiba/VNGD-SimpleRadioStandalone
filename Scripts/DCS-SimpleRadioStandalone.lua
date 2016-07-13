@@ -825,7 +825,7 @@ function SR.exportRadioC101(_data)
 
     _data.radios[3].name = "No Radio"
     _data.radios[3].frequency =  1
-    _data.radios[3].modulation = 0
+    _data.radios[3].modulation = 3
     _data.radios[3].volume = 1.0
 
     local _selector = SR.getSelectorPosition(404,0.5)
@@ -866,19 +866,23 @@ function SR.exportRadioHawk(_data)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = 1
 
-
-    _data.radios[2].name = "No Radio"
-    _data.radios[2].frequency =1
+    _data.radios[2].name = "VHF"
+    _data.radios[2].frequency =  SR.getRadioFrequency(8)
     _data.radios[2].modulation = 0
     _data.radios[2].volume =1
 
     _data.radios[3].name = "No Radio"
     _data.radios[3].frequency =  1
-    _data.radios[3].modulation = 0
+    _data.radios[3].modulation = 3
     _data.radios[3].volume = 1.0
 
+    if(SR.getButtonPosition(265)) > 0.5 then
+           _data.selected = 1
+    else
+            _data.selected = 0
+    end
 
-    _data.selected = 0
+
 
     _data.radioType = 1; -- full radio
 
@@ -899,7 +903,7 @@ function SR.exportRadioM2000C(_data)
 
     _data.radios[3].name = "N/A"
     _data.radios[3].frequency =  1
-    _data.radios[3].modulation = 0
+    _data.radios[3].modulation = 3
     _data.radios[3].volume = 0
 
     local _switch = SR.getButtonPosition(700)

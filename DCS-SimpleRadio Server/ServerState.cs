@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
 
@@ -27,14 +28,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
         private readonly ConcurrentDictionary<string, SRClient> _connectedClients =
             new ConcurrentDictionary<string, SRClient>();
+        private volatile bool _stop = true;
 
         public ServerState(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
-          
 
             StartServer();
+
+           
+        }
+
+        private void StartExport()
+        {
+            _stop = false;
+            Task.Factory.StartNew(() =>
+            {
+                while (!_stop)
+                {
+                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED] == "ON")
+                    {
+                        var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
+                        File.WriteAllText(GetCurrentDirectory() + "\\clients-list.json", json);
+                    }
+                    Thread.Sleep(5000);
+                }
+            });
         }
 
         private void PopulateBanList()
@@ -92,6 +112,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             if (_serverListener == null)
             {
+                StartExport();
+
                 PopulateBanList();
 
                 _serverListener = new UDPVoiceRouter(_connectedClients, _eventAggregator);
@@ -108,6 +130,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         {
             if (_serverListener != null)
             {
+                _stop = true;
                 _serverSync.RequestStop();
                 _serverSync = null;
                 _serverListener.RequestStop();
