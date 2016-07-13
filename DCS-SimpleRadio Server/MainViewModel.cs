@@ -76,6 +76,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             NotifyOfPropertyChange(() => SpectatorAudioText);
         }
 
+        public string ExportListText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.CLIENT_EXPORT_ENABLED] == "ON" ? "ON" : "OFF";
+
+        public void ExportListToggle()
+        {
+            var newSetting = ExportListText == "ON" ? "OFF" : "ON";
+            ServerSettings.Instance.WriteSetting(ServerSettingType.CLIENT_EXPORT_ENABLED, newSetting);
+            NotifyOfPropertyChange(() => ExportListText);
+        }
+
         public void Handle(ServerStateMessage message)
         {
             IsServerRunning = message.IsRunning;

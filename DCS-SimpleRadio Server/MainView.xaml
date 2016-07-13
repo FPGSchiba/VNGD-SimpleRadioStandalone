@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Server.UI"
              mc:Ignorable="d" 
-             Height="160" Width="330">
+             Height="180" Width="330">
     <Grid Margin="0,0,-6,0">
         <Button x:Name="ServerStartStop" Content="{Binding ServerButtonText}"  HorizontalAlignment="Left" Margin="18,18,0,0"
                 VerticalAlignment="Top" Width="75"  />
@@ -23,5 +23,10 @@
                VerticalAlignment="Top" Width="143" />
         <Label Content="Spectator Audio" HorizontalAlignment="Left" Margin="18,90,0,0"
                VerticalAlignment="Top" Width="143" />
+        <Label Content="Auto Export List" HorizontalAlignment="Left" Margin="18,126,0,0"
+        	VerticalAlignment="Top" Width="143" />
+
+        <Button x:Name="ExportListToggle" Content="{Binding ExportListText}" HorizontalAlignment="Left" Margin="206,130,0,0" VerticalAlignment="Top"
+                      Width="75" />
     </Grid>
 </UserControl>
