@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private RadioTransmit lastActive;
 
         private DateTime lastActiveTime = new DateTime(0L);
-        private DCSPlayerRadioInfo lastUpdate;
+        private DCSPlayerRadioInfo _lastUpdate;
         public int radioId;
 
         public RadioControlGroup()
@@ -70,8 +70,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void sendUDPUpdate(RadioCommand update)
         {
             //only send update if the aircraft doesnt have its own radio system, i.e FC3
-            if (lastUpdate != null &&
-                lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (_lastUpdate != null &&
+                _lastUpdate.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
                 var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
                 //multicast
@@ -159,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         internal void update(DCSPlayerRadioInfo lastUpdate, TimeSpan elapsedSpan)
         {
-            this.lastUpdate = lastUpdate;
+            this._lastUpdate = lastUpdate;
             if (elapsedSpan.TotalSeconds > 10)
             {
                 radioActive.Fill = new SolidColorBrush(Colors.Red);
@@ -220,7 +220,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                                           (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secondaryFrequency > 100)
                     {
-                        radioFrequency.Text += " G";
+                        radioFrequency.Text += " +G";
+                    }
+                    if (currentRadio.enc > 0)
+                    {
+                        radioFrequency.Text += " +E"; // ENCRYPTED
                     }
                 }
                 radioLabel.Content = lastUpdate.radios[radioId].name;

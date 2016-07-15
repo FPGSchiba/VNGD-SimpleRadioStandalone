@@ -203,10 +203,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     encodedOpusAudio, encodedOpusAudio.Length - 22, 22);
 
                                 var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                                    encodedOpusAudio.Length - 22 - 4 - 1 - 8);
+                                    encodedOpusAudio.Length - 22 - 4 - 1 - 1 - 8);
 
-                                //before guid and modulation so -36 and then -1
-                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1];
+                                //before guid and modulation so - 22 - 4 - 1 - 1  
+                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1 - 1 ];
+
+                                var encryption = (sbyte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1 ];
 
                                 var unitId = BitConverter.ToUInt32(encodedOpusAudio, encodedOpusAudio.Length - 22 - 4);
 
@@ -221,7 +223,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     int len;
                                     //- 22 so we ignore the UUID
                                     var decoded = _decoder.Decode(encodedOpusAudio,
-                                        encodedOpusAudio.Length - 22 - 4 - 1 - 8, out len);
+                                        encodedOpusAudio.Length - 22 - 4 - 1 - 1 - 8, out len);
 
                                     if (len > 0)
                                     {
@@ -240,7 +242,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             Modulation = modulation,
                                             Volume = receivingRadio.volume,
                                             ReceivedRadio = radioId,
-                                            UnitId = unitId
+                                            UnitId = unitId,
+                                            Encryption = encryption,
+                                            Decryptable = encryption == receivingRadio.enc // mark if we can decrypt it
                                         };
 
                                         //TODO throw away audio for each client that is before the latest receive time!
@@ -323,7 +327,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                         if (radio != null)
                         {
-                            var combinedBytes = new byte[len + 8 + 1 + 4 + 22];
+                            var combinedBytes = new byte[len + 8 + 1 + 1 + 4 + 22];
                             Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
 
                             var freq = BitConverter.GetBytes(radio.frequency); //8 bytes
@@ -340,14 +344,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             //modulation
                             combinedBytes[len + 8] = (byte) radio.modulation; //1 byte;
 
+                            combinedBytes[len + 9] = (byte)radio.enc; //1 byte;
+
                             //unit Id
                             var unitId = BitConverter.GetBytes(RadioSyncServer.DcsPlayerRadioInfo.unitId); //4 bytes
-                            combinedBytes[len + 9] = unitId[0];
-                            combinedBytes[len + 10] = unitId[1];
-                            combinedBytes[len + 11] = unitId[2];
-                            combinedBytes[len + 12] = unitId[3];
+                            combinedBytes[len + 10] = unitId[0];
+                            combinedBytes[len + 11] = unitId[1];
+                            combinedBytes[len + 12] = unitId[2];
+                            combinedBytes[len + 13] = unitId[3];
 
-                            Buffer.BlockCopy(_guidAsciiBytes, 0, combinedBytes, len + 8 + 1 + 4, 22); // copy short guid
+                            Buffer.BlockCopy(_guidAsciiBytes, 0, combinedBytes, len + 8 + 1 + + 1 + 4, 22); // copy short guid
 
                             var ip = new IPEndPoint(_address, 5010);
 

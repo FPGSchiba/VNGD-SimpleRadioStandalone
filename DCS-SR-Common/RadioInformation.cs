@@ -9,6 +9,7 @@
         public string name = "";
         public double secondaryFrequency = 1;
         public float volume = 1.0f;
+        public sbyte enc = 0; // encrytion channel - 0 is off
 
         public override bool Equals(object obj)
         {

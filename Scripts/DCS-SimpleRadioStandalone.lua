@@ -336,6 +336,11 @@ end
 
 function SR.exportRadioUH1H(_data)
 
+    _data.radios[1].name = "AN/ARC-131"
+    _data.radios[1].frequency = SR.getRadioFrequency(23)
+    _data.radios[1].modulation = 1
+    _data.radios[1].volume = SR.getRadioVolume(0, 37,{0.3,1.0},true)
+
     _data.radios[2].name = "AN/ARC-51BX - UHF"
     _data.radios[2].frequency = SR.getRadioFrequency(22)
     _data.radios[2].modulation = 0
@@ -346,15 +351,10 @@ function SR.exportRadioUH1H(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume =  SR.getRadioVolume(0, 8,{0.0,0.65},false )
 
-    _data.radios[1].name = "AN/ARC-131"
-    _data.radios[1].frequency = SR.getRadioFrequency(23)
-    _data.radios[1].modulation = 1
-    _data.radios[1].volume = SR.getRadioVolume(0, 37,{0.3,1.0},true)
-
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
 	if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
-		_data.radios[1].secondaryFrequency = 243.0*1000000 
+		_data.radios[2].secondaryFrequency = 243.0*1000000 
 	end
 
     local _panel = GetDevice(0)
@@ -448,7 +448,6 @@ function SR.exportRadioKA50(_data)
     return _data
 
 end
-
 function SR.exportRadioMI8(_data)
 
     _data.radios[1].name = "R-863"
@@ -463,15 +462,15 @@ function SR.exportRadioMI8(_data)
     
     _data.radios[1].volume = SR.getRadioVolume(0, 156,{0.0,1.0},false)
 
-    _data.radios[2].name = "R-828"
-    _data.radios[2].frequency = SR.getRadioFrequency(39,50000)
-    _data.radios[2].modulation = 1
-    _data.radios[2].volume = SR.getRadioVolume(0, 737,{0.0,1.0},false)
+    _data.radios[2].name = "JADRO-1A"
+    _data.radios[2].frequency = SR.getRadioFrequency(37,500)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 743,{0.0,1.0},false)
 
-    _data.radios[3].name = "JADRO-1A"
-    _data.radios[3].frequency = SR.getRadioFrequency(37,500)
-    _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 743,{0.0,1.0},false)
+    _data.radios[3].name = "R-828"
+    _data.radios[3].frequency = SR.getRadioFrequency(39,50000)
+    _data.radios[3].modulation = 1
+    _data.radios[3].volume = SR.getRadioVolume(0, 737,{0.0,1.0},false)
 
     --guard mode for R-863 Radio
     local uhfModeKnob = SR.getSelectorPosition(153,1)
@@ -485,9 +484,9 @@ function SR.exportRadioMI8(_data)
     if _switch == 0 then
         _data.selected = 0
     elseif _switch == 1 then
-        _data.selected = 2
-    elseif _switch == 2 then
         _data.selected = 1
+    elseif _switch == 2 then
+        _data.selected = 2
     else
         _data.selected = -1
     end
@@ -539,15 +538,15 @@ end
 
 function SR.exportRadioA10C(_data)
 
-    _data.radios[2].name = "AN/ARC-164 UHF"
-    _data.radios[2].frequency = SR.getRadioFrequency(54)
-    _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)
-
     _data.radios[1].name = "AN/ARC-186(V)"
     _data.radios[1].frequency =  SR.getRadioFrequency(55)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = SR.getRadioVolume(0, 133,{0.0,1.0},false)
+
+    _data.radios[2].name = "AN/ARC-164 UHF"
+    _data.radios[2].frequency = SR.getRadioFrequency(54)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)
 
     _data.radios[3].name = "AN/ARC-186(V)FM"
     _data.radios[3].frequency =  SR.getRadioFrequency(56)
@@ -557,7 +556,7 @@ function SR.exportRadioA10C(_data)
      --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(168,0.1)
 	if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
-		_data.radios[1].secondaryFrequency = 243.0*1000000 
+		_data.radios[2].secondaryFrequency = 243.0*1000000 
 	end
 
 --    local value = GetDevice(0):get_argument_value(239)
@@ -917,15 +916,15 @@ end
 
 function SR.exportRadioM2000C(_data)
 
-    _data.radios[2].name = "UHF"
-    _data.radios[2].frequency = SR.getRadioFrequency(20)
-    _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 706,{0.0,1.0},false)
-
     _data.radios[1].name = "V/UHF"
     _data.radios[1].frequency =  SR.getRadioFrequency(19)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = SR.getRadioVolume(0, 707,{0.0,1.0},false)
+
+    _data.radios[2].name = "UHF"
+    _data.radios[2].frequency = SR.getRadioFrequency(20)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 706,{0.0,1.0},false)
 
     _data.radios[3].name = "N/A"
     _data.radios[3].frequency =  1
