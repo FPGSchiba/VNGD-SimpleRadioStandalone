@@ -59,8 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             else
             {
-                client = new ClientAudioProvider();
-                client.LastUpdate = GetTickCount64();
+                client = new ClientAudioProvider {LastUpdate = GetTickCount64()};
                 _clientsBufferedAudio[audio.ClientGuid] = client;
 
                 _mixing.AddMixerInput(client.VolumeSampleProvider);

@@ -30,6 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public VolumeSampleProvider VolumeSampleProvider { get; }
         public BufferedWaveProvider BufferedWaveProvider { get; }
+        private Random _random = new Random();
 
 
         public void AddSamples(ClientAudio audio)
@@ -52,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             var setting = _settings.UserSettings[(int) settingType];
 
-            var stereoMix = new byte[0];
+            byte[] stereoMix;
 
             if (setting == "Left")
             {
@@ -75,10 +76,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var stereoMix = new byte[audio.PcmAudio.Length*2];
             for (var i = 0; i < audio.PcmAudio.Length/2; i++)
             {
-                stereoMix[i*4] = audio.PcmAudio[i*2];
-                ;
-                stereoMix[i*4 + 1] = audio.PcmAudio[i*2 + 1];
-
+                if (audio.Decryptable || audio.Encryption == 0)
+                {
+                    stereoMix[i * 4] = audio.PcmAudio[i * 2];
+                    stereoMix[i * 4 + 1] = audio.PcmAudio[i * 2 + 1];
+                }
+                else
+                {
+                    stereoMix[i*4] = (byte) _random.Next(16);
+                    stereoMix[i * 4 + 1] = (byte)_random.Next(16);
+                }
+                
                 stereoMix[i*4 + 2] = 0;
                 stereoMix[i*4 + 3] = 0;
             }
@@ -93,8 +101,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 stereoMix[i*4] = 0;
                 stereoMix[i*4 + 1] = 0;
 
-                stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
-                stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
+                if (audio.Decryptable || audio.Encryption == 0) 
+                {
+                    stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
+                    stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
+                }
+                else
+                {
+                    stereoMix[i * 4 + 2] = (byte)_random.Next(16);
+                    stereoMix[i * 4 + 3] = (byte)_random.Next(16);
+                }
+               
             }
             return stereoMix;
         }
@@ -104,11 +121,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var stereoMix = new byte[audio.PcmAudio.Length*2];
             for (var i = 0; i < audio.PcmAudio.Length/2; i++)
             {
-                stereoMix[i*4] = audio.PcmAudio[i*2];
-                stereoMix[i*4 + 1] = audio.PcmAudio[i*2 + 1];
+                if (audio.Decryptable || audio.Encryption == 0)
+                {
+                    stereoMix[i*4] = audio.PcmAudio[i*2];
+                    stereoMix[i*4 + 1] = audio.PcmAudio[i*2 + 1];
 
-                stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
-                stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
+                    stereoMix[i*4 + 2] = audio.PcmAudio[i*2];
+                    stereoMix[i*4 + 3] = audio.PcmAudio[i*2 + 1];
+                }
+                else
+                {
+                    stereoMix[i * 4] = (byte)_random.Next(16);
+                    stereoMix[i * 4 + 1] = (byte)_random.Next(16);
+
+                    stereoMix[i * 4 + 2] = (byte)_random.Next(16);
+                    stereoMix[i * 4 + 3] = (byte)_random.Next(16);
+                }
+               
             }
             return stereoMix;
         }

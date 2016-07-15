@@ -12,5 +12,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public short Modulation { get; internal set; }
         public float Volume { get; internal set; }
         public UInt32 UnitId { get;  set; }
+        public short Encryption { get; internal set; }
+        public bool Decryptable { get; internal set; }
     }
 }
