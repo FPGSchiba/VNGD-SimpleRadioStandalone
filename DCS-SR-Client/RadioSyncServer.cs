@@ -151,6 +151,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     clientRadio.volume = radioCommand.volume;
                 }
             }
+            else if (radioCommand.cmdType == RadioCommand.CmdType.GUARD_TOGGLE)
+            {
+                if (DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
+                    && radioCommand.radio >= 0
+                    && radioCommand.radio < 3)
+                {
+                    //sort out the frequencies
+                    var clientRadio = DcsPlayerRadioInfo.radios[radioCommand.radio];
+                    if (clientRadio.secondaryFrequency > 0)
+                    {
+                        clientRadio.secondaryFrequency = 0; // 0 indicates we want it overridden + disabled
+                    }
+                    else
+                    {
+                        clientRadio.secondaryFrequency = 1; //indicates we want it back
+                    }
+
+                 
+                }
+            }
         }
 
         private void StartDcsMulticastListener()
@@ -297,41 +317,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             else // FC3 Radio - Take nothing from DCS, just update the last tickcount
             {
-                //update common parts
-                DcsPlayerRadioInfo.name = message.name;
-                DcsPlayerRadioInfo.radioType = message.radioType;
-                DcsPlayerRadioInfo.unit = message.unit;
-                DcsPlayerRadioInfo.unitId = message.unitId;
-
-                //copy over radio names, min + max
-                for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
+                if (DcsPlayerRadioInfo.unitId != message.unitId)
                 {
-                    var updateRadio = message.radios[i];
-
-                    var clientRadio = DcsPlayerRadioInfo.radios[i];
-
-                    clientRadio.freqMin = updateRadio.freqMin;
-                    clientRadio.freqMax = updateRadio.freqMax;
-
-                    clientRadio.name = updateRadio.name;
-                    clientRadio.secondaryFrequency = updateRadio.secondaryFrequency;
-
-                    clientRadio.modulation = updateRadio.modulation;
-
-                    //check we're not over a limit
-
-                    if (clientRadio.frequency > clientRadio.freqMax)
-                    {
-                        clientRadio.frequency = clientRadio.freqMax;
-                    }
-                    else if (clientRadio.frequency < clientRadio.freqMin)
-                    {
-                        clientRadio.frequency = clientRadio.freqMin;
-                    }
+                    //replace it all - new aircraft
+                    DcsPlayerRadioInfo = message;
                 }
+                else // same aircraft
+                {
+                    //update common parts
+                    DcsPlayerRadioInfo.name = message.name;
+                    DcsPlayerRadioInfo.radioType = message.radioType;
+                    DcsPlayerRadioInfo.unit = message.unit;
 
-                //change PTT last
-                DcsPlayerRadioInfo.ptt = message.ptt;
+                    DcsPlayerRadioInfo.unitId = message.unitId;
+
+                    //copy over radio names, min + max
+                    for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
+                    {
+                        var updateRadio = message.radios[i];
+
+                        var clientRadio = DcsPlayerRadioInfo.radios[i];
+
+                        clientRadio.freqMin = updateRadio.freqMin;
+                        clientRadio.freqMax = updateRadio.freqMax;
+
+                        clientRadio.name = updateRadio.name;
+
+                        if (clientRadio.secondaryFrequency == 0)
+                        {
+                            //currently turned off
+                            clientRadio.secondaryFrequency = 0;
+
+                        }
+                        else
+                        {
+                            //put back
+                            clientRadio.secondaryFrequency = updateRadio.secondaryFrequency;
+                        }
+
+                        clientRadio.modulation = updateRadio.modulation;
+
+                        //check we're not over a limit
+
+                        if (clientRadio.frequency > clientRadio.freqMax)
+                        {
+                            clientRadio.frequency = clientRadio.freqMax;
+                        }
+                        else if (clientRadio.frequency < clientRadio.freqMin)
+                        {
+                            clientRadio.frequency = clientRadio.freqMin;
+                        }
+                    }
+
+                    //change PTT last
+                    DcsPlayerRadioInfo.ptt = message.ptt;
+                }
+               
             }
 
             //update
