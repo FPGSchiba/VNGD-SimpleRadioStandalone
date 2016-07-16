@@ -154,6 +154,7 @@ namespace Installer
             {
                 MessageBox.Show("Please close SimpleRadio Overlay before updating!", "SR Standalone Installer",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
 
                 return;
             }
@@ -317,6 +318,8 @@ namespace Installer
             {
                 MessageBox.Show("Please close SimpleRadio Standalone Overlay before removing!",
                     "SR Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                Environment.Exit(0);
 
                 return;
             }
