@@ -18,6 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly AppConfiguration _appConfig;
 
         private readonly AudioManager _audioManager;
@@ -36,10 +37,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public MainWindow()
         {
+            InitializeComponent();
+
+            SetupLogging();
+
+            Logger.Info("Started DCS-SimpleRadio Client");
 
             InputManager = new InputDeviceManager(this);
-
-            InitializeComponent();
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -57,15 +61,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
-            SetupLogging();
-
             _appConfig = new AppConfiguration();
             _guid = ShortGuid.NewGuid().ToString();
 
             InitAudioInput();
 
             InitAudioOutput();
-
 
             ServerIp.Text = _appConfig.LastServer;
             MicrophoneBoost.Value = _appConfig.MicBoost;
