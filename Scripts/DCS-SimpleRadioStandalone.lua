@@ -10,7 +10,10 @@
 -- If an Export.lua doesn't exist, just create one add add the single line in
 SR = {}
 
-SR.unicast = false -- if you've setup DCS Correctly and the plugin isn't talking to DCS,
+SR.M2000C_ENCRYPTION_KEY = 3 -- Change your Mirage Encryption Key here. Set to a number (inclusive) between 1-15
+                             -- Setting the number to 1-6 will allow you to talk to an A-10C with encryption
+
+SR.unicast = false --DONT CHANGE THIS
 
 SR.dbg = {}
 SR.logFile = io.open(lfs.writedir()..[[Logs\DCS-SimpleRadioStandalone.log]], "w")
@@ -580,8 +583,8 @@ function SR.exportRadioA10C(_data)
 
         local _radio = nil
         if SR.round(SR.getButtonPosition(781),0.1) == 0.2 then
-            --crad/2 vhf
-             _radio = _data.radios[1]
+            --crad/2 vhf - FM
+             _radio = _data.radios[3]
         elseif SR.getButtonPosition(781) == 0 then
             --crad/1 uhf
             _radio = _data.radios[2]
@@ -942,8 +945,18 @@ function SR.exportRadioM2000C(_data)
     --guard mode for V/UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(446,0.25) -- TODO!
 	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
-		_data.radios[2].secondaryFrequency = 243.0*1000000 
+		_data.radios[1].secondaryFrequency = 243.0*1000000 
 	end
+
+    --V/UHF Encryption
+    if SR.getButtonPosition(438) > 0.5 then
+        _data.radios[1].enc = SR.M2000C_ENCRYPTION_KEY
+    end
+
+    if SR.getButtonPosition(431) > 0.5 then
+        _data.radios[2].enc = SR.M2000C_ENCRYPTION_KEY
+    end
+
 
     _data.radioType = 2; -- partial radio, allows hotkeys
 

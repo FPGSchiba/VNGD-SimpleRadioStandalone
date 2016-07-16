@@ -220,11 +220,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                                           (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secondaryFrequency > 100)
                     {
-                        radioFrequency.Text += " +G";
+                        radioFrequency.Text += " G";
                     }
                     if (currentRadio.enc > 0)
                     {
-                        radioFrequency.Text += " +E"; // ENCRYPTED
+                        radioFrequency.Text += " E"+currentRadio.enc; // ENCRYPTED
                     }
                 }
                 radioLabel.Content = lastUpdate.radios[radioId].name;
