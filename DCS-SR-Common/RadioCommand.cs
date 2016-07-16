@@ -6,7 +6,8 @@
         {
             FREQUENCY = 1,
             VOLUME = 2,
-            SELECT = 3
+            SELECT = 3,
+            GUARD_TOGGLE = 4
         }
 
         public CmdType cmdType;

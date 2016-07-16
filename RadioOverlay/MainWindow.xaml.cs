@@ -48,9 +48,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            radio1.radioId = 0;
-            radio2.radioId = 1;
-            radio3.radioId = 2;
+            radio1.RadioId = 0;
+            radio2.RadioId = 1;
+            radio3.RadioId = 2;
 
             SetupActiveRadio();
             SetupRadioStatus();
@@ -137,9 +137,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                             var elapsedTicks = DateTime.Now.Ticks - lastUpdateTime.Ticks;
                             var elapsedSpan = new TimeSpan(elapsedTicks);
 
-                            radio1.update(lastUpdate, elapsedSpan);
-                            radio2.update(lastUpdate, elapsedSpan);
-                            radio3.update(lastUpdate, elapsedSpan);
+                            radio1.Update(lastUpdate, elapsedSpan);
+                            radio2.Update(lastUpdate, elapsedSpan);
+                            radio3.Update(lastUpdate, elapsedSpan);
                         });
                     }
                 }
@@ -178,13 +178,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                             switch (lastRadioTransmit.radio)
                             {
                                 case 0:
-                                    radio1.setLastRadioTransmit(lastRadioTransmit);
+                                    radio1.SetLastRadioTransmit(lastRadioTransmit);
                                     break;
                                 case 1:
-                                    radio2.setLastRadioTransmit(lastRadioTransmit);
+                                    radio2.SetLastRadioTransmit(lastRadioTransmit);
                                     break;
                                 case 2:
-                                    radio3.setLastRadioTransmit(lastRadioTransmit);
+                                    radio3.SetLastRadioTransmit(lastRadioTransmit);
                                     break;
                                 default:
                                     break;
@@ -208,9 +208,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        radio1.repaintRadioTransmit();
-                        radio2.repaintRadioTransmit();
-                        radio3.repaintRadioTransmit();
+                        radio1.RepaintRadioTransmit();
+                        radio2.RepaintRadioTransmit();
+                        radio3.RepaintRadioTransmit();
                     });
                 }
             });
