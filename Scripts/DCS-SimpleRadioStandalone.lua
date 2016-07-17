@@ -311,7 +311,7 @@ end
 
 function SR.exportRadioF15C(_data)
 
-    _data.radios[1].name = "UHF-1"
+    _data.radios[1].name = "AN/ARC-164 UHF-1"
     _data.radios[1].frequency = 251.0*1000000 --225 to 399.975MHZ
     _data.radios[1].modulation = 0
     _data.radios[1].secondaryFrequency = 243.0*1000000
@@ -319,7 +319,7 @@ function SR.exportRadioF15C(_data)
     _data.radios[1].freqMin = 225*1000000
     _data.radios[1].freqMax = 399.975*1000000
 
-    _data.radios[2].name = "UHF-2"
+    _data.radios[2].name = "AN/ARC-164 UHF-2"
     _data.radios[2].frequency = 231.0*1000000 --225 to 399.975MHZ
     _data.radios[2].modulation = 0
     _data.radios[2].freqMin = 225*1000000
@@ -813,7 +813,7 @@ function SR.exportRadioC101(_data)
     --    end
     local MHZ = 1000000
 
-    _data.radios[1].name = "UHF"
+    _data.radios[1].name = "AN/ARC-164 UHF"
 
     local _selector = SR.getSelectorPosition(232,0.25)
 
@@ -833,7 +833,7 @@ function SR.exportRadioC101(_data)
     _data.radios[1].volume = SR.getRadioVolume(0, 234,{0.0,1.0},false)
 
 
-    _data.radios[2].name = "VHF"
+    _data.radios[2].name = "AN/ARC-134"
 
     local _vhfPower = SR.getSelectorPosition(413,1.0)
 
@@ -875,7 +875,7 @@ function SR.exportRadioHawk(_data)
 
     local MHZ = 1000000
 
-    _data.radios[1].name = "UHF"
+    _data.radios[1].name = "AN/ARC-164 UHF"
 
     local _selector = SR.getSelectorPosition(221,0.25)
 
@@ -919,12 +919,12 @@ end
 
 function SR.exportRadioM2000C(_data)
 
-    _data.radios[1].name = "V/UHF"
+    _data.radios[1].name = "TRT ERA 7000 V/UHF"
     _data.radios[1].frequency =  SR.getRadioFrequency(19)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = SR.getRadioVolume(0, 707,{0.0,1.0},false)
 
-    _data.radios[2].name = "UHF"
+    _data.radios[2].name = "TRT ERA 7200 UHF"
     _data.radios[2].frequency = SR.getRadioFrequency(20)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 706,{0.0,1.0},false)
@@ -949,11 +949,11 @@ function SR.exportRadioM2000C(_data)
 	end
 
     --V/UHF Encryption
-    if SR.getButtonPosition(438) > 0.5 then
-        _data.radios[1].enc = SR.M2000C_ENCRYPTION_KEY
-    end
+  --  if SR.getButtonPosition(438) > 0.5 then
+  --      _data.radios[1].enc = SR.M2000C_ENCRYPTION_KEY
+  --  end
 
-    if SR.getButtonPosition(431) > 0.5 then
+    if SR.getButtonPosition(432) > 0.5 then --431
         _data.radios[2].enc = SR.M2000C_ENCRYPTION_KEY
     end
 

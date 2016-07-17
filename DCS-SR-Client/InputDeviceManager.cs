@@ -27,14 +27,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             new Guid("1b171b1c-0000-0000-0000-504944564944"),
             //Corsair K65 Gaming keyboard  It reports as a Joystick when its a keyboard...
-            new Guid("1b091b1c-0000-0000-0000-504944564944") // Corsair K70R Gaming Keyboard
+            new Guid("1b091b1c-0000-0000-0000-504944564944"), // Corsair K70R Gaming Keyboard
+            new Guid("1b1e1b1c-0000-0000-0000-504944564944"), //Corsair Gaming Scimitar RGB Mouse
+            new Guid("16a40951-0000-0000-0000-504944564944"), //HyperX 7.1 Audio
+            new Guid("b660044f-0000-0000-0000-504944564944"),// T500 RS Gear Shift
+            new Guid("00f2068e-0000-0000-0000-504944564944"), //CH PRO PEDALS USB 
+
         };
+
+        private WindowInteropHelper WindowHelper { get; set; }
 
         public InputDeviceManager(Window window)
         {
             InputConfig = new InputConfiguration();
             _directInput = new DirectInput();
             var deviceInstances = _directInput.GetDevices();
+
+            WindowHelper =
+                new WindowInteropHelper(window);
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -44,17 +54,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Logger.Info("Found " + deviceInstance.ProductGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
 
-                    if (deviceInstance.Usage == UsageId.GenericJoystick ||
-                        deviceInstance.Usage == UsageId.GenericGamepad)
+                    if (deviceInstance.Usage == UsageId.GenericJoystick)
                     {
                         Logger.Info("Adding " + deviceInstance.ProductGuid + " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
                         var device = new Joystick(_directInput, deviceInstance.ProductGuid);
 
-                        var helper =
-                            new WindowInteropHelper(window);
 
-                        device.SetCooperativeLevel(helper.Handle,
+                        device.SetCooperativeLevel(WindowHelper.Handle,
                             CooperativeLevel.Background | CooperativeLevel.NonExclusive);
                         device.Acquire();
 
