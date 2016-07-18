@@ -204,7 +204,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 while (!end)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
