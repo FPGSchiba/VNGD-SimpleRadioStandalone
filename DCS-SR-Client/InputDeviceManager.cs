@@ -51,15 +51,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Workaround for Bad Devices that pretend to be joysticks
                 if (!IsBlackListed(deviceInstance.ProductGuid))
                 {
-                    Logger.Info("Found " + deviceInstance.ProductGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                    Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", "")+" Usage: "+deviceInstance.UsagePage);
 
-                    if (deviceInstance.Usage == UsageId.GenericJoystick)
+                   
+                    if (deviceInstance.Type == DeviceType.Keyboard)
                     {
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " " +
+                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid  + " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
-                        var device = new Joystick(_directInput, deviceInstance.ProductGuid);
+                        var device = new Keyboard(_directInput);
 
+                        device.SetCooperativeLevel(WindowHelper.Handle,
+                            CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                        device.Acquire();
+
+                        _inputDevices.Add(device);
+                    }
+                    else if (deviceInstance.Type >= DeviceType.Joystick && deviceInstance.Type <= DeviceType.FirstPerson)
+                    {
+                       
+                        var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
+
+                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
+                                  deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                         device.SetCooperativeLevel(WindowHelper.Handle,
                             CooperativeLevel.Background | CooperativeLevel.NonExclusive);
@@ -70,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 else
                 {
-                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " " +
+                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                 }
             }
@@ -121,6 +135,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         for (int j = 0; j < pov.Length; j++)
                         {
                             initial[i, j + 128] = pov[j];
+                        }
+                    }
+                    else if (_inputDevices[i] is Keyboard)
+                    {
+                        var keyboard = _inputDevices[i] as Keyboard;
+                        keyboard.Poll();
+                        var state = keyboard.GetCurrentState();
+
+                        for (var j = 0; j < 128; j++)
+                        {
+                            initial[i, j] = state.IsPressed(state.AllKeys[j])?1:0;
                         }
                     }
                 }
@@ -193,6 +218,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 }
                             }
                         }
+                        else if (_inputDevices[i] is Keyboard)
+                        {
+                            var keyboard = _inputDevices[i] as Keyboard;
+                            keyboard.Poll();
+                            var state = keyboard.GetCurrentState();
+
+                            for (var j = 0; j < 128; j++)
+                            {
+                                if (initial[i, j] != (state.IsPressed(state.AllKeys[j]) ? 1 : 0))
+                                {
+                                    found = true;
+
+                                    InputDevice inputDevice = new InputDevice
+                                    {
+                                        DeviceName =
+                                            _inputDevices[i].Information.ProductName.Trim().Replace("\0", ""),
+                                        Button = j,
+                                        InstanceGuid = _inputDevices[i].Information.InstanceGuid,
+                                        ButtonValue = 1
+                                    };
+
+                                    Application.Current.Dispatcher.Invoke(
+                                        () => { callback(inputDevice); });
+
+
+                                    return;
+                                }
+
+//                                if (initial[i, j] == 1)
+//                                {
+//                                    Console.WriteLine("Pressed: "+j);
+//                                    MessageBox.Show("Keyboard!");
+//                                }
+                            }
+                        }
                     }
                 }
             });
@@ -244,6 +304,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
 
                                         break;
+                                    }
+                                    else if (_inputDevices[i] is Keyboard)
+                                    {
+                                        var keyboard = _inputDevices[i] as Keyboard;
+                                        keyboard.Poll();
+                                        var state = keyboard.GetCurrentState();
+                                        buttonStates[(int) device.InputBind] = state.IsPressed(state.AllKeys[device.Button]);
                                     }
                                 }
                             }
