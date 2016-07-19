@@ -74,6 +74,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioManager = new AudioManager(_clients);
             _audioManager.Volume = (float) MicrophoneBoost.Value;
 
+            if (BoostLabel != null && MicrophoneBoost != null)
+            {
+                BoostLabel.Content = ((int)(MicrophoneBoost.Value * 100) - 100) + "%";
+            }
+
             UpdaterChecker.CheckForUpdate();
 
             InitRadioEffectsToggle();
@@ -307,6 +312,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _appConfig.MicBoost = (float) MicrophoneBoost.Value;
             }
+
+            if (BoostLabel != null && MicrophoneBoost!=null)
+            {
+                BoostLabel.Content = ((int)(MicrophoneBoost.Value * 100) -100)  + "%";
+            }
+         
         }
 
         private void RadioEffects_Click(object sender, RoutedEventArgs e)

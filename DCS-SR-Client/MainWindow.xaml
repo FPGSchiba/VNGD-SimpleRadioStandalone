@@ -19,8 +19,13 @@
                         <Label x:Name="MicLabel" Content="Microphone" HorizontalAlignment="Center" />
                         <ComboBox x:Name="Mic" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
 
-                        <Slider x:Name="MicrophoneBoost" Width="300" Maximum="6.0" Minimum="1.0"
+                        <Slider x:Name="MicrophoneBoost" Width="300" Maximum="6.2" Minimum="0.6"
                                 ValueChanged="MicrophoneBoost_ValueChanged" Margin="0,10,0,0" />
+
+                        <StackPanel Margin="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Label Content="Microphone Boost:" HorizontalAlignment="Center" />
+                            <Label x:Name="BoostLabel" Content="+/- %" HorizontalAlignment="Center" />
+                        </StackPanel>
 
                         <Button x:Name="Preview" HorizontalAlignment="Center" VerticalAlignment="Top"
                                 Content="Preview Audio" Margin="0,10,0,0" Click="PreviewAudio"

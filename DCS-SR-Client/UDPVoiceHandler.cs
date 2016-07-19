@@ -325,7 +325,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         var radio = RadioSyncServer.DcsPlayerRadioInfo.radios[currentSelected];
 
-                        if (radio != null)
+                        if (radio != null && (radio.frequency > 100 && radio.modulation != 3) 
+                            || radio.modulation == 2 )
                         {
                             var combinedBytes = new byte[len + 8 + 1 + 1 + 4 + 22];
                             Buffer.BlockCopy(bytes, 0, combinedBytes, 0, len); // copy audio
@@ -395,8 +396,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void SendUpdateToGui(int radio, bool secondary)
         {
-            //  return; //TODO fix the string format?!
-            var str = "{\"radio\": " + radio + " , \"secondary\": false }\r\n";
+
+            var secondaryStr = "false";
+
+            if (secondary)
+            {
+                secondaryStr = "true";
+            }
+            var str = "{\"radio\": " + radio + " , \"secondary\": "+ secondaryStr+" }\r\n";
             var bytes = Encoding.ASCII.GetBytes(str);
             //multicast
             try
