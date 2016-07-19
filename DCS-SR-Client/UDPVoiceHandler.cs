@@ -396,8 +396,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void SendUpdateToGui(int radio, bool secondary)
         {
-            //  return; //TODO fix the string format?!
-            var str = "{\"radio\": " + radio + " , \"secondary\": false }\r\n";
+
+            var secondaryStr = "false";
+
+            if (secondary)
+            {
+                secondaryStr = "true";
+            }
+            var str = "{\"radio\": " + radio + " , \"secondary\": "+ secondaryStr+" }\r\n";
             var bytes = Encoding.ASCII.GetBytes(str);
             //multicast
             try
