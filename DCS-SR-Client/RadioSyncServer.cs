@@ -50,7 +50,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void DcsListener()
         {
-            StartDcsMulticastListener();
+            StartDcsBroadcastListener();
             StartDcsGameGuiMulticastListener();
             StartRadioOverlayListener();
         }
@@ -66,8 +66,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             _radioCommandUdpListener.ExclusiveAddressUse = false;
             // only if you want to send/receive on same machine.
 
-            var multicastaddress = IPAddress.Parse("239.255.50.10");
-            _radioCommandUdpListener.JoinMulticastGroup(multicastaddress);
+           // var multicastaddress = IPAddress.Parse("239.255.50.10");
+          //  _radioCommandUdpListener.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any, 5070);
             _radioCommandUdpListener.Client.Bind(localEp);
@@ -173,16 +173,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        private void StartDcsMulticastListener()
+        private void StartDcsBroadcastListener()
         {
             _dcsUdpListener = new UdpClient();
             _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _dcsUdpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var multicastaddress = IPAddress.Parse("239.255.50.10");
-            _dcsUdpListener.JoinMulticastGroup(multicastaddress);
+         //   var multicastaddress = IPAddress.Parse("239.255.50.10");
+      //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
 
-            var localEp = new IPEndPoint(IPAddress.Any, 5067);
+            var localEp = new IPEndPoint(IPAddress.Any, 9084);
             _dcsUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -193,7 +193,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 5067);
+                        var groupEp = new IPEndPoint(IPAddress.Any, 9084);
                         var bytes = _dcsUdpListener.Receive(ref groupEp);
 
                         try
@@ -201,6 +201,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             var message =
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.ASCII.GetString(
                                     bytes, 0, bytes.Length));
+
+                          //  Logger.Info("Recevied Message from DCS: "+message);
 
                             //update internal radio
                             UpdateRadio(message);
@@ -237,8 +239,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 true);
             _dcsGameGuiudpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var multicastaddress = IPAddress.Parse("239.255.50.10");
-            _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
+        //    var multicastaddress = IPAddress.Parse("239.255.50.10");
+         //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any, 5068);
             _dcsGameGuiudpListener.Client.Bind(localEp);
@@ -397,7 +399,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(DcsPlayerRadioInfo) + "\n");
             //multicast
-            Send("239.255.50.10", 35034, bytes);
+            Send("127.255.255.255", 9081, bytes);
             //unicast
             //  send("127.0.0.1", 5061, bytes);
         }

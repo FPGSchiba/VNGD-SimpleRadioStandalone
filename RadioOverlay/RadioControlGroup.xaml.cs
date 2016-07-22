@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
                 //multicast
-                Send("239.255.50.10", 5070, bytes);
+                Send("127.255.255.255", 5070, bytes);
                 //unicast
                 //  send("127.0.0.1", 5061, bytes);
             }

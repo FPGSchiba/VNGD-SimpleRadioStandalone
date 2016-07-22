@@ -18,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int UdpClientBroadcastPort = 35034;
+        private const int UdpClientBroadcastPort = 9081;
         private const int ActiveRadioClientPort = 35035;
 
         private const double MHZ = 1000000;
@@ -154,8 +154,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 true);
             activeRadioUdpClient.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var multicastaddress = IPAddress.Parse("239.255.50.10");
-            activeRadioUdpClient.JoinMulticastGroup(multicastaddress);
+           // var multicastaddress = IPAddress.Parse("239.255.50.10");
+            //activeRadioUdpClient.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any, ActiveRadioClientPort);
             activeRadioUdpClient.Client.Bind(localEp);
@@ -260,7 +260,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
             //multicast
-            Send("239.255.50.10", 5070, bytes);
+            Send("127.255.255.255", 5070, bytes);
             //unicast
             // Send("127.0.0.1", 5061, bytes);
         }
