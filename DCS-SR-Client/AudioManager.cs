@@ -41,7 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             this._clientsList = clientsList;
         }
 
-        public float Volume { get; set; } = 1.0f;
+        public float MicBoost { get; set; } = 1.0f;
+        public float SpeakerBoost { get; set; } = 1.0f;
 
         [DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
@@ -65,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing.AddMixerInput(client.VolumeSampleProvider);
             }
 
-            client.VolumeSampleProvider.Volume = audio.Volume;
+            client.VolumeSampleProvider.Volume = audio.Volume *SpeakerBoost;
 
             client.AddSamples(audio);
         }
@@ -159,13 +160,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
                 //boost microphone volume if needed
-                if (Volume != 1.0f)
+                if (MicBoost != 1.0f)
                 {
                     for (var n = 0; n < segment.Length; n += 2)
                     {
                         var sample = (short) ((segment[n + 1] << 8) | segment[n + 0]);
                         // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                        sample = (short) (sample*Volume);
+                        sample = (short) (sample*MicBoost);
                         segment[n] = (byte) (sample & 0xFF);
                         segment[n + 1] = (byte) (sample >> 8);
                     }
