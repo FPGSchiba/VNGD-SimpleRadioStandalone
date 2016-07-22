@@ -61,7 +61,7 @@ SRS.sendUpdate = function(playerID)
 
     --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
-    socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "239.255.50.10", 5068))
+    socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
 
 end
 

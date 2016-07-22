@@ -97,6 +97,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioMIG15(_update)
                 elseif _update.unit == "MiG-21Bis" then
                     _update = SR.exportRadioMIG21(_update)
+                elseif _update.unit == "F-5E-3" then
+                       _update = SR.exportRadioF5E(_update)
                 elseif _update.unit == "P-51D" or  _update.unit == "TF-51D" then
                     _update = SR.exportRadioP51(_update)
                 elseif _update.unit == "FW-190D9" then
@@ -145,9 +147,9 @@ LuaExportActivityNextEvent = function(tCurrent)
                 end
 
                 if SR.unicast then
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
                 else
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
                 end
 
             else
@@ -169,9 +171,9 @@ LuaExportActivityNextEvent = function(tCurrent)
                 }
 
                 if SR.unicast then
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
                 else
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "239.255.50.10", 5067))
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
                 end
 
             end
@@ -389,19 +391,33 @@ function SR.exportRadioSA342(_data)
     _data.radios[1].name = "VHF/AM Radio"
     _data.radios[1].frequency = SR.getRadioFrequency(5)
     _data.radios[1].modulation = 0
-    _data.radios[1].volume = SR.getRadioVolume(0, 68,{0.0,1.0},true)
+    _data.radios[1].volume = SR.getRadioVolume(0, 68,{1.0,0.0},true)
 
     _data.radios[2].name = "UHF/AM Radio"
     _data.radios[2].frequency = SR.getRadioFrequency(31)
     _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 70,{0.0,1.0},false)
+    _data.radios[2].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
 
     _data.radios[3].name = "FM Radio"
     _data.radios[3].frequency = SR.getRadioFrequency(28)
     _data.radios[3].modulation = 1
-    _data.radios[3].volume =  SR.getRadioVolume(0, 69,{0.0,1.0},false)
+    _data.radios[3].volume =  SR.getRadioVolume(0, 70,{0.0,1.0},false) 
 
-    --TODO - do Guard Radio
+    --- is UHF ON?
+	if SR.getSelectorPosition(383,0.167) == 0   then
+		_data.radios[2].frequency = 1
+	end
+
+    --guard mode for UHF Radio
+    local uhfModeKnob = SR.getSelectorPosition(383,0.167)
+	if uhfModeKnob == 5 and _data.radios[2].frequency > 1000 then
+        _data.radios[2].secondaryFrequency = 243.0*1000000 
+	end
+    
+    --- is FM ON?
+	if SR.getSelectorPosition(272,0.25) == 0   then
+		_data.radios[3].frequency = 1
+	end
 
     _data.radioType = 2; -- partial Radio
 
@@ -558,7 +574,7 @@ function SR.exportRadioA10C(_data)
 
      --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(168,0.1)
-	if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
+	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
 		_data.radios[2].secondaryFrequency = 243.0*1000000 
 	end
 
@@ -697,6 +713,45 @@ function SR.exportRadioMIG21(_data)
     _data.selected = 0
 
     if(SR.getButtonPosition(315)) > 0.5 then
+        _data.ptt = true
+    else
+        _data.ptt = false
+    end
+
+    _data.radioType = 1; -- full radio
+
+    return _data;
+end
+
+
+function SR.exportRadioF5E(_data) 
+    _data.radios[1].name = "AN/ARC-164"
+    _data.radios[1].frequency = SR.getRadioFrequency(23)
+    _data.radios[1].modulation = 0
+    _data.radios[1].volume = SR.getRadioVolume(0, 309,{0.1,0.9},false)
+
+    _data.radios[2].name = "N/A"
+    _data.radios[2].frequency = 1
+    _data.radios[2].modulation = 3
+
+    _data.radios[3].name = "N/A"
+    _data.radios[3].frequency = 1
+    _data.radios[3].modulation = 3
+
+    _data.radios[2].volume = 1.0
+    _data.radios[3].volume = 1.0
+
+    _data.selected = 0
+
+    --guard mode for UHF Radio
+    local uhfModeKnob = SR.getSelectorPosition(311,0.1)
+    
+    if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
+        _data.radios[1].secondaryFrequency = 243.0*1000000 
+    end
+
+    -- Check PTT
+    if(SR.getButtonPosition(135)) > 0.5 then
         _data.ptt = true
     else
         _data.ptt = false
