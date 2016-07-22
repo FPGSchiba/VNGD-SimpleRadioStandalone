@@ -10,7 +10,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             AUDIO_INPUT_DEVICE_ID,
             AUDIO_OUTPUT_DEVICE_ID,
             LAST_SERVER,
-            MIC_BOOST
+            MIC_BOOST,
+            SPEAKER_BOOST,
         }
 
         private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
@@ -19,6 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private int _audioOutputDeviceId;
         private string _lastServer;
         private float _micBoost;
+        private float _speakerBoost;
 
         public AppConfiguration()
         {
@@ -64,6 +66,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex)
             {
                 MicBoost = 1.0f;
+            }
+
+            try
+            {
+                SpeakerBoost = float.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.SPEAKER_BOOST.ToString(),
+                    "1.0"));
+            }
+            catch (Exception ex)
+            {
+                SpeakerBoost = 1.0f;
             }
         }
 
@@ -119,5 +132,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     _micBoost);
             }
         }
+
+
+
+        public float SpeakerBoost
+        {
+            get { return _speakerBoost; }
+            set
+            {
+                _speakerBoost = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.SPEAKER_BOOST.ToString(),
+                    _speakerBoost);
+            }
+        }
+       
     }
 }

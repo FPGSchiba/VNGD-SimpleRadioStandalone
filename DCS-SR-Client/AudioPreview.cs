@@ -15,6 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public SampleChannel Volume { get; private set; }
 
+
         public void StartPreview(int mic, int speakers)
         {
             try
