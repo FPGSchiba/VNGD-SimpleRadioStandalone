@@ -13,7 +13,7 @@ SR = {}
 SR.M2000C_ENCRYPTION_KEY = 3 -- Change your Mirage Encryption Key here. Set to a number (inclusive) between 1-15
                              -- Setting the number to 1-6 will allow you to talk to an A-10C with encryption
 
-SR.unicast = false --DONT CHANGE THIS
+SR.unicast = true --DONT CHANGE THIS
 
 SR.dbg = {}
 SR.logFile = io.open(lfs.writedir()..[[Logs\DCS-SimpleRadioStandalone.log]], "w")

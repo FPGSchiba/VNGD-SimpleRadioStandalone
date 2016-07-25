@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Ciribob.DCS.SimpleRadio.Standalone.Overlay.RadioControlGroup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
+
+             Name="radioControlContainer"
+             Width="120" Height="70">
+    <WrapPanel>
+
+        <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
+               Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>
+
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="up10" Content="" Width="15" Height="10" Margin="25,0,0,0"
+                ToolTip="+10MHz" Click="Up10_Click" IsEnabled="False"  />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="up1" Content="" Width="15" Height="10" ToolTip="+1MHZ"
+                Click="Up1_Click" IsEnabled="False" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="up01" Content="" Width="15" Height="10" Margin="0,0,0,0"
+                ToolTip="+0.1MHz" Click="Up01_Click" IsEnabled="False" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="up001" Content="" Width="15" Height="10" Margin="0,0,0,0"
+        	ToolTip="+0.01MHz" Click="Up001_Click" IsEnabled="False" />
+
+        <TextBlock Style="{x:Null}" x:Name="radioFrequency" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                   VerticalAlignment="Top" Width="100"
+                   MouseRightButtonDown="RadioFrequencyText_RightClick"
+                   MouseDown="RadioFrequencyText_Click"
+                   Background="Black" Foreground="#00FF00" Text="000.00AM" />
+
+        <Ellipse Style="{x:Null}" x:Name="radioActive" Fill="#FF9900" HorizontalAlignment="Right" ToolTip="Selected Radio" Height="12"
+                 Stroke="Black" VerticalAlignment="Center" Width="12" Margin="2" MouseDown="RadioSelectSwitch" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="down10" Content="" Width="15" Height="10" Margin="25,0,0,0"
+        	ToolTip="-10MHZ" Click="Down10_Click" IsEnabled="False" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="down1" Content="" Width="15" Height="10" ToolTip="-1MHz"
+                Click="Down1_Click" IsEnabled="False" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="down01" Content="" Width="15" Height="10" Margin="0,0,0,0"
+                ToolTip="-0.1MHz" Click="Down01_Click" IsEnabled="False" />
+        <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="down001" Content="" Width="15" Height="10" Margin="0,0,0,0"
+        	ToolTip="-0.01MHz" Click="Down001_Click" IsEnabled="False" />
+        <Slider Style="{x:Null}" x:Name="radioVolume" Width="115" Margin="2" Maximum="100" IsEnabled="False" Height="15"
+                Thumb.DragCompleted="RadioVolume_DragCompleted" Thumb.DragStarted="RadioVolume_DragStarted" />
+
+    </WrapPanel>
+</UserControl>
