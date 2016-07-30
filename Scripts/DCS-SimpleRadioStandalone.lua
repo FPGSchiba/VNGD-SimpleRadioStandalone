@@ -13,7 +13,7 @@ SR = {}
 SR.M2000C_ENCRYPTION_KEY = 3 -- Change your Mirage Encryption Key here. Set to a number (inclusive) between 1-15
                              -- Setting the number to 1-6 will allow you to talk to an A-10C with encryption
 
-SR.unicast = false --DONT CHANGE THIS
+SR.unicast = true --DONT CHANGE THIS
 
 SR.dbg = {}
 SR.logFile = io.open(lfs.writedir()..[[Logs\DCS-SimpleRadioStandalone.log]], "w")
@@ -750,8 +750,9 @@ function SR.exportRadioF5E(_data)
         _data.radios[1].secondaryFrequency = 243.0*1000000 
     end
 
-    -- Check PTT
-    if(SR.getButtonPosition(135)) > 0.5 then
+    -- Check PTT - By Tarres!
+    --NWS works as PTT when wheels up
+    if(SR.getButtonPosition(135) > 0.5 or (SR.getButtonPosition(131) > 0.5 and SR.getButtonPosition(83) > 0.5 )) then
         _data.ptt = true
     else
         _data.ptt = false

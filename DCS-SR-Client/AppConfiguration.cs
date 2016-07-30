@@ -12,6 +12,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             LAST_SERVER,
             MIC_BOOST,
             SPEAKER_BOOST,
+            RADIO_X,
+            RADIO_Y,
+            RADIO_SIZE,
+            RADIO_OPACITY,
+            RADIO_WIDTH,
+            RADIO_HEIGHT
         }
 
         private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
@@ -21,8 +27,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private string _lastServer;
         private float _micBoost;
         private float _speakerBoost;
+        private double _radioX;
+        private double _radioY;
+        private float _radioSize;
+        private double _radioOpacity;
+        private double _radioWidth;
+        private double _radioHeight;
 
-        public AppConfiguration()
+        private static AppConfiguration _instance;
+
+        public string[] UserSettings { get; }
+
+        public static AppConfiguration Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new AppConfiguration();
+                }
+                return _instance;
+            }
+        }
+
+        private AppConfiguration()
         {
             try
             {
@@ -77,6 +105,64 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex)
             {
                 SpeakerBoost = 1.0f;
+            }
+
+         
+            try
+            {
+                RadioX = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.RADIO_X.ToString(),
+                    "300"));
+            }
+            catch (Exception ex)
+            {
+                RadioX = 300;
+            }
+
+            try
+            {
+                RadioY = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.RADIO_Y.ToString(),
+                    "300"));
+            }
+            catch (Exception ex)
+            {
+                RadioY = 300;
+            }
+
+
+            try
+            {
+                RadioWidth = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.RADIO_WIDTH.ToString(),
+                    "122"));
+            }
+            catch (Exception ex)
+            {
+                RadioWidth = 300;
+            }
+
+            try
+            {
+                RadioHeight = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.RADIO_HEIGHT.ToString(),
+                    "270"));
+            }
+            catch (Exception ex)
+            {
+                RadioHeight = 300;
+            }
+
+
+            try
+            {
+                RadioOpacity = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.RADIO_OPACITY.ToString(),
+                    "1.0"));
+            }
+            catch (Exception ex)
+            {
+                RadioOpacity = 1.0;
             }
         }
 
@@ -147,6 +233,86 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     _speakerBoost);
             }
         }
-       
+
+        public double RadioX
+        {
+            get { return _radioX; }
+            set
+            {
+                _radioX = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_X.ToString(),
+                    _radioX);
+            }
+        }
+
+        public double RadioY
+        {
+            get { return _radioY; }
+            set
+            {
+                _radioY = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_Y.ToString(),
+                    _radioY);
+            }
+        }
+
+        public double RadioHeight
+        {
+            get { return _radioHeight; }
+            set
+            {
+                _radioHeight = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_HEIGHT.ToString(),
+                    _radioHeight);
+            }
+        }
+
+        public double RadioWidth
+        {
+            get { return _radioWidth; }
+            set
+            {
+                _radioWidth = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_WIDTH.ToString(),
+                    _radioWidth);
+            }
+        }
+
+        public float RadioSize
+        {
+            get { return _radioSize; }
+            set
+            {
+                _radioSize = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_SIZE.ToString(),
+                    _radioSize);
+            }
+        }
+
+        public double RadioOpacity
+        {
+            get { return _radioOpacity; }
+            set
+            {
+                _radioOpacity = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.RADIO_OPACITY.ToString(),
+                    _radioOpacity);
+            }
+        }
+
+
+
     }
 }

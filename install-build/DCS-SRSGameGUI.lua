@@ -3,6 +3,8 @@
 -- Otherwise the Radio Might not work
 SRS = {}
 
+SRS.unicast = true
+
 SRS.dbg = {}
 SRS.logFile = io.open(lfs.writedir()..[[Logs\DCS-SRS-GameGUI.log]], "w")
 function SRS.log(str)
@@ -61,12 +63,14 @@ SRS.sendUpdate = function(playerID)
 
     --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
-    socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
+	if SRS.unicast then
+		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+	else
+		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
+	end
 
+   
 end
-
-
-
 
 DCS.setUserCallbacks(SRS)
 

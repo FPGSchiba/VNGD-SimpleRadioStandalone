@@ -19,7 +19,7 @@ namespace Installer
         private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
         private readonly string currentDirectory;
 
-        private readonly string currentPath;
+     //   private readonly string currentPath;
 
         public MainWindow()
         {
@@ -52,7 +52,7 @@ namespace Installer
             }
 
             //To get the location the assembly normally resides on disk or the install directory
-            currentPath = Assembly.GetExecutingAssembly().CodeBase;
+            var currentPath = Assembly.GetExecutingAssembly().CodeBase;
 
             //once you have the path you get the directory with:
             currentDirectory = Path.GetDirectoryName(currentPath);
@@ -64,16 +64,16 @@ namespace Installer
         }
 
 
-        private string ReadPath(string key)
+        private static string ReadPath(string key)
         {
             var srPath = (string) Registry.GetValue(REG_PATH,
                 key,
                 "");
 
-            return srPath == null ? "" : srPath;
+            return srPath ?? "";
         }
 
-        private void WritePath(string path, string key)
+        private static void WritePath(string path, string key)
         {
             Registry.SetValue(REG_PATH,
                 key,
@@ -81,7 +81,7 @@ namespace Installer
         }
 
 
-        private void DeleteRegKeys()
+        private static void DeleteRegKeys()
         {
             Registry.SetValue(REG_PATH,
                 "SRPathStandalone",
@@ -93,7 +93,7 @@ namespace Installer
 
 
         //
-        private bool Is_SimpleRadio_running()
+        private static bool Is_SimpleRadio_running()
         {
             foreach (var clsProcess in Process.GetProcesses())
             {
@@ -193,7 +193,7 @@ namespace Installer
             Environment.Exit(0);
         }
 
-        public List<string> FindValidDCSFolders(string path)
+        private static List<string> FindValidDCSFolders(string path)
         {
             var paths = new List<string>();
 
@@ -212,7 +212,7 @@ namespace Installer
             return paths;
         }
 
-        public void InstallProgram(string path)
+        private void InstallProgram(string path)
         {
             if (Directory.Exists(path) && File.Exists(path + "\\SR-ClientRadio.exe"))
             {
@@ -223,7 +223,7 @@ namespace Installer
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
-            File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
+         //   File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
         //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
                 true);

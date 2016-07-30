@@ -32,11 +32,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private UdpClient _listener;
 
         private volatile bool _ptt;
+        public static volatile RadioSendingState RadioSendingState = new RadioSendingState();
+        public static volatile RadioReceivingState RadioReceivingState = new RadioReceivingState();
 
         private volatile bool _stop;
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
-
 
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -301,7 +302,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         && myClient.unitId > 0 && unitId > 0
                         && myClient.unitId == unitId)
                     {
-                        SendUpdateToGui(i, false);
+                        RadioReceivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = false,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
+
                         radioId = i;
                         return receivingRadio;
                     }
@@ -309,14 +316,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         && receivingRadio.modulation == modulation
                         && receivingRadio.frequency > 1)
                     {
-                        SendUpdateToGui(i, false);
+                        RadioReceivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = false,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
                         radioId = i;
                         return receivingRadio;
                     }
                     if (receivingRadio.secondaryFrequency == frequency
                         && receivingRadio.secondaryFrequency > 100)
                     {
-                        SendUpdateToGui(i, true);
+                        RadioReceivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = true,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
                         radioId = i;
                         return receivingRadio;
                     }
@@ -340,6 +357,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 part2 = new byte[len];
                 Buffer.BlockCopy(bytes, 0, part2, 0, len);
+            }
+            else
+            {
+                part2 = part1;
+
+                part1 = new byte[len];
+                Buffer.BlockCopy(bytes, 0, part1, 0, len);
             }
             
             //if either PTT is true
@@ -411,28 +435,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 // copy short guid
 
                             var ip = new IPEndPoint(_address, 5010);
-
-
-
                             _listener.Send(combinedBytes, combinedBytes.Length, ip);
 
-
-                            SendUpdateToGui(currentSelected, false);
+                            RadioSendingState = new RadioSendingState()
+                            {
+                                IsSending = true,
+                                LastSentAt = Environment.TickCount,
+                                SendingOn = currentSelected
+                            };
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception Handling Audio Message " + e.Message);
+                    Logger.Error(e,"Exception Sending Audio Message " + e.Message);
                 }
-                //    }
             }
-            else if(part1 != null && part2 != null)
+            else if (part1 != null && part2 != null)
             {
-                //discard audio, not needed
-                part1 = null;
-                part2 = null;
+              
+
+                RadioSendingState.IsSending = false;
             }
+           
         }
 
         private void StartPing()
@@ -456,30 +481,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             });
         }
 
-
-        private void SendUpdateToGui(int radio, bool secondary)
-        {
-
-            var secondaryStr = "false";
-
-            if (secondary)
-            {
-                secondaryStr = "true";
-            }
-            var str = "{\"radio\": " + radio + " , \"secondary\": "+ secondaryStr+" }\r\n";
-            var bytes = Encoding.ASCII.GetBytes(str);
-            //multicast
-            try
-            {
-                var client = new UdpClient();
-                var ip = new IPEndPoint(IPAddress.Parse("127.255.255.255"), 35035);
-
-                client.Send(bytes, bytes.Length, ip);
-                client.Close();
-            }
-            catch (Exception e)
-            {
-            }
-        }
+        
     }
 }
