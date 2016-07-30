@@ -8,13 +8,13 @@
                        xmlns:devices="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client"
                       mc:Ignorable="d"
                       ResizeMode="CanMinimize"
-                      Title="DCS-SimpleRadio Standalone Client" Height="500" Width="500">
+                      Title="DCS-SimpleRadio Standalone Client" Height="550" Width="500">
 
     <TabControl>
         <TabItem Header="General">
             <StackPanel Margin="10">
 
-                <GroupBox x:Name="GroupBox" Header="Setup" Height="400">
+                <GroupBox x:Name="GroupBox" Header="Setup" Height="450">
                     <StackPanel Margin="0">
                         <Label x:Name="MicLabel" Content="Microphone" HorizontalAlignment="Center" />
                         <ComboBox x:Name="Mic" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
@@ -48,9 +48,9 @@
                         <TextBox x:Name="ServerIp" Height="23" TextWrapping="Wrap" Text="127.0.0.1" Width="150"
                                  MaxLines="1" />
                         <StackPanel Margin="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button x:Name="StartStop" Content="Connect" HorizontalAlignment="Center" Width="100"
+                            <Button x:Name="StartStop" Content="Connect" HorizontalAlignment="Center" Width="120"
                                 Margin="0,10,20,0" Click="startStop_Click" Style="{DynamicResource SquareButtonStyle}" />
-                            <Button x:Name="ShowOverlay" Content="Show Overlay" HorizontalAlignment="Center" Width="100"
+                            <Button x:Name="ShowOverlay" Content="Toggle Radio Overlay" HorizontalAlignment="Center" Width="120"
                                 Margin="0,10,0,0" Click="ShowOverlay_OnClick" Style="{DynamicResource SquareButtonStyle}" />
                         </StackPanel>
                     </StackPanel>
@@ -77,6 +77,7 @@
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                         
       
                     </Grid.RowDefinitions>
@@ -91,6 +92,7 @@
                     <local:InputBindingControl x:Name="Radio2" InputName="Radio 2" Grid.Row="2" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch2}"  />
                     <local:InputBindingControl x:Name="Radio3" InputName="Radio 3" Grid.Row="3" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch3}"  />
                     <local:InputBindingControl x:Name="PTT" InputName="Common PTT" Grid.Row="4" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Ptt}"  />
+                    <local:InputBindingControl x:Name="RadioOverlay" InputName="Radio Overlay Toggle" Grid.Row="5" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.OverlayToggle}"  />
 
                 </Grid>
                
@@ -153,7 +155,7 @@
                     <local:RadioChannelConfigUi Grid.Column="1" Grid.Row="3" x:Name="Radio3Config"
                                                 SettingConfig="{x:Static local:SettingType.Radio3Channel}" />
 
-                    <Label Grid.Column="0" Grid.Row="4" Content="Radio Switch works PTT" HorizontalContentAlignment="Center"
+                    <Label Grid.Column="0" Grid.Row="4" Content="Radio Switch works as PTT" HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center" />
 
                     <ToggleButton Grid.Column="1" Grid.Row="4" HorizontalContentAlignment="Center"

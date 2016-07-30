@@ -36,6 +36,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private bool _stop = true;
 
+        public delegate void ToggleOverlayCallback(bool uiButton);
+
+        private ToggleOverlayCallback _toggleOverlayCallback;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -44,7 +48,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Logger.Info("Started DCS-SimpleRadio Client");
 
-            InputManager = new InputDeviceManager(this);
+            _toggleOverlayCallback = ToggleOverlay;
+
+            InputManager = new InputDeviceManager(this, _toggleOverlayCallback);
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -62,7 +68,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
-            _appConfig = new AppConfiguration();
+            RadioOverlay.InputName = "Radio Overlay Toggle";
+            RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
+            RadioOverlay.InputDeviceManager = InputManager;
+
+            _appConfig = AppConfiguration.Instance;
             _guid = ShortGuid.NewGuid().ToString();
 
             InitAudioInput();
@@ -93,6 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitRadioEffectsToggle();
 
             InitRadioSwitchIsPTT();
+            
         }
 
 
@@ -286,9 +297,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
             }
-        }
 
-      
+            _radioOverlayWindow?.Close();
+            _radioOverlayWindow = null;
+        }
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
@@ -365,18 +377,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_radioOverlayWindow == null || !_radioOverlayWindow.IsVisible)
-            {
-                _radioOverlayWindow?.Close();
+           ToggleOverlay(true);
+        }
+        
+        //used to debounce toggle
+        private double _toggleShowHide = 0;
 
-                _radioOverlayWindow = new RadioOverlayWindow();
-                _radioOverlayWindow.Show();
-            }
-            else
+        private void ToggleOverlay(bool uiButton)
+        {
+            //debounce show hide
+            if ((Environment.TickCount - _toggleShowHide > 600) || uiButton)
             {
-                //TODO bring to front
-            }
+                _toggleShowHide = Environment.TickCount;
+                if (_radioOverlayWindow == null || !_radioOverlayWindow.IsVisible || _radioOverlayWindow.WindowState == WindowState.Minimized)
+                {
+                    _radioOverlayWindow?.Close();
 
+                    _radioOverlayWindow = new RadioOverlayWindow();
+                    _radioOverlayWindow.Show();
+                }
+                else
+                {
+                    _radioOverlayWindow?.Close();
+                    _radioOverlayWindow = null;
+                }
+            }
+           
         }
     }
+
 }

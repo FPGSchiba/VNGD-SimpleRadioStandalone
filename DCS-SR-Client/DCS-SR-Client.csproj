@@ -156,8 +156,6 @@
     <Compile Include="RadioSendingState.cs" />
     <Compile Include="RadioSyncServer.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Themes\LeftMarginMultiplierConverter.cs" />
-    <Compile Include="Themes\TreeViewItemExtensions.cs" />
     <Compile Include="UDPVoiceHandler.cs" />
     <Compile Include="RadioOverlayWindow\WindowHelper.cs" />
     <Page Include="ClientWindow\InputBindingControl.xaml">

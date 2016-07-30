@@ -75,20 +75,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             FocusDCS();
         }
 
-        private void SendUdpUpdate(RadioCommand update)
-        {
-            //only send update if the aircraft doesnt have its own radio system, i.e FC3
-            if (RadioSyncServer.DcsPlayerRadioInfo != null &&
-                RadioSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
-            {
-                var bytes = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(update) + "\n");
-                //multicast
-              //  Send("127.255.255.255", 5070, bytes);
-                //unicast
-                //  send("127.0.0.1", 5061, bytes);
-            }
-        }
-
         private void FocusDCS()
         {
             var localByName = Process.GetProcessesByName("dcs");
@@ -99,55 +85,67 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
         }
 
-    
-
         private void SendFrequencyChange(double frequency)
         {
-            var update = new RadioCommand
-            {
-                freq = frequency,
-                radio = RadioId,
-                cmdType = RadioCommand.CmdType.FREQUENCY
-            };
 
-            SendUdpUpdate(update);
+            if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
+               && RadioId >= 0
+               && RadioId < 3)
+            {
+                //sort out the frequencies
+                var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+                clientRadio.frequency += frequency;
+
+                //make sure we're not over or under a limit
+                if (clientRadio.frequency > clientRadio.freqMax)
+                {
+                    clientRadio.frequency = clientRadio.freqMax;
+                }
+                else if (clientRadio.frequency < clientRadio.freqMin)
+                {
+                    clientRadio.frequency = clientRadio.freqMin;
+                }
+            }
         }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            var update = new RadioCommand
+            if (RadioSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                radio = RadioId,
-                cmdType = RadioCommand.CmdType.SELECT
-            };
-
-            SendUdpUpdate(update);
+                RadioSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+            }
 
             FocusDCS();
         }
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            var update = new RadioCommand
+            if (RadioSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                radio = RadioId,
-                cmdType = RadioCommand.CmdType.SELECT
-            };
+                RadioSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+            }
 
-            SendUdpUpdate(update);
             FocusDCS();
         }
 
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
-            // Console.WriteLine("Click!");
-            var update = new RadioCommand
-            {
-                radio = RadioId,
-                cmdType = RadioCommand.CmdType.GUARD_TOGGLE
-            };
 
-            SendUdpUpdate(update);
+            if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            {
+                //sort out the frequencies
+                var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+                if (clientRadio.secondaryFrequency > 0)
+                {
+                    clientRadio.secondaryFrequency = 0; // 0 indicates we want it overridden + disabled
+                }
+                else
+                {
+                    clientRadio.secondaryFrequency = 1; //indicates we want it back
+                }
+
+
+            }
             FocusDCS();
         }
 
@@ -159,14 +157,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var update = new RadioCommand
-            {
-                radio = RadioId,
-                volume = (float) radioVolume.Value/100.0f,
-                cmdType = RadioCommand.CmdType.VOLUME
-            };
 
-            SendUdpUpdate(update);
+            if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            {
+                var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+
+                clientRadio.volume = (float)radioVolume.Value / 100.0f;
+            }
+
             _dragging = false;
 
             FocusDCS();
@@ -185,14 +183,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 radioVolume.IsEnabled = false;
 
-                up10.IsEnabled = false;
-                up1.IsEnabled = false;
-                up01.IsEnabled = false;
+                up10.Visibility = Visibility.Hidden;
+                up1.Visibility = Visibility.Hidden;
+                up01.Visibility = Visibility.Hidden;
+                up001.Visibility = Visibility.Hidden;
 
-                down10.IsEnabled = false;
-                down1.IsEnabled = false;
-                down01.IsEnabled = false;
-
+                down10.Visibility = Visibility.Hidden;
+                down1.Visibility = Visibility.Hidden;
+                down01.Visibility = Visibility.Hidden;
+                down001.Visibility = Visibility.Hidden;
 
                 //reset dragging just incase
                 _dragging = false;
@@ -227,15 +226,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     radioVolume.IsEnabled = false;
 
-                    up10.IsEnabled = false;
-                    up1.IsEnabled = false;
-                    up01.IsEnabled = false;
-                    up001.IsEnabled = false;
+                    up10.Visibility = Visibility.Hidden;
+                    up1.Visibility = Visibility.Hidden;
+                    up01.Visibility = Visibility.Hidden;
+                    up001.Visibility = Visibility.Hidden;
 
-                    down10.IsEnabled = false;
-                    down1.IsEnabled = false;
-                    down01.IsEnabled = false;
-                    down001.IsEnabled = false;
+                    down10.Visibility = Visibility.Hidden;
+                    down1.Visibility = Visibility.Hidden;
+                    down01.Visibility = Visibility.Hidden;
+                    down001.Visibility = Visibility.Hidden;
                     return;
                 }
                 if (currentRadio.modulation == 2) //intercom
@@ -260,15 +259,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
                     radioVolume.IsEnabled = false;
-                    up10.IsEnabled = false;
-                    up1.IsEnabled = false;
-                    up01.IsEnabled = false;
-                    up001.IsEnabled = false;
+                    up10.Visibility = Visibility.Hidden;
+                    up1.Visibility = Visibility.Hidden;
+                    up01.Visibility = Visibility.Hidden;
+                    up001.Visibility = Visibility.Hidden;
 
-                    down10.IsEnabled = false;
-                    down1.IsEnabled = false;
-                    down01.IsEnabled = false;
-                    down001.IsEnabled = false;
+                    down10.Visibility = Visibility.Hidden;
+                    down1.Visibility = Visibility.Hidden;
+                    down01.Visibility = Visibility.Hidden;
+                    down001.Visibility = Visibility.Hidden;
 
                     //reset dragging just incase
                     _dragging = false;
@@ -277,15 +276,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     radioVolume.IsEnabled = true;
 
-                    up10.IsEnabled = false;
-                    up1.IsEnabled = false;
-                    up01.IsEnabled = false;
-                    up001.IsEnabled = false;
+                    up10.Visibility = Visibility.Hidden;
+                    up1.Visibility = Visibility.Hidden;
+                    up01.Visibility = Visibility.Hidden;
+                    up001.Visibility = Visibility.Hidden;
 
-                    down10.IsEnabled = false;
-                    down1.IsEnabled = false;
-                    down01.IsEnabled = false;
-                    down001.IsEnabled = false;
+                    down10.Visibility = Visibility.Hidden;
+                    down1.Visibility = Visibility.Hidden;
+                    down01.Visibility = Visibility.Hidden;
+                    down001.Visibility = Visibility.Hidden;
 
                     //reset dragging just incase
                     _dragging = false;
@@ -293,6 +292,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 else
                 {
                     radioVolume.IsEnabled = true;
+                    up10.Visibility = Visibility.Visible;
+                    up1.Visibility = Visibility.Visible;
+                    up01.Visibility = Visibility.Visible;
+                    up001.Visibility = Visibility.Visible;
+
+                    down10.Visibility = Visibility.Visible;
+                    down1.Visibility = Visibility.Visible;
+                    down01.Visibility = Visibility.Visible;
+                    down001.Visibility = Visibility.Visible;
+
                     up10.IsEnabled = true;
                     up1.IsEnabled = true;
                     up01.IsEnabled = true;

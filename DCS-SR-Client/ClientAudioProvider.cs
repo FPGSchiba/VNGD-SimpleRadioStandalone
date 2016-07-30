@@ -15,6 +15,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public ClientAudioProvider()
         {
             BufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(24000, 16, 2));
+           
+            
             //    
             BufferedWaveProvider.DiscardOnBufferOverflow = true;
             BufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 2); //2 seconds buffer

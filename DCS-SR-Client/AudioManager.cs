@@ -107,7 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 60;
+                _waveIn.BufferMilliseconds = 80;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(24000, 16, 1); // should this be 44100??

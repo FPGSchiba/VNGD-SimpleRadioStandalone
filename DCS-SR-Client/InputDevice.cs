@@ -8,10 +8,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         Switch2 = 1,
         Switch3 = 2,
         Ptt = 3,
+
         ModifierSwitch1 = 4,
         ModifierSwitch2 = 5,
         ModifierSwitch3 = 6,
         ModifierPtt = 7,
+
+        OverlayToggle = 8, //all buttons that are "main" buttons will be in hundreds
+        ModifierOverlayToggle = 9,
 
     }
 

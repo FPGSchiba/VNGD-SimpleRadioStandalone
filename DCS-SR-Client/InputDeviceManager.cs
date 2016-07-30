@@ -34,10 +34,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             new Guid("00f2068e-0000-0000-0000-504944564944"), //CH PRO PEDALS USB 
 
         };
+        private MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
         private WindowInteropHelper WindowHelper { get; set; }
 
-        public InputDeviceManager(Window window)
+        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
         {
             InputConfig = new InputConfiguration();
             _directInput = new DirectInput();
@@ -45,6 +46,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             WindowHelper =
                 new WindowInteropHelper(window);
+
+            this._toggleOverlayCallback = _toggleOverlayCallback;
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -317,15 +320,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         }
                         else
                         {
-                            if (j < 4)
+                            if (j < 4 || j ==8) //==8 is for OverlayToggle
                             {
                                 // set to false as its its a main button, not a modifier
                                 buttonStates[j] = false;
                             }
-                       
                         }
                     }
-                    //if no buttons are bound then dont call callback
+                    //if no buttons are bound then  call callback with false for everything
                     if (noDevices)
                     {
                         callback(new bool[bindingsCount]);
@@ -333,9 +335,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     else
                     {
                         callback(buttonStates);
-                    }
+                        //handle overlay
+                        if(buttonStates[(int)InputBinding.OverlayToggle] && buttonStates[(int)InputBinding.ModifierOverlayToggle])
+                        {
+                            //run on main
+                            Application.Current.Dispatcher.Invoke(
+                                       () => { _toggleOverlayCallback(false); });
 
-                    
+                        }
+                    }
 
                     Thread.Sleep(1);
                 }

@@ -14,6 +14,7 @@ using MahApps.Metro;
 using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using NLog;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -28,21 +29,47 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private volatile bool _end;
 
+        private RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+
         public RadioOverlayWindow()
         {
-        
+            //load opacity before the intialising as the slider changed
+            //method fires after initialisation
+            var opacity = AppConfiguration.Instance.RadioOpacity; 
+
             InitializeComponent();
             this.AllowsTransparency = true;
-            this.Opacity = 1.0;
+            this.Opacity = opacity;
+            this.windowOpacitySlider.Value = this.Opacity;
+
+            radioControlGroup[0] = radio1;
+            radioControlGroup[1] = radio2;
+            radioControlGroup[2] = radio3;
 
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            radio1.RadioId = 0;
-            radio2.RadioId = 1;
-            radio3.RadioId = 2;
+            this.Top = AppConfiguration.Instance.RadioX;
+            this.Left = AppConfiguration.Instance.RadioY;
 
-            SetupActiveRadio();
+            Width = AppConfiguration.Instance.RadioWidth;
+            Height = AppConfiguration.Instance.RadioHeight;
+
+            _aspectRatio = Width / Height;
+
+          //  Window_Loaded(null, null);
+            CalculateScale();
+
+            SetupRadioRefresh();
+
+            LocationChanged += Location_Changed;
+
+            //init radio
+            foreach (var radio in radioControlGroup)
+            {
+                radio.RepaintRadioReceive();
+                radio.RepaintRadioStatus();
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -50,25 +77,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _aspectRatio = ActualWidth/ActualHeight;
         }
 
+        private void Location_Changed(object sender,EventArgs e)
+        {
+            AppConfiguration.Instance.RadioX = this.Top;
+            AppConfiguration.Instance.RadioY = this.Left;
+        }
 
-        private void SetupActiveRadio()
+        private void SetupRadioRefresh()
         {
         
             Task.Run(() =>
             {
                 while (!_end)
                 {
+                    //roughly 20 FPS
                     Thread.Sleep(50);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        radio1.RepaintRadioReceive();
-                        radio2.RepaintRadioReceive();
-                        radio3.RepaintRadioReceive();
-
-                        radio1.RepaintRadioStatus();
-                        radio2.RepaintRadioStatus();
-                        radio3.RepaintRadioStatus();
+                        foreach(var radio in radioControlGroup)
+                        {
+                            radio.RepaintRadioReceive();
+                            radio.RepaintRadioStatus();
+                        }
+                        
                     });
                    
                 }
@@ -107,13 +139,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
+            AppConfiguration.Instance.RadioOpacity = Opacity;
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //force aspect ratio
             CalculateScale();
+
+           
         }
+
+     
 
         private void CalculateScale()
         {
@@ -130,6 +167,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
                 Height = sizeInfo.NewSize.Width/_aspectRatio;
 
+            AppConfiguration.Instance.RadioWidth = Width;
+            AppConfiguration.Instance.RadioHeight = Height;
             // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 
