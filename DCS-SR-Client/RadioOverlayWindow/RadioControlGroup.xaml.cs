@@ -170,6 +170,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             FocusDCS();
         }
 
+        private void ToggleButtons(bool enable)
+        {
+            if (enable)
+            {
+                up10.Visibility = Visibility.Visible;
+                up1.Visibility = Visibility.Visible;
+                up01.Visibility = Visibility.Visible;
+                up001.Visibility = Visibility.Visible;
+
+                down10.Visibility = Visibility.Visible;
+                down1.Visibility = Visibility.Visible;
+                down01.Visibility = Visibility.Visible;
+                down001.Visibility = Visibility.Visible;
+
+                up10.IsEnabled = true;
+                up1.IsEnabled = true;
+                up01.IsEnabled = true;
+                up001.IsEnabled = true;
+
+                down10.IsEnabled = true;
+                down1.IsEnabled = true;
+                down01.IsEnabled = true;
+                down001.IsEnabled = true;
+            }
+            else
+            {
+                up10.Visibility = Visibility.Hidden;
+                up1.Visibility = Visibility.Hidden;
+                up01.Visibility = Visibility.Hidden;
+                up001.Visibility = Visibility.Hidden;
+
+                down10.Visibility = Visibility.Hidden;
+                down1.Visibility = Visibility.Hidden;
+                down01.Visibility = Visibility.Hidden;
+                down001.Visibility = Visibility.Hidden;
+
+            }
+           
+        }
 
         internal void RepaintRadioStatus()
         {
@@ -183,16 +222,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 radioVolume.IsEnabled = false;
 
-                up10.Visibility = Visibility.Hidden;
-                up1.Visibility = Visibility.Hidden;
-                up01.Visibility = Visibility.Hidden;
-                up001.Visibility = Visibility.Hidden;
-
-                down10.Visibility = Visibility.Hidden;
-                down1.Visibility = Visibility.Hidden;
-                down01.Visibility = Visibility.Hidden;
-                down001.Visibility = Visibility.Hidden;
-
+                ToggleButtons(false);
+               
                 //reset dragging just incase
                 _dragging = false;
             }
@@ -226,15 +257,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     radioVolume.IsEnabled = false;
 
-                    up10.Visibility = Visibility.Hidden;
-                    up1.Visibility = Visibility.Hidden;
-                    up01.Visibility = Visibility.Hidden;
-                    up001.Visibility = Visibility.Hidden;
-
-                    down10.Visibility = Visibility.Hidden;
-                    down1.Visibility = Visibility.Hidden;
-                    down01.Visibility = Visibility.Hidden;
-                    down001.Visibility = Visibility.Hidden;
+                    ToggleButtons(false);
                     return;
                 }
                 if (currentRadio.modulation == 2) //intercom
@@ -259,32 +282,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
                     radioVolume.IsEnabled = false;
-                    up10.Visibility = Visibility.Hidden;
-                    up1.Visibility = Visibility.Hidden;
-                    up01.Visibility = Visibility.Hidden;
-                    up001.Visibility = Visibility.Hidden;
 
-                    down10.Visibility = Visibility.Hidden;
-                    down1.Visibility = Visibility.Hidden;
-                    down01.Visibility = Visibility.Hidden;
-                    down001.Visibility = Visibility.Hidden;
+                    ToggleButtons(false);
 
                     //reset dragging just incase
                     _dragging = false;
                 }
                 else if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
                 {
-                    radioVolume.IsEnabled = true;
+                    radioVolume.IsEnabled = false;
 
-                    up10.Visibility = Visibility.Hidden;
-                    up1.Visibility = Visibility.Hidden;
-                    up01.Visibility = Visibility.Hidden;
-                    up001.Visibility = Visibility.Hidden;
-
-                    down10.Visibility = Visibility.Hidden;
-                    down1.Visibility = Visibility.Hidden;
-                    down01.Visibility = Visibility.Hidden;
-                    down001.Visibility = Visibility.Hidden;
+                    ToggleButtons(false);
 
                     //reset dragging just incase
                     _dragging = false;
@@ -292,25 +300,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 else
                 {
                     radioVolume.IsEnabled = true;
-                    up10.Visibility = Visibility.Visible;
-                    up1.Visibility = Visibility.Visible;
-                    up01.Visibility = Visibility.Visible;
-                    up001.Visibility = Visibility.Visible;
-
-                    down10.Visibility = Visibility.Visible;
-                    down1.Visibility = Visibility.Visible;
-                    down01.Visibility = Visibility.Visible;
-                    down001.Visibility = Visibility.Visible;
-
-                    up10.IsEnabled = true;
-                    up1.IsEnabled = true;
-                    up01.IsEnabled = true;
-                    up001.IsEnabled = true;
-
-                    down10.IsEnabled = true;
-                    down1.IsEnabled = true;
-                    down01.IsEnabled = true;
-                    down001.IsEnabled = true;
+                    ToggleButtons(true);
                 }
 
                 if (_dragging == false)
