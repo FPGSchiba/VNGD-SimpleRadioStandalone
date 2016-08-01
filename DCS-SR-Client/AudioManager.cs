@@ -80,10 +80,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
-                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
+                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(8000, 2));
 
                 //add silence track?
-                var provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(24000, 2));
+                var provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(8000, 2));
                 //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
 
                 _mixing.AddMixerInput(provider);
@@ -96,21 +96,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut = new WaveOut();
                 _waveOut.DesiredLatency = 100; //75ms latency in output buffer
                 _waveOut.DeviceNumber = speakers;
-
+             
                 _waveOut.Init(_mixing);
                 _waveOut.Play();
 
-                _segmentFrames = 960; //960 frames is 20 ms of audio
-                _encoder = OpusEncoder.Create(24000, 1, Application.Restricted_LowLatency);
+                _segmentFrames = 960/2; //960 frames is 20 ms of audio
+                _encoder = OpusEncoder.Create(8000, 1, Application.Voip);
                 //    _encoder.Bitrate = 8192;
-                _decoder = OpusDecoder.Create(24000, 1);
+                _decoder = OpusDecoder.Create(8000, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
                 _waveIn.BufferMilliseconds = 80;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new WaveFormat(24000, 16, 1); // should this be 44100??
+                _waveIn.WaveFormat = new WaveFormat(8000, 16, 1); // should this be 44100??
 
                 _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
