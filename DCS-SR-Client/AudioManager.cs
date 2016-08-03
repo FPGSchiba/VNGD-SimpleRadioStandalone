@@ -100,14 +100,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.Init(_mixing);
                 _waveOut.Play();
 
-                _segmentFrames = 960/2; //960 frames is 20 ms of audio
-                _encoder = OpusEncoder.Create(8000, 1, Application.Voip);
+                _segmentFrames = 480; //960 frames is 20 ms of audio
+                _encoder = OpusEncoder.Create(8000, 1, Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
                 _decoder = OpusDecoder.Create(8000, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 80;
+                _waveIn.BufferMilliseconds = 100;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(8000, 16, 1); // should this be 44100??

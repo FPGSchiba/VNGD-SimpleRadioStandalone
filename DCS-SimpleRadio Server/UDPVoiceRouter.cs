@@ -36,14 +36,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             _listener.AllowNatTraversal(true);
             _listener.ExclusiveAddressUse = true;
             _listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
-            StartPing();
             while (!_stop)
             {
                 try
                 {
                     var groupEP = new IPEndPoint(IPAddress.Any, 5010);
                     var rawBytes = _listener.Receive(ref groupEP);
-                    if (rawBytes.Length >= 22)
+                    if (rawBytes!=null && rawBytes.Length >= 22)
                     {
                         Task.Run(() =>
                         {
@@ -56,16 +55,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 var client = _clientsList[guid];
                                 client.voipPort = groupEP;
 
-                                var spectatorAudio =
-                                    _serverSettings.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+                                var spectatorAudio = _serverSettings.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
 
                                 if (client.Coalition == 0 && spectatorAudio == "DISABLED")
                                 {
-                                    // IGNORE THE AUDIO
+                                   // IGNORE THE AUDIO
                                 }
                                 else
                                 {
-                                    SendToOthers(rawBytes, client);
+                                    SendToOthers(rawBytes,client );
                                 }
                             }
                             else
@@ -76,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             }
                         });
                     }
-                    else if (rawBytes != null && rawBytes.Length == 15 && rawBytes[0] == 1 && rawBytes[14] == 15)
+                    else if (rawBytes!=null && rawBytes.Length == 15 && rawBytes[0] == 1 && rawBytes[14] == 15)
                     {
                         try
                         {
@@ -87,6 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         {
                             //dont log because it slows down thread too much...
                         }
+
                     }
                 }
                 catch (Exception e)
@@ -119,7 +118,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void SendToOthers(byte[] bytes, SRClient fromClient)
         {
             var coalitionSecurity =
-                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
+                                    _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
@@ -143,7 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                            //    _listener.Send(bytes, bytes.Length, ip);
+                             //    _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
                 }
@@ -158,39 +157,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         }
 
 
-        private void StartPing()
-        {
-            Task.Run(() =>
-            {
-                byte[] message = {1, 2, 3, 4, 5};
-                while (!_stop)
-                {
-                    Logger.Info("Pinging Clients");
-                    try
-                    {
-                        foreach (var client in _clientsList)
-                        {
-                            try
-                            {
-                                var ip = client.Value.voipPort;
-
-                                if (ip != null)
-                                {
-                                    _listener.Send(message, message.Length, ip);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                    }
-
-                    Thread.Sleep(60*1000);
-                }
-            });
-        }
+     
     }
 }
