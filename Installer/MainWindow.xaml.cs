@@ -17,6 +17,7 @@ namespace Installer
     public partial class MainWindow
     {
         private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
+        private const string CLIENT_REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE";
         private readonly string currentDirectory;
 
      //   private readonly string currentPath;
@@ -83,12 +84,30 @@ namespace Installer
 
         private static void DeleteRegKeys()
         {
-            Registry.SetValue(REG_PATH,
-                "SRPathStandalone",
-                "");
-            Registry.SetValue(REG_PATH,
-                "ScriptsPath",
-                "");
+            try
+            {
+                Registry.SetValue(REG_PATH,
+            "SRPathStandalone",
+            "");
+                Registry.SetValue(REG_PATH,
+                    "ScriptsPath",
+                    "");
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
+                {
+                    key.DeleteSubKeyTree("DCS-SimpleRadioStandalone", false);
+                    key.DeleteSubKeyTree("DCS-SR-Standalone", false);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
 
@@ -327,8 +346,6 @@ namespace Installer
             var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
 
             var dcsPath = savedGamesPath + "DCS";
-
-            var scriptsPath = dcsPath + "\\Scripts";
 
             RemoveScripts(dcsPath + ".openalpha\\Scripts");
             RemoveScripts(dcsPath + "\\Scripts");
