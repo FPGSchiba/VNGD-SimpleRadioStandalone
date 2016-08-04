@@ -177,7 +177,7 @@
                     </ToggleButton>
 
 
-                    <Label Grid.Column="0" Grid.Row="5" Content="Rest Radio Overlay" HorizontalContentAlignment="Center"
+                    <Label Grid.Column="0" Grid.Row="5" Content="Reset Radio Overlay" HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center" />
 
                     <Button Grid.Column="1" Grid.Row="5" HorizontalContentAlignment="Center"

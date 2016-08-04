@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Win32;
 using MessageBox = System.Windows.MessageBox;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Installer
 {
@@ -178,6 +182,7 @@ namespace Installer
                 return;
             }
 
+           
             // string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
             var paths = FindValidDCSFolders(dcsScriptsPath.Text);
 
@@ -191,6 +196,12 @@ namespace Installer
 
                 return;
             }
+
+            InstallButton.IsEnabled = false;
+            RemoveButton.IsEnabled = false;
+
+            InstallButton.Content = "Installing...";
+
             foreach (var path in paths)
             {
                 InstallScripts(path + "\\Scripts");
@@ -202,7 +213,6 @@ namespace Installer
             WritePath(srPath.Text, "SRPathStandalone");
             WritePath(dcsScriptsPath.Text, "ScriptsPath");
 
-
             MessageBox.Show("Installation / Update Completed Succesfully!", "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -210,6 +220,7 @@ namespace Installer
             Process.Start("explorer.exe", srPath.Text);
 
             Environment.Exit(0);
+
         }
 
         private static List<string> FindValidDCSFolders(string path)
@@ -237,7 +248,31 @@ namespace Installer
             {
                 DeleteDirectory(path);
             }
-            Directory.CreateDirectory(path);
+            //sleep! WTF directory is lagging behind state here...
+            Thread.Sleep(200);
+
+            if (!Directory.Exists(path))
+            {
+                SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+
+                // Create the rules
+                FileSystemAccessRule writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
+
+                var dir = Directory.CreateDirectory(path);
+
+                dir.Refresh();
+                //sleep! WTF directory is lagging behind state here...
+                Thread.Sleep(200);
+
+                DirectorySecurity dSecurity = dir.GetAccessControl();
+                dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                dir.SetAccessControl(dSecurity);
+                dir.Refresh();
+
+            }
+
+            //sleep! WTF directory is lagging behind state here...
+            Thread.Sleep(200);
 
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
@@ -254,6 +289,7 @@ namespace Installer
         {
             //if scripts folder doesnt exist, create it
             Directory.CreateDirectory(path);
+            Thread.Sleep(100);
 
             var write = true;
             //does it contain an export.lua?
@@ -343,7 +379,13 @@ namespace Installer
                 return;
             }
 
-            var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
+            InstallButton.IsEnabled = false;
+            RemoveButton.IsEnabled = false;
+
+            InstallButton.Content = "Removing...";
+
+            var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+                                    "\\Saved Games\\";
 
             var dcsPath = savedGamesPath + "DCS";
 
