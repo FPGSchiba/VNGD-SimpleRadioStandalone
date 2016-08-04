@@ -958,7 +958,7 @@ function SR.exportRadioHawk(_data)
     _data.radios[1].volume = 1
 
     _data.radios[2].name = "VHF"
-    _data.radios[2].frequency =  SR.getRadioFrequency(8)
+    _data.radios[2].frequency =  SR.getRadioFrequency(7)
     _data.radios[2].modulation = 0
     _data.radios[2].volume =1
 
@@ -967,13 +967,17 @@ function SR.exportRadioHawk(_data)
     _data.radios[3].modulation = 3
     _data.radios[3].volume = 1.0
 
-    if(SR.getButtonPosition(265)) > 0.5 then
-           _data.selected = 1
-    else
-            _data.selected = 0
+
+     --- is VHF ON?
+	if SR.getSelectorPosition(391,0.2) == 0   then
+		_data.radios[2].frequency = 1
     end
-
-
+    
+    --guard mode for VHF Radio
+    local _vhfKnob = SR.getSelectorPosition(391,0.2)
+	if _vhfKnob == 2 and _data.radios[2].frequency > 1000 then
+		_data.radios[2].secondaryFrequency = 121.5*1000000 
+	end
 
     _data.radioType = 1; -- full radio
 
