@@ -56,15 +56,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 var client = _clientsList[guid];
                                 client.voipPort = groupEP;
 
-                                var spectatorAudio = _serverSettings.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+                                var spectatorAudio =
+                                    _serverSettings.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED];
 
                                 if (client.Coalition == 0 && spectatorAudio == "DISABLED")
                                 {
-                                   // IGNORE THE AUDIO
+                                    // IGNORE THE AUDIO
                                 }
                                 else
                                 {
-                                    SendToOthers(rawBytes,client );
+                                    SendToOthers(rawBytes, client);
                                 }
                             }
                             else
@@ -74,6 +75,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 //  logger.Info("Removing  "+guid+" From UDP pool");
                             }
                         });
+                    }
+                    else if (rawBytes != null && rawBytes.Length == 15 && rawBytes[0] == 1 && rawBytes[14] == 15)
+                    {
+                        try
+                        {
+                            //send back ping UDP
+                            _listener.Send(rawBytes, rawBytes.Length, groupEP);
+                        }
+                        catch (Exception ex)
+                        {
+                            //dont log because it slows down thread too much...
+                        }
                     }
                 }
                 catch (Exception e)
@@ -106,7 +119,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void SendToOthers(byte[] bytes, SRClient fromClient)
         {
             var coalitionSecurity =
-                                    _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
+                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
@@ -130,7 +143,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                             //    _listener.Send(bytes, bytes.Length, ip);
+                            //    _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
                 }

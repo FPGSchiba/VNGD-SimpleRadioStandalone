@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
-            RadioOverlay.InputName = "Radio Overlay Toggle";
+            RadioOverlay.InputName = "Overlay Toggle";
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
 
@@ -403,6 +403,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
            
+        }
+
+        private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
+        {
+            //close overlay
+            _radioOverlayWindow?.Close();
+            _radioOverlayWindow = null;
+
+            AppConfiguration.Instance.RadioX = 100;
+            AppConfiguration.Instance.RadioY = 100;
+
+            AppConfiguration.Instance.RadioWidth = 122;
+            AppConfiguration.Instance.RadioHeight = 270;
+
+            AppConfiguration.Instance.RadioOpacity = 1.0;
         }
     }
 

@@ -189,9 +189,16 @@ LuaExportActivityNextEvent = function(tCurrent)
     end
 
 
-    -- Call original function if it exists
-    if _prevExport.LuaExportActivityNextEvent then
-        _prevExport.LuaExportActivityNextEvent(tCurrent)
+    -- call
+    _status,_result = pcall(function()
+       	-- Call original function if it exists
+		if _prevExport.LuaExportActivityNextEvent then
+			_prevExport.LuaExportActivityNextEvent(tCurrent)
+		end
+    end)
+
+    if not _status then
+        SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
     end
 
     return tNext

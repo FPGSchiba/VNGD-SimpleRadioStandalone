@@ -18,7 +18,7 @@
         Name="myMainWindow"
         Title="DCS-SimpleRadio" MinHeight="270" MinWidth="122" Height="270" Width="122">
 
-    <WrapPanel Style="{x:Null}"  Name="containerPanel" SizeChanged="containerPanel_SizeChanged" Loaded="Window_Loaded">
+    <WrapPanel Style="{x:Null}"  Name="containerPanel" SizeChanged="containerPanel_SizeChanged" >
 
         <WrapPanel.LayoutTransform>
             <ScaleTransform x:Name="ApplicationScaleTransform"

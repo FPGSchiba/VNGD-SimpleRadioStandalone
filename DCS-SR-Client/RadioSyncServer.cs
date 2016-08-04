@@ -35,7 +35,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private UdpClient _dcsUdpListener;
 
         private long _lastSent;
-        private UdpClient _radioCommandUdpListener;
 
         public RadioSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate)
         {
@@ -275,21 +274,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             return true;
         }
 
-        private void Send(string ipStr, int port, byte[] bytes)
-        {
-            try
-            {
-                var client = new UdpClient();
-                var ip = new IPEndPoint(IPAddress.Parse(ipStr), port);
-
-                client.Send(bytes, bytes.Length, ip);
-                client.Close();
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
         public void Stop()
         {
             _stop = true;
@@ -303,7 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             try
             {
-                _radioCommandUdpListener.Close();
+                _dcsGameGuiudpListener.Close();
             }
             catch (Exception ex)
             {

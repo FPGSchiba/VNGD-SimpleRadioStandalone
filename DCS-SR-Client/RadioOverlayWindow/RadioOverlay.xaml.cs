@@ -25,11 +25,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     {
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private double _aspectRatio;
+        private readonly double _aspectRatio;
 
         private volatile bool _end;
 
         private RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+
 
         public RadioOverlayWindow()
         {
@@ -38,6 +39,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var opacity = AppConfiguration.Instance.RadioOpacity; 
 
             InitializeComponent();
+
+            _aspectRatio = MinWidth / MinHeight;
+
             this.AllowsTransparency = true;
             this.Opacity = opacity;
             this.windowOpacitySlider.Value = this.Opacity;
@@ -55,8 +59,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Width = AppConfiguration.Instance.RadioWidth;
             Height = AppConfiguration.Instance.RadioHeight;
 
-            _aspectRatio = Width / Height;
-
           //  Window_Loaded(null, null);
             CalculateScale();
 
@@ -70,11 +72,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioReceive();
                 radio.RepaintRadioStatus();
             }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            _aspectRatio = ActualWidth/ActualHeight;
         }
 
         private void Location_Changed(object sender,EventArgs e)
@@ -129,6 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             WindowState = WindowState.Minimized;
         }
+        
 
         private void Button_Close(object sender, RoutedEventArgs e)
         {
@@ -147,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //force aspect ratio
             CalculateScale();
 
-           
+            WindowState = WindowState.Normal;
         }
 
      
