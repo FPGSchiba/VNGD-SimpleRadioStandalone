@@ -61,6 +61,8 @@
     <Compile Include="RadioTransmit.cs" />
     <Compile Include="ShortGuid.cs" />
     <Compile Include="SRClient.cs" />
+    <Compile Include="Timer\ITimer.cs" />
+    <Compile Include="Timer\Timer.cs" />
     <Compile Include="UpdaterChecker.cs" />
   </ItemGroup>
   <ItemGroup>
