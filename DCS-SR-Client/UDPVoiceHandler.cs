@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -39,6 +40,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
+        private Cabhishek.Timers.Timer _timer;
+
+        private readonly int JITTER_BUFFER = 100; //in milliseconds
+
+        private static object _lock = new object();
+
+        private List<ClientAudio> _jitterBuffer = new List<ClientAudio>();
+
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
@@ -56,6 +65,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         [DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
+
+        private void JitterBufferTick()
+        {
+            lock (_lock)
+            {
+                //Empty Jitterbuffer
+                foreach (var clientAudio in _jitterBuffer)
+                {
+                    //TODO Reorder list per client to sort out packets sent in the wrong order!
+                    _audioManager.AddClientAudio(clientAudio);
+                }
+                _jitterBuffer.Clear();
+            }
+            
+        }
 
         public void Listen()
         {
@@ -106,6 +130,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             StartPing();
 
+            StartTimer();
+
             while (!_stop)
             {
                 try
@@ -139,6 +165,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
+        public void StartTimer()
+        {
+            StopTimer();
+            lock (_lock)
+            {
+                _jitterBuffer.Clear();
+                _timer = new Cabhishek.Timers.Timer(JitterBufferTick, TimeSpan.FromMilliseconds(JITTER_BUFFER));
+                _timer.Start();
+
+            }
+        }
+
+        public void StopTimer()
+        {
+            lock (_lock)
+            {
+                if (_timer != null)
+                {
+                    _jitterBuffer.Clear();
+                    _timer.Stop();
+                    _timer = null;
+                }
+            }
+        }
+
         public void RequestStop()
         {
             _stop = true;
@@ -153,6 +204,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _stopFlag.Cancel();
 
             _inputManager.StopPtt();
+
+            StopTimer();
         }
 
         private SRClient IsClientMetaDataValid(string clientGuid)
@@ -256,8 +309,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             Decryptable = encryption == receivingRadio.enc // mark if we can decrypt it
                                         };
 
-                                        //TODO throw away audio for each client that is before the latest receive time!
-                                        _audioManager.AddClientAudio(audio);
+                                        //add to JitterBuffer!
+                                        lock (_lock)
+                                        {
+                                            _jitterBuffer.Add(audio);
+                                        }
                                     }
                                 }
                             }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Timer
+namespace Cabhishek.Timers
 {
     /// <summary>
     /// Source: https://github.com/cabhishek

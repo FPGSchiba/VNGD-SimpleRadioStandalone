@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public ClientAudioProvider()
         {
-            BufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(24000, 16, 2));
+            BufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(8000, 16, 2));
            
             
             //    
