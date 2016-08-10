@@ -1,4 +1,4 @@
--- Version 1.1.5.0
+-- Version 1.1.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -181,7 +181,6 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "CA",
                     selected = 0,
                     ptt = false,
-                    intercom = false,
                     pos = {x=0,y=0,z=0},
                     radios =
                     {

@@ -132,6 +132,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             StartTimer();
 
+            //set to false so we sent one packet to open up the radio
+            //automatically rather than the user having to press Send
+            this.hasSentVoicePacket = false;
+
             while (!_stop)
             {
                 try
@@ -248,12 +252,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
 
                                 // check the radio
-                                var radioId = -1;
-                                var receivingRadio = CanHear(RadioSyncServer.DcsPlayerRadioInfo, udpVoicePacket.Frequency,
+                                RadioReceivingState receivingState = null;
+                                var receivingRadio = RadioSyncServer.DcsPlayerRadioInfo.CanHear(udpVoicePacket.Frequency,
                                     udpVoicePacket.Modulation,
-                                    udpVoicePacket.UnitId, out radioId);
-                                if (receivingRadio != null)
+                                    udpVoicePacket.UnitId, out receivingState);
+                                if (receivingRadio != null && receivingState !=null)
                                 {
+                                    RadioReceivingState = receivingState;
 
                                     //DECODE audio
                                     int len1;
@@ -282,7 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             Frequency = udpVoicePacket.Frequency,
                                             Modulation = udpVoicePacket.Modulation,
                                             Volume = receivingRadio.volume,
-                                            ReceivedRadio = radioId,
+                                            ReceivedRadio = receivingState.ReceivedOn,
                                             UnitId = udpVoicePacket.UnitId,
                                             Encryption = udpVoicePacket.Encryption,
                                             Decryptable = udpVoicePacket.Encryption == receivingRadio.enc // mark if we can decrypt it
@@ -312,68 +317,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, byte modulation, UInt32 unitId,
-            out int radioId)
-        {
-            if (!myClient.IsCurrent())
-            {
-                radioId = -1;
-                return null;
-            }
-            for (var i = 0; i < 3; i++)
-            {
-                var receivingRadio = myClient.radios[i];
-
-                if (receivingRadio != null)
-                {
-                    //handle INTERCOM Modulation is 2
-                    if (receivingRadio.modulation == 2 && modulation == 2
-                        && myClient.unitId > 0 && unitId > 0
-                        && myClient.unitId == unitId)
-                    {
-                        RadioReceivingState = new RadioReceivingState()
-                        {
-                            IsSecondary = false,
-                            LastReceviedAt = Environment.TickCount,
-                            ReceivedOn = i
-                        };
-
-                        radioId = i;
-                        return receivingRadio;
-                    }
-                    if (receivingRadio.frequency == frequency
-                        && receivingRadio.modulation == modulation
-                        && receivingRadio.frequency > 1)
-                    {
-                        RadioReceivingState = new RadioReceivingState()
-                        {
-                            IsSecondary = false,
-                            LastReceviedAt = Environment.TickCount,
-                            ReceivedOn = i
-                        };
-                        radioId = i;
-                        return receivingRadio;
-                    }
-                    if (receivingRadio.secondaryFrequency == frequency
-                        && receivingRadio.secondaryFrequency > 100)
-                    {
-                        RadioReceivingState = new RadioReceivingState()
-                        {
-                            IsSecondary = true,
-                            LastReceviedAt = Environment.TickCount,
-                            ReceivedOn = i
-                        };
-                        radioId = i;
-                        return receivingRadio;
-                    }
-                }
-            }
-            radioId = -1;
-            return null;
-        }
 
         private byte[] part1;
         private byte[] part2;
+        private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
         public void Send(byte[] bytes, int len)
         {
@@ -400,6 +347,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 && RadioSyncServer.DcsPlayerRadioInfo.IsCurrent() && part1 != null && part2 != null)
                 //can only send if DCS is connected
             {
+             
                 try
                 {
                     var currentSelected = RadioSyncServer.DcsPlayerRadioInfo.selected;
@@ -425,12 +373,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 Modulation = radio.modulation
                             }.EncodePacket();
 
+                            //clear audio
                             part1 = null;
                             part2 = null;
+
+                            //no need to auto send packet anymore
+                            hasSentVoicePacket = true;
 
                             var ip = new IPEndPoint(_address, 5010);
                             _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
 
+                            //set radio overlay state
                             RadioSendingState = new RadioSendingState()
                             {
                                 IsSending = true,
@@ -447,11 +400,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             else if (part1 != null && part2 != null)
             {
-              
-
                 RadioSendingState.IsSending = false;
+
+                if (!hasSentVoicePacket)
+                {
+                    try
+                    {
+                        var udpVoicePacket = new UDPVoicePacket()
+                        {
+                            GuidBytes = _guidAsciiBytes,
+                            AudioPart1Bytes = part1,
+                            AudioPart1Length = (ushort)part1.Length,
+                            AudioPart2Bytes = part2,
+                            AudioPart2Length = (ushort)part2.Length,
+                            Frequency = 100,
+                            UnitId = 1,
+                            Encryption = 0,
+                            Modulation = 3
+                        }.EncodePacket();
+
+                        hasSentVoicePacket = true;
+
+                        var ip = new IPEndPoint(_address, 5010);
+                        _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
+
+                        Logger.Info("Sent First Voice Packet");
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Exception Sending First Audio Message " + e.Message);
+                    }
+                }
             }
-           
         }
 
         private void StartPing()

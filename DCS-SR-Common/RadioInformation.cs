@@ -35,10 +35,10 @@
             {
                 return false;
             }
-            if (volume != compare.volume)
-            {
-                return false;
-            }
+            //if (volume != compare.volume)
+            //{
+            //    return false;
+            //}
             if (freqMin != compare.freqMin)
             {
                 return false;
@@ -50,6 +50,11 @@
 
 
             return true;
+        }
+        public RadioInformation ShallowCopy()
+        {
+            return (RadioInformation) MemberwiseClone();
+
         }
     }
 }

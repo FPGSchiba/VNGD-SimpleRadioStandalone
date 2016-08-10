@@ -152,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 if (bytesRead > 0)
                 {
                     // There  might be more data, so store the data received so far.
-                    state.sb.Append(Encoding.ASCII.GetString(
+                    state.sb.Append(Encoding.UTF8.GetString(
                         state.buffer, 0, bytesRead));
 
                     var content = state.sb.ToString();
@@ -222,7 +222,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         // Do nothing for now
                         break;
                     case NetworkMessage.MessageType.UPDATE:
-                        HandleRadioUpdate(message);
+                        HandleClientMetaDataUpdate(message);
+                        break;
+                    case NetworkMessage.MessageType.RADIO_UPDATE:
+                        HandleClientRadioUpdate(message);
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
@@ -239,7 +242,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
                         }
 
-                        HandleRadioSync(clientIp, state.workSocket, message);
+                        HandleRadioClientsSync(clientIp, state.workSocket, message);
 
                         break;
                     default:
@@ -253,7 +256,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        private void HandleRadioUpdate(NetworkMessage message)
+        private void HandleClientMetaDataUpdate(NetworkMessage message)
+        {
+            if (_clients.ContainsKey(message.Client.ClientGuid))
+            {
+                var client = _clients[message.Client.ClientGuid];
+
+                if (client != null)
+                {
+                    //copy the data we need
+                    client.LastUpdate = Environment.TickCount;
+                    client.Name = message.Client.Name;
+                    client.Coalition = message.Client.Coalition;
+                   
+
+                    //send update to everyone
+                    //Remove Client Radio Info
+                    var replyMessage = new NetworkMessage
+                    {
+                        MsgType = NetworkMessage.MessageType.UPDATE,
+                        Client = new SRClient()
+                        {
+                            ClientGuid = client.ClientGuid,
+                            Coalition = client.Coalition,
+                            Name = client.Name,
+                            LastUpdate = client.LastUpdate
+                        }
+                    };
+
+                    foreach (var clientToSent in _clients)
+                    {
+                        Send(clientToSent.Value.ClientSocket, replyMessage);
+                    }
+                }
+            }
+        }
+
+
+        private void HandleClientRadioUpdate(NetworkMessage message)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -264,27 +304,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     client.LastUpdate = Environment.TickCount;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
-                    //send update to everyone
+                    client.RadioInfo = message.Client.RadioInfo;
 
-                    var replyMessage = new NetworkMessage();
-                    replyMessage.MsgType = NetworkMessage.MessageType.UPDATE;
-                    replyMessage.Client = client;
-
-                    foreach (var clientToSent in _clients)
-                    {
-                        Send(clientToSent.Value.ClientSocket, replyMessage);
-                    }
+                    _logger.Info("Received Radio Update");
                 }
             }
         }
 
-        private void HandleRadioSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
+
+        private void HandleRadioClientsSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
-            var replyMessage = new NetworkMessage();
-            replyMessage.MsgType = NetworkMessage.MessageType.SYNC;
-
-            replyMessage.Clients = new List<SRClient>();
+            var replyMessage = new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.SYNC,
+                Clients = new List<SRClient>()
+            };
 
             foreach (var clientToSent in _clients)
             {
@@ -299,7 +334,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             try
             {
                 // Convert the string data to byte data using ASCII encoding.
-                var byteData = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
+                var byteData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
                 // Begin sending the data to the remote device.
                 handler.BeginSend(byteData, 0, byteData.Length, 0,

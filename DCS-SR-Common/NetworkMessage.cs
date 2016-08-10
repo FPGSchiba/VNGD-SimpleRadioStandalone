@@ -6,9 +6,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public enum MessageType
         {
-            UPDATE,
+            UPDATE, //META Data update - No Radio Information
             PING,
-            SYNC
+            SYNC,
+            RADIO_UPDATE //Only received server side
         }
 
         public SRClient Client { get; set; }

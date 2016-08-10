@@ -10,7 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker
     {
-        private static readonly string VERSION = "1.1.5.0";
+        private static readonly string VERSION = "1.1.6.0";
 
         public static async void CheckForUpdate()
         {

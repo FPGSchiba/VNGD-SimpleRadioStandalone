@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void Connect()
         {
-            var radioSync = new RadioSyncServer(ClientRadioUpdated, ClientSideUpdate);
+            var radioSync = new RadioSyncServer(ClientRadioUpdated, ClientCoalitionUpdate);
             using (_tcpClient = new TcpClient())
             {
                 _tcpClient.SendTimeout = 10;
@@ -75,10 +75,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void ClientRadioUpdated()
         {
-          //DO NOTHING FOR NOW
+            
+            SendToServer(new NetworkMessage
+            {
+                Client = new SRClient
+                {
+                    Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
+                    Name = RadioSyncServer.DcsPlayerSideInfo.name,
+                    ClientGuid = _guid,
+                    RadioInfo = RadioSyncServer.DcsPlayerRadioInfo,
+                
+                },
+                MsgType = NetworkMessage.MessageType.RADIO_UPDATE
+            });
+
         }
 
-        private void ClientSideUpdate()
+        private void ClientCoalitionUpdate()
         {
             SendToServer(new NetworkMessage
             {
@@ -209,7 +222,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                var json = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message) + "\n");
+                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
                 _tcpClient.GetStream().Write(json, 0, json.Length);
                 //Need to flush?
