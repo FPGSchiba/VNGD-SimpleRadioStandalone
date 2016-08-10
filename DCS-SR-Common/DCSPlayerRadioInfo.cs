@@ -59,10 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 return false;
             }
-            if (selected != compareRadio.selected)
-            {
-                return false;
-            }
+   
             if (unitId != compareRadio.unitId)
             {
                 return false;
@@ -89,6 +86,67 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public bool IsCurrent()
         {
             return lastUpdate > Environment.TickCount - 10000;
+        }
+
+
+        public RadioInformation CanHear(double frequency, byte modulation, UInt32 unitId,
+           out RadioReceivingState receivingState)
+        {
+            if (!this.IsCurrent())
+            {
+                receivingState = null;
+                return null;
+            }
+            for (var i = 0; i < 3; i++)
+            {
+                var receivingRadio = this.radios[i];
+
+                if (receivingRadio != null)
+                {
+                    //handle INTERCOM Modulation is 2
+                    if (receivingRadio.modulation == 2 && modulation == 2
+                        && this.unitId > 0 && unitId > 0
+                        && this.unitId == unitId)
+                    {
+                        receivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = false,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
+
+                      
+                        return receivingRadio;
+                    }
+                    if (receivingRadio.frequency == frequency
+                        && receivingRadio.modulation == modulation
+                        && receivingRadio.frequency > 1)
+                    {
+                        receivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = false,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
+                       
+                        return receivingRadio;
+                    }
+                    if (receivingRadio.secondaryFrequency == frequency
+                        && receivingRadio.secondaryFrequency > 100)
+                    {
+                        receivingState = new RadioReceivingState()
+                        {
+                            IsSecondary = true,
+                            LastReceviedAt = Environment.TickCount,
+                            ReceivedOn = i
+                        };
+                       
+                        return receivingRadio;
+                    }
+                }
+            }
+            receivingState = null;
+            return null;
         }
     }
 }

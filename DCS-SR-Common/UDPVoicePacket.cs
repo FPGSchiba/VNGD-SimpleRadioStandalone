@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             combinedBytes[3] = part2Size[1];
 
             //copy audio segments after we've added the two length heads
-            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 4, AudioPart2Bytes.Length); // copy audio
+            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 4, AudioPart1Bytes.Length); // copy audio
             Buffer.BlockCopy(AudioPart2Bytes, 0, combinedBytes, AudioPart1Bytes.Length + 4, AudioPart2Bytes.Length); // copy audio
 
             var freq = BitConverter.GetBytes(Frequency); //8 bytes
@@ -89,7 +89,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             combinedBytes[combinedLength + 12] = unitId[2];
             combinedBytes[combinedLength + 13] = unitId[3];
 
-            Buffer.BlockCopy(GuidBytes, 0, combinedBytes, combinedLength + FixedPacketLength , GuidLength);
+            Buffer.BlockCopy(GuidBytes, 0, combinedBytes, combinedLength + FixedPacketLength - GuidLength, GuidLength);
             // copy short guid
 
             return combinedBytes;
@@ -101,16 +101,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             var recievingGuid = Encoding.ASCII.GetString(
                 encodedOpusAudio, encodedOpusAudio.Length - GuidLength, GuidLength);
 
-            var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                encodedOpusAudio.Length - 22 - 4 - 1 - 1 - 8);
-
-            //before guid and frequency so - 22 - 4 - 1 - 1  
-            var modulation = (byte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1 - 1];
-
-            var encryption = (byte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1];
-
-            var unitId = BitConverter.ToUInt32(encodedOpusAudio, encodedOpusAudio.Length - 22 - 4);
-
             var ecnAudio1 = BitConverter.ToUInt16(encodedOpusAudio, 0);
             var ecnAudio2 = BitConverter.ToUInt16(encodedOpusAudio, 2);
 
@@ -119,6 +109,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             var part2 = new byte[ecnAudio2];
             Buffer.BlockCopy(encodedOpusAudio, 4 + ecnAudio1, part2, 0, ecnAudio2);
+
+            var frequency = BitConverter.ToDouble(encodedOpusAudio,
+                ecnAudio1+ ecnAudio2+4);
+
+            //after frequency and audio
+            var modulation = (byte)encodedOpusAudio[ecnAudio1 + ecnAudio2 + 4 + 8];
+
+            var encryption = (byte)encodedOpusAudio[ecnAudio1 + ecnAudio2 + 4 + 8 + 1 ];
+
+            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + ecnAudio2 + 4 + 8 + 1 + 1);
 
             return new UDPVoicePacket()
             {

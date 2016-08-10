@@ -105,6 +105,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     clientRadio.frequency = clientRadio.freqMin;
                 }
+
+                //make radio data stale to force resysnc
+                RadioSyncServer.LastSent = 0;
+
             }
         }
 
@@ -144,7 +148,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     clientRadio.secondaryFrequency = 1; //indicates we want it back
                 }
 
-
+                //make radio data stale to force resysnc
+                RadioSyncServer.LastSent = 0;
             }
             FocusDCS();
         }

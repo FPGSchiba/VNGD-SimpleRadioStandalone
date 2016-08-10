@@ -53,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             if (_clientsList.ContainsKey(guid))
                             {
                                 var client = _clientsList[guid];
-                                client.voipPort = groupEP;
+                                client.VoipPort = groupEP;
 
                                 var spectatorAudio = _serverSettings.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
 
@@ -63,7 +63,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 }
                                 else
                                 {
-                                    SendToOthers(rawBytes,client );
+                                    try
+                                    {
+                                        //decode
+                                        var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(rawBytes);
+
+                                        if (udpVoicePacket != null)
+                                        {
+                                            SendToOthers(rawBytes, client, udpVoicePacket);
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        //Hide for now, slows down loop to much....
+                                    }
+                                   
+                                   
                                 }
                             }
                             else
@@ -115,7 +130,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
         }
 
-        private void SendToOthers(byte[] bytes, SRClient fromClient)
+        private void SendToOthers(byte[] bytes, SRClient fromClient, UDPVoicePacket udpVoicePacket)
         {
             var coalitionSecurity =
                                     _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
@@ -127,18 +142,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 {
                     if (!client.Key.Equals(guid))
                     {
-                        var ip = client.Value.voipPort;
+                        var ip = client.Value.VoipPort;
 
                         // check that either coalition radio security is disabled OR the coalitions match
                         if (ip != null && (!coalitionSecurity || client.Value.Coalition == fromClient.Coalition))
                         {
-                            //TODO only send to clients on the same team?
-                            _listener.Send(bytes, bytes.Length, ip);
+                            var radioInfo = client.Value.RadioInfo;
+                         
+                            if (radioInfo != null  )
+                            {
+                                RadioReceivingState radioReceivingState = null;
+                                var receivingRadio = radioInfo.CanHear(udpVoicePacket.Frequency, udpVoicePacket.Modulation,
+                                    udpVoicePacket.UnitId, out radioReceivingState);
+
+                                //only send if we can hear!
+                                if (receivingRadio != null)
+                                {
+                                    _listener.Send(bytes, bytes.Length, ip);
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        var ip = client.Value.voipPort;
+                        var ip = client.Value.VoipPort;
 
                         if (ip != null)
                         {

@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private UdpClient _dcsUdpListener;
 
-        private long _lastSent;
+        public static long LastSent { get; set; }
 
         public RadioSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate)
         {
@@ -66,6 +66,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             _dcsUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
+            //reset last sent
+            LastSent = 0;
 
             Task.Factory.StartNew(() =>
             {
@@ -79,19 +81,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         try
                         {
                             var message =
-                                JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.ASCII.GetString(
+                                JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
-                          //  Logger.Info("Recevied Message from DCS: "+ Encoding.ASCII.GetString(
+                          //  Logger.Info("Recevied Message from DCS: "+ Encoding.UTF8.GetString(
                           //          bytes, 0, bytes.Length));
 
-                            //update internal radio
-                            UpdateRadio(message);
-
                             //sync with others
-                            if (ShouldSendUpdate(message))
+                            //Radio info is marked as Stale for FC3 aircraft after every frequency change
+
+                            if (UpdateRadio(message) || IsRadioInfoStale(message))
                             {
-                                _lastSent = Environment.TickCount;
+                                
+                                LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
                             }
                         }
@@ -140,7 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         try
                         {
                             var playerInfo =
-                                JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.ASCII.GetString(
+                                JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
                             if (DcsPlayerSideInfo.name != playerInfo.name || DcsPlayerSideInfo.side != playerInfo.side ||
@@ -174,17 +176,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             });
         }
 
-        private void UpdateRadio(DCSPlayerRadioInfo message)
+        private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
-            
+
+            bool changed = false;
             if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 // Full radio, all from DCS
             {
+                changed = !DcsPlayerRadioInfo.Equals(message);
+
                 DcsPlayerRadioInfo = message;
             }
             else if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
                 // Partial radio - can select radio but the rest is from DCS
             {
+                //check if its changed frequency wise
+                changed = !DcsPlayerRadioInfo.Equals(message);
+
                 //update common parts
                 DcsPlayerRadioInfo.name = message.name;
                 DcsPlayerRadioInfo.radioType = message.radioType;
@@ -198,12 +206,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.ptt = message.ptt;
 
             }
-            else // FC3 Radio - Take nothing from DCS, just update the last tickcount
+            else // FC3 Radio - Take nothing from DCS, just update the last tickcount, UPDATE triggered a different way
             {
                 if (DcsPlayerRadioInfo.unitId != message.unitId)
                 {
                     //replace it all - new aircraft
                     DcsPlayerRadioInfo = message;
+                    changed = true;
                 }
                 else // same aircraft
                 {
@@ -261,13 +270,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             //update
             DcsPlayerRadioInfo.lastUpdate = Environment.TickCount;
 
-           // SendUpdateToGui();
+            return changed;
         }
 
-        private bool ShouldSendUpdate(DCSPlayerRadioInfo radioUpdate)
+        private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if (Environment.TickCount - _lastSent < 4000)
+            if (Environment.TickCount - LastSent < 8000)
             {
                 return false;
             }

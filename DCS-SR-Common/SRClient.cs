@@ -13,6 +13,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public string Name { get; set; }
 
+      //  public DcsPosition Position { get; set; }
+
         private int _coalition;
         public int Coalition
         {
@@ -28,12 +30,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public Socket ClientSocket { get; set; }
 
         [JsonIgnore]
-        public IPEndPoint voipPort { get; set; }
+        public IPEndPoint VoipPort { get; set; }
 
         [JsonIgnore]
         public long LastUpdate { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public DCSPlayerRadioInfo RadioInfo { get; set; }
 
         public bool isCurrent()
         {

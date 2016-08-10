@@ -152,7 +152,6 @@
     <Compile Include="RadioOverlayWindow\RadioOverlay.xaml.cs">
       <DependentUpon>RadioOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RadioReceivingState.cs" />
     <Compile Include="RadioSendingState.cs" />
     <Compile Include="RadioSyncServer.cs" />
     <Compile Include="Settings.cs" />

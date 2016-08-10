@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
-    class RadioReceivingState
+    public class RadioReceivingState
     {
         public double LastReceviedAt { get; set; }
 
