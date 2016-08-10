@@ -42,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private Cabhishek.Timers.Timer _timer;
 
-        private readonly int JITTER_BUFFER = 100; //in milliseconds
+        private readonly int JITTER_BUFFER = 150; //in milliseconds
 
         private static object _lock = new object();
 
@@ -244,69 +244,48 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                             if (myClient != null && RadioSyncServer.DcsPlayerRadioInfo.IsCurrent())
                             {
-                                //last 22 bytes are guid!
-                                var recievingGuid = Encoding.ASCII.GetString(
-                                    encodedOpusAudio, encodedOpusAudio.Length - 22, 22);
-
-                                var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                                    encodedOpusAudio.Length - 22 - 4 - 1 - 1 - 8);
-
-                                //before guid and modulation so - 22 - 4 - 1 - 1  
-                                var modulation = (sbyte) encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1 - 1 ];
-
-                                var encryption = (sbyte)encodedOpusAudio[encodedOpusAudio.Length - 22 - 4 - 1 ];
-
-                                var unitId = BitConverter.ToUInt32(encodedOpusAudio, encodedOpusAudio.Length - 22 - 4);
+                                //Decode bytes
+                                var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
 
                                 // check the radio
                                 var radioId = -1;
-                                var receivingRadio = CanHear(RadioSyncServer.DcsPlayerRadioInfo, frequency,
-                                    modulation,
-                                    unitId, out radioId);
+                                var receivingRadio = CanHear(RadioSyncServer.DcsPlayerRadioInfo, udpVoicePacket.Frequency,
+                                    udpVoicePacket.Modulation,
+                                    udpVoicePacket.UnitId, out radioId);
                                 if (receivingRadio != null)
                                 {
-                                    var ecnAudio1 = BitConverter.ToUInt16(encodedOpusAudio, 0);
-                                    var ecnAudio2 = BitConverter.ToUInt16(encodedOpusAudio, 2);
 
-                                    var part1 = new byte[ecnAudio1];
-                                    Buffer.BlockCopy(encodedOpusAudio, 4, part1, 0, ecnAudio1);
-
-                                    var part2 = new byte[ecnAudio2];
-                                    Buffer.BlockCopy(encodedOpusAudio, 4 + ecnAudio1, part2, 0, ecnAudio2);
-
-                                    //now check that the radios match
+                                    //DECODE audio
                                     int len1;
-                                
-                                    //- 22 so we ignore the UUID
-                                    var decoded = _decoder.Decode(part1,
-                                        part1.Length, out len1);
+                                    var decoded = _decoder.Decode(udpVoicePacket.AudioPart1Bytes,
+                                        udpVoicePacket.AudioPart1Bytes.Length, out len1);
 
                                     int len2;
-                                    var decoded2 = _decoder.Decode(part2,
-                                        part2.Length, out len2);
+                                    var decoded2 = _decoder.Decode(udpVoicePacket.AudioPart2Bytes,
+                                        udpVoicePacket.AudioPart2Bytes.Length, out len2);
 
                                     if (len1 > 0 && len2 > 0)
                                     {
                                         // for some reason if this is removed then it lags?!
+                                        //guess it makes a giant buffer and only uses a little?
                                         var tmp = new byte[len1 +len2];
                                         Buffer.BlockCopy(decoded, 0, tmp, 0, len1);
                                         Buffer.BlockCopy(decoded2, 0, tmp, len1, len2);
-                                    //    Array.Copy(decoded2, tmp, len1);
 
                                         //ALL GOOD!
                                         //create marker for bytes
                                         var audio = new ClientAudio
                                         {
-                                            ClientGuid = recievingGuid,
+                                            ClientGuid = udpVoicePacket.Guid,
                                             PcmAudio = tmp,
                                             ReceiveTime = GetTickCount64(),
-                                            Frequency = frequency,
-                                            Modulation = modulation,
+                                            Frequency = udpVoicePacket.Frequency,
+                                            Modulation = udpVoicePacket.Modulation,
                                             Volume = receivingRadio.volume,
                                             ReceivedRadio = radioId,
-                                            UnitId = unitId,
-                                            Encryption = encryption,
-                                            Decryptable = encryption == receivingRadio.enc // mark if we can decrypt it
+                                            UnitId = udpVoicePacket.UnitId,
+                                            Encryption = udpVoicePacket.Encryption,
+                                            Decryptable = udpVoicePacket.Encryption == receivingRadio.enc // mark if we can decrypt it
                                         };
 
                                         //add to JitterBuffer!
@@ -333,7 +312,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, sbyte modulation, UInt32 unitId,
+        private RadioInformation CanHear(DCSPlayerRadioInfo myClient, double frequency, byte modulation, UInt32 unitId,
             out int radioId)
         {
             if (!myClient.IsCurrent())
@@ -423,11 +402,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 try
                 {
-                    //Packet Format
-                    //append OPUS bytes (unknown length?)
-                    //append frequency - double (8bytes)
-                    //append modulation - AM / FM (1 byte)
-                    //append guid - String - (36 bytes)
                     var currentSelected = RadioSyncServer.DcsPlayerRadioInfo.selected;
                     //removes race condition by assigning here with the current selected changing
                     if (currentSelected >= 0 && currentSelected < 3)
@@ -437,55 +411,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         if (radio != null && (radio.frequency > 100 && radio.modulation != 3)
                             || radio.modulation == 2)
                         {
-                            var combinedLength = part1.Length + part2.Length + 4;
-                                //2 * int16 at the start giving the two segments
-
-                            var combinedBytes = new byte[combinedLength + 8 + 1 + 1 + 4 + 22];
-
-
-                            byte[] part1Size = BitConverter.GetBytes(Convert.ToUInt16(part1.Length));
-                            combinedBytes[0] = part1Size[0];
-                            combinedBytes[1] = part1Size[1];
-
-                            byte[] part2Size = BitConverter.GetBytes(Convert.ToUInt16(part2.Length));
-                            combinedBytes[2] = part2Size[0];
-                            combinedBytes[3] = part2Size[1];
-
-                            //copy audio segments after we've added the two length heads
-                            Buffer.BlockCopy(part1, 0, combinedBytes, 4, part1.Length); // copy audio
-                            Buffer.BlockCopy(part2, 0, combinedBytes, part1.Length + 4, part2.Length); // copy audio
+                            //generate packet
+                            var udpVoicePacket = new UDPVoicePacket()
+                            {
+                                GuidBytes = _guidAsciiBytes,
+                                AudioPart1Bytes = part1,
+                                AudioPart1Length = (ushort) part1.Length,
+                                AudioPart2Bytes = part2,
+                                AudioPart2Length = (ushort) part2.Length,
+                                Frequency = radio.frequency,
+                                UnitId = RadioSyncServer.DcsPlayerRadioInfo.unitId,
+                                Encryption = radio.enc,
+                                Modulation = radio.modulation
+                            }.EncodePacket();
 
                             part1 = null;
                             part2 = null;
 
-                            var freq = BitConverter.GetBytes(radio.frequency); //8 bytes
-
-                            combinedBytes[combinedLength] = freq[0];
-                            combinedBytes[combinedLength + 1] = freq[1];
-                            combinedBytes[combinedLength + 2] = freq[2];
-                            combinedBytes[combinedLength + 3] = freq[3];
-                            combinedBytes[combinedLength + 4] = freq[4];
-                            combinedBytes[combinedLength + 5] = freq[5];
-                            combinedBytes[combinedLength + 6] = freq[6];
-                            combinedBytes[combinedLength + 7] = freq[7];
-
-                            //modulation
-                            combinedBytes[combinedLength + 8] = (byte) radio.modulation; //1 byte;
-
-                            combinedBytes[combinedLength + 9] = (byte) radio.enc; //1 byte;
-
-                            //unit Id
-                            var unitId = BitConverter.GetBytes(RadioSyncServer.DcsPlayerRadioInfo.unitId); //4 bytes
-                            combinedBytes[combinedLength + 10] = unitId[0];
-                            combinedBytes[combinedLength + 11] = unitId[1];
-                            combinedBytes[combinedLength + 12] = unitId[2];
-                            combinedBytes[combinedLength + 13] = unitId[3];
-
-                            Buffer.BlockCopy(_guidAsciiBytes, 0, combinedBytes, combinedLength + 8 + 1 + +1 + 4, 22);
-                                // copy short guid
-
                             var ip = new IPEndPoint(_address, 5010);
-                            _listener.Send(combinedBytes, combinedBytes.Length, ip);
+                            _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
 
                             RadioSendingState = new RadioSendingState()
                             {

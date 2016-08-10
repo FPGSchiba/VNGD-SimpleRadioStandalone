@@ -14,6 +14,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class AudioManager
     {
+        public static readonly int SAMPLE_RATE = 16000;
+        public static readonly int SEGMENT_FRAMES = 960; //480 for 8000 960 for 24000
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private int _bytesPerSegment;
 
@@ -80,10 +82,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //       _playBuffer = new BufferedWaveProvider(new NAudio.Wave.WaveFormat(48000, 16, 1));
 
-                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(8000, 2));
+                _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(SAMPLE_RATE, 2));
 
                 //add silence track?
-                var provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(8000, 2));
+                var provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(SAMPLE_RATE, 2));
                 //  provider.BufferDuration = TimeSpan.FromMilliseconds(100);
 
                 _mixing.AddMixerInput(provider);
@@ -100,17 +102,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.Init(_mixing);
                 _waveOut.Play();
 
-                _segmentFrames = 480; //960 frames is 20 ms of audio
-                _encoder = OpusEncoder.Create(8000, 1, Application.Restricted_LowLatency);
+                _segmentFrames = SEGMENT_FRAMES; //960 frames is 20 ms of audio
+                _encoder = OpusEncoder.Create(SAMPLE_RATE, 1, Application.Restricted_LowLatency);
                 //    _encoder.Bitrate = 8192;
-                _decoder = OpusDecoder.Create(8000, 1);
+                _decoder = OpusDecoder.Create(SAMPLE_RATE, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
                 _waveIn.BufferMilliseconds = 100;
                 _waveIn.DeviceNumber = mic;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new WaveFormat(8000, 16, 1); // should this be 44100??
+                _waveIn.WaveFormat = new WaveFormat(SAMPLE_RATE, 16, 1); // should this be 44100??
 
                 _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);

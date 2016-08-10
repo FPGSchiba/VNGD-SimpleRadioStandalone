@@ -13,6 +13,9 @@ SR = {}
 SR.M2000C_ENCRYPTION_KEY = 3 -- Change your Mirage Encryption Key here. Set to a number (inclusive) between 1-15
                              -- Setting the number to 1-6 will allow you to talk to an A-10C with encryption
 
+SR.SA342_ENCRYPTION_KEY = 3 -- Change your Gazelle Encryption Key here. Set to a number (inclusive) between 1-15
+                             -- Setting the number to 1-6 will allow you to talk to an A-10C with encryption
+
 SR.unicast = true --DONT CHANGE THIS
 
 SR.dbg = {}
@@ -27,6 +30,24 @@ end
 package.path  = package.path..";.\\LuaSocket\\?.lua"
 package.cpath = package.cpath..";.\\LuaSocket\\?.dll"
 
+---- DCS Search Paths - So we can load Terrain!
+local guiBindPath = './dxgui/bind/?.lua;' .. 
+              './dxgui/loader/?.lua;' .. 
+              './dxgui/skins/skinME/?.lua;' .. 
+              './dxgui/skins/common/?.lua;'
+
+package.path = 
+      package.path..";"
+    .. guiBindPath
+    .. './MissionEditor/?.lua;'
+    .. './MissionEditor/themes/main/?.lua;'
+    .. './MissionEditor/modules/?.lua;' 
+    .. './Scripts/?.lua;'
+    .. './LuaSocket/?.lua;'
+    .. './Scripts/UI/?.lua;'
+    .. './Scripts/UI/Multiplayer/?.lua;'
+    .. './Scripts/DemoScenes/?.lua;'
+
 local socket = require("socket")
 
 local JSON = loadfile("Scripts\\JSON.lua")()
@@ -34,6 +55,12 @@ SR.JSON = JSON
 
 SR.UDPSendSocket = socket.udp()
 SR.UDPSendSocket:settimeout(0)
+
+local terrain = require('terrain')
+
+if terrain ~= nil then
+  SR.log("Loaded Terrain!")
+end
 
 -- Prev Export functions.
 local _prevExport = {}
@@ -52,32 +79,32 @@ LuaExportActivityNextEvent = function(tCurrent)
 
         local _status,_result = pcall(function()
 
-            local _update  =
-            {
-                name = "",
-                unit = "",
-                selected = -1,
-                unitId = -1,
-                ptt = false,
-                radios =
-                {
-                    { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000,enc = 0}, -- enc means encrypted
-                    { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 ,enc = 0},
-                    { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000,enc = 0 }
-                },
-                radioType = 3,
-            }
+            local _update = nil
 
             local _data = LoGetSelfData()
 
             if _data ~= nil then
 
+                 _update  =
+                {
+                    name = "",
+                    unit = "",
+                    selected = -1,
+                    unitId = -1,
+                    ptt = false,
+                    radios =
+                    {
+                        { id = 1, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 200*1000000, freqMax = 400*1000000,enc = 0}, -- enc means encrypted
+                        { id = 2, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 100*1000000, freqMax = 200*1000000 ,enc = 0},
+                        { id = 3, name = "init", frequency = 0, modulation = 0, volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000,enc = 0 }
+                    },
+                    radioType = 3,
+                }
 
                 _update.name =  _data.UnitName
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
-                --            _update.pos.x = _data.Position.x
-                --            _update.pos.y = _data.Position.z
+                _update.pos = SR.exportPlayerLocation(_data)
 
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
@@ -145,22 +172,17 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                     _update.selected = 1
                 end
-
-                if SR.unicast then
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
-                else
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
-                end
-
             else
 
                 --Ground Commander or spectator
-                local _update  =
+                 _update  =
                 {
                     name = "Unknown",
                     unit = "CA",
                     selected = 0,
                     ptt = false,
+                    intercom = false,
+                    pos = {x=0,y=0,z=0},
                     radios =
                     {
                         { id = 1, name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,enc = 0 },
@@ -169,13 +191,12 @@ LuaExportActivityNextEvent = function(tCurrent)
                     },
                     radioType = 3
                 }
+            end
 
-                if SR.unicast then
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
-                else
-                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
-                end
-
+            if SR.unicast then
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
+            else
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
             end
 
         end)
@@ -195,6 +216,12 @@ LuaExportActivityNextEvent = function(tCurrent)
 		if _prevExport.LuaExportActivityNextEvent then
 			_prevExport.LuaExportActivityNextEvent(tCurrent)
 		end
+
+        if terrain ~= nil then
+          --  SR.log("Terrain IS GOOD")
+            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
+            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
+        end
     end)
 
     if not _status then
@@ -202,6 +229,15 @@ LuaExportActivityNextEvent = function(tCurrent)
     end
 
     return tNext
+end
+
+function SR.exportPlayerLocation(_data)
+
+    if _data ~= nil and _data.Position ~= nil then
+        return _data.Position
+    else
+        return {x=0,y=0,z=0}
+    end
 end
 
 function SR.exportRadioA10A(_data)
@@ -395,17 +431,17 @@ end
 
 function SR.exportRadioSA342(_data)
 
-    _data.radios[1].name = "VHF/AM Radio"
+    _data.radios[1].name = "TRAP 138A"
     _data.radios[1].frequency = SR.getRadioFrequency(5)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = SR.getRadioVolume(0, 68,{1.0,0.0},true)
 
-    _data.radios[2].name = "UHF/AM Radio"
+    _data.radios[2].name = "UHF TRA 6031"
     _data.radios[2].frequency = SR.getRadioFrequency(31)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
 
-    _data.radios[3].name = "FM Radio"
+    _data.radios[3].name = "TRC 9600 PR4G"
     _data.radios[3].frequency = SR.getRadioFrequency(28)
     _data.radios[3].modulation = 1
     _data.radios[3].volume =  SR.getRadioVolume(0, 70,{0.0,1.0},false) 
@@ -413,7 +449,11 @@ function SR.exportRadioSA342(_data)
     --- is UHF ON?
 	if SR.getSelectorPosition(383,0.167) == 0   then
 		_data.radios[2].frequency = 1
-	end
+	elseif SR.getSelectorPosition(383,0.167) == 2 then
+        --check UHF encryption
+        _data.radios[2].enc = SR.SA342_ENCRYPTION_KEY
+    end
+
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383,0.167)
@@ -422,9 +462,14 @@ function SR.exportRadioSA342(_data)
 	end
     
     --- is FM ON?
-	if SR.getSelectorPosition(272,0.25) == 0   then
+	if SR.getSelectorPosition(272,0.25) == 0  then
 		_data.radios[3].frequency = 1
-	end
+	elseif SR.getSelectorPosition(272,0.25) == 2 then
+        --check FM encryption
+        _data.radios[3].enc = SR.SA342_ENCRYPTION_KEY
+    end
+
+   
 
     _data.radioType = 2; -- partial Radio
 
@@ -856,78 +901,51 @@ end
 
 function SR.exportRadioC101(_data)
 
-    --    local _count = 0
-    --
-    --    local status,result;
-    --
-    --    while(true) do
-    --        status,result = pcall(function(_c)
-    --            return SR.getRadioFrequency(_c)
-    --        end, _count)
-    --
-    --        if not status and _count < 1000 then
-    --            SR.log('ERROR: ' .. result)
-    --            _count = _count +1
-    --            result = 0.0
-    --        else
-    --            break
-    --        end
-    --
-    --    end
-    local MHZ = 1000000
+    _data.radios[1].name = "INTERCOM"
+    _data.radios[1].frequency =  100
+    _data.radios[1].modulation = 2
+    _data.radios[1].volume = SR.getRadioVolume(0, 403,{0.0,1.0},false)
 
-    _data.radios[1].name = "AN/ARC-164 UHF"
-
+    _data.radios[2].name = "AN/ARC-164 UHF"
+     _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 234,{0.0,1.0},false)
+   
     local _selector = SR.getSelectorPosition(232,0.25)
 
-    if _selector == 1 or _selector == 2 then
-
-        local _hundreds = SR.round(SR.getKnobPosition(0, 226,{0.1,0.3},{1,3}),0.1)*100*1000000
-        local _tens = SR.round(SR.getKnobPosition(0, 227,{0.0,0.9},{0,9}),0.1)*10*1000000
-        local _ones = SR.round(SR.getKnobPosition(0, 228,{0.0,0.9},{0,9}),0.1)*1000000
-        local _tenth = SR.round(SR.getKnobPosition(0, 229,{0.0,0.9},{0,9}),0.1)*100000
-        local _hundreth = SR.round(SR.getKnobPosition(0, 230,{0.0,0.3},{0,3}),0.1)*10000
-
-        _data.radios[1].frequency = _hundreds+_tens+_ones+_tenth+_hundreth
+    if _selector ~= 0 then
+        _data.radios[2].frequency = SR.getRadioFrequency(9)
     else
-        _data.radios[1].frequency = 1
+        _data.radios[2].frequency = 1
     end
-    _data.radios[1].modulation = 0
-    _data.radios[1].volume = SR.getRadioVolume(0, 234,{0.0,1.0},false)
 
+    -- UHF Guard
+    if _selector == 2 then
+        _data.radios[2].secondaryFrequency = 243.0*1000000 
+    end
 
-    _data.radios[2].name = "AN/ARC-134"
+    _data.radios[3].name = "AN/ARC-134"
+    _data.radios[3].modulation = 0
+    _data.radios[3].volume = SR.getRadioVolume(0, 412,{0.0,1.0},false)
 
     local _vhfPower = SR.getSelectorPosition(413,1.0)
 
     if _vhfPower == 1 then
-
-        local _tens = (SR.round(SR.getKnobPosition(0, 415,{0.1,0.4},{1,4}),0.1)/2.5) *10*1000000
-        local _ones = SR.round(SR.getKnobPosition(0, 416,{0.0,0.9},{0,9}),0.1)*1000000
-        local _tenth = SR.round(SR.getKnobPosition(0, 417,{0.0,0.9},{0,9}),0.1)*100000
-        local _hundreth = SR.round(SR.getKnobPosition(0, 418,{0.0,0.3},{0,3}),0.1)*10000
-
-        _data.radios[2].frequency =(MHZ*110) + _tens+_ones+_tenth+_hundreth
+        _data.radios[3].frequency = SR.getRadioFrequency(8)
     else
-        _data.radios[2].frequency = 1
+        _data.radios[3].frequency = 1
     end
-    _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 412,{0.0,1.0},false)
-
-    _data.radios[3].name = "No Radio"
-    _data.radios[3].frequency =  1
-    _data.radios[3].modulation = 3
-    _data.radios[3].volume = 1.0
-
+  
     local _selector = SR.getSelectorPosition(404,0.5)
 
     if  _selector == 1 then
-        _data.selected = 0
-    elseif  _selector == 2 then
         _data.selected = 1
+    elseif  _selector == 2 then
+        _data.selected = 2
     else
-        _data.selected = -1
+        _data.selected = 0
     end
+
+    --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
     _data.radioType = 1; -- full radio
 
