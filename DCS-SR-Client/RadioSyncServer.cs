@@ -82,7 +82,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.ASCII.GetString(
                                     bytes, 0, bytes.Length));
 
-                          //  Logger.Info("Recevied Message from DCS: "+message);
+                          //  Logger.Info("Recevied Message from DCS: "+ Encoding.ASCII.GetString(
+                          //          bytes, 0, bytes.Length));
 
                             //update internal radio
                             UpdateRadio(message);

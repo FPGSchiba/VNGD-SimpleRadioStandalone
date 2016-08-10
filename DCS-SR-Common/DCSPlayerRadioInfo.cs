@@ -23,7 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string unit = "";
         public UInt32 unitId;
         public volatile  bool ptt = false;
-     
+        public DcsPosition pos = new DcsPosition();
+
         public DCSPlayerRadioInfo()
         {
             for (var i = 0; i < 3; i++)

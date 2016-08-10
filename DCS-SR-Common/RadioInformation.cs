@@ -5,11 +5,11 @@
         public double freqMax = 1;
         public double freqMin = 1;
         public double frequency = 1;
-        public sbyte modulation = 0;
+        public byte modulation = 0;
         public string name = "";
         public double secondaryFrequency = 1;
         public float volume = 1.0f;
-        public sbyte enc = 0; // encrytion channel - 0 is off
+        public byte enc = 0; // encrytion channel - 0 is off
 
         public override bool Equals(object obj)
         {
