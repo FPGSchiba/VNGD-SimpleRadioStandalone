@@ -352,7 +352,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     var currentSelected = RadioSyncServer.DcsPlayerRadioInfo.selected;
                     //removes race condition by assigning here with the current selected changing
-                    if (currentSelected >= 0 && currentSelected < 3)
+                    if (currentSelected >= 0 
+                        && currentSelected < RadioSyncServer.DcsPlayerRadioInfo.radios.Length)
                     {
                         var radio = RadioSyncServer.DcsPlayerRadioInfo.radios[currentSelected];
 

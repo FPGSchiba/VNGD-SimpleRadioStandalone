@@ -6,8 +6,41 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
 
              Name="radioControlContainer"
-             Width="120" Height="70">
-    <WrapPanel>
+             Width="130" Height="90">
+
+    <TabControl x:Name="tabControl" Height="90" Width="130" Style="{x:Null}" Background="#3D3D3D">
+
+        <TabControl.Resources>
+            <Style TargetType="TabItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#595959"  Margin="0" Padding="0">
+                                <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="0"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="#595959" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="False">
+                                    <Setter TargetName="Border" Property="Background" Value="#3D3D3D" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </TabControl.Resources>
+
+        <TabItem >
+            <TabItem.Header>
+                <TextBlock Text="Radio" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7" />
+            </TabItem.Header>
+            <WrapPanel >
 
         <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
                Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>
@@ -39,6 +72,19 @@
         	ToolTip="-0.01MHz" Click="Down001_Click" IsEnabled="False" />
         <Slider Style="{x:Null}" x:Name="radioVolume" Width="115" Margin="2" Maximum="100" IsEnabled="False" Height="15"
                 Thumb.DragCompleted="RadioVolume_DragCompleted" Thumb.DragStarted="RadioVolume_DragStarted" />
+  
 
     </WrapPanel>
+        </TabItem>
+        <TabItem >
+            <TabItem.Header>
+                <TextBlock Text="Config" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7" />
+            </TabItem.Header>
+
+            <Grid Background="#3D3D3D">
+                <Label Style="{x:Null}" Content="Encryption" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
+               Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </UserControl>

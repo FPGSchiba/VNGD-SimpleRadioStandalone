@@ -97,7 +97,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                             radio.RepaintRadioReceive();
                             radio.RepaintRadioStatus();
                         }
-                        
+
+                        intercom.RepaintRadioStatus();
                     });
                    
                 }

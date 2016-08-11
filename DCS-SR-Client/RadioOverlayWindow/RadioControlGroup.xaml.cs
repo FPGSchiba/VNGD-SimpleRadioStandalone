@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
                && RadioId >= 0
-               && RadioId < 3)
+               && RadioId < RadioSyncServer.DcsPlayerRadioInfo.radios.Length)
             {
                 //sort out the frequencies
                 var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];

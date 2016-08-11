@@ -20,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public string name = "";
 
-        public RadioInformation[] radios = new RadioInformation[3];
+        public RadioInformation[] radios = new RadioInformation[4];
         public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION;
         public short selected = 0;
         public string unit = "";
@@ -30,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public DCSPlayerRadioInfo()
         {
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < 4; i++)
             {
                 radios[i] = new RadioInformation();
             }
@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 return false;
             }
 
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < 4; i++)
             {
                 var radio1 = radios[i];
                 var radio2 = compareRadio.radios[i];
@@ -102,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 receivingState = null;
                 return null;
             }
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < 4; i++)
             {
                 var receivingRadio = this.radios[i];
 
