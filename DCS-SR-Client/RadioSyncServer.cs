@@ -268,7 +268,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
 
             //update
-            DcsPlayerRadioInfo.lastUpdate = Environment.TickCount;
+            DcsPlayerRadioInfo.LastUpdate = Environment.TickCount;
 
             return changed;
         }
@@ -276,7 +276,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if (Environment.TickCount - LastSent < 8000)
+            if (Environment.TickCount - LastSent < 7000)
             {
                 return false;
             }

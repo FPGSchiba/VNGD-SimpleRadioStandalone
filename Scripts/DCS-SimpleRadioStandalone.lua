@@ -974,7 +974,7 @@ function SR.exportRadioHawk(_data)
     _data.radios[1].modulation = 0
     _data.radios[1].volume = 1
 
-    _data.radios[2].name = "VHF"
+    _data.radios[2].name = "ARI 23259/1"
     _data.radios[2].frequency =  SR.getRadioFrequency(7)
     _data.radios[2].modulation = 0
     _data.radios[2].volume =1
