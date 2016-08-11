@@ -253,7 +253,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                 // check the radio
                                 RadioReceivingState receivingState = null;
-                                var receivingRadio = RadioSyncServer.DcsPlayerRadioInfo.CanHear(udpVoicePacket.Frequency,
+                                var receivingRadio = RadioSyncServer.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency,
                                     udpVoicePacket.Modulation,
                                     udpVoicePacket.UnitId, out receivingState);
                                 if (receivingRadio != null && receivingState !=null)

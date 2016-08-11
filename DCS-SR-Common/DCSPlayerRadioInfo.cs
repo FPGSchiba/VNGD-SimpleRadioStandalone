@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -14,7 +15,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             NO_COCKPIT_INTEGRATION = 3
         }
 
-        public long lastUpdate = 0;
+        [JsonIgnore]
+        public long LastUpdate { get; set; }
+
         public string name = "";
 
         public RadioInformation[] radios = new RadioInformation[3];
@@ -83,13 +86,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         }
 
 
+        /*
+         * Was Radio updated in the last 10 Seconds
+         */
         public bool IsCurrent()
         {
-            return lastUpdate > Environment.TickCount - 10000;
+            return LastUpdate > Environment.TickCount - 10000;
         }
 
-
-        public RadioInformation CanHear(double frequency, byte modulation, UInt32 unitId,
+        public RadioInformation CanHearTransmission(double frequency, byte modulation, UInt32 unitId,
            out RadioReceivingState receivingState)
         {
             if (!this.IsCurrent())

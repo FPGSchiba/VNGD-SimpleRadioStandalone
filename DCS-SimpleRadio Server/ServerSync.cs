@@ -301,10 +301,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 if (client != null)
                 {
+                    //update to local ticks
+                    message.Client.RadioInfo.LastUpdate = Environment.TickCount;
+
                     client.LastUpdate = Environment.TickCount;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.RadioInfo = message.Client.RadioInfo;
+                    
 
                     _logger.Info("Received Radio Update");
                 }
