@@ -22,8 +22,9 @@
         public string name = "";
         public double secondaryFrequency = 1;
         public float volume = 1.0f;
-        public byte enc = 0; // encrytion channel - 0 is off
-        public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION; 
+        public bool enc = false; // encrytion enabled
+        public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
+        public byte encKey = 0;
 
         /**
          * Used to determine if we should send an update to the server or not

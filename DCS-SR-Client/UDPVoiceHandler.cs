@@ -290,7 +290,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             ReceivedRadio = receivingState.ReceivedOn,
                                             UnitId = udpVoicePacket.UnitId,
                                             Encryption = udpVoicePacket.Encryption,
-                                            Decryptable = udpVoicePacket.Encryption == receivingRadio.enc // mark if we can decrypt it
+                                            Decryptable = udpVoicePacket.Encryption == receivingRadio.encKey // mark if we can decrypt it
                                         };
 
                                         //add to JitterBuffer!
@@ -370,7 +370,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 AudioPart2Length = (ushort) part2.Length,
                                 Frequency = radio.frequency,
                                 UnitId = RadioSyncServer.DcsPlayerRadioInfo.unitId,
-                                Encryption = radio.enc,
+                                Encryption = radio.enc?radio.encKey:(byte)0,
                                 Modulation = radio.modulation
                             }.EncodePacket();
 

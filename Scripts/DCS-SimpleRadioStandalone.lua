@@ -89,10 +89,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radios =
                     {
                         -- Radio 1 is always Intercom
-                        { name = "INTERCOM", frequency = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,enc = 0, encMode = 0 },
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,enc = 0, encMode = 0}, -- enc means encrypted
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,enc = 0, encMode = 0},
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,enc = 0, encMode = 0}
+                        { name = "INTERCOM", frequency = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0 },
+                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0}, -- enc means encrypted
+                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0},
+                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0}
                     },
                     radioType = 3,
                 }
@@ -181,10 +181,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radios =
                     {
                         --- Radio 0 is always intercom now
-                        { name = "Disabled", frequency = 100, modulation = 3,volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,enc = 0, encMode = 0 },
-                        { name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,enc = 0, encMode = 1 },
-                        { name = "CA UHF/VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,enc = 0 , encMode = 0  },
-                        { name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000,enc = 0, encMode = 1  }
+                        { name = "Disabled", frequency = 100, modulation = 3,volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0 },
+                        { name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1 },
+                        { name = "CA UHF/VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0  },
+                        { name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1  }
                     },
                     radioType = 3
                 }
@@ -256,6 +256,7 @@ function SR.exportRadioA10A(_data)
     _data.radios[3].freqMin = 225*1000000
     _data.radios[3].freqMax = 399.975*1000000
     
+    _data.radios[3].encKey = 1
     _data.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[4].name = "AN/ARC-186(V)FM"
@@ -265,6 +266,7 @@ function SR.exportRadioA10A(_data)
     _data.radios[4].freqMin = 30*1000000
     _data.radios[4].freqMax = 76*1000000
 
+    _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 	_data.radioType = 3;
@@ -345,6 +347,7 @@ function SR.exportRadioF15C(_data)
     _data.radios[2].freqMin = 225*1000000
     _data.radios[2].freqMax = 399.975*1000000
 
+    _data.radios[2].encKey = 1
     _data.radios[2].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[3].name = "AN/ARC-164 UHF-2"
@@ -353,6 +356,7 @@ function SR.exportRadioF15C(_data)
     _data.radios[3].freqMin = 225*1000000
     _data.radios[3].freqMax = 399.975*1000000
     
+    _data.radios[3].encKey = 1
     _data.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 	_data.radioType = 3;
@@ -420,6 +424,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
 	
+    _data.radios[3].encKey = 1
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
 
     _data.radios[4].name = "TRC 9600 PR4G"
@@ -427,6 +432,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[4].modulation = 1
     _data.radios[4].volume =  SR.getRadioVolume(0, 70,{0.0,1.0},false) 
 	
+    _data.radios[4].encKey = 1
     _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
 
     --- is UHF ON?
@@ -434,7 +440,7 @@ function SR.exportRadioSA342(_data)
 		_data.radios[3].frequency = 1
 	elseif SR.getSelectorPosition(383,0.167) == 2 then
         --check UHF encryption
-        _data.radios[3].enc = 1
+        _data.radios[3].enc = true
     end
 
 
@@ -449,7 +455,7 @@ function SR.exportRadioSA342(_data)
 		_data.radios[4].frequency = 1
 	elseif SR.getSelectorPosition(272,0.25) == 2 then
         --check FM encryption
-        _data.radios[4].enc = 1
+        _data.radios[4].enc = true
     end
 
     _data.radioType = 2; -- partial Radio
@@ -473,7 +479,7 @@ function SR.exportRadioKA50(_data)
     else
         _data.radios[2].modulation = 0
     end
-    _data.radios[2].volume = 1.0 -- no volume knob??
+    _data.radios[2].volume = SR.getRadioVolume(0, 353,{0.0,1.0},false) -- using ADF knob for now 
 
     _data.radios[3].name = "R-828"
     _data.radios[3].frequency = SR.getRadioFrequency(49,50000)
@@ -496,6 +502,12 @@ function SR.exportRadioKA50(_data)
 
 end
 function SR.exportRadioMI8(_data)
+
+    -- Doesnt work but might as well allow selection
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].frequency =100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume =1.0
 
     _data.radios[2].name = "R-863"
     _data.radios[2].frequency = SR.getRadioFrequency(38)
@@ -542,7 +554,13 @@ function SR.exportRadioMI8(_data)
         _data.ptt = true
     end
 
-    _data.radioType = 1; -- full radio
+
+    -- Radio / ICS Switch
+    if SR.getButtonPosition(553) > 0.5 then
+        _data.selected = 0
+    end
+
+       _data.radioType = 1; -- full radio
 
     return _data
 
@@ -636,7 +654,8 @@ function SR.exportRadioA10C(_data)
         local _channel = SR.getSelectorPosition(782,0.1) +1
 
         if _radio ~= nil and _channel ~= nil then
-            _radio.enc = _channel
+            _radio.encKey = _channel
+            _radio.enc = true
 --            SR.log("Radio Select".._radio.name)
 --            SR.log("Channel Select".._channel)
         end
@@ -918,6 +937,7 @@ function SR.exportRadioM2000C(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 706,{0.0,1.0},false)
 
+    _data.radios[3].encKey = 1
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
 
   --  local _switch = SR.getButtonPosition(700) -- remmed, the connectors are being coded, maybe soon will be a full radio.
@@ -935,7 +955,7 @@ function SR.exportRadioM2000C(_data)
 	end
 
     if SR.getButtonPosition(432) > 0.5 then --431
-        _data.radios[3].enc = 1
+        _data.radios[3].enc = true
     end
 
     _data.radioType = 2; -- partial radio, allows hotkeys

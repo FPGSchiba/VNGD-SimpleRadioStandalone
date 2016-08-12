@@ -19,7 +19,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class IntercomControlGroup : UserControl
     {
-        private const double MHz = 1000000;
         private bool _dragging;
 
         public int RadioId { private get; set; }
@@ -28,101 +27,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             InitializeComponent();
         }
-
-        private void Up001_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz/100);
-            FocusDCS();
-        }
-        private void Up01_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz / 10);
-            FocusDCS();
-        }
-
-        private void Up1_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz);
-            FocusDCS();
-        }
-
-        private void Up10_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz*10);
-            FocusDCS();
-        }
-
-        private void Down10_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz*-10);
-            FocusDCS();
-        }
-
-        private void Down1_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz*-1);
-            FocusDCS();
-        }
-
-        private void Down01_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz/10*-1);
-            FocusDCS();
-        }
-        private void Down001_Click(object sender, RoutedEventArgs e)
-        {
-            SendFrequencyChange(MHz / 100 * -1);
-            FocusDCS();
-        }
-
-        private void FocusDCS()
-        {
-            var localByName = Process.GetProcessesByName("dcs");
-
-            if (localByName != null && localByName.Length > 0)
-            {
-                //    WindowHelper.BringProcessToFront(localByName[0]);
-            }
-        }
-
-        private void SendFrequencyChange(double frequency)
-        {
-
-            if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
-               && RadioId >= 0
-               && RadioId < RadioSyncServer.DcsPlayerRadioInfo.radios.Length)
-            {
-                //sort out the frequencies
-                var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                clientRadio.frequency += frequency;
-
-                //make sure we're not over or under a limit
-                if (clientRadio.frequency > clientRadio.freqMax)
-                {
-                    clientRadio.frequency = clientRadio.freqMax;
-                }
-                else if (clientRadio.frequency < clientRadio.freqMin)
-                {
-                    clientRadio.frequency = clientRadio.freqMin;
-                }
-
-                //make radio data stale to force resysnc
-                RadioSyncServer.LastSent = 0;
-
-            }
-        }
-
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
             if (RadioSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
                 RadioSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
             }
-
-            FocusDCS();
         }
 
-   
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
         {
             _dragging = true;
@@ -140,11 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
             _dragging = false;
-
-            FocusDCS();
         }
 
-       
         internal void RepaintRadioStatus()
         {
             var dcsPlayerRadioInfo = RadioSyncServer.DcsPlayerRadioInfo;
@@ -185,12 +94,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (currentRadio.modulation == 2) //intercom
                 {
-                    radioLabel.Content = "INTERCOM";
+                    radioLabel.Text = "INTERCOM";
                     radioVolume.IsEnabled = false;
                 }
                 else
                 {
-                    radioLabel.Content = "No INTERCOM";
+                    radioLabel.Text = "NO INTERCOM";
                     radioActive.Fill = new SolidColorBrush(Colors.Red);
                 }
              

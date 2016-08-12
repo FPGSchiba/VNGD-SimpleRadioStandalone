@@ -4,18 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
-
+            xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="radioControlContainer"
-             Width="130" Height="90">
+             Width="135" Height="75" >
 
-    <TabControl x:Name="tabControl" Height="90" Width="130" Style="{x:Null}" Background="#3D3D3D">
+    <TabControl x:Name="tabControl"  Style="{x:Null}" Background="#444" >
 
         <TabControl.Resources>
             <Style TargetType="TabItem">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TabItem">
-                            <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#595959"  Margin="0" Padding="0">
+                            <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="#ACACAC"  Margin="0" Padding="0">
                                 <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"
@@ -38,12 +38,12 @@
 
         <TabItem >
             <TabItem.Header>
-                <TextBlock Text="Radio" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7" />
+                <TextBlock  x:Name="radioLabel" Text="Radio" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7"  />
             </TabItem.Header>
             <WrapPanel >
-
-        <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
-               Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>
+<!---->
+<!--        <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" -->
+<!--               Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>-->
 
         <Button Style="{StaticResource DarkStyle-Button}" HorizontalAlignment="Center" x:Name="up10" Content="" Width="15" Height="10" Margin="25,0,0,0"
                 ToolTip="+10MHz" Click="Up10_Click" IsEnabled="False"  />
@@ -55,7 +55,7 @@
         	ToolTip="+0.01MHz" Click="Up001_Click" IsEnabled="False" />
 
         <TextBlock Style="{x:Null}" x:Name="radioFrequency" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
-                   VerticalAlignment="Top" Width="100"
+                   VerticalAlignment="Top" Width="110"
                    MouseRightButtonDown="RadioFrequencyText_RightClick"
                    MouseDown="RadioFrequencyText_Click"
                    Background="Black" Foreground="#00FF00" Text="000.00AM" />
@@ -78,13 +78,18 @@
         </TabItem>
         <TabItem >
             <TabItem.Header>
-                <TextBlock Text="Config" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7" />
+                <TextBlock Text="Set" FontSize="10" Margin="3,0,3,0" Padding="0" Foreground="#E7E7E7" />
             </TabItem.Header>
 
-            <Grid Background="#3D3D3D">
-                <Label Style="{x:Null}" Content="Encryption" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
-               Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>
-            </Grid>
+            <WrapPanel Background="#444" Orientation="Vertical" HorizontalAlignment="Center" >
+                <TextBlock Text="Encryption Key" FontSize="10" TextAlignment="Center" HorizontalAlignment="Center"  Foreground="#E7E7E7" />
+                <WrapPanel Orientation="Horizontal">
+                    <xctk:IntegerUpDown Minimum="1" Maximum="252"  Value="1" Width="50" Height="20" Margin="5" />
+                    <Button Style="{x:Null}" Click="Encryption_ButtonClick" Content="Enable" Width="50" Height="20" Margin="5"  ></Button>
+                </WrapPanel>
+                
+            </WrapPanel>
+                  
         </TabItem>
     </TabControl>
 </UserControl>

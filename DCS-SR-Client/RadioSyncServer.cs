@@ -185,6 +185,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 changed = !DcsPlayerRadioInfo.Equals(message);
 
+                HandleEncryptionSettings(message);
+
                 DcsPlayerRadioInfo = message;
             }
             else if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
@@ -198,6 +200,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.radioType = message.radioType;
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
+
+                HandleEncryptionSettings(message);
 
                 //copy over the radios
                 DcsPlayerRadioInfo.radios = message.radios;
@@ -232,6 +236,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         clientRadio.freqMin = updateRadio.freqMin;
                         clientRadio.freqMax = updateRadio.freqMax;
+
+                        if (clientRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
+                        {
+                            clientRadio.enc = false;
+                            clientRadio.encKey = 1;
+                        }
 
                         clientRadio.name = updateRadio.name;
 
@@ -271,6 +281,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             DcsPlayerRadioInfo.LastUpdate = Environment.TickCount;
 
             return changed;
+        }
+
+        private void HandleEncryptionSettings(DCSPlayerRadioInfo radioUpdate)
+        {
+            // handle encryption type
+            for (int i = 0; i < radioUpdate.radios.Length; i++)
+            {
+                var updatedRadio = radioUpdate.radios[i];
+                var currentRadio = DcsPlayerRadioInfo.radios[i];
+
+                if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                {
+                    updatedRadio.enc = currentRadio.enc;
+                    updatedRadio.encMode = currentRadio.encMode;
+                    updatedRadio.encKey = currentRadio.encKey;
+                }
+                else if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                {
+                    //if its not 0, i.e not turned off copy it over
+                  
+                     updatedRadio.enc = currentRadio.enc;
+                     updatedRadio.encKey = currentRadio.encKey;
+
+                }
+            }
         }
 
         private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)

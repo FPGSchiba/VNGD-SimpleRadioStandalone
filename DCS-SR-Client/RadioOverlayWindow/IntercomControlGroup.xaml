@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
 
              Name="radioControlContainer"
-             Width="120" Height="40">
+             Width="135" Height="35">
     <WrapPanel>
 
-        <Label Style="{x:Null}" x:Name="radioLabel" Content="INTERCOM" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" 
-               Width="104" Padding="0" Margin="0" Foreground="#E7E7E7"/>
+        <TextBlock Style="{x:Null}" x:Name="radioLabel" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="10" 
+               Width="110" Padding="0" Margin="2" Foreground="#E7E7E7" Text="INTERCOM"/>
 
         <Ellipse Style="{x:Null}" x:Name="radioActive" Fill="#FF9900" HorizontalAlignment="Right" ToolTip="Selected Radio" Height="12"
                  Stroke="Black" VerticalAlignment="Center" Width="12" Margin="2" MouseDown="RadioSelectSwitch" />
