@@ -185,6 +185,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 changed = !DcsPlayerRadioInfo.Equals(message);
 
+                HandleEncryptionSettingsFullFidelity(message);
+
                 DcsPlayerRadioInfo = message;
             }
             else if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
@@ -198,6 +200,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.radioType = message.radioType;
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
+
+                HandleEncryptionSettingsFullFidelity(message);
 
                 //copy over the radios
                 DcsPlayerRadioInfo.radios = message.radios;
@@ -232,7 +236,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         clientRadio.freqMin = updateRadio.freqMin;
                         clientRadio.freqMax = updateRadio.freqMax;
-
+                                             
                         clientRadio.name = updateRadio.name;
 
                         if (clientRadio.secondaryFrequency == 0)
@@ -259,6 +263,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         {
                             clientRadio.frequency = clientRadio.freqMin;
                         }
+
+                        clientRadio.encMode = updateRadio.encMode;
+
+                        //Handle Encryption
+                        if (updateRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                        {
+                            if (clientRadio.encKey == 0)
+                            {
+                                clientRadio.encKey = 1;
+                            }
+                        }
+
                     }
 
                     //change PTT last
@@ -271,6 +287,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             DcsPlayerRadioInfo.LastUpdate = Environment.TickCount;
 
             return changed;
+        }
+
+        private void HandleEncryptionSettingsFullFidelity(DCSPlayerRadioInfo radioUpdate)
+        {
+            // handle encryption type
+            for (int i = 0; i < radioUpdate.radios.Length; i++)
+            {
+                var updatedRadio = radioUpdate.radios[i];
+                var currentRadio = DcsPlayerRadioInfo.radios[i];
+
+                if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                {
+                    if (currentRadio.encKey != 0)
+                    {
+                        updatedRadio.encKey = currentRadio.encKey;
+                    }
+                }
+               
+            }
         }
 
         private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)

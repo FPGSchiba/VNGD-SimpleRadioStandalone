@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             if (RadioSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
                && RadioId >= 0
-               && RadioId < 3)
+               && RadioId < RadioSyncServer.DcsPlayerRadioInfo.radios.Length)
             {
                 //sort out the frequencies
                 var clientRadio = RadioSyncServer.DcsPlayerRadioInfo.radios[RadioId];
@@ -217,12 +217,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         internal void RepaintRadioStatus()
         {
+            SetupEncryption();
+
             var dcsPlayerRadioInfo = RadioSyncServer.DcsPlayerRadioInfo;
 
             if (dcsPlayerRadioInfo  == null || !dcsPlayerRadioInfo.IsCurrent())
             {
                 radioActive.Fill = new SolidColorBrush(Colors.Red);
-                radioLabel.Content = "No Radio";
+                radioLabel.Text = "No Radio";
                 radioFrequency.Text = "Unknown";
 
                 radioVolume.IsEnabled = false;
@@ -257,7 +259,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (currentRadio.modulation == 3) // disabled
                 {
                     radioActive.Fill = new SolidColorBrush(Colors.Red);
-                    radioLabel.Content = "No Radio";
+                    radioLabel.Text = "No Radio";
                     radioFrequency.Text = "Unknown";
 
                     radioVolume.IsEnabled = false;
@@ -277,12 +279,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     {
                         radioFrequency.Text += " G";
                     }
-                    if (currentRadio.enc > 0)
+                    if (currentRadio.enc && currentRadio.encKey > 0)
                     {
-                        radioFrequency.Text += " E" + currentRadio.enc; // ENCRYPTED
+                        radioFrequency.Text += " E" + currentRadio.encKey; // ENCRYPTED
                     }
                 }
-                radioLabel.Content = dcsPlayerRadioInfo.radios[RadioId].name;
+                radioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
                 if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 {
@@ -313,9 +315,67 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     radioVolume.Value = currentRadio.volume*100.0;
                 }
             }
+
+         
         }
 
-    
+        private void SetupEncryption()
+        {
+            var dcsPlayerRadioInfo = RadioSyncServer.DcsPlayerRadioInfo;
+
+            if (dcsPlayerRadioInfo != null || dcsPlayerRadioInfo.IsCurrent())
+            {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                EncryptionKeySpinner.Value = currentRadio.encKey;
+
+                //update stuff
+                if (currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION 
+                    || currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL 
+                    || currentRadio.modulation == 2)
+                {
+                    //Disable everything
+                    EncryptionKeySpinner.IsEnabled = false;
+                    EncryptionButton.IsEnabled = false;
+                    EncryptionButton.Content = "Enable";
+
+                }else if (currentRadio.encMode ==
+                            RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                {
+                    //allow spinner
+                    EncryptionKeySpinner.IsEnabled = true;
+
+                    //disallow encryption toggle
+                    EncryptionButton.IsEnabled = false;
+                    EncryptionButton.Content = "Enable";
+                }
+                else if(currentRadio.encMode ==
+                            RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                {
+                    EncryptionKeySpinner.IsEnabled = true;
+                    EncryptionButton.IsEnabled = true;
+
+                    if (currentRadio.enc)
+                    {
+                        EncryptionButton.Content = "Disable";
+                    }
+                    else
+                    {
+                        EncryptionButton.Content = "Enable";
+                    }
+                      
+                }
+
+            }
+            else
+            {
+                //Disable everything
+                EncryptionKeySpinner.IsEnabled = false;
+                EncryptionButton.IsEnabled = false;
+                EncryptionButton.Content = "Enable";
+            }
+        }
+
 
         internal void RepaintRadioReceive()
         {
@@ -355,6 +415,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
         }
 
-      
+
+        private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var dcsPlayerRadioInfo = RadioSyncServer.DcsPlayerRadioInfo;
+
+            if (dcsPlayerRadioInfo != null || dcsPlayerRadioInfo.IsCurrent())
+            {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio.modulation != 3) // disabled
+                {
+                    //update stuff
+                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                    {
+                        if (currentRadio.enc)
+                        {
+                            currentRadio.enc = false;
+                            EncryptionButton.Content = "Enable";
+                        }
+                        else
+                        {
+                            currentRadio.enc = true;
+                            EncryptionButton.Content = "Disable";
+                        }
+                    }
+                }
+            }
+        }
+
+        private void EncryptionKeySpinner_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var dcsPlayerRadioInfo = RadioSyncServer.DcsPlayerRadioInfo;
+
+            if (dcsPlayerRadioInfo != null || dcsPlayerRadioInfo.IsCurrent())
+            {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio.modulation != 3) // disabled
+                {
+                    //update stuff
+                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE || currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                    {
+                        if (EncryptionKeySpinner.Value != null)
+                        {
+                            currentRadio.encKey = (byte)EncryptionKeySpinner.Value;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

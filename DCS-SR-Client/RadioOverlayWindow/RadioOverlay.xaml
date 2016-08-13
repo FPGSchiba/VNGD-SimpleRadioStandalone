@@ -16,7 +16,7 @@
         Background="#444"
 
         Name="myMainWindow"
-        Title="DCS-SimpleRadio" MinHeight="270" MinWidth="122" Height="270" Width="122">
+        Title="DCS-SimpleRadio" MinHeight="315" MinWidth="135" Height="315" Width="135">
 
     <WrapPanel Style="{x:Null}"  Name="containerPanel" SizeChanged="containerPanel_SizeChanged" >
 
@@ -46,15 +46,18 @@
             </Button.Content>
         </Button>
 
-        <local:RadioControlGroup x:Name="radio1" RadioId="0" />
-        <Separator Margin="0" Width="120" />
-        <local:RadioControlGroup x:Name="radio2" RadioId="1" />
-        <Separator Margin="0" Width="120" />
-        <local:RadioControlGroup x:Name="radio3" RadioId="2" />
-        <Separator Margin="0 2" Width="120" />
+        <local:RadioControlGroup x:Name="radio1" RadioId="1" />
+
+        <local:RadioControlGroup x:Name="radio2" RadioId="2" />
+  
+        <local:RadioControlGroup x:Name="radio3" RadioId="3" />
+
+        <local:IntercomControlGroup x:Name="intercom" RadioId="0" />
+        
+        <Separator Margin="0 2" Width="135" />
 
 
-        <Slider Style="{x:Null}"  x:Name="windowOpacitySlider" VerticalAlignment="Center" Margin="10,2,0,0" Width="90" Minimum="0.05"
+        <Slider Style="{x:Null}"  x:Name="windowOpacitySlider" VerticalAlignment="Center" Margin="10,2,0,0" Width="110" Minimum="0.05"
                 Maximum="1.0" ValueChanged="windowOpacitySlider_ValueChanged" Value="1.0" ToolTip="Window Opacity" />
 
     </WrapPanel>
