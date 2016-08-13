@@ -84,8 +84,8 @@
             <WrapPanel Background="#444" Orientation="Vertical" HorizontalAlignment="Center" >
                 <TextBlock Text="Encryption Key" FontSize="10" TextAlignment="Center" HorizontalAlignment="Center"  Foreground="#E7E7E7" />
                 <WrapPanel Orientation="Horizontal">
-                    <xctk:IntegerUpDown Minimum="1" Maximum="252"  Value="1" Width="50" Height="20" Margin="5" />
-                    <Button Style="{x:Null}" Click="Encryption_ButtonClick" Content="Enable" Width="50" Height="20" Margin="5"  ></Button>
+                    <xctk:IntegerUpDown Name="EncryptionKeySpinner" Minimum="1" Maximum="252"  Value="1" Width="50" Height="20" Margin="5" ValueChanged="EncryptionKeySpinner_OnValueChanged" />
+                    <Button Style="{x:Null}" Name="EncryptionButton" Click="Encryption_ButtonClick" Content="Enable" Width="50" Height="20" Margin="5"  ></Button>
                 </WrapPanel>
                 
             </WrapPanel>

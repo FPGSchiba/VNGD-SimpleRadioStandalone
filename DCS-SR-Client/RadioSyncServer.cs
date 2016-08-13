@@ -185,7 +185,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 changed = !DcsPlayerRadioInfo.Equals(message);
 
-                HandleEncryptionSettings(message);
+                HandleEncryptionSettingsFullFidelity(message);
 
                 DcsPlayerRadioInfo = message;
             }
@@ -201,7 +201,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
 
-                HandleEncryptionSettings(message);
+                HandleEncryptionSettingsFullFidelity(message);
 
                 //copy over the radios
                 DcsPlayerRadioInfo.radios = message.radios;
@@ -236,13 +236,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         clientRadio.freqMin = updateRadio.freqMin;
                         clientRadio.freqMax = updateRadio.freqMax;
-
-                        if (clientRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
-                        {
-                            clientRadio.enc = false;
-                            clientRadio.encKey = 1;
-                        }
-
+                                             
                         clientRadio.name = updateRadio.name;
 
                         if (clientRadio.secondaryFrequency == 0)
@@ -269,6 +263,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         {
                             clientRadio.frequency = clientRadio.freqMin;
                         }
+
+                        clientRadio.encMode = updateRadio.encMode;
+
+                        //Handle Encryption
+                        if (updateRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                        {
+                            if (clientRadio.encKey == 0)
+                            {
+                                clientRadio.encKey = 1;
+                            }
+                        }
+
                     }
 
                     //change PTT last
@@ -283,7 +289,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             return changed;
         }
 
-        private void HandleEncryptionSettings(DCSPlayerRadioInfo radioUpdate)
+        private void HandleEncryptionSettingsFullFidelity(DCSPlayerRadioInfo radioUpdate)
         {
             // handle encryption type
             for (int i = 0; i < radioUpdate.radios.Length; i++)
@@ -291,20 +297,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 var updatedRadio = radioUpdate.radios[i];
                 var currentRadio = DcsPlayerRadioInfo.radios[i];
 
-                if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
                 {
-                    updatedRadio.enc = currentRadio.enc;
-                    updatedRadio.encMode = currentRadio.encMode;
-                    updatedRadio.encKey = currentRadio.encKey;
+                    if (currentRadio.encKey != 0)
+                    {
+                        updatedRadio.encKey = currentRadio.encKey;
+                    }
                 }
-                else if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
-                {
-                    //if its not 0, i.e not turned off copy it over
-                  
-                     updatedRadio.enc = currentRadio.enc;
-                     updatedRadio.encKey = currentRadio.encKey;
-
-                }
+               
             }
         }
 
