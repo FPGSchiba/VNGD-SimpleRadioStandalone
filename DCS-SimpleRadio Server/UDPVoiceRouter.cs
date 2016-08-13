@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                         //decode
                                         var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(rawBytes);
 
-                                        if (udpVoicePacket != null)
+                                        if (udpVoicePacket != null && udpVoicePacket.Modulation != 4) //magical ignore message 4
                                         {
                                             SendToOthers(rawBytes, client, udpVoicePacket);
                                         }
