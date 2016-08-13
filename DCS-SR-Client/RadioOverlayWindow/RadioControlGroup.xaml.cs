@@ -386,31 +386,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
             else
             {
-                var receiveState = UdpVoiceHandler.RadioReceivingState;
+                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
                 //check if current
 
-                if (!receiveState.IsReceiving())
+                if (receiveState == null || !receiveState.IsReceiving())
                 {
                     radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
-                else if(receiveState.IsReceiving())
+                else if (receiveState != null && receiveState.IsReceiving())
                 {
-                    if (receiveState.ReceivedOn == RadioId)
+                    if (receiveState.IsSecondary)
                     {
-                        if (receiveState.IsSecondary)
-                        {
-                            radioFrequency.Foreground = new SolidColorBrush(Colors.Red);
-                        }
-                        else
-                        {
-                            radioFrequency.Foreground = new SolidColorBrush(Colors.White);
-                        }
+                        radioFrequency.Foreground = new SolidColorBrush(Colors.Red);
                     }
                     else
                     {
-                        radioFrequency.Foreground =
-                            new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                        radioFrequency.Foreground = new SolidColorBrush(Colors.White);
                     }
+                }
+                else
+                {
+                    radioFrequency.Foreground =
+                            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
                 }
             }
         }

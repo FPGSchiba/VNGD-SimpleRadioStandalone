@@ -14,7 +14,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             return (Environment.TickCount - LastReceviedAt) < 600;
         }
-        public int ReceivedOn { get; set; }
+
         public bool IsSecondary { get; set; }
+        public int ReceivedOn { get; set; }
     }
 }

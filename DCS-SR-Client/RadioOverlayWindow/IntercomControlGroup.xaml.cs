@@ -72,11 +72,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
                     var transmitting = UdpVoiceHandler.RadioSendingState;
-                    var receiveState = UdpVoiceHandler.RadioReceivingState;
+                    var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
 
                     if ((transmitting.IsSending && transmitting.SendingOn == RadioId )
                         ||
-                        (receiveState.IsReceiving() && receiveState.ReceivedOn == RadioId))
+                        (receiveState!=null && receiveState.IsReceiving()))
                     {
                         radioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
                     }

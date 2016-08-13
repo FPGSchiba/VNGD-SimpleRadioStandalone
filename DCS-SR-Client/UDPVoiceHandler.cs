@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private volatile bool _ptt;
         public static volatile RadioSendingState RadioSendingState = new RadioSendingState();
-        public static volatile RadioReceivingState RadioReceivingState = new RadioReceivingState();
+        public static volatile RadioReceivingState[] RadioReceivingState = new RadioReceivingState[4];
 
         private volatile bool _stop;
 
@@ -258,7 +258,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     udpVoicePacket.UnitId, out receivingState);
                                 if (receivingRadio != null && receivingState !=null)
                                 {
-                                    RadioReceivingState = receivingState;
+                                    RadioReceivingState[receivingState.ReceivedOn] = receivingState;
 
                                     //DECODE audio
                                     int len1;
@@ -417,7 +417,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             Frequency = 100,
                             UnitId = 1,
                             Encryption = 0,
-                            Modulation = 3
+                            Modulation = 4
                         }.EncodePacket();
 
                         hasSentVoicePacket = true;
