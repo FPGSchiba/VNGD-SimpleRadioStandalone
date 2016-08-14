@@ -1,4 +1,4 @@
--- Version 1.1.7.0
+-- Version 1.1.8.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -950,8 +950,8 @@ function SR.exportRadioM2000C(_data)
 
     --guard mode for V/UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(446,0.25) -- TODO!
-	if uhfModeKnob == 2 and _data.radios[3].frequency > 1000 then
-		_data.radios[3].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
+		_data.radios[2].secondaryFrequency = 243.0*1000000 
 	end
 
     if SR.getButtonPosition(432) > 0.5 then --431
