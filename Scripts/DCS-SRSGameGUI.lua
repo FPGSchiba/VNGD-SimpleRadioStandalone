@@ -42,8 +42,8 @@ SRS.onSimulationFrame = function()
 
     local _now = DCS.getRealTime()
 
-    -- send every 10 seconds
-    if _now > _lastSent + 10.0 then
+    -- send every 5 seconds
+    if _now > _lastSent + 5.0 then
         _lastSent = _now 
      --    SRS.log("sending update")
         SRS.sendUpdate(net.get_my_player_id())

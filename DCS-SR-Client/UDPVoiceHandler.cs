@@ -417,7 +417,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             Frequency = 100,
                             UnitId = 1,
                             Encryption = 0,
-                            Modulation = 4
+                            Modulation = 4,
                         }.EncodePacket();
 
                         hasSentVoicePacket = true;
