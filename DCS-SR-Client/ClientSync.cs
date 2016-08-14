@@ -157,7 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         break;
                                     case NetworkMessage.MessageType.UPDATE:
 
-                                       
+
 
                                         if (_clients.ContainsKey(lastRadioTransmit.Client.ClientGuid))
                                         {
@@ -170,6 +170,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Position = updatedSrClient.Position;
+//
+//                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
+//                                                            lastRadioTransmit.Client.Name + " Coalition: " +
+//                                                            lastRadioTransmit.Client.Coalition + " Pos: " + lastRadioTransmit.Client.Position);
                                             }
                                         }
                                         else

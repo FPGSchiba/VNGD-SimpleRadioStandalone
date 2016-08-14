@@ -196,6 +196,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.radioType = message.radioType;
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
+                DcsPlayerRadioInfo.pos = message.pos;
 
                 HandleEncryptionSettingsFullFidelity(message);
 
@@ -220,6 +221,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     DcsPlayerRadioInfo.name = message.name;
                     DcsPlayerRadioInfo.radioType = message.radioType;
                     DcsPlayerRadioInfo.unit = message.unit;
+                    DcsPlayerRadioInfo.pos = message.pos;
 
                     DcsPlayerRadioInfo.unitId = message.unitId;
 

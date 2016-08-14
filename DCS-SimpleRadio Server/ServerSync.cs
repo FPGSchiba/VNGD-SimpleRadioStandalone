@@ -227,7 +227,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     case NetworkMessage.MessageType.RADIO_UPDATE:
                         HandleClientMetaDataUpdate(message);
                         HandleClientRadioUpdate(message);
-                       
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
