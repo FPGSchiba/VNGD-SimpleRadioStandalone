@@ -103,15 +103,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     if (pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
                     {
-                        radios.selected = 0;
+                        radios.selected = 1;
                     }
                     else if (pressed[(int) InputBinding.ModifierSwitch2] && pressed[(int) InputBinding.Switch2])
                     {
-                        radios.selected = 1;
+                        radios.selected = 2;
                     }
                     else if (pressed[(int) InputBinding.ModifierSwitch3] && pressed[(int) InputBinding.Switch3])
                     {
-                        radios.selected = 2;
+                        radios.selected = 3;
                     }
                 }
 
