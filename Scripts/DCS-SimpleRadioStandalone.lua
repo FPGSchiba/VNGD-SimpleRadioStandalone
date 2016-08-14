@@ -384,7 +384,7 @@ function SR.exportRadioUH1H(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
-	if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
+	if uhfModeKnob == 2 and _data.radios[3].frequency > 1000 then
 		_data.radios[3].secondaryFrequency = 243.0*1000000 
 	end
 
@@ -446,7 +446,7 @@ function SR.exportRadioSA342(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383,0.167)
-	if uhfModeKnob == 5 and _data.radios[2].frequency > 1000 then
+	if uhfModeKnob == 5 and _data.radios[3].frequency > 1000 then
         _data.radios[3].secondaryFrequency = 243.0*1000000 
 	end
     
@@ -533,7 +533,7 @@ function SR.exportRadioMI8(_data)
 
     --guard mode for R-863 Radio
     local uhfModeKnob = SR.getSelectorPosition(153,1)
-	if uhfModeKnob == 1 and _data.radios[1].frequency > 1000 then
+	if uhfModeKnob == 1 and _data.radios[2].frequency > 1000 then
 		_data.radios[2].secondaryFrequency = 121.5*1000000 
 	end
 
@@ -619,7 +619,7 @@ function SR.exportRadioA10C(_data)
 
      --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(168,0.1)
-	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
+	if uhfModeKnob == 2 and _data.radios[3].frequency > 1000 then
 		_data.radios[3].secondaryFrequency = 243.0*1000000 
 	end
 
@@ -751,7 +751,7 @@ function SR.exportRadioF5E(_data)
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(311,0.1)
     
-    if uhfModeKnob == 2 and _data.radios[1].frequency > 1000 then
+    if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
         _data.radios[2].secondaryFrequency = 243.0*1000000 
     end
 
