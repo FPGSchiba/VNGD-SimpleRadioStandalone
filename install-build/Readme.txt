@@ -24,8 +24,12 @@ Copy the rest of the zip file where ever you like and then run, don't forget to 
 Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
 
 FAQ - Q: I Hear Static on certain frequencies
-A: This is likely an encrypted transmission. You will need to configure you're KY-58 or Mirage Radio Appropriately 
+A: This is likely an encrypted transmission. You will need to configure you're KY-58 or Encrypted Radio Appropriately 
 
 Q: How do I run a server?
 A: Run SR-Server.exe (no need to run installer or add scripts!) and make sure UDP and TCP ports 5010 and 5002 are open. 
    It does NOT need to be on a PC running DCS and you do NOT need to port forward if you're just using the client.
+
+Q: I've installed everything manually and its not working
+A: Delete your Export.lua file in the DCS\Scripts, DCS.openbeta\Scripts and DCS.openalpha\Scripts and run the installer again
+
