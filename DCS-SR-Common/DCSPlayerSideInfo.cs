@@ -4,5 +4,6 @@
     {
         public string name = "";
         public int side = 0;
+        public DcsPosition Position { get; set; } = new DcsPosition();
     }
 }

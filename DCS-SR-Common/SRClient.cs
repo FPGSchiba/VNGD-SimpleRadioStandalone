@@ -38,6 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public event PropertyChangedEventHandler PropertyChanged;
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
+        public DcsPosition Position { get; set; }
 
         public bool isCurrent()
         {

@@ -84,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Name = RadioSyncServer.DcsPlayerSideInfo.name,
                     ClientGuid = _guid,
                     RadioInfo = RadioSyncServer.DcsPlayerRadioInfo,
-                
+                    Position = RadioSyncServer.DcsPlayerRadioInfo.pos
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             });
@@ -99,6 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
                     Name = RadioSyncServer.DcsPlayerSideInfo.name,
+                    Position = RadioSyncServer.DcsPlayerSideInfo.Position,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
@@ -133,6 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         {
                             Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
                             Name = RadioSyncServer.DcsPlayerSideInfo.name,
+                            Position = RadioSyncServer.DcsPlayerSideInfo.Position,
                             ClientGuid = _guid
                         },
                         MsgType = NetworkMessage.MessageType.SYNC
@@ -155,9 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         break;
                                     case NetworkMessage.MessageType.UPDATE:
 
-                                        Logger.Info("Recevied: " + NetworkMessage.MessageType.UPDATE + " From: " +
-                                                    lastRadioTransmit.Client.Name + " Coalition: " +
-                                                    lastRadioTransmit.Client.Coalition);
+
 
                                         if (_clients.ContainsKey(lastRadioTransmit.Client.ClientGuid))
                                         {
@@ -169,6 +169,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.LastUpdate = Environment.TickCount;
+                                                srClient.Position = updatedSrClient.Position;
+//
+//                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
+//                                                            lastRadioTransmit.Client.Name + " Coalition: " +
+//                                                            lastRadioTransmit.Client.Coalition + " Pos: " + lastRadioTransmit.Client.Position);
                                             }
                                         }
                                         else
@@ -176,6 +181,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             var connectedClient = lastRadioTransmit.Client;
                                             connectedClient.LastUpdate = Environment.TickCount;
                                             _clients[lastRadioTransmit.Client.ClientGuid] = connectedClient;
+
+                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
+                                                   lastRadioTransmit.Client.Name + " Coalition: " +
+                                                   lastRadioTransmit.Client.Coalition+" Pos: "+ connectedClient.Position);
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:

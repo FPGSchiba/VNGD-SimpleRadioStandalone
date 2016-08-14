@@ -225,6 +225,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         HandleClientMetaDataUpdate(message);
                         break;
                     case NetworkMessage.MessageType.RADIO_UPDATE:
+                        HandleClientMetaDataUpdate(message);
                         HandleClientRadioUpdate(message);
                         break;
                     case NetworkMessage.MessageType.SYNC:
@@ -268,6 +269,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     client.LastUpdate = Environment.TickCount;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
+                    client.Position = message.Client.Position;
                    
 
                     //send update to everyone
@@ -280,8 +282,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             ClientGuid = client.ClientGuid,
                             Coalition = client.Coalition,
                             Name = client.Name,
-                            LastUpdate = client.LastUpdate
-                        }
+                            LastUpdate = client.LastUpdate,
+                            Position = client.Position
+                }
                     };
 
                     foreach (var clientToSent in _clients)
@@ -308,6 +311,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.RadioInfo = message.Client.RadioInfo;
+                    client.Position = message.Client.Position;
                     
 
                     _logger.Info("Received Radio Update");

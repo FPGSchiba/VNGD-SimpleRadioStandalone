@@ -133,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 using (_dcsGameGuiudpListener)
                 {
-                    var count = 0;
+                //    var count = 0;
                     while (!_stop)
                     {
                         var groupEp = new IPEndPoint(IPAddress.Any, 5068);
@@ -145,17 +145,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
-                            if (DcsPlayerSideInfo.name != playerInfo.name || DcsPlayerSideInfo.side != playerInfo.side ||
-                                count > 3)
+                            if (playerInfo != null)
                             {
+                                //update position
+                                playerInfo.Position = DcsPlayerRadioInfo.pos;
                                 DcsPlayerSideInfo = playerInfo;
                                 _clientSideUpdate();
-                                count = 0;
-                            }
-                            else
-                            {
-                                count++;
-                                DcsPlayerSideInfo = playerInfo;
+                                //     count = 0;
                             }
                         }
                         catch (Exception e)
@@ -200,6 +196,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 DcsPlayerRadioInfo.radioType = message.radioType;
                 DcsPlayerRadioInfo.unit = message.unit;
                 DcsPlayerRadioInfo.unitId = message.unitId;
+                DcsPlayerRadioInfo.pos = message.pos;
 
                 HandleEncryptionSettingsFullFidelity(message);
 
@@ -224,6 +221,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     DcsPlayerRadioInfo.name = message.name;
                     DcsPlayerRadioInfo.radioType = message.radioType;
                     DcsPlayerRadioInfo.unit = message.unit;
+                    DcsPlayerRadioInfo.pos = message.pos;
 
                     DcsPlayerRadioInfo.unitId = message.unitId;
 
