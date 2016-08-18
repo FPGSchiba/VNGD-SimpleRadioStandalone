@@ -7,7 +7,7 @@ using System.Windows;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("DCS-SimpleRadio Standalone Installer")]
-[assembly: AssemblyDescription("Client for DCS-SimpleRadio Intaller")]
+[assembly: AssemblyDescription("Client for DCS-SimpleRadio Installer")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ciribob - GitHub.com/Ciribob")]
 [assembly: AssemblyProduct("DCS-SimpleRadio Standalone")]
@@ -52,5 +52,5 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.1.8.0")]
-[assembly: AssemblyFileVersion("1.1.8.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
