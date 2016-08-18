@@ -8,11 +8,16 @@
 -- 
 -- Make sure you COPY this file to the same location as the Export.lua as well.
 -- If an Export.lua doesn't exist, just create one add add the single line in
-SR = {}
+local SR = {}
+
+SR.LOS_RECEIVE_PORT = 9086
+SR.LOS_SEND_TO_PORT = 9085
+SR.RADIO_SEND_TO_PORT = 9084
 
 SR.unicast = true --DONT CHANGE THIS
 
-SR.dbg = {}
+SR.lastKnownPos = {x=0,y=0,z=0}
+
 SR.logFile = io.open(lfs.writedir()..[[Logs\DCS-SimpleRadioStandalone.log]], "w")
 function SR.log(str)
     if SR.logFile then
@@ -48,7 +53,11 @@ local JSON = loadfile("Scripts\\JSON.lua")()
 SR.JSON = JSON
 
 SR.UDPSendSocket = socket.udp()
-SR.UDPSendSocket:settimeout(0)
+SR.UDPLosReceiveSocket = socket.udp()
+
+--bind for listening for LOS info
+SR.UDPLosReceiveSocket:setsockname("*", SR.LOS_RECEIVE_PORT)
+SR.UDPLosReceiveSocket:settimeout(.0001) --receive timer
 
 local terrain = require('terrain')
 
@@ -59,6 +68,8 @@ end
 -- Prev Export functions.
 local _prevExport = {}
 _prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
+_prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
+
 
 local _send  = false
 
@@ -101,6 +112,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
+
+                 SR.lastKnownPos = _update.pos
 
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
@@ -169,6 +182,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update.selected = 1
                 end
             else
+                -- save last pos
+                SR.lastKnownPos ={x=0,y=0,z=0 }
 
                 --Ground Commander or spectator
                  _update  =
@@ -191,9 +206,9 @@ LuaExportActivityNextEvent = function(tCurrent)
             end
 
             if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 9084))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", SR.RADIO_SEND_TO_PORT))
             else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 9084))
+                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", SR.RADIO_SEND_TO_PORT))
             end
 
         end)
@@ -208,25 +223,87 @@ LuaExportActivityNextEvent = function(tCurrent)
 
 
     -- call
-    _status,_result = pcall(function()
+    local _status,_result = pcall(function()
        	-- Call original function if it exists
 		if _prevExport.LuaExportActivityNextEvent then
 			_prevExport.LuaExportActivityNextEvent(tCurrent)
 		end
 
-        if terrain ~= nil then
-          --  SR.log("Terrain IS GOOD")
-            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
-            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
-        end
     end)
 
     if not _status then
         SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
     end
 
+    
+        if terrain == nil then
+           SR.log("Terrain Export is not working")
+            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
+            --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
+        end
+
     return tNext
 end
+
+local _lastCheck = 0;
+
+LuaExportBeforeNextFrame = function()
+
+    -- read from socket
+    local _status,_result = pcall(function()
+
+        -- Receive buffer is 8192 in LUA Socket
+        -- will contain 10 clients for LOS
+        local _received = SR.UDPLosReceiveSocket:receive()
+
+        if _received then
+            local _decoded = SR.JSON:decode(_received)
+
+            if _decoded then
+
+                local _losList =  SR.checkLOS(_decoded)
+
+                --DEBUG
+                SR.log('LOS check ' .. SR.JSON:encode(_losList))
+                if SR.unicast then
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList).." \n", "127.0.0.1", SR.LOS_SEND_TO_PORT))
+                else
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList).." \n", "127.255.255.255", SR.LOS_SEND_TO_PORT))
+                end
+            end
+
+        end
+    end)
+
+    if not _status then
+        SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
+    end
+
+    -- call original
+    _status,_result = pcall(function()
+        -- Call original function if it exists
+        if _prevExport.LuaExportBeforeNextFrame then
+            _prevExport.LuaExportBeforeNextFrame()
+        end
+    end)
+
+    if not _status then
+        SR.log('ERROR Calling other LuaExportBeforeNextFrame from another script: ' .. _result)
+    end
+
+end
+
+function SR.checkLOS(_clientsList)
+
+    local _result = {}
+    for _,_client in pairs(_clientsList) do
+        -- add 5 meter tolerance
+       
+        table.insert(_result,{id = _client.id, los = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+3.0,SR.lastKnownPos.z,_client.x,_client.y+3.0,_client.z) })
+    end
+    return _result
+end
+
 
 function SR.exportPlayerLocation(_data)
 
@@ -661,7 +738,7 @@ function SR.exportRadioA10C(_data)
         end
     end
 
-    _data.selected = 0
+    _data.selected = 1
 
     _data.radioType = 2; -- Partial Radio (switched from FUll due to HOTAS controls)
 
@@ -726,7 +803,7 @@ function SR.exportRadioMIG21(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 210,{0.0,1.0},false)
 
-    _data.selected = 0
+    _data.selected = 1
 
     if(SR.getButtonPosition(315)) > 0.5 then
         _data.ptt = true
@@ -1048,3 +1125,5 @@ end
 function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
+
+SR.log("Loaded SimpleRadio Standalone Export version: 1.1.8.0")

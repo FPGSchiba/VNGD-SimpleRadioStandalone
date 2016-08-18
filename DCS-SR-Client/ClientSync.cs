@@ -14,7 +14,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    internal class ClientSync
+    public class ClientSync
     {
         public delegate void ConnectCallback(bool result);
 
@@ -24,6 +24,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private readonly string _guid;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
+
+        public static string[] ServerSettings = new string[Enum.GetValues(typeof(Server.ServerSettingType)).Length];
 
         public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid)
         {
@@ -43,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void Connect()
         {
-            var radioSync = new RadioSyncServer(ClientRadioUpdated, ClientCoalitionUpdate);
+            var radioSync = new RadioDCSSyncServer(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
                 _tcpClient.SendTimeout = 10;
@@ -80,11 +82,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 Client = new SRClient
                 {
-                    Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
-                    Name = RadioSyncServer.DcsPlayerSideInfo.name,
+                    Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
+                    Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
                     ClientGuid = _guid,
-                    RadioInfo = RadioSyncServer.DcsPlayerRadioInfo,
-                    Position = RadioSyncServer.DcsPlayerRadioInfo.pos
+                    RadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo,
+                    Position = RadioDCSSyncServer.DcsPlayerRadioInfo.pos
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             });
@@ -97,9 +99,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 Client = new SRClient
                 {
-                    Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
-                    Name = RadioSyncServer.DcsPlayerSideInfo.name,
-                    Position = RadioSyncServer.DcsPlayerSideInfo.Position,
+                    Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
+                    Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
+                    Position = RadioDCSSyncServer.DcsPlayerSideInfo.Position,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
@@ -132,9 +134,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         Client = new SRClient
                         {
-                            Coalition = RadioSyncServer.DcsPlayerSideInfo.side,
-                            Name = RadioSyncServer.DcsPlayerSideInfo.name,
-                            Position = RadioSyncServer.DcsPlayerSideInfo.Position,
+                            Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
+                            Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
+                            Position = RadioDCSSyncServer.DcsPlayerSideInfo.Position,
                             ClientGuid = _guid
                         },
                         MsgType = NetworkMessage.MessageType.SYNC
@@ -146,23 +148,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         try
                         {
-                            var lastRadioTransmit = JsonConvert.DeserializeObject<NetworkMessage>(line);
-                            //TODO: test malformed JSON
-                            if (lastRadioTransmit != null)
+                            var serverMessage = JsonConvert.DeserializeObject<NetworkMessage>(line);
+                            if (serverMessage != null)
                             {
-                                switch (lastRadioTransmit.MsgType)
+                                switch (serverMessage.MsgType)
                                 {
                                     case NetworkMessage.MessageType.PING:
                                         // Do nothing for now
                                         break;
                                     case NetworkMessage.MessageType.UPDATE:
 
+                                        ServerSettings = serverMessage.ServerSettings;
 
-
-                                        if (_clients.ContainsKey(lastRadioTransmit.Client.ClientGuid))
+                                        if (_clients.ContainsKey(serverMessage.Client.ClientGuid))
                                         {
-                                            var srClient = _clients[lastRadioTransmit.Client.ClientGuid];
-                                            var updatedSrClient = lastRadioTransmit.Client;
+                                            var srClient = _clients[serverMessage.Client.ClientGuid];
+                                            var updatedSrClient = serverMessage.Client;
                                             if (srClient != null)
                                             {
                                                 srClient.LastUpdate = Environment.TickCount;
@@ -178,27 +179,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         }
                                         else
                                         {
-                                            var connectedClient = lastRadioTransmit.Client;
+                                            var connectedClient = serverMessage.Client;
                                             connectedClient.LastUpdate = Environment.TickCount;
-                                            _clients[lastRadioTransmit.Client.ClientGuid] = connectedClient;
+
+                                            //init with LOS true so you can hear them incase of bad DCS install where
+                                            //LOS isnt working
+                                            connectedClient.HasLineOfSight = true;
+
+                                            _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
                                             Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
-                                                   lastRadioTransmit.Client.Name + " Coalition: " +
-                                                   lastRadioTransmit.Client.Coalition+" Pos: "+ connectedClient.Position);
+                                                   serverMessage.Client.Name + " Coalition: " +
+                                                   serverMessage.Client.Coalition);
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
                                         Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
-                                        if (lastRadioTransmit.Clients != null)
+                                        if (serverMessage.Clients != null)
                                         {
-                                            foreach (var client in lastRadioTransmit.Clients)
+                                            foreach (var client in serverMessage.Clients)
                                             {
                                                 client.LastUpdate = Environment.TickCount;
+                                                //init with LOS true so you can hear them incase of bad DCS install where
+                                                //LOS isnt working
+                                                client.HasLineOfSight = true;
                                                 _clients[client.ClientGuid] = client;
                                             }
                                         }
+                                        //add server settings
+                                        ServerSettings = serverMessage.ServerSettings;
 
+                                        break;
+
+                                    case NetworkMessage.MessageType.SERVER_SETTINGS:
+
+                                        Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
+                                        ServerSettings = serverMessage.ServerSettings;
                                         break;
                                     default:
                                         Logger.Warn("Recevied unknown " + line);
