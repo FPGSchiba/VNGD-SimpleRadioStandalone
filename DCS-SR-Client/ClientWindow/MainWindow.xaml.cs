@@ -69,6 +69,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
+            Intercom.InputName = "Intercom Select";
+            Intercom.ControlInputBinding = InputBinding.Intercom;
+            Intercom.InputDeviceManager = InputManager;
+
             RadioOverlay.InputName = "Overlay Toggle";
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;

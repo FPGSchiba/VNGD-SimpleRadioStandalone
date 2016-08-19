@@ -81,8 +81,8 @@
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
-                        
-      
+                        <RowDefinition />
+
                     </Grid.RowDefinitions>
 
 
@@ -95,7 +95,9 @@
                     <local:InputBindingControl x:Name="Radio2" InputName="Radio 2" Grid.Row="2" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch2}"  />
                     <local:InputBindingControl x:Name="Radio3" InputName="Radio 3" Grid.Row="3" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Switch3}"  />
                     <local:InputBindingControl x:Name="PTT" InputName="Common PTT" Grid.Row="4" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Ptt}"  />
-                    <local:InputBindingControl x:Name="RadioOverlay" InputName="Overlay Toggle" Grid.Row="5" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.OverlayToggle}"  />
+                    <local:InputBindingControl x:Name="Intercom" InputName="Intercom Select" Grid.Row="5" Grid.ColumnSpan="5" ControlInputBinding="{x:Static local:InputBinding.Intercom}"  />
+
+                    <local:InputBindingControl x:Name="RadioOverlay" InputName="Overlay Toggle" Grid.Row="6" Grid.ColumnSpan="6" ControlInputBinding="{x:Static local:InputBinding.OverlayToggle}"  />
 
                 </Grid>
                

@@ -491,6 +491,11 @@ end
 
 function SR.exportRadioSA342(_data)
 
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].frequency =100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume =1.0
+
     _data.radios[2].name = "TRAP 138A"
     _data.radios[2].frequency = SR.getRadioFrequency(5)
     _data.radios[2].modulation = 0

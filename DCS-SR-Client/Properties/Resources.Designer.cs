@@ -59,5 +59,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream mic_click_off {
+            get {
+                return ResourceManager.GetStream("mic_click_off", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream mic_click_on {
+            get {
+                return ResourceManager.GetStream("mic_click_on", resourceCulture);
+            }
+        }
     }
 }

@@ -113,13 +113,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         radios.selected = 3;
                     }
+                    else if (pressed[(int) InputBinding.Intercom] && pressed[(int) InputBinding.ModifierIntercom])
+                    {
+                        radios.selected = 0;
+                    }
                 }
 
                 var radioSwitchPtt = settings.UserSettings[(int) SettingType.RadioSwitchIsPTT] == "ON";
 
                 if (radioSwitchPtt && ((pressed[(int)InputBinding.ModifierSwitch1] && pressed[(int)InputBinding.Switch1])
                                        || (pressed[(int)InputBinding.ModifierSwitch2] && pressed[(int)InputBinding.Switch2])
-                                       || (pressed[(int)InputBinding.ModifierSwitch3] && pressed[(int)InputBinding.Switch3])))
+                                       || (pressed[(int)InputBinding.ModifierSwitch3] && pressed[(int)InputBinding.Switch3]))
+                                       || (pressed[(int)InputBinding.Intercom] && pressed[(int)InputBinding.ModifierIntercom])
+                                       )
                 {
                     ptt = true;
                 }
