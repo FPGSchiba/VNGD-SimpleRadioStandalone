@@ -118,10 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="mic_click_off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mic_click_off.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="ARC_164_Rx_End_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ARC-164_Rx_End_16_1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="mic_click_on" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mic_click_on.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="KY_58_RX_PREAMBLE_SHORT_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\KY-58 RX PREAMBLE SHORT 16 1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="KY_58_TX_PREAMBLE_SHORT_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\KY-58 TX PREAMBLE SHORT 16 1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="mic_click_on_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mic_click_on_16_1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="mic_click_on_16_1600_reversed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mic_click_on_16_1600_reversed.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

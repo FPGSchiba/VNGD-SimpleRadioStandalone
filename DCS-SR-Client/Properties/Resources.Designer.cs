@@ -63,18 +63,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream mic_click_off {
+        internal static System.IO.UnmanagedMemoryStream ARC_164_Rx_End_16_1600 {
             get {
-                return ResourceManager.GetStream("mic_click_off", resourceCulture);
+                return ResourceManager.GetStream("ARC_164_Rx_End_16_1600", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream mic_click_on {
+        internal static System.IO.UnmanagedMemoryStream KY_58_RX_PREAMBLE_SHORT_16_1600 {
             get {
-                return ResourceManager.GetStream("mic_click_on", resourceCulture);
+                return ResourceManager.GetStream("KY_58_RX_PREAMBLE_SHORT_16_1600", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream KY_58_TX_PREAMBLE_SHORT_16_1600 {
+            get {
+                return ResourceManager.GetStream("KY_58_TX_PREAMBLE_SHORT_16_1600", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream mic_click_on_16_1600 {
+            get {
+                return ResourceManager.GetStream("mic_click_on_16_1600", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream mic_click_on_16_1600_reversed {
+            get {
+                return ResourceManager.GetStream("mic_click_on_16_1600_reversed", resourceCulture);
             }
         }
     }
