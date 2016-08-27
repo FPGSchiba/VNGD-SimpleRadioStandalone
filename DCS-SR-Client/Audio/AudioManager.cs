@@ -112,11 +112,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveOut = new WaveOut
                 {
-                    DesiredLatency = 100, //100ms latency in output buffer
+                    DesiredLatency = 100,   //100ms latency in output buffer
                     DeviceNumber = speakers
                 };
 
-            //    var resample = new WdlResamplingSampleProvider(_mixing, 44100);
+             
+
+             //   var resample = new WdlResamplingSampleProvider(_mixing, 44100); //resample and output at 44100
 
                 _waveOut.Init(_mixing);
                 _waveOut.Play();
@@ -132,8 +134,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     BufferMilliseconds = 80,
                     DeviceNumber = mic
                 };
+
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new WaveFormat(SAMPLE_RATE, 16, 1); // should this be 44100??
+                _waveIn.WaveFormat = new WaveFormat(SAMPLE_RATE, 16, 1); //take in at 8000
 
                 _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
@@ -154,49 +157,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void PlaySoundEffectStartTransmit( int transmitOnRadio, bool encrypted, float volume)
         {
             var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffects];
-            if (radioEffects == "ON")
-            {
-                var _effectBuffer = _effectsBuffer[transmitOnRadio];
-                //TODO change volume here as well
-                if (encrypted)
-                {
-                    _effectBuffer.VolumeSampleProvider.Volume = volume;
-                    _effectBuffer.AddSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_TX].AudioEffectBytes, true, 0,
-                        transmitOnRadio);
-                }
-                else
-                {
-                    _effectBuffer.VolumeSampleProvider.Volume = volume;
-                    _effectBuffer.AddSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes, true, 0,
-                        transmitOnRadio);
-                }
-            }
+//            if (radioEffects == "ON")
+//            {
+//                var _effectBuffer = _effectsBuffer[transmitOnRadio];
+//                //TODO change volume here as well
+//                if (encrypted)
+//                {
+//                    _effectBuffer.VolumeSampleProvider.Volume = volume;
+//                    _effectBuffer.AddSamples(
+//                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_TX].AudioEffectBytes, true, 0,
+//                        transmitOnRadio);
+//                }
+//                else
+//                {
+//                    _effectBuffer.VolumeSampleProvider.Volume = volume;
+//                    _effectBuffer.AddSamples(
+//                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes, true, 0,
+//                        transmitOnRadio);
+//                }
+//            }
         }
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
             var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffects];
-            if (radioEffects == "ON")
-            {
-                var _effectBuffer = _effectsBuffer[transmitOnRadio];
-             
-                if (encrypted)
-                {
-                    _effectBuffer.VolumeSampleProvider.Volume = volume;
-                    _effectBuffer.AddSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_RX].AudioEffectBytes, true, 0,
-                        transmitOnRadio);
-                }
-                else
-                {
-                    _effectBuffer.VolumeSampleProvider.Volume = volume;
-                    _effectBuffer.AddSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes, true, 0,
-                        transmitOnRadio);
-                }
-            }
+//            if (radioEffects == "ON")
+//            {
+//                var _effectBuffer = _effectsBuffer[transmitOnRadio];
+//             
+//                if (encrypted)
+//                {
+//                    _effectBuffer.VolumeSampleProvider.Volume = volume;
+//                    _effectBuffer.AddSamples(
+//                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_RX].AudioEffectBytes, true, 0,
+//                        transmitOnRadio);
+//                }
+//                else
+//                {
+//                    _effectBuffer.VolumeSampleProvider.Volume = volume;
+//                    _effectBuffer.AddSamples(
+//                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes, true, 0,
+//                        transmitOnRadio);
+//                }
+//            }
         }
 
 

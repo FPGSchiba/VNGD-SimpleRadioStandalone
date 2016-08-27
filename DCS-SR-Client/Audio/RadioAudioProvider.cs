@@ -21,91 +21,216 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public RadioAudioProvider(bool radioFilter)
         {
-            BufferedWaveProvider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.SAMPLE_RATE, 2));
+            BufferedWaveProvider =
+                new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.SAMPLE_RATE, 2));
 
             BufferedWaveProvider.DiscardOnBufferOverflow = true;
             BufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 2); //2 seconds buffer
 
+              var pcm = new Pcm16BitToSampleProvider(BufferedWaveProvider);
+
             if (radioFilter)
             {
-                var filter = new RadioFilter(BufferedWaveProvider.ToSampleProvider());
+                var filter = new RadioFilter(pcm);
                 VolumeSampleProvider = new VolumeSampleProvider(filter);
             }
             else
             {
-                VolumeSampleProvider = new VolumeSampleProvider(BufferedWaveProvider.ToSampleProvider());
+                VolumeSampleProvider = new VolumeSampleProvider(pcm);
             }
             _settings = Settings.Instance;
         }
 
-
-        public void AddSamples(byte[] floatAudio, bool decrytable, short encryptionKey, int receiveRadio)
+        public void AddSamples(float[] pcmAudio, bool decrytable, short encryptionKey, int receiveRadio)
         {
             //convert to Stereo Mix
             var settingType = SettingType.Radio1Channel;
-            byte[] stereoMix;
-            if (receiveRadio == 0)
-            {
-                settingType = SettingType.IntercomChannel;
-            }
-            else if (receiveRadio == 1)
-            {
-                settingType = SettingType.Radio1Channel;
-            }
-            else if (receiveRadio == 2)
-            {
-                settingType = SettingType.Radio2Channel;
-            }
-            else if (receiveRadio == 3)
-            {
-                settingType = SettingType.Radio3Channel;
-            }
-            else
-            {
-                //different radio
-                stereoMix = CreateBothMix(floatAudio, decrytable,  encryptionKey);
+            float[] stereoMix;
 
-             
+            stereoMix = CreateBothMix(pcmAudio, decrytable, encryptionKey);
+            var pcm16 = ConvertToByteArray(stereoMix);
+            BufferedWaveProvider.AddSamples(pcm16, 0, pcm16.Length);
+            //            if (receiveRadio == 0)
+            //            {
+            //                settingType = SettingType.IntercomChannel;
+            //            }
+            //            else if (receiveRadio == 1)
+            //            {
+            //                settingType = SettingType.Radio1Channel;
+            //            }
+            //            else if (receiveRadio == 2)
+            //            {
+            //                settingType = SettingType.Radio2Channel;
+            //            }
+            //            else if (receiveRadio == 3)
+            //            {
+            //                settingType = SettingType.Radio3Channel;
+            //            }
+            //            else
+            //            {
+            //                //different radio
+            //                stereoMix = CreateBothMix(pcmAudio, decrytable, encryptionKey);
+            //                BufferedWaveProvider.AddSamples(ConvertToByteArray(stereoMix), 0, stereoMix.Length);
+            //
+            //                return;
+            //            }
 
-                BufferedWaveProvider.AddSamples((stereoMix), 0, stereoMix.Length);
+            //            var setting = _settings.UserSettings[(int) settingType];
+            //
+            //            if (setting == "Left")
+            //            {
+            //                stereoMix = CreateLeftMix(pcmAudio, decrytable, encryptionKey);
+            //            }
+            //            else if (setting == "Right")
+            //            {
+            //                stereoMix = CreateRightMix(pcmAudio, decrytable, encryptionKey);
+            //            }
+            //            else
+            //            {
+            //                stereoMix = CreateBothMix(pcmAudio, decrytable, encryptionKey);
+            //            }
 
-                return;
-            }
-
-            var setting = _settings.UserSettings[(int) settingType];
-
-            if (setting == "Left")
-            {
-                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
-                ; //CreateLeftMix(floatAudio, decrytable, encryptionKey);
-            }
-            else if (setting == "Right")
-            {
-                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
-                ; //CreateRightMix(floatAudio, decrytable, encryptionKey);
-            }
-            else
-            {
-                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
-            }
-
-            BufferedWaveProvider.AddSamples((stereoMix), 0, stereoMix.Length);
+            BufferedWaveProvider.AddSamples(ConvertToByteArray(stereoMix), 0, stereoMix.Length);
         }
+
+        private byte[] CreateLeftMix(byte[] pcmAudio, bool decrytable, short encryptionKey)
+        {
+            var stereoMix = new byte[pcmAudio.Length*2];
+            for (var i = 0; i < pcmAudio.Length/2; i++)
+            {
+                if (decrytable || encryptionKey == 0)
+                {
+                    stereoMix[i*4] = pcmAudio[i*2];
+                    stereoMix[i*4 + 1] = pcmAudio[i*2 + 1];
+                }
+                else
+                {
+                    stereoMix[i*4] = (byte) _random.Next(16);
+                    stereoMix[i*4 + 1] = (byte) _random.Next(16);
+                }
+
+                stereoMix[i*4 + 2] = 0;
+                stereoMix[i*4 + 3] = 0;
+            }
+            return stereoMix;
+        }
+
+        private byte[] CreateRightMix(byte[] pcmAudio, bool decrytable, short encryptionKey)
+        {
+            var stereoMix = new byte[pcmAudio.Length*2];
+            for (var i = 0; i < pcmAudio.Length/2; i++)
+            {
+                stereoMix[i*4] = 0;
+                stereoMix[i*4 + 1] = 0;
+
+                if (decrytable || encryptionKey == 0)
+                {
+                    stereoMix[i*4 + 2] = pcmAudio[i*2];
+                    stereoMix[i*4 + 3] = pcmAudio[i*2 + 1];
+                }
+                else
+                {
+                    stereoMix[i*4 + 2] = (byte) _random.Next(16);
+                    stereoMix[i*4 + 3] = (byte) _random.Next(16);
+                }
+
+            }
+            return stereoMix;
+        }
+
+        private byte[] CreateBothMix(byte[] pcmAudio, bool decrytable, short encryptionKey)
+        {
+            var stereoMix = new byte[pcmAudio.Length*2];
+            for (var i = 0; i < pcmAudio.Length/2; i++)
+            {
+                if (decrytable || encryptionKey == 0)
+                {
+                    stereoMix[i*4] = pcmAudio[i*2];
+                    stereoMix[i*4 + 1] = pcmAudio[i*2 + 1];
+
+                    stereoMix[i*4 + 2] = pcmAudio[i*2];
+                    stereoMix[i*4 + 3] = pcmAudio[i*2 + 1];
+                }
+                else
+                {
+                    stereoMix[i*4] = (byte) _random.Next(16);
+                    stereoMix[i*4 + 1] = (byte) _random.Next(16);
+
+                    stereoMix[i*4 + 2] = (byte) _random.Next(16);
+                    stereoMix[i*4 + 3] = (byte) _random.Next(16);
+                }
+
+            }
+            return stereoMix;
+        }
+
+//        public void AddSamples(byte[] floatAudio, bool decrytable, short encryptionKey, int receiveRadio)
+//        {
+//            //convert to Stereo Mix
+//            var settingType = SettingType.Radio1Channel;
+//            byte[] stereoMix;
+//            if (receiveRadio == 0)
+//            {
+//                settingType = SettingType.IntercomChannel;
+//            }
+//            else if (receiveRadio == 1)
+//            {
+//                settingType = SettingType.Radio1Channel;
+//            }
+//            else if (receiveRadio == 2)
+//            {
+//                settingType = SettingType.Radio2Channel;
+//            }
+//            else if (receiveRadio == 3)
+//            {
+//                settingType = SettingType.Radio3Channel;
+//            }
+//            else
+//            {
+//                //different radio
+//                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
+//
+//
+//
+//                BufferedWaveProvider.AddSamples((stereoMix), 0, stereoMix.Length);
+//
+//                return;
+//            }
+//
+//            var setting = _settings.UserSettings[(int) settingType];
+//
+//            if (setting == "Left")
+//            {
+//                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
+//                ; //CreateLeftMix(floatAudio, decrytable, encryptionKey);
+//            }
+//            else if (setting == "Right")
+//            {
+//                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
+//                ; //CreateRightMix(floatAudio, decrytable, encryptionKey);
+//            }
+//            else
+//            {
+//                stereoMix = CreateBothMix(floatAudio, decrytable, encryptionKey);
+//            }
+//
+//            BufferedWaveProvider.AddSamples((stereoMix), 0, stereoMix.Length);
+//        }
 
         private float[] CreateLeftMix(float[] pcmAudio, bool decrytable, short encryptionKey)
         {
             var stereoMix = new float[pcmAudio.Length*2];
             for (var i = 0; i < pcmAudio.Length/2; i++)
             {
-                stereoMix[i * 2 + 1] = 0;
+                stereoMix[i*2 + 1] = 0;
 
                 if (decrytable || encryptionKey == 0)
                 {
-                    stereoMix[i * 2 ] = pcmAudio[i];
+                    stereoMix[i*2] = pcmAudio[i];
                 }
                 else
                 {
-                    stereoMix[i * 2] = (1.0f - _random.Next(1000) / 1000.0f) * 0.6f;
+                    stereoMix[i*2] = (1.0f - _random.Next(1000)/1000.0f)*0.6f;
                 }
             }
             return stereoMix;
@@ -117,14 +242,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             for (var i = 0; i < pcmAudio.Length/2; i++)
             {
                 stereoMix[i*2] = 0;
-               
+
                 if (decrytable || encryptionKey == 0)
                 {
-                    stereoMix[i * 2 + 1] = pcmAudio[i];
+                    stereoMix[i*2 + 1] = pcmAudio[i];
                 }
                 else
                 {
-                    stereoMix[i * 2 + 1] = (1.0f - _random.Next(1000) / 1000.0f) * 0.6f;
+                    stereoMix[i*2 + 1] = (1.0f - _random.Next(1000)/1000.0f)*0.6f;
                 }
 
             }
@@ -143,39 +268,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 else
                 {
-                    stereoMix[i*2] = (1.0f - _random.Next(1000) / 1000.0f) * 0.6f;
-                    stereoMix[i*2 + 1] = (1.0f - _random.Next(1000) / 1000.0f) * 0.6f;
+                    stereoMix[i*2] = (1.0f - _random.Next(1000)/1000.0f)*0.6f;
+                    stereoMix[i*2 + 1] = (1.0f - _random.Next(1000)/1000.0f)*0.6f;
                 }
 
             }
             return stereoMix;
         }
 
-        private byte[] CreateBothMix(byte[] pcmAudio, bool decrytable, short encryptionKey)
-        {
-            var stereoMix = new byte[pcmAudio.Length * 2];
-            for (var i = 0; i < pcmAudio.Length / 2; i++)
-            {
-                if (decrytable || encryptionKey == 0)
-                {
-                    stereoMix[i * 4] = pcmAudio[i * 2];
-                    stereoMix[i * 4 + 1] = pcmAudio[i * 2 + 1];
-
-                    stereoMix[i * 4 + 2] = pcmAudio[i * 2];
-                    stereoMix[i * 4 + 3] = pcmAudio[i * 2 + 1];
-                }
-                else
-                {
-                    stereoMix[i * 4] = (byte)_random.Next(16);
-                    stereoMix[i * 4 + 1] = (byte)_random.Next(16);
-
-                    stereoMix[i * 4 + 2] = (byte)_random.Next(16);
-                    stereoMix[i * 4 + 3] = (byte)_random.Next(16);
-                }
-
-            }
-            return stereoMix;
-        }
 
         private byte[] ConvertToByteArray(float[] stereoMix)
         {
@@ -198,6 +298,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             return destWaveBuffer;
         }
-      
+
+
     }
+
 }

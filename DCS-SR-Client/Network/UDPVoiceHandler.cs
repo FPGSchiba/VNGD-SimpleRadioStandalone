@@ -351,7 +351,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         var audio = new ClientAudio
                                         {
                                             ClientGuid = udpVoicePacket.Guid,
-                                            PcmAudioFloat = tmp, //ClientAudio.ConvertPCMtoFloats(tmp),  //Convert to Floats
+                                            PcmAudioFloat = ClientAudio.ConvertPCMtoFloats(tmp),  //Convert to Floats
                                             ReceiveTime = GetTickCount64(),
                                             Frequency = udpVoicePacket.Frequency,
                                             Modulation = udpVoicePacket.Modulation,
