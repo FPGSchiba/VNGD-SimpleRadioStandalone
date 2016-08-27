@@ -16,8 +16,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class AudioManager
     {
-        public static readonly int SAMPLE_RATE = 16000;
-        public static readonly int SEGMENT_FRAMES = 960; //480 for 8000 960 for 24000
+        public static readonly int SAMPLE_RATE = 8000;
+        public static readonly int SEGMENT_FRAMES = 160; //480 for 8000 960 for 24000
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private int _bytesPerSegment;
 
@@ -98,7 +98,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(SAMPLE_RATE, 2));
                 _mixing.ReadFully = true;
 
-
                 _effectsBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
              
                 for (int i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length;i++)
@@ -111,22 +110,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WaveOut();
-                _waveOut.DesiredLatency = 100; //75ms latency in output buffer
-                _waveOut.DeviceNumber = speakers;
-             
+                _waveOut = new WaveOut
+                {
+                    DesiredLatency = 100, //100ms latency in output buffer
+                    DeviceNumber = speakers
+                };
+
+            //    var resample = new WdlResamplingSampleProvider(_mixing, 44100);
+
                 _waveOut.Init(_mixing);
                 _waveOut.Play();
 
-                _segmentFrames = SEGMENT_FRAMES; //960 frames is 20 ms of audio
+                _segmentFrames = SEGMENT_FRAMES; //160 frames is 20 ms of audio
                 _encoder = OpusEncoder.Create(SAMPLE_RATE, 1, Application.Restricted_LowLatency);
-                //    _encoder.Bitrate = 8192;
+
                 _decoder = OpusDecoder.Create(SAMPLE_RATE, 1);
                 _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
 
-                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
-                _waveIn.BufferMilliseconds = 60;
-                _waveIn.DeviceNumber = mic;
+                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
+                {
+                    BufferMilliseconds = 80,
+                    DeviceNumber = mic
+                };
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(SAMPLE_RATE, 16, 1); // should this be 44100??
 
@@ -137,13 +142,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveIn.StartRecording();
 
-              //  _effectsBuffer.AddSamples(_micClickOffBytes, 0, _micClickOffBytes.Length);
-                //  _effectsBuffer.DiscardOnBufferOverflow = true;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error starting audio Quitting!");
-
 
                 Environment.Exit(1);
             }

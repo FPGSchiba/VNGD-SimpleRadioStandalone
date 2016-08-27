@@ -22,7 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 80,
+                    BufferMilliseconds = 100,
                     DeviceNumber = mic,
                     WaveFormat = new WaveFormat(8000, 16, 1)
                 };
@@ -32,9 +32,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Volume = new SampleChannel(pcm);
 
-          //      var downsample =  new WdlResamplingSampleProvider(Volume, 24000);
+                var downsample = new WdlResamplingSampleProvider(Volume, 44100);
 
-                var filter = new RadioFilter(Volume);
+                var filter = new RadioFilter(downsample);
 
                 _waveOut = new WaveOut
                 {

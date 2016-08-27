@@ -351,7 +351,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         var audio = new ClientAudio
                                         {
                                             ClientGuid = udpVoicePacket.Guid,
-                                            PcmAudio = tmp,
+                                            PcmAudioFloat = tmp, //ClientAudio.ConvertPCMtoFloats(tmp),  //Convert to Floats
                                             ReceiveTime = GetTickCount64(),
                                             Frequency = udpVoicePacket.Frequency,
                                             Modulation = udpVoicePacket.Modulation,
@@ -386,6 +386,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Logger.Info("Stopped DeJitter Buffer");
             }
         }
+
+       
 
         private bool IsCurrentlyTransmittingOn(int radioId)
         {
@@ -608,7 +610,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
             });
         }
-
-        
     }
 }

@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CircularBuffer.cs" />
     <Compile Include="DCSLosCheckRequest.cs" />
     <Compile Include="DCSLosCheckResult.cs" />
     <Compile Include="DCSPlayerSideInfo.cs" />

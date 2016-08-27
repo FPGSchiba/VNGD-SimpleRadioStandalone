@@ -18,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void AddSamples(ClientAudio audio)
         {
-            base.AddSamples(audio.PcmAudio,audio.Decryptable,audio.Encryption,audio.ReceivedRadio);
+            base.AddSamples(audio.PcmAudioFloat,audio.Decryptable,audio.Encryption,audio.ReceivedRadio);
         }
     }
 }
