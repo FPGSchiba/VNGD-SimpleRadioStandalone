@@ -19,6 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
     public RadioAudioProvider(bool radioFilter)
     {
+          
       BufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(AudioManager.SAMPLE_RATE, 16, 2));
 
       BufferedWaveProvider.DiscardOnBufferOverflow = true;
@@ -41,8 +42,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     public void AddAudioSamples(byte[] pcmAudio)
     {
       BufferedWaveProvider.AddSamples(pcmAudio, 0, pcmAudio.Length);
-
-      //TODO change audio volume
     }
 
   }

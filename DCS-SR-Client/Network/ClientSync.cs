@@ -12,7 +12,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     public class ClientSync
     {
@@ -184,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                             //init with LOS true so you can hear them incase of bad DCS install where
                                             //LOS isnt working
-                                            connectedClient.HasLineOfSight = true;
+                                            connectedClient.LineOfSightLoss = 0.0f; //0.0 is NO LOSS therefore full Line of sight
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
@@ -203,7 +203,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                                 client.LastUpdate = Environment.TickCount;
                                                 //init with LOS true so you can hear them incase of bad DCS install where
                                                 //LOS isnt working
-                                                client.HasLineOfSight = true;
+                                                client.LineOfSightLoss = 0.0f; //0.0 is NO LOSS therefore full Line of sight
                                                 _clients[client.ClientGuid] = client;
                                             }
                                         }

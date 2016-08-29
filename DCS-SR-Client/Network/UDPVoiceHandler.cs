@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -8,14 +7,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using FragLabs.Audio.Codecs;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputDevice;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     internal class UdpVoiceHandler
     {
@@ -343,14 +341,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                 //Check that we're not transmitting on this radio
 
+                                double receivingPower = 0;
+                                float lineOfSightLoss = 0;
+
                                 if (receivingRadio != null && receivingState !=null 
                                         && 
                                         ( receivingRadio.modulation == 2 // INTERCOM Modulation is 2 so if its two dont bother checking LOS and Range
                                             ||
                                             (
-                                                HasLineOfSight(udpVoicePacket) 
+                                                HasLineOfSight(udpVoicePacket, out lineOfSightLoss) 
                                                 && 
-                                                InRange(udpVoicePacket)
+                                                InRange(udpVoicePacket,out receivingPower)
                                                 &&
                                                 !IsCurrentlyTransmittingOn(receivingState.ReceivedOn)
                                             )
@@ -390,7 +391,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                             UnitId = udpVoicePacket.UnitId,
                                             Encryption = udpVoicePacket.Encryption,
                                             Decryptable = udpVoicePacket.Encryption == receivingRadio.encKey && receivingRadio.enc, // mark if we can decrypt it
-                                            RadioReceivingState = receivingState
+                                            RadioReceivingState = receivingState,
+                                            RecevingPower = receivingPower,
+                                            LineOfSightLoss = lineOfSightLoss // Loss of 1.0 or greater is total loss
                                         };
 
                                         //add to JitterBuffer!
@@ -434,8 +437,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 && RadioDCSSyncServer.DcsPlayerRadioInfo.selected == radioId);
         }
 
-        private bool HasLineOfSight(UDPVoicePacket udpVoicePacket)
+        private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
         {
+            losLoss = 0; //0 is NO LOSS
             if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] == null || ClientSync.ServerSettings[(int)ServerSettingType.LOS_ENABLED] == "OFF")
             {
                 return true;
@@ -444,15 +448,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
-                return transmittingClient.HasLineOfSight;
+                losLoss = transmittingClient.LineOfSightLoss;
+                return transmittingClient.LineOfSightLoss < 1.0f; // 1.0 or greater  is TOTAL loss
             }
+
+            losLoss = 0;
             return false;
 
         }
 
-        private bool InRange(UDPVoicePacket udpVoicePacket)
+        private bool InRange(UDPVoicePacket udpVoicePacket,out double signalStrength)
         {
-
+            signalStrength = 0;
             if (ClientSync.ServerSettings[(int)ServerSettingType.DISTANCE_ENABLED] == null 
                 || ClientSync.ServerSettings[(int)ServerSettingType.DISTANCE_ENABLED] == "OFF" 
                  )
@@ -472,8 +479,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //no real position
                     return true;
                 }
-               
-                return RadioCalculator.CanHearTransmission(RadioCalculator.CalculateDistance(myPosition,clientPos),udpVoicePacket.Frequency);
+
+                signalStrength =
+                    RadioCalculator.FriisTransmissionReceivedPower(
+                        RadioCalculator.CalculateDistance(myPosition, clientPos), udpVoicePacket.Frequency);
+
+                return signalStrength > RadioCalculator.RXSensivity;
             }
             return false;
 

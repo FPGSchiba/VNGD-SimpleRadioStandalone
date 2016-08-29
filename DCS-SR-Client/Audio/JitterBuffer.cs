@@ -37,7 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 if (!radioBuffer.ContainsKey(audio.ClientGuid))
                 {
-                    radioBuffer[audio.ClientGuid] = new List<ClientAudio> { audio };
+                    radioBuffer[audio.ClientGuid] = new List<ClientAudio> {audio};
                 }
                 else
                 {
@@ -50,7 +50,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public byte[][] MixDown()
         {
-            long start = Environment.TickCount;
+           // long start = Environment.TickCount;
             lock (_lock)
             {
                 byte[][] mixDownBytes = new byte[_clientRadioBuffers.Length][];
@@ -81,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     else
                     {
                         //different radio
-                        mixDownBytes[i] = CreateBothMix(mixDownBytes[i]);
+                        mixDownBytes[i] = CreateStereoMix(mixDownBytes[i]);
 
                         continue; //back to the top
                     }
@@ -98,13 +98,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     }
                     else
                     {
-                        mixDownBytes[i] = CreateBothMix(mixDownBytes[i]);
+                        mixDownBytes[i] = CreateStereoMix(mixDownBytes[i]);
                     }
                 }
 
                 Clear();
 
-                Logger.Debug("Mixdown took: "+(Environment.TickCount - start));
+                // Logger.Debug("Mixdown took: "+(Environment.TickCount - start));
 
                 return mixDownBytes;
             }
@@ -133,6 +133,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         if (decrytable)
                         {
                             speaker1Short = clientAudioBytesArray[i];
+
+                            if (clientAudio.RecevingPower < 0)
+                            {
+                                //calculate % loss - not real percent coz is logs
+                                double loss = clientAudio.RecevingPower / RadioCalculator.RXSensivity;
+
+                                //add in radio loss
+                                //if more than 0.6 loss reduce volume
+                                if (loss > 0.6)
+                                {
+                                    speaker1Short = (short)(speaker1Short * (1.0f - loss));
+                                }
+                            }
+
+                            //0 is no loss so if more than 0 reduce volume
+                            if (clientAudio.LineOfSightLoss > 0)
+                            {
+                                speaker1Short = (short) (speaker1Short*(1.0f - clientAudio.LineOfSightLoss));
+                            }
                         }
                         else
                         {
@@ -274,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             return (short) _random.Next(-32768/8, 32768/8);
         }
 
-        private byte[] CreateLeftMix(byte[] pcmAudio)
+        public static byte[] CreateLeftMix(byte[] pcmAudio)
         {
             var stereoMix = new byte[pcmAudio.Length*2];
             for (var i = 0; i < pcmAudio.Length/2; i++)
@@ -288,7 +307,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             return stereoMix;
         }
 
-        private byte[] CreateRightMix(byte[] pcmAudio)
+        public static byte[] CreateRightMix(byte[] pcmAudio)
         {
             var stereoMix = new byte[pcmAudio.Length*2];
             for (var i = 0; i < pcmAudio.Length/2; i++)
@@ -302,7 +321,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             return stereoMix;
         }
 
-        private byte[] CreateBothMix(byte[] pcmAudio)
+        public static byte[] CreateStereoMix(byte[] pcmAudio)
         {
             var stereoMix = new byte[pcmAudio.Length*2];
             for (var i = 0; i < pcmAudio.Length/2; i++)

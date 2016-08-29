@@ -82,8 +82,6 @@
   <ItemGroup>
     <Compile Include="CircularBuffer.cs" />
     <Compile Include="ConversionHelpers.cs" />
-    <Compile Include="DCSLosCheckRequest.cs" />
-    <Compile Include="DCSLosCheckResult.cs" />
     <Compile Include="DCSPlayerSideInfo.cs" />
     <Compile Include="DCSPosition.cs" />
     <Compile Include="ListHelper.cs" />

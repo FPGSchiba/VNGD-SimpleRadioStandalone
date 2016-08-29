@@ -149,6 +149,8 @@
     <Compile Include="Audio\ClientAudio.cs" />
     <Compile Include="Audio\ClientAudioProvider.cs" />
     <Compile Include="Audio\JitterBuffer.cs" />
+    <Compile Include="Network\DCSLosCheckRequest.cs" />
+    <Compile Include="Network\DCSLosCheckResult.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>

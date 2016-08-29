@@ -7,8 +7,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
 using NLog;
 
@@ -17,7 +17,7 @@ Keeps radio information in Sync Between DCS and
 
 **/
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     public class RadioDCSSyncServer
     {
@@ -222,9 +222,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                                 
                                 if (_clients.TryGetValue(player.id, out client))
                                 {
-                                    client.HasLineOfSight = player.los;
+                                    client.LineOfSightLoss = player.los;
 
-                                   // Logger.Debug(client.ToString());
+                                    Logger.Debug(client.ToString());
                                 }
                             }
                         }
@@ -311,7 +311,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if (client.Position.x != 0 && client.Position.z != 0 && client.ClientGuid != _guid)
+                    if (client.Position.x != 0 && client.Position.z != 0  && client.ClientGuid != _guid)
                     {
                         requests.Add(new DCSLosCheckRequest()
                         {

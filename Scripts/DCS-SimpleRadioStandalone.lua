@@ -15,6 +15,8 @@ SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
 
 SR.LOS_HEIGHT_OFFSET = 10.0 -- sets the line of sight offset to simulate radio waves bending
+SR.LOS_HEIGHT_OFFSET_MAX = 80.0 -- max amount of "bend"
+SR.LOS_HEIGHT_OFFSET_STEP = 10.0 -- Interval to "bend" in
 
 SR.unicast = true --DONT CHANGE THIS
 
@@ -300,8 +302,41 @@ function SR.checkLOS(_clientsList)
     local _result = {}
     for _,_client in pairs(_clientsList) do
         -- add 10 meter tolerance
-       
-        table.insert(_result,{id = _client.id, los = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+SR.LOS_HEIGHT_OFFSET,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z) })
+
+
+        local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
+
+        local _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+SR.LOS_HEIGHT_OFFSET,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+        if _hasLos then
+            table.insert(_result,{id = _client.id, los = 0.0 })
+        else
+            --check from 10 - 60 in incremenents of 10 if there is Line of sight
+
+            -- check Max
+            _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+SR.LOS_HEIGHT_OFFSET_MAX,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+            if _hasLos then
+                table.insert(_result,{id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
+            end
+
+            -- now check all the values that arent MAX offset and MIN offset
+
+            for _losOffset = SR.LOS_HEIGHT_OFFSET+SR.LOS_HEIGHT_OFFSET_STEP,SR.LOS_HEIGHT_OFFSET_MAX-SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
+
+                _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+_losOffset,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+                 if _hasLos then
+                    table.insert(_result,{id = _client.id, los =  (_losOffset/ 100.0) })
+                    break;
+                end
+            end
+
+            if not _hasLos then 
+                table.insert(_result,{id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+            end
+        end
+
     end
     return _result
 end

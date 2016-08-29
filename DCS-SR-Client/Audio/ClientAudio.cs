@@ -16,22 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public short Encryption { get; internal set; }
         public bool Decryptable { get; internal set; }
         public RadioReceivingState RadioReceivingState { get; set; }
-
-
-        //From NAUDIO but modded
-
-        public static float[] ConvertPCMtoFloats(byte[] sourceBuffer)
-        {
-            float[] buffer = new float[sourceBuffer.Length/2];
-
-            int newIndex = 0;
-            int startIndex = 0;
-            while (startIndex < sourceBuffer.Length)
-            {
-                buffer[newIndex++] = (float)BitConverter.ToInt16(sourceBuffer, startIndex) / 32768f;
-                startIndex += 2;
-            }
-            return buffer;
-        }
+        public double RecevingPower { get; set; }
+        public float LineOfSightLoss { get; set; }
     }
 }
