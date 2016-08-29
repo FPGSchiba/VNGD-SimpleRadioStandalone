@@ -21,8 +21,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private int _bytesPerSegment;
 
-        private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
-            new ConcurrentDictionary<string, ClientAudioProvider>();
+    //    private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
+      //      new ConcurrentDictionary<string, ClientAudioProvider>();
 
         private OpusDecoder _decoder;
         private OpusEncoder _encoder;
@@ -64,29 +64,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         [DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
 
-        internal void AddClientAudio(ClientAudio audio)
-        {
-            //16bit PCM Audio
-            //TODO: Clean  - remove if we havent received audio in a while
-            // If we have recieved audio, create a new buffered audio and read it
-            ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.ClientGuid))
-            {
-                client = _clientsBufferedAudio[audio.ClientGuid];
-                client.LastUpdate = GetTickCount64();
-            }
-            else
-            {
-                client = new ClientAudioProvider {LastUpdate = GetTickCount64()};
-                _clientsBufferedAudio[audio.ClientGuid] = client;
+//        internal void AddClientAudio(byte[][] audio)
+//        {
+//            //16bit PCM Audio
+//            //TODO: Clean  - remove if we havent received audio in a while
+//            // If we have recieved audio, create a new buffered audio and read it
+//            ClientAudioProvider client = null;
+//            if (_clientsBufferedAudio.ContainsKey(audio.ClientGuid))
+//            {
+//                client = _clientsBufferedAudio[audio.ClientGuid];
+//                client.LastUpdate = GetTickCount64();
+//            }
+//            else
+//            {
+//                client = new ClientAudioProvider {LastUpdate = GetTickCount64()};
+//                _clientsBufferedAudio[audio.ClientGuid] = client;
+//
+//                _mixing.AddMixerInput(client.VolumeSampleProvider);
+//            }
+//
+//            client.VolumeSampleProvider.Volume = audio.Volume *SpeakerBoost;
+//
+//            client.AddSamples(audio);
+//        }
 
-                _mixing.AddMixerInput(client.VolumeSampleProvider);
-            }
+      public void AddRadioAudio(byte[] radioPCMAudio, int radioId)
+      {
+          _effectsBuffer[radioId].AddAudioSamples(radioPCMAudio);
 
-            client.VolumeSampleProvider.Volume = audio.Volume *SpeakerBoost;
-
-            client.AddSamples(audio);
-        }
+      }
 
         public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
             IPAddress ipAddress)
@@ -263,7 +269,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing.RemoveAllMixerInputs();
             }
 
-            _clientsBufferedAudio.Clear();
+        //    _clientsBufferedAudio.Clear();
 
             if (_waveIn != null)
             {

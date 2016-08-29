@@ -5,7 +5,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudio
     {
-        public float[] PcmAudioFloat { get; set; }
+        public short[] PcmAudioShort { get; set; }
         public string ClientGuid { get; set; }
         public long ReceiveTime { get; set; }
         public int ReceivedRadio { get; set; }

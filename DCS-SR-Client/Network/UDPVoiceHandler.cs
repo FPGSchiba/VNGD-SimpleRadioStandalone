@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using FragLabs.Audio.Codecs;
@@ -46,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private static object _lock = new object();
 
-        private List<ClientAudio> _jitterBuffer = new List<ClientAudio>();
+        private JitterBuffer _jitterBuffer = new JitterBuffer();
 
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -70,61 +71,90 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             lock (_lock)
             {
-                if (_jitterBuffer.Count > 0)
+
+              var radioMixDown = _jitterBuffer.MixDown();
+
+              for (int i = 0; i < radioMixDown.Length; i++)
+              {
+                var singleRadio = radioMixDown[i];
+
+                if (singleRadio == null || singleRadio.Length == 0)
                 {
-                    //Empty Jitterbuffer
-                    foreach (var clientAudio in _jitterBuffer)
-                    {
-                        var lastState = RadioReceivingState[clientAudio.ReceivedRadio];
+                  //Nothing on this radio!
+                }
+                else
+                {
 
-                        if (lastState == null || !lastState.IsReceiving() && !IsCurrentlyTransmittingOn(clientAudio.ReceivedRadio))
-                        {
-                            this._audioManager.PlaySoundEffectStartTransmit(clientAudio.ReceivedRadio, false,
-                                clientAudio.Volume);
-                        }
-                        else
-                        {
-                            //do nothing
-                        }
+                  RadioReceivingState[i] = new RadioReceivingState()
+                  {
+                    Encrypted = false,
+                    IsSecondary = false,
+                    LastReceviedAt = Environment.TickCount,
+                    PlayedEndOfTransmission = false,
+                    ReceivedOn = i
+                  };
 
-                        clientAudio.RadioReceivingState.PlayedEndOfTransmission = false;
-                        RadioReceivingState[clientAudio.ReceivedRadio] = clientAudio.RadioReceivingState;
+                  _audioManager.AddRadioAudio(singleRadio,i);
 
-                   //     Logger.Debug("Received: " + clientAudio.ReceivedRadio + " - " + (Environment.TickCount - clientAudio.RadioReceivingState.LastReceviedAt));
-
-                        //TODO Reorder list per client to sort out packets sent in the wrong order!
-                        _audioManager.AddClientAudio(clientAudio);
-                    }
-                    _jitterBuffer.Clear();
                 }
 
-                //check all radios for playout sound
-                for (int i = 0; i < RadioReceivingState.Length; i++)
-                {
-                    var state = RadioReceivingState[i];
-                    if (state != null &&  (!RadioDCSSyncServer.DcsPlayerRadioInfo.IsCurrent() || IsCurrentlyTransmittingOn(i)))
-                    {
-                        state.PlayedEndOfTransmission = true;
-                    }
-                    else if (state != null && !state.PlayedEndOfTransmission && !state.IsReceiving())
-                    {
-                        state.PlayedEndOfTransmission = true;
-                        var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i];
+              }
 
-
-                        this._audioManager.PlaySoundEffectEndTransmit(i, false,
-                            radio.volume);
-
-                  //      Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
-
-                    }
-                    else if(state!=null)
-                    {
-                //        Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
-                    }
-
-
-                }
+//                if (_jitterBuffer.Count > 0)
+//                {
+//                    //Empty Jitterbuffer
+//                    foreach (var clientAudio in _jitterBuffer)
+//                    {
+//                        var lastState = RadioReceivingState[clientAudio.ReceivedRadio];
+//
+//                        if (lastState == null || !lastState.IsReceiving() && !IsCurrentlyTransmittingOn(clientAudio.ReceivedRadio))
+//                        {
+//                            this._audioManager.PlaySoundEffectStartTransmit(clientAudio.ReceivedRadio, false,
+//                                clientAudio.Volume);
+//                        }
+//                        else
+//                        {
+//                            //do nothing
+//                        }
+//
+//                        clientAudio.RadioReceivingState.PlayedEndOfTransmission = false;
+//                        RadioReceivingState[clientAudio.ReceivedRadio] = clientAudio.RadioReceivingState;
+//
+//                   //     Logger.Debug("Received: " + clientAudio.ReceivedRadio + " - " + (Environment.TickCount - clientAudio.RadioReceivingState.LastReceviedAt));
+//
+//                        //TODO Reorder list per client to sort out packets sent in the wrong order!
+//                        _audioManager.AddClientAudio(clientAudio);
+//                    }
+//                    _jitterBuffer.Clear();
+//                }
+//
+//                //check all radios for playout sound
+//                for (int i = 0; i < RadioReceivingState.Length; i++)
+//                {
+//                    var state = RadioReceivingState[i];
+//                    if (state != null &&  (!RadioDCSSyncServer.DcsPlayerRadioInfo.IsCurrent() || IsCurrentlyTransmittingOn(i)))
+//                    {
+//                        state.PlayedEndOfTransmission = true;
+//                    }
+//                    else if (state != null && !state.PlayedEndOfTransmission && !state.IsReceiving())
+//                    {
+//                        state.PlayedEndOfTransmission = true;
+//                        var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i];
+//
+//
+//                        this._audioManager.PlaySoundEffectEndTransmit(i, false,
+//                            radio.volume);
+//
+//                  //      Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
+//
+//                    }
+//                    else if(state!=null)
+//                    {
+//                //        Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
+//                    }
+//
+//
+//                }
             }
             
         }
@@ -351,7 +381,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         var audio = new ClientAudio
                                         {
                                             ClientGuid = udpVoicePacket.Guid,
-                                            PcmAudioFloat = ClientAudio.ConvertPCMtoFloats(tmp),  //Convert to Floats
+                                            PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),  //Convert to Shorts!
                                             ReceiveTime = GetTickCount64(),
                                             Frequency = udpVoicePacket.Frequency,
                                             Modulation = udpVoicePacket.Modulation,
@@ -366,7 +396,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                         //add to JitterBuffer!
                                         lock (_lock)
                                         {
-                                            _jitterBuffer.Add(audio);
+                                            _jitterBuffer.AddAudio(audio);
                                         }
                                     }
                                 }
