@@ -1,22 +1,22 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
-    public class SRClient:INotifyPropertyChanged
+    public class SRClient : INotifyPropertyChanged
     {
-      
+        //  public DcsPosition Position { get; set; }
+
+        private int _coalition;
+
+        [JsonIgnore] private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
+
         public string ClientGuid { get; set; }
 
         public string Name { get; set; }
 
-      //  public DcsPosition Position { get; set; }
-
-        private int _coalition;
-    
 
         public int Coalition
         {
@@ -24,7 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             set
             {
                 _coalition = value;
-                PropertyChanged?.Invoke(this,new PropertyChangedEventArgs("Coalition"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
 
@@ -37,13 +37,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         [JsonIgnore]
         public long LastUpdate { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public DCSPlayerRadioInfo RadioInfo { get; set; }
         public DcsPosition Position { get; set; }
 
-        [JsonIgnore]
-        private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
         [JsonIgnore]
         public float LineOfSightLoss
         {
@@ -53,21 +49,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 {
                     return 0;
                 }
-                else
+                if (Position.x == 0 && Position.z == 0)
                 {
-                    if (Position.x == 0 && Position.z == 0)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return _lineOfSightLoss;
-                    }
+                    return 0;
                 }
-               
+                return _lineOfSightLoss;
             }
             set { _lineOfSightLoss = value; }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
 
         public bool isCurrent()
@@ -82,7 +73,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 //            {
 //                return true;
 //            }
-
         }
 
         public override string ToString()
@@ -101,7 +91,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 side = "Spectator";
             }
-            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss "+ _lineOfSightLoss + " Pos"+ Position.ToString();
+            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss " + _lineOfSightLoss + " Pos" + Position;
         }
     }
 }
