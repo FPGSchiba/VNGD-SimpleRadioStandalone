@@ -5,13 +5,12 @@ using System.IO;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Win32;
 using MessageBox = System.Windows.MessageBox;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Installer
 {
@@ -24,7 +23,7 @@ namespace Installer
         private const string CLIENT_REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE";
         private readonly string currentDirectory;
 
-     //   private readonly string currentPath;
+        //   private readonly string currentPath;
 
         public MainWindow()
         {
@@ -91,8 +90,8 @@ namespace Installer
             try
             {
                 Registry.SetValue(REG_PATH,
-            "SRPathStandalone",
-            "");
+                    "SRPathStandalone",
+                    "");
                 Registry.SetValue(REG_PATH,
                     "ScriptsPath",
                     "");
@@ -103,7 +102,7 @@ namespace Installer
 
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
+                using (var key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
                 {
                     key.DeleteSubKeyTree("DCS-SimpleRadioStandalone", false);
                     key.DeleteSubKeyTree("DCS-SR-Standalone", false);
@@ -120,7 +119,7 @@ namespace Installer
         {
             foreach (var clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-") )
+                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-"))
                 {
                     return true;
                 }
@@ -182,7 +181,7 @@ namespace Installer
                 return;
             }
 
-           
+
             // string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
             var paths = FindValidDCSFolders(dcsScriptsPath.Text);
 
@@ -220,7 +219,6 @@ namespace Installer
             Process.Start("explorer.exe", srPath.Text);
 
             Environment.Exit(0);
-
         }
 
         private static List<string> FindValidDCSFolders(string path)
@@ -253,10 +251,10 @@ namespace Installer
 
             if (!Directory.Exists(path))
             {
-                SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+                var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
 
                 // Create the rules
-                FileSystemAccessRule writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
+                var writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
 
                 var dir = Directory.CreateDirectory(path);
 
@@ -264,11 +262,13 @@ namespace Installer
                 //sleep! WTF directory is lagging behind state here...
                 Thread.Sleep(200);
 
-                DirectorySecurity dSecurity = dir.GetAccessControl();
-                dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                var dSecurity = dir.GetAccessControl();
+                dSecurity.AddAccessRule(new FileSystemAccessRule(
+                    new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl,
+                    InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                    PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
                 dir.SetAccessControl(dSecurity);
                 dir.Refresh();
-
             }
 
             //sleep! WTF directory is lagging behind state here...
@@ -277,8 +277,8 @@ namespace Installer
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
-         //   File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
-        //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+            //   File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
+            //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
                 true);
             File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
@@ -307,7 +307,7 @@ namespace Installer
 //
 //                    File.WriteAllText(path + "\\Export.lua", contents);
 
-                // do nothing
+                    // do nothing
                 }
                 else
                 {
@@ -316,7 +316,6 @@ namespace Installer
                     writer.WriteLine(
                         "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
                     writer.Close();
-                   
                 }
             }
             else
@@ -385,7 +384,7 @@ namespace Installer
             InstallButton.Content = "Removing...";
 
             var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-                                    "\\Saved Games\\";
+                                 "\\Saved Games\\";
 
             var dcsPath = savedGamesPath + "DCS";
 
@@ -426,7 +425,7 @@ namespace Installer
                 }
             }
 
-            if(File.Exists(path + "\\DCS-SimpleRadioStandalone.lua"))
+            if (File.Exists(path + "\\DCS-SimpleRadioStandalone.lua"))
             {
                 File.Delete(path + "\\DCS-SimpleRadioStandalone.lua");
             }
@@ -439,6 +438,6 @@ namespace Installer
         private void Remove_Plugin(object sender, RoutedEventArgs e)
         {
             UninstallSR();
-         }
+        }
     }
 }

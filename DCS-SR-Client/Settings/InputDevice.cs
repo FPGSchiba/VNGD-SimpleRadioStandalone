@@ -18,13 +18,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         ModifierOverlayToggle = 9,
 
         Intercom = 10,
-        ModifierIntercom =11,
-
+        ModifierIntercom = 11
     }
 
     public class InputDevice
     {
-     
         public InputBinding InputBind { get; set; }
 
         public string DeviceName { get; set; }

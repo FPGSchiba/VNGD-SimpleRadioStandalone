@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
-    public sealed class MainViewModel:Screen,IHandle<ServerStateMessage>
+    public sealed class MainViewModel : Screen, IHandle<ServerStateMessage>
     {
-        private readonly IWindowManager _windowManager;
-        private readonly IEventAggregator _eventAggregator;
         private readonly ClientAdminViewModel _clientAdminViewModel;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IWindowManager _windowManager;
 
-        public MainViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, ClientAdminViewModel clientAdminViewModel)
+        public MainViewModel(IWindowManager windowManager, IEventAggregator eventAggregator,
+            ClientAdminViewModel clientAdminViewModel)
         {
             _windowManager = windowManager;
             _eventAggregator = eventAggregator;
@@ -28,7 +26,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
         public bool IsServerRunning { get; private set; } = true;
 
         public string ServerButtonText => IsServerRunning ? "Stop Server" : "Start Server";
-      
+
+        public int ClientsCount { get; private set; }
+
+        public string RadioSecurityText
+            =>
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY] == "ON"
+                    ? "ON"
+                    : "OFF";
+
+        public string SpectatorAudioText
+            =>
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED] == "DISABLED"
+                    ? "DISABLED"
+                    : "ENABLED";
+
+        public string ExportListText
+            =>
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED] == "ON"
+                    ? "ON"
+                    : "OFF";
+
+        public string LOSText
+            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.LOS_ENABLED] == "ON" ? "ON" : "OFF";
+
+        public string DistanceLimitText
+            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.DISTANCE_ENABLED] == "ON" ? "ON" : "OFF";
+
+        public string RealRadioText
+            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
+
+        public void Handle(ServerStateMessage message)
+        {
+            IsServerRunning = message.IsRunning;
+            ClientsCount = message.Count;
+        }
+
         public void ServerStartStop()
         {
             if (IsServerRunning)
@@ -39,38 +72,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
                 _eventAggregator.PublishOnBackgroundThread(new StartServerMessage());
             }
-            
-        }
-
-        public int ClientsCount
-        {
-            get; private set;
         }
 
         public void ShowClientList()
         {
             IDictionary<string, object> settings = new Dictionary<string, object>
             {
-                { "Icon", new BitmapImage(new Uri("pack://application:,,,/SR-Server;component/server-10.ico")) },
-                { "ResizeMode" , ResizeMode.CanMinimize},
-
+                {"Icon", new BitmapImage(new Uri("pack://application:,,,/SR-Server;component/server-10.ico"))},
+                {"ResizeMode", ResizeMode.CanMinimize}
             };
-            _windowManager.ShowWindow(_clientAdminViewModel,null,settings);
+            _windowManager.ShowWindow(_clientAdminViewModel, null, settings);
         }
-
-        public string RadioSecurityText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY] == "ON"? "ON" : "OFF";
 
         public void RadioSecurityToggle()
         {
-            var newSetting = RadioSecurityText == "ON"?"OFF" : "ON";
+            var newSetting = RadioSecurityText == "ON" ? "OFF" : "ON";
             ServerSettings.Instance.WriteSetting(ServerSettingType.COALITION_AUDIO_SECURITY, newSetting);
             NotifyOfPropertyChange(() => RadioSecurityText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
-
         }
-
-        public string SpectatorAudioText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED] == "DISABLED" ? "DISABLED" : "ENABLED";
 
         public void SpectatorAudioToggle()
         {
@@ -79,10 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             NotifyOfPropertyChange(() => SpectatorAudioText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
-
         }
-
-        public string ExportListText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.CLIENT_EXPORT_ENABLED] == "ON" ? "ON" : "OFF";
 
         public void ExportListToggle()
         {
@@ -93,8 +111,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
 
-        public string LOSText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.LOS_ENABLED] == "ON" ? "ON" : "OFF";
-
         public void LOSToggle()
         {
             var newSetting = LOSText == "ON" ? "OFF" : "ON";
@@ -103,8 +119,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
-
-        public string DistanceLimitText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.DISTANCE_ENABLED] == "ON" ? "ON" : "OFF";
 
         public void DistanceLimitToggle()
         {
@@ -115,8 +129,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
 
-        public string RealRadioText => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
-
         public void RealRadioToggle()
         {
             var newSetting = RealRadioText == "ON" ? "OFF" : "ON";
@@ -124,12 +136,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             NotifyOfPropertyChange(() => RealRadioText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
-        }
-
-        public void Handle(ServerStateMessage message)
-        {
-            IsServerRunning = message.IsRunning;
-            ClientsCount = message.Count;
         }
     }
 }

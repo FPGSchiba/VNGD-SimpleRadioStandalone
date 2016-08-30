@@ -10,14 +10,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
     public class JitterBuffer
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly Settings _settings;
 
         private readonly Dictionary<string, List<ClientAudio>>[] _clientRadioBuffers = new Dictionary<string, List<
             ClientAudio>>[4];
 
-        private Random _random = new Random();
+        private readonly object _lock = new object();
 
-        private Object _lock = new Object();
+        private readonly Random _random = new Random();
+        private readonly Settings _settings;
+
+        private bool[] _hasDecryptedAudio = new bool[4];
 
         public JitterBuffer()
         {
@@ -48,17 +50,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         }
 
 
-        public byte[][] MixDown()
+        public RadioMixDown[] MixDown()
         {
-           // long start = Environment.TickCount;
+            // long start = Environment.TickCount;
             lock (_lock)
             {
-                byte[][] mixDownBytes = new byte[_clientRadioBuffers.Length][];
+                var radioMix = new RadioMixDown[_clientRadioBuffers.Length];
 
                 for (var i = 0; i < _clientRadioBuffers.Length; i++)
                 {
                     //TODO create stereo mix
-                    mixDownBytes[i] = ConversionHelpers.ShortArrayToByteArray(RadioMixDown(_clientRadioBuffers[i]));
+                    var radioBytes = ConversionHelpers.ShortArrayToByteArray(RadioMixDown(_clientRadioBuffers[i], i));
 
                     var settingType = SettingType.Radio1Channel;
 
@@ -80,8 +82,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     }
                     else
                     {
-                        //different radio
-                        mixDownBytes[i] = CreateStereoMix(mixDownBytes[i]);
+                        radioMix[i] = new RadioMixDown
+                        {
+                            RadioAudioPCM = CreateStereoMix(radioBytes),
+                            HasDecryptedAudio = _hasDecryptedAudio[i]
+                            //mark if this contains encrypted audio for effects
+                        };
 
                         continue; //back to the top
                     }
@@ -90,15 +96,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                     if (setting == "Left")
                     {
-                        mixDownBytes[i] = CreateLeftMix(mixDownBytes[i]);
+                        radioMix[i] = new RadioMixDown
+                        {
+                            RadioAudioPCM = CreateLeftMix(radioBytes),
+                            HasDecryptedAudio = _hasDecryptedAudio[i]
+                            //mark if this contains encrypted audio for effects
+                        };
                     }
                     else if (setting == "Right")
                     {
-                        mixDownBytes[i] = CreateRightMix(mixDownBytes[i]);
+                        radioMix[i] = new RadioMixDown
+                        {
+                            RadioAudioPCM = CreateRightMix(radioBytes),
+                            HasDecryptedAudio = _hasDecryptedAudio[i]
+                            //mark if this contains encrypted audio for effects
+                        };
                     }
                     else
                     {
-                        mixDownBytes[i] = CreateStereoMix(mixDownBytes[i]);
+                        radioMix[i] = new RadioMixDown
+                        {
+                            RadioAudioPCM = CreateStereoMix(radioBytes),
+                            HasDecryptedAudio = _hasDecryptedAudio[i]
+                            //mark if this contains encrypted audio for effects
+                        };
                     }
                 }
 
@@ -106,18 +127,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 // Logger.Debug("Mixdown took: "+(Environment.TickCount - start));
 
-                return mixDownBytes;
+                return radioMix;
             }
         }
 
-        private short[] RadioMixDown(Dictionary<string, List<ClientAudio>> radioData)
+        private short[] RadioMixDown(Dictionary<string, List<ClientAudio>> radioData, int radioId)
         {
             //now process all the clientAudio and add to the final mixdown
 
             //init mixdown with the longest audio from a client
             // this means the mixing works properly rather than mixing
             //with silence initially which will cause issues
-            var mixDown = InitRadioMixDown(radioData);
+            var mixDown = InitRadioMixDown(radioData, radioId);
 
             foreach (var clientAudioList in radioData.Values)
             {
@@ -125,7 +146,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 foreach (var clientAudio in clientAudioList)
                 {
                     var clientAudioBytesArray = clientAudio.PcmAudioShort;
-                    var decrytable = (clientAudio.Decryptable) || clientAudio.Encryption == 0;
+                    var decrytable = clientAudio.Decryptable || clientAudio.Encryption == 0;
+
+                    //mark that we have decrpyted encrypted audio for sound effects
+                    if (decrytable && clientAudio.Encryption > 0)
+                    {
+                        _hasDecryptedAudio[radioId] = true;
+                    }
 
                     for (var i = 0; i < clientAudioBytesArray.Count(); i++)
                     {
@@ -137,13 +164,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                             if (clientAudio.RecevingPower < 0)
                             {
                                 //calculate % loss - not real percent coz is logs
-                                double loss = clientAudio.RecevingPower / RadioCalculator.RXSensivity;
+                                var loss = clientAudio.RecevingPower/RadioCalculator.RXSensivity;
 
                                 //add in radio loss
                                 //if more than 0.6 loss reduce volume
                                 if (loss > 0.6)
                                 {
-                                    speaker1Short = (short)(speaker1Short * (1.0f - loss));
+                                    speaker1Short = (short) (speaker1Short*(1.0f - loss));
                                 }
                             }
 
@@ -170,18 +197,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             return mixDown;
         }
 
-        private short[] InitRadioMixDown(Dictionary<string, List<ClientAudio>> radioData)
+        private short[] InitRadioMixDown(Dictionary<string, List<ClientAudio>> radioData, int radioId)
         {
-            //TODO this return the longest client array and be used to init the MixDown array with data
-
             string longestGuid = null;
-            int longestCount = 0;
+            var longestCount = 0;
 
 
             foreach (var clientAudioList in radioData.Values)
             {
                 //perclient audio
-                int clientCount = 0;
+                var clientCount = 0;
                 string clientGuid = null;
                 foreach (var clientAudio in clientAudioList)
                 {
@@ -204,10 +229,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 var mixDownInit = new List<short>();
 
-                bool decryptable = true;
+                var decryptable = true;
                 foreach (var audio in clientAudio)
                 {
-                    decryptable = (audio.Decryptable) || audio.Encryption == 0;
+                    decryptable = audio.Decryptable || audio.Encryption == 0;
+
+                    if (decryptable && audio.Encryption > 0)
+                    {
+                        _hasDecryptedAudio[radioId] = true;
+                    }
+
                     mixDownInit.AddRange(audio.PcmAudioShort);
                 }
 
@@ -219,7 +250,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 //now randomise if not decrytable
                 if (!decryptable)
                 {
-                    for (int i = 0; i < initArray.Length; i++)
+                    for (var i = 0; i < initArray.Length; i++)
                     {
                         initArray[i] = RandomShort();
                     }
@@ -227,10 +258,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 return initArray;
             }
-            else
-            {
-                return new short[0];
-            }
+            return new short[0];
         }
 
 
@@ -273,7 +301,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             else
             {
                 // Viktor's second equation when one or both sources are loud
-                m = 2*(speaker1 + speaker2) - (speaker1*speaker2)/32768 - 65536;
+                m = 2*(speaker1 + speaker2) - speaker1*speaker2/32768 - 65536;
             }
 
             // Output is unsigned (0..65536) so convert back to signed (-32768..32767)
@@ -340,6 +368,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             //clear buffer
             lock (_lock)
             {
+                _hasDecryptedAudio = new bool[4];
+
                 foreach (var perRadio in _clientRadioBuffers)
                 {
                     perRadio.Clear();

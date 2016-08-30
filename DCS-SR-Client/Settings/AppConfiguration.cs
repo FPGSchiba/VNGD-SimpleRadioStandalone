@@ -22,33 +22,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
+        private static AppConfiguration _instance;
+
         private int _audioInputDeviceId;
         private int _audioOutputDeviceId;
         private string _lastServer;
         private float _micBoost;
-        private float _speakerBoost;
+        private double _radioHeight;
+        private double _radioOpacity;
+        private float _radioSize;
+        private double _radioWidth;
         private double _radioX;
         private double _radioY;
-        private float _radioSize;
-        private double _radioOpacity;
-        private double _radioWidth;
-        private double _radioHeight;
-
-        private static AppConfiguration _instance;
-
-        public string[] UserSettings { get; }
-
-        public static AppConfiguration Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new AppConfiguration();
-                }
-                return _instance;
-            }
-        }
+        private float _speakerBoost;
 
         private AppConfiguration()
         {
@@ -98,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                SpeakerBoost = float.Parse((string)Registry.GetValue(RegPath,
+                SpeakerBoost = float.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.SPEAKER_BOOST.ToString(),
                     "1.0"));
             }
@@ -107,10 +93,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 SpeakerBoost = 1.0f;
             }
 
-         
+
             try
             {
-                RadioX = double.Parse((string)Registry.GetValue(RegPath,
+                RadioX = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_X.ToString(),
                     "300"));
             }
@@ -121,7 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                RadioY = double.Parse((string)Registry.GetValue(RegPath,
+                RadioY = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_Y.ToString(),
                     "300"));
             }
@@ -133,7 +119,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                RadioWidth = double.Parse((string)Registry.GetValue(RegPath,
+                RadioWidth = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_WIDTH.ToString(),
                     "122"));
             }
@@ -144,7 +130,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                RadioHeight = double.Parse((string)Registry.GetValue(RegPath,
+                RadioHeight = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_HEIGHT.ToString(),
                     "270"));
             }
@@ -156,13 +142,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                RadioOpacity = double.Parse((string)Registry.GetValue(RegPath,
+                RadioOpacity = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_OPACITY.ToString(),
                     "1.0"));
             }
             catch (Exception ex)
             {
                 RadioOpacity = 1.0;
+            }
+        }
+
+        public string[] UserSettings { get; }
+
+        public static AppConfiguration Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new AppConfiguration();
+                }
+                return _instance;
             }
         }
 
@@ -218,7 +218,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     _micBoost);
             }
         }
-
 
 
         public float SpeakerBoost
@@ -311,8 +310,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     _radioOpacity);
             }
         }
-
-
-
     }
 }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
@@ -20,11 +16,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
     {
         private readonly List<SRClient> _srClients;
 
-        public ServerStateMessage(bool isRunning, List<SRClient> srClients )
+        public ServerStateMessage(bool isRunning, List<SRClient> srClients)
         {
             _srClients = srClients;
             IsRunning = isRunning;
         }
+
         //SUPER SAFE
         public ReadOnlyCollection<SRClient> Clients => new ReadOnlyCollection<SRClient>(_srClients);
 

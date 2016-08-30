@@ -1,5 +1,4 @@
-﻿using System;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NAudio.Dsp;
 using NAudio.Wave;
 
@@ -7,10 +6,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
 {
     public class RadioFilter : ISampleProvider
     {
-        private readonly ISampleProvider _source;
         private readonly BiQuadFilter _highPassFilter;
         private readonly BiQuadFilter _lowPassFilter;
         private readonly Settings _settings;
+        private readonly ISampleProvider _source;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {
@@ -31,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
 
-            if (_settings.UserSettings[(int) SettingType.RadioEffects] == "ON" && samplesRead >0)
+            if (_settings.UserSettings[(int) SettingType.RadioEffects] == "ON" && samplesRead > 0)
             {
                 for (var n = 0; n < sampleCount; n++)
                 {
@@ -50,8 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
                         {
                             buffer[offset + n] = audio;
                         }
-
-                        
                     }
                 }
             }

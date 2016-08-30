@@ -1,17 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
-using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -22,17 +13,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     {
         private bool _dragging;
 
-        public int RadioId { private get; set; }
-
         public IntercomControlGroup()
         {
             InitializeComponent();
         }
+
+        public int RadioId { private get; set; }
+
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
+                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
         }
 
@@ -44,12 +37,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
+                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
             {
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 
-                clientRadio.volume = (float)radioVolume.Value / 100.0f;
+                clientRadio.volume = (float) radioVolume.Value/100.0f;
             }
 
             _dragging = false;
@@ -59,12 +52,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-            if (dcsPlayerRadioInfo  == null || !dcsPlayerRadioInfo.IsCurrent())
+            if (dcsPlayerRadioInfo == null || !dcsPlayerRadioInfo.IsCurrent())
             {
                 radioActive.Fill = new SolidColorBrush(Colors.Red);
 
                 radioVolume.IsEnabled = false;
-               
+
                 //reset dragging just incase
                 _dragging = false;
             }
@@ -75,11 +68,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     var transmitting = UdpVoiceHandler.RadioSendingState;
                     var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
 
-                    if ((transmitting.IsSending && transmitting.SendingOn == RadioId )
+                    if ((transmitting.IsSending && transmitting.SendingOn == RadioId)
                         ||
-                        (receiveState!=null && receiveState.IsReceiving()))
+                        (receiveState != null && receiveState.IsReceiving()))
                     {
-                        radioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                        radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
@@ -103,13 +96,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     radioLabel.Text = "NO INTERCOM";
                     radioActive.Fill = new SolidColorBrush(Colors.Red);
                 }
-             
+
                 if (_dragging == false)
                 {
                     radioVolume.Value = currentRadio.volume*100.0;
                 }
             }
         }
-
     }
 }

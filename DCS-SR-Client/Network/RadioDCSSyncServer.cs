@@ -31,29 +31,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         public static volatile DCSPlayerSideInfo DcsPlayerSideInfo = new DCSPlayerSideInfo();
 
-        private volatile bool _stop;
-
         private readonly SendRadioUpdate _clientRadioUpdate;
         private readonly ClientSideUpdate _clientSideUpdate;
+        private readonly ConcurrentDictionary<string, SRClient> _clients;
 
         private UdpClient _dcsGameGuiudpListener;
-        private UdpClient _dcsUdpListener;
 
         private UdpClient _dcsLOSListener;
-        private ConcurrentDictionary<string, SRClient> _clients;
-        private string _guid;
+        private UdpClient _dcsUdpListener;
+        private readonly string _guid;
+
+        private volatile bool _stop;
+
+        public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
+            ConcurrentDictionary<string, SRClient> _clients, string guid)
+        {
+            _clientRadioUpdate = clientRadioUpdate;
+            _clientSideUpdate = clientSideUpdate;
+            this._clients = _clients;
+            _guid = guid;
+        }
 
         public static long LastSent { get; set; }
 
-        public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate, ConcurrentDictionary<string, SRClient> _clients,String guid)
-        {
-            this._clientRadioUpdate = clientRadioUpdate;
-            this._clientSideUpdate = clientSideUpdate;
-            this._clients = _clients;
-            this._guid = guid;
-        }
 
-       
         public void Listen()
         {
             DcsListener();
@@ -73,8 +74,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _dcsUdpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-         //   var multicastaddress = IPAddress.Parse("239.255.50.10");
-      //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
+            //   var multicastaddress = IPAddress.Parse("239.255.50.10");
+            //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any, 9084);
             _dcsUdpListener.Client.Bind(localEp);
@@ -98,15 +99,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
-                          //  Logger.Info("Recevied Message from DCS: "+ Encoding.UTF8.GetString(
-                          //          bytes, 0, bytes.Length));
+                            //  Logger.Info("Recevied Message from DCS: "+ Encoding.UTF8.GetString(
+                            //          bytes, 0, bytes.Length));
 
                             //sync with others
                             //Radio info is marked as Stale for FC3 aircraft after every frequency change
 
                             if (UpdateRadio(message) || IsRadioInfoStale(message))
                             {
-                                
                                 LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
                             }
@@ -136,8 +136,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 true);
             _dcsGameGuiudpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-        //    var multicastaddress = IPAddress.Parse("239.255.50.10");
-         //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
+            //    var multicastaddress = IPAddress.Parse("239.255.50.10");
+            //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any, 5068);
             _dcsGameGuiudpListener.Client.Bind(localEp);
@@ -147,7 +147,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 using (_dcsGameGuiudpListener)
                 {
-                //    var count = 0;
+                    //    var count = 0;
                     while (!_stop)
                     {
                         var groupEp = new IPEndPoint(IPAddress.Any, 5068);
@@ -209,7 +209,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         try
                         {
-                         /*   Logger.Debug(Encoding.UTF8.GetString(
+                            /*   Logger.Debug(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));*/
                             var playerInfo =
                                 JsonConvert.DeserializeObject<DCSLosCheckResult[]>(Encoding.UTF8.GetString(
@@ -217,9 +217,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             foreach (var player in playerInfo)
                             {
-                               
                                 SRClient client;
-                                
+
                                 if (_clients.TryGetValue(player.id, out client))
                                 {
                                     client.LineOfSightLoss = player.los;
@@ -265,19 +264,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             if (clientsList.Count > 0)
                             {
-                                var splitList =  clientsList.ChunkBy(10);
+                                var splitList = clientsList.ChunkBy(10);
                                 foreach (var clientSubList in splitList)
                                 {
-                                   // Logger.Info( "Sending LOS Request: "+ JsonConvert.SerializeObject(clientSubList));
-                                    var byteData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(clientSubList) + "\n");
-                                    
-                                    _udpSocket.Send(byteData,byteData.Length, _host);
+                                    // Logger.Info( "Sending LOS Request: "+ JsonConvert.SerializeObject(clientSubList));
+                                    var byteData =
+                                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(clientSubList) + "\n");
+
+                                    _udpSocket.Send(byteData, byteData.Length, _host);
 
                                     //every 250 - Wait for the queue
                                     Thread.Sleep(250);
                                 }
                             }
-                           
                         }
                         catch (Exception e)
                         {
@@ -311,9 +310,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if (client.Position.x != 0 && client.Position.z != 0  && client.ClientGuid != _guid)
+                    if (client.Position.x != 0 && client.Position.z != 0 && client.ClientGuid != _guid)
                     {
-                        requests.Add(new DCSLosCheckRequest()
+                        requests.Add(new DCSLosCheckRequest
                         {
                             id = client.ClientGuid,
                             x = client.Position.x,
@@ -325,11 +324,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             return requests;
         }
-       
+
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
-
-            bool changed = false;
+            var changed = false;
             if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
                 // Full radio, all from DCS
             {
@@ -359,7 +357,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 //change PTT last
                 DcsPlayerRadioInfo.ptt = message.ptt;
-
             }
             else // FC3 Radio - Take nothing from DCS, just update the last tickcount, UPDATE triggered a different way
             {
@@ -388,14 +385,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         clientRadio.freqMin = updateRadio.freqMin;
                         clientRadio.freqMax = updateRadio.freqMax;
-                                             
+
                         clientRadio.name = updateRadio.name;
 
                         if (clientRadio.secondaryFrequency == 0)
                         {
                             //currently turned off
                             clientRadio.secondaryFrequency = 0;
-
                         }
                         else
                         {
@@ -426,13 +422,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 clientRadio.encKey = 1;
                             }
                         }
-
                     }
 
                     //change PTT last
                     DcsPlayerRadioInfo.ptt = message.ptt;
                 }
-               
             }
 
             //update
@@ -444,7 +438,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private void HandleEncryptionSettingsFullFidelity(DCSPlayerRadioInfo radioUpdate)
         {
             // handle encryption type
-            for (int i = 0; i < radioUpdate.radios.Length; i++)
+            for (var i = 0; i < radioUpdate.radios.Length; i++)
             {
                 var updatedRadio = radioUpdate.radios[i];
                 var currentRadio = DcsPlayerRadioInfo.radios[i];
@@ -456,7 +450,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         updatedRadio.encKey = currentRadio.encKey;
                     }
                 }
-               
             }
         }
 
@@ -482,7 +475,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             catch (Exception ex)
             {
             }
-            
+
             try
             {
                 _dcsGameGuiudpListener.Close();

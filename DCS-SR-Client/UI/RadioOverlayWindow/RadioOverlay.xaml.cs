@@ -1,20 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
-using MahApps.Metro;
-using MahApps.Metro.Controls;
-using Newtonsoft.Json;
-using NLog;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -23,28 +14,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class RadioOverlayWindow : Window
     {
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly double _aspectRatio;
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private volatile bool _end;
 
-        private RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
 
 
         public RadioOverlayWindow()
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
-            var opacity = AppConfiguration.Instance.RadioOpacity; 
+            var opacity = AppConfiguration.Instance.RadioOpacity;
 
             InitializeComponent();
 
-            _aspectRatio = MinWidth / MinHeight;
+            _aspectRatio = MinWidth/MinHeight;
 
-            this.AllowsTransparency = true;
-            this.Opacity = opacity;
-            this.windowOpacitySlider.Value = this.Opacity;
+            AllowsTransparency = true;
+            Opacity = opacity;
+            windowOpacitySlider.Value = Opacity;
 
             radioControlGroup[0] = radio1;
             radioControlGroup[1] = radio2;
@@ -53,13 +43,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            this.Top = AppConfiguration.Instance.RadioX;
-            this.Left = AppConfiguration.Instance.RadioY;
+            Top = AppConfiguration.Instance.RadioX;
+            Left = AppConfiguration.Instance.RadioY;
 
             Width = AppConfiguration.Instance.RadioWidth;
             Height = AppConfiguration.Instance.RadioHeight;
 
-          //  Window_Loaded(null, null);
+            //  Window_Loaded(null, null);
             CalculateScale();
 
             SetupRadioRefresh();
@@ -74,15 +64,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
         }
 
-        private void Location_Changed(object sender,EventArgs e)
+        private void Location_Changed(object sender, EventArgs e)
         {
-            AppConfiguration.Instance.RadioX = this.Top;
-            AppConfiguration.Instance.RadioY = this.Left;
+            AppConfiguration.Instance.RadioX = Top;
+            AppConfiguration.Instance.RadioY = Left;
         }
 
         private void SetupRadioRefresh()
         {
-        
             Task.Run(() =>
             {
                 while (!_end)
@@ -92,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        foreach(var radio in radioControlGroup)
+                        foreach (var radio in radioControlGroup)
                         {
                             radio.RepaintRadioReceive();
                             radio.RepaintRadioStatus();
@@ -100,7 +89,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                         intercom.RepaintRadioStatus();
                     });
-                   
                 }
             });
         }
@@ -127,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             WindowState = WindowState.Minimized;
         }
-        
+
 
         private void Button_Close(object sender, RoutedEventArgs e)
         {
@@ -149,7 +137,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             WindowState = WindowState.Normal;
         }
 
-     
 
         private void CalculateScale()
         {

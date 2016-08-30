@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 using SharpDX.DirectInput;
-using SharpDX.Multimedia;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -18,9 +16,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public delegate void DetectPttCallback(bool[] buttonStates);
 
-        private volatile bool _detectPtt;
-        private readonly DirectInput _directInput;
-        private readonly List<Device> _inputDevices = new List<Device>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public static readonly HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
@@ -30,13 +25,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             new Guid("1b091b1c-0000-0000-0000-504944564944"), // Corsair K70R Gaming Keyboard
             new Guid("1b1e1b1c-0000-0000-0000-504944564944"), //Corsair Gaming Scimitar RGB Mouse
             new Guid("16a40951-0000-0000-0000-504944564944"), //HyperX 7.1 Audio
-            new Guid("b660044f-0000-0000-0000-504944564944"),// T500 RS Gear Shift
-            new Guid("00f2068e-0000-0000-0000-504944564944"), //CH PRO PEDALS USB 
-
+            new Guid("b660044f-0000-0000-0000-504944564944"), // T500 RS Gear Shift
+            new Guid("00f2068e-0000-0000-0000-504944564944") //CH PRO PEDALS USB 
         };
-        private MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
-        private WindowInteropHelper WindowHelper { get; set; }
+        private readonly DirectInput _directInput;
+        private readonly List<Device> _inputDevices = new List<Device>();
+
+        private volatile bool _detectPtt;
+        private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
         {
@@ -54,13 +51,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Workaround for Bad Devices that pretend to be joysticks
                 if (!IsBlackListed(deviceInstance.ProductGuid))
                 {
-                    Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", "")+" Usage: "+deviceInstance.UsagePage);
+                    Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
+                                " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
+                                deviceInstance.UsagePage);
 
-                   
+
                     if (deviceInstance.Type == DeviceType.Keyboard)
                     {
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid  + " " +
+                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
+                                    " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
                         var device = new Keyboard(_directInput);
 
@@ -72,11 +72,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     }
                     else if (deviceInstance.Type >= DeviceType.Joystick && deviceInstance.Type <= DeviceType.FirstPerson)
                     {
-                       
                         var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
-                                  deviceInstance.ProductName.Trim().Replace("\0", ""));
+                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " +
+                                    deviceInstance.InstanceGuid + " " +
+                                    deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                         device.SetCooperativeLevel(WindowHelper.Handle,
                             CooperativeLevel.Background | CooperativeLevel.NonExclusive);
@@ -87,18 +87,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
                 else
                 {
-                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid + " " +
+                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " +
+                                deviceInstance.InstanceGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                 }
             }
         }
 
-        public InputConfiguration InputConfig { get; set; }
+        private WindowInteropHelper WindowHelper { get; }
 
-        public bool IsBlackListed(Guid device)
-        {
-            return _blacklistedDevices.Contains(device);
-        }
+        public InputConfiguration InputConfig { get; set; }
 
 
         public void Dispose()
@@ -112,6 +110,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     device.Dispose();
                 }
             }
+        }
+
+        public bool IsBlackListed(Guid device)
+        {
+            return _blacklistedDevices.Contains(device);
         }
 
         public void AssignButton(DetectButton callback)
@@ -135,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         }
                         var pov = state.PointOfViewControllers;
 
-                        for (int j = 0; j < pov.Length; j++)
+                        for (var j = 0; j < pov.Length; j++)
                         {
                             initial[i, j + 128] = pov[j];
                         }
@@ -148,7 +151,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                         for (var j = 0; j < 128; j++)
                         {
-                            initial[i, j] = state.IsPressed(state.AllKeys[j])?1:0;
+                            initial[i, j] = state.IsPressed(state.AllKeys[j]) ? 1 : 0;
                         }
                     }
                 }
@@ -182,7 +185,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                     {
                                         found = true;
 
-                                        InputDevice inputDevice = new InputDevice
+                                        var inputDevice = new InputDevice
                                         {
                                             DeviceName =
                                                 _inputDevices[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -197,13 +200,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 }
                                 else
                                 {
-                                    int buttonState = (state.Buttons[j] ? 1 : 0);
+                                    var buttonState = state.Buttons[j] ? 1 : 0;
 
                                     if (buttonState != initial[i, j])
                                     {
                                         found = true;
- 
-                                        InputDevice inputDevice = new InputDevice
+
+                                        var inputDevice = new InputDevice
                                         {
                                             DeviceName =
                                                 _inputDevices[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -233,7 +236,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 {
                                     found = true;
 
-                                    InputDevice inputDevice = new InputDevice
+                                    var inputDevice = new InputDevice
                                     {
                                         DeviceName =
                                             _inputDevices[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -271,14 +274,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 while (_detectPtt)
                 {
                     var buttonStates = new bool[bindingsCount];
-                    for (int i = 0; i < bindingsCount; i++)
+                    for (var i = 0; i < bindingsCount; i++)
                     {
                         //init to true so the modifier bindings logic is easier
                         buttonStates[i] = true;
                     }
 
-                    bool noDevices = true;
-                    for(int j = 0; j < InputConfig.InputDevices.Length; j++)
+                    var noDevices = true;
+                    for (var j = 0; j < InputConfig.InputDevices.Length; j++)
                     {
                         var device = InputConfig.InputDevices[j];
 
@@ -308,19 +311,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                                         break;
                                     }
-                                    else if (_inputDevices[i] is Keyboard)
+                                    if (_inputDevices[i] is Keyboard)
                                     {
                                         var keyboard = _inputDevices[i] as Keyboard;
                                         keyboard.Poll();
                                         var state = keyboard.GetCurrentState();
-                                        buttonStates[(int) device.InputBind] = state.IsPressed(state.AllKeys[device.Button]);
+                                        buttonStates[(int) device.InputBind] =
+                                            state.IsPressed(state.AllKeys[device.Button]);
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            if (j < 4 || j ==8 || j == 10) //==8 is for OverlayToggle == 10 is for intercom
+                            if (j < 4 || j == 8 || j == 10) //==8 is for OverlayToggle == 10 is for intercom
                             {
                                 // set to false as its its a main button, not a modifier
                                 buttonStates[j] = false;
@@ -336,12 +340,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         callback(buttonStates);
                         //handle overlay
-                        if(buttonStates[(int)InputBinding.OverlayToggle] && buttonStates[(int)InputBinding.ModifierOverlayToggle])
+                        if (buttonStates[(int) InputBinding.OverlayToggle] &&
+                            buttonStates[(int) InputBinding.ModifierOverlayToggle])
                         {
                             //run on main
                             Application.Current.Dispatcher.Invoke(
-                                       () => { _toggleOverlayCallback(false); });
-
+                                () => { _toggleOverlayCallback(false); });
                         }
                     }
 

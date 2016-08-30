@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public struct DcsPosition
     {
@@ -14,9 +8,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public override string ToString()
         {
-
-            return $"Pos:[{x},{y},{z}]"; 
+            return $"Pos:[{x},{y},{z}]";
         }
     }
-
 }

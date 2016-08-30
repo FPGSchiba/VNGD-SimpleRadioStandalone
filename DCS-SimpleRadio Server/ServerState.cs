@@ -2,13 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Newtonsoft.Json;
@@ -17,17 +14,19 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
-    public class ServerState:IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>, IHandle<BanClientMessage>
+    public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>,
+        IHandle<BanClientMessage>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly IEventAggregator _eventAggregator;
-        private UDPVoiceRouter _serverListener;
-        private ServerSync _serverSync;
 
         private readonly HashSet<IPAddress> _bannedIps = new HashSet<IPAddress>();
 
         private readonly ConcurrentDictionary<string, SRClient> _connectedClients =
             new ConcurrentDictionary<string, SRClient>();
+
+        private readonly IEventAggregator _eventAggregator;
+        private UDPVoiceRouter _serverListener;
+        private ServerSync _serverSync;
         private volatile bool _stop = true;
 
         public ServerState(IEventAggregator eventAggregator)
@@ -36,8 +35,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             _eventAggregator.Subscribe(this);
 
             StartServer();
+        }
 
-           
+        public void Handle(BanClientMessage message)
+        {
+            WriteBanIP(message.Client);
+
+            KickClient(message.Client);
+        }
+
+        public void Handle(KickClientMessage message)
+        {
+            var client = message.Client;
+            KickClient(client);
+        }
+
+        public void Handle(StartServerMessage message)
+        {
+            StartServer();
+            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_connectedClients.Values)));
+        }
+
+        public void Handle(StopServerMessage message)
+        {
+            StopServer();
+            _eventAggregator.PublishOnUIThread(new ServerStateMessage(false,
+                new List<SRClient>(_connectedClients.Values)));
         }
 
         private void StartExport()
@@ -96,18 +119,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             return currentDirectory;
         }
 
-        public void Handle(StartServerMessage message)
-        { 
-            StartServer();
-           _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_connectedClients.Values)));
-        }
-
-        public void Handle(StopServerMessage message)
-        {
-            StopServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(false, new List<SRClient>(_connectedClients.Values)));
-        }
-
         private void StartServer()
         {
             if (_serverListener == null)
@@ -138,12 +149,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             }
         }
 
-        public void Handle(KickClientMessage message)
-        {
-            var client = message.Client;
-            KickClient(client);
-        }
-
         private void KickClient(SRClient client)
         {
             if (client != null)
@@ -157,13 +162,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                     Logger.Error(e, "Error kicking client");
                 }
             }
-        }
-
-        public void Handle(BanClientMessage message)
-        {
-            WriteBanIP(message.Client);
-
-            KickClient(message.Client);
         }
 
         private void WriteBanIP(SRClient client)
@@ -182,6 +180,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
                 Logger.Error(ex, "Error saving banned client");
             }
         }
-
     }
 }

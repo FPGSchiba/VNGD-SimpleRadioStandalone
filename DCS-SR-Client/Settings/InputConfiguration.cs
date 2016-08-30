@@ -1,7 +1,6 @@
 ﻿using System;
-using Microsoft.Win32;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputDevice;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Microsoft.Win32;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -15,9 +14,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             //load from registry
             //    PTTCommon = ReadInputRegistry("common");
-            foreach(var bind in Enum.GetValues(typeof(InputBinding)))
+            foreach (var bind in Enum.GetValues(typeof(InputBinding)))
             {
-                InputDevices[(int)bind] = ReadInputRegistry((InputBinding)bind);
+                InputDevices[(int) bind] = ReadInputRegistry((InputBinding) bind);
             }
         }
 
@@ -37,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     key + "_button",
                     "");
 
-                var buttonValue = (int)Registry.GetValue(RegPath,
+                var buttonValue = (int) Registry.GetValue(RegPath,
                     key + "_value",
                     "1");
 

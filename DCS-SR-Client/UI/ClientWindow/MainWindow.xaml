@@ -191,8 +191,6 @@
                 </Grid>
 
 
-
-
             </GroupBox>
         </TabItem>
 
@@ -352,11 +350,9 @@
                             Content="Reset" />
 
 
-
                 </Grid>
 
             </GroupBox>
-
 
 
         </TabItem>

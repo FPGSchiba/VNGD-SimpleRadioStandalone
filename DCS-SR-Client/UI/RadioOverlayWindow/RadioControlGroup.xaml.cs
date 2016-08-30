@@ -1,17 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
-using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -23,21 +16,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private const double MHz = 1000000;
         private bool _dragging;
 
-        public int RadioId { private get; set; }
-
         public RadioControlGroup()
         {
             InitializeComponent();
         }
+
+        public int RadioId { private get; set; }
 
         private void Up001_Click(object sender, RoutedEventArgs e)
         {
             SendFrequencyChange(MHz/100);
             FocusDCS();
         }
+
         private void Up01_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz / 10);
+            SendFrequencyChange(MHz/10);
             FocusDCS();
         }
 
@@ -70,9 +64,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             SendFrequencyChange(MHz/10*-1);
             FocusDCS();
         }
+
         private void Down001_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz / 100 * -1);
+            SendFrequencyChange(MHz/100*-1);
             FocusDCS();
         }
 
@@ -88,10 +83,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void SendFrequencyChange(double frequency)
         {
-
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
-               && RadioId >= 0
-               && RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
+                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION
+                && RadioId >= 0
+                && RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length)
             {
                 //sort out the frequencies
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
@@ -109,15 +104,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 //make radio data stale to force resysnc
                 RadioDCSSyncServer.LastSent = 0;
-
             }
         }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
+                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
 
             FocusDCS();
@@ -125,9 +120,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
+                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
             {
-                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
 
             FocusDCS();
@@ -135,8 +131,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
-
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
+                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
             {
                 //sort out the frequencies
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
@@ -163,12 +159,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
+                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
             {
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 
-                clientRadio.volume = (float)radioVolume.Value / 100.0f;
+                clientRadio.volume = (float) radioVolume.Value/100.0f;
             }
 
             _dragging = false;
@@ -211,9 +207,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 down1.Visibility = Visibility.Hidden;
                 down01.Visibility = Visibility.Hidden;
                 down001.Visibility = Visibility.Hidden;
-
             }
-           
         }
 
         internal void RepaintRadioStatus()
@@ -222,7 +216,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-            if (dcsPlayerRadioInfo  == null || !dcsPlayerRadioInfo.IsCurrent())
+            if (dcsPlayerRadioInfo == null || !dcsPlayerRadioInfo.IsCurrent())
             {
                 radioActive.Fill = new SolidColorBrush(Colors.Red);
                 radioLabel.Text = "No Radio";
@@ -231,7 +225,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radioVolume.IsEnabled = false;
 
                 ToggleButtons(false);
-               
+
                 //reset dragging just incase
                 _dragging = false;
             }
@@ -243,7 +237,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     if (transmitting.IsSending && transmitting.SendingOn == RadioId)
                     {
-                        radioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                        radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
@@ -316,8 +310,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     radioVolume.Value = currentRadio.volume*100.0;
                 }
             }
-
-         
         }
 
         private void SetupEncryption()
@@ -331,17 +323,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 EncryptionKeySpinner.Value = currentRadio.encKey;
 
                 //update stuff
-                if (currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION 
-                    || currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL 
+                if (currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION
+                    || currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL
                     || currentRadio.modulation == 2)
                 {
                     //Disable everything
                     EncryptionKeySpinner.IsEnabled = false;
                     EncryptionButton.IsEnabled = false;
                     EncryptionButton.Content = "Enable";
-
-                }else if (currentRadio.encMode ==
-                            RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                }
+                else if (currentRadio.encMode ==
+                         RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
                 {
                     //allow spinner
                     EncryptionKeySpinner.IsEnabled = true;
@@ -350,8 +342,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     EncryptionButton.IsEnabled = false;
                     EncryptionButton.Content = "Enable";
                 }
-                else if(currentRadio.encMode ==
-                            RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                else if (currentRadio.encMode ==
+                         RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
                 {
                     EncryptionKeySpinner.IsEnabled = true;
                     EncryptionButton.IsEnabled = true;
@@ -364,9 +356,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     {
                         EncryptionButton.Content = "Enable";
                     }
-                      
                 }
-
             }
             else
             {
@@ -408,7 +398,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 else
                 {
                     radioFrequency.Foreground =
-                            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
             }
         }
@@ -453,11 +443,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (currentRadio.modulation != 3) // disabled
                 {
                     //update stuff
-                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE || currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE ||
+                        currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
                     {
                         if (EncryptionKeySpinner.Value != null)
                         {
-                            currentRadio.encKey = (byte)EncryptionKeySpinner.Value;
+                            currentRadio.encKey = (byte) EncryptionKeySpinner.Value;
                         }
                     }
                 }

@@ -20,27 +20,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        public delegate void ToggleOverlayCallback(bool uiButton);
+
         private readonly AppConfiguration _appConfig;
 
         private readonly AudioManager _audioManager;
-        private AudioPreview _audioPreview;
-        private ClientSync _client;
 
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
 
         private readonly string _guid;
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private AudioPreview _audioPreview;
+        private ClientSync _client;
 
-        public InputDeviceManager InputManager { get; set; }
+        private RadioOverlayWindow _radioOverlayWindow;
 
         private IPAddress _resolvedIp;
+        private ServerSettingsWindow _serverSettingsWindow;
 
         private bool _stop = true;
 
-        public delegate void ToggleOverlayCallback(bool uiButton);
+        private readonly ToggleOverlayCallback _toggleOverlayCallback;
 
-        private ToggleOverlayCallback _toggleOverlayCallback;
-        private UI.ServerSettingsWindow _serverSettingsWindow;
+        //used to debounce toggle
+        private double _toggleShowHide;
 
         public MainWindow()
         {
@@ -96,12 +99,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (BoostLabel != null && MicrophoneBoost != null)
             {
-                BoostLabel.Content = ((int)(MicrophoneBoost.Value * 100) - 100) + "%";
+                BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
             }
 
             if (SpeakerBoostLabel != null && SpeakerBoost != null)
             {
-                SpeakerBoostLabel.Content = ((int)(SpeakerBoost.Value * 100) - 100) + "%";
+                SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
             }
 
             UpdaterChecker.CheckForUpdate();
@@ -112,6 +115,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioClickEffectsToggle();
         }
+
+        public InputDeviceManager InputManager { get; set; }
 
 
         private void InitAudioInput()
@@ -163,7 +168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioClickEffectsToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffects];
+            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
             if (radioEffects == "ON")
             {
                 RadioClicksToggle.IsChecked = true;
@@ -176,7 +181,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioSwitchIsPTT()
         {
-            var switchIsPTT = Settings.Instance.UserSettings[(int)SettingType.RadioSwitchIsPTT];
+            var switchIsPTT = Settings.Instance.UserSettings[(int) SettingType.RadioSwitchIsPTT];
             if (switchIsPTT == "ON")
             {
                 RadioSwitchIsPTT.IsChecked = true;
@@ -325,7 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _audioPreview = new AudioPreview();
                 _audioPreview.StartPreview(Mic.SelectedIndex, Speakers.SelectedIndex);
-                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value * (float)SpeakerBoost.Value;
+                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
                 Preview.Content = "Stop Preview";
             }
             else
@@ -340,7 +345,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview != null)
             {
-                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value * (float)SpeakerBoost.Value;
+                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
             }
             if (_audioManager != null)
             {
@@ -351,33 +356,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _appConfig.MicBoost = (float) MicrophoneBoost.Value;
             }
 
-            if (BoostLabel != null && MicrophoneBoost!=null)
+            if (BoostLabel != null && MicrophoneBoost != null)
             {
-                BoostLabel.Content = ((int)(MicrophoneBoost.Value * 100) -100)  + "%";
+                BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
             }
-         
         }
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_audioPreview != null)
             {
-                _audioPreview.Volume.Volume = (float)MicrophoneBoost.Value * (float)SpeakerBoost.Value;
+                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
             }
             if (_audioManager != null)
             {
-                _audioManager.SpeakerBoost = (float)SpeakerBoost.Value;
+                _audioManager.SpeakerBoost = (float) SpeakerBoost.Value;
             }
             if (_appConfig != null)
             {
-                _appConfig.SpeakerBoost = (float)SpeakerBoost.Value;
+                _appConfig.SpeakerBoost = (float) SpeakerBoost.Value;
             }
 
             if (SpeakerBoostLabel != null && SpeakerBoost != null)
             {
-                SpeakerBoostLabel.Content = ((int)(SpeakerBoost.Value * 100) - 100) + "%";
+                SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
             }
-
         }
 
         private void RadioEffects_Click(object sender, RoutedEventArgs e)
@@ -387,23 +390,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RadioClicks_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioClickEffects, (string)RadioClicksToggle.Content);
+            Settings.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
         }
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string)RadioSwitchIsPTT.Content);
+            Settings.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string) RadioSwitchIsPTT.Content);
         }
-
-        private RadioOverlayWindow _radioOverlayWindow;
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
         {
-           ToggleOverlay(true);
+            ToggleOverlay(true);
         }
-        
-        //used to debounce toggle
-        private double _toggleShowHide = 0;
 
         private void ToggleOverlay(bool uiButton)
         {
@@ -411,7 +409,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if ((Environment.TickCount - _toggleShowHide > 600) || uiButton)
             {
                 _toggleShowHide = Environment.TickCount;
-                if (_radioOverlayWindow == null || !_radioOverlayWindow.IsVisible || _radioOverlayWindow.WindowState == WindowState.Minimized)
+                if (_radioOverlayWindow == null || !_radioOverlayWindow.IsVisible ||
+                    _radioOverlayWindow.WindowState == WindowState.Minimized)
                 {
                     _radioOverlayWindow?.Close();
 
@@ -424,7 +423,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _radioOverlayWindow = null;
                 }
             }
-           
         }
 
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
@@ -444,13 +442,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_serverSettingsWindow == null || !_serverSettingsWindow.IsVisible || _serverSettingsWindow.WindowState == WindowState.Minimized)
+            if (_serverSettingsWindow == null || !_serverSettingsWindow.IsVisible ||
+                _serverSettingsWindow.WindowState == WindowState.Minimized)
             {
                 _serverSettingsWindow?.Close();
 
                 _serverSettingsWindow = new ServerSettingsWindow();
                 _serverSettingsWindow.ShowDialog();
-              
             }
             else
             {
@@ -458,8 +456,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = null;
             }
         }
-
-      
     }
-
 }

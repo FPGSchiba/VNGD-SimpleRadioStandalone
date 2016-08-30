@@ -19,24 +19,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public delegate void ConnectCallback(bool result);
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private ConnectCallback _callback;
+
+        public static string[] ServerSettings = new string[Enum.GetValues(typeof(ServerSettingType)).Length];
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
+        private ConnectCallback _callback;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
 
-        public static string[] ServerSettings = new string[Enum.GetValues(typeof(Server.ServerSettingType)).Length];
-
         public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid)
         {
-            this._clients = clients;
-            this._guid = guid;
+            _clients = clients;
+            _guid = guid;
         }
 
 
         public void TryConnect(IPEndPoint endpoint, ConnectCallback callback)
         {
-            this._callback = callback;
+            _callback = callback;
             _serverEndpoint = endpoint;
 
             var tcpThread = new Thread(Connect);
@@ -77,7 +77,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientRadioUpdated()
         {
-            
             SendToServer(new NetworkMessage
             {
                 Client = new SRClient
@@ -90,7 +89,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             });
-
         }
 
         private void ClientCoalitionUpdate()
@@ -184,13 +182,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                             //init with LOS true so you can hear them incase of bad DCS install where
                                             //LOS isnt working
-                                            connectedClient.LineOfSightLoss = 0.0f; //0.0 is NO LOSS therefore full Line of sight
+                                            connectedClient.LineOfSightLoss = 0.0f;
+                                                //0.0 is NO LOSS therefore full Line of sight
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
-                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
-                                                   serverMessage.Client.Name + " Coalition: " +
-                                                   serverMessage.Client.Coalition);
+                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE +
+                                                        " From: " +
+                                                        serverMessage.Client.Name + " Coalition: " +
+                                                        serverMessage.Client.Coalition);
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
@@ -203,7 +203,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 client.LastUpdate = Environment.TickCount;
                                                 //init with LOS true so you can hear them incase of bad DCS install where
                                                 //LOS isnt working
-                                                client.LineOfSightLoss = 0.0f; //0.0 is NO LOSS therefore full Line of sight
+                                                client.LineOfSightLoss = 0.0f;
+                                                    //0.0 is NO LOSS therefore full Line of sight
                                                 _clients[client.ClientGuid] = client;
                                             }
                                         }

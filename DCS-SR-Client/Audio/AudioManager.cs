@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using FragLabs.Audio.Codecs;
 using FragLabs.Audio.Codecs.Opus;
 using NAudio.Wave;
@@ -20,51 +18,51 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public static readonly int SAMPLE_RATE = 16000;
         public static readonly int SEGMENT_FRAMES = 320; //480 for 8000 960 for 24000
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
         private int _bytesPerSegment;
+
+        private readonly CachedAudioEffect[] _cachedAudioEffects;
 
         //    private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
         //      new ConcurrentDictionary<string, ClientAudioProvider>();
 
         private OpusDecoder _decoder;
         private OpusEncoder _encoder;
+
+        private byte[] _micClickOffBytes;
         private MixingSampleProvider _mixing;
-        private VolumeSampleProvider _volumeSampleProvider;
 
         private byte[] _notEncodedBuffer = new byte[0];
         private BufferedWaveProvider _playBuffer;
+        private RadioAudioProvider[] _radioEffectsBuffer;
+
+        private RadioAudioProvider[] _radioOutputBuffer;
 
         private int _segmentFrames;
+
+        private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
+        private UdpVoiceHandler _udpVoiceHandler;
+        private VolumeSampleProvider _volumeSampleProvider;
 
         private WaveIn _waveIn;
         private WaveOut _waveOut;
 
-        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
-        private UdpVoiceHandler _udpVoiceHandler;
-
-        private RadioAudioProvider[] _radioOutputBuffer;
-        private RadioAudioProvider[] _radioEffectsBuffer;
-
-        private CachedAudioEffect[] _cachedAudioEffects;
-
-        private byte[] _micClickOffBytes;
-
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
-            this._clientsList = clientsList;
+            _clientsList = clientsList;
 
             _cachedAudioEffects =
                 new CachedAudioEffect[Enum.GetNames(typeof(CachedAudioEffect.AudioEffectTypes)).Length];
-            for (int i = 0; i < _cachedAudioEffects.Length; i++)
+            for (var i = 0; i < _cachedAudioEffects.Length; i++)
             {
                 _cachedAudioEffects[i] = new CachedAudioEffect((CachedAudioEffect.AudioEffectTypes) i);
             }
         }
 
         public float MicBoost { get; set; } = 1.0f;
-
-        private float _speakerBoost = 1.0f;
 
         public float SpeakerBoost
         {
@@ -101,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _radioOutputBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
                 _radioEffectsBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
 
-                for (int i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length; i++)
+                for (var i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length; i++)
                 {
                     _radioOutputBuffer[i] = new RadioAudioProvider(true);
                     _radioEffectsBuffer[i] = new RadioAudioProvider(false);
@@ -188,7 +186,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _radioOutputBuffer[transmitOnRadio];
-             
+
                 if (encrypted)
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
