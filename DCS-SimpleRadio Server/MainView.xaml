@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="330"
-             Height="230"
+             Height="300"
              mc:Ignorable="d">
     <Grid Margin="0,0,-6,0">
         <Button x:Name="ServerStartStop"
@@ -105,5 +105,31 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Content="{Binding RealRadioText}" />
+
+        <Label Width="143"
+               Margin="18,216,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="IRL Radio Rx Behaviour" />
+
+        <Button x:Name="IRLRadioRxBehaviourToggle"
+                Width="75"
+                Margin="206,221,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding IRLRadioRxText}" />
+
+        <Label Width="143"
+               Margin="18,247,0,-3"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="IRL Radio Static" />
+
+        <Button x:Name="IRLRadioStaticToggle"
+                Width="75"
+                Margin="206,252,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding RadioStaticText}" />
     </Grid>
 </UserControl>

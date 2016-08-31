@@ -35,6 +35,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED] == "ON" ? "ON" : "OFF";
 
                 RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
+
+                RadioRXInterference.Content = settings[(int)ServerSettingType.IRL_RADIO_RX_INTERFERENCE] == "ON" ? "ON" : "OFF";
+
+                RadioStatic.Content = settings[(int)ServerSettingType.IRL_RADIO_STATIC] == "ON" ? "ON" : "OFF";
             }
             catch (IndexOutOfRangeException ex)
             {

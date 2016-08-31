@@ -10,7 +10,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         CLIENT_EXPORT_ENABLED = 2,
         LOS_ENABLED = 3,
         DISTANCE_ENABLED = 4,
-        IRL_RADIO_TX = 5
+        IRL_RADIO_TX = 5,
+        IRL_RADIO_RX_INTERFERENCE = 6,
+        IRL_RADIO_STATIC = 7
     }
 
     public class ServerSettings

@@ -60,7 +60,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.DISTANCE_ENABLED] == "ON" ? "ON" : "OFF";
 
         public string RealRadioText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
+           => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
+
+        public string IRLRadioRxText
+         => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.IRL_RADIO_RX_INTERFERENCE] == "ON" ? "ON" : "OFF";
+
+        public string RadioStaticText
+         => ServerSettings.Instance.ServerSetting[(int)ServerSettingType.IRL_RADIO_STATIC] == "ON" ? "ON" : "OFF";
 
         public void Handle(ServerStateMessage message)
         {
@@ -140,6 +146,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             var newSetting = RealRadioText == "ON" ? "OFF" : "ON";
             ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_TX, newSetting);
             NotifyOfPropertyChange(() => RealRadioText);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void IRLRadioRxBehaviourToggle()
+        {
+            var newSetting = IRLRadioRxText == "ON" ? "OFF" : "ON";
+            ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_RX_INTERFERENCE, newSetting);
+            NotifyOfPropertyChange(() => IRLRadioRxText);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void IRLRadioStaticToggle()
+        {
+            var newSetting = RadioStaticText == "ON" ? "OFF" : "ON";
+            ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_STATIC, newSetting);
+            NotifyOfPropertyChange(() => RadioStaticText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
