@@ -1,4 +1,5 @@
 ﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Microsoft.Win32;
 

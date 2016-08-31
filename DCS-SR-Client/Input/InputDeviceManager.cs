@@ -8,7 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
     public class InputDeviceManager : IDisposable
     {
@@ -27,6 +27,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             new Guid("16a40951-0000-0000-0000-504944564944"), //HyperX 7.1 Audio
             new Guid("b660044f-0000-0000-0000-504944564944"), // T500 RS Gear Shift
             new Guid("00f2068e-0000-0000-0000-504944564944") //CH PRO PEDALS USB 
+        };
+
+        //devices that report incorrectly but SHOULD work?
+        public static readonly HashSet<Guid> _whitelistDevices = new HashSet<Guid>
+        {
+            new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle 
         };
 
         private readonly DirectInput _directInput;
@@ -70,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                         _inputDevices.Add(device);
                     }
-                    else if (deviceInstance.Type >= DeviceType.Joystick && deviceInstance.Type <= DeviceType.FirstPerson)
+                    else if (deviceInstance.Type >= DeviceType.Joystick && deviceInstance.Type <= DeviceType.FirstPerson || IsWhiteListed(deviceInstance.ProductGuid))
                     {
                         var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
@@ -89,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " +
                                 deviceInstance.InstanceGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: "+deviceInstance.Type);
                 }
             }
         }
@@ -115,6 +121,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public bool IsBlackListed(Guid device)
         {
             return _blacklistedDevices.Contains(device);
+        }
+
+        public bool IsWhiteListed(Guid device)
+        {
+            return _whitelistDevices.Contains(device);
         }
 
         public void AssignButton(DetectButton callback)

@@ -11,7 +11,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         Radio3Channel = 3,
         RadioSwitchIsPTT = 4,
         IntercomChannel = 5,
-        RadioClickEffects = 6
+        RadioClickEffects = 6, // Recieving Radio Effects
+        RadioClickEffectsTx = 7, //Transmitting Radio Effects
+        RadioEncryptionEffects = 8, //Radio Encryption effects
     }
 
 

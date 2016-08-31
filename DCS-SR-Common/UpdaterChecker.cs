@@ -4,16 +4,19 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker
     {
-        private static readonly string VERSION = "1.2.0.0";
+        public static readonly string VERSION = "1.2.1.0";
 
         public static async void CheckForUpdate()
         {
+            Logger logger = LogManager.GetCurrentClassLogger();
+            Version currentVersion = Version.Parse(VERSION);
             try
             {
                 var request = WebRequest.Create("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
@@ -28,14 +31,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                     if (path.Contains("tag/"))
                     {
-                        var githubVersion = path.Split('/').Last().ToLower().Replace("v", "").Split('.');
-                        //now compare major minor patch (ignore build)
-                        var current = VERSION.Split('.');
+                        var githubVersion = path.Split('/').Last().ToLower().Replace("v", "");
+                        Version ghVersion = null;
 
-                        for (var i = 0; i < 3; i++)
+                        if (Version.TryParse(githubVersion, out ghVersion))
                         {
-                            if (current[i] != githubVersion[i])
+                            //comparse parts
+                            if (ghVersion.CompareTo(currentVersion) > 0)
                             {
+                                logger.Warn("Update Available on GitHub: " + githubVersion);
                                 var result =
                                     MessageBox.Show("New Version Available!\n\nDo you want to Update?",
                                         "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
@@ -53,6 +57,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                                 }
                                 return;
                             }
+                            else if (ghVersion.CompareTo(currentVersion) == 0)
+                            {
+                                logger.Warn("Running Latest Version: " + githubVersion);
+                            }
+                            else
+                            {
+                                logger.Warn("Running TESTING Version!! : " + VERSION);
+                            }
+
+                        }
+                        else
+                        {
+                            logger.Warn("Failed to Parse version: "+githubVersion);
                         }
                     }
                 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
@@ -90,32 +91,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         if (radioState != null && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving())
                         {
                             radioState.PlayedEndOfTransmission = true;
-                            _audioManager.PlaySoundEffectEndTransmitOrReceive(i, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+                            _audioManager.PlaySoundEffectEndReceive(i, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
                         }
 
                     }
                     else
                     {
-                        var radioState = RadioReceivingState[i];
-
-                        if (radioState == null ||  radioState.PlayedEndOfTransmission || !radioState.IsReceiving())
+                        //check again that we're not transmitting
+                        if (!ShouldBlockRxAsTransmitting(i))
                         {
-                            _audioManager.PlaySoundEffectStartReceive(i, singleRadio.HasDecryptedAudio, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+                            var radioState = RadioReceivingState[i];
+
+                            if (radioState == null || radioState.PlayedEndOfTransmission || !radioState.IsReceiving())
+                            {
+                                _audioManager.PlaySoundEffectStartReceive(i, singleRadio.HasDecryptedAudio, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+                            }
+
+                            //Append Mic Click Audio Effect to the start
+                            //if we're not transmitting and this is the 
+                            RadioReceivingState[i] = new RadioReceivingState
+                            {
+                                Encrypted = singleRadio.HasDecryptedAudio,
+                                IsSecondary = false,
+                                LastReceviedAt = Environment.TickCount,
+                                PlayedEndOfTransmission = false,
+
+                                ReceivedOn = i
+                            };
+
+                            _audioManager.AddRadioAudio(singleRadio.RadioAudioPCM, i);
                         }
-
-                        //Append Mic Click Audio Effect to the start
-                        //if we're not transmitting and this is the 
-                        RadioReceivingState[i] = new RadioReceivingState
-                        {
-                            Encrypted = singleRadio.HasDecryptedAudio,
-                            IsSecondary = false,
-                            LastReceviedAt = Environment.TickCount,
-                            PlayedEndOfTransmission = false,
-                          
-                            ReceivedOn = i
-                        };
-
-                        _audioManager.AddRadioAudio(singleRadio.RadioAudioPCM, i);
+                   
                     }
                 }
             }
@@ -319,7 +325,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                          &&
                                          InRange(udpVoicePacket, out receivingPower)
                                          &&
-                                         !IsCurrentlyTransmittingOn(receivingState.ReceivedOn)
+                                         !ShouldBlockRxAsTransmitting(receivingState.ReceivedOn)
                                          )
                                         )
                                     )
@@ -388,7 +394,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         }
 
 
-        private bool IsCurrentlyTransmittingOn(int radioId)
+        private bool ShouldBlockRxAsTransmitting(int radioId)
         {
             //Return based on server settings as well
             if (ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX] == null
@@ -546,7 +552,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioSendingState.SendingOn];
 
-                        _audioManager.PlaySoundEffectEndTransmitOrReceive(RadioSendingState.SendingOn, radio.volume);
+                        _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn, radio.volume);
                     }
                 }
 

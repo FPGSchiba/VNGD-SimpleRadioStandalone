@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
     public enum InputBinding
     {

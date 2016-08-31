@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {

@@ -157,8 +157,8 @@
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\InputConfiguration.cs" />
-    <Compile Include="Settings\InputDevice.cs" />
-    <Compile Include="Settings\InputDeviceManager.cs" />
+    <Compile Include="Input\InputDevice.cs" />
+    <Compile Include="Input\InputDeviceManager.cs" />
     <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
       <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
     </Compile>

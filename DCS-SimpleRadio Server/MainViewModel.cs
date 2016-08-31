@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NLog;
+using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
     public sealed class MainViewModel : Screen, IHandle<ServerStateMessage>
     {
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ClientAdminViewModel _clientAdminViewModel;
         private readonly IEventAggregator _eventAggregator;
         private readonly IWindowManager _windowManager;
@@ -20,7 +24,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             _clientAdminViewModel = clientAdminViewModel;
             _eventAggregator.Subscribe(this);
 
-            DisplayName = "DCS-SimpleRadio Server";
+            DisplayName = "DCS-SRS Server - "+UpdaterChecker.VERSION;
+
+            Logger.Info("DCS-SRS Server Running - " + UpdaterChecker.VERSION);
         }
 
         public bool IsServerRunning { get; private set; } = true;

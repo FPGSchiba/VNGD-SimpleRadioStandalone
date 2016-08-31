@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
@@ -51,7 +52,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             SetupLogging();
 
-            Logger.Info("Started DCS-SimpleRadio Client");
+            this.Title= this.Title+ " - "+ UpdaterChecker.VERSION;
+
+            Logger.Info("Started DCS-SimpleRadio Client " +UpdaterChecker.VERSION);
 
             _toggleOverlayCallback = ToggleOverlay;
 
@@ -114,7 +117,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitRadioSwitchIsPTT();
 
             InitRadioClickEffectsToggle();
+
+            InitRadioClickEffectsTXToggle();
+
+            InitRadioEncryptionEffectsToggle();
         }
+
+  
+
 
         public InputDeviceManager InputManager { get; set; }
 
@@ -176,6 +186,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 RadioClicksToggle.IsChecked = false;
+            }
+        }
+
+
+        private void InitRadioClickEffectsTXToggle()
+        {
+            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffectsTx];
+            if (radioEffects == "ON")
+            {
+                RadioClicksTXToggle.IsChecked = true;
+            }
+            else
+            {
+                RadioClicksTXToggle.IsChecked = false;
+            }
+        }
+
+        private void InitRadioEncryptionEffectsToggle()
+        {
+            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioEncryptionEffects];
+            if (radioEffects == "ON")
+            {
+                RadioEncryptionEffectsToggle.IsChecked = true;
+            }
+            else
+            {
+                RadioEncryptionEffectsToggle.IsChecked = false;
             }
         }
 
@@ -393,6 +430,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Settings.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
         }
 
+        private void RadioClicksTX_Click(object sender, RoutedEventArgs e)
+        {
+
+            Settings.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string)RadioClicksTXToggle.Content);
+        }
+
+        private void RadioEncryptionEffects_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RadioEncryptionEffects, (string)RadioEncryptionEffectsToggle.Content);
+        }
+
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
         {
             Settings.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string) RadioSwitchIsPTT.Content);
@@ -456,5 +504,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = null;
             }
         }
+
+
+     
     }
 }
