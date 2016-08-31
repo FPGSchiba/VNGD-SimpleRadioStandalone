@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NAudio.Dsp;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
@@ -20,6 +21,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private readonly Settings _settings;
 
         private bool[] _hasDecryptedAudio = new bool[4];
+        private BiQuadFilter _highPassFilter;
+        private BiQuadFilter _lowPassFilter;
 
         public JitterBuffer()
         {
@@ -29,6 +32,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             }
 
             _settings = Settings.Instance;
+
+            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.SAMPLE_RATE, 520, 0.97f);
+            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.SAMPLE_RATE, 4130, 2.0f);
         }
 
         public void AddAudio(ClientAudio audio)
@@ -57,70 +63,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             {
                 var radioMix = new RadioMixDown[_clientRadioBuffers.Length];
 
+                bool _addEffect = _settings.UserSettings[(int) SettingType.RadioEffects] == "ON";
+
+
+                
+
                 for (var i = 0; i < _clientRadioBuffers.Length; i++)
                 {
-                    //TODO create stereo mix
-                    var radioBytes = ConversionHelpers.ShortArrayToByteArray(RadioMixDown(_clientRadioBuffers[i], i));
 
-                    var settingType = SettingType.Radio1Channel;
+                    var radioBytes = ConversionHelpers.ShortArrayToByteArray(
+                        
+                            AddRadioEffect(RadioMixDown(_clientRadioBuffers[i], i),_addEffect)
+                        );
 
-                    if (i == 0)
+                    radioMix[i] = new RadioMixDown
                     {
-                        settingType = SettingType.IntercomChannel;
-                    }
-                    else if (i == 1)
-                    {
-                        settingType = SettingType.Radio1Channel;
-                    }
-                    else if (i == 2)
-                    {
-                        settingType = SettingType.Radio2Channel;
-                    }
-                    else if (i == 3)
-                    {
-                        settingType = SettingType.Radio3Channel;
-                    }
-                    else
-                    {
-                        radioMix[i] = new RadioMixDown
-                        {
-                            RadioAudioPCM = CreateStereoMix(radioBytes),
-                            HasDecryptedAudio = _hasDecryptedAudio[i]
-                            //mark if this contains encrypted audio for effects
-                        };
-
-                        continue; //back to the top
-                    }
-
-                    var setting = _settings.UserSettings[(int) settingType];
-
-                    if (setting == "Left")
-                    {
-                        radioMix[i] = new RadioMixDown
-                        {
-                            RadioAudioPCM = CreateLeftMix(radioBytes),
-                            HasDecryptedAudio = _hasDecryptedAudio[i]
-                            //mark if this contains encrypted audio for effects
-                        };
-                    }
-                    else if (setting == "Right")
-                    {
-                        radioMix[i] = new RadioMixDown
-                        {
-                            RadioAudioPCM = CreateRightMix(radioBytes),
-                            HasDecryptedAudio = _hasDecryptedAudio[i]
-                            //mark if this contains encrypted audio for effects
-                        };
-                    }
-                    else
-                    {
-                        radioMix[i] = new RadioMixDown
-                        {
-                            RadioAudioPCM = CreateStereoMix(radioBytes),
-                            HasDecryptedAudio = _hasDecryptedAudio[i]
-                            //mark if this contains encrypted audio for effects
-                        };
-                    }
+                        RadioAudioPCM = (radioBytes),
+                        HasDecryptedAudio = _hasDecryptedAudio[i]
+                        //mark if this contains encrypted audio for effects
+                    };
                 }
 
                 Clear();
@@ -129,6 +90,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 return radioMix;
             }
+        }
+
+        private short[] AddRadioEffect(short[] mixedAudio ,bool effect)
+        {
+            if (!effect)
+            {
+                return mixedAudio;
+            }
+
+            for (int i = 0; i < mixedAudio.Length; i++)
+            {
+
+                float audio = mixedAudio[i] / 32768f;
+
+                audio = _highPassFilter.Transform(audio);
+
+                if (float.IsNaN(audio))
+                    audio = _lowPassFilter.Transform(mixedAudio[i]);
+                else
+                    audio = _lowPassFilter.Transform(audio);
+
+                if (!float.IsNaN(audio))
+                {
+              
+                    // clip
+                    if (audio > 1.0f)
+                        audio = 1.0f;
+                    if (audio < -1.0f)
+                        audio = -1.0f;
+
+                    mixedAudio[i] = (short)(audio * 32767);
+                }
+
+            }
+            return mixedAudio;
+            
         }
 
         private short[] RadioMixDown(Dictionary<string, List<ClientAudio>> radioData, int radioId)

@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 case AudioEffectTypes.KY_58_TX:
                     return Resources.KY_58_TX_PREAMBLE_SHORT_16_1600;
                 case AudioEffectTypes.RADIO_RX:
-                    return Resources.mic_click_on_16_1600;
+                    return Resources.mic_click_on_16_1600_reversed;
                 case AudioEffectTypes.RADIO_TX:
                     return Resources.mic_click_on_16_1600;
                 default:

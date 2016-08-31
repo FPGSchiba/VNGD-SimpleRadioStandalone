@@ -92,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         try
                         {
                             //send back ping UDP
-                            _listener.Send(rawBytes, rawBytes.Length, groupEP);
+                         //   _listener.Send(rawBytes, rawBytes.Length, groupEP);
                         }
                         catch (Exception ex)
                         {

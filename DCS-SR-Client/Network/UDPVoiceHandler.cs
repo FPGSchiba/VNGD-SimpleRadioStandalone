@@ -37,7 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
-        private readonly int JITTER_BUFFER = 80; //in milliseconds
+        private readonly int JITTER_BUFFER = 50; //in milliseconds
 
         private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private UdpClient _listener;
@@ -84,11 +84,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     if (singleRadio == null || singleRadio.RadioAudioPCM.Length == 0)
                     {
                         //Nothing on this radio!
-                        //play out if nothing after another 80 MS 
+                        //play out if nothing after 200ms
                         //and Audio hasn't been played already
+                        var radioState = RadioReceivingState[i];
+                        if (radioState != null && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving())
+                        {
+                            radioState.PlayedEndOfTransmission = true;
+                            _audioManager.PlaySoundEffectEndTransmitOrReceive(i, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+                        }
+
                     }
                     else
                     {
+                        var radioState = RadioReceivingState[i];
+
+                        if (radioState == null ||  radioState.PlayedEndOfTransmission || !radioState.IsReceiving())
+                        {
+                            _audioManager.PlaySoundEffectStartReceive(i, singleRadio.HasDecryptedAudio, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+                        }
+
                         //Append Mic Click Audio Effect to the start
                         //if we're not transmitting and this is the 
                         RadioReceivingState[i] = new RadioReceivingState
@@ -97,68 +111,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             IsSecondary = false,
                             LastReceviedAt = Environment.TickCount,
                             PlayedEndOfTransmission = false,
+                          
                             ReceivedOn = i
                         };
 
                         _audioManager.AddRadioAudio(singleRadio.RadioAudioPCM, i);
                     }
                 }
-
-//                if (_jitterBuffer.Count > 0)
-//                {
-//                    //Empty Jitterbuffer
-//                    foreach (var clientAudio in _jitterBuffer)
-//                    {
-//                        var lastState = RadioReceivingState[clientAudio.ReceivedRadio];
-//
-//                        if (lastState == null || !lastState.IsReceiving() && !IsCurrentlyTransmittingOn(clientAudio.ReceivedRadio))
-//                        {
-//                            this._audioManager.PlaySoundEffectStartTransmit(clientAudio.ReceivedRadio, false,
-//                                clientAudio.Volume);
-//                        }
-//                        else
-//                        {
-//                            //do nothing
-//                        }
-//
-//                        clientAudio.RadioReceivingState.PlayedEndOfTransmission = false;
-//                        RadioReceivingState[clientAudio.ReceivedRadio] = clientAudio.RadioReceivingState;
-//
-//                   //     Logger.Debug("Received: " + clientAudio.ReceivedRadio + " - " + (Environment.TickCount - clientAudio.RadioReceivingState.LastReceviedAt));
-//
-//                        //TODO Reorder list per client to sort out packets sent in the wrong order!
-//                        _audioManager.AddClientAudio(clientAudio);
-//                    }
-//                    _jitterBuffer.Clear();
-//                }
-//
-//                //check all radios for playout sound
-//                for (int i = 0; i < RadioReceivingState.Length; i++)
-//                {
-//                    var state = RadioReceivingState[i];
-//                    if (state != null &&  (!RadioDCSSyncServer.DcsPlayerRadioInfo.IsCurrent() || IsCurrentlyTransmittingOn(i)))
-//                    {
-//                        state.PlayedEndOfTransmission = true;
-//                    }
-//                    else if (state != null && !state.PlayedEndOfTransmission && !state.IsReceiving())
-//                    {
-//                        state.PlayedEndOfTransmission = true;
-//                        var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i];
-//
-//
-//                        this._audioManager.PlaySoundEffectEndTransmit(i, false,
-//                            radio.volume);
-//
-//                  //      Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
-//
-//                    }
-//                    else if(state!=null)
-//                    {
-//                //        Logger.Debug("Last Received: " + i + " - " + (Environment.TickCount - state.LastReceviedAt));
-//                    }
-//
-//
-//                }
             }
         }
 
@@ -555,8 +514,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             var ip = new IPEndPoint(_address, 5010);
                             _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
 
-                            //sent more than 180ms ago
-                            if (RadioSendingState.LastSentAt < Environment.TickCount - 180)
+                            //not sending or really quickly switched sending
+                            if (!RadioSendingState.IsSending || RadioSendingState.SendingOn != currentSelected)
                             {
                                 _audioManager.PlaySoundEffectStartTransmit(currentSelected,
                                     radio.enc && radio.encKey > 0, radio.volume);
@@ -587,8 +546,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioSendingState.SendingOn];
 
-                        _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn,
-                            radio.enc && radio.encKey > 0, radio.volume);
+                        _audioManager.PlaySoundEffectEndTransmitOrReceive(RadioSendingState.SendingOn, radio.volume);
                     }
                 }
 

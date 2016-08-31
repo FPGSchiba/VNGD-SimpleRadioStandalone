@@ -16,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     public class AudioManager
     {
         public static readonly int SAMPLE_RATE = 16000;
-        public static readonly int SEGMENT_FRAMES = 320; //480 for 8000 960 for 24000
+        public static readonly int SEGMENT_FRAMES = 640; //480 for 8000 960 for 24000
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private byte[] _notEncodedBuffer = new byte[0];
         private BufferedWaveProvider _playBuffer;
-        private RadioAudioProvider[] _radioEffectsBuffer;
+   
 
         private RadioAudioProvider[] _radioOutputBuffer;
 
@@ -83,7 +83,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             radioOutput.VolumeSampleProvider.Volume = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[radioId].volume;
 
-            _radioOutputBuffer[radioId].AddAudioSamples(radioPCMAudio);
+            _radioOutputBuffer[radioId].AddAudioSamples(radioPCMAudio,radioId);
         }
 
         public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
@@ -97,16 +97,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing.ReadFully = true;
 
                 _radioOutputBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
-                _radioEffectsBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
-
+             
                 for (var i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length; i++)
                 {
-                    _radioOutputBuffer[i] = new RadioAudioProvider(true);
-                    _radioEffectsBuffer[i] = new RadioAudioProvider(false);
-
-
+                    _radioOutputBuffer[i] = new RadioAudioProvider();
+                 
+                  
                     _mixing.AddMixerInput(_radioOutputBuffer[i].VolumeSampleProvider);
-                    _mixing.AddMixerInput(_radioEffectsBuffer[i].VolumeSampleProvider);
+                  
                 }
 
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
@@ -158,7 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         }
 
 
-        public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
+        public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
             var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
             if (radioEffects == "ON")
@@ -169,36 +167,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_TX].AudioEffectBytes);
+                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_RX].AudioEffectBytes, transmitOnRadio);
                 }
                 else
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes);
+                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes, transmitOnRadio);
                 }
             }
         }
 
-        public void PlaySoundEffectEndTransmit(int transmitOnRadio, bool encrypted, float volume)
+        public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffects];
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _radioOutputBuffer[transmitOnRadio];
-
+              
                 if (encrypted)
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.KY_58_RX].AudioEffectBytes);
+                        _cachedAudioEffects[(int)CachedAudioEffect.AudioEffectTypes.KY_58_TX].AudioEffectBytes, transmitOnRadio);
                 }
                 else
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
-                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes);
+                        _cachedAudioEffects[(int)CachedAudioEffect.AudioEffectTypes.RADIO_TX].AudioEffectBytes, transmitOnRadio);
                 }
+            }
+        }
+
+     
+        public void PlaySoundEffectEndTransmitOrReceive(int transmitOnRadio, float volume)
+        {
+            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            if (radioEffects == "ON")
+            {
+                    var _effectBuffer = _radioOutputBuffer[transmitOnRadio];
+
+                    _effectBuffer.VolumeSampleProvider.Volume = volume;
+                    _effectBuffer.AddAudioSamples(
+                        _cachedAudioEffects[(int) CachedAudioEffect.AudioEffectTypes.RADIO_RX].AudioEffectBytes, transmitOnRadio);
             }
         }
 
@@ -260,7 +272,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             if (_mixing != null)
             {
                 _radioOutputBuffer = null;
-                _radioEffectsBuffer = null;
+             
                 _volumeSampleProvider = null;
                 _mixing.RemoveAllMixerInputs();
                 _mixing = null;

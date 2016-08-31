@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public bool IsReceiving()
         {
-            return Environment.TickCount - LastReceviedAt < 200;
+            return Environment.TickCount - LastReceviedAt < 220;
         }
     }
 }
