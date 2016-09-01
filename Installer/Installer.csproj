@@ -182,14 +182,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)\DCS-SimpleRadio Server\bin\Release\SR-Server.exe" "$(SolutionDir)\install-build\SR-Server.exe" 
+ <PostBuildEvent>copy /Y "$(SolutionDir)\DCS-SimpleRadio Server\bin\Release\SR-Server.exe" "$(SolutionDir)\install-build\SR-Server.exe" 
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\Release\SR-ClientRadio.exe"  "$(SolutionDir)\install-build\SR-ClientRadio.exe" 
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\Release\opus.dll"  "$(SolutionDir)\install-build\opus.dll" 
-copy /Y "$(SolutionDir)\RadioOverlay\bin\Release\SR-Overlay.exe"  "$(SolutionDir)\install-build\SR-Overlay.exe" 
 copy /Y "$(SolutionDir)\Installer\bin\Release\Installer.exe" "$(SolutionDir)\install-build\Installer.exe" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SimpleRadioStandalone.lua" "$(SolutionDir)\install-build\DCS-SimpleRadioStandalone.lua" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SRSGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRSGameGUI.lua"
-</PostBuildEvent>
+</PostBuildEvent>  
   </PropertyGroup>
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

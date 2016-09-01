@@ -19,7 +19,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public List<SRClient> Clients { get; set; }
 
-        public string[] ServerSettings { get; set; }
-
+        public bool[] ServerSettings { get; set; }
     }
 }

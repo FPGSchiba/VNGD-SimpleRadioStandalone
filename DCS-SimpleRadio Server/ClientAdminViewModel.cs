@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
 {
-    public sealed class ClientAdminViewModel:Screen,IHandle<ServerStateMessage>
+    public sealed class ClientAdminViewModel : Screen, IHandle<ServerStateMessage>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly IEventAggregator _eventAggregator;
-
-        public ObservableCollection<ClientViewModel> Clients { get; } = new ObservableCollection<ClientViewModel>();
 
         public ClientAdminViewModel(IEventAggregator eventAggregator)
         {
@@ -26,13 +18,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             DisplayName = "SR Client List";
         }
 
+        public ObservableCollection<ClientViewModel> Clients { get; } = new ObservableCollection<ClientViewModel>();
+
         public void Handle(ServerStateMessage message)
         {
             Clients.Clear();
 
-            message.Clients.Apply(client => Clients.Add(new ClientViewModel(client,_eventAggregator)));
+            message.Clients.Apply(client => Clients.Add(new ClientViewModel(client, _eventAggregator)));
         }
-
-   
     }
 }

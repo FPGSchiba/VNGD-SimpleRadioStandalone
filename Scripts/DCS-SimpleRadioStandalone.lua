@@ -1,4 +1,4 @@
--- Version 1.2.0.0
+-- Version 1.2.1.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -14,6 +14,10 @@ SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
 
+SR.LOS_HEIGHT_OFFSET = 10.0 -- sets the line of sight offset to simulate radio waves bending
+SR.LOS_HEIGHT_OFFSET_MAX = 80.0 -- max amount of "bend"
+SR.LOS_HEIGHT_OFFSET_STEP = 10.0 -- Interval to "bend" in
+
 SR.unicast = true --DONT CHANGE THIS
 
 SR.lastKnownPos = {x=0,y=0,z=0}
@@ -26,8 +30,8 @@ function SR.log(str)
     end
 end
 
-package.path  = package.path..";.\\LuaSocket\\?.lua"
-package.cpath = package.cpath..";.\\LuaSocket\\?.dll"
+package.path  = package.path..";.\\LuaSocket\\?.lua;"
+package.cpath = package.cpath..";.\\LuaSocket\\?.dll;"
 
 ---- DCS Search Paths - So we can load Terrain!
 local guiBindPath = './dxgui/bind/?.lua;' .. 
@@ -62,7 +66,7 @@ SR.UDPLosReceiveSocket:settimeout(.0001) --receive timer
 local terrain = require('terrain')
 
 if terrain ~= nil then
-  SR.log("Loaded Terrain!")
+  SR.log("Loaded Terrain - SimpleRadio Standalone!")
 end
 
 -- Prev Export functions.
@@ -297,9 +301,42 @@ function SR.checkLOS(_clientsList)
 
     local _result = {}
     for _,_client in pairs(_clientsList) do
-        -- add 5 meter tolerance
-       
-        table.insert(_result,{id = _client.id, los = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+3.0,SR.lastKnownPos.z,_client.x,_client.y+3.0,_client.z) })
+        -- add 10 meter tolerance
+
+
+        local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
+
+        local _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+SR.LOS_HEIGHT_OFFSET,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+        if _hasLos then
+            table.insert(_result,{id = _client.id, los = 0.0 })
+        else
+            --check from 10 - 60 in incremenents of 10 if there is Line of sight
+
+            -- check Max
+            _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+SR.LOS_HEIGHT_OFFSET_MAX,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+            if _hasLos then
+                table.insert(_result,{id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
+            end
+
+            -- now check all the values that arent MAX offset and MIN offset
+
+            for _losOffset = SR.LOS_HEIGHT_OFFSET+SR.LOS_HEIGHT_OFFSET_STEP,SR.LOS_HEIGHT_OFFSET_MAX-SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
+
+                _hasLos = terrain.isVisible(SR.lastKnownPos.x,SR.lastKnownPos.y+_losOffset,SR.lastKnownPos.z,_client.x,_client.y+SR.LOS_HEIGHT_OFFSET,_client.z)
+
+                 if _hasLos then
+                    table.insert(_result,{id = _client.id, los =  (_losOffset/ 100.0) })
+                    break;
+                end
+            end
+
+            if not _hasLos then 
+                table.insert(_result,{id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+            end
+        end
+
     end
     return _result
 end
@@ -490,6 +527,11 @@ function SR.exportRadioUH1H(_data)
 end
 
 function SR.exportRadioSA342(_data)
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].frequency =100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume =1.0
 
     _data.radios[2].name = "TRAP 138A"
     _data.radios[2].frequency = SR.getRadioFrequency(5)
@@ -881,10 +923,10 @@ end
 
 function SR.exportRadioBF109(_data)
 
-    _data.radios[1].name = "FuG 16ZY"
-    _data.radios[1].frequency =  SR.getRadioFrequency(14)
-    _data.radios[1].modulation = 0
-    _data.radios[1].volume = SR.getRadioVolume(0, 130,{0.0,1.0},false)
+    _data.radios[2].name = "FuG 16ZY"
+    _data.radios[2].frequency =  SR.getRadioFrequency(14)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 130,{0.0,1.0},false)
 
     _data.selected = 1
 
@@ -1126,4 +1168,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.2.0.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.1.0")

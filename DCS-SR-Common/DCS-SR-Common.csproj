@@ -80,8 +80,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DCSLosCheckRequest.cs" />
-    <Compile Include="DCSLosCheckResult.cs" />
+    <Compile Include="CircularBuffer.cs" />
+    <Compile Include="ConversionHelpers.cs" />
     <Compile Include="DCSPlayerSideInfo.cs" />
     <Compile Include="DCSPosition.cs" />
     <Compile Include="ListHelper.cs" />
@@ -92,7 +92,7 @@
     <Compile Include="RadioInformation.cs" />
     <Compile Include="RadioReceivingState.cs" />
     <Compile Include="RadioTransmit.cs" />
-    <Compile Include="ServerSettings.cs" />
+    <Compile Include="ServerSettingType.cs" />
     <Compile Include="ShortGuid.cs" />
     <Compile Include="SRClient.cs" />
     <Compile Include="Timers\ITimer.cs" />

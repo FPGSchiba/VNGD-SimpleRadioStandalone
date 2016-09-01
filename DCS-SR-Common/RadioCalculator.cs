@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -27,11 +23,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             //Friis equation http://www.daycounter.com/Calculators/Friis-Calculator.phtml
             //Prx= Ptx(dB)+ Gtx(dB)+ Grx(dB)  -  20log(4*PI*d/lambda);
 
-            return (TransmissonPowerdBm + RxAntennaGain + TxAntennaGain) -
-                   (20*Math.Log10(
-                       (4*Math.PI*distance) / 
-                            FrequencyToWaveLength(frequency)
-                       )
+            return TransmissonPowerdBm + RxAntennaGain + TxAntennaGain -
+                   20*Math.Log10(
+                       4*Math.PI*distance/
+                       FrequencyToWaveLength(frequency)
                        );
         }
 
@@ -44,7 +39,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static double CalculateDistance(DcsPosition from, DcsPosition too)
         {
-            return Math.Abs(Math.Sqrt( Math.Pow((too.x - from.x),2) + Math.Pow((too.y - from.y), 2) + Math.Pow((too.z - from.z), 2)));
+            return
+                Math.Abs(
+                    Math.Sqrt(Math.Pow(too.x - from.x, 2) + Math.Pow(too.y - from.y, 2) + Math.Pow(too.z - from.z, 2)));
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
@@ -11,11 +8,11 @@ using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-using LogManager = Caliburn.Micro.LogManager;
+using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
-    public class Bootstrapper: BootstrapperBase
+    public class Bootstrapper : BootstrapperBase
     {
         private readonly SimpleContainer _simpleContainer = new SimpleContainer();
 
@@ -29,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             var config = new LoggingConfiguration();
 
-            var consoleTarget = new ColoredConsoleTarget { Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}" };
+            var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
             config.AddTarget("console", consoleTarget);
 
             var fileTarget = new FileTarget
@@ -45,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
             config.LoggingRules.Add(rule2);
 
-            NLog.LogManager.Configuration = config;
+            LogManager.Configuration = config;
         }
 
 
@@ -57,8 +54,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             _simpleContainer.Singleton<MainViewModel>();
             _simpleContainer.Singleton<ClientAdminViewModel>();
-
-
         }
 
         protected override object GetInstance(Type service, string key)
@@ -80,9 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             IDictionary<string, object> settings = new Dictionary<string, object>
             {
-                { "Icon", new BitmapImage(new Uri("pack://application:,,,/SR-Server;component/server-10.ico")) },
-                { "ResizeMode" , ResizeMode.CanMinimize},
-                
+                {"Icon", new BitmapImage(new Uri("pack://application:,,,/SR-Server;component/server-10.ico"))},
+                {"ResizeMode", ResizeMode.CanMinimize}
             };
             //create an instance of serverState to actually start the server
             _simpleContainer.GetInstance(typeof(ServerState), null);
@@ -90,7 +84,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             DisplayRootViewFor<MainViewModel>(settings);
 
             UpdaterChecker.CheckForUpdate();
-
         }
 
         protected override void BuildUp(object instance)
@@ -103,7 +96,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             var serverState = (ServerState) _simpleContainer.GetInstance(typeof(ServerState), null);
             serverState.StopServer();
-
         }
     }
 }

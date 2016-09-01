@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -15,18 +15,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             NO_COCKPIT_INTEGRATION = 3
         }
 
-        [JsonIgnore]
-        public long LastUpdate { get; set; }
-
         public string name = "";
+        public DcsPosition pos = new DcsPosition();
+        public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[4];
         public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION;
         public short selected = 0;
         public string unit = "";
-        public UInt32 unitId;
-        public volatile  bool ptt = false;
-        public DcsPosition pos = new DcsPosition();
+        public uint unitId;
 
         public DCSPlayerRadioInfo()
         {
@@ -35,6 +32,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 radios[i] = new RadioInformation();
             }
         }
+
+        [JsonIgnore]
+        public long LastUpdate { get; set; }
 
         // override object.Equals
         public override bool Equals(object compare)
@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 return false;
             }
-   
+
             if (unitId != compareRadio.unitId)
             {
                 return false;
@@ -89,22 +89,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         /*
          * Was Radio updated in the last 10 Seconds
          */
+
         public bool IsCurrent()
         {
             return LastUpdate > Environment.TickCount - 10000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, byte modulation, UInt32 unitId,
-           out RadioReceivingState receivingState)
+        public RadioInformation CanHearTransmission(double frequency, byte modulation, uint unitId,
+            out RadioReceivingState receivingState)
         {
-            if (!this.IsCurrent())
+            if (!IsCurrent())
             {
                 receivingState = null;
                 return null;
             }
             for (var i = 0; i < 4; i++)
             {
-                var receivingRadio = this.radios[i];
+                var receivingRadio = radios[i];
 
                 if (receivingRadio != null)
                 {
@@ -113,39 +114,39 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         && this.unitId > 0 && unitId > 0
                         && this.unitId == unitId)
                     {
-                        receivingState = new RadioReceivingState()
+                        receivingState = new RadioReceivingState
                         {
                             IsSecondary = false,
                             LastReceviedAt = Environment.TickCount,
                             ReceivedOn = i
                         };
 
-                      
+
                         return receivingRadio;
                     }
                     if (receivingRadio.frequency == frequency
                         && receivingRadio.modulation == modulation
                         && receivingRadio.frequency > 1)
                     {
-                        receivingState = new RadioReceivingState()
+                        receivingState = new RadioReceivingState
                         {
                             IsSecondary = false,
                             LastReceviedAt = Environment.TickCount,
                             ReceivedOn = i
                         };
-                       
+
                         return receivingRadio;
                     }
                     if (receivingRadio.secondaryFrequency == frequency
                         && receivingRadio.secondaryFrequency > 100)
                     {
-                        receivingState = new RadioReceivingState()
+                        receivingState = new RadioReceivingState
                         {
                             IsSecondary = true,
                             LastReceviedAt = Environment.TickCount,
                             ReceivedOn = i
                         };
-                       
+
                         return receivingRadio;
                     }
                 }

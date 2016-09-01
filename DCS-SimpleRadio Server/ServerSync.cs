@@ -29,33 +29,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public Socket workSocket;
     }
 
-    internal class ServerSync: IHandle<ServerSettingsChangedMessage>
+    internal class ServerSync : IHandle<ServerSettingsChangedMessage>
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         // Thread signal.
         public static ManualResetEvent _allDone = new ManualResetEvent(false);
         private readonly HashSet<IPAddress> _bannedIps;
-        private readonly IEventAggregator _eventAggregator;
 
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
+        private readonly IEventAggregator _eventAggregator;
+
+        private readonly ServerSettings _serverSettings;
 
         private Socket listener;
 
-        private ServerSettings _serverSettings;
-
-        public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps, IEventAggregator eventAggregator)
+        public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps,
+            IEventAggregator eventAggregator)
         {
             _clients = connectedClients;
             this._bannedIps = _bannedIps;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
-            _serverSettings = ServerSettings.Instance;;
+            _serverSettings = ServerSettings.Instance;
+            ;
+        }
+
+        public void Handle(ServerSettingsChangedMessage message)
+        {
+            foreach (var clientToSent in _clients)
+            {
+                try
+                {
+                    HandleServerSettingsMessage(clientToSent.Value.ClientSocket);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Exception Sending Server Settings ");
+                }
+            }
         }
 
         public void StartListening()
         {
             var ipAddress = new IPAddress(0);
-            var localEndPoint = new IPEndPoint(ipAddress, 5002);
+            var localEndPoint = new IPEndPoint(ipAddress, _serverSettings.ServerListeningPort());
 
             // Create a TCP/IP socket.
             listener = new Socket(AddressFamily.InterNetwork,
@@ -73,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     _allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    _logger.Info("Waiting for a connection...");
+                    _logger.Info($"Waiting for a connection on { _serverSettings.ServerListeningPort() }...");
                     listener.BeginAccept(
                         AcceptCallback,
                         listener);
@@ -84,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Server Listen error");
+                _logger.Error(e, "Server Listen error: "+e.Message);
             }
         }
 
@@ -127,7 +144,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     _logger.Info("Removed Client " + state.guid);
                 }
 
-                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
+                try
+                {
+                    _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
+                }
+                catch (Exception ex)
+                {
+                    _logger.Info(ex, "Exception Publishing Client Update After Disconnect");
+                }
             }
 
             try
@@ -220,8 +244,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                 switch (message.MsgType)
                 {
-
-                 
                     case NetworkMessage.MessageType.PING:
                         // Do nothing for now
                         break;
@@ -244,12 +266,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                             state.guid = srClient.ClientGuid;
 
-                            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
+                            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                                new List<SRClient>(_clients.Values)));
                         }
 
                         HandleRadioClientsSync(clientIp, state.workSocket, message);
 
-                    
+
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
                         HandleServerSettingsMessage(state.workSocket);
@@ -272,10 +295,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             {
                 MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
                 ServerSettings = _serverSettings.ServerSetting
-
             };
             Send(socket, replyMessage);
-
         }
 
         private void HandleClientMetaDataUpdate(NetworkMessage message)
@@ -291,7 +312,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.Position = message.Client.Position;
-                   
+
 
                     //send update to everyone
                     //Remove Client Radio Info
@@ -299,14 +320,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     {
                         MsgType = NetworkMessage.MessageType.UPDATE,
                         ServerSettings = _serverSettings.ServerSetting,
-                    
-                        Client = new SRClient()
+                        Client = new SRClient
                         {
                             ClientGuid = client.ClientGuid,
                             Coalition = client.Coalition,
                             Name = client.Name,
                             LastUpdate = client.LastUpdate,
-                            Position = client.Position,
+                            Position = client.Position
                         }
                     };
 
@@ -335,7 +355,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     client.Coalition = message.Client.Coalition;
                     client.RadioInfo = message.Client.RadioInfo;
                     client.Position = message.Client.Position;
-                    
+
 
                     _logger.Info("Received Radio Update");
                 }
@@ -415,22 +435,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception ex)
             {
-            }
-        }
-
-        public void Handle(ServerSettingsChangedMessage message)
-        {
-            foreach (var clientToSent in _clients)
-            {
-                try
-                {
-                    HandleServerSettingsMessage(clientToSent.Value.ClientSocket);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Exception Sending Server Settings ");
-                }
-               
             }
         }
     }
