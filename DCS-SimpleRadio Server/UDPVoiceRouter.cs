@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
@@ -44,8 +45,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     if (rawBytes != null && rawBytes.Length >= 22)
                     {
                         //WRAP IN REAL THREAD??
-                        //                   Task.Run(() =>
-                        //               {
+                         Task.Run(() =>
+                                       {
                         //last 36 bytes are guid!
                         var guid = Encoding.ASCII.GetString(
                             rawBytes, rawBytes.Length - 22, 22);
@@ -87,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             _clientsList.TryRemove(guid, out value);
                             //  logger.Info("Removing  "+guid+" From UDP pool");
                         }
-                        //                    });
+                                         });
                     }
                     else if (rawBytes != null && rawBytes.Length == 15 && rawBytes[0] == 1 && rawBytes[14] == 15)
                     {
@@ -169,7 +170,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
                         if (ip != null)
                         {
-                            _listener.Send(bytes, bytes.Length, ip);
+                          //  _listener.Send(bytes, bytes.Length, ip);
                         }
                     }
                 }
