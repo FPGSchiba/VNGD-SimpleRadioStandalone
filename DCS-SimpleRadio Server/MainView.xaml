@@ -15,13 +15,13 @@
                 VerticalAlignment="Top"
                 Content="{Binding ServerButtonText}" />
         <Label Width="55"
-               Margin="106,15,0,0"
+               Margin="106,0,0,0"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
                Content="Clients:" />
         <Label x:Name="ClientsCount"
-               Width="35"
-               Margin="166,15,0,0"
+               Width="44"
+               Margin="157,0,0,0"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
                Content="0" />
@@ -131,5 +131,18 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Content="{Binding RadioStaticText}" />
+
+
+        <Label Width="55"
+               Margin="106,18,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="Port:" />
+        <Label x:Name="ListeningPort"
+               Width="44"
+               Margin="157,18,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="5002" />
     </Grid>
 </UserControl>

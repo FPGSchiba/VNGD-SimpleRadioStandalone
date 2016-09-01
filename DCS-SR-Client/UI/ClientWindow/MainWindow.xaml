@@ -78,15 +78,17 @@
                                    HorizontalAlignment="Center"
                                    Content="+/- %" />
                         </StackPanel>
-
                         <Label x:Name="ServerIpLabel"
+                               Width="232"
+                               Margin="128,0,136,0"
                                HorizontalAlignment="Center"
-                               Content="Server IP" />
+                               HorizontalContentAlignment="Center"
+                               Content="Server IP / Address - Optional Port" />
                         <TextBox x:Name="ServerIp"
                                  Width="150"
                                  Height="23"
                                  MaxLines="1"
-                                 Text="127.0.0.1"
+                                 Text="127.0.0.1:5002"
                                  TextWrapping="Wrap" />
                         <StackPanel Margin="0"
                                     HorizontalAlignment="Center"

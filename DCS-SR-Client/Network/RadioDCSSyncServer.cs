@@ -304,8 +304,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var requests = new List<DCSLosCheckRequest>();
 
-            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] != null &&
-                ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] == "ON")
+            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] )
             {
                 foreach (var client in clients)
                 {

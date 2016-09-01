@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
                 while (!_stop)
                 {
-                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED] == "ON")
+                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED] )
                     {
                         var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
                         File.WriteAllText(GetCurrentDirectory() + "\\clients-list.json", json);

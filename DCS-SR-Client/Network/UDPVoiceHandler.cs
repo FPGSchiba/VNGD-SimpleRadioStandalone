@@ -27,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly object _lock = new object();
         private readonly IPAddress _address;
+        private readonly int _port;
         private readonly AudioManager _audioManager;
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
         private readonly OpusDecoder _decoder;
@@ -54,8 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private byte[] part1;
         private byte[] part2;
 
-        public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
-            OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
+        public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
             _decoder = decoder;
             _audioManager = audioManager;
@@ -65,6 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _guid = guid;
             _address = address;
+            _port = port;
 
             _inputManager = inputManager;
         }
@@ -193,7 +194,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
-                    var groupEp = new IPEndPoint(IPAddress.Any, 5010);
+                    var groupEp = new IPEndPoint(IPAddress.Any, _port);
                     //   listener.Client.ReceiveTimeout = 3000;
 
                     var bytes = _listener.Receive(ref groupEp);
@@ -397,8 +398,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool ShouldBlockRxAsTransmitting(int radioId)
         {
             //Return based on server settings as well
-            if (ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX] == null
-                || ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX] == "OFF")
+            if (!ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX])
             {
                 return false;
             }
@@ -410,8 +410,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
         {
             losLoss = 0; //0 is NO LOSS
-            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] == null ||
-                ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] == "OFF")
+            if (!ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
             {
                 return true;
             }
@@ -430,9 +429,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool InRange(UDPVoicePacket udpVoicePacket, out double signalStrength)
         {
             signalStrength = 0;
-            if (ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED] == null
-                || ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED] == "OFF"
-                )
+            if (!ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED])
             {
                 return true;
             }
@@ -517,7 +514,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //no need to auto send packet anymore
                             hasSentVoicePacket = true;
 
-                            var ip = new IPEndPoint(_address, 5010);
+                            var ip = new IPEndPoint(_address, _port);
                             _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
 
                             //not sending or really quickly switched sending
@@ -575,7 +572,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         hasSentVoicePacket = true;
 
-                        var ip = new IPEndPoint(_address, 5010);
+                        var ip = new IPEndPoint(_address, _port);
                         _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
 
                         Logger.Info("Sent First Voice Packet");
@@ -599,7 +596,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Logger.Info("Pinging Server");
                     try
                     {
-                        var ip = new IPEndPoint(_address, 5010);
+                        var ip = new IPEndPoint(_address, _port);
                         _listener.Send(message, message.Length, ip);
                     }
                     catch (Exception e)

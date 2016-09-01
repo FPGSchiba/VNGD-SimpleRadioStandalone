@@ -20,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static string[] ServerSettings = new string[Enum.GetValues(typeof(ServerSettingType)).Length];
+        public static bool[] ServerSettings = new bool[Enum.GetValues(typeof(ServerSettingType)).Length];
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
         private ConnectCallback _callback;

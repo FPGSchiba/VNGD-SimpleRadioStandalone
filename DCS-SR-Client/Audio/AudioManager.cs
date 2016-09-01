@@ -91,8 +91,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _radioOutputBuffer[radioId].AddAudioSamples(radioPCMAudio, radioId);
         }
 
-        public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress)
+        public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress, int port)
         {
             _stop = false;
 
@@ -135,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(SAMPLE_RATE, 16, 1); //take in at 8000
 
-                _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, _decoder, this, inputManager);
+                _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress,port, _decoder, this, inputManager);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                 voiceSenderThread.Start();

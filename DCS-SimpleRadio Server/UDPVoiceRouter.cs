@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using NLog;
 using LogManager = NLog.LogManager;
 
@@ -29,15 +30,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public void Listen()
         {
+            var port = _serverSettings.ServerListeningPort();
             _listener = new UdpClient();
             _listener.AllowNatTraversal(true);
             _listener.ExclusiveAddressUse = true;
-            _listener.Client.Bind(new IPEndPoint(IPAddress.Any, 5010));
+            _listener.Client.Bind(new IPEndPoint(IPAddress.Any, _serverSettings.ServerListeningPort()));
             while (!_stop)
             {
                 try
                 {
-                    var groupEP = new IPEndPoint(IPAddress.Any, 5010);
+                    var groupEP = new IPEndPoint(IPAddress.Any, port);
                     var rawBytes = _listener.Receive(ref groupEP);
                     if (rawBytes != null && rawBytes.Length >= 22)
                     {
@@ -53,10 +55,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                             var client = _clientsList[guid];
                             client.VoipPort = groupEP;
 
-                            var spectatorAudio =
+                            var spectatorAudioDisabled =
                                 _serverSettings.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED];
 
-                            if (client.Coalition == 0 && spectatorAudio == "DISABLED")
+                            if (client.Coalition == 0 && spectatorAudioDisabled)
                             {
                                 // IGNORE THE AUDIO
                             }
@@ -130,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         private void SendToOthers(byte[] bytes, SRClient fromClient, UDPVoicePacket udpVoicePacket)
         {
             var coalitionSecurity =
-                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY] == "ON";
+                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY] ;
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)

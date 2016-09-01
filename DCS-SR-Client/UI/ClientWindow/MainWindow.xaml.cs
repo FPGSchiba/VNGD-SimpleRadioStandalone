@@ -37,6 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindow _radioOverlayWindow;
 
         private IPAddress _resolvedIp;
+        private int _port = 5002;
         private ServerSettingsWindow _serverSettingsWindow;
 
         private bool _stop = true;
@@ -268,14 +269,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 try
                 {
                     //process hostname
-                    var ipAddr = Dns.GetHostAddresses(ServerIp.Text.Trim());
+                    var ipAddr = Dns.GetHostAddresses(GetAddressFromTextBox());
 
                     if (ipAddr.Length > 0)
                     {
                         _resolvedIp = ipAddr[0];
+                        _port = GetPortFromTextBox();
 
                         _client = new ClientSync(_clients, _guid);
-                        _client.TryConnect(new IPEndPoint(_resolvedIp, 5002), ConnectCallback);
+                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
                         StartStop.IsEnabled = false;
@@ -295,6 +297,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         MessageBoxImage.Error);
                 }
             }
+        }
+
+        private String GetAddressFromTextBox()
+        {
+           
+           var addr =  ServerIp.Text.Trim();
+
+            if (addr.Contains(":"))
+            {
+                return addr.Split(':')[0];
+            }
+
+            return addr;
+
+        }
+
+        private int GetPortFromTextBox()
+        {
+
+            var addr = ServerIp.Text.Trim();
+
+            try
+            {
+                if (addr.Contains(":"))
+                {
+
+                    return int.Parse(addr.Split(':')[1]);
+                }
+            }
+            catch (Exception ex)
+            {
+                //no valid port! remove it
+                ServerIp.Text = GetAddressFromTextBox();
+            }
+        
+            return 5002;
+
         }
 
         private void Stop()
@@ -335,7 +374,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
 
                     _audioManager.StartEncoding(Mic.SelectedIndex, Speakers.SelectedIndex, _guid, InputManager,
-                        _resolvedIp);
+                        _resolvedIp,_port);
                     _stop = false;
                 }
             }

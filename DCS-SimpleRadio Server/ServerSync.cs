@@ -72,7 +72,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         public void StartListening()
         {
             var ipAddress = new IPAddress(0);
-            var localEndPoint = new IPEndPoint(ipAddress, 5002);
+            var localEndPoint = new IPEndPoint(ipAddress, _serverSettings.ServerListeningPort());
 
             // Create a TCP/IP socket.
             listener = new Socket(AddressFamily.InterNetwork,
@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                     _allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    _logger.Info("Waiting for a connection...");
+                    _logger.Info($"Waiting for a connection on { _serverSettings.ServerListeningPort() }...");
                     listener.BeginAccept(
                         AcceptCallback,
                         listener);
@@ -101,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Server Listen error");
+                _logger.Error(e, "Server Listen error: "+e.Message);
             }
         }
 

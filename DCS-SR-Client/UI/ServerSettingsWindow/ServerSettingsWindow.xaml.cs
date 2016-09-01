@@ -22,23 +22,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             try
             {
-                SpectatorAudio.Content = settings[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED] == "DISABLED"
+                SpectatorAudio.Content = settings[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED]
                     ? "DISABLED"
                     : "ENABLED";
 
-                CoalitionSecurity.Content = settings[(int) ServerSettingType.COALITION_AUDIO_SECURITY] == "ON"
+                CoalitionSecurity.Content = settings[(int) ServerSettingType.COALITION_AUDIO_SECURITY] 
                     ? "ON"
                     : "OFF";
 
-                LineOfSight.Content = settings[(int) ServerSettingType.LOS_ENABLED] == "ON" ? "ON" : "OFF";
+                LineOfSight.Content = settings[(int) ServerSettingType.LOS_ENABLED] ? "ON" : "OFF";
 
-                Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED] == "ON" ? "ON" : "OFF";
+                Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED]  ? "ON" : "OFF";
 
-                RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX] == "ON" ? "ON" : "OFF";
+                RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX]? "ON" : "OFF";
 
-                RadioRXInterference.Content = settings[(int)ServerSettingType.IRL_RADIO_RX_INTERFERENCE] == "ON" ? "ON" : "OFF";
+                RadioRXInterference.Content = settings[(int)ServerSettingType.IRL_RADIO_RX_INTERFERENCE]? "ON" : "OFF";
 
-                RadioStatic.Content = settings[(int)ServerSettingType.IRL_RADIO_STATIC] == "ON" ? "ON" : "OFF";
+                RadioStatic.Content = settings[(int)ServerSettingType.IRL_RADIO_STATIC]  ? "ON" : "OFF";
             }
             catch (IndexOutOfRangeException ex)
             {
