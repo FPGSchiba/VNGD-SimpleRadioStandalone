@@ -277,11 +277,13 @@ namespace Installer
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
-            //   File.Copy(currentDirectory + "\\SR-Overlay.exe", path + "\\SR-Overlay.exe", true);
+          
             //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
                 true);
             File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
+                true);
+            File.Copy(currentDirectory + "\\DCS-SRS-AutoConnectGameGUI.lua", path + "\\DCS-SRS-AutoConnectGameGUI.lua", 
                 true);
         }
 
@@ -432,6 +434,10 @@ namespace Installer
             if (File.Exists(path + "\\DCS-SRSGameGUI.lua"))
             {
                 File.Delete(path + "\\DCS-SRSGameGUI.lua");
+            }
+            if (File.Exists(path + "\\DCS-SRS-AutoConnectGameGUI.lua"))
+            {
+                File.Delete(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
             }
         }
 
