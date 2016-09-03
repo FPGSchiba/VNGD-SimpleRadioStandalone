@@ -403,6 +403,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return false;
             }
 
+            if (radioId == 0)
+            {
+                //intercoms dont block
+                return false;
+            }
+
             return (_ptt || RadioDCSSyncServer.DcsPlayerRadioInfo.ptt)
                    && RadioDCSSyncServer.DcsPlayerRadioInfo.selected == radioId;
         }

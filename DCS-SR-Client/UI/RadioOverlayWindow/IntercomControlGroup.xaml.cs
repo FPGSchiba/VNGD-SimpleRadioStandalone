@@ -63,14 +63,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
             else
             {
-                if (RadioId == dcsPlayerRadioInfo.selected)
-                {
-                    var transmitting = UdpVoiceHandler.RadioSendingState;
-                    var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
+                var transmitting = UdpVoiceHandler.RadioSendingState;
+                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
 
-                    if ((transmitting.IsSending && transmitting.SendingOn == RadioId)
-                        ||
-                        (receiveState != null && receiveState.IsReceiving()))
+                if (receiveState != null && receiveState.IsReceiving())
+                {
+                    radioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                }
+                else if (RadioId == dcsPlayerRadioInfo.selected)
+                {
+                    if ((transmitting.IsSending && transmitting.SendingOn == RadioId))
                     {
                         radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
@@ -79,6 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                         radioActive.Fill = new SolidColorBrush(Colors.Green);
                     }
                 }
+                
                 else
                 {
                     radioActive.Fill = new SolidColorBrush(Colors.Orange);
