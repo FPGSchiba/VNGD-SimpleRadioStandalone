@@ -125,6 +125,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioEncryptionEffectsToggle();
 
+            InitResample();
+
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
         }
@@ -226,6 +228,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 RadioSwitchIsPTT.IsChecked = false;
+            }
+        }
+
+        private void InitResample()
+        {
+            var resample = Settings.Instance.UserSettings[(int)SettingType.ResampleOutput];
+            if (resample == "ON")
+            {
+                ResamplerToggle.IsChecked = true;
+                _audioManager.Resample = true;
+            }
+            else
+            {
+                ResamplerToggle.IsChecked = false;
+                _audioManager.Resample = false;
             }
         }
 
@@ -563,6 +580,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow?.Close();
                 _serverSettingsWindow = null;
             }
+        }
+
+        private void ResamplerToggle_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.ResampleOutput, (string)ResamplerToggle.Content);
+            //Restart message needed
+            _audioManager.Resample = (string)ResamplerToggle.Content == "ON";
+
+             MessageBox.Show(this, $"You must disconnect and re-connect to the server for this setting to take effect", "Please Disconnect", MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
         }
     }
 }

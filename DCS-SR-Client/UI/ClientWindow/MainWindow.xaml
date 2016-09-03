@@ -9,7 +9,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="550"
+                      Height="570"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
 
@@ -217,6 +217,7 @@
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <Label Grid.Row="0"
@@ -407,6 +408,34 @@
                             VerticalContentAlignment="Center"
                             Click="ResetRadioWindow_Click"
                             Content="Reset" />
+
+
+                    <Label Grid.Row="10"
+                           Grid.Column="0"
+                           HorizontalContentAlignment="Center"
+                           VerticalContentAlignment="Center"
+                           Content="Re-sampler - Adds latency &#xD;&#xA;Enable if you have soundcard issues" />
+
+                    <ToggleButton Name="ResamplerToggle"
+                                  Grid.Row="10"
+                                  Grid.Column="1"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  Click="ResamplerToggle_Click">
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Setter Property="Content" Value="ON" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="ON" />
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content" Value="OFF" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
 
 
                 </Grid>

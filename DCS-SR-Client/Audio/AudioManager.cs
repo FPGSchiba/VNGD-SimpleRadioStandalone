@@ -54,7 +54,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private WaveIn _waveIn;
         private WaveOut _waveOut;
 
-
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
             _clientsList = clientsList;
@@ -81,6 +80,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
             }
         }
+
+        public bool Resample { get; set; }
 
         public void AddRadioAudio(byte[] radioPCMAudio, int radioId)
         {
@@ -110,11 +111,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     DeviceNumber = speakers
                 };
 
-                //   var resample = new WdlResamplingSampleProvider(_mixing, 44100); //resample and output at 44100
-
                 _volumeSampleProvider = new VolumeSampleProvider(_mixing);
 
                 _volumeSampleProvider.Volume = SpeakerBoost;
+
+                if (Resample)
+                {
+                    var resampler = new WdlResamplingSampleProvider(_volumeSampleProvider, 44100); //resample and output at 44100
+                    _waveOut.Init(resampler);
+                }
+                else
+                {
+                    _waveOut.Init(_volumeSampleProvider);
+                }
 
                 _waveOut.Init(_volumeSampleProvider);
                 _waveOut.Play();
@@ -315,8 +324,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _mixing.RemoveAllMixerInputs();
                 _mixing = null;
             }
-
-            //    _clientsBufferedAudio.Clear();
 
             if (_waveIn != null)
             {
