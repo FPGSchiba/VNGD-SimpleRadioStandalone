@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows;
@@ -515,22 +516,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoConnect(String address,int port)
         {
-          Logger.Info("Received AutoConnect "+address);
+            Logger.Info("Received AutoConnect "+address);
 
             if (StartStop.Content.ToString().ToLower() == "connect")
             {
-                MessageBoxResult result = MessageBox.Show($"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect", MessageBoxButton.YesNo,
+                WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
+
+                MessageBoxResult result = MessageBox.Show(this,$"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect", MessageBoxButton.YesNo,
                          MessageBoxImage.Question);
 
-                if (result == MessageBoxResult.Yes)
+                if (result == MessageBoxResult.Yes && StartStop.Content.ToString().ToLower() == "connect")
                 {
                     ServerIp.Text = address + ":" + port;
                     startStop_Click(null,null);
                 }
-
-
             }
-
         }
 
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
