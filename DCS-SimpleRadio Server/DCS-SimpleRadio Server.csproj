@@ -133,23 +133,23 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="ClientAdminViewModel.cs" />
-    <Compile Include="ClientViewModel.cs" />
-    <Compile Include="MainViewModel.cs" />
-    <Compile Include="ServerLifecycleMessage.cs" />
-    <Compile Include="ServerSettings.cs" />
-    <Compile Include="ServerState.cs" />
-    <Compile Include="UDPVoiceRouter.cs" />
-    <Compile Include="ServerSync.cs" />
-    <Page Include="ClientAdminView.xaml">
+    <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
+    <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />
+    <Compile Include="UI\MainWindow\MainViewModel.cs" />
+    <Compile Include="Network\ServerLifecycleMessage.cs" />
+    <Compile Include="Network\ServerSettings.cs" />
+    <Compile Include="Network\ServerState.cs" />
+    <Compile Include="Network\UDPVoiceRouter.cs" />
+    <Compile Include="Network\ServerSync.cs" />
+    <Page Include="UI\ClientAdmin\ClientAdminView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientView.xaml">
+    <Page Include="UI\ClientAdmin\ClientView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainView.xaml">
+    <Page Include="UI\MainWindow\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

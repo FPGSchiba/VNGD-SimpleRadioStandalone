@@ -414,7 +414,7 @@
                            Grid.Column="0"
                            HorizontalContentAlignment="Center"
                            VerticalContentAlignment="Center"
-                           Content="Re-sampler - Adds latency &#xD;&#xA;Enable if you have soundcard issues" />
+                           Content="Re-sampler - Might add latency &#xA;Enable if you have soundcard issues" />
 
                     <ToggleButton Name="ResamplerToggle"
                                   Grid.Row="10"

@@ -1,7 +1,9 @@
--- Version 1.2.1.0
+-- Version 1.2.2.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 local SRS = {}
+
+SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
 
 SRS.unicast = true
 
@@ -69,8 +71,53 @@ SRS.sendUpdate = function(playerID)
 		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
 	end
 
-   
+
 end
+
+SRS.MESSAGE_PREFIX = "This server is running SRS on - " -- DO NOT MODIFY!!!
+
+function string.startsWith(string, prefix)
+    return string.sub(string, 1, string.len(prefix)) == prefix
+end
+
+function string.trim(_str)
+    return string.format( "%s", _str:match( "^%s*(.-)%s*$" ) )
+end
+
+function SRS.isAutoConnectMessage(msg)
+    return string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX)
+end
+
+function SRS.getHostFromMessage(msg)
+    return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX) + 1))
+end
+
+-- Register callbacks --
+
+SRS.sendConnect = function(_message)
+
+    if SRS.unicast then
+        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
+    else
+        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.255.255.255", 5069))
+    end
+end
+
+SRS.onChatMessage = function(msg, from)
+    --	if DCS.isServer() then
+    --        return
+    --    end
+
+    -- Only accept auto connect message coming from host.
+    if SRS.CLIENT_ACCEPT_AUTO_CONNECT
+                        and from == 1
+            and  SRS.isAutoConnectMessage(msg) then
+        local host = SRS.getHostFromMessage(msg)
+        SRS.log(string.format("Got SRS Auto Connect message: %s", host))
+        SRS.sendConnect(host)
+    end
+end
+
 
 DCS.setUserCallbacks(SRS)
 
