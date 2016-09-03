@@ -23,6 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         public delegate void ToggleOverlayCallback(bool uiButton);
 
+        public delegate void ReceivedAutoConnect(string address, int port);
+
         private readonly AppConfiguration _appConfig;
 
         private readonly AudioManager _audioManager;
@@ -42,10 +44,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private bool _stop = true;
 
-        private readonly ToggleOverlayCallback _toggleOverlayCallback;
-
         //used to debounce toggle
         private double _toggleShowHide;
+        private DCSAutoConnectListener _dcsAutoConnectListener;
+
+        public InputDeviceManager InputManager { get; set; }
 
         public MainWindow()
         {
@@ -57,9 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Logger.Info("Started DCS-SimpleRadio Client " +UpdaterChecker.VERSION);
 
-            _toggleOverlayCallback = ToggleOverlay;
-
-            InputManager = new InputDeviceManager(this, _toggleOverlayCallback);
+            InputManager = new InputDeviceManager(this, ToggleOverlay);
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -122,13 +123,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitRadioClickEffectsTXToggle();
 
             InitRadioEncryptionEffectsToggle();
+
+            _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
+
         }
-
-  
-
-
-        public InputDeviceManager InputManager { get; set; }
-
 
         private void InitAudioInput()
         {
@@ -323,7 +321,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (addr.Contains(":"))
                 {
 
-                    return int.Parse(addr.Split(':')[1]);
+                    return Int32.Parse(addr.Split(':')[1]);
                 }
             }
             catch (Exception ex)
@@ -398,6 +396,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
+
+            _dcsAutoConnectListener.Stop();
+            _dcsAutoConnectListener = null;
         }
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
@@ -512,6 +513,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void AutoConnect(String address,int port)
+        {
+          Logger.Info("Received AutoConnect "+address);
+
+            if (StartStop.Content.ToString().ToLower() == "connect")
+            {
+                MessageBoxResult result = MessageBox.Show($"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect", MessageBoxButton.YesNo,
+                         MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ServerIp.Text = address + ":" + port;
+                    startStop_Click(null,null);
+                }
+
+
+            }
+
+        }
+
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
@@ -543,8 +564,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = null;
             }
         }
-
-
-     
     }
 }
