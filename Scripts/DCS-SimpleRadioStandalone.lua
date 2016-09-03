@@ -605,12 +605,19 @@ function SR.exportRadioKA50(_data)
     _data.radios[3].modulation = 1
     _data.radios[3].volume = SR.getRadioVolume(0, 372,{0.0,1.0},false)
 
+    _data.radios[4].name = "SPU-9 SW"
+    _data.radios[4].frequency = 600.0*1000000
+    _data.radios[4].modulation = 0
+    _data.radios[4].volume = 1.0
+
     local switch = _panel:get_argument_value(428)
 
     if SR.nearlyEqual(switch, 0.0, 0.03) then
         _data.selected = 1
     elseif SR.nearlyEqual(switch, 0.1, 0.03) then
         _data.selected = 2
+    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
+        _data.selected = 3
     else
         _data.selected = -1
     end
