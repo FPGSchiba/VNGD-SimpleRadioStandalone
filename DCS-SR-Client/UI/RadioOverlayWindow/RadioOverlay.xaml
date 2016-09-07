@@ -14,6 +14,7 @@
         Background="#444"
         Opacity="1.0"
         ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="False"
         Style="{x:Null}"
         Topmost="True"
         WindowStyle="None">
@@ -26,8 +27,10 @@
             <ScaleTransform x:Name="ApplicationScaleTransform"
                             CenterX="0"
                             CenterY="0"
-                            ScaleX="{Binding ElementName=myMainWindow, Path=ScaleValue}"
-                            ScaleY="{Binding ElementName=myMainWindow, Path=ScaleValue}" />
+                            ScaleX="{Binding ElementName=myMainWindow,
+                                             Path=ScaleValue}"
+                            ScaleY="{Binding ElementName=myMainWindow,
+                                             Path=ScaleValue}" />
         </WrapPanel.LayoutTransform>
 
         <Button Margin="90,0,0,0"
