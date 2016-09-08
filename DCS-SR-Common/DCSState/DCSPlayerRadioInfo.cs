@@ -95,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > Environment.TickCount - 10000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, byte modulation, uint unitId,
+        public RadioInformation CanHearTransmission(double frequency, byte modulation, uint sendingUnitId,
             out RadioReceivingState receivingState)
         {
             if (!IsCurrent())
@@ -110,23 +110,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if (receivingRadio.modulation == 2 && modulation == 2
-                        && this.unitId > 0 && unitId > 0
-                        && this.unitId == unitId)
+                    if (receivingRadio.modulation == 2 && modulation == 2)
                     {
-                        receivingState = new RadioReceivingState
+                        if (this.unitId > 0 && sendingUnitId > 0
+                            && this.unitId == sendingUnitId)
                         {
-                            IsSecondary = false,
-                            LastReceviedAt = Environment.TickCount,
-                            ReceivedOn = i
-                        };
+                            receivingState = new RadioReceivingState
+                            {
+                                IsSecondary = false,
+                                LastReceviedAt = Environment.TickCount,
+                                ReceivedOn = i
+                            };
 
 
-                        return receivingRadio;
+                            return receivingRadio;
+                        }
+                        else
+                        {
+                            receivingState = null;
+                            return null;
+                        }
+                      
                     }
                     if (receivingRadio.frequency == frequency
                         && receivingRadio.modulation == modulation
-                        && receivingRadio.frequency > 1)
+                        && receivingRadio.frequency > 10000)
                     {
                         receivingState = new RadioReceivingState
                         {
@@ -138,7 +146,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         return receivingRadio;
                     }
                     if (receivingRadio.secondaryFrequency == frequency
-                        && receivingRadio.secondaryFrequency > 100)
+                        && receivingRadio.secondaryFrequency > 10000)
                     {
                         receivingState = new RadioReceivingState
                         {

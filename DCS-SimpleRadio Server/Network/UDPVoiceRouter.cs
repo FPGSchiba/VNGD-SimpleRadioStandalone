@@ -216,6 +216,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
+            {
                 if (!client.Key.Equals(guid))
                 {
                     var ip = client.Value.VoipPort;
@@ -247,6 +248,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
                         //outgoingList.Add(ip);
                     }
                 }
+            }
 
             return outgoingList.Count > 0 ? outgoingVoice : null;
         }
