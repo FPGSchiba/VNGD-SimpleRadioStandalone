@@ -4,10 +4,12 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using NLog;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 {
     public sealed class MainViewModel : Screen, IHandle<ServerStateMessage>
     {

@@ -7,7 +7,7 @@
     <ProjectGuid>{8579C7DA-206F-4705-B073-D3CC946DC8EC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ciribob.DCS.SimpleRadio.Standalone.Server.UI</RootNamespace>
+    <RootNamespace>Ciribob.DCS.SimpleRadio.Standalone.Server</RootNamespace>
     <AssemblyName>SR-Server</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

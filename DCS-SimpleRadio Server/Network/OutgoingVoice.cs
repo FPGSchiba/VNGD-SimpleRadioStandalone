@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class OutgoingVoice
     {

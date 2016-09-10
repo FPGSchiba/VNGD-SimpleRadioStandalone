@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.Properties {
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ciribob.DCS.SimpleRadio.Standalone.Server.UI.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ciribob.DCS.SimpleRadio.Standalone.Server.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

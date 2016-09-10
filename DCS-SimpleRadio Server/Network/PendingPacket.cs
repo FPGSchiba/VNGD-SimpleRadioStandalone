@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class PendingPacket
     {

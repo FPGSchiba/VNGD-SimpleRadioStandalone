@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     // State object for reading client data asynchronously
     public class StateObject

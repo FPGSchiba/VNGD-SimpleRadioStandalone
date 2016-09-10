@@ -3,10 +3,11 @@ using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
 using NLog;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 {
     public class ClientViewModel : Screen
     {
