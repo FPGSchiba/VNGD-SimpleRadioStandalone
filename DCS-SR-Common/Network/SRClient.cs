@@ -49,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 {
                     return 0;
                 }
-                if (Position.x == 0 && Position.z == 0)
+                if ((Position.x == 0) && (Position.z == 0))
                 {
                     return 0;
                 }

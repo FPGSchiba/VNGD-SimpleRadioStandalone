@@ -39,7 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         // override object.Equals
         public override bool Equals(object compare)
         {
-            if (compare == null || GetType() != compare.GetType())
+            if ((compare == null) || (GetType() != compare.GetType()))
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 var radio1 = radios[i];
                 var radio2 = compareRadio.radios[i];
 
-                if (radio1 != null && radio2 != null)
+                if ((radio1 != null) && (radio2 != null))
                 {
                     if (!radio1.Equals(radio2))
                     {
@@ -110,10 +110,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if (receivingRadio.modulation == 2 && modulation == 2)
+                    if ((receivingRadio.modulation == 2) && (modulation == 2))
                     {
-                        if (this.unitId > 0 && sendingUnitId > 0
-                            && this.unitId == sendingUnitId)
+                        if ((unitId > 0) && (sendingUnitId > 0)
+                            && (unitId == sendingUnitId))
                         {
                             receivingState = new RadioReceivingState
                             {
@@ -125,16 +125,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                             return receivingRadio;
                         }
-                        else
-                        {
-                            receivingState = null;
-                            return null;
-                        }
-                      
+                        receivingState = null;
+                        return null;
                     }
-                    if (receivingRadio.frequency == frequency
-                        && receivingRadio.modulation == modulation
-                        && receivingRadio.frequency > 10000)
+                    if ((receivingRadio.frequency == frequency)
+                        && (receivingRadio.modulation == modulation)
+                        && (receivingRadio.frequency > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {
@@ -145,8 +141,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                         return receivingRadio;
                     }
-                    if (receivingRadio.secondaryFrequency == frequency
-                        && receivingRadio.secondaryFrequency > 10000)
+                    if ((receivingRadio.secondaryFrequency == frequency)
+                        && (receivingRadio.secondaryFrequency > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {

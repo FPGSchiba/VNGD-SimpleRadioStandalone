@@ -15,8 +15,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static async void CheckForUpdate()
         {
-            Logger logger = LogManager.GetCurrentClassLogger();
-            Version currentVersion = Version.Parse(VERSION);
+            var logger = LogManager.GetCurrentClassLogger();
+            var currentVersion = Version.Parse(VERSION);
             try
             {
                 var request = WebRequest.Create("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
@@ -55,7 +55,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                                         break;
                                 }
-                                return;
                             }
                             else if (ghVersion.CompareTo(currentVersion) == 0)
                             {
@@ -65,11 +64,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                             {
                                 logger.Warn("Running TESTING Version!! : " + VERSION);
                             }
-
                         }
                         else
                         {
-                            logger.Warn("Failed to Parse version: "+githubVersion);
+                            logger.Warn("Failed to Parse version: " + githubVersion);
                         }
                     }
                 }

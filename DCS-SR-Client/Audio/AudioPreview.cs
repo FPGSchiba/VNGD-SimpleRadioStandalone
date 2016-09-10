@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     DesiredLatency = 80, // buffer of 40ms gives data every 40ms - so half latency gives tick rate
                     DeviceNumber = speakers
                 };
-              
+
 
                 _waveOut.Init(downsample);
 

@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -90,7 +89,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     _allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    _logger.Info($"Waiting for a connection on { _serverSettings.ServerListeningPort() }...");
+                    _logger.Info($"Waiting for a connection on {_serverSettings.ServerListeningPort()}...");
                     listener.BeginAccept(
                         AcceptCallback,
                         listener);
@@ -101,7 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Server Listen error: "+e.Message);
+                _logger.Error(e, "Server Listen error: " + e.Message);
             }
         }
 
@@ -133,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             _logger.Info("Disconnecting Client");
 
-            if (state != null && state.guid != null)
+            if ((state != null) && (state.guid != null))
             {
                 //removed
                 SRClient client;

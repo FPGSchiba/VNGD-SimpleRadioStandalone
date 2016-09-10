@@ -26,19 +26,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     ? "DISABLED"
                     : "ENABLED";
 
-                CoalitionSecurity.Content = settings[(int) ServerSettingType.COALITION_AUDIO_SECURITY] 
+                CoalitionSecurity.Content = settings[(int) ServerSettingType.COALITION_AUDIO_SECURITY]
                     ? "ON"
                     : "OFF";
 
                 LineOfSight.Content = settings[(int) ServerSettingType.LOS_ENABLED] ? "ON" : "OFF";
 
-                Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED]  ? "ON" : "OFF";
+                Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED] ? "ON" : "OFF";
 
-                RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX]? "ON" : "OFF";
+                RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX] ? "ON" : "OFF";
 
-                RadioRXInterference.Content = settings[(int)ServerSettingType.IRL_RADIO_RX_INTERFERENCE]? "ON" : "OFF";
+                RadioRXInterference.Content = settings[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
 
-                RadioStatic.Content = settings[(int)ServerSettingType.IRL_RADIO_STATIC]  ? "ON" : "OFF";
+                RadioStatic.Content = settings[(int) ServerSettingType.IRL_RADIO_STATIC] ? "ON" : "OFF";
             }
             catch (IndexOutOfRangeException ex)
             {

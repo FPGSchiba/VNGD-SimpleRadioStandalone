@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         RadioClickEffects = 6, // Recieving Radio Effects
         RadioClickEffectsTx = 7, //Transmitting Radio Effects
         RadioEncryptionEffects = 8, //Radio Encryption effects
-        ResampleOutput = 9,
+        ResampleOutput = 9
     }
 
 

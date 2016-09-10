@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -9,8 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Newtonsoft.Json;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
@@ -18,10 +15,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
     public class DCSAutoConnectListener
     {
         private readonly MainWindow.ReceivedAutoConnect _receivedAutoConnect;
-        private Logger Logger = LogManager.GetCurrentClassLogger();
         private UdpClient _dcsUdpListener;
 
         private volatile bool _stop;
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
         public DCSAutoConnectListener(MainWindow.ReceivedAutoConnect receivedAutoConnect)
@@ -36,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             _dcsUdpListener = new UdpClient();
             _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _dcsUdpListener.ExclusiveAddressUse = false; 
+            _dcsUdpListener.ExclusiveAddressUse = false;
 
             var localEp = new IPEndPoint(IPAddress.Any, 5069);
             _dcsUdpListener.Client.Bind(localEp);
@@ -53,8 +50,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         try
                         {
-                            var message = (Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
+                            var message = Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length);
 
                             HandleMessage(message);
                         }
@@ -76,24 +73,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             });
         }
 
-        private void HandleMessage(String message)
+        private void HandleMessage(string message)
         {
             var address = message.Split(':');
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-             new ThreadStart(delegate {
-          
-            message = message.Trim();
-            if (message.Contains(':'))
-            {
-                this._receivedAutoConnect(address[0].Trim(), int.Parse(address[1].Trim()));
-
-            }
-            else
-            {
-                this._receivedAutoConnect(message, 5002);
-            }
-                
-             }));
+                new ThreadStart(delegate
+                {
+                    message = message.Trim();
+                    if (message.Contains(':'))
+                    {
+                        _receivedAutoConnect(address[0].Trim(), int.Parse(address[1].Trim()));
+                    }
+                    else
+                    {
+                        _receivedAutoConnect(message, 5002);
+                    }
+                }));
         }
 
 

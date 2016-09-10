@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using NLog;
 using LogManager = NLog.LogManager;
 
@@ -18,15 +17,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
         private readonly IEventAggregator _eventAggregator;
-        private UdpClient _listener;
-        private readonly ServerSettings _serverSettings = ServerSettings.Instance;
-
-        private readonly BlockingCollection<PendingPacket> _pendingProcessingPackets = new BlockingCollection<PendingPacket>();
-
-        private readonly CancellationTokenSource _pendingProcessingCancellationToken = new CancellationTokenSource();
 
         private readonly BlockingCollection<OutgoingVoice> _outGoing = new BlockingCollection<OutgoingVoice>();
         private readonly CancellationTokenSource _outgoingCancellationToken = new CancellationTokenSource();
+
+        private readonly CancellationTokenSource _pendingProcessingCancellationToken = new CancellationTokenSource();
+
+        private readonly BlockingCollection<PendingPacket> _pendingProcessingPackets =
+            new BlockingCollection<PendingPacket>();
+
+        private readonly ServerSettings _serverSettings = ServerSettings.Instance;
+        private UdpClient _listener;
 
         private volatile bool _stop;
 
@@ -44,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             new Thread(ProcessPackets).Start();
             //outgoing packets
             new Thread(SendPendingPackets).Start();
-          
+
             var port = _serverSettings.ServerListeningPort();
             _listener = new UdpClient();
             _listener.AllowNatTraversal(true);
@@ -58,10 +59,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     var groupEP = new IPEndPoint(IPAddress.Any, port);
                     var rawBytes = _listener.Receive(ref groupEP);
                     if ((rawBytes != null) && (rawBytes.Length >= 22))
-                        _pendingProcessingPackets.Add(new PendingPacket()
+                        _pendingProcessingPackets.Add(new PendingPacket
                         {
                             RawBytes = rawBytes,
-                            ReceivedFrom =  groupEP
+                            ReceivedFrom = groupEP
                         });
                     else if ((rawBytes != null) && (rawBytes.Length == 15) && (rawBytes[0] == 1) && (rawBytes[14] == 15))
                         try
@@ -105,7 +106,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private void ProcessPackets()
         {
-            
             while (!_stop)
                 try
                 {
@@ -124,7 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             client.VoipPort = udpPacket.ReceivedFrom;
 
                             var spectatorAudioDisabled =
-                                _serverSettings.ServerSetting[(int)ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+                                _serverSettings.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED];
 
                             if ((client.Coalition == 0) && spectatorAudioDisabled)
                             {
@@ -158,19 +158,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             _clientsList.TryRemove(guid, out value);
                             //  logger.Info("Removing  "+guid+" From UDP pool");
                         }
-
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Info("Failed to Process UDP Packet: "+ex.Message);
+                    Logger.Info("Failed to Process UDP Packet: " + ex.Message);
                 }
         }
 
         private
-                void SendPendingPackets()
+            void SendPendingPackets()
         {
-
             //_listener.Send(bytes, bytes.Length, ip);
             while (!_stop)
                 try
@@ -203,14 +201,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             SRClient fromClient)
         {
             var outgoingList = new List<IPEndPoint>();
-            var outgoingVoice = new OutgoingVoice()
+            var outgoingVoice = new OutgoingVoice
             {
-                OutgoingEndPoints =  outgoingList,
+                OutgoingEndPoints = outgoingList,
                 ReceivedPacket = pendingPacket.RawBytes
             };
 
             var coalitionSecurity =
-               _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY];
+                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY];
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
@@ -243,13 +241,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
-                        outgoingList.Add(ip);
+                        // outgoingList.Add(ip);
                     }
                 }
             }
 
             return outgoingList.Count > 0 ? outgoingVoice : null;
         }
-        
     }
 }

@@ -44,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             //1 * int16 at the start giving the segment
             //
             var combinedLength = AudioPart1Length + 2;
-                //calculate first part of packet length + 4 for 2* int16
+            //calculate first part of packet length + 4 for 2* int16
             var combinedBytes = new byte[combinedLength + FixedPacketLength];
 
             var part1Size = BitConverter.GetBytes(Convert.ToUInt16(AudioPart1Bytes.Length));
@@ -53,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             //copy audio segments after we've added the length header
             Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 2, AudioPart1Bytes.Length); // copy audio
-       
+
             var freq = BitConverter.GetBytes(Frequency); //8 bytes
 
             combinedBytes[combinedLength] = freq[0];
@@ -104,18 +104,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 ecnAudio1 + 2);
 
             //after frequency and audio
-            var modulation = encodedOpusAudio[ecnAudio1  + 2 + 8];
+            var modulation = encodedOpusAudio[ecnAudio1 + 2 + 8];
 
-            var encryption = encodedOpusAudio[ecnAudio1  + 2 + 8 + 1];
+            var encryption = encodedOpusAudio[ecnAudio1 + 2 + 8 + 1];
 
-            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1  + 2 + 8 + 1 + 1);
+            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + 2 + 8 + 1 + 1);
 
             return new UDPVoicePacket
             {
                 Guid = recievingGuid,
                 AudioPart1Bytes = part1,
                 AudioPart1Length = ecnAudio1,
-           
                 Frequency = frequency,
                 UnitId = unitId,
                 Encryption = encryption,

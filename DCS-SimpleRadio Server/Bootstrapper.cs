@@ -5,7 +5,6 @@ using System.Windows.Media.Imaging;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow;
 using NLog;

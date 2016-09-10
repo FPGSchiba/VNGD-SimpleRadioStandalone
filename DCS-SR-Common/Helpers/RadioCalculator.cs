@@ -27,7 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                    20*Math.Log10(
                        4*Math.PI*distance/
                        FrequencyToWaveLength(frequency)
-                       );
+                   );
         }
 
         //we can hear if the received power is more than the RX sensivity

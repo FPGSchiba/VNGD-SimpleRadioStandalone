@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Win32;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 {
     public enum ServerSettingType
     {
@@ -14,5 +11,4 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         IRL_RADIO_RX_INTERFERENCE = 6,
         IRL_RADIO_STATIC = 7
     }
-
 }

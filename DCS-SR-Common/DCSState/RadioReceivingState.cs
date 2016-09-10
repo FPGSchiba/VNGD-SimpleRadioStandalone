@@ -10,11 +10,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public int ReceivedOn { get; set; }
 
         public bool PlayedEndOfTransmission { get; set; }
-        public bool Encrypted { get; set; }
+        //   public bool Encrypted { get; set; }
 
         public bool IsReceiving()
         {
-            return Environment.TickCount - LastReceviedAt < 220;
+            return Environment.TickCount - LastReceviedAt < 200;
         }
     }
 }

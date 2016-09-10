@@ -32,14 +32,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         //devices that report incorrectly but SHOULD work?
         public static readonly HashSet<Guid> _whitelistDevices = new HashSet<Guid>
         {
-            new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle 
+            new Guid("1105231d-0000-0000-0000-504944564944") //GTX Throttle 
         };
 
         private readonly DirectInput _directInput;
         private readonly List<Device> _inputDevices = new List<Device>();
+        private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
         private volatile bool _detectPtt;
-        private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
         {
@@ -76,7 +76,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                    else if (deviceInstance.Type >= DeviceType.Joystick && deviceInstance.Type <= DeviceType.FirstPerson || IsWhiteListed(deviceInstance.ProductGuid))
+                    else if (((deviceInstance.Type >= DeviceType.Joystick) && (deviceInstance.Type <= DeviceType.FirstPerson)) ||
+                             IsWhiteListed(deviceInstance.ProductGuid))
                     {
                         var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
@@ -95,7 +96,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 {
                     Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " +
                                 deviceInstance.InstanceGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: "+deviceInstance.Type);
+                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: " + deviceInstance.Type);
                 }
             }
         }
@@ -335,7 +336,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         }
                         else
                         {
-                            if (j < 4 || j == 8 || j == 10) //==8 is for OverlayToggle == 10 is for intercom
+                            if ((j < 4) || (j == 8) || (j == 10)) //==8 is for OverlayToggle == 10 is for intercom
                             {
                                 // set to false as its its a main button, not a modifier
                                 buttonStates[j] = false;

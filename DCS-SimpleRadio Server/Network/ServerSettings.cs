@@ -7,8 +7,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class ServerSettings
     {
-        private Logger _logger = LogManager.GetCurrentClassLogger();
-
         public static readonly string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
         public static readonly string CFG_FILE_NAME = "server.cfg";
@@ -16,7 +14,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private static ServerSettings instance;
         private static readonly object _lock = new object();
 
-        private Configuration _configuration;
+        private readonly Configuration _configuration;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public ServerSettings()
         {
@@ -42,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         try
                         {
                             ServerSettingType settingEnum;
-                            if (ServerSettingType.TryParse(setting.Name, true, out settingEnum))
+                            if (Enum.TryParse(setting.Name, true, out settingEnum))
                             {
                                 ServerSetting[(int) settingEnum] = setting.BoolValue;
                             }
@@ -50,7 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             {
                                 _logger.Warn("Invalid setting: " + setting.Name);
                             }
-
                         }
                         catch (Exception ex)
                         {
@@ -61,7 +59,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             SaveAllGeneral(true);
-
         }
 
         public bool[] ServerSetting { get; }
@@ -83,28 +80,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void WriteSetting(ServerSettingType settingType, bool setting)
         {
-
-            ServerSetting[(int)settingType] = setting;
+            ServerSetting[(int) settingType] = setting;
             try
             {
-                Section section = _configuration["General Settings"];
+                var section = _configuration["General Settings"];
                 section[settingType.ToString()].BoolValue = setting;
 
                 SaveAllGeneral(true);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex,"Unable to save Settings: "+ex.Message);
+                _logger.Error(ex, "Unable to save Settings: " + ex.Message);
             }
         }
 
         private void SaveAllGeneral(bool savePort)
         {
-
-            Section section = _configuration["General Settings"];
-            for (int i = 0; i < ServerSetting.Length; i++)
+            var section = _configuration["General Settings"];
+            for (var i = 0; i < ServerSetting.Length; i++)
             {
-                ServerSettingType serverSettingType = (ServerSettingType)i;
+                var serverSettingType = (ServerSettingType) i;
                 section[serverSettingType.ToString()].BoolValue = ServerSetting[i];
             }
 
@@ -125,15 +120,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         }
 
 
-
         public int ServerListeningPort()
         {
             try
             {
                 SaveAllGeneral(false);
 
-                Section section = _configuration["Server Settings"];
-                
+                var section = _configuration["Server Settings"];
+
                 return section["port"].IntValue;
             }
             catch (Exception ex)
