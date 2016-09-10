@@ -22,7 +22,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly int FixedPacketLength =
             sizeof(ushort)
-            + sizeof(ushort)
             + sizeof(double)
             + sizeof(int)
             + sizeof(byte)
@@ -31,9 +30,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public ushort AudioPart1Length { get; set; }
         public byte[] AudioPart1Bytes { get; set; }
-
-        public ushort AudioPart2Length { get; set; }
-        public byte[] AudioPart2Bytes { get; set; }
 
         public double Frequency { get; set; }
         public byte Modulation { get; set; } //0 - AM, 1 - FM, 2- Intercom, 3 - disabled
@@ -45,9 +41,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public byte[] EncodePacket()
         {
-            //2 * int16 at the start giving the two segments
+            //1 * int16 at the start giving the segment
             //
-            var combinedLength = AudioPart1Length + AudioPart2Length + 4;
+            var combinedLength = AudioPart1Length + 2;
                 //calculate first part of packet length + 4 for 2* int16
             var combinedBytes = new byte[combinedLength + FixedPacketLength];
 
@@ -55,15 +51,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             combinedBytes[0] = part1Size[0];
             combinedBytes[1] = part1Size[1];
 
-            var part2Size = BitConverter.GetBytes(Convert.ToUInt16(AudioPart2Bytes.Length));
-            combinedBytes[2] = part2Size[0];
-            combinedBytes[3] = part2Size[1];
-
-            //copy audio segments after we've added the two length heads
-            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 4, AudioPart1Bytes.Length); // copy audio
-            Buffer.BlockCopy(AudioPart2Bytes, 0, combinedBytes, AudioPart1Bytes.Length + 4, AudioPart2Bytes.Length);
-                // copy audio
-
+            //copy audio segments after we've added the length header
+            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 2, AudioPart1Bytes.Length); // copy audio
+       
             var freq = BitConverter.GetBytes(Frequency); //8 bytes
 
             combinedBytes[combinedLength] = freq[0];
@@ -101,37 +91,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 encodedOpusAudio, encodedOpusAudio.Length - GuidLength, GuidLength);
 
             var ecnAudio1 = BitConverter.ToUInt16(encodedOpusAudio, 0);
-            var ecnAudio2 = BitConverter.ToUInt16(encodedOpusAudio, 2);
 
             byte[] part1 = null;
-            byte[] part2 = null;
 
             if (decode)
             {
                 part1 = new byte[ecnAudio1];
-                Buffer.BlockCopy(encodedOpusAudio, 4, part1, 0, ecnAudio1);
-
-                part2 = new byte[ecnAudio2];
-                Buffer.BlockCopy(encodedOpusAudio, 4 + ecnAudio1, part2, 0, ecnAudio2);
+                Buffer.BlockCopy(encodedOpusAudio, 2, part1, 0, ecnAudio1);
             }
 
             var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                ecnAudio1 + ecnAudio2 + 4);
+                ecnAudio1 + 2);
 
             //after frequency and audio
-            var modulation = encodedOpusAudio[ecnAudio1 + ecnAudio2 + 4 + 8];
+            var modulation = encodedOpusAudio[ecnAudio1  + 2 + 8];
 
-            var encryption = encodedOpusAudio[ecnAudio1 + ecnAudio2 + 4 + 8 + 1];
+            var encryption = encodedOpusAudio[ecnAudio1  + 2 + 8 + 1];
 
-            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + ecnAudio2 + 4 + 8 + 1 + 1);
+            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1  + 2 + 8 + 1 + 1);
 
             return new UDPVoicePacket
             {
                 Guid = recievingGuid,
                 AudioPart1Bytes = part1,
                 AudioPart1Length = ecnAudio1,
-                AudioPart2Bytes = part2,
-                AudioPart2Length = ecnAudio2,
+           
                 Frequency = frequency,
                 UnitId = unitId,
                 Encryption = encryption,

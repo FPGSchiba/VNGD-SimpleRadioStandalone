@@ -243,7 +243,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
-                        //outgoingList.Add(ip);
+                        outgoingList.Add(ip);
                     }
                 }
             }

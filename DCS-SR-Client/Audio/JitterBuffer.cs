@@ -33,8 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             _settings = Settings.Instance;
 
-            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.SAMPLE_RATE, 520, 0.97f);
-            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.SAMPLE_RATE, 4130, 2.0f);
+            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
+            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
         }
 
         public void AddAudio(ClientAudio audio)

@@ -1,4 +1,5 @@
 ﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -22,28 +23,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 100,
+                    BufferMilliseconds = 20, // buffer of 20ms gives data every 40ms - double latency gives tick rate
                     DeviceNumber = mic,
                     WaveFormat = new WaveFormat(8000, 16, 1)
                 };
 
-                var pcm = new WaveInProvider(_waveIn);
-
+                var pcm = new TestWaveInProvider(_waveIn);
 
                 Volume = new SampleChannel(pcm);
 
-                var downsample = new WdlResamplingSampleProvider(Volume, 44100);
+                var filter = new RadioFilter(Volume);
 
-                var filter = new RadioFilter(downsample);
+                var downsample = new WdlResamplingSampleProvider(filter, 44100);
 
                 _waveOut = new WaveOut
                 {
-                    DesiredLatency = 100,
+                    DesiredLatency = 80, // buffer of 40ms gives data every 40ms - so half latency gives tick rate
                     DeviceNumber = speakers
                 };
-                //75ms latency in output buffer
+              
 
-                _waveOut.Init(filter);
+                _waveOut.Init(downsample);
 
                 _waveIn.StartRecording();
                 _waveOut.Play();

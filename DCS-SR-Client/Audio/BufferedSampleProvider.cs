@@ -28,7 +28,7 @@
 //          
 //            this.WaveFormat = waveFormat;
 //
-//            _circularBuffer = new CircularBuffer<float>(AudioManager.SAMPLE_RATE * 5); // 5 seconds worth
+//            _circularBuffer = new CircularBuffer<float>(AudioManager.INPUT_SAMPLE_RATE * 5); // 5 seconds worth
 //        }
 //
 //   
@@ -78,7 +78,7 @@
 //
 //        public void Clear()
 //        {
-//            _circularBuffer = new CircularBuffer<float>(AudioManager.SAMPLE_RATE * 5); // 5 seconds worth
+//            _circularBuffer = new CircularBuffer<float>(AudioManager.INPUT_SAMPLE_RATE * 5); // 5 seconds worth
 //        }
 //
 //    }

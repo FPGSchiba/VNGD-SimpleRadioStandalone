@@ -1,4 +1,6 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+﻿using System;
+using System.Diagnostics;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NAudio.Dsp;
 using NAudio.Wave;
 
@@ -10,6 +12,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         private readonly BiQuadFilter _lowPassFilter;
         private readonly Settings _settings;
         private readonly ISampleProvider _source;
+        private Stopwatch _stopwatch;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {
@@ -19,6 +22,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
             _lowPassFilter = BiQuadFilter.LowPassFilter(sampleProvider.WaveFormat.SampleRate, 4130, 2.0f);
 
             _settings = Settings.Instance;
+            _stopwatch= new Stopwatch();
+            _stopwatch.Start();
         }
 
         public WaveFormat WaveFormat
@@ -52,6 +57,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
                     }
                 }
             }
+
+           
+            Console.WriteLine("Read:"+samplesRead+" Time - " + _stopwatch.ElapsedMilliseconds);
+            _stopwatch.Restart();
 
             return samplesRead;
         }
