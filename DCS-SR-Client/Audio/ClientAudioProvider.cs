@@ -36,12 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //adjust for LOS + Distance + Volume
                 AdjustVolume(audio);
 
-              //  var addEffect = _settings.UserSettings[(int) SettingType.RadioEffects] == "ON";
-
-                //if (addEffect)
-                //{
-                    AddRadioEffect(audio);
-                //}
+                AddRadioEffect(audio);
             }
             else
             {

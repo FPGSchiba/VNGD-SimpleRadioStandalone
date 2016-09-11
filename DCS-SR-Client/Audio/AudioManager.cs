@@ -30,7 +30,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES*3);
 
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
-        private int _bytesPerSegment;
         private MixingSampleProvider _clientAudioMixer;
 
         private OpusDecoder _decoder;
@@ -39,9 +38,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         //plays in parallel with radio output buffer
         private RadioAudioProvider[] _effectsOutputBuffer;
         private OpusEncoder _encoder;
-
-        private byte[] _micClickOffBytes;
-        //   private MixingSampleProvider _effectsMixer;
 
         private BufferedWaveProvider _playBuffer;
 

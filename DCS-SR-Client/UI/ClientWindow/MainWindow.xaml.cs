@@ -113,8 +113,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             UpdaterChecker.CheckForUpdate();
 
-            InitRadioEffectsToggle();
-
             InitRadioSwitchIsPTT();
 
             InitRadioClickEffectsToggle();
@@ -123,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioEncryptionEffectsToggle();
 
-            InitResample();
+            InitAutoConnectPrompt();
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
         }
@@ -164,18 +162,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void InitRadioEffectsToggle()
-        {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEffects];
-            if (radioEffects == "ON")
-            {
-                RadioEffectsToggle.IsChecked = true;
-            }
-            else
-            {
-                RadioEffectsToggle.IsChecked = false;
-            }
-        }
 
         private void InitRadioClickEffectsToggle()
         {
@@ -230,18 +216,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void InitResample()
+        private void InitAutoConnectPrompt()
         {
-            var resample = Settings.Instance.UserSettings[(int) SettingType.ResampleOutput];
-            if (resample == "ON")
+            var autoConnect = Settings.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
+            if (autoConnect == "ON")
             {
-                ResamplerToggle.IsChecked = true;
-                _audioManager.Resample = true;
+                AutoConnectPromptToggle.IsChecked = true;
+           
             }
             else
             {
-                ResamplerToggle.IsChecked = false;
-                _audioManager.Resample = false;
+                AutoConnectPromptToggle.IsChecked = false;
             }
         }
 
@@ -472,11 +457,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void RadioEffects_Click(object sender, RoutedEventArgs e)
-        {
-            Settings.Instance.WriteSetting(SettingType.RadioEffects, (string) RadioEffectsToggle.Content);
-        }
-
         private void RadioClicks_Click(object sender, RoutedEventArgs e)
         {
             Settings.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
@@ -531,14 +511,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (StartStop.Content.ToString().ToLower() == "connect")
             {
-                WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
+                var autoConnect = Settings.Instance.UserSettings[(int)SettingType.AutoConnectPrompt];
 
-                var result = MessageBox.Show(this,
-                    $"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                if (autoConnect == "ON")
+                {
+                    WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
-                if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
+                    var result = MessageBox.Show(this,
+                        $"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
+                    {
+                        ServerIp.Text = address + ":" + port;
+                        startStop_Click(null, null);
+                    }
+                }
+                else
                 {
                     ServerIp.Text = address + ":" + port;
                     startStop_Click(null, null);
@@ -578,15 +568,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ResamplerToggle_Click(object sender, RoutedEventArgs e)
+        private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.ResampleOutput, (string) ResamplerToggle.Content);
-            //Restart message needed
-            _audioManager.Resample = (string) ResamplerToggle.Content == "ON";
+            Settings.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
 
-            MessageBox.Show(this, $"You must disconnect and re-connect to the server for this setting to take effect",
-                "Please Disconnect", MessageBoxButton.OK,
-                MessageBoxImage.Warning);
         }
     }
 }
