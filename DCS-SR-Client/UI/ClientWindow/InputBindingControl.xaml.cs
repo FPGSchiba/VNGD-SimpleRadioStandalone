@@ -95,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 Device.Text = device.DeviceName;
                 DeviceText.Text = device.Button < 128 ? device.Button.ToString() : "POV " + (device.Button - 127);
-                    //output POV info;
+                //output POV info;
 
                 device.InputBind = ControlInputBinding;
 
@@ -126,7 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ModifierDevice.Text = device.DeviceName;
                 ModifierText.Text = device.Button < 128 ? device.Button.ToString() : "POV " + (device.Button - 127);
-                    //output POV info;
+                //output POV info;
 
                 device.InputBind = ModifierBinding;
 

@@ -64,13 +64,13 @@ namespace FragLabs.Audio.Codecs
         /// <returns>A new <c>OpusDecoder</c>.</returns>
         public static OpusDecoder Create(int outputSampleRate, int outputChannels)
         {
-            if (outputSampleRate != 8000 &&
-                outputSampleRate != 12000 &&
-                outputSampleRate != 16000 &&
-                outputSampleRate != 24000 &&
-                outputSampleRate != 48000)
+            if ((outputSampleRate != 8000) &&
+                (outputSampleRate != 12000) &&
+                (outputSampleRate != 16000) &&
+                (outputSampleRate != 24000) &&
+                (outputSampleRate != 48000))
                 throw new ArgumentOutOfRangeException("inputSamplingRate");
-            if (outputChannels != 1 && outputChannels != 2)
+            if ((outputChannels != 1) && (outputChannels != 2))
                 throw new ArgumentOutOfRangeException("inputChannels");
 
             IntPtr error;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using Caliburn.Micro;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
 using NLog;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 {
     public sealed class ClientAdminViewModel : Screen, IHandle<ServerStateMessage>
     {

@@ -183,7 +183,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             //init with LOS true so you can hear them incase of bad DCS install where
                                             //LOS isnt working
                                             connectedClient.LineOfSightLoss = 0.0f;
-                                                //0.0 is NO LOSS therefore full Line of sight
+                                            //0.0 is NO LOSS therefore full Line of sight
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
@@ -204,7 +204,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 //init with LOS true so you can hear them incase of bad DCS install where
                                                 //LOS isnt working
                                                 client.LineOfSightLoss = 0.0f;
-                                                    //0.0 is NO LOSS therefore full Line of sight
+                                                //0.0 is NO LOSS therefore full Line of sight
                                                 _clients[client.ClientGuid] = client;
                                             }
                                         }

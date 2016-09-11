@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdminView"
+﻿<UserControl x:Class="Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin.ClientAdminView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cal="http://www.caliburnproject.org"

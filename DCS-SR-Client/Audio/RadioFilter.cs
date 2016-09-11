@@ -10,6 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         private readonly BiQuadFilter _lowPassFilter;
         private readonly Settings _settings;
         private readonly ISampleProvider _source;
+        //    private Stopwatch _stopwatch;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {
@@ -19,6 +20,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
             _lowPassFilter = BiQuadFilter.LowPassFilter(sampleProvider.WaveFormat.SampleRate, 4130, 2.0f);
 
             _settings = Settings.Instance;
+            //        _stopwatch= new Stopwatch();
+            //      _stopwatch.Start();
         }
 
         public WaveFormat WaveFormat
@@ -30,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
 
-            if (_settings.UserSettings[(int) SettingType.RadioEffects] == "ON" && samplesRead > 0)
+            if ((_settings.UserSettings[(int) SettingType.RadioEffects] == "ON") && (samplesRead > 0))
             {
                 for (var n = 0; n < sampleCount; n++)
                 {
@@ -53,6 +56,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
                 }
             }
 
+
+            //   Console.WriteLine("Read:"+samplesRead+" Time - " + _stopwatch.ElapsedMilliseconds);
+            //     _stopwatch.Restart();
+//
             return samplesRead;
         }
     }

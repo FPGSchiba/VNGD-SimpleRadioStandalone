@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class StartServerMessage
     {

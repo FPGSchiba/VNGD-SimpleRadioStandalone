@@ -32,14 +32,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public static volatile DCSPlayerSideInfo DcsPlayerSideInfo = new DCSPlayerSideInfo();
 
         private readonly SendRadioUpdate _clientRadioUpdate;
-        private readonly ClientSideUpdate _clientSideUpdate;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
+        private readonly ClientSideUpdate _clientSideUpdate;
+        private readonly string _guid;
 
         private UdpClient _dcsGameGuiudpListener;
 
         private UdpClient _dcsLOSListener;
         private UdpClient _dcsUdpListener;
-        private readonly string _guid;
 
         private volatile bool _stop;
 
@@ -304,12 +304,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var requests = new List<DCSLosCheckRequest>();
 
-            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED] )
+            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
             {
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if (client.Position.x != 0 && client.Position.z != 0 && client.ClientGuid != _guid)
+                    if ((client.Position.x != 0) && (client.Position.z != 0) && (client.ClientGuid != _guid))
                     {
                         requests.Add(new DCSLosCheckRequest
                         {

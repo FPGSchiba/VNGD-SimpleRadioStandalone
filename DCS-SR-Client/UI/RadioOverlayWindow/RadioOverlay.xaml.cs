@@ -17,9 +17,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private volatile bool _end;
-
         private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+
+        private volatile bool _end;
 
 
         public RadioOverlayWindow()

@@ -11,10 +11,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         Radio3Channel = 3,
         RadioSwitchIsPTT = 4,
         IntercomChannel = 5,
-        RadioClickEffects = 6, // Recieving Radio Effects
+        RadioClickEffects = 6, // Recieving Radio Effects - not used anymore
         RadioClickEffectsTx = 7, //Transmitting Radio Effects
         RadioEncryptionEffects = 8, //Radio Encryption effects
-        ResampleOutput = 9,
+        ResampleOutput = 9, //not used - on always
+        AutoConnectPrompt = 10, //message about auto connect
     }
 
 

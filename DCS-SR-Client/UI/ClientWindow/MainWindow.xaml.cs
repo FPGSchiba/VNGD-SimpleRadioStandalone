@@ -22,9 +22,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        public delegate void ToggleOverlayCallback(bool uiButton);
-
         public delegate void ReceivedAutoConnect(string address, int port);
+
+        public delegate void ToggleOverlayCallback(bool uiButton);
 
         private readonly AppConfiguration _appConfig;
 
@@ -36,20 +36,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
         private ClientSync _client;
+        private DCSAutoConnectListener _dcsAutoConnectListener;
+        private int _port = 5002;
 
         private RadioOverlayWindow _radioOverlayWindow;
 
         private IPAddress _resolvedIp;
-        private int _port = 5002;
         private ServerSettingsWindow _serverSettingsWindow;
 
         private bool _stop = true;
 
         //used to debounce toggle
         private double _toggleShowHide;
-        private DCSAutoConnectListener _dcsAutoConnectListener;
-
-        public InputDeviceManager InputManager { get; set; }
 
         public MainWindow()
         {
@@ -57,9 +55,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             SetupLogging();
 
-            this.Title= this.Title+ " - "+ UpdaterChecker.VERSION;
+            Title = Title + " - " + UpdaterChecker.VERSION;
 
-            Logger.Info("Started DCS-SimpleRadio Client " +UpdaterChecker.VERSION);
+            Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
 
             InputManager = new InputDeviceManager(this, ToggleOverlay);
 
@@ -103,19 +101,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioManager.MicBoost = (float) MicrophoneBoost.Value;
             _audioManager.SpeakerBoost = (float) SpeakerBoost.Value;
 
-            if (BoostLabel != null && MicrophoneBoost != null)
+            if ((BoostLabel != null) && (MicrophoneBoost != null))
             {
                 BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
             }
 
-            if (SpeakerBoostLabel != null && SpeakerBoost != null)
+            if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
                 SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
             }
 
             UpdaterChecker.CheckForUpdate();
-
-            InitRadioEffectsToggle();
 
             InitRadioSwitchIsPTT();
 
@@ -125,11 +121,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioEncryptionEffectsToggle();
 
-            InitResample();
+            InitAutoConnectPrompt();
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
-
         }
+
+        public InputDeviceManager InputManager { get; set; }
 
         private void InitAudioInput()
         {
@@ -138,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Mic.Items.Add(WaveIn.GetCapabilities(i).ProductName);
             }
 
-            if (WaveIn.DeviceCount >= _appConfig.AudioInputDeviceId && WaveIn.DeviceCount > 0)
+            if ((WaveIn.DeviceCount >= _appConfig.AudioInputDeviceId) && (WaveIn.DeviceCount > 0))
             {
                 Mic.SelectedIndex = _appConfig.AudioInputDeviceId;
             }
@@ -155,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Speakers.Items.Add(WaveOut.GetCapabilities(i).ProductName);
             }
 
-            if (WaveOut.DeviceCount >= _appConfig.AudioOutputDeviceId && WaveOut.DeviceCount > 0)
+            if ((WaveOut.DeviceCount >= _appConfig.AudioOutputDeviceId) && (WaveOut.DeviceCount > 0))
             {
                 Speakers.SelectedIndex = _appConfig.AudioOutputDeviceId;
             }
@@ -165,18 +162,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void InitRadioEffectsToggle()
-        {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEffects];
-            if (radioEffects == "ON")
-            {
-                RadioEffectsToggle.IsChecked = true;
-            }
-            else
-            {
-                RadioEffectsToggle.IsChecked = false;
-            }
-        }
 
         private void InitRadioClickEffectsToggle()
         {
@@ -194,7 +179,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioClickEffectsTXToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioClickEffectsTx];
+            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
             if (radioEffects == "ON")
             {
                 RadioClicksTXToggle.IsChecked = true;
@@ -207,7 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioEncryptionEffectsToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioEncryptionEffects];
+            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
             if (radioEffects == "ON")
             {
                 RadioEncryptionEffectsToggle.IsChecked = true;
@@ -231,18 +216,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void InitResample()
+        private void InitAutoConnectPrompt()
         {
-            var resample = Settings.Instance.UserSettings[(int)SettingType.ResampleOutput];
-            if (resample == "ON")
+            var autoConnect = Settings.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
+            if (autoConnect == "ON")
             {
-                ResamplerToggle.IsChecked = true;
-                _audioManager.Resample = true;
+                AutoConnectPromptToggle.IsChecked = true;
+           
             }
             else
             {
-                ResamplerToggle.IsChecked = false;
-                _audioManager.Resample = false;
+                AutoConnectPromptToggle.IsChecked = false;
             }
         }
 
@@ -315,10 +299,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private String GetAddressFromTextBox()
+        private string GetAddressFromTextBox()
         {
-           
-           var addr =  ServerIp.Text.Trim();
+            var addr = ServerIp.Text.Trim();
 
             if (addr.Contains(":"))
             {
@@ -326,20 +309,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             return addr;
-
         }
 
         private int GetPortFromTextBox()
         {
-
             var addr = ServerIp.Text.Trim();
 
             try
             {
                 if (addr.Contains(":"))
                 {
-
-                    return Int32.Parse(addr.Split(':')[1]);
+                    return int.Parse(addr.Split(':')[1]);
                 }
             }
             catch (Exception ex)
@@ -347,9 +327,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //no valid port! remove it
                 ServerIp.Text = GetAddressFromTextBox();
             }
-        
-            return 5002;
 
+            return 5002;
         }
 
         private void Stop()
@@ -390,7 +369,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
 
                     _audioManager.StartEncoding(Mic.SelectedIndex, Speakers.SelectedIndex, _guid, InputManager,
-                        _resolvedIp,_port);
+                        _resolvedIp, _port);
                     _stop = false;
                 }
             }
@@ -451,7 +430,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _appConfig.MicBoost = (float) MicrophoneBoost.Value;
             }
 
-            if (BoostLabel != null && MicrophoneBoost != null)
+            if ((BoostLabel != null) && (MicrophoneBoost != null))
             {
                 BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
             }
@@ -472,15 +451,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _appConfig.SpeakerBoost = (float) SpeakerBoost.Value;
             }
 
-            if (SpeakerBoostLabel != null && SpeakerBoost != null)
+            if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
                 SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
             }
-        }
-
-        private void RadioEffects_Click(object sender, RoutedEventArgs e)
-        {
-            Settings.Instance.WriteSetting(SettingType.RadioEffects, (string) RadioEffectsToggle.Content);
         }
 
         private void RadioClicks_Click(object sender, RoutedEventArgs e)
@@ -490,13 +464,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RadioClicksTX_Click(object sender, RoutedEventArgs e)
         {
-
-            Settings.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string)RadioClicksTXToggle.Content);
+            Settings.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string) RadioClicksTXToggle.Content);
         }
 
         private void RadioEncryptionEffects_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioEncryptionEffects, (string)RadioEncryptionEffectsToggle.Content);
+            Settings.Instance.WriteSetting(SettingType.RadioEncryptionEffects,
+                (string) RadioEncryptionEffectsToggle.Content);
         }
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
@@ -515,8 +489,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if ((Environment.TickCount - _toggleShowHide > 600) || uiButton)
             {
                 _toggleShowHide = Environment.TickCount;
-                if (_radioOverlayWindow == null || !_radioOverlayWindow.IsVisible ||
-                    _radioOverlayWindow.WindowState == WindowState.Minimized)
+                if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
+                    (_radioOverlayWindow.WindowState == WindowState.Minimized))
                 {
                     _radioOverlayWindow?.Close();
 
@@ -531,21 +505,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void AutoConnect(String address,int port)
+        private void AutoConnect(string address, int port)
         {
-            Logger.Info("Received AutoConnect "+address);
+            Logger.Info("Received AutoConnect " + address);
 
             if (StartStop.Content.ToString().ToLower() == "connect")
             {
-                WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
+                var autoConnect = Settings.Instance.UserSettings[(int)SettingType.AutoConnectPrompt];
 
-                MessageBoxResult result = MessageBox.Show(this,$"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect", MessageBoxButton.YesNo,
-                         MessageBoxImage.Question);
+                if (autoConnect == "ON")
+                {
+                    WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
-                if (result == MessageBoxResult.Yes && StartStop.Content.ToString().ToLower() == "connect")
+                    var result = MessageBox.Show(this,
+                        $"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
+                    {
+                        ServerIp.Text = address + ":" + port;
+                        startStop_Click(null, null);
+                    }
+                }
+                else
                 {
                     ServerIp.Text = address + ":" + port;
-                    startStop_Click(null,null);
+                    startStop_Click(null, null);
                 }
             }
         }
@@ -567,8 +553,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_serverSettingsWindow == null || !_serverSettingsWindow.IsVisible ||
-                _serverSettingsWindow.WindowState == WindowState.Minimized)
+            if ((_serverSettingsWindow == null) || !_serverSettingsWindow.IsVisible ||
+                (_serverSettingsWindow.WindowState == WindowState.Minimized))
             {
                 _serverSettingsWindow?.Close();
 
@@ -582,14 +568,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ResamplerToggle_Click(object sender, RoutedEventArgs e)
+        private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.ResampleOutput, (string)ResamplerToggle.Content);
-            //Restart message needed
-            _audioManager.Resample = (string)ResamplerToggle.Content == "ON";
+            Settings.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
 
-             MessageBox.Show(this, $"You must disconnect and re-connect to the server for this setting to take effect", "Please Disconnect", MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
         }
     }
 }

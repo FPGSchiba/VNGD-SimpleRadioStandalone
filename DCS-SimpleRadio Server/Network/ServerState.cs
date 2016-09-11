@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>,
         IHandle<BanClientMessage>
@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI
             {
                 while (!_stop)
                 {
-                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED] )
+                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED])
                     {
                         var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
                         File.WriteAllText(GetCurrentDirectory() + "\\clients-list.json", json);

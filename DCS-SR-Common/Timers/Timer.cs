@@ -54,7 +54,7 @@ namespace Cabhishek.Timers
 
         private void StartUnmanagedTimer()
         {
-            timerId = timeSetEvent((uint)interval.TotalMilliseconds, 0, callbackFunction, 0, 1);
+            timerId = timeSetEvent((uint) interval.TotalMilliseconds, 0, callbackFunction, 0, 1);
         }
 
         private void StopUnmanagedTimer()
@@ -63,26 +63,26 @@ namespace Cabhishek.Timers
             timerId = 0;
         }
 
-        private void CallbackFunction(UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2)
+        private void CallbackFunction(uint timerid, uint msg, IntPtr user, uint dw1, uint dw2)
         {
             clientCallback();
         }
 
         [DllImport(WINMM)]
         private static extern uint timeSetEvent(
-            UInt32 uDelay,
-            UInt32 uResolution,
+            uint uDelay,
+            uint uResolution,
             [MarshalAs(UnmanagedType.FunctionPtr)] MMTimerProc lpTimeProc,
-            UInt32 dwUser,
-            Int32 fuEvent
-            );
+            uint dwUser,
+            int fuEvent
+        );
 
         [DllImport(WINMM)]
         private static extern uint timeKillEvent(uint uTimerID);
 
         #region Nested type: MMTimerProc
 
-        private delegate void MMTimerProc(UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2);
+        private delegate void MMTimerProc(uint timerid, uint msg, IntPtr user, uint dw1, uint dw2);
 
         #endregion
     }
