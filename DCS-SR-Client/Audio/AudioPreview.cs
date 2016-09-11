@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     BufferMilliseconds = 20, // buffer of 20ms gives data every 40ms - double latency gives tick rate
                     DeviceNumber = mic,
-                    WaveFormat = new WaveFormat(8000, 16, 1)
+                    WaveFormat = new WaveFormat(16000, 16, 1)
                 };
 
                 var pcm = new TestWaveInProvider(_waveIn);
