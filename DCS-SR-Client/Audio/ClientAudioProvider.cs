@@ -7,13 +7,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudioProvider : RadioAudioProvider
     {
-        public static readonly int SILENCE_PAD = 100;
+        public static readonly int SILENCE_PAD = 80;
 
         private readonly Random _random = new Random();
 
         private readonly BiQuadFilter _highPassFilter;
         private readonly BiQuadFilter _lowPassFilter;
 
+        private int _lastReceivedOn = -1;
 
         public ClientAudioProvider() : base(AudioManager.INPUT_SAMPLE_RATE)
         {
@@ -35,12 +36,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //adjust for LOS + Distance + Volume
                 AdjustVolume(audio);
 
-                var addEffect = _settings.UserSettings[(int) SettingType.RadioEffects] == "ON";
+              //  var addEffect = _settings.UserSettings[(int) SettingType.RadioEffects] == "ON";
 
-                if (addEffect)
-                {
+                //if (addEffect)
+                //{
                     AddRadioEffect(audio);
-                }
+                //}
             }
             else
             {
@@ -48,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             long now = Environment.TickCount;
-            if (now - LastUpdate > 160)
+            if (now - LastUpdate > 160 ) //3 missed packets at 40ms
             {
                 //append 100ms of silence - this functions as our jitter buffer??
                 var silencePad = AudioManager.INPUT_SAMPLE_RATE/1000*SILENCE_PAD;
@@ -60,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 audio.PcmAudioShort = newAudio;
             }
 
+            _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = Environment.TickCount;
 
             AddAudioSamples(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio, false);
