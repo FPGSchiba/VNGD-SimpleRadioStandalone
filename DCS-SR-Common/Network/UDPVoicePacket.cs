@@ -6,13 +6,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     /**
        * UDP PACKET LAYOUT
        * UInt16 AudioPart1 Length - 2 bytes
-       * UInt16 AudioPart2 Length - 2 bytes
        * Bytes AudioPart1 - variable bytes
-       * Bytes AudioPart2 - variable bytes
        * Double Frequency Length - 8 bytes
        * byte Modulation Length - 1 byte
        * byte Encryption Length - 1 byte
        * UInt UnitId Length - 4 bytes
+       * UInt PacketId Length - 4 bytes
        * Byte[] / Ascii String GUID length - 22
        */
 
@@ -26,7 +25,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             + sizeof(int)
             + sizeof(byte)
             + sizeof(byte)
-            + sizeof(uint) + GuidLength;
+            + sizeof(uint) 
+            + sizeof(uint)
+            + GuidLength;
 
         public ushort AudioPart1Length { get; set; }
         public byte[] AudioPart1Bytes { get; set; }
@@ -37,7 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public uint UnitId { get; set; }
         public byte[] GuidBytes { get; set; }
         public string Guid { get; set; }
-
+        public uint PacketNumber { get; set; }
 
         public byte[] EncodePacket()
         {
@@ -78,6 +79,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             combinedBytes[combinedLength + 12] = unitId[2];
             combinedBytes[combinedLength + 13] = unitId[3];
 
+            //Packet Id
+            var packetNumber = BitConverter.GetBytes(PacketNumber); //4 bytes
+            combinedBytes[combinedLength + 14] = packetNumber[0];
+            combinedBytes[combinedLength + 15] = packetNumber[1];
+            combinedBytes[combinedLength + 16] = packetNumber[2];
+            combinedBytes[combinedLength + 17] = packetNumber[3];
+
             Buffer.BlockCopy(GuidBytes, 0, combinedBytes, combinedLength + FixedPacketLength - GuidLength, GuidLength);
             // copy short guid
 
@@ -110,6 +118,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + 2 + 8 + 1 + 1);
 
+            var packetNumber = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + 2 + 8 + 1 + 1 + 4);
+
             return new UDPVoicePacket
             {
                 Guid = recievingGuid,
@@ -118,7 +128,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 Frequency = frequency,
                 UnitId = unitId,
                 Encryption = encryption,
-                Modulation = modulation
+                Modulation = modulation,
+                PacketNumber = packetNumber
             };
         }
     }

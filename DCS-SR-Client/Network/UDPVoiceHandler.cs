@@ -49,6 +49,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private Timer _timer;
         private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
+        private uint _packetNumber = 1;
+
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
@@ -145,6 +147,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //set to false so we sent one packet to open up the radio
             //automatically rather than the user having to press Send
             hasSentVoicePacket = false;
+
+            _packetNumber = 1; //reset packet number
 
             while (!_stop)
             {
@@ -317,7 +321,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             // mark if we can decrypt it
                                             RadioReceivingState = receivingState,
                                             RecevingPower = receivingPower,
-                                            LineOfSightLoss = lineOfSightLoss // Loss of 1.0 or greater is total loss
+                                            LineOfSightLoss = lineOfSightLoss, // Loss of 1.0 or greater is total loss
+                                            PacketNumber = udpVoicePacket.PacketNumber
                                         };
 
 
@@ -466,7 +471,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 Frequency = radio.frequency,
                                 UnitId = RadioDCSSyncServer.DcsPlayerRadioInfo.unitId,
                                 Encryption = radio.enc ? radio.encKey : (byte) 0,
-                                Modulation = radio.modulation
+                                Modulation = radio.modulation,
+                                PacketNumber = _packetNumber++
+
                             }.EncodePacket();
 
 

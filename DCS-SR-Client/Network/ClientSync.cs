@@ -51,6 +51,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _tcpClient.SendTimeout = 10;
                 try
                 {
+                    _tcpClient.NoDelay = true;
+
                     _tcpClient.Connect(_serverEndpoint);
 
                     if (_tcpClient.Connected)

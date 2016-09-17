@@ -1,11 +1,14 @@
 ﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Dsp;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    public class ClientAudioProvider : RadioAudioProvider
+    public class ClientAudioProvider : AudioProvider
     {
         public static readonly int SILENCE_PAD = 80;
 
@@ -16,17 +19,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private int _lastReceivedOn = -1;
 
-        public ClientAudioProvider() : base(AudioManager.INPUT_SAMPLE_RATE)
+        public JitterBufferProvider JitterBufferProvider { get; }
+        public Pcm16BitToSampleProvider SampleProvider { get; }
+
+        public ClientAudioProvider() 
         {
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
+
+            JitterBufferProvider = new JitterBufferProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE,2));
+
+            SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProvider);
         }
 
         public long LastUpdate { get; private set; }
 
         public void AddClientAudioSamples(ClientAudio audio)
         {
-            VolumeSampleProvider.Volume = 1.0f;
             //sort out volume
 
             var decrytable = audio.Decryptable || (audio.Encryption == 0);
@@ -59,7 +68,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = Environment.TickCount;
 
-            AddAudioSamples(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio, false);
+            JitterBufferProvider.AddSamples(new JitterBufferAudio()
+            {
+                Audio = SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
+                PacketNumber =  audio.PacketNumber
+            });
         }
 
         private void AdjustVolume(ClientAudio clientAudio)

@@ -392,7 +392,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 client = new ClientAudioProvider();
                 _clientsBufferedAudio[audio.ClientGuid] = client;
 
-                _clientAudioMixer.AddMixerInput(client.VolumeSampleProvider);
+                _clientAudioMixer.AddMixerInput(client.SampleProvider);
             }
 
             client.AddClientAudioSamples(audio);
