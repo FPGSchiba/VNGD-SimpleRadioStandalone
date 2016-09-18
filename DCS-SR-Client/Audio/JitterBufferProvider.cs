@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private uint _lastRead = 0; // gives current index
         private uint _missing = 0; // counts missing packets
 
-        private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES];
+        private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES *2]; //*2 for stereo
 
         private LinkedList<JitterBufferAudio> _bufferedAudio = new LinkedList<JitterBufferAudio>();
 
@@ -87,6 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public int Read(byte[] buffer, int offset, int count)
         {
+           
             int read = 0;
             lock (_lock)
             {

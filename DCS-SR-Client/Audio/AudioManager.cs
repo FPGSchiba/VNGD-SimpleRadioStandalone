@@ -99,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveOut = new WaveOut
                 {
-                    DesiredLatency = 80, // half to get tick rate - so 40ms
+                    DesiredLatency = 160, // half to get tick rate - so 40ms
                     DeviceNumber = speakers
                 };
 
