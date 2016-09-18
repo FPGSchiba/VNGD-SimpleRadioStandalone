@@ -7,6 +7,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using FragLabs.Audio.Codecs.Opus;
 using NAudio.Wave;
@@ -59,6 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _cachedAudioEffects[i] = new CachedAudioEffect((CachedAudioEffect.AudioEffectTypes) i);
             }
+         
         }
 
         public float MicBoost { get; set; } = 1.0f;
@@ -132,6 +134,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 voiceSenderThread.Start();
 
                 _waveIn.StartRecording();
+
+
+                MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
             }
             catch (Exception ex)
             {
@@ -373,6 +378,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             _stop = true;
+
+            MessageHub.Instance.ClearSubscriptions();
         }
 
         public void AddClientAudio(ClientAudio audio)
@@ -396,6 +403,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             client.AddClientAudioSamples(audio);
+        }
+
+        private void RemoveClientBuffer(SRClient srClient)
+        {
+            ClientAudioProvider clientAudio = null;
+            _clientsBufferedAudio.TryRemove(srClient.ClientGuid, out clientAudio);
+
+            if (clientAudio !=null)
+            {
+
+                try
+                {
+                    _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex,"Error removing client input");
+                }
+              
+            }
         }
     }
 }

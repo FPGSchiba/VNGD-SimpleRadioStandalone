@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
 
@@ -225,6 +226,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         SRClient outClient;
                                         _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);
+
+                                        if (outClient != null)
+                                        {
+                                            MessageHub.Instance.Publish(outClient);
+                                        }
 
                                         break;
 
