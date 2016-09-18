@@ -220,6 +220,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
                                         ServerSettings = serverMessage.ServerSettings;
                                         break;
+                                    case NetworkMessage.MessageType.CLIENT_DISCONNECT:
+                                        Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
+
+                                        SRClient outClient;
+                                        _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);
+
+                                        break;
+
+
                                     default:
                                         Logger.Warn("Recevied unknown " + line);
                                         break;

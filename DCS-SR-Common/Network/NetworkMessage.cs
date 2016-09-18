@@ -10,7 +10,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             PING,
             SYNC,
             RADIO_UPDATE, //Only received server side
-            SERVER_SETTINGS
+            SERVER_SETTINGS,
+            CLIENT_DISCONNECT // Client disconnected
         }
 
         public SRClient Client { get; set; }
