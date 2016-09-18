@@ -327,7 +327,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
-            if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
                 // Full radio, all from DCS
             {
                 changed = !DcsPlayerRadioInfo.Equals(message);
@@ -336,7 +336,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 DcsPlayerRadioInfo = message;
             }
-            else if (message.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
+            else if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.PARTIAL_COCKPIT_INTEGRATION)
                 // Partial radio - can select radio but the rest is from DCS
             {
                 //check if its changed frequency wise

@@ -5,14 +5,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class DCSPlayerRadioInfo
     {
-        //1 - Full Radio - No Switch or frequency
-        //2 - Partial Radio - Allow Radio Switch but no frequency
-        //3 - FC3 / Spectator - Allow Radio Switch + Frequency
-        public enum AircraftRadioType
+
+        //HOTAS or IN COCKPIT controls
+        public enum RadioSwitchControls
         {
-            FULL_COCKPIT_INTEGRATION = 1,
-            PARTIAL_COCKPIT_INTEGRATION = 2,
-            NO_COCKPIT_INTEGRATION = 3
+            HOTAS = 0, 
+            IN_COCKPIT = 1
         }
 
         public string name = "";
@@ -20,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[4];
-        public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION;
+        public RadioSwitchControls control = RadioSwitchControls.HOTAS;
         public short selected = 0;
         public string unit = "";
         public uint unitId;
@@ -46,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             var compareRadio = compare as DCSPlayerRadioInfo;
 
-            if (radioType != compareRadio.radioType)
+            if (control != compareRadio.control)
             {
                 return false;
             }

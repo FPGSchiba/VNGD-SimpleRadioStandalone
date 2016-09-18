@@ -104,12 +104,12 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radios =
                     {
                         -- Radio 1 is always Intercom
-                        { name = "INTERCOM", frequency = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0 },
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0}, -- enc means encrypted
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0},
-                        { name = "No Radio", frequency = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0}
+                        { name = "INTERCOM", freq = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
+                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false}, -- enc means encrypted
+                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0,expansion = false},
+                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false}
                     },
-                    radioType = 3,
+                    control = 0, -- HOTAS
                 }
 
                 _update.name =  _data.UnitName
@@ -164,24 +164,30 @@ LuaExportActivityNextEvent = function(tCurrent)
                 else
                     -- FC 3
                     _update.radios[2].name = "FC3 UHF"
-                    _update.radios[2].frequency = 251.0*1000000
+                    _update.radios[2].freq = 251.0*1000000
                     _update.radios[2].modulation = 0
-                    _update.radios[2].secondaryFrequency = 243.0*1000000
+                    _update.radios[2].secFreq = 243.0*1000000
+                    _update.radios[2].volMode = 1
+                    _update.radios[2].freqMode = 1
 
                     _update.radios[3].name = "FC3 VHF"
-                    _update.radios[3].frequency = 124.8*1000000
+                    _update.radios[3].freq = 124.8*1000000
                     _update.radios[3].modulation = 0
-                    _update.radios[3].secondaryFrequency = 121.5*1000000
+                    _update.radios[3].secFreq = 121.5*1000000
+                    _update.radios[3].volMode = 1
+                    _update.radios[3].freqMode = 1
 
                     _update.radios[4].name = "FC3 FM"
-                    _update.radios[4].frequency = 30.0*1000000
+                    _update.radios[4].freq = 30.0*1000000
                     _update.radios[4].modulation = 1
+                    _update.radios[4].volMode = 1
+                    _update.radios[4].freqMode = 1
 
                     _update.radios[2].volume = 1.0
                     _update.radios[3].volume = 1.0
                     _update.radios[4].volume = 1.0
 
-                    _update.radioType = 3
+                    _update.control = 0
 
                     _update.selected = 1
                 end
@@ -200,10 +206,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radios =
                     {
                         --- Radio 0 is always intercom now
-                        { name = "Disabled", frequency = 100, modulation = 3,volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0 },
-                        { name = "CA UHF/VHF", frequency = 251.0*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1 },
-                        { name = "CA UHF/VHF", frequency = 124.8*1000000, modulation = 0,volume = 1.0, secondaryFrequency = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0  },
-                        { name = "CA FM", frequency = 30.0*1000000, modulation = 1,volume = 1.0, secondaryFrequency = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1  }
+                        { name = "Disabled", freq = 100, modulation = 3,volume = 1.0, secFreq = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "CA UHF/VHF", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "CA UHF/VHF", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
+                        { name = "CA FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   }
                     },
                     radioType = 3
                 }
@@ -354,36 +360,42 @@ end
 function SR.exportRadioA10A(_data)
 
     _data.radios[2].name = "AN/ARC-186(V)"
-    _data.radios[2].frequency = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[2].freq = 124.8*1000000 --116,00-151,975 MHz
     _data.radios[2].modulation = 0
-    _data.radios[2].secondaryFrequency = 121.5*1000000
+    _data.radios[2].secFreq = 121.5*1000000
     _data.radios[2].volume = 1.0
     _data.radios[2].freqMin = 116*1000000
     _data.radios[2].freqMax = 151.975*1000000
-   
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
+
 
     _data.radios[3].name = "AN/ARC-164 UHF"
-    _data.radios[3].frequency = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[3].freq = 251.0*1000000 --225-399.975 MHZ
     _data.radios[3].modulation = 0
-    _data.radios[3].secondaryFrequency = 243.0*1000000
+    _data.radios[3].secFreq = 243.0*1000000
     _data.radios[3].volume = 1.0
     _data.radios[3].freqMin = 225*1000000
     _data.radios[3].freqMax = 399.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
     
     _data.radios[3].encKey = 1
     _data.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[4].name = "AN/ARC-186(V)FM"
-    _data.radios[4].frequency = 30.0*1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
+    _data.radios[4].freq = 30.0*1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
     _data.radios[4].modulation = 1
     _data.radios[4].volume = 1.0
     _data.radios[4].freqMin = 30*1000000
     _data.radios[4].freqMax = 76*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
 
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.radioType = 3;
+	_data.control = 0;
     _data.selected = 1
 
     return _data
@@ -392,14 +404,40 @@ end
 function SR.exportRadioMiG29(_data)
 
     _data.radios[2].name = "R-862"
-    _data.radios[2].frequency = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
+    _data.radios[2].freq = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
     _data.radios[2].modulation = 0
-    _data.radios[2].secondaryFrequency = 121.5*1000000
+    _data.radios[2].secFreq = 121.5*1000000
     _data.radios[2].volume = 1.0
     _data.radios[2].freqMin = 100*1000000
     _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
 
-	_data.radioType = 3;
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].expansion = true
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+
+	_data.control = 0;
     _data.selected = 1
 
     return _data
@@ -408,21 +446,37 @@ end
 function SR.exportRadioSU25(_data)
 
     _data.radios[2].name = "R-862"
-    _data.radios[2].frequency = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
+    _data.radios[2].freq = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
     _data.radios[2].modulation = 0
-    _data.radios[2].secondaryFrequency = 121.5*1000000
+    _data.radios[2].secFreq = 121.5*1000000
     _data.radios[2].volume = 1.0
     _data.radios[2].freqMin = 100*1000000
     _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
 
     _data.radios[3].name = "R-828"
-    _data.radios[3].frequency = 30.0*1000000 --20 - 60 MHz.
+    _data.radios[3].freq = 30.0*1000000 --20 - 60 MHz.
     _data.radios[3].modulation = 1
     _data.radios[3].volume = 1.0
     _data.radios[3].freqMin = 20*1000000
     _data.radios[3].freqMax = 59.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
 
-	_data.radioType = 3;
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+
+	_data.control = 0;
     _data.selected = 1
 
     return _data
@@ -431,21 +485,39 @@ end
 function SR.exportRadioSU27(_data)
 
     _data.radios[2].name = "R-800"
-    _data.radios[2].frequency = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
+    _data.radios[2].freq = 251.0*1000000 --V/UHF, frequencies are: VHF range of 100 to 149.975 MHz and UHF range of 220 to 399.975 MHz
     _data.radios[2].modulation = 0
-    _data.radios[2].secondaryFrequency = 121.5*1000000
+    _data.radios[2].secFreq = 121.5*1000000
     _data.radios[2].volume = 1.0
     _data.radios[2].freqMin = 100*1000000
     _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
 
     _data.radios[3].name = "R-864"
-    _data.radios[3].frequency = 3.5*1000000 --HF frequencies in the 3-10Mhz, like the Jadro
+    _data.radios[3].freq = 3.5*1000000 --HF frequencies in the 3-10Mhz, like the Jadro
     _data.radios[3].modulation = 0
     _data.radios[3].volume = 1.0
     _data.radios[3].freqMin = 3*1000000
     _data.radios[3].freqMax = 10*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
 
-	_data.radioType = 3;
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+
+	_data.control = 0;
     _data.selected = 1
 
     return _data
@@ -454,26 +526,43 @@ end
 function SR.exportRadioF15C(_data)
 
     _data.radios[2].name = "AN/ARC-164 UHF-1"
-    _data.radios[2].frequency = 251.0*1000000 --225 to 399.975MHZ
+    _data.radios[2].freq = 251.0*1000000 --225 to 399.975MHZ
     _data.radios[2].modulation = 0
-    _data.radios[2].secondaryFrequency = 243.0*1000000
+    _data.radios[2].secFreq = 243.0*1000000
     _data.radios[2].volume = 1.0
     _data.radios[2].freqMin = 225*1000000
     _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
 
     _data.radios[2].encKey = 1
     _data.radios[2].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[3].name = "AN/ARC-164 UHF-2"
-    _data.radios[3].frequency = 231.0*1000000 --225 to 399.975MHZ
+    _data.radios[3].freq = 231.0*1000000 --225 to 399.975MHZ
     _data.radios[3].modulation = 0
     _data.radios[3].freqMin = 225*1000000
     _data.radios[3].freqMax = 399.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
     
     _data.radios[3].encKey = 1
     _data.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.radioType = 3;
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-186(V)"
+    _data.radios[4].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 121.5*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 116*1000000
+    _data.radios[4].freqMax = 151.975*1000000
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+
+	_data.control = 0;
     _data.selected = 1
 
     return _data
@@ -482,24 +571,24 @@ end
 function SR.exportRadioUH1H(_data)
 
     _data.radios[2].name = "AN/ARC-131"
-    _data.radios[2].frequency = SR.getRadioFrequency(23)
+    _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 1
     _data.radios[2].volume = SR.getRadioVolume(0, 37,{0.3,1.0},true)
 
     _data.radios[3].name = "AN/ARC-51BX - UHF"
-    _data.radios[3].frequency = SR.getRadioFrequency(22)
+    _data.radios[3].freq = SR.getRadioFrequency(22)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 21,{0.0,1.0},true)
 
     _data.radios[4].name = "AN/ARC-134"
-    _data.radios[4].frequency = SR.getRadioFrequency(20)
+    _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
     _data.radios[4].volume =  SR.getRadioVolume(0, 8,{0.0,0.65},false )
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
-	if uhfModeKnob == 2 and _data.radios[3].frequency > 1000 then
-		_data.radios[3].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+		_data.radios[3].secFreq = 243.0*1000000 
 	end
 
     local _panel = GetDevice(0)
@@ -520,7 +609,7 @@ function SR.exportRadioUH1H(_data)
         _data.ptt = true
     end
 
-    _data.radioType = 1; -- Full Radio
+    _data.control = 1; -- Full Radio
 
     return _data
 
@@ -529,17 +618,17 @@ end
 function SR.exportRadioSA342(_data)
 
     _data.radios[1].name = "Intercom"
-    _data.radios[1].frequency =100.0
+    _data.radios[1].freq =100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =1.0
 
     _data.radios[2].name = "TRAP 138A"
-    _data.radios[2].frequency = SR.getRadioFrequency(5)
+    _data.radios[2].freq = SR.getRadioFrequency(5)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 68,{1.0,0.0},true)
 
     _data.radios[3].name = "UHF TRA 6031"
-    _data.radios[3].frequency = SR.getRadioFrequency(31)
+    _data.radios[3].freq = SR.getRadioFrequency(31)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
 	
@@ -547,7 +636,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
 
     _data.radios[4].name = "TRC 9600 PR4G"
-    _data.radios[4].frequency = SR.getRadioFrequency(28)
+    _data.radios[4].freq = SR.getRadioFrequency(28)
     _data.radios[4].modulation = 1
     _data.radios[4].volume =  SR.getRadioVolume(0, 70,{0.0,1.0},false) 
 	
@@ -556,7 +645,7 @@ function SR.exportRadioSA342(_data)
 
     --- is UHF ON?
 	if SR.getSelectorPosition(383,0.167) == 0   then
-		_data.radios[3].frequency = 1
+		_data.radios[3].freq = 1
 	elseif SR.getSelectorPosition(383,0.167) == 2 then
         --check UHF encryption
         _data.radios[3].enc = true
@@ -565,19 +654,19 @@ function SR.exportRadioSA342(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383,0.167)
-	if uhfModeKnob == 5 and _data.radios[3].frequency > 1000 then
-        _data.radios[3].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
+        _data.radios[3].secFreq = 243.0*1000000 
 	end
     
     --- is FM ON?
 	if SR.getSelectorPosition(272,0.25) == 0  then
-		_data.radios[4].frequency = 1
+		_data.radios[4].freq = 1
 	elseif SR.getSelectorPosition(272,0.25) == 2 then
         --check FM encryption
         _data.radios[4].enc = true
     end
 
-    _data.radioType = 2; -- partial Radio
+    _data.control = 0; -- HOTAS Controls
 
     return _data
 
@@ -589,7 +678,7 @@ function SR.exportRadioKA50(_data)
     local _panel = GetDevice(0)
 
     _data.radios[2].name = "R-800L14 VHF/UHF"
-    _data.radios[2].frequency = SR.getRadioFrequency(48)
+    _data.radios[2].freq = SR.getRadioFrequency(48)
 
     -- Get modulation mode
     local switch = _panel:get_argument_value(417)
@@ -601,15 +690,20 @@ function SR.exportRadioKA50(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 353,{0.0,1.0},false) -- using ADF knob for now 
 
     _data.radios[3].name = "R-828"
-    _data.radios[3].frequency = SR.getRadioFrequency(49,50000)
+    _data.radios[3].freq = SR.getRadioFrequency(49,50000)
     _data.radios[3].modulation = 1
     _data.radios[3].volume = SR.getRadioVolume(0, 372,{0.0,1.0},false)
 
 	--expansion radios
---    _data.radios[4].name = "SPU-9 SW"
---    _data.radios[4].frequency = 600.0*1000000
- --   _data.radios[4].modulation = 0
- --   _data.radios[4].volume = 1.0
+    _data.radios[4].name = "SPU-9 SW"
+    _data.radios[4].freq = 5.0*1000000
+    _data.radios[4].freqMin = 1.0*1000000
+    _data.radios[4].freqMax = 10.0*1000000
+    _data.radios[4].modulation = 0
+    _data.radios[4].volume = 1.0
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
 
     local switch = _panel:get_argument_value(428)
 
@@ -623,7 +717,7 @@ function SR.exportRadioKA50(_data)
         _data.selected = -1
     end
 
-    _data.radioType = 1;
+    _data.control = 1;
 
     return _data
 
@@ -632,12 +726,12 @@ function SR.exportRadioMI8(_data)
 
     -- Doesnt work but might as well allow selection
     _data.radios[1].name = "Intercom"
-    _data.radios[1].frequency =100.0
+    _data.radios[1].freq =100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =1.0
 
     _data.radios[2].name = "R-863"
-    _data.radios[2].frequency = SR.getRadioFrequency(38)
+    _data.radios[2].freq = SR.getRadioFrequency(38)
     
     local _modulation = GetDevice(0):get_argument_value(369)
     if _modulation > 0.5 then
@@ -649,19 +743,19 @@ function SR.exportRadioMI8(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 156,{0.0,1.0},false)
 
     _data.radios[3].name = "JADRO-1A"
-    _data.radios[3].frequency = SR.getRadioFrequency(37,500)
+    _data.radios[3].freq = SR.getRadioFrequency(37,500)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 743,{0.0,1.0},false)
 
     _data.radios[4].name = "R-828"
-    _data.radios[4].frequency = SR.getRadioFrequency(39,50000)
+    _data.radios[4].freq = SR.getRadioFrequency(39,50000)
     _data.radios[4].modulation = 1
     _data.radios[4].volume = SR.getRadioVolume(0, 737,{0.0,1.0},false)
 
     --guard mode for R-863 Radio
     local uhfModeKnob = SR.getSelectorPosition(153,1)
-	if uhfModeKnob == 1 and _data.radios[2].frequency > 1000 then
-		_data.radios[2].secondaryFrequency = 121.5*1000000 
+	if uhfModeKnob == 1 and _data.radios[2].freq > 1000 then
+		_data.radios[2].secFreq = 121.5*1000000 
 	end
 
     -- Get selected radio from SPU-9
@@ -687,7 +781,7 @@ function SR.exportRadioMI8(_data)
         _data.selected = 0
     end
 
-       _data.radioType = 1; -- full radio
+       _data.control = 1; -- full radio
 
     return _data
 
@@ -696,12 +790,12 @@ end
 function SR.exportRadioL39(_data)
 
     _data.radios[1].name = "Intercom"
-    _data.radios[1].frequency =100.0
+    _data.radios[1].freq =100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =1.0
 
     _data.radios[2].name = "R-832M"
-    _data.radios[2].frequency = SR.getRadioFrequency(19)
+    _data.radios[2].freq = SR.getRadioFrequency(19)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 289,{0.0,0.8},false)
 
@@ -717,7 +811,7 @@ function SR.exportRadioL39(_data)
          _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    _data.control = 1; -- full radio
 
     return _data
 end
@@ -726,19 +820,19 @@ end
 function SR.exportRadioA10C(_data)
 
     _data.radios[2].name = "AN/ARC-186(V)"
-    _data.radios[2].frequency =  SR.getRadioFrequency(55)
+    _data.radios[2].freq =  SR.getRadioFrequency(55)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 133,{0.0,1.0},false)
 
     _data.radios[3].name = "AN/ARC-164 UHF"
-    _data.radios[3].frequency = SR.getRadioFrequency(54)
+    _data.radios[3].freq = SR.getRadioFrequency(54)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)
 	
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
     _data.radios[4].name = "AN/ARC-186(V)FM"
-    _data.radios[4].frequency =  SR.getRadioFrequency(56)
+    _data.radios[4].freq =  SR.getRadioFrequency(56)
     _data.radios[4].modulation = 1
     _data.radios[4].volume = SR.getRadioVolume(0, 147,{0.0,1.0},false)
 	
@@ -746,8 +840,8 @@ function SR.exportRadioA10C(_data)
 
      --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(168,0.1)
-	if uhfModeKnob == 2 and _data.radios[3].frequency > 1000 then
-		_data.radios[3].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+		_data.radios[3].secFreq = 243.0*1000000 
 	end
 
 --    local value = GetDevice(0):get_argument_value(239)
@@ -790,7 +884,7 @@ function SR.exportRadioA10C(_data)
 
     _data.selected = 1
 
-    _data.radioType = 2; -- Partial Radio (switched from FUll due to HOTAS controls)
+    _data.control = 0; -- Partial Radio (switched from FUll due to HOTAS controls)
 
     return _data
 end
@@ -798,7 +892,7 @@ end
 function SR.exportRadioF86Sabre(_data)
 
     _data.radios[2].name = "AN/ARC-27"
-    _data.radios[2].frequency =  SR.getRadioFrequency(26)
+    _data.radios[2].freq =  SR.getRadioFrequency(26)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 806,{0.1,0.9},false)
 
@@ -809,8 +903,8 @@ function SR.exportRadioF86Sabre(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(805,0.1)
-	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
-		_data.radios[2].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+		_data.radios[2].secFreq = 243.0*1000000 
 	end
 
         -- Check PTT
@@ -820,7 +914,32 @@ function SR.exportRadioF86Sabre(_data)
         _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+
+    _data.control = 0; -- Hotas Controls
 
     return _data;
 end
@@ -828,7 +947,7 @@ end
 function SR.exportRadioMIG15(_data)
 
     _data.radios[2].name = "RSI-6K"
-    _data.radios[2].frequency =  SR.getRadioFrequency(30)
+    _data.radios[2].freq =  SR.getRadioFrequency(30)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 126,{0.1,0.9},false)
 
@@ -841,7 +960,31 @@ function SR.exportRadioMIG15(_data)
         _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- Hotas Controls radio
 
     return _data;
 end
@@ -849,7 +992,7 @@ end
 function SR.exportRadioMIG21(_data)
 
     _data.radios[2].name = "R-832"
-    _data.radios[2].frequency =  SR.getRadioFrequency(22)
+    _data.radios[2].freq =  SR.getRadioFrequency(22)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 210,{0.0,1.0},false)
 
@@ -861,7 +1004,31 @@ function SR.exportRadioMIG21(_data)
         _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- hotas radio
 
     return _data;
 end
@@ -869,7 +1036,7 @@ end
 
 function SR.exportRadioF5E(_data) 
     _data.radios[2].name = "AN/ARC-164"
-    _data.radios[2].frequency = SR.getRadioFrequency(23)
+    _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 309,{0.1,0.9},false)
 
@@ -878,8 +1045,8 @@ function SR.exportRadioF5E(_data)
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(311,0.1)
     
-    if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
-        _data.radios[2].secondaryFrequency = 243.0*1000000 
+    if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 243.0*1000000 
     end
 
     -- Check PTT - By Tarres!
@@ -890,7 +1057,31 @@ function SR.exportRadioF5E(_data)
         _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- hotas radio
 
     return _data;
 end
@@ -898,7 +1089,7 @@ end
 function SR.exportRadioP51(_data)
 
     _data.radios[2].name = "SCR522A"
-    _data.radios[2].frequency =  SR.getRadioFrequency(24)
+    _data.radios[2].freq =  SR.getRadioFrequency(24)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 116,{0.0,1.0},false)
 
@@ -910,7 +1101,31 @@ function SR.exportRadioP51(_data)
         _data.ptt = false
     end
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- hotas radio
 
     return _data;
 end
@@ -918,13 +1133,38 @@ end
 function SR.exportRadioFW190(_data)
 
     _data.radios[2].name = "FuG 16ZY"
-    _data.radios[2].frequency = SR.getRadioFrequency(15)
+    _data.radios[2].freq = SR.getRadioFrequency(15)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = 1.0  --SR.getRadioVolume(0, 83,{0.0,1.0},true) Volume knob is not behaving..
 
     _data.selected = 1
 
-    _data.radioType = 1; -- full radio
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- hotas radio
 
     return _data;
 end
@@ -932,13 +1172,37 @@ end
 function SR.exportRadioBF109(_data)
 
     _data.radios[2].name = "FuG 16ZY"
-    _data.radios[2].frequency =  SR.getRadioFrequency(14)
+    _data.radios[2].freq =  SR.getRadioFrequency(14)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 130,{0.0,1.0},false)
 
     _data.selected = 1
 
-    _data.radioType = 1; -- full radio
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0; -- hotas radio
 
     return _data;
 end
@@ -946,7 +1210,7 @@ end
 function SR.exportRadioC101(_data)
 
     _data.radios[1].name = "INTERCOM"
-    _data.radios[1].frequency =  100
+    _data.radios[1].freq =  100
     _data.radios[1].modulation = 2
     _data.radios[1].volume = SR.getRadioVolume(0, 403,{0.0,1.0},false)
 
@@ -957,14 +1221,14 @@ function SR.exportRadioC101(_data)
     local _selector = SR.getSelectorPosition(232,0.25)
 
     if _selector ~= 0 then
-        _data.radios[2].frequency = SR.getRadioFrequency(9)
+        _data.radios[2].freq = SR.getRadioFrequency(9)
     else
-        _data.radios[2].frequency = 1
+        _data.radios[2].freq = 1
     end
 
     -- UHF Guard
     if _selector == 2 then
-        _data.radios[2].secondaryFrequency = 243.0*1000000 
+        _data.radios[2].secFreq = 243.0*1000000 
     end
 
     _data.radios[3].name = "AN/ARC-134"
@@ -974,9 +1238,9 @@ function SR.exportRadioC101(_data)
     local _vhfPower = SR.getSelectorPosition(413,1.0)
 
     if _vhfPower == 1 then
-        _data.radios[3].frequency = SR.getRadioFrequency(8)
+        _data.radios[3].freq = SR.getRadioFrequency(8)
     else
-        _data.radios[3].frequency = 1
+        _data.radios[3].freq = 1
     end
   
     local _selector = SR.getSelectorPosition(404,0.5)
@@ -991,7 +1255,7 @@ function SR.exportRadioC101(_data)
 
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
-    _data.radioType = 1; -- full radio
+    _data.control = 1; -- full radio
 
     return _data;
 end
@@ -1012,32 +1276,32 @@ function SR.exportRadioHawk(_data)
         local _tenth = SR.round(SR.getKnobPosition(0, 229,{0.0,0.9},{0,9}),0.1)*100000
         local _hundreth = SR.round(SR.getKnobPosition(0, 230,{0.0,0.3},{0,3}),0.1)*10000
 
-        _data.radios[2].frequency = _hundreds+_tens+_ones+_tenth+_hundreth
+        _data.radios[2].freq = _hundreds+_tens+_ones+_tenth+_hundreth
     else
-        _data.radios[2].frequency = 1
+        _data.radios[2].freq = 1
     end
     _data.radios[2].modulation = 0
     _data.radios[2].volume = 1
 
     _data.radios[3].name = "ARI 23259/1"
-    _data.radios[3].frequency =  SR.getRadioFrequency(7)
+    _data.radios[3].freq =  SR.getRadioFrequency(7)
     _data.radios[3].modulation = 0
     _data.radios[3].volume =1
 
       --guard mode for UHF Radio
     local _uhfKnob = SR.getSelectorPosition(221,0.25)
-	if _uhfKnob == 2 and _data.radios[2].frequency > 1000 then
-		_data.radios[2].secondaryFrequency = 243.0*1000000 
+	if _uhfKnob == 2 and _data.radios[2].freq > 1000 then
+		_data.radios[2].secFreq = 243.0*1000000 
 	end
 
          --- is VHF ON?
 	if SR.getSelectorPosition(391,0.2) == 0   then
-		_data.radios[3].frequency = 1
+		_data.radios[3].freq = 1
     end
     --guard mode for VHF Radio
     local _vhfKnob = SR.getSelectorPosition(391,0.2)
-	if _vhfKnob == 2 and _data.radios[3].frequency > 1000 then
-		_data.radios[3].secondaryFrequency = 121.5*1000000 
+	if _vhfKnob == 2 and _data.radios[3].freq > 1000 then
+		_data.radios[3].secFreq = 121.5*1000000 
 	end
 
     -- Radio Select Switch
@@ -1047,7 +1311,7 @@ function SR.exportRadioHawk(_data)
             _data.selected = 1
     end
 
-    _data.radioType = 1; -- full radio
+    _data.control = 1; -- full radio
 
     return _data;
 end
@@ -1055,12 +1319,12 @@ end
 function SR.exportRadioM2000C(_data)
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
-    _data.radios[2].frequency =  SR.getRadioFrequency(19)
+    _data.radios[2].freq =  SR.getRadioFrequency(19)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707,{0.0,1.0},false)
 
     _data.radios[3].name = "TRT ERA 7200 UHF"
-    _data.radios[3].frequency = SR.getRadioFrequency(20)
+    _data.radios[3].freq = SR.getRadioFrequency(20)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 706,{0.0,1.0},false)
 
@@ -1077,15 +1341,15 @@ function SR.exportRadioM2000C(_data)
 
     --guard mode for V/UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(446,0.25) -- TODO!
-	if uhfModeKnob == 2 and _data.radios[2].frequency > 1000 then
-		_data.radios[2].secondaryFrequency = 243.0*1000000 
+	if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+		_data.radios[2].secFreq = 243.0*1000000 
 	end
 
     if SR.getButtonPosition(432) > 0.5 then --431
         _data.radios[3].enc = true
     end
 
-    _data.radioType = 2; -- partial radio, allows hotkeys
+    _data.control = 0; -- partial radio, allows hotkeys
 
     return _data
 end

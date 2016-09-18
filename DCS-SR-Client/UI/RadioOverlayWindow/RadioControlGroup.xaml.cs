@@ -84,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void SendFrequencyChange(double frequency)
         {
             if ((RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                 DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+                 DCSPlayerRadioInfo.RadioSwitchControls.NO_COCKPIT_INTEGRATION)
                 && (RadioId >= 0)
                 && (RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length))
             {
@@ -110,7 +110,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
-                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
-                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -132,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.NO_COCKPIT_INTEGRATION)
             {
                 //sort out the frequencies
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
@@ -160,7 +160,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.NO_COCKPIT_INTEGRATION)
             {
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 
@@ -281,7 +281,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
                 radioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
-                if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
                 {
                     radioVolume.IsEnabled = false;
 
@@ -290,7 +290,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     //reset dragging just incase
                     _dragging = false;
                 }
-                else if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
+                else if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.RadioSwitchControls.PARTIAL_COCKPIT_INTEGRATION)
                 {
                     radioVolume.IsEnabled = false;
 

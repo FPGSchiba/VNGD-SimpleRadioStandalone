@@ -67,8 +67,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public string IRLRadioRxText
             => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
 
-        public string RadioStaticText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_STATIC] ? "ON" : "OFF";
+        public string RadioExpansion
+            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.RADIO_EXPANSION] ? "ON" : "OFF";
 
         public string ListeningPort
             => ServerSettings.Instance.ServerListeningPort() + "";
@@ -164,11 +164,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
 
-        public void IRLRadioStaticToggle()
+        public void RadioExpansionToggle()
         {
-            var newSetting = RadioStaticText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_STATIC, newSetting);
-            NotifyOfPropertyChange(() => RadioStaticText);
+            var newSetting = RadioExpansion != "ON";
+            ServerSettings.Instance.WriteSetting(ServerSettingType.RADIO_EXPANSION, newSetting);
+            NotifyOfPropertyChange(() => RadioExpansion);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }

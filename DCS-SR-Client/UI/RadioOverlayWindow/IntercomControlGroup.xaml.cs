@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
-                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -38,7 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+                DCSPlayerRadioInfo.RadioSwitchControls.NO_COCKPIT_INTEGRATION)
             {
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 

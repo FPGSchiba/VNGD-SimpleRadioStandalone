@@ -104,7 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var ptt = pressed[(int) InputBinding.ModifierPtt] && pressed[(int) InputBinding.Ptt];
 
                 //check we're allowed to switch radios
-                if (radios.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                if (radios.radioType != DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
                 {
                     if (pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
                     {

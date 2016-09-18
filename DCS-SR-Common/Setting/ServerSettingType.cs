@@ -9,6 +9,7 @@
         DISTANCE_ENABLED = 4,
         IRL_RADIO_TX = 5,
         IRL_RADIO_RX_INTERFERENCE = 6,
-        IRL_RADIO_STATIC = 7
+        IRL_RADIO_STATIC = 7, // Not used
+        RADIO_EXPANSION = 8,
     }
 }
