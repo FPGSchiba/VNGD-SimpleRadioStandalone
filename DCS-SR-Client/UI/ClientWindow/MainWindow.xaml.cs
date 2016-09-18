@@ -123,6 +123,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitAutoConnectPrompt();
 
+            InitRadioOverlayTaskbarHide();
+
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
         }
 
@@ -227,6 +229,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 AutoConnectPromptToggle.IsChecked = false;
+            }
+        }
+
+        private void InitRadioOverlayTaskbarHide()
+        {
+            var autoConnect = Settings.Instance.UserSettings[(int)SettingType.RadioOverlayTaskbarHide];
+            if (autoConnect == "ON")
+            {
+                RadioOverlayTaskbarItem.IsChecked = true;
+
+            }
+            else
+            {
+                RadioOverlayTaskbarItem.IsChecked = false;
             }
         }
 
@@ -495,7 +511,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _radioOverlayWindow?.Close();
 
                     _radioOverlayWindow = new RadioOverlayWindow();
+                    _radioOverlayWindow.ShowInTaskbar =
+                        Settings.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide] != "ON";
                     _radioOverlayWindow.Show();
+
                 }
                 else
                 {
@@ -572,6 +591,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             Settings.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
 
+        }
+
+        private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string)RadioOverlayTaskbarItem.Content);
         }
     }
 }
