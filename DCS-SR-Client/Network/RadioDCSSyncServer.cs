@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
@@ -327,106 +328,196 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
-            if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
-                // Full radio, all from DCS
+            //            if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
+            //                // Full radio, all from DCS
+            //            {
+            //                changed = !DcsPlayerRadioInfo.Equals(message);
+            //
+            //                HandleEncryptionSettingsFullFidelity(message);
+            //
+            //                DcsPlayerRadioInfo = message;
+            //            }
+            //            else if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.PARTIAL_COCKPIT_INTEGRATION)
+            //                // Partial radio - can select radio but the rest is from DCS
+            //            {
+            //                //check if its changed frequency wise
+            //                changed = !DcsPlayerRadioInfo.Equals(message);
+            //
+            //                //update common parts
+            //                DcsPlayerRadioInfo.name = message.name;
+            //                DcsPlayerRadioInfo.radioType = message.radioType;
+            //                DcsPlayerRadioInfo.unit = message.unit;
+            //                DcsPlayerRadioInfo.unitId = message.unitId;
+            //                DcsPlayerRadioInfo.pos = message.pos;
+            //
+            //                HandleEncryptionSettingsFullFidelity(message);
+            //
+            //                //copy over the radios
+            //                DcsPlayerRadioInfo.radios = message.radios;
+            //
+            //                //change PTT last
+            //                DcsPlayerRadioInfo.ptt = message.ptt;
+            //            }
+            //            else // FC3 Radio - Take nothing from DCS, just update the last tickcount, UPDATE triggered a different way
+            //            {
+            //                if (DcsPlayerRadioInfo.unitId != message.unitId)
+            //                {
+            //                    //replace it all - new aircraft
+            //                    DcsPlayerRadioInfo = message;
+            //                    changed = true;
+            //                }
+            //                else // same aircraft
+            //                {
+
+            var expansion = ClientSync.ServerSettings[(int)ServerSettingType.RADIO_EXPANSION];
+
+            //update common parts
+            DcsPlayerRadioInfo.name = message.name;
+            DcsPlayerRadioInfo.control = message.control;
+            DcsPlayerRadioInfo.unit = message.unit;
+            DcsPlayerRadioInfo.pos = message.pos;
+
+            var overrideFreqAndVol = DcsPlayerRadioInfo.unitId != message.unitId;
+
+            if (overrideFreqAndVol)
             {
-                changed = !DcsPlayerRadioInfo.Equals(message);
-
-                HandleEncryptionSettingsFullFidelity(message);
-
-                DcsPlayerRadioInfo = message;
+                DcsPlayerRadioInfo.selected = message.selected;
+                changed = true;
             }
-            else if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.PARTIAL_COCKPIT_INTEGRATION)
-                // Partial radio - can select radio but the rest is from DCS
+
+            if (message.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
             {
-                //check if its changed frequency wise
-                changed = !DcsPlayerRadioInfo.Equals(message);
-
-                //update common parts
-                DcsPlayerRadioInfo.name = message.name;
-                DcsPlayerRadioInfo.radioType = message.radioType;
-                DcsPlayerRadioInfo.unit = message.unit;
-                DcsPlayerRadioInfo.unitId = message.unitId;
-                DcsPlayerRadioInfo.pos = message.pos;
-
-                HandleEncryptionSettingsFullFidelity(message);
-
-                //copy over the radios
-                DcsPlayerRadioInfo.radios = message.radios;
-
-                //change PTT last
-                DcsPlayerRadioInfo.ptt = message.ptt;
+                DcsPlayerRadioInfo.selected = message.selected;
             }
-            else // FC3 Radio - Take nothing from DCS, just update the last tickcount, UPDATE triggered a different way
+
+            DcsPlayerRadioInfo.unitId = message.unitId;
+
+            //copy over radio names, min + max
+            for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
             {
-                if (DcsPlayerRadioInfo.unitId != message.unitId)
+                var updateRadio = message.radios[i];
+
+                var clientRadio = DcsPlayerRadioInfo.radios[i];
+
+                if (updateRadio.expansion && !expansion || updateRadio.modulation == RadioInformation.Modulation.DISABLED)
                 {
-                    //replace it all - new aircraft
-                    DcsPlayerRadioInfo = message;
-                    changed = true;
+                    //expansion radio, not allowed
+                    clientRadio.freq = 1;
+                    clientRadio.freqMin = 1;
+                    clientRadio.freqMax = 1;
+                    clientRadio.modulation = RadioInformation.Modulation.DISABLED;
+                    clientRadio.name = "No Radio";
+
+                    clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
+                    clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
+
                 }
-                else // same aircraft
+                else
                 {
                     //update common parts
-                    DcsPlayerRadioInfo.name = message.name;
-                    DcsPlayerRadioInfo.radioType = message.radioType;
-                    DcsPlayerRadioInfo.unit = message.unit;
-                    DcsPlayerRadioInfo.pos = message.pos;
+                    clientRadio.freqMin = updateRadio.freqMin;
+                    clientRadio.freqMax = updateRadio.freqMax;
 
-                    DcsPlayerRadioInfo.unitId = message.unitId;
+                    clientRadio.name = updateRadio.name;
 
-                    //copy over radio names, min + max
-                    for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
+                    clientRadio.modulation = updateRadio.modulation;
+
+                    //update modes
+                    clientRadio.freqMode = updateRadio.freqMode;
+                    clientRadio.encMode = updateRadio.encMode;
+                    clientRadio.volMode = updateRadio.volMode;
+
+                    if (updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT || overrideFreqAndVol)
                     {
-                        var updateRadio = message.radios[i];
+                        if (clientRadio.freq != updateRadio.freq)
+                            changed = true;
 
-                        var clientRadio = DcsPlayerRadioInfo.radios[i];
+                        if (clientRadio.secFreq != updateRadio.secFreq)
+                            changed = true;
 
-                        clientRadio.freqMin = updateRadio.freqMin;
-                        clientRadio.freqMax = updateRadio.freqMax;
+                        clientRadio.freq = updateRadio.freq;
 
-                        clientRadio.name = updateRadio.name;
-
-                        if (clientRadio.secondaryFrequency == 0)
+                        //default overlay to off
+                        if (updateRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
                         {
-                            //currently turned off
-                            clientRadio.secondaryFrequency = 0;
+                            clientRadio.secFreq = 0;
                         }
-                        else
+                        
+                    }
+                    else
+                    {
+                        if (clientRadio.secFreq != 0)
                         {
                             //put back
-                            clientRadio.secondaryFrequency = updateRadio.secondaryFrequency;
+                            clientRadio.secFreq = updateRadio.secFreq;
                         }
-
-                        clientRadio.modulation = updateRadio.modulation;
-
+                    
                         //check we're not over a limit
-
-                        if (clientRadio.frequency > clientRadio.freqMax)
+                        if (clientRadio.freq > clientRadio.freqMax)
                         {
-                            clientRadio.frequency = clientRadio.freqMax;
+                            clientRadio.freq = clientRadio.freqMax;
                         }
-                        else if (clientRadio.frequency < clientRadio.freqMin)
+                        else if (clientRadio.freq < clientRadio.freqMin)
                         {
-                            clientRadio.frequency = clientRadio.freqMin;
-                        }
-
-                        clientRadio.encMode = updateRadio.encMode;
-
-                        //Handle Encryption
-                        if (updateRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-                        {
-                            if (clientRadio.encKey == 0)
-                            {
-                                clientRadio.encKey = 1;
-                            }
+                            clientRadio.freq = clientRadio.freqMin;
                         }
                     }
 
-                    //change PTT last
-                    DcsPlayerRadioInfo.ptt = message.ptt;
+                    //reset encryption
+                    if (overrideFreqAndVol)
+                    {
+                        clientRadio.enc = false;
+                        clientRadio.encKey = 0;
+                    }
+
+                    //Handle Encryption
+                    if (updateRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                    {
+                        if (clientRadio.encKey == 0)
+                        {
+                            clientRadio.encKey = 1;
+                        }
+                    }
+                    else if (clientRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                    {
+                        clientRadio.enc = updateRadio.enc;
+
+                        if (clientRadio.encKey == 0)
+                        {
+                            clientRadio.encKey = 1;
+                        }
+                    }
+                    else if (clientRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL)
+                    {
+                        clientRadio.enc = updateRadio.enc;
+                        clientRadio.encKey = updateRadio.encKey;
+                    }
+                    else
+                    {
+                        clientRadio.enc = false;
+                        clientRadio.encKey = 0;
+                    }
+
+                    //handle volume
+                    if (updateRadio.volMode == RadioInformation.VolumeMode.COCKPIT || overrideFreqAndVol)
+                    {
+                        clientRadio.volume = updateRadio.volume;
+                    }
+                    else
+                    {
+                        //leave as is
+                    }
+
                 }
+
+              
             }
+
+            //change PTT last
+            DcsPlayerRadioInfo.ptt = message.ptt;
+//                }
+//            }
 
             //update
             DcsPlayerRadioInfo.LastUpdate = Environment.TickCount;
@@ -434,28 +525,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return changed;
         }
 
-        private void HandleEncryptionSettingsFullFidelity(DCSPlayerRadioInfo radioUpdate)
-        {
-            // handle encryption type
-            for (var i = 0; i < radioUpdate.radios.Length; i++)
-            {
-                var updatedRadio = radioUpdate.radios[i];
-                var currentRadio = DcsPlayerRadioInfo.radios[i];
-
-                if (updatedRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
-                {
-                    if (currentRadio.encKey != 0)
-                    {
-                        updatedRadio.encKey = currentRadio.encKey;
-                    }
-                }
-            }
-        }
-
         private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if (Environment.TickCount - LastSent < 7000)
+            if (Environment.TickCount - LastSent < 5000)
             {
                 return false;
             }

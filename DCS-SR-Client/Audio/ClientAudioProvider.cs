@@ -44,12 +44,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //adjust for LOS + Distance + Volume
                 AdjustVolume(audio);
-
                 AddRadioEffect(audio);
             }
             else
             {
                 AddEncryptionFailureEffect(audio);
+                AddRadioEffect(audio);
             }
 
             long now = Environment.TickCount;

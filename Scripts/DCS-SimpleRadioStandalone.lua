@@ -400,7 +400,7 @@ function SR.exportRadioA10A(_data)
 
     return _data
 end
-
+ 
 function SR.exportRadioMiG29(_data)
 
     _data.radios[2].name = "R-862"
@@ -436,6 +436,8 @@ function SR.exportRadioMiG29(_data)
     _data.radios[4].expansion = true
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 	_data.control = 0;
     _data.selected = 1
@@ -475,6 +477,8 @@ function SR.exportRadioSU25(_data)
     _data.radios[4].expansion = true
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 	_data.control = 0;
     _data.selected = 1
@@ -516,6 +520,8 @@ function SR.exportRadioSU27(_data)
     _data.radios[4].expansion = true
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 	_data.control = 0;
     _data.selected = 1
@@ -621,6 +627,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[1].freq =100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =1.0
+    _data.radios[1].volMode = 1
 
     _data.radios[2].name = "TRAP 138A"
     _data.radios[2].freq = SR.getRadioFrequency(5)
@@ -937,7 +944,8 @@ function SR.exportRadioF86Sabre(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
-
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- Hotas Controls
 
@@ -983,6 +991,8 @@ function SR.exportRadioMIG15(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- Hotas Controls radio
 
@@ -1027,6 +1037,8 @@ function SR.exportRadioMIG21(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- hotas radio
 
@@ -1080,6 +1092,8 @@ function SR.exportRadioF5E(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- hotas radio
 
@@ -1124,6 +1138,8 @@ function SR.exportRadioP51(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- hotas radio
 
@@ -1163,6 +1179,8 @@ function SR.exportRadioFW190(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- hotas radio
 
@@ -1201,6 +1219,8 @@ function SR.exportRadioBF109(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
     _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0; -- hotas radio
 

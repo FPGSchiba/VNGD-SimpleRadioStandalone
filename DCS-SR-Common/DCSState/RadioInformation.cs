@@ -27,6 +27,14 @@
             OVERLAY = 1,
         }
 
+        public enum Modulation
+        {
+            AM = 0,
+            FM = 1,
+            INTERCOM = 2,
+            DISABLED = 3
+        }
+
         public bool enc = false; // encrytion enabled
         public byte encKey = 0;
         public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
@@ -34,7 +42,7 @@
         public double freqMax = 1;
         public double freqMin = 1;
         public double freq = 1;
-        public byte modulation = 0;
+        public Modulation modulation = Modulation.DISABLED;
         public string name = "";
         public double secFreq = 1;
         public float volume = 1.0f;

@@ -93,7 +93,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > Environment.TickCount - 10000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, byte modulation, uint sendingUnitId,
+        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation, uint sendingUnitId,
             out RadioReceivingState receivingState)
         {
             if (!IsCurrent())
@@ -108,7 +108,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if ((receivingRadio.modulation == 2) && (modulation == 2))
+                    if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) && (modulation == RadioInformation.Modulation.INTERCOM))
                     {
                         if ((unitId > 0) && (sendingUnitId > 0)
                             && (unitId == sendingUnitId))
@@ -126,9 +126,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         receivingState = null;
                         return null;
                     }
-                    if ((receivingRadio.frequency == frequency)
+
+                    if (modulation == RadioInformation.Modulation.DISABLED 
+                        || receivingRadio.modulation == RadioInformation.Modulation.DISABLED)
+                    {
+                        continue;
+                    }
+
+                    if ((receivingRadio.freq == frequency)
                         && (receivingRadio.modulation == modulation)
-                        && (receivingRadio.frequency > 10000))
+                        && (receivingRadio.freq > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {
@@ -139,8 +146,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                         return receivingRadio;
                     }
-                    if ((receivingRadio.secondaryFrequency == frequency)
-                        && (receivingRadio.secondaryFrequency > 10000))
+                    if ((receivingRadio.secFreq == frequency)
+                        && (receivingRadio.secFreq > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {
