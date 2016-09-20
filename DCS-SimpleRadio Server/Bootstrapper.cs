@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
@@ -22,6 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             Initialize();
             SetupLogging();
+
+            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
         private void SetupLogging()
@@ -38,8 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             };
             config.AddTarget("file", fileTarget);
 
-            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-            config.LoggingRules.Add(rule1);
+//            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+//            config.LoggingRules.Add(rule1);
 
             var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
             config.LoggingRules.Add(rule2);

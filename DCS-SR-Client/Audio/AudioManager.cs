@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
@@ -125,6 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     DeviceNumber = mic
                 };
 
+                _waveIn.NumberOfBuffers = 1;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
@@ -247,9 +249,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-
+       // Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
+//            if(_stopwatch.ElapsedMilliseconds > 22)
+//            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+//            _stopwatch.Restart();
+            
             //fill sound buffer
 
             byte[] soundBuffer = null;
