@@ -571,13 +571,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void StartPing()
         {
-            Task.Run(() =>
+            Thread thread = new Thread(() =>
             {
                 byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
                 while (!_stop)
                 {
-                    Logger.Info("Pinging Server");
+                    //Logger.Info("Pinging Server");
                     try
                     {
                         var ip = new IPEndPoint(_address, _port);
@@ -591,6 +591,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Thread.Sleep(25*1000);
                 }
             });
+            thread.Start();
         }
     }
 }
