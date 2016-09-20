@@ -5,14 +5,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class DCSPlayerRadioInfo
     {
-        //1 - Full Radio - No Switch or frequency
-        //2 - Partial Radio - Allow Radio Switch but no frequency
-        //3 - FC3 / Spectator - Allow Radio Switch + Frequency
-        public enum AircraftRadioType
+
+        //HOTAS or IN COCKPIT controls
+        public enum RadioSwitchControls
         {
-            FULL_COCKPIT_INTEGRATION = 1,
-            PARTIAL_COCKPIT_INTEGRATION = 2,
-            NO_COCKPIT_INTEGRATION = 3
+            HOTAS = 0, 
+            IN_COCKPIT = 1
         }
 
         public string name = "";
@@ -20,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[4];
-        public AircraftRadioType radioType = AircraftRadioType.NO_COCKPIT_INTEGRATION;
+        public RadioSwitchControls control = RadioSwitchControls.HOTAS;
         public short selected = 0;
         public string unit = "";
         public uint unitId;
@@ -46,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             var compareRadio = compare as DCSPlayerRadioInfo;
 
-            if (radioType != compareRadio.radioType)
+            if (control != compareRadio.control)
             {
                 return false;
             }
@@ -95,7 +93,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > Environment.TickCount - 10000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, byte modulation, uint sendingUnitId,
+        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation, uint sendingUnitId,
             out RadioReceivingState receivingState)
         {
             if (!IsCurrent())
@@ -110,7 +108,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if ((receivingRadio.modulation == 2) && (modulation == 2))
+                    if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) && (modulation == RadioInformation.Modulation.INTERCOM))
                     {
                         if ((unitId > 0) && (sendingUnitId > 0)
                             && (unitId == sendingUnitId))
@@ -128,9 +126,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         receivingState = null;
                         return null;
                     }
-                    if ((receivingRadio.frequency == frequency)
+
+                    if (modulation == RadioInformation.Modulation.DISABLED 
+                        || receivingRadio.modulation == RadioInformation.Modulation.DISABLED)
+                    {
+                        continue;
+                    }
+
+                    if ((receivingRadio.freq == frequency)
                         && (receivingRadio.modulation == modulation)
-                        && (receivingRadio.frequency > 10000))
+                        && (receivingRadio.freq > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {
@@ -141,8 +146,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                         return receivingRadio;
                     }
-                    if ((receivingRadio.secondaryFrequency == frequency)
-                        && (receivingRadio.secondaryFrequency > 10000))
+                    if ((receivingRadio.secFreq == frequency)
+                        && (receivingRadio.secFreq > 10000))
                     {
                         receivingState = new RadioReceivingState
                         {

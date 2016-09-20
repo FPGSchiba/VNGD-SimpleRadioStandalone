@@ -110,10 +110,10 @@
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-               Content="Radio Static" />
+               Content="Radio Expansion" />
 
 
-        <Label Name="RadioStatic"
+        <Label Name="RadioExpansion"
                Grid.Row="6"
                Grid.Column="1"
                HorizontalContentAlignment="Center"

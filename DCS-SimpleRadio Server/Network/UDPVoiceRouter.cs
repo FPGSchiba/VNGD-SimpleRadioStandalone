@@ -226,7 +226,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             RadioReceivingState radioReceivingState = null;
                             var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequency,
-                                udpVoice.Modulation,
+                                (RadioInformation.Modulation)udpVoice.Modulation,
                                 udpVoice.UnitId, out radioReceivingState);
 
                             //only send if we can hear!

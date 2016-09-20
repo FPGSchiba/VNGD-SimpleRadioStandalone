@@ -76,13 +76,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             // Create a TCP/IP socket.
             listener = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
+            listener.NoDelay = true;
 
             // Bind the socket to the local endpoint and listen for incoming connections.
             try
             {
                 listener.Bind(localEndPoint);
                 listener.Listen(100);
-
+                listener.NoDelay = true;
                 while (true)
                 {
                     // Set the event to nonsignaled state.
@@ -140,6 +141,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 if (client != null)
                 {
+                    HandleClientDisconnect(client);
+
                     _logger.Info("Removed Client " + state.guid);
                 }
 
@@ -335,6 +338,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                 }
             }
+        }
+
+        private void HandleClientDisconnect(SRClient client)
+        {
+
+            var message = new NetworkMessage()
+            {
+                Client = client,
+                MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
+                
+            };
+
+            foreach (var clientToSent in _clients)
+            {
+                Send(clientToSent.Value.ClientSocket, message);
+            }
+
         }
 
 

@@ -83,23 +83,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void SendFrequencyChange(double frequency)
         {
-            if ((RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                 DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+
+            if ((currentRadio.freqMode ==
+                RadioInformation.FreqMode.OVERLAY)
                 && (RadioId >= 0)
                 && (RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length))
             {
                 //sort out the frequencies
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                clientRadio.frequency += frequency;
+                clientRadio.freq += frequency;
 
                 //make sure we're not over or under a limit
-                if (clientRadio.frequency > clientRadio.freqMax)
+                if (clientRadio.freq > clientRadio.freqMax)
                 {
-                    clientRadio.frequency = clientRadio.freqMax;
+                    clientRadio.freq = clientRadio.freqMax;
                 }
-                else if (clientRadio.frequency < clientRadio.freqMin)
+                else if (clientRadio.freq < clientRadio.freqMin)
                 {
-                    clientRadio.frequency = clientRadio.freqMin;
+                    clientRadio.freq = clientRadio.freqMin;
                 }
 
                 //make radio data stale to force resysnc
@@ -109,8 +111,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
-                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
+                DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -120,8 +123,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType !=
-                DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+            if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
+               DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -131,18 +134,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+
+            if (currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
             {
                 //sort out the frequencies
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                if (clientRadio.secondaryFrequency > 0)
+                if (clientRadio.secFreq > 0)
                 {
-                    clientRadio.secondaryFrequency = 0; // 0 indicates we want it overridden + disabled
+                    clientRadio.secFreq = 0; // 0 indicates we want it overridden + disabled
                 }
                 else
                 {
-                    clientRadio.secondaryFrequency = 1; //indicates we want it back
+                    clientRadio.secFreq = 1; //indicates we want it back
                 }
 
                 //make radio data stale to force resysnc
@@ -159,8 +163,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.radioType ==
-                DCSPlayerRadioInfo.AircraftRadioType.NO_COCKPIT_INTEGRATION)
+            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+
+            if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 
@@ -251,7 +256,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
-                if (currentRadio.modulation == 3) // disabled
+                if (currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
                     radioActive.Fill = new SolidColorBrush(Colors.Red);
                     radioLabel.Text = "No Radio";
@@ -262,15 +267,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     ToggleButtons(false);
                     return;
                 }
-                if (currentRadio.modulation == 2) //intercom
+                if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
                     radioFrequency.Text = "INTERCOM";
                 }
                 else
                 {
-                    radioFrequency.Text = (currentRadio.frequency/MHz).ToString("0.000") +
+                    radioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000") +
                                           (currentRadio.modulation == 0 ? "AM" : "FM");
-                    if (currentRadio.secondaryFrequency > 100)
+                    if (currentRadio.secFreq > 100)
                     {
                         radioFrequency.Text += " G";
                     }
@@ -281,29 +286,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
                 radioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
-                if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {
-                    radioVolume.IsEnabled = false;
-
-                    ToggleButtons(false);
+                    radioVolume.IsEnabled = true;
 
                     //reset dragging just incase
-                    _dragging = false;
-                }
-                else if (dcsPlayerRadioInfo.radioType == DCSPlayerRadioInfo.AircraftRadioType.PARTIAL_COCKPIT_INTEGRATION)
-                {
-                    radioVolume.IsEnabled = false;
-
-                    ToggleButtons(false);
-
-                    //reset dragging just incase
-                    _dragging = false;
+                //    _dragging = false;
                 }
                 else
                 {
-                    radioVolume.IsEnabled = true;
-                    ToggleButtons(true);
+                    radioVolume.IsEnabled = false;
+
+                    //reset dragging just incase
+                  //  _dragging = false;
                 }
+
+                ToggleButtons(currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY);
 
                 if (_dragging == false)
                 {
@@ -325,7 +323,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 //update stuff
                 if ((currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
                     || (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL)
-                    || (currentRadio.modulation == 2))
+                    || (currentRadio.modulation == RadioInformation.Modulation.INTERCOM))
                 {
                     //Disable everything
                     EncryptionKeySpinner.IsEnabled = false;
@@ -412,7 +410,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
-                if (currentRadio.modulation != 3) // disabled
+                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
                     //update stuff
                     if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
@@ -440,7 +438,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
-                if (currentRadio.modulation != 3) // disabled
+                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
                     //update stuff
                     if ((currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE) ||

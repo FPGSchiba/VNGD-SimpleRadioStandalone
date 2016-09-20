@@ -49,6 +49,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private Timer _timer;
         private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
+        private uint _packetNumber = 1;
+
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
@@ -102,23 +104,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var ptt = pressed[(int) InputBinding.ModifierPtt] && pressed[(int) InputBinding.Ptt];
 
                 //check we're allowed to switch radios
-                if (radios.radioType != DCSPlayerRadioInfo.AircraftRadioType.FULL_COCKPIT_INTEGRATION)
+                if (radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
                     if (pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
                     {
-                        radios.selected = 1;
+                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[1];
+
+                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            radios.selected = 1;
+                        }
                     }
                     else if (pressed[(int) InputBinding.ModifierSwitch2] && pressed[(int) InputBinding.Switch2])
                     {
-                        radios.selected = 2;
+                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[2];
+
+                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            radios.selected = 2;
+                        }
                     }
                     else if (pressed[(int) InputBinding.ModifierSwitch3] && pressed[(int) InputBinding.Switch3])
                     {
-                        radios.selected = 3;
+                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[3];
+
+                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            radios.selected = 3;
+                        }
                     }
                     else if (pressed[(int) InputBinding.Intercom] && pressed[(int) InputBinding.ModifierIntercom])
                     {
-                        radios.selected = 0;
+                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[0];
+
+                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            radios.selected = 0;
+                        }
                     }
                 }
 
@@ -145,6 +167,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //set to false so we sent one packet to open up the radio
             //automatically rather than the user having to press Send
             hasSentVoicePacket = false;
+
+            _packetNumber = 1; //reset packet number
 
             while (!_stop)
             {
@@ -259,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 RadioReceivingState receivingState = null;
                                 var receivingRadio =
                                     RadioDCSSyncServer.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency,
-                                        udpVoicePacket.Modulation,
+                                        (RadioInformation.Modulation) udpVoicePacket.Modulation,
                                         udpVoicePacket.UnitId, out receivingState);
 
                                 //Check that we're not transmitting on this radio
@@ -269,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                 if ((receivingRadio != null) && (receivingState != null)
                                     &&
-                                    ((receivingRadio.modulation == 2)
+                                    ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM)
                                      // INTERCOM Modulation is 2 so if its two dont bother checking LOS and Range
                                      ||
                                      (
@@ -317,7 +341,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             // mark if we can decrypt it
                                             RadioReceivingState = receivingState,
                                             RecevingPower = receivingPower,
-                                            LineOfSightLoss = lineOfSightLoss // Loss of 1.0 or greater is total loss
+                                            LineOfSightLoss = lineOfSightLoss, // Loss of 1.0 or greater is total loss
+                                            PacketNumber = udpVoicePacket.PacketNumber
                                         };
 
 
@@ -454,8 +479,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[currentSelected];
 
-                        if (((radio != null) && (radio.frequency > 100) && (radio.modulation != 3))
-                            || (radio.modulation == 2))
+                        if (((radio != null) && (radio.freq > 100) && (radio.modulation != RadioInformation.Modulation.DISABLED))
+                            || (radio.modulation == RadioInformation.Modulation.INTERCOM))
                         {
                             //generate packet
                             var udpVoicePacket = new UDPVoicePacket
@@ -463,10 +488,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 GuidBytes = _guidAsciiBytes,
                                 AudioPart1Bytes = bytes,
                                 AudioPart1Length = (ushort) bytes.Length,
-                                Frequency = radio.frequency,
+                                Frequency = radio.freq,
                                 UnitId = RadioDCSSyncServer.DcsPlayerRadioInfo.unitId,
                                 Encryption = radio.enc ? radio.encKey : (byte) 0,
-                                Modulation = radio.modulation
+                                Modulation = (byte)radio.modulation,
+                                PacketNumber = _packetNumber++
+
                             }.EncodePacket();
 
 
@@ -544,13 +571,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void StartPing()
         {
-            Task.Run(() =>
+            Thread thread = new Thread(() =>
             {
                 byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
                 while (!_stop)
                 {
-                    Logger.Info("Pinging Server");
+                    //Logger.Info("Pinging Server");
                     try
                     {
                         var ip = new IPEndPoint(_address, _port);
@@ -564,6 +591,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Thread.Sleep(25*1000);
                 }
             });
+            thread.Start();
         }
     }
 }

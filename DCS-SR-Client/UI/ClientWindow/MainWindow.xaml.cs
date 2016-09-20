@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -52,6 +53,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public MainWindow()
         {
             InitializeComponent();
+
+
+            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
             SetupLogging();
 
@@ -122,6 +126,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitRadioEncryptionEffectsToggle();
 
             InitAutoConnectPrompt();
+
+            InitRadioOverlayTaskbarHide();
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
         }
@@ -230,6 +236,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void InitRadioOverlayTaskbarHide()
+        {
+            var autoConnect = Settings.Instance.UserSettings[(int)SettingType.RadioOverlayTaskbarHide];
+            if (autoConnect == "ON")
+            {
+                RadioOverlayTaskbarItem.IsChecked = true;
+
+            }
+            else
+            {
+                RadioOverlayTaskbarItem.IsChecked = false;
+            }
+        }
+
         private void SetupLogging()
         {
             // Step 1. Create configuration object 
@@ -248,10 +268,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
             // Step 4. Define rules
-            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-            config.LoggingRules.Add(rule1);
+//            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+//            config.LoggingRules.Add(rule1);
 
-            var rule2 = new LoggingRule("*", LogLevel.Debug, fileTarget);
+            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
             config.LoggingRules.Add(rule2);
 
             // Step 5. Activate the configuration
@@ -495,7 +515,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _radioOverlayWindow?.Close();
 
                     _radioOverlayWindow = new RadioOverlayWindow();
+                    _radioOverlayWindow.ShowInTaskbar =
+                        Settings.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide] != "ON";
                     _radioOverlayWindow.Show();
+
                 }
                 else
                 {
@@ -572,6 +595,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             Settings.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
 
+        }
+
+        private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string)RadioOverlayTaskbarItem.Content);
         }
     }
 }

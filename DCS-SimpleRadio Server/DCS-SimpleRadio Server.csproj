@@ -79,8 +79,8 @@
       <HintPath>..\packages\PropertyChanged.Fody.1.51.3\lib\dotnet\PropertyChanged.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SharpConfig, Version=2.0.0.0, Culture=neutral, PublicKeyToken=c1deedac91bd7724, processorArchitecture=MSIL">
-      <HintPath>..\packages\sharpconfig.2.0\lib\net20\SharpConfig.dll</HintPath>
+    <Reference Include="SharpConfig, Version=2.0.1.0, Culture=neutral, PublicKeyToken=c1deedac91bd7724, processorArchitecture=MSIL">
+      <HintPath>..\packages\sharpconfig.2.0.1\lib\net20\SharpConfig.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

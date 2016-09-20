@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
@@ -52,13 +54,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //  Window_Loaded(null, null);
             CalculateScale();
 
-            SetupRadioRefresh();
+            Thread thread = new Thread(SetupRadioRefresh);
+            thread.Start();
 
             LocationChanged += Location_Changed;
 
             //init radio
             foreach (var radio in radioControlGroup)
             {
+                ControlText.Text = "";
                 radio.RepaintRadioReceive();
                 radio.RepaintRadioStatus();
             }
@@ -71,26 +75,60 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
 
         private void SetupRadioRefresh()
-        {
-            Task.Run(() =>
+        { 
+            while (!_end)
             {
-                while (!_end)
-                {
-                    //roughly 20 FPS
-                    Thread.Sleep(50);
+                //roughly 20 FPS
+                Thread.Sleep(80);
 
-                    Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (var radio in radioControlGroup)
                     {
-                        foreach (var radio in radioControlGroup)
+                        radio.RepaintRadioReceive();
+                        radio.RepaintRadioStatus();
+                    }
+
+                    intercom.RepaintRadioStatus();
+
+                    var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+                    if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+                    {
+                        int avalilableRadios = 0;
+
+                        for (int i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                         {
-                            radio.RepaintRadioReceive();
-                            radio.RepaintRadioStatus();
+                            if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
+                            {
+                                avalilableRadios++;
+                               
+                            }
                         }
 
-                        intercom.RepaintRadioStatus();
-                    });
-                }
-            });
+                        if (avalilableRadios > 1)
+                        {
+                            if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                            {
+                                ControlText.Text = "HOTAS Controls";
+                            }
+                            else
+                            {
+                                ControlText.Text = "Cockpit Controls";
+                            }
+                        }
+                        else
+                        {
+                            ControlText.Text = "";
+                        }
+                      
+                    }
+                    else
+                    {
+                        ControlText.Text = "";
+                    }
+                });
+            }
+ 
         }
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -140,10 +178,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void CalculateScale()
         {
-            var yScale = ActualHeight/myMainWindow.MinWidth;
-            var xScale = ActualWidth/myMainWindow.MinWidth;
+            var yScale = ActualHeight/ RadioOverlayWin.MinWidth;
+            var xScale = ActualWidth/ RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
-            ScaleValue = (double) OnCoerceScaleValue(myMainWindow, value);
+            ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)

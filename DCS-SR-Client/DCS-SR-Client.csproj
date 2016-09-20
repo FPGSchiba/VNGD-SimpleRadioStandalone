@@ -68,6 +68,10 @@
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Easy.MessageHub, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Easy.MessageHub.2.5.0\lib\net40\Easy.MessageHub.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -142,13 +146,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Audio\BufferedSampleProvider.cs" />
+    <Compile Include="Audio\AudioProvider.cs" />
     <Compile Include="Audio\CachedAudioEffect.cs" />
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioPreview.cs" />
     <Compile Include="Audio\ClientAudio.cs" />
     <Compile Include="Audio\ClientAudioProvider.cs" />
     <Compile Include="Audio\JitterBuffer.cs" />
+    <Compile Include="Audio\JitterBufferAudio.cs" />
+    <Compile Include="Audio\JitterBufferProvider.cs" />
     <Compile Include="Audio\RadioMixDown.cs" />
     <Compile Include="Audio\TestWaveInProvider.cs" />
     <Compile Include="Network\DCSAutoConnectListener.cs" />

@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
 
@@ -51,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _tcpClient.SendTimeout = 10;
                 try
                 {
+                    _tcpClient.NoDelay = true;
+
                     _tcpClient.Connect(_serverEndpoint);
 
                     if (_tcpClient.Connected)
@@ -187,14 +190,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
-                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE +
-                                                        " From: " +
-                                                        serverMessage.Client.Name + " Coalition: " +
-                                                        serverMessage.Client.Coalition);
+//                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE +
+//                                                        " From: " +
+//                                                        serverMessage.Client.Name + " Coalition: " +
+//                                                        serverMessage.Client.Coalition);
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
-                                        Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
+                                       // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
                                         if (serverMessage.Clients != null)
                                         {
@@ -215,11 +218,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                     case NetworkMessage.MessageType.SERVER_SETTINGS:
 
-                                        Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
+                                      //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
                                         ServerSettings = serverMessage.ServerSettings;
                                         break;
+                                    case NetworkMessage.MessageType.CLIENT_DISCONNECT:
+                                     //   Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
+
+                                        SRClient outClient;
+                                        _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);
+
+                                        if (outClient != null)
+                                        {
+                                            MessageHub.Instance.Publish(outClient);
+                                        }
+
+                                        break;
+
+
                                     default:
-                                        Logger.Warn("Recevied unknown " + line);
+                                        Logger.Error("Recevied unknown " + line);
                                         break;
                                 }
                             }
@@ -276,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
             }
 
-            Logger.Warn("Disconnecting from server");
+            Logger.Error("Disconnecting from server");
 
             //CallOnMain(false);
         }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using FragLabs.Audio.Codecs.Opus;
 using NAudio.Wave;
@@ -59,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _cachedAudioEffects[i] = new CachedAudioEffect((CachedAudioEffect.AudioEffectTypes) i);
             }
+         
         }
 
         public float MicBoost { get; set; } = 1.0f;
@@ -97,7 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveOut = new WaveOut
                 {
-                    DesiredLatency = 80, // half to get tick rate - so 40ms
+                    DesiredLatency = 160, // half to get tick rate - so 40ms
                     DeviceNumber = speakers
                 };
 
@@ -123,6 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     DeviceNumber = mic
                 };
 
+                _waveIn.NumberOfBuffers = 1;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
@@ -132,6 +136,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 voiceSenderThread.Start();
 
                 _waveIn.StartRecording();
+
+
+                MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
             }
             catch (Exception ex)
             {
@@ -242,9 +249,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-
+       // Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
+//            if(_stopwatch.ElapsedMilliseconds > 22)
+//            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+//            _stopwatch.Restart();
+            
             //fill sound buffer
 
             byte[] soundBuffer = null;
@@ -373,6 +384,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             _stop = true;
+
+            MessageHub.Instance.ClearSubscriptions();
         }
 
         public void AddClientAudio(ClientAudio audio)
@@ -392,10 +405,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 client = new ClientAudioProvider();
                 _clientsBufferedAudio[audio.ClientGuid] = client;
 
-                _clientAudioMixer.AddMixerInput(client.VolumeSampleProvider);
+                _clientAudioMixer.AddMixerInput(client.SampleProvider);
             }
 
             client.AddClientAudioSamples(audio);
+        }
+
+        private void RemoveClientBuffer(SRClient srClient)
+        {
+            ClientAudioProvider clientAudio = null;
+            _clientsBufferedAudio.TryRemove(srClient.ClientGuid, out clientAudio);
+
+            if (clientAudio !=null)
+            {
+
+                try
+                {
+                    _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex,"Error removing client input");
+                }
+              
+            }
         }
     }
 }
