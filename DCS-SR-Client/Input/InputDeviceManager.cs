@@ -361,7 +361,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         }
                     }
 
-                    Thread.Sleep(1);
+                    Thread.Sleep(40);
                 }
             });
             pttInputThread.Start();

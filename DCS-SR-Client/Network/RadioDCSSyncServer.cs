@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
@@ -369,7 +368,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //                else // same aircraft
             //                {
 
-            var expansion = ClientSync.ServerSettings[(int)ServerSettingType.RADIO_EXPANSION];
+            var expansion = ClientSync.ServerSettings[(int) ServerSettingType.RADIO_EXPANSION];
 
             //update common parts
             DcsPlayerRadioInfo.name = message.name;
@@ -399,7 +398,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 var clientRadio = DcsPlayerRadioInfo.radios[i];
 
-                if (updateRadio.expansion && !expansion || updateRadio.modulation == RadioInformation.Modulation.DISABLED)
+                if ((updateRadio.expansion && !expansion) ||
+                    (updateRadio.modulation == RadioInformation.Modulation.DISABLED))
                 {
                     //expansion radio, not allowed
                     clientRadio.freq = 1;
@@ -411,7 +411,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
                     clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
-
                 }
                 else
                 {
@@ -428,7 +427,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.encMode = updateRadio.encMode;
                     clientRadio.volMode = updateRadio.volMode;
 
-                    if (updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT || overrideFreqAndVol)
+                    if ((updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT) || overrideFreqAndVol)
                     {
                         if (clientRadio.freq != updateRadio.freq)
                             changed = true;
@@ -443,7 +442,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             clientRadio.secFreq = 0;
                         }
-                        
                     }
                     else
                     {
@@ -452,7 +450,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //put back
                             clientRadio.secFreq = updateRadio.secFreq;
                         }
-                    
+
                         //check we're not over a limit
                         if (clientRadio.freq > clientRadio.freqMax)
                         {
@@ -500,18 +498,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
 
                     //handle volume
-                    if (updateRadio.volMode == RadioInformation.VolumeMode.COCKPIT || overrideFreqAndVol)
+                    if ((updateRadio.volMode == RadioInformation.VolumeMode.COCKPIT) || overrideFreqAndVol)
                     {
                         clientRadio.volume = updateRadio.volume;
                     }
-                    else
-                    {
-                        //leave as is
-                    }
-
                 }
-
-              
             }
 
             //change PTT last

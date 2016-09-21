@@ -38,19 +38,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 _waveOut = new WaveOut
                 {
-                    DesiredLatency = 80, // buffer of 40ms gives data every 40ms - so half latency gives tick rate
+                    DesiredLatency = 160, // buffer of 40ms gives data every 40ms - so half latency gives tick rate
                     DeviceNumber = speakers
                 };
 
-
-                _waveOut.Init(downsample);
-
                 _waveIn.StartRecording();
+                _waveOut.Init(downsample);
                 _waveOut.Play();
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error starting audio Quitting!");
+                Logger.Error(ex, "Error starting audio Quitting! " + ex.Message);
 
                 Environment.Exit(1);
             }

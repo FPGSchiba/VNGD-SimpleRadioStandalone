@@ -1,9 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -21,8 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
 
-        private volatile bool _end;
-
+        private readonly DispatcherTimer _updateTimer;
 
         public RadioOverlayWindow()
         {
@@ -54,18 +52,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //  Window_Loaded(null, null);
             CalculateScale();
 
-            Thread thread = new Thread(SetupRadioRefresh);
-            thread.Start();
-
             LocationChanged += Location_Changed;
 
-            //init radio
-            foreach (var radio in radioControlGroup)
-            {
-                ControlText.Text = "";
-                radio.RepaintRadioReceive();
-                radio.RepaintRadioStatus();
-            }
+            RadioRefresh(null, null);
+
+            //init radio refresh
+            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
+            _updateTimer.Tick += RadioRefresh;
+            _updateTimer.Start();
         }
 
         private void Location_Changed(object sender, EventArgs e)
@@ -74,61 +68,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             AppConfiguration.Instance.RadioY = Left;
         }
 
-        private void SetupRadioRefresh()
-        { 
-            while (!_end)
+        private void RadioRefresh(object sender, EventArgs eventArgs)
+        {
+            foreach (var radio in radioControlGroup)
             {
-                //roughly 20 FPS
-                Thread.Sleep(80);
+                radio.RepaintRadioReceive();
+                radio.RepaintRadioStatus();
+            }
 
-                Application.Current.Dispatcher.Invoke(() =>
+            intercom.RepaintRadioStatus();
+
+            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            {
+                var avalilableRadios = 0;
+
+                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                 {
-                    foreach (var radio in radioControlGroup)
+                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
                     {
-                        radio.RepaintRadioReceive();
-                        radio.RepaintRadioStatus();
+                        avalilableRadios++;
                     }
+                }
 
-                    intercom.RepaintRadioStatus();
-
-                    var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-                    if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+                if (avalilableRadios > 1)
+                {
+                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        int avalilableRadios = 0;
-
-                        for (int i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                        {
-                            if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                            {
-                                avalilableRadios++;
-                               
-                            }
-                        }
-
-                        if (avalilableRadios > 1)
-                        {
-                            if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                            {
-                                ControlText.Text = "HOTAS Controls";
-                            }
-                            else
-                            {
-                                ControlText.Text = "Cockpit Controls";
-                            }
-                        }
-                        else
-                        {
-                            ControlText.Text = "";
-                        }
-                      
+                        ControlText.Text = "HOTAS Controls";
                     }
                     else
                     {
-                        ControlText.Text = "";
+                        ControlText.Text = "Cockpit Controls";
                     }
-                });
+                }
+                else
+                {
+                    ControlText.Text = "";
+                }
             }
- 
+            else
+            {
+                ControlText.Text = "";
+            }
         }
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -140,13 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             base.OnClosing(e);
 
-            _end = true;
-        }
-
-        ~RadioOverlayWindow()
-        {
-            //Shut down threads
-            _end = true;
+            _updateTimer.Stop();
         }
 
         private void Button_Minimise(object sender, RoutedEventArgs e)
@@ -157,7 +133,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void Button_Close(object sender, RoutedEventArgs e)
         {
-            _end = true;
             Close();
         }
 
@@ -178,8 +153,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void CalculateScale()
         {
-            var yScale = ActualHeight/ RadioOverlayWin.MinWidth;
-            var xScale = ActualWidth/ RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight/RadioOverlayWin.MinWidth;
+            var xScale = ActualWidth/RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
@@ -202,6 +177,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             typeof(double), typeof(RadioOverlayWindow),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
+
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {

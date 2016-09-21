@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
@@ -29,8 +28,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
             new ConcurrentDictionary<string, ClientAudioProvider>();
 
-        private Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES*3);
-
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
         private MixingSampleProvider _clientAudioMixer;
 
@@ -40,6 +37,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         //plays in parallel with radio output buffer
         private RadioAudioProvider[] _effectsOutputBuffer;
         private OpusEncoder _encoder;
+
+        private readonly Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES*3);
 
         private BufferedWaveProvider _playBuffer;
 
@@ -61,7 +60,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _cachedAudioEffects[i] = new CachedAudioEffect((CachedAudioEffect.AudioEffectTypes) i);
             }
-         
         }
 
         public float MicBoost { get; set; } = 1.0f;
@@ -110,7 +108,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 //resample client audio to 44100
                 var resampler = new WdlResamplingSampleProvider(_volumeSampleProvider, OUTPUT_SAMPLE_RATE);
-                    //resample and output at 44100
+                //resample and output at 44100
 
                 _waveOut.Init(resampler);
 
@@ -249,17 +247,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-       // Stopwatch _stopwatch = new Stopwatch();
+        // Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
 //            if(_stopwatch.ElapsedMilliseconds > 22)
 //            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
 //            _stopwatch.Restart();
-            
+
             //fill sound buffer
 
             byte[] soundBuffer = null;
-            if (e.BytesRecorded == SEGMENT_FRAMES && _micInputQueue.Count == 0)
+            if ((e.BytesRecorded == SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
             {
                 //perfect!
                 soundBuffer = new byte[e.BytesRecorded];
@@ -267,21 +265,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             else
             {
-                for (int i = 0; i < e.BytesRecorded; i++)
+                for (var i = 0; i < e.BytesRecorded; i++)
                 {
                     _micInputQueue.Enqueue(e.Buffer[i]);
                 }
             }
-       
+
             //read out the queue
-            while(soundBuffer != null ||_micInputQueue.Count >= SEGMENT_FRAMES)
+            while ((soundBuffer != null) || (_micInputQueue.Count >= SEGMENT_FRAMES))
             {
                 //null sound buffer so read from the queue
                 if (soundBuffer == null)
                 {
                     soundBuffer = new byte[SEGMENT_FRAMES];
 
-                    for (int i = 0; i < SEGMENT_FRAMES; i++)
+                    for (var i = 0; i < SEGMENT_FRAMES; i++)
                     {
                         soundBuffer[i] = _micInputQueue.Dequeue();
                     }
@@ -328,7 +326,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 soundBuffer = null;
             }
-
         }
 
         public void StopEncoding()
@@ -340,7 +337,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _volumeSampleProvider = null;
                 _clientAudioMixer.RemoveAllMixerInputs();
                 _clientAudioMixer = null;
-
             }
 
             _clientsBufferedAudio.Clear();
@@ -416,19 +412,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             ClientAudioProvider clientAudio = null;
             _clientsBufferedAudio.TryRemove(srClient.ClientGuid, out clientAudio);
 
-            if (clientAudio !=null)
+            if (clientAudio != null)
             {
-
                 try
                 {
                     _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
-
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex,"Error removing client input");
+                    Logger.Error(ex, "Error removing client input");
                 }
-              
             }
         }
     }

@@ -197,7 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         }
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
-                                       // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
+                                        // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
                                         if (serverMessage.Clients != null)
                                         {
@@ -218,11 +218,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                     case NetworkMessage.MessageType.SERVER_SETTINGS:
 
-                                      //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
+                                        //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
                                         ServerSettings = serverMessage.ServerSettings;
                                         break;
                                     case NetworkMessage.MessageType.CLIENT_DISCONNECT:
-                                     //   Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
+                                        //   Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
 
                                         SRClient outClient;
                                         _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);

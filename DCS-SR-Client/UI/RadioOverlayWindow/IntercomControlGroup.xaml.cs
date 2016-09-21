@@ -27,13 +27,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-             DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-                    RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
+                    RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
                 }
             }
-
-         
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -48,7 +46,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
-              
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {
                     var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];

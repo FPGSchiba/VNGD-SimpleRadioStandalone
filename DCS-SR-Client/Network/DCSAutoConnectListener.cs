@@ -15,10 +15,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
     public class DCSAutoConnectListener
     {
         private readonly MainWindow.ReceivedAutoConnect _receivedAutoConnect;
+        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private UdpClient _dcsUdpListener;
 
         private volatile bool _stop;
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
         public DCSAutoConnectListener(MainWindow.ReceivedAutoConnect receivedAutoConnect)

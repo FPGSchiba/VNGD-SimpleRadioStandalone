@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using MahApps.Metro.Controls;
@@ -13,11 +15,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     public partial class ServerSettingsWindow : MetroWindow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly DispatcherTimer _updateTimer;
 
         public ServerSettingsWindow()
         {
             InitializeComponent();
 
+            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
+            _updateTimer.Tick += UpdateUI;
+            _updateTimer.Start();
+
+            UpdateUI(null, null);
+        }
+
+        private void UpdateUI(object sender, EventArgs e)
+        {
             var settings = ClientSync.ServerSettings;
 
             try
@@ -49,6 +61,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void CloseButton_OnClick(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            _updateTimer.Stop();
         }
     }
 }

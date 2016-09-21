@@ -1,6 +1,5 @@
 ﻿using System;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Dsp;
 using NAudio.Wave;
@@ -12,25 +11,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public static readonly int SILENCE_PAD = 80;
 
-        private readonly Random _random = new Random();
-
         private readonly BiQuadFilter _highPassFilter;
         private readonly BiQuadFilter _lowPassFilter;
 
+        private readonly Random _random = new Random();
+
         private int _lastReceivedOn = -1;
 
-        public JitterBufferProvider JitterBufferProvider { get; }
-        public Pcm16BitToSampleProvider SampleProvider { get; }
-
-        public ClientAudioProvider() 
+        public ClientAudioProvider()
         {
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
 
-            JitterBufferProvider = new JitterBufferProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE,2));
+            JitterBufferProvider = new JitterBufferProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
 
             SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProvider);
         }
+
+        public JitterBufferProvider JitterBufferProvider { get; }
+        public Pcm16BitToSampleProvider SampleProvider { get; }
 
         public long LastUpdate { get; private set; }
 
@@ -53,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             long now = Environment.TickCount;
-            if (now - LastUpdate > 160 ) //3 missed packets at 40ms
+            if (now - LastUpdate > 160) //3 missed packets at 40ms
             {
                 //append 100ms of silence - this functions as our jitter buffer??
                 var silencePad = AudioManager.INPUT_SAMPLE_RATE/1000*SILENCE_PAD;
@@ -68,10 +67,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = Environment.TickCount;
 
-            JitterBufferProvider.AddSamples(new JitterBufferAudio()
+            JitterBufferProvider.AddSamples(new JitterBufferAudio
             {
                 Audio = SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
-                PacketNumber =  audio.PacketNumber
+                PacketNumber = audio.PacketNumber
             });
         }
 

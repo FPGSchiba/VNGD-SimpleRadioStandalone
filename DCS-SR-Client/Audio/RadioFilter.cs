@@ -1,5 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using NAudio.Dsp;
+﻿using NAudio.Dsp;
 using NAudio.Wave;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
@@ -31,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
 
-            if ((samplesRead > 0))
+            if (samplesRead > 0)
             {
                 for (var n = 0; n < sampleCount; n++)
                 {

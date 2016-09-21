@@ -111,11 +111,20 @@
                         </StackPanel>
                         <Button x:Name="ShowOverlay"
                                 Width="120"
-                                Margin="15"
+                                Margin="0,15,0,0"
                                 HorizontalAlignment="Center"
                                 Click="ShowOverlay_OnClick"
                                 Content="Toggle Radio Overlay"
                                 Style="{DynamicResource SquareButtonStyle}" />
+
+                        <StackPanel Margin="0"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <Label HorizontalAlignment="Center" Content="Connected Clients:" />
+                            <Label x:Name="ClientCount"
+                                   HorizontalAlignment="Center"
+                                   Content="0" />
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
 

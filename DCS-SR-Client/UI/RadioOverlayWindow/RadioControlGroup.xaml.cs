@@ -86,7 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
 
             if ((currentRadio.freqMode ==
-                RadioInformation.FreqMode.OVERLAY)
+                 RadioInformation.FreqMode.OVERLAY)
                 && (RadioId >= 0)
                 && (RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length))
             {
@@ -111,7 +111,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
                 DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
             {
@@ -124,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
             if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-               DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
             {
                 RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
             }
@@ -291,14 +290,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     radioVolume.IsEnabled = true;
 
                     //reset dragging just incase
-                //    _dragging = false;
+                    //    _dragging = false;
                 }
                 else
                 {
                     radioVolume.IsEnabled = false;
 
                     //reset dragging just incase
-                  //  _dragging = false;
+                    //  _dragging = false;
                 }
 
                 ToggleButtons(currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY);

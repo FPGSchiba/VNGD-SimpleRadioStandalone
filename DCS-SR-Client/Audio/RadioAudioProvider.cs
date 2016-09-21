@@ -1,11 +1,10 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
-    public class RadioAudioProvider:AudioProvider
+    public class RadioAudioProvider : AudioProvider
     {
         public RadioAudioProvider(int sampleRate)
         {
@@ -16,7 +15,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var pcm = new Pcm16BitToSampleProvider(BufferedWaveProvider);
 
             VolumeSampleProvider = new VolumeSampleProvider(pcm);
-
         }
 
         public VolumeSampleProvider VolumeSampleProvider { get; }

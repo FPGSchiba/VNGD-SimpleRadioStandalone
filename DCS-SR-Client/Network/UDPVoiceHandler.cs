@@ -5,7 +5,6 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -42,14 +41,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private UdpClient _listener;
 
+        private uint _packetNumber = 1;
+
         private volatile bool _ptt;
 
         private volatile bool _stop;
 
         private Timer _timer;
         private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
-
-        private uint _packetNumber = 1;
 
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -479,7 +478,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[currentSelected];
 
-                        if (((radio != null) && (radio.freq > 100) && (radio.modulation != RadioInformation.Modulation.DISABLED))
+                        if (((radio != null) && (radio.freq > 100) &&
+                             (radio.modulation != RadioInformation.Modulation.DISABLED))
                             || (radio.modulation == RadioInformation.Modulation.INTERCOM))
                         {
                             //generate packet
@@ -491,9 +491,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 Frequency = radio.freq,
                                 UnitId = RadioDCSSyncServer.DcsPlayerRadioInfo.unitId,
                                 Encryption = radio.enc ? radio.encKey : (byte) 0,
-                                Modulation = (byte)radio.modulation,
+                                Modulation = (byte) radio.modulation,
                                 PacketNumber = _packetNumber++
-
                             }.EncodePacket();
 
 
@@ -571,7 +570,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void StartPing()
         {
-            Thread thread = new Thread(() =>
+            var thread = new Thread(() =>
             {
                 byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 

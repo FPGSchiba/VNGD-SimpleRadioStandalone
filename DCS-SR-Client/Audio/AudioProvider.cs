@@ -1,14 +1,7 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
-
-
     public abstract class AudioProvider
     {
         protected readonly Settings _settings;
@@ -41,23 +34,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             }
             else
             {
-                return AudioProvider.CreateStereoMix(pcmAudio);
+                return CreateStereoMix(pcmAudio);
             }
 
-            var setting = _settings.UserSettings[(int)settingType];
+            var setting = _settings.UserSettings[(int) settingType];
 
             if (setting == "Left")
             {
-               return AudioProvider.CreateLeftMix(pcmAudio);
+                return CreateLeftMix(pcmAudio);
             }
-            else if (setting == "Right")
+            if (setting == "Right")
             {
-                return AudioProvider.CreateRightMix(pcmAudio);
+                return CreateRightMix(pcmAudio);
             }
-            else
-            {
-               return AudioProvider.CreateStereoMix(pcmAudio);
-            }
+            return CreateStereoMix(pcmAudio);
         }
 
         public static byte[] CreateLeftMix(byte[] pcmAudio)

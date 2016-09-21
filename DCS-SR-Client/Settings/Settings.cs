@@ -16,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         RadioEncryptionEffects = 8, //Radio Encryption effects
         ResampleOutput = 9, //not used - on always
         AutoConnectPrompt = 10, //message about auto connect
-        RadioOverlayTaskbarHide = 11,
+        RadioOverlayTaskbarHide = 11
     }
 
 
