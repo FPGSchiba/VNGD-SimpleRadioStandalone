@@ -7,7 +7,7 @@
              mc:Ignorable="d">
     <StackPanel Orientation="Horizontal">
         <TextBlock Name="ClientName"
-                   Width="160"
+                   Width="190"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center" />
         <Ellipse Width="12"
@@ -17,10 +17,6 @@
                  VerticalAlignment="Center"
                  Fill="{Binding ClientCoalitionColour}"
                  Stroke="Black" />
-        <Button Name="ViewClient"
-                Margin="2"
-                VerticalAlignment="Center"
-                Content="View" />
         <Button Name="KickClient"
                 Margin="2"
                 VerticalAlignment="Center"
