@@ -1,4 +1,4 @@
--- Version1.2.4.0
+-- Version 1.2.5.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1151,6 +1151,7 @@ function SR.exportRadioFW190(_data)
     _data.radios[2].name = "FuG 16ZY"
     _data.radios[2].freq = SR.getRadioFrequency(15)
     _data.radios[2].modulation = 0
+	_data.radios[2].volMode = 1
     _data.radios[2].volume = 1.0  --SR.getRadioVolume(0, 83,{0.0,1.0},true) Volume knob is not behaving..
 
     _data.selected = 1
@@ -1460,4 +1461,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.2.4.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.5.0")
