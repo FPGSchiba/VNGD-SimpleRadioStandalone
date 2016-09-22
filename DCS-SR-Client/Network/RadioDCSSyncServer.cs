@@ -327,46 +327,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
-            //            if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.FULL_COCKPIT_INTEGRATION)
-            //                // Full radio, all from DCS
-            //            {
-            //                changed = !DcsPlayerRadioInfo.Equals(message);
-            //
-            //                HandleEncryptionSettingsFullFidelity(message);
-            //
-            //                DcsPlayerRadioInfo = message;
-            //            }
-            //            else if (message.radioType == DCSPlayerRadioInfo.RadioSwitchControls.PARTIAL_COCKPIT_INTEGRATION)
-            //                // Partial radio - can select radio but the rest is from DCS
-            //            {
-            //                //check if its changed frequency wise
-            //                changed = !DcsPlayerRadioInfo.Equals(message);
-            //
-            //                //update common parts
-            //                DcsPlayerRadioInfo.name = message.name;
-            //                DcsPlayerRadioInfo.radioType = message.radioType;
-            //                DcsPlayerRadioInfo.unit = message.unit;
-            //                DcsPlayerRadioInfo.unitId = message.unitId;
-            //                DcsPlayerRadioInfo.pos = message.pos;
-            //
-            //                HandleEncryptionSettingsFullFidelity(message);
-            //
-            //                //copy over the radios
-            //                DcsPlayerRadioInfo.radios = message.radios;
-            //
-            //                //change PTT last
-            //                DcsPlayerRadioInfo.ptt = message.ptt;
-            //            }
-            //            else // FC3 Radio - Take nothing from DCS, just update the last tickcount, UPDATE triggered a different way
-            //            {
-            //                if (DcsPlayerRadioInfo.unitId != message.unitId)
-            //                {
-            //                    //replace it all - new aircraft
-            //                    DcsPlayerRadioInfo = message;
-            //                    changed = true;
-            //                }
-            //                else // same aircraft
-            //                {
 
             var expansion = ClientSync.ServerSettings[(int) ServerSettingType.RADIO_EXPANSION];
 
@@ -405,6 +365,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.freq = 1;
                     clientRadio.freqMin = 1;
                     clientRadio.freqMax = 1;
+                    clientRadio.secFreq = 0;
                     clientRadio.modulation = RadioInformation.Modulation.DISABLED;
                     clientRadio.name = "No Radio";
 
@@ -441,6 +402,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         if (updateRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
                         {
                             clientRadio.secFreq = 0;
+                        }
+                        else
+                        {
+                            clientRadio.secFreq = updateRadio.secFreq;
                         }
                     }
                     else
