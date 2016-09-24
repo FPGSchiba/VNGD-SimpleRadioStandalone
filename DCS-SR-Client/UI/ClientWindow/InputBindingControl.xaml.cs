@@ -51,9 +51,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 ModifierBinding = InputBinding.ModifierSwitch3;
             }
-            else if (ControlInputBinding == InputBinding.OverlayToggle)
+            else if (ControlInputBinding == InputBinding.Switch4)
             {
-                ModifierBinding = InputBinding.ModifierOverlayToggle;
+                ModifierBinding = InputBinding.ModifierSwitch4;
+            }
+            else if (ControlInputBinding == InputBinding.Switch5)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch5;
+            }
+            else if (ControlInputBinding == InputBinding.Switch6)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch6;
+            }
+            else if (ControlInputBinding == InputBinding.Switch7)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch7;
+            }
+            else if (ControlInputBinding == InputBinding.Switch8)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch8;
+            }
+            else if (ControlInputBinding == InputBinding.Switch9)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch9;
+            }
+            else if (ControlInputBinding == InputBinding.Switch10)
+            {
+                ModifierBinding = InputBinding.ModifierSwitch10;
             }
             else if (ControlInputBinding == InputBinding.OverlayToggle)
             {

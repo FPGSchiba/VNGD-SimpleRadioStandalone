@@ -9,6 +9,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         Radio1Channel = 1,
         Radio2Channel = 2,
         Radio3Channel = 3,
+        Radio4Channel = 12,
+        Radio5Channel = 13,
+        Radio6Channel = 14,
+        Radio7Channel = 15,
+        Radio8Channel = 16,
+        Radio9Channel = 17,
+        Radio10Channel = 18,
         RadioSwitchIsPTT = 4,
         IntercomChannel = 5,
         RadioClickEffects = 6, // Recieving Radio Effects - not used anymore

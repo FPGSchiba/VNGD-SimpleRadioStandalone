@@ -354,9 +354,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //copy over radio names, min + max
             for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
             {
-                var updateRadio = message.radios[i];
-
                 var clientRadio = DcsPlayerRadioInfo.radios[i];
+
+                if (i >= message.radios.Length)
+                {
+                    clientRadio.freq = 1;
+                    clientRadio.freqMin = 1;
+                    clientRadio.freqMax = 1;
+                    clientRadio.secFreq = 0;
+                    clientRadio.modulation = RadioInformation.Modulation.DISABLED;
+                    clientRadio.name = "No Radio";
+
+                    clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
+                    clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
+
+                    continue;
+                }
+
+                var updateRadio = message.radios[i];
 
                 if ((updateRadio.expansion && !expansion) ||
                     (updateRadio.modulation == RadioInformation.Modulation.DISABLED))

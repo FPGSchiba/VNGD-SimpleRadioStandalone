@@ -32,6 +32,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             {
                 settingType = SettingType.Radio3Channel;
             }
+            else if (radioId == 4)
+            {
+                settingType = SettingType.Radio4Channel;
+            }
+            else if (radioId == 5)
+            {
+                settingType = SettingType.Radio5Channel;
+            }
+            else if (radioId == 6)
+            {
+                settingType = SettingType.Radio6Channel;
+            }
+            else if (radioId == 7)
+            {
+                settingType = SettingType.Radio7Channel;
+            }
+            else if (radioId == 8)
+            {
+                settingType = SettingType.Radio8Channel;
+            }
+            else if (radioId == 9)
+            {
+                settingType = SettingType.Radio9Channel;
+            }
+            else if (radioId == 10)
+            {
+                settingType = SettingType.Radio10Channel;
+            }
             else
             {
                 return CreateStereoMix(pcmAudio);

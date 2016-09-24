@@ -17,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public DcsPosition pos = new DcsPosition();
         public volatile bool ptt = false;
 
-        public RadioInformation[] radios = new RadioInformation[4];
+        public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom
         public RadioSwitchControls control = RadioSwitchControls.HOTAS;
         public short selected = 0;
         public string unit = "";
@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public DCSPlayerRadioInfo()
         {
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 11; i++)
             {
                 radios[i] = new RadioInformation();
             }
@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 return false;
             }
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < radios.Length; i++)
             {
                 var radio1 = radios[i];
                 var radio2 = compareRadio.radios[i];
@@ -101,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 receivingState = null;
                 return null;
             }
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < radios.Length; i++)
             {
                 var receivingRadio = radios[i];
 

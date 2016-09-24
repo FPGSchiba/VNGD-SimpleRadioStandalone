@@ -42,6 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private int _port = 5002;
 
         private RadioOverlayWindow _radioOverlayWindow;
+        private AwacsRadioOverlayWindow.RadioOverlayWindow _awacsRadioOverlay;
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -52,6 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private double _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
+
 
 
         public MainWindow()
@@ -66,32 +68,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Title = Title + " - " + UpdaterChecker.VERSION;
 
             Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
-
-            InputManager = new InputDeviceManager(this, ToggleOverlay);
-
-            Radio1.InputName = "Radio 1";
-            Radio1.ControlInputBinding = InputBinding.Switch1;
-            Radio1.InputDeviceManager = InputManager;
-
-            Radio2.InputName = "Radio 2";
-            Radio2.ControlInputBinding = InputBinding.Switch2;
-            Radio2.InputDeviceManager = InputManager;
-
-            Radio3.InputName = "Radio 3";
-            Radio3.ControlInputBinding = InputBinding.Switch3;
-            Radio3.InputDeviceManager = InputManager;
-
-            PTT.InputName = "Common PTT";
-            PTT.ControlInputBinding = InputBinding.Ptt;
-            PTT.InputDeviceManager = InputManager;
-
-            Intercom.InputName = "Intercom Select";
-            Intercom.ControlInputBinding = InputBinding.Intercom;
-            Intercom.InputDeviceManager = InputManager;
-
-            RadioOverlay.InputName = "Overlay Toggle";
-            RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
-            RadioOverlay.InputDeviceManager = InputManager;
+          
+            InitInput();
 
             _appConfig = AppConfiguration.Instance;
             _guid = ShortGuid.NewGuid().ToString();
@@ -138,6 +116,64 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
             _updateTimer.Tick += UpdateClientCount;
             _updateTimer.Start();
+        }
+
+        private void InitInput()
+        {
+            InputManager = new InputDeviceManager(this, ToggleOverlay);
+
+            Radio1.InputName = "Radio 1";
+            Radio1.ControlInputBinding = InputBinding.Switch1;
+            Radio1.InputDeviceManager = InputManager;
+
+            Radio2.InputName = "Radio 2";
+            Radio2.ControlInputBinding = InputBinding.Switch2;
+            Radio2.InputDeviceManager = InputManager;
+
+            Radio3.InputName = "Radio 3";
+            Radio3.ControlInputBinding = InputBinding.Switch3;
+            Radio3.InputDeviceManager = InputManager;
+
+            PTT.InputName = "Common PTT";
+            PTT.ControlInputBinding = InputBinding.Ptt;
+            PTT.InputDeviceManager = InputManager;
+
+            Intercom.InputName = "Intercom Select";
+            Intercom.ControlInputBinding = InputBinding.Intercom;
+            Intercom.InputDeviceManager = InputManager;
+
+            RadioOverlay.InputName = "Overlay Toggle";
+            RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
+            RadioOverlay.InputDeviceManager = InputManager;
+
+            Radio4.InputName = "Radio 4";
+            Radio4.ControlInputBinding = InputBinding.Switch4;
+            Radio4.InputDeviceManager = InputManager;
+
+            Radio5.InputName = "Radio 5";
+            Radio5.ControlInputBinding = InputBinding.Switch5;
+            Radio5.InputDeviceManager = InputManager;
+
+            Radio6.InputName = "Radio 6";
+            Radio6.ControlInputBinding = InputBinding.Switch6;
+            Radio6.InputDeviceManager = InputManager;
+
+            Radio7.InputName = "Radio 7";
+            Radio7.ControlInputBinding = InputBinding.Switch7;
+            Radio7.InputDeviceManager = InputManager;
+
+            Radio8.InputName = "Radio 8";
+            Radio8.ControlInputBinding = InputBinding.Switch8;
+            Radio8.InputDeviceManager = InputManager;
+
+            Radio9.InputName = "Radio 9";
+            Radio9.ControlInputBinding = InputBinding.Switch9;
+            Radio9.InputDeviceManager = InputManager;
+
+            Radio10.InputName = "Radio 10";
+            Radio10.ControlInputBinding = InputBinding.Switch10;
+            Radio10.InputDeviceManager = InputManager;
+
         }
 
         public InputDeviceManager InputManager { get; set; }
@@ -541,6 +577,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
+        {
+            if ((_awacsRadioOverlay == null) || !_awacsRadioOverlay.IsVisible ||
+                (_awacsRadioOverlay.WindowState == WindowState.Minimized))
+            {
+                _awacsRadioOverlay?.Close();
+
+                _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
+                _awacsRadioOverlay.ShowInTaskbar =
+                    Settings.Instance.UserSettings[(int)SettingType.RadioOverlayTaskbarHide] != "ON";
+                _awacsRadioOverlay.Show();
+            }
+            else
+            {
+                _awacsRadioOverlay?.Close();
+                _awacsRadioOverlay = null;
+            }
+            
+        }
+
         private void AutoConnect(string address, int port)
         {
             Logger.Info("Received AutoConnect " + address);
@@ -613,5 +669,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             Settings.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string) RadioOverlayTaskbarItem.Content);
         }
+
+       
     }
 }
