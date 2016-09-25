@@ -13,6 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
     {
         private bool _dragging;
 
+        private bool _init = true;
         public IntercomControlGroup()
         {
             InitializeComponent();
@@ -69,6 +70,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 //reset dragging just incase
                 _dragging = false;
+
+                IntercomNumberSpinner.IsEnabled = false;
             }
             else
             {
@@ -103,12 +106,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioLabel.Text = "INTERCOM";
 
                     RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
+
+                    if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+                    {
+                        IntercomNumberSpinner.IsEnabled = true;
+                        IntercomNumberSpinner.Value = (int)(dcsPlayerRadioInfo.unitId - DCSPlayerRadioInfo.UnitIdOffset);
+                    }
+                    else
+                    {
+                        IntercomNumberSpinner.Value = 1;
+                        IntercomNumberSpinner.IsEnabled = false;
+                    }
                 }
                 else
                 {
                     RadioLabel.Text = "NO INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
                     RadioVolume.IsEnabled = false;
+                    IntercomNumberSpinner.Value = 1;
+                    IntercomNumberSpinner.IsEnabled = false;
                 }
 
                 if (_dragging == false)
@@ -120,8 +136,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            
+            if (_init)
+            {
+                //ignore
+                _init = false;
+                return;
+            }
+            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+            {
+               
+                    dcsPlayerRadioInfo.unitId = DCSPlayerRadioInfo.UnitIdOffset + ((uint) ((uint)IntercomNumberSpinner.Value));
+             
+            }
         }
     }
 }

@@ -21,11 +21,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private readonly DispatcherTimer _updateTimer;
 
+        public static bool AwacsActive = false; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
+
         public RadioOverlayWindow()
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
        //     var opacity = AppConfiguration.Instance.RadioOpacity;
+            AwacsActive = true;
 
             InitializeComponent();
 
@@ -72,8 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void Location_Changed(object sender, EventArgs e)
         {
-            AppConfiguration.Instance.RadioX = Top;
-            AppConfiguration.Instance.RadioY = Left;
+         //   AppConfiguration.Instance.RadioX = Top;
+          //  AppConfiguration.Instance.RadioY = Left;
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -112,6 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             base.OnClosing(e);
 
+            AwacsActive = false;
             _updateTimer.Stop();
         }
 
@@ -129,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
-            AppConfiguration.Instance.RadioOpacity = Opacity;
+            //AppConfiguration.Instance.RadioOpacity = Opacity;
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)

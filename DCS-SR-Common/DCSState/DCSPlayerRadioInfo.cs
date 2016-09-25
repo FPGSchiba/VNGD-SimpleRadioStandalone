@@ -23,6 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string unit = "";
         public uint unitId;
 
+        public readonly static uint UnitIdOffset = 100000001; // this is where non aircraft "Unit" Ids start from for satcom intercom
+
         public DCSPlayerRadioInfo()
         {
             for (var i = 0; i < 11; i++)

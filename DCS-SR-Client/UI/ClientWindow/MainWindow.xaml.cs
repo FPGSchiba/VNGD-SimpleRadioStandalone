@@ -562,12 +562,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
                     (_radioOverlayWindow.WindowState == WindowState.Minimized))
                 {
+                    //hide awacs panel
+                    _awacsRadioOverlay?.Close();
+                    _awacsRadioOverlay = null;
+
                     _radioOverlayWindow?.Close();
 
                     _radioOverlayWindow = new RadioOverlayWindow();
                     _radioOverlayWindow.ShowInTaskbar =
                         Settings.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide] != "ON";
                     _radioOverlayWindow.Show();
+
+                   
                 }
                 else
                 {
@@ -579,9 +585,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
         {
+            
             if ((_awacsRadioOverlay == null) || !_awacsRadioOverlay.IsVisible ||
                 (_awacsRadioOverlay.WindowState == WindowState.Minimized))
             {
+                //close normal overlay
+                _radioOverlayWindow?.Close();
+                _radioOverlayWindow = null;
+
                 _awacsRadioOverlay?.Close();
 
                 _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
