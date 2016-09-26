@@ -148,7 +148,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                
                     dcsPlayerRadioInfo.unitId = DCSPlayerRadioInfo.UnitIdOffset + ((uint) ((uint)IntercomNumberSpinner.Value));
-             
+                RadioDCSSyncServer.LastSent = 0; //force refresh
+
             }
         }
     }

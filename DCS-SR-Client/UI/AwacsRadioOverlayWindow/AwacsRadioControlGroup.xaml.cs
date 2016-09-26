@@ -527,6 +527,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                             currentRadio.enc = true;
                             EncryptionButton.Content = "Disable";
                         }
+
+                        //make radio data stale to force resysnc
+                        RadioDCSSyncServer.LastSent = 0;
                     }
                 }
             }
@@ -549,6 +552,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         if (EncryptionKeySpinner.Value != null)
                         {
                             currentRadio.encKey = (byte) EncryptionKeySpinner.Value;
+                            //make radio data stale to force resysnc
+                            RadioDCSSyncServer.LastSent = 0;
                         }
                     }
                 }

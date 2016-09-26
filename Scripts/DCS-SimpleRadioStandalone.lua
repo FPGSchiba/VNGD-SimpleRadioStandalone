@@ -203,11 +203,11 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     pos = {x=0,y=0,z=0},
-					unitId = 0,
+					unitId = 100000001, -- pass through starting unit id here
                     radios =
                     {
-                        --- Radio 0 is always intercom now
-                        { name = "", freq = 100, modulation = 3,volume = 1.0, secFreq = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
+                        --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
+                        { name = "SATCOM", freq = 100, modulation = 2,volume = 1.0, secFreq = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0,freqMode = 0, volMode = 1, expansion = false  },
                         { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
                         { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1 ,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
                         { name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
