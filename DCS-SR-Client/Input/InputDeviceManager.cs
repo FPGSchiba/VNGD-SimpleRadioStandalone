@@ -336,7 +336,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         }
                         else
                         {
-                            if ((j < 4) || (j == 8) || (j == 10)) //==8 is for OverlayToggle == 10 is for intercom
+                            if ((j < 4) 
+                            || (j == 8) //Intercom
+                            || (j == 10) //Overlay
+                            || (j > 10 &&  //All the main (not modifiers) are even numbers so mod 2 to work out if any main buttons are pressed
+                                j % 2 == 0)
+
+                            ) 
                             {
                                 // set to false as its its a main button, not a modifier
                                 buttonStates[j] = false;

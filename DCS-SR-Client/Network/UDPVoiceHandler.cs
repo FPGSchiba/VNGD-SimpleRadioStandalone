@@ -21,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly object BufferLock = new object();
         public static volatile RadioSendingState RadioSendingState = new RadioSendingState();
-        public static volatile RadioReceivingState[] RadioReceivingState = new RadioReceivingState[4];
+        public static volatile RadioReceivingState[] RadioReceivingState = new RadioReceivingState[11];
 
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;

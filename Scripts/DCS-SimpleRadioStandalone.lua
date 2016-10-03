@@ -99,15 +99,15 @@ LuaExportActivityNextEvent = function(tCurrent)
                     name = "",
                     unit = "",
                     selected = 1,
-                    unitId = -1,
+                    unitId = 0,
                     ptt = false,
                     radios =
                     {
                         -- Radio 1 is always Intercom
-                        { name = "INTERCOM", freq = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
-                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false}, -- enc means encrypted
-                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0,expansion = false},
-                        { name = "No Radio", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false}
+                        { name = "", freq = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc = false, encMode = 0, freqMode = 0, volMode = 0,expansion = false}, -- enc means encrypted
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0,expansion = false},
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false},
                     },
                     control = 0, -- HOTAS
                 }
@@ -203,13 +203,21 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     pos = {x=0,y=0,z=0},
+					unitId = 100000001, -- pass through starting unit id here
                     radios =
                     {
-                        --- Radio 0 is always intercom now
-                        { name = "Disabled", freq = 100, modulation = 3,volume = 1.0, secFreq = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
-                        { name = "CA UHF/VHF", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
-                        { name = "CA UHF/VHF", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
-                        { name = "CA FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   }
+                        --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
+                        { name = "SATCOM", freq = 100, modulation = 2,volume = 1.0, secFreq = 0, freqMin = 100, freqMax =100 ,encKey = 0,enc =false, encMode = 0,freqMode = 0, volMode = 1, expansion = false  },
+                        { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1 ,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
+                        { name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
+						{ name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "UHF Guard", freq =251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1 ,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
+                      	{ name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
+						{ name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
+						{ name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
                     },
                     radioType = 3
                 }

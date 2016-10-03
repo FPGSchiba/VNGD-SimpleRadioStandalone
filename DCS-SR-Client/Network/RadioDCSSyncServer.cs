@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
@@ -42,6 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private UdpClient _dcsUdpListener;
 
         private volatile bool _stop;
+
 
         public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
             ConcurrentDictionary<string, SRClient> _clients, string guid)
@@ -336,7 +338,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             DcsPlayerRadioInfo.unit = message.unit;
             DcsPlayerRadioInfo.pos = message.pos;
 
-            var overrideFreqAndVol = DcsPlayerRadioInfo.unitId != message.unitId;
+            var overrideFreqAndVol = false;
+
+            if (message.unitId >= DCSPlayerRadioInfo.UnitIdOffset && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+            {
+                //overriden so leave as is
+            }
+            else
+            {
+                DcsPlayerRadioInfo.unitId = message.unitId;
+                overrideFreqAndVol = DcsPlayerRadioInfo.unitId != message.unitId;
+            }
+
+            //TODO - If AWACS panel is open set unitId to something high and use that as the number
+            //if awacs NOT open -  disable radios over 3
 
             if (overrideFreqAndVol)
             {
@@ -349,15 +364,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 DcsPlayerRadioInfo.selected = message.selected;
             }
 
-            DcsPlayerRadioInfo.unitId = message.unitId;
+         
 
             //copy over radio names, min + max
             for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
             {
-                var updateRadio = message.radios[i];
-
                 var clientRadio = DcsPlayerRadioInfo.radios[i];
 
+                if (i >= message.radios.Length 
+                    || (RadioOverlayWindow.AwacsActive == false 
+                            && (i > 3 || i ==0) // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
+                            && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+                {
+                    clientRadio.freq = 1;
+                    clientRadio.freqMin = 1;
+                    clientRadio.freqMax = 1;
+                    clientRadio.secFreq = 0;
+                    clientRadio.modulation = RadioInformation.Modulation.DISABLED;
+                    clientRadio.name = "No Radio";
+
+                    clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
+                    clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
+
+                    continue;
+                }
+
+                var updateRadio = message.radios[i];
+
+               
                 if ((updateRadio.expansion && !expansion) ||
                     (updateRadio.modulation == RadioInformation.Modulation.DISABLED))
                 {

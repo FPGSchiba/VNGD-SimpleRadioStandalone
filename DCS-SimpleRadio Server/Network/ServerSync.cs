@@ -376,7 +376,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Position = message.Client.Position;
 
 
-                    _logger.Info("Received Radio Update");
+                //    _logger.Info("Received Radio Update");
                 }
             }
         }

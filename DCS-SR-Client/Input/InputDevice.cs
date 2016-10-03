@@ -18,7 +18,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         ModifierOverlayToggle = 9,
 
         Intercom = 10,
-        ModifierIntercom = 11
+        ModifierIntercom = 11,
+
+        Switch4 = 12,
+        ModifierSwitch4 = 13,
+
+        Switch5 = 14,
+        ModifierSwitch5 = 15,
+
+        Switch6 = 16,
+        ModifierSwitch6 = 17,
+
+        Switch7 = 18,
+        ModifierSwitch7 = 19,
+
+        Switch8 = 20,
+        ModifierSwitch8 = 21,
+
+        Switch9 = 22,
+        ModifierSwitch9 = 23,
+
+        Switch10 = 24,
+        ModifierSwitch10 = 25,
     }
 
     public class InputDevice
