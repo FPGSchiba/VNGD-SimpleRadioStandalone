@@ -34,74 +34,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             DeviceLabel.Content = InputName;
             ModifierLabel.Content = InputName + " Modifier";
-
-            if (ControlInputBinding == InputBinding.Ptt)
-            {
-                ModifierBinding = InputBinding.ModifierPtt;
-            }
-            else if (ControlInputBinding == InputBinding.Switch1)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch1;
-            }
-            else if (ControlInputBinding == InputBinding.Switch2)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch2;
-            }
-            else if (ControlInputBinding == InputBinding.Switch3)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch3;
-            }
-            else if (ControlInputBinding == InputBinding.Switch4)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch4;
-            }
-            else if (ControlInputBinding == InputBinding.Switch5)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch5;
-            }
-            else if (ControlInputBinding == InputBinding.Switch6)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch6;
-            }
-            else if (ControlInputBinding == InputBinding.Switch7)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch7;
-            }
-            else if (ControlInputBinding == InputBinding.Switch8)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch8;
-            }
-            else if (ControlInputBinding == InputBinding.Switch9)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch9;
-            }
-            else if (ControlInputBinding == InputBinding.Switch10)
-            {
-                ModifierBinding = InputBinding.ModifierSwitch10;
-            }
-            else if (ControlInputBinding == InputBinding.OverlayToggle)
-            {
-                ModifierBinding = InputBinding.ModifierOverlayToggle;
-            }
-            else if (ControlInputBinding == InputBinding.Intercom)
-            {
-                ModifierBinding = InputBinding.ModifierIntercom;
-            }
+            ModifierBinding = (InputBinding)((int)ControlInputBinding)+100; //add 100 gets the enum of the modifier
+          
 
             if (InputDeviceManager.InputConfig.InputDevices != null)
             {
-                if (InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding] != null)
+                if (InputDeviceManager.InputConfig.InputDevices[ControlInputBinding] != null)
                 {
-                    var button = InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding].Button;
+                    var button = InputDeviceManager.InputConfig.InputDevices[ ControlInputBinding].Button;
                     DeviceText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
-                    Device.Text = InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding].DeviceName;
+                    Device.Text = InputDeviceManager.InputConfig.InputDevices[ControlInputBinding].DeviceName;
                 }
 
-                if (InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding] != null)
+                if (InputDeviceManager.InputConfig.InputDevices[ModifierBinding] != null)
                 {
-                    var button = InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding].Button;
+                    var button = InputDeviceManager.InputConfig.InputDevices[ ModifierBinding].Button;
                     ModifierText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
-                    ModifierDevice.Text = InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding].DeviceName;
+                    ModifierDevice.Text = InputDeviceManager.InputConfig.InputDevices[ModifierBinding].DeviceName;
                 }
             }
         }
@@ -123,7 +72,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 device.InputBind = ControlInputBinding;
 
-                InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding] = device;
+                InputDeviceManager.InputConfig.InputDevices[ControlInputBinding] = device;
                 InputDeviceManager.InputConfig.WriteInputRegistry(ControlInputBinding, device);
             });
         }
@@ -132,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void DeviceClear_Click(object sender, RoutedEventArgs e)
         {
             InputDeviceManager.InputConfig.ClearInputRegistry(ControlInputBinding);
-            InputDeviceManager.InputConfig.InputDevices[(int) ControlInputBinding] = null;
+            InputDeviceManager.InputConfig.InputDevices[ControlInputBinding] = null;
 
             Device.Text = "None";
             DeviceText.Text = "None";
@@ -154,7 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 device.InputBind = ModifierBinding;
 
-                InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding] = device;
+                InputDeviceManager.InputConfig.InputDevices[ModifierBinding] = device;
                 InputDeviceManager.InputConfig.WriteInputRegistry(ModifierBinding, device);
             });
         }
@@ -163,7 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
             InputDeviceManager.InputConfig.ClearInputRegistry(ModifierBinding);
-            InputDeviceManager.InputConfig.InputDevices[(int) ModifierBinding] = null;
+            InputDeviceManager.InputConfig.InputDevices[ModifierBinding] = null;
 
             ModifierDevice.Text = "None";
             ModifierText.Text = "None";

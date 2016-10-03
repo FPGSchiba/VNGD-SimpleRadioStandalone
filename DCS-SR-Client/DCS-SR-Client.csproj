@@ -157,6 +157,7 @@
     <Compile Include="Audio\JitterBufferProvider.cs" />
     <Compile Include="Audio\RadioMixDown.cs" />
     <Compile Include="Audio\TestWaveInProvider.cs" />
+    <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCSLosCheckResult.cs" />

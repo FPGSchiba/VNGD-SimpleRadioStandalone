@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Microsoft.Win32;
 
@@ -8,15 +9,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public static readonly string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
 
-        public InputDevice[] InputDevices = new InputDevice[Enum.GetValues(typeof(InputBinding)).Length];
+        public Dictionary<InputBinding,InputDevice> InputDevices = new Dictionary<InputBinding, InputDevice>();
 
         public InputConfiguration()
         {
             //load from registry
-            //    PTTCommon = ReadInputRegistry("common");
-            foreach (var bind in Enum.GetValues(typeof(InputBinding)))
+            foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
             {
-                InputDevices[(int) bind] = ReadInputRegistry((InputBinding) bind);
+                InputDevices[bind] = ReadInputRegistry(bind);
             }
         }
 

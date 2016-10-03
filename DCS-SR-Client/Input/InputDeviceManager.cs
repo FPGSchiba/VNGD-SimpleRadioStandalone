@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
     {
         public delegate void DetectButton(InputDevice inputDevice);
 
-        public delegate void DetectPttCallback(bool[] buttonStates);
+        public delegate void DetectPttCallback(List<InputBindState> buttonStates);
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -276,96 +276,96 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             });
         }
 
+
+
         public void StartDetectPtt(DetectPttCallback callback)
         {
             _detectPtt = true;
-            var bindingsCount = Enum.GetValues(typeof(InputBinding)).Length;
             //detect the state of all current buttons
             var pttInputThread = new Thread(() =>
             {
                 while (_detectPtt)
                 {
-                    var buttonStates = new bool[bindingsCount];
-                    for (var i = 0; i < bindingsCount; i++)
-                    {
-                        //init to true so the modifier bindings logic is easier
-                        buttonStates[i] = true;
-                    }
+                    var bindStates = GenerateBindStateList();
+                
 
-                    var noDevices = true;
-                    for (var j = 0; j < InputConfig.InputDevices.Length; j++)
+                    for (var i = 0; i < bindStates.Count; i++)
                     {
-                        var device = InputConfig.InputDevices[j];
+                        //contains main binding and optional modifier binding + states of each
+                        var bindState = bindStates[i];
 
-                        if (device != null)
+                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
+
+                        if (bindState.ModifierDevice != null)
                         {
-                            noDevices = false;
-                            for (var i = 0; i < _inputDevices.Count; i++)
-                            {
-                                if (_inputDevices[i].Information.InstanceGuid.Equals(device.InstanceGuid))
-                                {
-                                    if (_inputDevices[i] is Joystick)
-                                    {
-                                        _inputDevices[i].Poll();
-                                        var state = (_inputDevices[i] as Joystick).GetCurrentState();
+                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
 
-                                        if (device.Button >= 128) //its a POV!
-                                        {
-                                            var pov = state.PointOfViewControllers;
-                                            buttonStates[(int) device.InputBind] = pov[device.Button - 128] ==
-                                                                                   device.ButtonValue;
-                                        }
-                                        else
-                                        {
-                                            buttonStates[(int) device.InputBind] = state.Buttons[device.Button];
-                                        }
-
-
-                                        break;
-                                    }
-                                    if (_inputDevices[i] is Keyboard)
-                                    {
-                                        var keyboard = _inputDevices[i] as Keyboard;
-                                        keyboard.Poll();
-                                        var state = keyboard.GetCurrentState();
-                                        buttonStates[(int) device.InputBind] =
-                                            state.IsPressed(state.AllKeys[device.Button]);
-                                    }
-                                }
-                            }
+                            bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
                         }
                         else
                         {
-                            if ((j < 4) 
-                            || (j == 8) //Intercom
-                            || (j == 10) //Overlay
-                            || (j > 10 &&  //All the main (not modifiers) are even numbers so mod 2 to work out if any main buttons are pressed
-                                j % 2 == 0)
+                            bindState.IsActive = bindState.MainDeviceState;
+                        }
 
-                            ) 
+                        //now check this is the best binding and no previous ones are better
+                        //Means you can have better binds like PTT  = Space and Radio 1 is Space +1 - holding space +1 will actually trigger radio 1 not PTT
+                        if (bindState.IsActive)
+                        {
+                            for (int j = 0; j < i; j++)
                             {
-                                // set to false as its its a main button, not a modifier
-                                buttonStates[j] = false;
+                                //check previous bindings
+                                var previousBind = bindStates[j];
+
+                                if (previousBind.IsActive)
+                                {
+                                    if (previousBind.ModifierDevice == null && bindState.ModifierDevice !=null)
+                                    {
+                                        //set previous bind to off if previous bind Main == main or modifier of bindstate
+                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            previousBind.IsActive = false;
+                                            break;
+                                        }
+                                        if (previousBind.MainDevice.IsSameBind(bindState.ModifierDevice))
+                                        {
+                                            previousBind.IsActive = false;
+                                            break;
+                                        }
+
+                                    }
+                                    else if (previousBind.ModifierDevice != null && bindState.ModifierDevice == null)
+                                    {
+                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            bindState.IsActive = false;
+                                            break;
+                                        }
+                                        if (previousBind.ModifierDevice.IsSameBind(bindState.MainDevice))
+                                        {
+                                            bindState.IsActive = false;
+                                            break;
+                                        }
+                                    }
+
+                                }
                             }
                         }
                     }
-                    //if no buttons are bound then  call callback with false for everything
-                    if (noDevices)
+
+                    callback(bindStates);
+                    //handle overlay
+
+                    foreach (var bindState in bindStates)
                     {
-                        callback(new bool[bindingsCount]);
-                    }
-                    else
-                    {
-                        callback(buttonStates);
-                        //handle overlay
-                        if (buttonStates[(int) InputBinding.OverlayToggle] &&
-                            buttonStates[(int) InputBinding.ModifierOverlayToggle])
+                        if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.OverlayToggle)
                         {
                             //run on main
                             Application.Current.Dispatcher.Invoke(
                                 () => { _toggleOverlayCallback(false); });
+                            break;
                         }
                     }
+                      
 
                     Thread.Sleep(40);
                 }
@@ -376,6 +376,73 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public void StopPtt()
         {
             _detectPtt = false;
+        }
+
+        private bool GetButtonState(InputDevice inputDeviceBinding)
+        {
+            foreach (var device in _inputDevices)
+            {
+                if (device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
+                {
+                    if (device is Joystick)
+                    {
+                        device.Poll();
+                        var state = (device as Joystick).GetCurrentState();
+
+                        if (inputDeviceBinding.Button >= 128) //its a POV!
+                        {
+                            var pov = state.PointOfViewControllers;
+                            //-128 to get POV index
+                            return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
+                        }
+                        else
+                        {
+                            return state.Buttons[inputDeviceBinding.Button];
+                        }
+                    }
+                    else if (device is Keyboard)
+                    {
+                        var keyboard = device as Keyboard;
+                        keyboard.Poll();
+                        var state = keyboard.GetCurrentState();
+                        return
+                            state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                    }
+                }
+            }
+            return false;
+        }
+
+        public List<InputBindState> GenerateBindStateList()
+        {
+            var bindStates = new List<InputBindState>();
+
+            //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
+            //MIN + MAX bind numbers
+            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.OverlayToggle; i++)
+            {
+                var mainInputBind = InputConfig.InputDevices[(InputBinding) i];
+
+                if (mainInputBind != null)
+                {
+                    //construct InputBindState
+
+                    var bindState = new InputBindState()
+                    {
+                        IsActive = false,
+                        MainDevice = mainInputBind,
+                        MainDeviceState = false,
+                        ModifierDevice = InputConfig.InputDevices[(InputBinding) i + 100], // can be null but OK
+                        ModifierState = false
+                    };
+
+                    bindStates.Add(bindState);
+                }
+
+            }
+
+            return bindStates;
+
         }
     }
 }
