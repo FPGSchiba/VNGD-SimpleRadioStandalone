@@ -4,42 +4,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
     public enum InputBinding
     {
-        Switch1 = 0,
-        Switch2 = 1,
-        Switch3 = 2,
-        Ptt = 3,
 
-        ModifierSwitch1 = 4,
-        ModifierSwitch2 = 5,
-        ModifierSwitch3 = 6,
-        ModifierPtt = 7,
+        Intercom = 100,
+        ModifierIntercom = 200,
 
-        OverlayToggle = 8, //all buttons that are "main" buttons will be in hundreds
-        ModifierOverlayToggle = 9,
+        Switch1 = 101,
+        ModifierSwitch1 = 201,
 
-        Intercom = 10,
-        ModifierIntercom = 11,
+        Switch2 = 102,
+        ModifierSwitch2 = 202,
 
-        Switch4 = 12,
-        ModifierSwitch4 = 13,
+        Switch3 = 103,
+        ModifierSwitch3 = 203,
 
-        Switch5 = 14,
-        ModifierSwitch5 = 15,
+        Switch4 = 104,
+        ModifierSwitch4 = 204,
 
-        Switch6 = 16,
-        ModifierSwitch6 = 17,
+        Switch5 = 105,
+        ModifierSwitch5 = 205,
 
-        Switch7 = 18,
-        ModifierSwitch7 = 19,
+        Switch6 = 106,
+        ModifierSwitch6 = 206,
 
-        Switch8 = 20,
-        ModifierSwitch8 = 21,
+        Switch7 = 107,
+        ModifierSwitch7 = 207,
 
-        Switch9 = 22,
-        ModifierSwitch9 = 23,
+        Switch8 = 108,
+        ModifierSwitch8 = 208,
 
-        Switch10 = 24,
-        ModifierSwitch10 = 25,
+        Switch9 = 109,
+        ModifierSwitch9 = 209,
+
+        Switch10 = 110,
+        ModifierSwitch10 = 210,
+
+        Ptt = 111,
+        ModifierPtt = 211,
+
+        OverlayToggle = 112,
+        ModifierOverlayToggle = 212,
     }
 
     public class InputDevice
@@ -51,5 +54,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public int Button { get; set; }
         public Guid InstanceGuid { get; internal set; }
         public int ButtonValue { get; internal set; }
+
+
+        public bool IsSameBind(InputDevice compare)
+        {
+            return Button == compare.Button && 
+                compare.InstanceGuid == InstanceGuid &&
+                   ButtonValue == compare.ButtonValue;
+        }
     }
+
+
 }

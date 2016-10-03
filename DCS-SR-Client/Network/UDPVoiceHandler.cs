@@ -99,63 +99,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var radios = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-                //can be overriden by PTT Settings
-                var ptt = pressed[(int) InputBinding.ModifierPtt] && pressed[(int) InputBinding.Ptt];
+                var radioSwitchPtt = settings.UserSettings[(int)SettingType.RadioSwitchIsPTT] == "ON";
 
-                //check we're allowed to switch radios
-                if (radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                var ptt = false;
+                foreach (var inputBindState in pressed)
                 {
-                    if (pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
+                    if (inputBindState.IsActive)
                     {
-                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[1];
-
-                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        //radio switch?
+                        if ((int) inputBindState.MainDevice.InputBind >= (int) InputBinding.Intercom &&
+                            (int) inputBindState.MainDevice.InputBind <= (int) InputBinding.Switch10)
                         {
-                            radios.selected = 1;
+                            //gives you radio id if you minus 100
+                            var radioId = (int) inputBindState.MainDevice.InputBind - 100;
+
+                            if (radioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length)
+                            {
+                                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[radioId];
+
+                                if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                                {
+                                    radios.selected = (short)radioId;
+                                }
+
+                                //turn on PTT
+                                if (radioSwitchPtt)
+                                {
+                                    ptt = true;
+                                }
+                            }
                         }
-                    }
-                    else if (pressed[(int) InputBinding.ModifierSwitch2] && pressed[(int) InputBinding.Switch2])
-                    {
-                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[2];
-
-                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                        else if (inputBindState.MainDevice.InputBind == InputBinding.Ptt)
                         {
-                            radios.selected = 2;
-                        }
-                    }
-                    else if (pressed[(int) InputBinding.ModifierSwitch3] && pressed[(int) InputBinding.Switch3])
-                    {
-                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[3];
-
-                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
-                        {
-                            radios.selected = 3;
-                        }
-                    }
-                    else if (pressed[(int) InputBinding.Intercom] && pressed[(int) InputBinding.ModifierIntercom])
-                    {
-                        var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[0];
-
-                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
-                        {
-                            radios.selected = 0;
+                            ptt = true;
                         }
                     }
                 }
 
-                var radioSwitchPtt = settings.UserSettings[(int) SettingType.RadioSwitchIsPTT] == "ON";
-
-                if ((radioSwitchPtt &&
-                     ((pressed[(int) InputBinding.ModifierSwitch1] && pressed[(int) InputBinding.Switch1])
-                      || (pressed[(int) InputBinding.ModifierSwitch2] && pressed[(int) InputBinding.Switch2])
-                      || (pressed[(int) InputBinding.ModifierSwitch3] && pressed[(int) InputBinding.Switch3])))
-                    || (pressed[(int) InputBinding.Intercom] && pressed[(int) InputBinding.ModifierIntercom])
-                )
-                {
-                    ptt = true;
-                }
-
-                //set final PTT AFTER mods
+                //if length is zero - no keybinds or no PTT pressed set to false
                 _ptt = ptt;
             });
 
