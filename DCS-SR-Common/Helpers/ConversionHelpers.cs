@@ -17,5 +17,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             Buffer.BlockCopy(shortArray, 0, byteArray, 0, byteArray.Length);
             return byteArray;
         }
+
+        public static short ToShort(byte byte1, byte byte2)
+        { 
+            return  (short)(byte1 | byte2 << 8);
+        }
+
+        public static void FromShort(short number, out byte byte1, out byte byte2)
+        {
+            byte2 = (byte)(number >> 8);
+            byte1 = (byte)(number & 255);
+        }
     }
 }
