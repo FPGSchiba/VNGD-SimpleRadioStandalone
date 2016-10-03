@@ -268,7 +268,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                 //Check that we're not transmitting on this radio
 
-                                double receivingPower = 0;
+                                double receivingPowerLossPercent = 0;
                                 float lineOfSightLoss = 0;
 
                                 if ((receivingRadio != null) && (receivingState != null)
@@ -279,7 +279,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                      (
                                          HasLineOfSight(udpVoicePacket, out lineOfSightLoss)
                                          &&
-                                         InRange(udpVoicePacket, out receivingPower)
+                                         InRange(udpVoicePacket, out receivingPowerLossPercent)
                                          &&
                                          !ShouldBlockRxAsTransmitting(receivingState.ReceivedOn)
                                      )
@@ -320,7 +320,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 receivingRadio.enc,
                                             // mark if we can decrypt it
                                             RadioReceivingState = receivingState,
-                                            RecevingPower = receivingPower,
+                                            RecevingPower = receivingPowerLossPercent, //loss of 1.0 or greater is total loss
                                             LineOfSightLoss = lineOfSightLoss, // Loss of 1.0 or greater is total loss
                                             PacketNumber = udpVoicePacket.PacketNumber
                                         };
@@ -434,11 +434,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     return true;
                 }
 
-                signalStrength =
-                    RadioCalculator.FriisTransmissionReceivedPower(
-                        RadioCalculator.CalculateDistance(myPosition, clientPos), udpVoicePacket.Frequency);
+                var dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
 
-                return signalStrength > RadioCalculator.RXSensivity;
+                var max = RadioCalculator.FriisMaximumTransmissionRange(udpVoicePacket.Frequency);
+
+                signalStrength = (dist/max);
+
+                return max > dist;
             }
             return false;
         }

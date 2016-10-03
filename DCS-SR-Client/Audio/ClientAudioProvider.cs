@@ -80,18 +80,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             for (var i = 0; i < audio.Length; i++)
             {
                 var speaker1Short = (short) (audio[i]*clientAudio.Volume);
-                if (clientAudio.RecevingPower < 0)
+               
+                //calculate % loss 
+                var loss = 1 - clientAudio.RecevingPower;
+                //add in radio loss
+                //if less than loss reduce volume
+                if (clientAudio.RecevingPower <= 0.1) // less than 10% or lower left
                 {
-                    //calculate % loss - not real percent coz is logs
-                    var loss = clientAudio.RecevingPower/RadioCalculator.RXSensivity;
-
-                    //add in radio loss
-                    //if more than 0.6 loss reduce volume
-                    if (loss > 0.6)
-                    {
-                        speaker1Short = (short) (speaker1Short*(1.0f - loss));
-                    }
+                    //gives linear signal loss from 10% down to 0%
+                    speaker1Short = (short) (speaker1Short* loss/0.1);
                 }
+                
 
                 //0 is no loss so if more than 0 reduce volume
                 if (clientAudio.LineOfSightLoss > 0)

@@ -136,20 +136,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (localByName != null && localByName.Length > 0)
                 {
-                    if (foreGround == localByName[0].MainWindowHandle)
+                    //either DCS is in focus OR Overlay window is not in focus
+                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround || this.IsMouseOver)
                     {
                         _lastFocus = Environment.TickCount;
                     }
-                    else if (Environment.TickCount > _lastFocus + 3000l && overlayWindow == foreGround)
+                    else if (Environment.TickCount > _lastFocus + 2000l && overlayWindow == foreGround)
                     {
                         WindowHelper.BringProcessToFront(localByName[0]);
                     }
-
                 }
             }
         }
-
-  
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -253,5 +251,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
 
         #endregion
+
+        private void RadioOverlayWindow_OnLocationChanged(object sender, EventArgs e)
+        {
+            //reset last focus so we dont switch back to dcs while dragging
+            _lastFocus = Environment.TickCount;
+
+        }
     }
 }

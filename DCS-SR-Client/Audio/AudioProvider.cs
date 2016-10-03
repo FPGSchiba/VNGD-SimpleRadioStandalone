@@ -1,4 +1,6 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
@@ -111,11 +113,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             var stereoMix = new byte[pcmAudio.Length*2];
             for (var i = 0; i < pcmAudio.Length/2; i++)
             {
-                stereoMix[i*4] = pcmAudio[i*2];
-                stereoMix[i*4 + 1] = pcmAudio[i*2 + 1];
 
-                stereoMix[i*4 + 2] = pcmAudio[i*2];
-                stereoMix[i*4 + 3] = pcmAudio[i*2 + 1];
+                short audio = ConversionHelpers.ToShort(pcmAudio[i*2], pcmAudio[i*2 + 1]);
+
+                //half audio to keep loudness the same
+                if (audio != 0)
+                {
+                    audio = (short) (audio/2);
+                }
+
+                byte byte1;
+                byte byte2;
+                ConversionHelpers.FromShort(audio, out byte1, out byte2);
+
+                stereoMix[i*4] = byte1;
+                stereoMix[i*4 + 1] = byte2;
+
+                stereoMix[i*4 + 2] = byte1;
+                stereoMix[i*4 + 3] = byte2;
             }
             return stereoMix;
         }
