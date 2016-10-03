@@ -69,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         [DllImport("kernel32.dll")]
         private static extern long GetTickCount64();
 
-        private void JitterBufferTick()
+        private void AudioEffectCheckTick()
         {
             for (var i = 0; i < RadioReceivingState.Length; i++)
             {
@@ -188,7 +188,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StopTimer();
 
             // _jitterBuffer.Clear();
-            _timer = new Timer(JitterBufferTick, TimeSpan.FromMilliseconds(JITTER_BUFFER));
+            _timer = new Timer(AudioEffectCheckTick, TimeSpan.FromMilliseconds(JITTER_BUFFER));
             _timer.Start();
         }
 

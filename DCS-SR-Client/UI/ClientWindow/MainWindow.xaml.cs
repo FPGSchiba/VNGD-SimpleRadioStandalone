@@ -111,6 +111,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioOverlayTaskbarHide();
 
+            InitRefocusDCS();
+
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
@@ -296,6 +298,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 RadioOverlayTaskbarItem.IsChecked = false;
             }
         }
+
+        private void InitRefocusDCS()
+        {
+            var refocus = Settings.Instance.UserSettings[(int)SettingType.RefocusDCS];
+            if (refocus == "ON")
+            {
+                RefocusDCS.IsChecked = true;
+            }
+            else
+            {
+                RefocusDCS.IsChecked = false;
+            }
+        }
+
+        
 
         private void SetupLogging()
         {
@@ -681,6 +698,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Settings.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string) RadioOverlayTaskbarItem.Content);
         }
 
-       
+
+        private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RefocusDCS, (string)RefocusDCS.Content);
+        }
     }
 }

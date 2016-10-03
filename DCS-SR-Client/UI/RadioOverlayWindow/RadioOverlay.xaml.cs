@@ -1,10 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 
@@ -30,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             InitializeComponent();
 
-            _aspectRatio = MinWidth/MinHeight;
+            _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
             Opacity = opacity;
@@ -57,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             RadioRefresh(null, null);
 
             //init radio refresh
-            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(80) };
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
         }
@@ -111,7 +115,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 ControlText.Text = "";
             }
+
+            FocusDCS();
         }
+
+        private int _lastFocus;
+
+        private void FocusDCS()
+        {
+            var focus = Settings.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
+
+            if (focus)
+            {
+                var overlayWindow = new WindowInteropHelper(this).Handle;
+
+                //focus DCS if needed 
+                var foreGround = WindowHelper.GetForegroundWindow();
+
+                Process[] localByName = Process.GetProcessesByName("dcs");
+
+                if (localByName != null && localByName.Length > 0)
+                {
+                    if (foreGround == localByName[0].MainWindowHandle)
+                    {
+                        _lastFocus = Environment.TickCount;
+                    }
+                    else if (Environment.TickCount > _lastFocus + 3000l && overlayWindow == foreGround)
+                    {
+                        WindowHelper.BringProcessToFront(localByName[0]);
+                    }
+
+                }
+            }
+        }
+
+  
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -153,18 +191,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void CalculateScale()
         {
-            var yScale = ActualHeight/RadioOverlayWin.MinWidth;
-            var xScale = ActualWidth/RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight / RadioOverlayWin.MinWidth;
+            var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
-            ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
+            ScaleValue = (double)OnCoerceScaleValue(RadioOverlayWin, value);
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             if (sizeInfo.WidthChanged)
-                Width = sizeInfo.NewSize.Height*_aspectRatio;
+                Width = sizeInfo.NewSize.Height * _aspectRatio;
             else
-                Height = sizeInfo.NewSize.Width/_aspectRatio;
+                Height = sizeInfo.NewSize.Width / _aspectRatio;
 
             AppConfiguration.Instance.RadioWidth = Width;
             AppConfiguration.Instance.RadioHeight = Height;
@@ -178,12 +216,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
+        
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
             var mainWindow = o as RadioOverlayWindow;
             if (mainWindow != null)
-                return mainWindow.OnCoerceScaleValue((double) value);
+                return mainWindow.OnCoerceScaleValue((double)value);
             return value;
         }
 
@@ -191,7 +230,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             var mainWindow = o as RadioOverlayWindow;
             if (mainWindow != null)
-                mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
+                mainWindow.OnScaleValueChanged((double)e.OldValue, (double)e.NewValue);
         }
 
         protected virtual double OnCoerceScaleValue(double value)
@@ -209,7 +248,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public double ScaleValue
         {
-            get { return (double) GetValue(ScaleValueProperty); }
+            get { return (double)GetValue(ScaleValueProperty); }
             set { SetValue(ScaleValueProperty, value); }
         }
 
