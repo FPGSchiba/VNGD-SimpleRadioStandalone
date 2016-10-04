@@ -261,6 +261,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         var srClient = message.Client;
                         if (!_clients.ContainsKey(srClient.ClientGuid))
                         {
+                            if (message.Version == null)
+                            {
+                                _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " + clientIp.Port);
+                                state.workSocket.Disconnect(true);
+                                return;
+                            }
+
+                            var clientVersion = Version.Parse(message.Version);
+                            var serverVersion = Version.Parse(UpdaterChecker.VERSION);
+
+                            if (clientVersion != serverVersion)
+                            {
+
+                                _logger.Warn($"Disconnecting Non Matching Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
+                                HandleVersionMismatch(state.workSocket);
+
+                                //close socket after
+                                state.workSocket.Disconnect(true);
+
+                                return;
+                            }
+
                             srClient.ClientSocket = state.workSocket;
 
                             //add to proper list
@@ -297,6 +319,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
                 ServerSettings = _serverSettings.ServerSetting
+            };
+            Send(socket, replyMessage);
+        }
+
+        private void HandleVersionMismatch(Socket socket)
+        {
+            //send server settings
+            var replyMessage = new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.VERSION_MISMATCH,
             };
             Send(socket, replyMessage);
         }
@@ -404,6 +436,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             try
             {
+                message.Version = UpdaterChecker.VERSION;
+
                 // Convert the string data to byte data using ASCII encoding.
                 var byteData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 

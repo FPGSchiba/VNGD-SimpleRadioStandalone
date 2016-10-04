@@ -6,7 +6,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="Server Settings"
                       Width="280"
-                      Height="310"
+                      Height="340"
                       ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -15,6 +15,7 @@
 
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -119,8 +120,21 @@
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
                Content="Unknown" />
+        <Label Grid.Row="7"
+               Grid.Column="0"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Content="Server Version" />
 
-        <Button Grid.Row="7"
+
+        <Label Name="ServerVersion"
+               Grid.Row="7"
+               Grid.Column="1"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Content="Unknown" />
+
+        <Button Grid.Row="8"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Width="80"
