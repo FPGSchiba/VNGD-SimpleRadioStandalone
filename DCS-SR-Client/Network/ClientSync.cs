@@ -22,6 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public static bool[] ServerSettings = new bool[Enum.GetValues(typeof(ServerSettingType)).Length];
+        public static string ServerVersion = "Unknown";
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
         private ConnectCallback _callback;
@@ -199,6 +200,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     case NetworkMessage.MessageType.SYNC:
                                         // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
+                                        //check server version
+                                        if (serverMessage.Version == null)
+                                        {
+                                          
+                                            Logger.Error("Disconnecting Unversioned Server");
+                                            Disconnect();
+                                            break;
+                                        }
+
+                                        var serverVersion = Version.Parse(serverMessage.Version);
+                                        var clientVersion = Version.Parse(UpdaterChecker.VERSION);
+
+                                        if (clientVersion != serverVersion)
+                                        {
+                                            Logger.Warn($"Disconnecting Non Matching Server Version - Version {serverMessage}");
+                                            Disconnect();
+                                            break;
+                                        }
+
+                                        ServerVersion = serverMessage.Version;
+
                                         if (serverMessage.Clients != null)
                                         {
                                             foreach (var client in serverMessage.Clients)
@@ -220,6 +242,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
                                         ServerSettings = serverMessage.ServerSettings;
+                                        ServerVersion = serverMessage.Version;
+
                                         break;
                                     case NetworkMessage.MessageType.CLIENT_DISCONNECT:
                                         //   Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
@@ -233,7 +257,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         }
 
                                         break;
-
+                                    case NetworkMessage.MessageType.VERSION_MISMATCH:
+                                        Logger.Error("Version Mismatch Between Client & Server - Disconnecting");
+                                        Disconnect();
+                                        break;
 
                                     default:
                                         Logger.Error("Recevied unknown " + line);
@@ -266,6 +293,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             try
             {
+                message.Version = UpdaterChecker.VERSION;
+
                 var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
                 _tcpClient.GetStream().Write(json, 0, json.Length);

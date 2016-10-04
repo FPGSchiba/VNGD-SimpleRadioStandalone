@@ -11,7 +11,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             SYNC,
             RADIO_UPDATE, //Only received server side
             SERVER_SETTINGS,
-            CLIENT_DISCONNECT // Client disconnected
+            CLIENT_DISCONNECT, // Client disconnected
+            VERSION_MISMATCH
         }
 
         public SRClient Client { get; set; }
@@ -21,5 +22,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public List<SRClient> Clients { get; set; }
 
         public bool[] ServerSettings { get; set; }
+        public string Version { get; set; }
     }
 }

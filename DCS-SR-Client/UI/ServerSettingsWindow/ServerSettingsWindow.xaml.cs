@@ -51,6 +51,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 RadioRXInterference.Content = settings[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
 
                 RadioExpansion.Content = settings[(int) ServerSettingType.RADIO_EXPANSION] ? "ON" : "OFF";
+
+                ServerVersion.Content = ClientSync.ServerVersion;
             }
             catch (IndexOutOfRangeException ex)
             {
