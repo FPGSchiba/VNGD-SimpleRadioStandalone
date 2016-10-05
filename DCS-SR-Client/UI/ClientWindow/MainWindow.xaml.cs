@@ -55,7 +55,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
 
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -115,8 +114,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
-            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
-            _updateTimer.Tick += UpdateClientCount;
+            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
+            _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
         }
 
@@ -197,9 +196,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void UpdateClientCount(object sender, EventArgs e)
+        private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
             ClientCount.Content = _clients.Count;
+            if (_audioManager != null)
+            {
+                Mic_VU.Value = _audioManager.MicMax;
+                Speaker_VU.Value = _audioManager.SpeakerMax;
+            }
         }
 
         private void InitAudioOutput()

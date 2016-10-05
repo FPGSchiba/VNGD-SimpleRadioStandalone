@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
@@ -45,10 +46,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
         private UdpVoiceHandler _udpVoiceHandler;
-        private VolumeSampleProvider _volumeSampleProvider;
+        private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
         private WaveIn _waveIn;
         private WaveOut _waveOut;
+
+        public short MicMax { get; set; }
+        public float SpeakerMax { get; set; }
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -77,9 +81,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        public bool Resample { get; set; }
-
-
         public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
             IPAddress ipAddress, int port)
         {
@@ -103,7 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 };
 
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProvider(_clientAudioMixer);
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 //resample client audio to 44100
@@ -115,8 +116,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.Play();
 
                 //opus
-                _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, Application.Restricted_LowLatency);
+                _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, Application.Voip);
+                _encoder.ForwardErrorCorrection = false;
                 _decoder = OpusDecoder.Create(INPUT_SAMPLE_RATE, 1);
+                _decoder.ForwardErrorCorrection = false;
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
@@ -285,18 +288,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     }
                 }
 
-                //boost microphone volume if needed
-                if (MicBoost != 1.0f)
+                short max = 0;
+                for (var n = 0; n < soundBuffer.Length; n += 2)
                 {
-                    for (var n = 0; n < soundBuffer.Length; n += 2)
-                    {
-                        var sample = (short) ((soundBuffer[n + 1] << 8) | soundBuffer[n + 0]);
-                        // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                        sample = (short) (sample*MicBoost);
-                        soundBuffer[n] = (byte) (sample & 0xFF);
-                        soundBuffer[n + 1] = (byte) (sample >> 8);
-                    }
+                    var sample = (short) ((soundBuffer[n + 1] << 8) | soundBuffer[n + 0]);
+
+                    // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
+                    sample = (short) (sample*MicBoost);
+
+                    //determine peak
+                    if (sample > max)
+                        max = sample;
+
+                    //convert back
+                    soundBuffer[n] = (byte) (sample & 0xFF);
+                    soundBuffer[n + 1] = (byte) (sample >> 8);   
                 }
+
+                MicMax = max;
 
                 try
                 {
@@ -380,6 +389,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             _stop = true;
+
+            SpeakerMax = 0;
+            MicMax = 0;
 
             MessageHub.Instance.ClearSubscriptions();
         }

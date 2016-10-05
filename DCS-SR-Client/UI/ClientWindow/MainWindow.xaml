@@ -28,13 +28,22 @@
                                   Width="150"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Top" />
-
-                        <Slider x:Name="MicrophoneBoost"
-                                Width="300"
-                                Margin="0,10,0,0"
-                                Maximum="7.0"
-                                Minimum="0.6"
-                                ValueChanged="MicrophoneBoost_ValueChanged" />
+                        <StackPanel Margin="0"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <Slider x:Name="MicrophoneBoost"
+                                    Width="150"
+                                    Margin="0,10,0,0"
+                                    Maximum="7.0"
+                                    Minimum="0.6"
+                                    ValueChanged="MicrophoneBoost_ValueChanged" />
+                            <ProgressBar Name="Mic_VU"
+                                         Width="150"
+                                         Height="20"
+                                         Margin="10,10,0,0"
+                                         Maximum="32767"
+                                         Minimum="0" />
+                        </StackPanel>
 
                         <StackPanel Margin="0"
                                     HorizontalAlignment="Center"
@@ -63,12 +72,25 @@
                                   VerticalAlignment="Top" />
 
 
-                        <Slider x:Name="SpeakerBoost"
-                                Width="300"
-                                Margin="0,10,0,0"
-                                Maximum="15.0"
-                                Minimum="1.0"
-                                ValueChanged="SpeakerBoost_ValueChanged" />
+                        <StackPanel Margin="0"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <Slider x:Name="SpeakerBoost"
+                                    Width="150"
+                                    Margin="0,10,0,0"
+                                    VerticalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Maximum="15.0"
+                                    Minimum="1.0"
+                                    ValueChanged="SpeakerBoost_ValueChanged" />
+
+                            <ProgressBar Name="Speaker_VU"
+                                         Width="150"
+                                         Height="20"
+                                         Margin="10,10,0,0"
+                                         Maximum="1.0"
+                                         Minimum="0" />
+                        </StackPanel>
 
                         <StackPanel Margin="0"
                                     HorizontalAlignment="Center"
