@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -199,11 +200,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
             ClientCount.Content = _clients.Count;
-            if (_audioManager != null)
+
+            if (_audioPreview != null)
+            {
+                Mic_VU.Value = _audioPreview.MicMax;
+                Speaker_VU.Value = _audioPreview.SpeakerMax;
+            }
+            else if (_audioManager != null)
             {
                 Mic_VU.Value = _audioManager.MicMax;
                 Speaker_VU.Value = _audioManager.SpeakerMax;
-            }
+            } 
         }
 
         private void InitAudioOutput()
@@ -495,7 +502,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _audioPreview = new AudioPreview();
                 _audioPreview.StartPreview(Mic.SelectedIndex, Speakers.SelectedIndex);
-                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
+                _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
+                _audioPreview.MicBoost = (float)MicrophoneBoost.Value;
                 Preview.Content = "Stop Preview";
             }
             else
@@ -510,7 +518,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview != null)
             {
-                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
+                _audioPreview.MicBoost = (float) MicrophoneBoost.Value;
             }
             if (_audioManager != null)
             {
@@ -531,7 +539,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview != null)
             {
-                _audioPreview.Volume.Volume = (float) MicrophoneBoost.Value*(float) SpeakerBoost.Value;
+                _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
             }
             if (_audioManager != null)
             {
