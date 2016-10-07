@@ -50,9 +50,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         //now read in from the jitterbuffer
                         if (_bufferedAudio.Count == 0)
                         {
+                            //goes to a mixer so we just return what we've read which could be 0!
+                            //Mixer Handles this OK
+                            return read;
+                            //
                             // zero the end of the buffer
-                            Array.Clear(buffer, offset + read, count - read);
-                            read = count;
+                            //      Array.Clear(buffer, offset + read, count - read);
+                            //     read = count;
                             //  Console.WriteLine("Buffer Empty");
                         }
                         else

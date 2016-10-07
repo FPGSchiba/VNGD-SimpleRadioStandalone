@@ -10,6 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             BufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(sampleRate, 16, 2));
 
+            BufferedWaveProvider.ReadFully = false;
             BufferedWaveProvider.DiscardOnBufferOverflow = true;
 
             var pcm = new Pcm16BitToSampleProvider(BufferedWaveProvider);

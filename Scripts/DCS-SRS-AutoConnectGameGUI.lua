@@ -1,4 +1,4 @@
--- Version 1.2.7.1
+-- Version 1.2.7.2
 -- ONLY COPY THIS FILE IS YOU ARE GOING TO HOST A SERVER!
 -- The file must be in Saved Games\DCS\Scripts or Saved Games\DCS.openalpha\Scripts
 -- Make sure you enter the correct address into SERVER_SRS_HOST below.
@@ -50,7 +50,7 @@ SRSAuto.onPlayerConnect = function(id)
         return
     end
 	if SRSAuto.SERVER_SEND_AUTO_CONNECT and id ~= HOST_PLAYER_ID then
-        SRSAuto.log( SRSAuto.log("Got SRS Auto Connect message: %s", host)("Sending auto connect message to player %d ", id))
+        SRSAuto.log(string.format("Sending auto connect message to player %d on connect ", id))
 		net.send_chat_to(string.format(SRSAuto.MESSAGE_PREFIX .. "%s", SRSAuto.SERVER_SRS_HOST), id)
 	end
 end
@@ -60,7 +60,7 @@ SRSAuto.onPlayerChangeSlot = function(id)
         return
     end
     if SRSAuto.SERVER_SEND_AUTO_CONNECT and id ~= HOST_PLAYER_ID then
-        SRSAuto.log(string.format("Sending auto connect message to player %d ", id))
+        SRSAuto.log(string.format("Sending auto connect message to player %d on switch ", id))
         net.send_chat_to(string.format(SRSAuto.MESSAGE_PREFIX .. "%s", SRSAuto.SERVER_SRS_HOST), id)
    end
 end
