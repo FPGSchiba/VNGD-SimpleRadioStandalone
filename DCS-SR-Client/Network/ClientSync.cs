@@ -212,14 +212,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         var serverVersion = Version.Parse(serverMessage.Version);
                                         var clientVersion = Version.Parse(UpdaterChecker.VERSION);
 
+
+                                        ServerVersion = serverMessage.Version;
+
                                         if (clientVersion != serverVersion)
                                         {
-                                            Logger.Warn($"Disconnecting Non Matching Server Version - Version {serverMessage}");
+                                            Logger.Warn($"Disconnecting Non Matching Server Version - Version {serverMessage.Version}");
                                             Disconnect();
                                             break;
                                         }
-
-                                        ServerVersion = serverMessage.Version;
 
                                         if (serverMessage.Clients != null)
                                         {

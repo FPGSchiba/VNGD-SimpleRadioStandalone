@@ -99,9 +99,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-            //            if(_stopwatch.ElapsedMilliseconds > 22)
-            //            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-            //            _stopwatch.Restart();
 
             //fill sound buffer
 

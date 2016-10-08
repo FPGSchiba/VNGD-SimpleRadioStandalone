@@ -1,4 +1,4 @@
--- Version 1.2.7.1
+-- Version 1.2.8.0
 -- ONLY COPY THIS FILE IS YOU ARE GOING TO HOST A SERVER!
 -- The file must be in Saved Games\DCS\Scripts or Saved Games\DCS.openalpha\Scripts
 -- Make sure you enter the correct address into SERVER_SRS_HOST below.
