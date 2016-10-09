@@ -269,12 +269,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             }
 
                             var clientVersion = Version.Parse(message.Version);
-                            var serverVersion = Version.Parse(UpdaterChecker.VERSION);
+                            var protocolVersion = Version.Parse(UpdaterChecker.MINIMUM_PROTOCOL_VERSION);
 
-                            if (clientVersion != serverVersion)
+                            if (clientVersion < protocolVersion)
                             {
-
-                                _logger.Warn($"Disconnecting Non Matching Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
+                                _logger.Warn($"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
                                 HandleVersionMismatch(state.workSocket);
 
                                 //close socket after

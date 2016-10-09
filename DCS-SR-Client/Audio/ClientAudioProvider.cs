@@ -9,7 +9,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudioProvider : AudioProvider
     {
-        public static readonly int SILENCE_PAD = 120;
+        public static readonly int SILENCE_PAD = 160;
 
         private readonly BiQuadFilter _highPassFilter;
         private readonly BiQuadFilter _lowPassFilter;
@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             long now = Environment.TickCount;
-            if (now - LastUpdate > 160) //3 missed packets at 40ms
+            if (now - LastUpdate > 180) //3 missed packets at 40ms + a bit of leeway
             {
                 //append 100ms of silence - this functions as our jitter buffer??
                 var silencePad = AudioManager.INPUT_SAMPLE_RATE/1000*SILENCE_PAD;

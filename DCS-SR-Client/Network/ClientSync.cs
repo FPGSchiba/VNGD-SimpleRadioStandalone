@@ -210,14 +210,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         }
 
                                         var serverVersion = Version.Parse(serverMessage.Version);
-                                        var clientVersion = Version.Parse(UpdaterChecker.VERSION);
-
+                                        var protocolVersion = Version.Parse(UpdaterChecker.MINIMUM_PROTOCOL_VERSION);
 
                                         ServerVersion = serverMessage.Version;
 
-                                        if (clientVersion != serverVersion)
+                                        if (serverVersion < protocolVersion)
                                         {
-                                            Logger.Warn($"Disconnecting Non Matching Server Version - Version {serverMessage.Version}");
+                                            Logger.Warn($"Disconnecting From Unsupported Server Version - Version {serverMessage.Version}");
                                             Disconnect();
                                             break;
                                         }
