@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NLog;
 using NLog.Config;
@@ -54,6 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private double _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
+        private MMDeviceCollection outputDeviceList;
 
 
         public MainWindow()
@@ -197,6 +199,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void InitAudioOutput()
+        {
+
+            var enumerator = new MMDeviceEnumerator();
+            outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+
+            foreach (var device in outputDeviceList)
+            {
+                Speakers.Items.Add(device.FriendlyName);
+            }
+
+            if ((outputDeviceList.Count >= _appConfig.AudioOutputDeviceId) && (outputDeviceList.Count > 0))
+            {
+                Speakers.SelectedIndex = _appConfig.AudioOutputDeviceId;
+            }
+            else if (outputDeviceList.Count > 0)
+            {
+                Speakers.SelectedIndex = 0;
+            }
+        }
+
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
             ClientCount.Content = _clients.Count;
@@ -212,24 +235,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Speaker_VU.Value = _audioManager.SpeakerMax;
             } 
         }
-
-        private void InitAudioOutput()
-        {
-            for (var i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                Speakers.Items.Add(WaveOut.GetCapabilities(i).ProductName);
-            }
-
-            if ((WaveOut.DeviceCount >= _appConfig.AudioOutputDeviceId) && (WaveOut.DeviceCount > 0))
-            {
-                Speakers.SelectedIndex = _appConfig.AudioOutputDeviceId;
-            }
-            else if (WaveOut.DeviceCount > 0)
-            {
-                Speakers.SelectedIndex = 0;
-            }
-        }
-
 
         private void InitRadioClickEffectsToggle()
         {
@@ -455,17 +460,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 if (_stop)
                 {
-                    StartStop.Content = "Disconnect";
-                    StartStop.IsEnabled = true;
+                    try
+                    {
+                        var output = outputDeviceList[Speakers.SelectedIndex];
 
-                    //save app settings
-                    _appConfig.LastServer = ServerIp.Text.Trim();
-                    _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
-                    _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
+                        StartStop.Content = "Disconnect";
+                        StartStop.IsEnabled = true;
 
-                    _audioManager.StartEncoding(Mic.SelectedIndex, Speakers.SelectedIndex, _guid, InputManager,
-                        _resolvedIp, _port);
-                    _stop = false;
+                        //save app settings
+                        _appConfig.LastServer = ServerIp.Text.Trim();
+                        _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
+                        _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
+
+                        _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
+                            _resolvedIp, _port);
+                        _stop = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex,
+                            "Unable to get audio device - likely output device error - Pick another. Error:" +
+                            ex.Message);
+                        Stop();
+
+                        MessageBox.Show($"Problem Initialising Audio Output! Try selecting a different Output device.", "Audio Output Error", MessageBoxButton.OK,
+                         MessageBoxImage.Error);
+                    }
                 }
             }
             else
@@ -500,11 +520,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview == null)
             {
-                _audioPreview = new AudioPreview();
-                _audioPreview.StartPreview(Mic.SelectedIndex, Speakers.SelectedIndex);
-                _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
-                _audioPreview.MicBoost = (float)MicrophoneBoost.Value;
-                Preview.Content = "Stop Preview";
+                //get device
+                try
+                {
+                    var output = outputDeviceList[Speakers.SelectedIndex];
+
+                    _audioPreview = new AudioPreview();
+
+                    _audioPreview.StartPreview(Mic.SelectedIndex, output);
+                    _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
+                    _audioPreview.MicBoost = (float) MicrophoneBoost.Value;
+                    Preview.Content = "Stop Preview";
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex,"Unable to preview audio - likely output device error - Pick another. Error:"+ex.Message);
+                }
             }
             else
             {

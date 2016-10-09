@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -10,10 +11,12 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
-using FragLabs.Audio.Codecs.Opus;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using Application = FragLabs.Audio.Codecs.Opus.Application;
+using BufferedWaveProvider = Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.BufferedWaveProvider;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -49,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
         private WaveIn _waveIn;
-        private WaveOut _waveOut;
+        private WasapiOut _waveOut;
 
         public short MicMax { get; set; }
         public float SpeakerMax { get; set; }
@@ -81,10 +84,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        public void StartEncoding(int mic, int speakers, string guid, InputDeviceManager inputManager,
+        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
             IPAddress ipAddress, int port)
         {
             _stop = false;
+
 
             try
             {
@@ -97,21 +101,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WaveOut
-                {
-                    DesiredLatency = 160, // half to get tick rate - so 40ms
-                    DeviceNumber = speakers
-                };
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 160);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
-                //resample client audio to 44100
-                var resampler = new WdlResamplingSampleProvider(_volumeSampleProvider, OUTPUT_SAMPLE_RATE);
-                //resample and output at 44100
-
-                _waveOut.Init(resampler);
+                _waveOut.Init(_volumeSampleProvider);
 
                 _waveOut.Play();
 
@@ -121,6 +117,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _decoder = OpusDecoder.Create(INPUT_SAMPLE_RATE, 1);
                 _decoder.ForwardErrorCorrection = false;
 
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
+
+                MessageBox.Show($"Problem Initialising Audio Output! Try a different Output device and please post your client log on the forums", "Audio Output Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+
+                Environment.Exit(1);
+            }
+
+            try
+            {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
                     BufferMilliseconds = 20,
@@ -143,7 +152,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error starting audio Quitting! Error:" + ex.Message);
+                Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
+
+                MessageBox.Show($"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums", "Audio Input Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
 
                 Environment.Exit(1);
             }

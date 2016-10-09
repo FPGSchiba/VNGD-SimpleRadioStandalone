@@ -117,7 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[radioId];
 
-                                if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
+                                if (clientRadio.modulation != RadioInformation.Modulation.DISABLED && radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                                 {
                                     radios.selected = (short)radioId;
                                 }

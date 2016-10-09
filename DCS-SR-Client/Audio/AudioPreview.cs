@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
-using FragLabs.Audio.Codecs.Opus;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
@@ -14,7 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private BufferedWaveProvider _playBuffer;
         private WaveIn _waveIn;
-        private WaveOut _waveOut;
+        private WasapiOut _waveOut;
 
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
         private BufferedWaveProvider _buffBufferedWaveProvider;
@@ -43,15 +44,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         public short MicMax { get; set; }
         public float SpeakerMax { get; set; }
 
-        public void StartPreview(int mic, int speakers)
+        public void StartPreview(int mic, MMDevice speakers)
         {
             try
             {
-                _waveOut = new WaveOut
-                {
-                    DesiredLatency = 160, // half to get tick rate - so 40ms
-                    DeviceNumber = speakers
-                };
+                _waveOut = new WasapiOut(speakers,AudioClientShareMode.Shared, true, 200);
 
                 _buffBufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;
@@ -62,16 +59,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter, (peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
-                //resample client audio to 44100
-                var resampler = new WdlResamplingSampleProvider(_volumeSampleProvider, AudioManager.OUTPUT_SAMPLE_RATE);
-                //resample and output at 44100
-
-                _waveOut.Init(resampler);
+                _waveOut.Init(_volumeSampleProvider);
 
                 _waveOut.Play();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
 
+                MessageBox.Show($"Problem Initialising Audio Output! Try a different Output device and please post your client log on the forums", "Audio Output Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+
+                Environment.Exit(1);
+            }
+
+            try
+            {
                 //opus
-                _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1, Application.Voip);
+                _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
                 _encoder.ForwardErrorCorrection = false;
                 _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
                 _decoder.ForwardErrorCorrection = false;
@@ -87,11 +92,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _waveIn.WaveFormat = new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1);
 
                 _waveIn.StartRecording();
-
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error starting audio Quitting! " + ex.Message);
+                Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
+
+                MessageBox.Show($"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums", "Audio Input Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
 
                 Environment.Exit(1);
             }

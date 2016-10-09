@@ -1,6 +1,7 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using BufferedWaveProvider = Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.BufferedWaveProvider;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
