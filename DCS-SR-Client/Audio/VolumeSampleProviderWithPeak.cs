@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             get { return source.WaveFormat; }
         }
 
+        private int count = 0;
+        private float lastPeak = 0;
         /// <summary>
         /// Reads samples from this sample provider
         /// </summary>
@@ -44,10 +47,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         /// <param name="sampleCount">Number of samples desired</param>
         /// <returns>Number of samples read</returns>
         public int Read(float[] buffer, int offset, int sampleCount)
-        {
+        { 
             int samplesRead = source.Read(buffer, offset, sampleCount);
 
-            float max = 0;
             for (int n = 0; n < sampleCount; n++)
             {
                 var sample = buffer[offset + n];
@@ -55,13 +57,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 buffer[offset + n] = sample;
 
-                if (sample > max)
+                if (sample > lastPeak)
                 {
-                    max = sample;
+                    lastPeak = sample;
                 }
             }
 
-            _samplePeak(max);
+            if (count > 8)
+            {
+                _samplePeak(lastPeak);
+                count = 0;
+                lastPeak = 0;
+            }
+            else
+            {
+                count++;
+            }
+          
     
             return samplesRead;
         }
