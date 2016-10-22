@@ -17,7 +17,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             RADIO_SIZE,
             RADIO_OPACITY,
             RADIO_WIDTH,
-            RADIO_HEIGHT
+            RADIO_HEIGHT,
+            CLIENT_X,
+            CLIENT_Y,
+            AWACS_X,
+            AWACS_Y,
         }
 
         private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
@@ -35,6 +39,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private double _radioX;
         private double _radioY;
         private float _speakerBoost;
+
+        private double _clientX;
+        private double _clientY;
+
+        private double _awacsX;
+        private double _awacsY;
 
         private AppConfiguration()
         {
@@ -114,6 +124,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex)
             {
                 RadioY = 300;
+            }
+
+            try
+            {
+                 AwacsX = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.AWACS_X.ToString(),
+                    "300"));
+            }
+            catch (Exception ex)
+            {
+                AwacsX = 300;
+            }
+
+            try
+            {
+                AwacsY = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.AWACS_Y.ToString(),
+                    "300"));
+            }
+            catch (Exception ex)
+            {
+                AwacsY = 300;
+            }
+
+            try
+            {
+                ClientX = double.Parse((string)Registry.GetValue(RegPath,
+                   RegKeys.CLIENT_X.ToString(),
+                   "300"));
+            }
+            catch (Exception ex)
+            {
+                ClientX = 300;
+            }
+
+            try
+            {
+                ClientY = double.Parse((string)Registry.GetValue(RegPath,
+                    RegKeys.CLIENT_Y.ToString(),
+                    "300"));
+            }
+            catch (Exception ex)
+            {
+                ClientY = 300;
             }
 
 
@@ -308,6 +362,61 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_OPACITY.ToString(),
                     _radioOpacity);
+            }
+        }
+
+
+
+        public double AwacsX
+        {
+            get { return _awacsX; }
+            set
+            {
+                _awacsX = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.AWACS_X.ToString(),
+                    _awacsX);
+            }
+        }
+
+        public double AwacsY
+        {
+            get { return _awacsY; }
+            set
+            {
+                _awacsY = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.AWACS_Y.ToString(),
+                    _awacsY);
+            }
+        }
+
+
+        public double ClientX
+        {
+            get { return _clientX; }
+            set
+            {
+                _clientX = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.CLIENT_X.ToString(),
+                    _clientX);
+            }
+        }
+
+        public double ClientY
+        {
+            get { return _clientY; }
+            set
+            {
+                _clientY = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.CLIENT_Y.ToString(),
+                    _clientY);
             }
         }
     }

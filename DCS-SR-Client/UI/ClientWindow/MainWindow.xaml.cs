@@ -62,6 +62,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             InitializeComponent();
 
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
+            this.Left = AppConfiguration.Instance.ClientX;
+            this.Top = AppConfiguration.Instance.ClientY; 
+
 
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
@@ -494,8 +498,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        
+
         protected override void OnClosing(CancelEventArgs e)
         {
+            AppConfiguration.Instance.ClientX = this.Left;
+            AppConfiguration.Instance.ClientY = this.Top;
+
+            //save window position
             base.OnClosing(e);
 
             //stop timer
