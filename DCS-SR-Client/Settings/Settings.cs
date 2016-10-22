@@ -24,7 +24,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         ResampleOutput = 9, //not used - on always
         AutoConnectPrompt = 10, //message about auto connect
         RadioOverlayTaskbarHide = 11,
-        RefocusDCS = 19
+        RefocusDCS = 19,
+        ExpandControls = 20
     }
 
 

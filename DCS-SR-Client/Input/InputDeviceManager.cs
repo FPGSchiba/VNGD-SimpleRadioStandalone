@@ -60,7 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
                                 " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
-                                deviceInstance.UsagePage);
+                                deviceInstance.UsagePage + "Type: " +
+                                deviceInstance.Type);
 
 
                     if (deviceInstance.Type == DeviceType.Keyboard)
@@ -69,6 +70,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                     " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
                         var device = new Keyboard(_directInput);
+
+                        device.SetCooperativeLevel(WindowHelper.Handle,
+                            CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                        device.Acquire();
+
+                        _inputDevices.Add(device);
+                    }
+                    if (deviceInstance.Type == DeviceType.Mouse)
+                    {
+                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
+                                    " " +
+                                    deviceInstance.ProductName.Trim().Replace("\0", ""));
+                        var device = new Mouse(_directInput);
 
                         device.SetCooperativeLevel(WindowHelper.Handle,
                             CooperativeLevel.Background | CooperativeLevel.NonExclusive);
@@ -91,6 +105,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
+                }
+                else if (deviceInstance.Type != DeviceType.Mouse 
+                    && deviceInstance.Type != DeviceType.Keyboard
+                    && deviceInstance.Type != DeviceType.ScreenPointer
+                     && deviceInstance.Type != DeviceType.ScreenPointer
+                    && Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
+                {
+                    var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
+
+                    Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
+                                deviceInstance.InstanceGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+
+                    device.SetCooperativeLevel(WindowHelper.Handle,
+                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    device.Acquire();
+
+                    _inputDevices.Add(device);
                 }
                 else
                 {
