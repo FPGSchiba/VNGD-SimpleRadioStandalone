@@ -32,6 +32,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             InitializeComponent();
 
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
+            this.Left = AppConfiguration.Instance.AwacsX;
+            this.Top = AppConfiguration.Instance.AwacsY;
+
             _aspectRatio = MinWidth/MinHeight;
 
             AllowsTransparency = true;
@@ -113,6 +117,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         protected override void OnClosing(CancelEventArgs e)
         {
+
+            AppConfiguration.Instance.AwacsX = this.Left;
+            AppConfiguration.Instance.AwacsY = this.Top;
+
             base.OnClosing(e);
 
             AwacsActive = false;

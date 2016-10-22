@@ -34,6 +34,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             InitializeComponent();
 
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
+
             _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
