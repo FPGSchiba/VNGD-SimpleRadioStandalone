@@ -1,4 +1,4 @@
--- Version 1.2.8.1
+-- Version 1.2.9.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 local SRS = {}
@@ -74,7 +74,8 @@ SRS.sendUpdate = function(playerID)
 
 end
 
-SRS.MESSAGE_PREFIX = "This server is running SRS on - " -- DO NOT MODIFY!!!
+SRS.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
+SRS.MESSAGE_PREFIX = "SRS Running @ " -- DO NOT MODIFY!!!
 
 function string.startsWith(string, prefix)
     return string.sub(string, 1, string.len(prefix)) == prefix
@@ -85,11 +86,15 @@ function string.trim(_str)
 end
 
 function SRS.isAutoConnectMessage(msg)
-    return string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX)
+    return string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX) or string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX_OLD)
 end
 
 function SRS.getHostFromMessage(msg)
-    return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX) + 1))
+	if string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX_OLD) then
+		return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX_OLD) + 1))
+	else
+		return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX) + 1))
+	end
 end
 
 -- Register callbacks --
