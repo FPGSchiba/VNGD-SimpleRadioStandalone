@@ -61,7 +61,7 @@ SR.UDPLosReceiveSocket = socket.udp()
 
 --bind for listening for LOS info
 SR.UDPLosReceiveSocket:setsockname("*", SR.LOS_RECEIVE_PORT)
-SR.UDPLosReceiveSocket:settimeout(.0001) --receive timer
+SR.UDPLosReceiveSocket:settimeout(0) --receive timer was 0001
 
 local terrain = require('terrain')
 

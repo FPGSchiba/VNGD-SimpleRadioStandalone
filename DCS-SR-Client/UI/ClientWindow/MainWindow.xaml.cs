@@ -746,5 +746,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             Settings.Instance.WriteSetting(SettingType.RefocusDCS, (string)RefocusDCS.Content);
         }
+
+        private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
+        {
+
+            MessageBox.Show("You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but may cause issues with other devices being detected", "Restart SimpleRadio Standalone", MessageBoxButton.OK,
+                           MessageBoxImage.Warning);
+
+            Settings.Instance.WriteSetting(SettingType.ExpandControls, (string)ExpandInputDevices.Content);
+        }
     }
 }

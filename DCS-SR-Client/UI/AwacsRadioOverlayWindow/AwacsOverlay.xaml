@@ -57,7 +57,7 @@
                        FontSize="13"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="AWAC / GCI Panel" />
+                       Text="AWACS / GCI Panel" />
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
