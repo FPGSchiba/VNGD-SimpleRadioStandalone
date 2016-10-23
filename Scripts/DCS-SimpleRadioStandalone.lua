@@ -1,4 +1,4 @@
--- Version 1.2.8.1
+-- Version 1.2.9.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -282,7 +282,7 @@ LuaExportBeforeNextFrame = function()
                 local _losList =  SR.checkLOS(_decoded)
 
                 --DEBUG
-                SR.log('LOS check ' .. SR.JSON:encode(_losList))
+               -- SR.log('LOS check ' .. SR.JSON:encode(_losList))
                 if SR.unicast then
                     socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList).." \n", "127.0.0.1", SR.LOS_SEND_TO_PORT))
                 else
@@ -1469,4 +1469,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.2.8.1")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.0")
