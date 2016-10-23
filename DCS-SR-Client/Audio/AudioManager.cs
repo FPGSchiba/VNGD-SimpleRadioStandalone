@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     public class AudioManager
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
-        public static readonly int OUTPUT_SAMPLE_RATE = 44100;
+       // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
         public static readonly int SEGMENT_FRAMES = 640; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -165,9 +165,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(INPUT_SAMPLE_RATE, 2));
             _clientAudioMixer.ReadFully = true;
-
-//            _effectsMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
-//            _effectsMixer.ReadFully = true;
         }
 
         private void InitAudioBuffers()

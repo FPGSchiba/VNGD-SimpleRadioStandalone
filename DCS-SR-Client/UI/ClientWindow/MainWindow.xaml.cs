@@ -208,20 +208,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             var enumerator = new MMDeviceEnumerator();
             outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-
+            int i = 0;
             foreach (var device in outputDeviceList)
             {
+               
                 Speakers.Items.Add(device.FriendlyName);
+
+                //first time round the loop, select first item
+                if (i == 0)
+                {
+                    Speakers.SelectedIndex = 0;
+                }
+
+                if (device.DeviceFriendlyName == _appConfig.AudioOutputDeviceId)
+                {
+                    Speakers.SelectedIndex = i; //this one
+                }
+
+                i++;
             }
 
-            if ((outputDeviceList.Count >= _appConfig.AudioOutputDeviceId) && (outputDeviceList.Count > 0))
-            {
-                Speakers.SelectedIndex = _appConfig.AudioOutputDeviceId;
-            }
-            else if (outputDeviceList.Count > 0)
-            {
-                Speakers.SelectedIndex = 0;
-            }
         }
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
@@ -474,7 +480,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         //save app settings
                         _appConfig.LastServer = ServerIp.Text.Trim();
                         _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
-                        _appConfig.AudioOutputDeviceId = Speakers.SelectedIndex;
+                        _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
                         _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
                             _resolvedIp, _port);
@@ -534,6 +540,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 try
                 {
                     var output = outputDeviceList[Speakers.SelectedIndex];
+
+                    //save settings
+                    _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
+                    _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
                     _audioPreview = new AudioPreview();
 
