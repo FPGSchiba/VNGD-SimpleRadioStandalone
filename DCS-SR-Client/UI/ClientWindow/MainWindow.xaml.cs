@@ -74,7 +74,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Title = Title + " - " + UpdaterChecker.VERSION;
 
             Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
-          
+
+            InitExpandControls();
+
             InitInput();
 
             _appConfig = AppConfiguration.Instance;
@@ -118,6 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitRadioOverlayTaskbarHide();
 
             InitRefocusDCS();
+
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
@@ -338,7 +341,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        
+
+        private void InitExpandControls()
+        {
+            var expand = Settings.Instance.UserSettings[(int)SettingType.ExpandControls];
+            if (expand == "ON")
+            {
+                ExpandInputDevices.IsChecked = true;
+            }
+            else
+            {
+                ExpandInputDevices.IsChecked = false;
+            }
+        }
+
+
+
 
         private void SetupLogging()
         {

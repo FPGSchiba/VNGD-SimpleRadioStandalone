@@ -19,7 +19,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly object BufferLock = new object();
         public static volatile RadioSendingState RadioSendingState = new RadioSendingState();
         public static volatile RadioReceivingState[] RadioReceivingState = new RadioReceivingState[11];
 

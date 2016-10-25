@@ -109,7 +109,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 else if (deviceInstance.Type != DeviceType.Mouse 
                     && deviceInstance.Type != DeviceType.Keyboard
                     && deviceInstance.Type != DeviceType.ScreenPointer
-                     && deviceInstance.Type != DeviceType.ScreenPointer
                     && Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
                 {
                     var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
