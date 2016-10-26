@@ -52,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
 
+            Logger.Info("Starting Device Search. Expand Search: "+ ((Settings.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
+
             foreach (var deviceInstance in deviceInstances)
             {
                 //Workaround for Bad Devices that pretend to be joysticks
@@ -60,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
                                 " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
-                                deviceInstance.UsagePage + "Type: " +
+                                deviceInstance.UsagePage + " Type: " +
                                 deviceInstance.Type);
 
 
@@ -77,7 +79,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                    if (deviceInstance.Type == DeviceType.Mouse)
+                    else if (deviceInstance.Type == DeviceType.Mouse)
                     {
                         Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
                                     " " +
@@ -105,30 +107,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                }
-                else if (deviceInstance.Type != DeviceType.Mouse 
-                    && deviceInstance.Type != DeviceType.Keyboard
-                    && deviceInstance.Type != DeviceType.ScreenPointer
-                    && Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
-                {
-                    var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
+                    else if (Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
+                    {
 
-                    Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
-                                deviceInstance.InstanceGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                        Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
+                                 deviceInstance.InstanceGuid + " " +
+                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
 
-                    device.SetCooperativeLevel(WindowHelper.Handle,
-                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                    device.Acquire();
+                        var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
-                    _inputDevices.Add(device);
+                        device.SetCooperativeLevel(WindowHelper.Handle,
+                            CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                        device.Acquire();
+
+                        _inputDevices.Add(device);
+
+                        Logger.Info("Added (Expanded Device) " + deviceInstance.ProductGuid + " Instance: " +
+                                 deviceInstance.InstanceGuid + " " +
+                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
+                    }
+                    
                 }
                 else
                 {
-                    Logger.Info("Found but ignoring " + deviceInstance.ProductGuid + " Instance: " +
+                    Logger.Info("Found but ignoring blacklist device  " + deviceInstance.ProductGuid + " Instance: " +
                                 deviceInstance.InstanceGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: " + deviceInstance.Type);
                 }
+
             }
         }
 
