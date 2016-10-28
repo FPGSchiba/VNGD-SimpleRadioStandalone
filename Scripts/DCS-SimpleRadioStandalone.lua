@@ -1,4 +1,4 @@
--- Version 1.2.9.0
+-- Version 1.2.9.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1487,4 +1487,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.1")
