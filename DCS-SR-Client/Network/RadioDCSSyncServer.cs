@@ -346,8 +346,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             else
             {
-                DcsPlayerRadioInfo.unitId = message.unitId;
                 overrideFreqAndVol = DcsPlayerRadioInfo.unitId != message.unitId;
+                DcsPlayerRadioInfo.unitId = message.unitId;
             }
 
             //TODO - If AWACS panel is open set unitId to something high and use that as the number

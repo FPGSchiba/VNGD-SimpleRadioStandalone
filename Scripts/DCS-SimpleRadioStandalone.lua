@@ -77,6 +77,8 @@ _prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 
 local _send  = false
 
+local _lastUnitId = "" -- used for a10c volume
+
 LuaExportActivityNextEvent = function(tCurrent)
     local tNext = tCurrent + 0.1 -- for helios support
     -- we only want to send once every 0.2 seconds 
@@ -191,6 +193,8 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                     _update.selected = 1
                 end
+
+				  _lastUnitId = _update.unitId
             else
                 -- save last pos
                 SR.lastKnownPos ={x=0,y=0,z=0 }
@@ -221,6 +225,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     },
                     radioType = 3
                 }
+
+				_lastUnitId = ""
             end
 
             if SR.unicast then
@@ -831,8 +837,20 @@ function SR.exportRadioL39(_data)
     return _data
 end
 
-
+--for A10C
 function SR.exportRadioA10C(_data)
+
+	if _lastUnitId ~= _data.unitId then
+		-- set volumes to 100%
+		local _device = GetDevice(0)
+
+		if _device then
+		    _device:set_argument_value(133,1.0)
+		    _device:set_argument_value(171,1.0)
+		    _device:set_argument_value(147,1.0)
+		end
+	end
+	
 
     _data.radios[2].name = "AN/ARC-186(V)"
     _data.radios[2].freq =  SR.getRadioFrequency(55)
