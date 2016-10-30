@@ -30,7 +30,7 @@
         <DataGrid Grid.Row="2" ItemsSource="{Binding Path=SavedAddresses}" AutoGenerateColumns="False" SelectedItem="{Binding Path=SelectedItem}" HorizontalAlignment="Center">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"/>
-                <DataGridTextColumn Header="Ip Address" Binding="{Binding Path=Address}"/>
+                <DataGridTextColumn Header="Ip Address (and port)" Binding="{Binding Path=Address}"/>
                 <DataGridTemplateColumn Header="Is Default">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:SavedAddress">

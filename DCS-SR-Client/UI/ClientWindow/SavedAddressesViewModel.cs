@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -37,6 +38,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
         public ICommand RemoveSelectedCommand { get; set; }
 
         public SavedAddress SelectedItem { get; set; }
+
+        public SavedAddress DefaultAddress
+        {
+            get
+            {
+                var defaultAddress = _savedAddresses.FirstOrDefault(x => x.IsDefault);
+                if (defaultAddress == null && _savedAddresses.Count > 0)
+                {
+                    defaultAddress = _savedAddresses.First();
+                }
+                return defaultAddress;
+            }
+        }
 
         private void OnNewAddress()
         {
