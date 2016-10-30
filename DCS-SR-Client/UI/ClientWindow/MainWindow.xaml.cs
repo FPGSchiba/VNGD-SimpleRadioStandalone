@@ -98,7 +98,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _connectCommand = new DelegateCommand(Connect, () => Address != null);
             SavedAddressesViewModel = new SavedAddressesViewModel(new CsvAddressStore());
 
-            Address = SavedAddressesViewModel.DefaultAddress;
+            InitDefaultAddress();
+
             MicrophoneBoost.Value = _appConfig.MicBoost;
             SpeakerBoost.Value = _appConfig.SpeakerBoost;
 
@@ -138,6 +139,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
+        }
+
+        private void InitDefaultAddress()
+        {
+            // legacy setting migration
+            if (!string.IsNullOrEmpty(_appConfig.LastServer) && SavedAddressesViewModel.SavedAddresses.Count == 0)
+            {
+                var oldAddress = new AddressSetting(_appConfig.LastServer, _appConfig.LastServer, true);
+                SavedAddressesViewModel.SavedAddresses.Add(oldAddress);
+            }
+
+            Address = SavedAddressesViewModel.DefaultAddress;
         }
 
         private void InitInput()
