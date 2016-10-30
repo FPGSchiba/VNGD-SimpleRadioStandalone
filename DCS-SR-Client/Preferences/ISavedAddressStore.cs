@@ -7,6 +7,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
     {
         IEnumerable<AddressSetting> LoadFromStore();
 
-        void SaveToStore(IEnumerable<AddressSetting> savedAddresses);
+        bool SaveToStore(IEnumerable<AddressSetting> savedAddresses);
     }
 }

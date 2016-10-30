@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -54,7 +55,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void OnNewAddress()
         {
-            _savedAddresses.Add(new AddressSetting(NewName, NewAddress, false));
+            var isDefault = _savedAddresses.Count == 0;
+            _savedAddresses.Add(new AddressSetting(NewName, NewAddress, isDefault));
         }
 
         private void OnRemoveSelected()
@@ -69,7 +71,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void OnSave()
         {
-            _savedAddressStore.SaveToStore(_savedAddresses);
+            var saveSucceeded = _savedAddressStore.SaveToStore(_savedAddresses);
+
+            var messageBoxText = saveSucceeded ? "Saved addresses" : "Failed to save addresses. Please check logs for details.";
+            var icon = saveSucceeded ? MessageBoxImage.Information : MessageBoxImage.Error;
+
+            MessageBox.Show(Application.Current.MainWindow, messageBoxText, "Save result", MessageBoxButton.OK, icon);
         }
     }
 }

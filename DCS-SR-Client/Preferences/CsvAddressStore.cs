@@ -37,7 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             return Enumerable.Empty<AddressSetting>();
         }
 
-        public void SaveToStore(IEnumerable<AddressSetting> savedAddresses)
+        public bool SaveToStore(IEnumerable<AddressSetting> savedAddresses)
         {
             try
             {
@@ -47,11 +47,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
                     sb.AppendLine($"{savedAddress.Name},{savedAddress.Address},{savedAddress.IsDefault}");
                 }
                 File.WriteAllText(_fileNameAndPath, sb.ToString());
+
+                return true;
             }
             catch (Exception exception)
             {
                 Logger.Error(exception, "Failed to save preferences");
             }
+            return false;
         }
 
         private IEnumerable<AddressSetting> ReadFile()

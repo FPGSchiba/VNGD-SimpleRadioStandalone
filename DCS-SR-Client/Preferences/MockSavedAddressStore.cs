@@ -12,9 +12,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             yield return new AddressSetting("test 3", "123.456", false);
         }
 
-        public void SaveToStore(IEnumerable<AddressSetting> savedAddresses)
+        public bool SaveToStore(IEnumerable<AddressSetting> savedAddresses)
         {
-            // nothing :D
+            return true;
         }
     }
 }
