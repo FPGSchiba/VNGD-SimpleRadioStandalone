@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
@@ -124,7 +125,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRefocusDCS();
 
-            SavedAddressesViewModel = new SavedAddressesViewModel();
+            SavedAddressesViewModel = new SavedAddressesViewModel(new CsvAddressStore());
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 

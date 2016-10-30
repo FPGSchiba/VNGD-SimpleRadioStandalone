@@ -178,6 +178,9 @@
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCSLosCheckResult.cs" />
+    <Compile Include="Preferences\CsvAddressStore.cs" />
+    <Compile Include="Preferences\ISavedAddressStore.cs" />
+    <Compile Include="Preferences\MockSavedAddressStore.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>

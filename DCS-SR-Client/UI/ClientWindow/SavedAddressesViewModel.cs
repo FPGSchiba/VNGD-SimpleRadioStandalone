@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
@@ -7,16 +8,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
     public class SavedAddressesViewModel
     {
         private readonly ObservableCollection<SavedAddress> _savedAddresses = new ObservableCollection<SavedAddress>();
+        private readonly ISavedAddressStore _savedAddressStore;
 
-        public SavedAddressesViewModel()
+        public SavedAddressesViewModel(ISavedAddressStore savedAddressStore)
         {
-            _savedAddresses.Add(new SavedAddress("test 1", "123.456", true));
-            _savedAddresses.Add(new SavedAddress("test 2", "123.456", false));
-            _savedAddresses.Add(new SavedAddress("test 3", "123.456", false));
+            _savedAddressStore = savedAddressStore;
+
+            foreach (var savedAddress in _savedAddressStore.LoadFromStore())
+            {
+                _savedAddresses.Add(savedAddress);
+            }
 
             NewAddressCommand = new DelegateCommand(OnNewAddress);
-            SaveCommand = new DelegateCommand(OnSave);
             RemoveSelectedCommand = new DelegateCommand(OnRemoveSelected);
+            SaveCommand = new DelegateCommand(OnSave);
         }
 
         public ObservableCollection<SavedAddress> SavedAddresses => _savedAddresses;
@@ -38,11 +43,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             _savedAddresses.Add(new SavedAddress(NewName, NewAddress, false));
         }
 
-        private void OnSave()
-        {
-            // todo
-        }
-
         private void OnRemoveSelected()
         {
             if (SelectedItem == null)
@@ -51,6 +51,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             }
 
             _savedAddresses.Remove(SelectedItem);
+        }
+
+        private void OnSave()
+        {
+            _savedAddressStore.SaveToStore(_savedAddresses);
         }
     }
 }
