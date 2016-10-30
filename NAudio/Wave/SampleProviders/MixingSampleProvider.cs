@@ -100,11 +100,6 @@ namespace NAudio.Wave.SampleProviders
         }
 
         /// <summary>
-        /// Raised when a mixer input has been removed because it has ended
-        /// </summary>
-        public event EventHandler<SampleProviderEventArgs> MixerInputEnded;
-
-        /// <summary>
         /// Removes a mixer input
         /// </summary>
         /// <param name="mixerInput">Mixer input to remove</param>
