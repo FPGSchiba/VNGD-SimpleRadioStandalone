@@ -201,7 +201,7 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsOverlay.xaml.cs">
       <DependentUpon>AwacsOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\SavedAddress.cs" />
+    <Compile Include="UI\ClientWindow\AddressSetting.cs" />
     <Compile Include="UI\ClientWindow\SavedAddressesView.xaml.cs">
       <DependentUpon>SavedAddressesView.xaml</DependentUpon>
     </Compile>

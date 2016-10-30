@@ -5,8 +5,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 {
     public interface ISavedAddressStore
     {
-        IEnumerable<SavedAddress> LoadFromStore();
+        IEnumerable<AddressSetting> LoadFromStore();
 
-        void SaveToStore(IEnumerable<SavedAddress> savedAddresses);
+        void SaveToStore(IEnumerable<AddressSetting> savedAddresses);
     }
 }

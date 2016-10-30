@@ -5,14 +5,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 {
     public class MockSavedAddressStore : ISavedAddressStore
     {
-        public IEnumerable<SavedAddress> LoadFromStore()
+        public IEnumerable<AddressSetting> LoadFromStore()
         {
-            yield return new SavedAddress("test 1", "123.456", true);
-            yield return new SavedAddress("test 2", "123.456", false);
-            yield return new SavedAddress("test 3", "123.456", false);
+            yield return new AddressSetting("test 1", "123.456", true);
+            yield return new AddressSetting("test 2", "123.456", false);
+            yield return new AddressSetting("test 3", "123.456", false);
         }
 
-        public void SaveToStore(IEnumerable<SavedAddress> savedAddresses)
+        public void SaveToStore(IEnumerable<AddressSetting> savedAddresses)
         {
             // nothing :D
         }

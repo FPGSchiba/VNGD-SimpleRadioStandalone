@@ -8,7 +8,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 {
     public class SavedAddressesViewModel
     {
-        private readonly ObservableCollection<SavedAddress> _savedAddresses = new ObservableCollection<SavedAddress>();
+        private readonly ObservableCollection<AddressSetting> _savedAddresses = new ObservableCollection<AddressSetting>();
         private readonly ISavedAddressStore _savedAddressStore;
 
         public SavedAddressesViewModel(ISavedAddressStore savedAddressStore)
@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             SaveCommand = new DelegateCommand(OnSave);
         }
 
-        public ObservableCollection<SavedAddress> SavedAddresses => _savedAddresses;
+        public ObservableCollection<AddressSetting> SavedAddresses => _savedAddresses;
 
         public string NewName { get; set; }
 
@@ -37,9 +37,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         public ICommand RemoveSelectedCommand { get; set; }
 
-        public SavedAddress SelectedItem { get; set; }
+        public AddressSetting SelectedItem { get; set; }
 
-        public SavedAddress DefaultAddress
+        public AddressSetting DefaultAddress
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void OnNewAddress()
         {
-            _savedAddresses.Add(new SavedAddress(NewName, NewAddress, false));
+            _savedAddresses.Add(new AddressSetting(NewName, NewAddress, false));
         }
 
         private void OnRemoveSelected()

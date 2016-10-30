@@ -7,12 +7,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
@@ -21,6 +23,7 @@ using NAudio.Wave;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Input.InputBinding;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -59,6 +62,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private MMDeviceCollection outputDeviceList;
+        private AddressSetting _address;
+        private readonly DelegateCommand _connectCommand;
 
         public MainWindow()
         {
@@ -90,8 +95,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitAudioOutput();
 
+            _connectCommand = new DelegateCommand(Connect, () => Address != null);
             SavedAddressesViewModel = new SavedAddressesViewModel(new CsvAddressStore());
-            SavedAddress = SavedAddressesViewModel.DefaultAddress;
+
+            Address = SavedAddressesViewModel.DefaultAddress;
             MicrophoneBoost.Value = _appConfig.MicBoost;
             SpeakerBoost.Value = _appConfig.SpeakerBoost;
 
@@ -195,7 +202,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public SavedAddressesViewModel SavedAddressesViewModel { get; }
 
-        public SavedAddress SavedAddress { get; set; }
+        public AddressSetting Address
+        {
+            get { return _address; }
+            set
+            {
+                _address = value;
+                _connectCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        public ICommand ConnectCommand => _connectCommand;
 
         private void InitAudioInput()
         {
@@ -394,7 +411,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             LogManager.Configuration = config;
         }
 
-        private void startStop_Click(object sender, RoutedEventArgs e)
+        private void Connect()
         {
             if (!_stop)
             {
@@ -437,7 +454,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private string GetAddressFromTextBox()
         {
-            var addr = SavedAddress.Address.Trim();
+            var addr = Address.Address.Trim();
 
             if (addr.Contains(":"))
             {
@@ -449,7 +466,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private int GetPortFromTextBox()
         {
-            var addr = SavedAddress.Address.Trim();
+            var addr = Address.Address.Trim();
 
             try
             {
@@ -506,7 +523,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.IsEnabled = true;
 
                         //save app settings
-                        _appConfig.LastServer = SavedAddress.Address.Trim(); // todo: remove last server preference
                         _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
                         _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
@@ -736,14 +752,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
                     {
-                        SavedAddress = new SavedAddress(connection, connection, false); // todo: add to favourites
-                        startStop_Click(null, null);
+                        Address = new AddressSetting(connection, connection, false); // todo: add to favourites?
+                        Connect();
                     }
                 }
                 else
                 {
-                    SavedAddress = new SavedAddress(connection, connection, false); // todo: add to favourites
-                    startStop_Click(null, null);
+                    Address = new AddressSetting(connection, connection, false); // todo: add to favourites?
+                    Connect();
                 }
             }
         }
@@ -807,6 +823,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                            MessageBoxImage.Warning);
 
             Settings.Instance.WriteSetting(SettingType.ExpandControls, (string)ExpandInputDevices.Content);
+        }
+
+        private void LaunchAddressTab(object sender, RoutedEventArgs e)
+        {
+            TabControl.SelectedItem = AddressesTab;
         }
     }
 }

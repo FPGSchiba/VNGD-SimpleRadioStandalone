@@ -12,36 +12,49 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <UniformGrid Grid.Row="0" Rows="1">
-            <TextBlock Text="Add new:"/>
-            <TextBlock Text="Name"/>
-            <TextBox Text="{Binding Path=NewName}"/>
-            <TextBlock Text="Address"/>
-            <TextBox Text="{Binding Path=NewAddress}"/>
-            <Button Content="Add" Command="{Binding Path=NewAddressCommand}"/>
-        </UniformGrid>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Add new configuration" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
-        <Button Grid.Row="1" Content="Remove Selected" Command="{Binding Path=RemoveSelectedCommand}"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="1" Text="Name" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBox Grid.Column="2" Text="{Binding Path=NewName}"/>
+            <TextBlock Grid.Column="3" Text="Address" VerticalAlignment="Center" Margin="5,0"/>
+            <TextBox Grid.Column="4" Text="{Binding Path=NewAddress}"/>
+            <Button Grid.Column="5" Command="{Binding Path=NewAddressCommand}" Height="23" Margin="5,0,0,0">
+                <Path Stretch="Uniform" UseLayoutRounding="False" Fill="Black" Data="F1 M 2.88,17.2725C 0.959991,15.3475 0,12.95 0,10.08C 0,7.21002 0.959991,4.8125 2.88,2.88751C 4.80002,0.962494 7.19125,0 10.0537,0C 12.9163,0 15.3163,0.962494 17.2538,2.88751C 19.1913,4.8125 20.16,7.21002 20.16,10.08C 20.16,12.95 19.1913,15.3475 17.2538,17.2725C 15.3163,19.1975 12.9163,20.16 10.0537,20.16C 7.19125,20.16 4.80002,19.1975 2.88,17.2725 Z M 3.84,11.3625L 8.81998,11.3625L 8.81998,16.32L 11.34,16.32L 11.34,11.3625L 16.32,11.3625L 16.32,8.85001L 11.34,8.85001L 11.34,3.84L 8.81998,3.84L 8.81998,8.85001L 3.84,8.85001L 3.84,11.3625 Z "/>
+            </Button>
+        </Grid>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding Path=SavedAddresses}" AutoGenerateColumns="False" SelectedItem="{Binding Path=SelectedItem}" HorizontalAlignment="Center">
+        <Button Grid.Row="2" Content="Remove Selected" Command="{Binding Path=RemoveSelectedCommand}" Margin="0,10" Width="120"/>
+
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Path=SavedAddresses}" AutoGenerateColumns="False" SelectedItem="{Binding Path=SelectedItem}" HorizontalAlignment="Center">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"/>
                 <DataGridTextColumn Header="Ip Address (and port)" Binding="{Binding Path=Address}"/>
                 <DataGridTemplateColumn Header="Is Default">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="ui:SavedAddress">
-                            <RadioButton IsChecked="{Binding Path=IsDefault}" GroupName="DefaultAddress"/>
+                        <DataTemplate DataType="ui:AddressSetting">
+                            <RadioButton IsChecked="{Binding Path=IsDefault}" GroupName="DefaultAddress" HorizontalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button Grid.Row="3" Content="Save" Height="40" Command="{Binding Path=SaveCommand}"/>
+        <Button Grid.Row="4" Content="Save" Height="40" Command="{Binding Path=SaveCommand}" Margin="0,5,0,0"/>
     </Grid>
 
 </UserControl>

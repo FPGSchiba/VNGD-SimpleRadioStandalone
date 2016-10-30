@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             _fileNameAndPath = Path.Combine(Environment.CurrentDirectory, "SavedAddresses.csv");
         }
 
-        public IEnumerable<SavedAddress> LoadFromStore()
+        public IEnumerable<AddressSetting> LoadFromStore()
         {
             try
             {
@@ -34,10 +34,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
                 Logger.Error(exception, message);
                 System.Windows.MessageBox.Show(message);
             }
-            return Enumerable.Empty<SavedAddress>();
+            return Enumerable.Empty<AddressSetting>();
         }
 
-        public void SaveToStore(IEnumerable<SavedAddress> savedAddresses)
+        public void SaveToStore(IEnumerable<AddressSetting> savedAddresses)
         {
             try
             {
@@ -54,10 +54,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             }
         }
 
-        private IEnumerable<SavedAddress> ReadFile()
+        private IEnumerable<AddressSetting> ReadFile()
         {
             var allLines = File.ReadAllLines(_fileNameAndPath);
-            IList<SavedAddress> savedAddresses = new List<SavedAddress>();
+            IList<AddressSetting> savedAddresses = new List<AddressSetting>();
 
             foreach (var line in allLines)
             {
@@ -76,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             return savedAddresses;
         }
 
-        private SavedAddress Parse(string line)
+        private AddressSetting Parse(string line)
         {
             var split = line.Split(',');
             if (split.Length == 3)
@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 
                 if (bool.TryParse(split[2], out isDefault))
                 {
-                    return new SavedAddress(split[0], split[1], isDefault);
+                    return new AddressSetting(split[0], split[1], isDefault);
                 }
                 throw new ArgumentException("isDefault parameter cannot be cast to a boolean");
             }

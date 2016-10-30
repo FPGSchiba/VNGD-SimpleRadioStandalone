@@ -72,17 +72,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             try
             {
-                LastServer = (string) Registry.GetValue(RegPath,
-                    RegKeys.LAST_SERVER.ToString(),
-                    "127.0.0.1");
-            }
-            catch (Exception ex)
-            {
-                LastServer = "127.0.0.1";
-            }
-
-            try
-            {
                 MicBoost = float.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.MIC_BOOST.ToString(),
                     "1.0"));
@@ -244,19 +233,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(RegPath,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     _audioOutputDeviceId);
-            }
-        }
-
-        public string LastServer
-        {
-            get { return _lastServer; }
-            set
-            {
-                _lastServer = value;
-
-                Registry.SetValue(RegPath,
-                    RegKeys.LAST_SERVER.ToString(),
-                    _lastServer);
             }
         }
 
