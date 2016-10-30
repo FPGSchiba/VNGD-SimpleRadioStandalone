@@ -7,11 +7,13 @@
                       xmlns:input="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Input"
                       xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:clientWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow"
                       Title="DCS-SRS Client"
                       Width="550"
                       Height="570"
                       ResizeMode="CanMinimize"
-                      mc:Ignorable="d">
+                      mc:Ignorable="d" 
+                      d:DataContext="{d:DesignInstance local:MainWindow}">
 
     <TabControl>
         <TabItem Header="General">
@@ -282,6 +284,12 @@
                                                    InputName="Radio 10" />
                     </Grid>
                 </ScrollViewer>
+            </GroupBox>
+        </TabItem>
+
+        <TabItem Header="Addresses">
+            <GroupBox Header="Addresses">
+                <clientWindow:SavedAddressesView DataContext="{Binding Path=SavedAddressesViewModel}"/>
             </GroupBox>
         </TabItem>
 

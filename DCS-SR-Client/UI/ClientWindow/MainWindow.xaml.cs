@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
@@ -10,6 +11,7 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
@@ -57,10 +59,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
         private MMDeviceCollection outputDeviceList;
 
-
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = this;
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.Left = AppConfiguration.Instance.ClientX;
@@ -121,6 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRefocusDCS();
 
+            SavedAddressesViewModel = new SavedAddressesViewModel();
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
@@ -188,6 +192,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         }
 
         public InputDeviceManager InputManager { get; set; }
+
+        public SavedAddressesViewModel SavedAddressesViewModel { get; }
 
         private void InitAudioInput()
         {
