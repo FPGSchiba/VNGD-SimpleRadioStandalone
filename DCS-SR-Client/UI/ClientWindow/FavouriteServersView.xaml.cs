@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 {
     /// <summary>
-    /// Interaction logic for SavedAddressesView.xaml
+    /// Interaction logic for FavouriteServersView.xaml
     /// </summary>
-    public partial class SavedAddressesView : UserControl
+    public partial class FavouriteServersView : UserControl
     {
-        public SavedAddressesView()
+        public FavouriteServersView()
         {
             InitializeComponent();
         }

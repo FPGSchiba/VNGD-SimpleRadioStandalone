@@ -179,9 +179,9 @@
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCSLosCheckResult.cs" />
-    <Compile Include="Preferences\CsvAddressStore.cs" />
-    <Compile Include="Preferences\ISavedAddressStore.cs" />
-    <Compile Include="Preferences\MockSavedAddressStore.cs" />
+    <Compile Include="Preferences\CsvFavouriteServerStore.cs" />
+    <Compile Include="Preferences\IFavouriteServerStore.cs" />
+    <Compile Include="Preferences\MockFavouriteServerStore.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
@@ -202,11 +202,11 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsOverlay.xaml.cs">
       <DependentUpon>AwacsOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\AddressSetting.cs" />
-    <Compile Include="UI\ClientWindow\SavedAddressesView.xaml.cs">
-      <DependentUpon>SavedAddressesView.xaml</DependentUpon>
+    <Compile Include="UI\ClientWindow\ServerAddress.cs" />
+    <Compile Include="UI\ClientWindow\FavouriteServersView.xaml.cs">
+      <DependentUpon>FavouriteServersView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\SavedAddressesViewModel.cs" />
+    <Compile Include="UI\ClientWindow\FavouriteServersViewModel.cs" />
     <Compile Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
     </Compile>
@@ -259,7 +259,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ClientWindow\SavedAddressesView.xaml">
+    <Page Include="UI\ClientWindow\FavouriteServersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

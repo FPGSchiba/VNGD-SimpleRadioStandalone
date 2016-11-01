@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private MMDeviceCollection outputDeviceList;
-        private AddressSetting _address;
+        private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
         public MainWindow()
@@ -95,8 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitAudioOutput();
 
-            _connectCommand = new DelegateCommand(Connect, () => Address != null);
-            SavedAddressesViewModel = new SavedAddressesViewModel(new CsvAddressStore());
+            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
+            FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
 
@@ -144,13 +144,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void InitDefaultAddress()
         {
             // legacy setting migration
-            if (!string.IsNullOrEmpty(_appConfig.LastServer) && SavedAddressesViewModel.SavedAddresses.Count == 0)
+            if (!string.IsNullOrEmpty(_appConfig.LastServer) && FavouriteServersViewModel.Addresses.Count == 0)
             {
-                var oldAddress = new AddressSetting(_appConfig.LastServer, _appConfig.LastServer, true);
-                SavedAddressesViewModel.SavedAddresses.Add(oldAddress);
+                var oldAddress = new ServerAddress(_appConfig.LastServer, _appConfig.LastServer, true);
+                FavouriteServersViewModel.Addresses.Add(oldAddress);
             }
 
-            Address = SavedAddressesViewModel.DefaultAddress;
+            ServerAddress = FavouriteServersViewModel.DefaultServerAddress;
         }
 
         private void InitInput()
@@ -213,14 +213,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public InputDeviceManager InputManager { get; set; }
 
-        public SavedAddressesViewModel SavedAddressesViewModel { get; }
+        public FavouriteServersViewModel FavouriteServersViewModel { get; }
 
-        public AddressSetting Address
+        public ServerAddress ServerAddress
         {
-            get { return _address; }
+            get { return _serverAddress; }
             set
             {
-                _address = value;
+                _serverAddress = value;
                 _connectCommand.RaiseCanExecuteChanged();
             }
         }
@@ -467,7 +467,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private string GetAddressFromTextBox()
         {
-            var addr = Address.Address.Trim();
+            var addr = ServerAddress.Address.Trim();
 
             if (addr.Contains(":"))
             {
@@ -479,21 +479,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private int GetPortFromTextBox()
         {
-            var addr = Address.Address.Trim();
+            var addr = ServerAddress.Address.Trim();
 
-            try
+            if (addr.Contains(":"))
             {
-                if (addr.Contains(":"))
+                int port;
+                if (int.TryParse(addr.Split(':')[1], out port))
                 {
-                    return int.Parse(addr.Split(':')[1]);
+                    return port;
                 }
-            }
-            catch (Exception ex)
-            {
-                //no valid port! remove it
-
-                // todo: what do we do here?
-                throw;
+                throw new ArgumentException("specified port is not valid");
             }
 
             return 5002;
@@ -765,13 +760,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
                     {
-                        Address = new AddressSetting(connection, connection, false); // todo: add to favourites?
+                        ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
                         Connect();
                     }
                 }
                 else
                 {
-                    Address = new AddressSetting(connection, connection, false); // todo: add to favourites?
+                    ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
                     Connect();
                 }
             }
@@ -840,7 +835,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
         {
-            TabControl.SelectedItem = AddressesTab;
+            TabControl.SelectedItem = FavouritesSeversTab;
         }
     }
 }

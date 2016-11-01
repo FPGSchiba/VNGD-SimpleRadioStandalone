@@ -1,8 +1,8 @@
 ﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
-    public class AddressSetting
+    public class ServerAddress
     {
-        public AddressSetting(string name, string address, bool isDefault)
+        public ServerAddress(string name, string address, bool isDefault)
         {
             Name = name;
             Address = address;

@@ -8,18 +8,18 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 {
-    public class CsvAddressStore : ISavedAddressStore
+    public class CsvFavouriteServerStore : IFavouriteServerStore
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly string _fileNameAndPath;
 
-        public CsvAddressStore()
+        public CsvFavouriteServerStore()
         {
-            _fileNameAndPath = Path.Combine(Environment.CurrentDirectory, "SavedAddresses.csv");
+            _fileNameAndPath = Path.Combine(Environment.CurrentDirectory, "FavouriteServers.csv");
         }
 
-        public IEnumerable<AddressSetting> LoadFromStore()
+        public IEnumerable<ServerAddress> LoadFromStore()
         {
             try
             {
@@ -34,17 +34,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
                 Logger.Error(exception, message);
                 System.Windows.MessageBox.Show(message);
             }
-            return Enumerable.Empty<AddressSetting>();
+            return Enumerable.Empty<ServerAddress>();
         }
 
-        public bool SaveToStore(IEnumerable<AddressSetting> savedAddresses)
+        public bool SaveToStore(IEnumerable<ServerAddress> addresses)
         {
             try
             {
                 var sb = new StringBuilder();
-                foreach (var savedAddress in savedAddresses)
+                foreach (var address in addresses)
                 {
-                    sb.AppendLine($"{savedAddress.Name},{savedAddress.Address},{savedAddress.IsDefault}");
+                    sb.AppendLine($"{address.Name},{address.Address},{address.IsDefault}");
                 }
                 File.WriteAllText(_fileNameAndPath, sb.ToString());
 
@@ -57,29 +57,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
             return false;
         }
 
-        private IEnumerable<AddressSetting> ReadFile()
+        private IEnumerable<ServerAddress> ReadFile()
         {
             var allLines = File.ReadAllLines(_fileNameAndPath);
-            IList<AddressSetting> savedAddresses = new List<AddressSetting>();
+            IList<ServerAddress> addresses = new List<ServerAddress>();
 
             foreach (var line in allLines)
             {
                 try
                 {
                     var address = Parse(line);
-                    savedAddresses.Add(address);
+                    addresses.Add(address);
                 }
                 catch (Exception ex)
                 {
-                    var message = $"Failed to parse saved address from csv, text: {line}";
+                    var message = $"Failed to parse address from csv, text: {line}";
                     Logger.Error(ex, message);
                 }
             }
 
-            return savedAddresses;
+            return addresses;
         }
 
-        private AddressSetting Parse(string line)
+        private ServerAddress Parse(string line)
         {
             var split = line.Split(',');
             if (split.Length == 3)
@@ -88,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 
                 if (bool.TryParse(split[2], out isDefault))
                 {
-                    return new AddressSetting(split[0], split[1], isDefault);
+                    return new ServerAddress(split[0], split[1], isDefault);
                 }
                 throw new ArgumentException("isDefault parameter cannot be cast to a boolean");
             }

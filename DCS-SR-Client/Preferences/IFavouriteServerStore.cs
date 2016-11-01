@@ -3,10 +3,10 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 {
-    public interface ISavedAddressStore
+    public interface IFavouriteServerStore
     {
-        IEnumerable<AddressSetting> LoadFromStore();
+        IEnumerable<ServerAddress> LoadFromStore();
 
-        bool SaveToStore(IEnumerable<AddressSetting> savedAddresses);
+        bool SaveToStore(IEnumerable<ServerAddress> addresses);
     }
 }
