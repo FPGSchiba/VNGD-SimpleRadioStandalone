@@ -261,3 +261,4 @@ install-build/DCS-SimpleRadioStandalone.lua
 install-build/clientlog.txt
 install-build/serverlog.txt
 /.DS_Store
+*.DotSettings

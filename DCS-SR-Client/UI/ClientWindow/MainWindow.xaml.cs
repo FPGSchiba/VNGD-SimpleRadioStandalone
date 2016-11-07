@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
@@ -18,6 +23,7 @@ using NAudio.Wave;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Input.InputBinding;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -56,11 +62,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private MMDeviceCollection outputDeviceList;
-
+        private ServerAddress _serverAddress;
+        private readonly DelegateCommand _connectCommand;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = this;
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.Left = AppConfiguration.Instance.ClientX;
@@ -86,7 +95,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitAudioOutput();
 
-            ServerIp.Text = _appConfig.LastServer;
+            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
+            FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
+
+            InitDefaultAddress();
+
             MicrophoneBoost.Value = _appConfig.MicBoost;
             SpeakerBoost.Value = _appConfig.SpeakerBoost;
 
@@ -121,12 +134,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRefocusDCS();
 
-
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
+        }
+
+        private void InitDefaultAddress()
+        {
+            // legacy setting migration
+            if (!string.IsNullOrEmpty(_appConfig.LastServer) && FavouriteServersViewModel.Addresses.Count == 0)
+            {
+                var oldAddress = new ServerAddress(_appConfig.LastServer, _appConfig.LastServer, true);
+                FavouriteServersViewModel.Addresses.Add(oldAddress);
+            }
+
+            ServerAddress = FavouriteServersViewModel.DefaultServerAddress;
         }
 
         private void InitInput()
@@ -188,6 +212,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         }
 
         public InputDeviceManager InputManager { get; set; }
+
+        public FavouriteServersViewModel FavouriteServersViewModel { get; }
+
+        public ServerAddress ServerAddress
+        {
+            get { return _serverAddress; }
+            set
+            {
+                _serverAddress = value;
+                _connectCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        public ICommand ConnectCommand => _connectCommand;
 
         private void InitAudioInput()
         {
@@ -386,7 +424,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             LogManager.Configuration = config;
         }
 
-        private void startStop_Click(object sender, RoutedEventArgs e)
+        private void Connect()
         {
             if (!_stop)
             {
@@ -429,7 +467,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private string GetAddressFromTextBox()
         {
-            var addr = ServerIp.Text.Trim();
+            var addr = ServerAddress.Address.Trim();
 
             if (addr.Contains(":"))
             {
@@ -441,19 +479,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private int GetPortFromTextBox()
         {
-            var addr = ServerIp.Text.Trim();
+            var addr = ServerAddress.Address.Trim();
 
-            try
+            if (addr.Contains(":"))
             {
-                if (addr.Contains(":"))
+                int port;
+                if (int.TryParse(addr.Split(':')[1], out port))
                 {
-                    return int.Parse(addr.Split(':')[1]);
+                    return port;
                 }
-            }
-            catch (Exception ex)
-            {
-                //no valid port! remove it
-                ServerIp.Text = GetAddressFromTextBox();
+                throw new ArgumentException("specified port is not valid");
             }
 
             return 5002;
@@ -496,7 +531,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.IsEnabled = true;
 
                         //save app settings
-                        _appConfig.LastServer = ServerIp.Text.Trim();
                         _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
                         _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
@@ -714,6 +748,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 var autoConnect = Settings.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
 
+                var connection = $"{address}:{port}";
                 if (autoConnect == "ON")
                 {
                     WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
@@ -725,14 +760,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
                     {
-                        ServerIp.Text = address + ":" + port;
-                        startStop_Click(null, null);
+                        ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
+                        Connect();
                     }
                 }
                 else
                 {
-                    ServerIp.Text = address + ":" + port;
-                    startStop_Click(null, null);
+                    ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
+                    Connect();
                 }
             }
         }
@@ -796,6 +831,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                            MessageBoxImage.Warning);
 
             Settings.Instance.WriteSetting(SettingType.ExpandControls, (string)ExpandInputDevices.Content);
+        }
+
+        private void LaunchAddressTab(object sender, RoutedEventArgs e)
+        {
+            TabControl.SelectedItem = FavouritesSeversTab;
         }
     }
 }

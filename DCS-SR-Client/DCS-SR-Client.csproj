@@ -42,6 +42,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -178,6 +179,9 @@
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCSLosCheckResult.cs" />
+    <Compile Include="Preferences\CsvFavouriteServerStore.cs" />
+    <Compile Include="Preferences\IFavouriteServerStore.cs" />
+    <Compile Include="Preferences\MockFavouriteServerStore.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
@@ -198,6 +202,11 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsOverlay.xaml.cs">
       <DependentUpon>AwacsOverlay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\ServerAddress.cs" />
+    <Compile Include="UI\ClientWindow\FavouriteServersView.xaml.cs">
+      <DependentUpon>FavouriteServersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\FavouriteServersViewModel.cs" />
     <Compile Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
     </Compile>
@@ -216,6 +225,7 @@
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
+    <Compile Include="Utils\DelegateCommand.cs" />
     <Page Include="UI\ClientWindow\InputBindingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -248,6 +258,10 @@
     <Page Include="UI\AwacsRadioOverlayWindow\AwacsOverlay.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ClientWindow\FavouriteServersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -360,6 +374,7 @@
   <ItemGroup>
     <None Include="Resources\mic_click_on_16_1600_reversed.wav" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
