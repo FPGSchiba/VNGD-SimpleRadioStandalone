@@ -103,7 +103,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MicrophoneBoost.Value = _appConfig.MicBoost;
             SpeakerBoost.Value = _appConfig.SpeakerBoost;
 
-            //   this.boostAmount.Content = "Boost: " + this.microphoneBoost.Value;
             _audioManager = new AudioManager(_clients);
             _audioManager.MicBoost = (float) MicrophoneBoost.Value;
             _audioManager.SpeakerBoost = (float) SpeakerBoost.Value;
@@ -221,6 +220,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set
             {
                 _serverAddress = value;
+                ServerIp.Text = value.Address;
                 _connectCommand.RaiseCanExecuteChanged();
             }
         }
@@ -467,7 +467,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private string GetAddressFromTextBox()
         {
-            var addr = ServerAddress.Address.Trim();
+            var addr = ServerIp.Text.Trim();
 
             if (addr.Contains(":"))
             {
@@ -479,7 +479,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private int GetPortFromTextBox()
         {
-            var addr = ServerAddress.Address.Trim();
+            var addr = ServerIp.Text.Trim();
 
             if (addr.Contains(":"))
             {
@@ -760,13 +760,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
                     {
-                        ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
+                        ServerIp.Text = connection;
                         Connect();
                     }
                 }
                 else
                 {
-                    ServerAddress = new ServerAddress(connection, connection, false); // add to favourites?
+                    ServerIp.Text = connection;
                     Connect();
                 }
             }
