@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 
@@ -25,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             NewAddressCommand = new DelegateCommand(OnNewAddress);
             RemoveSelectedCommand = new DelegateCommand(OnRemoveSelected);
             SaveCommand = new DelegateCommand(OnSave);
+            OnDefaultChangedCommand = new DelegateCommand(OnDefaultChanged);
         }
 
         public ObservableCollection<ServerAddress> Addresses => _addresses;
@@ -38,6 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
         public ICommand SaveCommand { get; set; }
 
         public ICommand RemoveSelectedCommand { get; set; }
+
+        public ICommand OnDefaultChangedCommand { get; set; }
 
         public ServerAddress SelectedItem { get; set; }
 
@@ -72,14 +77,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void OnSave()
         {
-            //update based on UI because of checkbox bug?! https://social.msdn.microsoft.com/Forums/vstudio/en-US/8eb8280a-19c4-4502-8260-f74633a9e2f2/radiobutton-unchecked-bindings-issue-still-not-resolved?forum=wpf
-
             var saveSucceeded = _favouriteServerStore.SaveToStore(_addresses);
 
             var messageBoxText = saveSucceeded ? "Favourite servers saved" : "Failed to save favourite servers. Please check logs for details.";
             var icon = saveSucceeded ? MessageBoxImage.Information : MessageBoxImage.Error;
 
             MessageBox.Show(Application.Current.MainWindow, messageBoxText, "Save result", MessageBoxButton.OK, icon);
+        }
+
+        private void OnDefaultChanged(object obj)
+        {
+            var address = obj as ServerAddress;
+            if (address == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (address.IsDefault)
+            {
+                return;
+            }
+
+            address.IsDefault = true;
+
+            foreach (var serverAddress in _addresses)
+            {
+                if (serverAddress != address)
+                {
+                    serverAddress.IsDefault = false;
+                }
+            }
         }
     }
 }
