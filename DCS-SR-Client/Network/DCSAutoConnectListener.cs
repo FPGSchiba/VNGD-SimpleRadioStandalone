@@ -82,7 +82,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     message = message.Trim();
                     if (message.Contains(':'))
                     {
-                        _receivedAutoConnect(address[0].Trim(), int.Parse(address[1].Trim()));
+                        try
+                        {
+                            _receivedAutoConnect(address[0].Trim(), int.Parse(address[1].Trim()));
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(ex, "Exception Parsing DCS AutoConnect Message");
+                        }
+                        
                     }
                     else
                     {
