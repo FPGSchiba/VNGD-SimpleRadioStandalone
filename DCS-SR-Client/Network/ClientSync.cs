@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -144,7 +145,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         MsgType = NetworkMessage.MessageType.SYNC
                     });
 
-
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
@@ -173,10 +173,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Position = updatedSrClient.Position;
-//
+
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
-//                                                            lastRadioTransmit.Client.Name + " Coalition: " +
-//                                                            lastRadioTransmit.Client.Coalition + " Pos: " + lastRadioTransmit.Client.Position);
+//                                                            srClient.Name + " Coalition: " +
+//                                                            srClient.Coalition + " Pos: " + srClient.Position);
                                             }
                                         }
                                         else
@@ -288,14 +288,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             CallOnMain(false);
         }
 
-
         private void SendToServer(NetworkMessage message)
         {
             try
             {
                 message.Version = UpdaterChecker.VERSION;
 
-                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
+                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n" );
 
                 _tcpClient.GetStream().Write(json, 0, json.Length);
                 //Need to flush?

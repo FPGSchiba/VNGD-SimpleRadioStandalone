@@ -43,7 +43,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 //adjust for LOS + Distance + Volume
                 AdjustVolume(audio);
-                AddRadioEffect(audio);
+
+                ////no radio effect for intercom
+                if (audio.ReceivedRadio != 0)
+                {
+                    //no radio effect for intercom
+                    AddRadioEffect(audio);
+                }
+             
             }
             else
             {
@@ -90,7 +97,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //gives linear signal loss from 10% down to 0%
                     speaker1Short = (short) (speaker1Short* loss/0.1);
                 }
-                
 
                 //0 is no loss so if more than 0 reduce volume
                 if (clientAudio.LineOfSightLoss > 0)
