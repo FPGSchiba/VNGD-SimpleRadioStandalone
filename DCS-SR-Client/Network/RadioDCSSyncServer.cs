@@ -350,9 +350,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 DcsPlayerRadioInfo.unitId = message.unitId;
             }
 
-            //TODO - If AWACS panel is open set unitId to something high and use that as the number
-            //if awacs NOT open -  disable radios over 3
-
+           
             if (overrideFreqAndVol)
             {
                 DcsPlayerRadioInfo.selected = message.selected;
@@ -371,6 +369,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var clientRadio = DcsPlayerRadioInfo.radios[i];
 
+                //if awacs NOT open -  disable radios over 3
                 if (i >= message.radios.Length 
                     || (RadioOverlayWindow.AwacsActive == false 
                             && (i > 3 || i ==0) // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId

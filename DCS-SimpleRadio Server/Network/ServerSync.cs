@@ -184,35 +184,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     state.sb.Append(Encoding.UTF8.GetString(
                         state.buffer, 0, bytesRead));
 
-                    var content = state.sb.ToString();
-                    if (content.EndsWith("\n"))
+                    List<string> messages = GetNetworkMessage(state.sb);
+
+                    if (messages.Count > 0)
                     {
-                        //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                        //   content.Length, content);
-
-                        try
+                        foreach (var content in messages)
                         {
-                            var message = JsonConvert.DeserializeObject<NetworkMessage>(content);
+                            //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
+                            //   content.Length, content);
 
-                            HandleMessage(state, message);
+                            try
+                            {
+                                var message = JsonConvert.DeserializeObject<NetworkMessage>(content);
+
+                                HandleMessage(state, message);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "Server - Client Exception reading");
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Server - Client Exception reading");
-                        }
-
-                        //clear the state buffer
-                        state.sb.Clear();
-
-                        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                            ReadCallback, state);
+                       
                     }
-                    else
-                    {
-                        // Not all data received. Get more.
-                        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                            ReadCallback, state);
-                    }
+
+                    //continue receiving more
+                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                        ReadCallback, state);
                 }
                 else
                 {
@@ -225,6 +222,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 HandleDisconnect(state);
             }
+        }
+
+        private List<string> GetNetworkMessage(StringBuilder buf)
+        {
+            List<string> messages = new List<string>();
+            //search for a \n, extract up to that \n and then remove from buffer
+            var content = buf.ToString();
+            while (content.Length > 2 && content.Contains("\n"))
+            {
+                //extract message
+                var message = content.Substring(0, content.IndexOf("\n") + 1);
+
+                //now clear from buffer
+                buf.Remove(0, message.Length);
+
+                //trim the received part
+                messages.Add(message.Trim());
+
+                //load in next part
+                content = buf.ToString();
+            }
+
+            return messages;
         }
 
         public void HandleMessage(StateObject state, NetworkMessage message)
@@ -263,7 +283,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             if (message.Version == null)
                             {
-                                _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " + clientIp.Port);
+                                _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
+                                             clientIp.Port);
                                 state.workSocket.Disconnect(true);
                                 return;
                             }
@@ -273,7 +294,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                             if (clientVersion < protocolVersion)
                             {
-                                _logger.Warn($"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
+                                _logger.Warn(
+                                    $"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
                                 HandleVersionMismatch(state.workSocket);
 
                                 //close socket after
@@ -373,19 +395,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private void HandleClientDisconnect(SRClient client)
         {
-
             var message = new NetworkMessage()
             {
                 Client = client,
                 MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
-                
             };
 
             foreach (var clientToSent in _clients)
             {
                 Send(clientToSent.Value.ClientSocket, message);
             }
-
         }
 
 
@@ -407,7 +426,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Position = message.Client.Position;
 
 
-                //    _logger.Info("Received Radio Update");
+                    //    _logger.Info("Received Radio Update");
                 }
             }
         }
