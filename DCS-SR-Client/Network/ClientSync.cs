@@ -174,9 +174,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Position = updatedSrClient.Position;
 
-                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
-                                                            srClient.Name + " Coalition: " +
-                                                            srClient.Coalition + " Pos: " + srClient.Position);
+//                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
+//                                                            srClient.Name + " Coalition: " +
+//                                                            srClient.Coalition + " Pos: " + srClient.Position);
                                             }
                                         }
                                         else
