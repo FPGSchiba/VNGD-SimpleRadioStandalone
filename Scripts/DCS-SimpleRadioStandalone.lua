@@ -106,10 +106,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radios =
                     {
                         -- Radio 1 is always Intercom
-                        { name = "", freq = 100, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc = false, encMode = 0, freqMode = 0, volMode = 0,expansion = false}, -- enc means encrypted
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0,expansion = false},
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secondaryFrequency = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false},
+                        { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc = false, encMode = 0, freqMode = 0, volMode = 0,expansion = false}, -- enc means encrypted
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false, encMode = 0, freqMode = 0, volMode = 0,expansion = false},
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1 , encKey = 0,enc =false,encMode = 0, freqMode = 0, volMode = 0,expansion = false},
                     },
                     control = 0, -- HOTAS
                 }

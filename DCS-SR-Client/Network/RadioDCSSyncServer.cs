@@ -107,10 +107,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //sync with others
                             //Radio info is marked as Stale for FC3 aircraft after every frequency change
 
-                            if (UpdateRadio(message) || IsRadioInfoStale(message))
+                            var update = UpdateRadio(message);
+
+                            //send to DCS UI
+                            SendRadioUpdateToDCS();
+
+                            if (update || IsRadioInfoStale(message))
                             {
                                 LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
+
+                              
                             }
                         }
                         catch (Exception e)
@@ -129,6 +136,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                 }
             });
+        }
+
+        //send updated radio info back to DCS for ingame GUI
+        private void SendRadioUpdateToDCS()
+        {
+            var _udpSocket = new UdpClient();
+            var _host = new IPEndPoint(IPAddress.Loopback, 7080);
+            try
+            {
+                var byteData =
+                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(DcsPlayerRadioInfo) + "\n");
+
+                _udpSocket.Send(byteData, byteData.Length, _host);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Exception Sending DCS Radio Update Message");
+            }
+
+            try
+            {
+                _dcsLOSListener.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Exception stoping DCS Radio Update Message ");
+            }
         }
 
         private void StartDcsGameGuiBroadcastListener()
@@ -340,7 +374,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var overrideFreqAndVol = false;
 
-            if (message.unitId >= DCSPlayerRadioInfo.UnitIdOffset && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+            if (message.unitId >= DCSPlayerRadioInfo.UnitIdOffset &&
+                DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
             {
                 //overriden so leave as is
             }
@@ -350,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 DcsPlayerRadioInfo.unitId = message.unitId;
             }
 
-           
+
             if (overrideFreqAndVol)
             {
                 DcsPlayerRadioInfo.selected = message.selected;
@@ -362,7 +397,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 DcsPlayerRadioInfo.selected = message.selected;
             }
 
-         
 
             //copy over radio names, min + max
             for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
@@ -370,10 +404,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var clientRadio = DcsPlayerRadioInfo.radios[i];
 
                 //if awacs NOT open -  disable radios over 3
-                if (i >= message.radios.Length 
-                    || (RadioOverlayWindow.AwacsActive == false 
-                            && (i > 3 || i ==0) // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
-                            && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+                if (i >= message.radios.Length
+                    || (RadioOverlayWindow.AwacsActive == false
+                        && (i > 3 || i == 0)
+                        // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
+                        && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
                 {
                     clientRadio.freq = 1;
                     clientRadio.freqMin = 1;
@@ -391,7 +426,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 var updateRadio = message.radios[i];
 
-               
+
                 if ((updateRadio.expansion && !expansion) ||
                     (updateRadio.modulation == RadioInformation.Modulation.DISABLED))
                 {
