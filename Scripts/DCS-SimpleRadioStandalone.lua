@@ -153,6 +153,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioHawk(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
+		elseif _update.unit == "AJS37" then
+                    _update = SR.exportRadioAJS37(_update)
 			    elseif _update.unit == "A-10A" then
 				    _update = SR.exportRadioA10A(_update)
 			    elseif _update.unit == "F-15C" then
@@ -1397,6 +1399,49 @@ function SR.exportRadioM2000C(_data)
     end
 
     _data.control = 0; -- partial radio, allows hotkeys
+
+    return _data
+end
+
+function SR.exportRadioAJS37(_data)
+
+    _data.radios[2].name = "FR 22"
+    _data.radios[2].freq =  SR.getRadioFrequency(31)
+		_data.radios[2].modulation = 0
+
+--[[ Modulation switch position
+    local _modulation = GetDevice(0):get_argument_value(3008)
+    if _modulation > 0.5 then
+        _data.radios[2].modulation = 1
+    else
+        _data.radios[2].modulation = 0
+    end
+]]--		
+    _data.radios[2].volume = 1.0
+    _data.radios[2].volMode = 1
+
+    _data.radios[3].name = "FR 24"
+		_data.radios[3].freq =  SR.getRadioFrequency(30)
+    _data.radios[3].modulation = 0
+    _data.radios[3].volume = 1.0
+    _data.radios[3].volMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].expansion = true
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+	_data.control = 0;
+    _data.selected = 1
 
     return _data
 end
