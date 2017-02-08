@@ -1409,21 +1409,21 @@ function SR.exportRadioAJS37(_data)
     _data.radios[2].freq =  SR.getRadioFrequency(31)
 		_data.radios[2].modulation = 0
 
---[[ Modulation switch position
+--[[
     local _modulation = GetDevice(0):get_argument_value(3008)
     if _modulation > 0.5 then
         _data.radios[2].modulation = 1
     else
         _data.radios[2].modulation = 0
     end
-]]--		
+]]--
     _data.radios[2].volume = 1.0
     _data.radios[2].volMode = 1
 
     _data.radios[3].name = "FR 24"
 		_data.radios[3].freq =  SR.getRadioFrequency(30)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = 1.0
+    _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[3].volMode = 1
 
     -- Expansion Radio - Server Side Controlled
