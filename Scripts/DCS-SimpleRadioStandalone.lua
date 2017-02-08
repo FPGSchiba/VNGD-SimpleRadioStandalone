@@ -1407,7 +1407,7 @@ function SR.exportRadioAJS37(_data)
 
     _data.radios[2].name = "FR 22"
     _data.radios[2].freq =  SR.getRadioFrequency(31)
-		_data.radios[2].modulation = 0
+    _data.radios[2].modulation = 0
 
 --[[
     local _modulation = GetDevice(0):get_argument_value(3008)
