@@ -1532,4 +1532,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.2")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.3")
