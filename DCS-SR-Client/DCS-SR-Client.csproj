@@ -166,7 +166,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Audio\AudioProvider.cs" />
-    <Compile Include="Audio\BufferedWaveProvider.cs" />
     <Compile Include="Audio\CachedAudioEffect.cs" />
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Audio\AudioPreview.cs" />

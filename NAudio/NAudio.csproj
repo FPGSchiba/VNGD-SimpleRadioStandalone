@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -23,7 +23,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -39,8 +39,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,7 +54,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>NAudio.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -65,33 +63,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\NAudio.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\NAudio.XML</DocumentationFile>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>NAudio.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\NAudio.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -155,6 +129,7 @@
     <Compile Include="MediaFoundation\IMFReadWriteClassFactory.cs" />
     <Compile Include="MediaFoundation\MediaFoundationErrors.cs" />
     <Compile Include="MediaFoundation\MediaTypes.cs" />
+    <Compile Include="Midi\RawMetaEvent.cs" />
     <Compile Include="Utils\ChunkIdentifier.cs" />
     <Compile Include="Utils\FieldDescriptionAttribute.cs" />
     <Compile Include="MediaFoundation\IMFActivate.cs" />
@@ -195,7 +170,12 @@
     <Compile Include="Utils\WavePositionExtensions.cs" />
     <Compile Include="Utils\IEEE.cs" />
     <Compile Include="Utils\NativeMethods.cs" />
+    <Compile Include="Wave\Asio\Asio64Bit.cs" />
+    <Compile Include="Wave\Asio\AsioCallbacks.cs" />
+    <Compile Include="Wave\Asio\AsioChannelInfo.cs" />
     <Compile Include="Wave\Asio\AsioDriverCapability.cs" />
+    <Compile Include="Wave\Asio\AsioError.cs" />
+    <Compile Include="Wave\Asio\AsioMessageSelector.cs" />
     <Compile Include="Wave\Asio\AsioSampleType.cs" />
     <Compile Include="Wave\Compression\AcmDriverAddFlags.cs" />
     <Compile Include="Wave\SampleProviders\AdsrSampleProvider.cs" />
@@ -251,7 +231,6 @@
     <Compile Include="FileFormats\Mp3\MpegLayer.cs" />
     <Compile Include="FileFormats\Mp3\MpegVersion.cs" />
     <Compile Include="FileFormats\Mp3\XingHeader.cs" />
-    <Compile Include="FileFormats\Sfz\SfzFileReader.cs" />
     <Compile Include="FileFormats\SoundFont\Generator.cs" />
     <Compile Include="FileFormats\SoundFont\GeneratorBuilder.cs" />
     <Compile Include="FileFormats\SoundFont\GeneratorEnum.cs" />
@@ -386,10 +365,10 @@
     <Compile Include="CoreAudioApi\MMDeviceEnumerator.cs" />
     <Compile Include="CoreAudioApi\PropertyStore.cs" />
     <Compile Include="CoreAudioApi\PropertyStoreProperty.cs" />
-    <Compile Include="Wave\Asio\ASIODriver.cs" />
-    <Compile Include="Wave\Asio\ASIODriverExt.cs" />
-    <Compile Include="Wave\Asio\ASIOSampleConvertor.cs" />
-    <Compile Include="Wave\Asio\ASIOStructures.cs" />
+    <Compile Include="Wave\Asio\AsioDriver.cs" />
+    <Compile Include="Wave\Asio\AsioDriverExt.cs" />
+    <Compile Include="Wave\Asio\AsioSampleConvertor.cs" />
+    <Compile Include="Wave\Asio\AsioStructures.cs" />
     <Compile Include="Wave\Compression\AcmDriver.cs" />
     <Compile Include="Wave\Compression\AcmDriverDetails.cs" />
     <Compile Include="Wave\Compression\AcmDriverDetailsSupportFlags.cs" />
@@ -495,6 +474,7 @@
     <Compile Include="Wave\WaveStreams\AiffFileReader.cs" />
     <Compile Include="Wave\WaveStreams\AudioFileReader.cs" />
     <Compile Include="Wave\WaveStreams\BlockAlignReductionStream.cs" />
+    <Compile Include="Wave\WaveStreams\ComStream.cs" />
     <Compile Include="Wave\WaveStreams\CueList.cs" />
     <Compile Include="Wave\WaveStreams\CueWaveFileReader.cs" />
     <Compile Include="Wave\WaveStreams\ISampleNotifier.cs" />
@@ -507,6 +487,7 @@
     <Compile Include="Wave\WaveStreams\ResamplerDmoStream.cs" />
     <Compile Include="Wave\WaveStreams\RiffChunk.cs" />
     <Compile Include="Wave\WaveStreams\SimpleCompressorStream.cs" />
+    <Compile Include="Wave\WaveStreams\StreamMediaFoundationReader.cs" />
     <Compile Include="Wave\WaveStreams\Wave32To16Stream.cs" />
     <Compile Include="Wave\WaveStreams\WaveChannel32.cs" />
     <Compile Include="Wave\SampleProviders\SampleChannel.cs" />
@@ -560,7 +541,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Changes.xml" />
-    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

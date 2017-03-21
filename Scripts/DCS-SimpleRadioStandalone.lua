@@ -147,13 +147,15 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
+				elseif _update.unit == "SpitfireLFMkIX" then
+				    _update = SR.exportRadioSpitfireLFMkIX(_update)	
                 elseif _update.unit == "C-101EB" then
                     _update = SR.exportRadioC101(_update)
                 elseif _update.unit == "Hawk" then
                     _update = SR.exportRadioHawk(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
-		elseif _update.unit == "AJS37" then
+				elseif _update.unit == "AJS37" then
                     _update = SR.exportRadioAJS37(_update)
 			    elseif _update.unit == "A-10A" then
 				    _update = SR.exportRadioA10A(_update)
@@ -1256,6 +1258,46 @@ function SR.exportRadioBF109(_data)
     return _data;
 end
 
+function SR.exportRadioSpitfireLFMkIX (_data)
+    _data.radios[2].name = "A.R.I. 1063" --minimal bug in the ME GUI and in the LUA. SRC5222 is the P-51 radio.
+    _data.radios[2].freq = SR.getRadioFrequency(15)
+    _data.radios[2].modulation = 0
+	_data.radios[2].volMode = 1
+    _data.radios[2].volume = 1.0 --no volume control
+
+    _data.selected = 1
+	
+	  -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0; -- no ptt, same as the FW and 109. No connector.
+
+    return _data;
+end
+
 function SR.exportRadioC101(_data)
 
     _data.radios[1].name = "INTERCOM"
@@ -1409,19 +1451,19 @@ function SR.exportRadioAJS37(_data)
     _data.radios[2].freq =  SR.getRadioFrequency(31)
     _data.radios[2].modulation = 0
 
---[[
-    local _modulation = GetDevice(0):get_argument_value(3008)
-    if _modulation > 0.5 then
-        _data.radios[2].modulation = 1
-    else
-        _data.radios[2].modulation = 0
-    end
-]]--
+ --   local _modulation =SR.getButtonPosition(3008)
+
+ --   if _modulation > 0.5 then
+ --       _data.radios[2].modulation = 1
+ --   else
+ --       _data.radios[2].modulation = 0
+ --   end
+
     _data.radios[2].volume = 1.0
     _data.radios[2].volMode = 1
 
     _data.radios[3].name = "FR 24"
-		_data.radios[3].freq =  SR.getRadioFrequency(30)
+	_data.radios[3].freq =  SR.getRadioFrequency(30)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[3].volMode = 1
