@@ -48,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             try
             {
-                _waveOut = new WasapiOut(speakers,AudioClientShareMode.Shared, true, 100);
+                _waveOut = new WasapiOut(speakers,AudioClientShareMode.Shared, true, 40);
 
                 _buffBufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;
@@ -83,7 +83,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 80,
+                    BufferMilliseconds = 40,
                     DeviceNumber = mic
                 };
 
