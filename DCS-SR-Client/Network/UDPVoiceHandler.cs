@@ -404,6 +404,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
+
+                var myPosition = RadioDCSSyncServer.DcsPlayerRadioInfo.pos;
+
+                var clientPos = transmittingClient.Position;
+
+                if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
+                {
+                    //no real position therefore no line of Sight!
+                    return true;
+                }
+
                 losLoss = transmittingClient.LineOfSightLoss;
                 return transmittingClient.LineOfSightLoss < 1.0f; // 1.0 or greater  is TOTAL loss
             }
