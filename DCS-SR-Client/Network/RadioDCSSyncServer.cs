@@ -225,7 +225,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 {
                                     client.LineOfSightLoss = player.los;
 
-                                    Logger.Debug(client.ToString());
+                                  //  Logger.Debug(client.ToString());
                                 }
                             }
                         }
