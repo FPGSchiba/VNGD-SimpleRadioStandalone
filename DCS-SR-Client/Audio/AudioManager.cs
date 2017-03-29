@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -16,7 +17,6 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
-using BufferedWaveProvider = Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.BufferedWaveProvider;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -43,8 +43,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private OpusEncoder _encoder;
 
         private readonly Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES*3);
-
-        private BufferedWaveProvider _playBuffer;
 
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
@@ -101,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 120);
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
@@ -132,11 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 20,
+                    BufferMilliseconds = 40,
                     DeviceNumber = mic
                 };
 
-                _waveIn.NumberOfBuffers = 1;
+                _waveIn.NumberOfBuffers = 2;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
@@ -259,12 +257,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        // Stopwatch _stopwatch = new Stopwatch();
+         //Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-//            if(_stopwatch.ElapsedMilliseconds > 22)
-//            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-//            _stopwatch.Restart();
+           // if(_stopwatch.ElapsedMilliseconds > 22)
+            //Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+           // _stopwatch.Restart();
 
             //fill sound buffer
 
@@ -372,13 +370,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _waveOut.Dispose();
                 _waveOut = null;
             }
-
-            if (_playBuffer != null)
-            {
-                _playBuffer.ClearBuffer();
-                _playBuffer = null;
-            }
-
 
             if (_encoder != null)
             {

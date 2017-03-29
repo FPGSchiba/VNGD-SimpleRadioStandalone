@@ -59,9 +59,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             long now = Environment.TickCount;
-            if (now - LastUpdate > 180) //3 missed packets at 40ms + a bit of leeway
+            if (now - LastUpdate > 500) //500 ms since last update
             {
-                //append 100ms of silence - this functions as our jitter buffer??
+                //append 150ms of silence - this functions as our jitter buffer??
                 var silencePad = AudioManager.INPUT_SAMPLE_RATE/1000*SILENCE_PAD;
 
                 var newAudio = new short[audio.PcmAudioShort.Length + silencePad];

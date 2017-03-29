@@ -100,6 +100,11 @@ namespace NAudio.Wave.SampleProviders
         }
 
         /// <summary>
+        /// Raised when a mixer input has been removed because it has ended
+        /// </summary>
+        public event EventHandler<SampleProviderEventArgs> MixerInputEnded;
+
+        /// <summary>
         /// Removes a mixer input
         /// </summary>
         /// <param name="mixerInput">Mixer input to remove</param>
@@ -158,11 +163,11 @@ namespace NAudio.Wave.SampleProviders
                         }
                     }
                     outputSamples = Math.Max(samplesRead, outputSamples);
-                    if (samplesRead < count)
-                    {
-                      //  MixerInputEnded?.Invoke(this, new SampleProviderEventArgs(source));
-                      //  sources.RemoveAt(index);
-                    }
+//                    if (samplesRead < count)
+//                    {
+//                        MixerInputEnded?.Invoke(this, new SampleProviderEventArgs(source));
+//                        sources.RemoveAt(index);
+//                    }
                     index--;
                 }
             }

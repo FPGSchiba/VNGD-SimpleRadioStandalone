@@ -1,4 +1,3 @@
--- Version 1.2.9.2
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 local SRS = {}
