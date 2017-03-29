@@ -12,7 +12,7 @@ namespace NAudio.Wave
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 2)]	
     public class WaveFormatExtensible : WaveFormat
-    {        
+    {
         short wValidBitsPerSample; // bits of precision, or is wSamplesPerBlock if wBitsPerSample==0
         int dwChannelMask; // which channels are present in stream
         Guid subFormat;
@@ -40,12 +40,12 @@ namespace NAudio.Wave
             if (bits == 32)
             {
                 // KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
-                subFormat = AudioMediaSubtypes.MEDIASUBTYPE_IEEE_FLOAT; // new Guid("00000003-0000-0010-8000-00aa00389b71");
+                subFormat = AudioMediaSubtypes.MEDIASUBTYPE_IEEE_FLOAT;
             }
             else
             {
                 // KSDATAFORMAT_SUBTYPE_PCM
-                subFormat = AudioMediaSubtypes.MEDIASUBTYPE_PCM; // new Guid("00000001-0000-0010-8000-00aa00389b71");
+                subFormat = AudioMediaSubtypes.MEDIASUBTYPE_PCM;
             }
 
         }

@@ -83,11 +83,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 100,
+                    BufferMilliseconds = 80,
                     DeviceNumber = mic
                 };
 
-                _waveIn.NumberOfBuffers = 1;
+                _waveIn.NumberOfBuffers = 2;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1);
 
