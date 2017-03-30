@@ -23,8 +23,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     public class AudioManager
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
-       // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
-        public static readonly int SEGMENT_FRAMES = 640; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
+        // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
+        public static readonly int INPUT_AUDIO_LENGTH_MS = 40;
+        public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly CachedAudioEffect[] _cachedAudioEffects;
@@ -99,7 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 30);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
@@ -130,7 +131,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
-                    BufferMilliseconds = 40,
+                    BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
                     DeviceNumber = mic
                 };
 

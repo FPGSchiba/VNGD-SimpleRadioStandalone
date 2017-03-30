@@ -1,5 +1,6 @@
 ﻿using System;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Dsp;
 using NAudio.Wave;
@@ -16,6 +17,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private readonly Random _random = new Random();
 
+        private Settings _settings = Settings.Instance;
+
         private int _lastReceivedOn = -1;
 
         public ClientAudioProvider()
@@ -23,12 +26,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
 
-            JitterBufferProvider = new JitterBufferProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
+            JitterBufferProviderInterface = new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
 
-            SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProvider);
+            SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
         }
 
-        public JitterBufferProvider JitterBufferProvider { get; }
+        public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
         public Pcm16BitToSampleProvider SampleProvider { get; }
 
         public long LastUpdate { get; private set; }
@@ -47,22 +50,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 ////no radio effect for intercom
                 if (audio.ReceivedRadio != 0)
                 {
-                    //no radio effect for intercom
-                    AddRadioEffect(audio);
+                    if (_settings.UserSettings[(int)SettingType.RadioEffects] == "ON")
+                    {
+                        AddRadioEffect(audio);
+                    }
                 }
-             
             }
             else
             {
                 AddEncryptionFailureEffect(audio);
-                AddRadioEffect(audio);
+
+                if (_settings.UserSettings[(int) SettingType.RadioEffects] == "ON")
+                {
+                    AddRadioEffect(audio);
+                }
             }
 
             long now = Environment.TickCount;
-            if (now - LastUpdate > 500) //500 ms since last update
+            if ((now - LastUpdate) > 400) //400 ms since last update
             {
-                //append 150ms of silence - this functions as our jitter buffer??
-                var silencePad = AudioManager.INPUT_SAMPLE_RATE/1000*SILENCE_PAD;
+                //append 160ms of silence - this functions as our jitter buffer??
+                var silencePad = (AudioManager.INPUT_SAMPLE_RATE/1000)*SILENCE_PAD;
 
                 var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
 
@@ -72,9 +80,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
 
             _lastReceivedOn = audio.ReceivedRadio;
-            LastUpdate = Environment.TickCount;
+            LastUpdate = now;
 
-            JitterBufferProvider.AddSamples(new JitterBufferAudio
+            JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
             {
                 Audio = SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
                 PacketNumber = audio.PacketNumber

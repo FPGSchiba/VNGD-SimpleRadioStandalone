@@ -5,7 +5,7 @@ using NAudio.Wave;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
-    public class JitterBufferProvider : IWaveProvider
+    public class JitterBufferProviderInterface : IWaveProvider
     {
         private readonly CircularBuffer _circularBuffer;
 
@@ -18,11 +18,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private readonly object _lock = new object();
         private uint _missing; // counts missing packets
 
-        public JitterBufferProvider(WaveFormat waveFormat)
+      //  private const int INITIAL_DELAY_MS = 200;
+     //   private long _delayedUntil = -1; //holds audio for a period of time
+
+        public JitterBufferProviderInterface(WaveFormat waveFormat)
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond*10);
+            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond*6);
 
             Array.Clear(_silence, 0, _silence.Length);
         }
@@ -31,6 +34,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public int Read(byte[] buffer, int offset, int count)
         {
+            int now = Environment.TickCount;
+
+            //other implementation of waiting
+//            if(_delayedUntil > now)
+//            {
+//                //wait
+//                return 0;
+//            }
+
             var read = 0;
             lock (_lock)
             {
@@ -52,7 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         {
                             //goes to a mixer so we just return what we've read which could be 0!
                             //Mixer Handles this OK
-                            return read;
+                            break;
                             //
                             // zero the end of the buffer
                             //      Array.Clear(buffer, offset + read, count - read);
@@ -94,6 +106,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         }
                     }
                 } while (read < count);
+
+//                if (read == 0)
+//                {
+//                    _delayedUntil = Environment.TickCount + INITIAL_DELAY_MS;
+//                }
             }
             return read;
         }
@@ -148,5 +165,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 }
             }
         }
+
+       
     }
 }

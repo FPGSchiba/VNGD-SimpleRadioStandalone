@@ -393,7 +393,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-
+        private void InitRadioSoundEffects()
+        {
+            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioEffects];
+            if (radioEffects == "ON")
+            {
+                RadioSoundEffects.IsChecked = true;
+            }
+            else
+            {
+                RadioSoundEffects.IsChecked = false;
+            }
+        }
 
 
         private void SetupLogging()
@@ -836,6 +847,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
         {
             TabControl.SelectedItem = FavouritesSeversTab;
+        }
+
+        private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
+        {
+            Settings.Instance.WriteSetting(SettingType.RadioEffects, (string)RadioSoundEffects.Content);
         }
     }
 }

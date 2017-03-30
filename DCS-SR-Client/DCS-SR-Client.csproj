@@ -165,15 +165,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Audio\AudioProvider.cs" />
-    <Compile Include="Audio\CachedAudioEffect.cs" />
-    <Compile Include="Audio\AudioManager.cs" />
-    <Compile Include="Audio\AudioPreview.cs" />
-    <Compile Include="Audio\ClientAudio.cs" />
-    <Compile Include="Audio\ClientAudioProvider.cs" />
-    <Compile Include="Audio\JitterBufferAudio.cs" />
-    <Compile Include="Audio\JitterBufferProvider.cs" />
-    <Compile Include="Audio\VolumeSampleProviderWithPeak.cs" />
+    <Compile Include="Audio\Providers\AudioProvider.cs" />
+    <Compile Include="Audio\Models\CachedAudioEffect.cs" />
+    <Compile Include="Audio\Managers\AudioManager.cs" />
+    <Compile Include="Audio\Managers\AudioPreview.cs" />
+    <Compile Include="Audio\Models\ClientAudio.cs" />
+    <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
+    <Compile Include="Audio\Models\JitterBufferAudio.cs" />
+    <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
+    <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\DCSLosCheckRequest.cs" />
@@ -191,7 +191,7 @@
     <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
       <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Audio\RadioAudioProvider.cs" />
+    <Compile Include="Audio\Providers\RadioAudioProvider.cs" />
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml.cs">
       <DependentUpon>AwacsIntercomControlGroup.xaml</DependentUpon>
     </Compile>
@@ -212,7 +212,7 @@
     <Compile Include="UI\RadioOverlayWindow\RadioControlGroup.xaml.cs">
       <DependentUpon>RadioControlGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Audio\RadioFilter.cs" />
+    <Compile Include="Audio\Providers\RadioFilter.cs" />
     <Compile Include="UI\RadioOverlayWindow\RadioOverlay.xaml.cs">
       <DependentUpon>RadioOverlay.xaml</DependentUpon>
     </Compile>
