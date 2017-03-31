@@ -1,4 +1,4 @@
--- Version 1.2.9.4
+-- Version 1.2.9.5
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -817,7 +817,7 @@ function SR.exportRadioL39(_data)
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq =100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
-    _data.radios[1].volume =1.0
+    _data.radios[1].volume =SR.getRadioVolume(0, 288,{0.0,0.8},false)
 
     _data.radios[2].name = "R-832M"
     _data.radios[2].freq = SR.getRadioFrequency(19)
@@ -932,9 +932,6 @@ function SR.exportRadioF86Sabre(_data)
     _data.radios[2].freq =  SR.getRadioFrequency(26)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 806,{0.1,0.9},false)
-
-    _data.radios[3].volume = 1.0
-    _data.radios[4].volume = 1.0
 
     _data.selected = 1
 
@@ -1447,25 +1444,25 @@ end
 
 function SR.exportRadioAJS37(_data)
 
-    _data.radios[2].name = "FR 22"
-    _data.radios[2].freq =  SR.getRadioFrequency(31)
+    _data.radios[2].name = "FR 24"
+	_data.radios[2].freq =  SR.getRadioFrequency(30)
     _data.radios[2].modulation = 0
+    _data.radios[2].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
+    _data.radios[2].volMode = 1
+
+	_data.radios[3].name = "FR 22"
+    _data.radios[3].freq =  SR.getRadioFrequency(31)
+    _data.radios[3].modulation = 0
 
  --   local _modulation =SR.getButtonPosition(3008)
 
  --   if _modulation > 0.5 then
- --       _data.radios[2].modulation = 1
+ --       _data.radios[3].modulation = 1
  --   else
- --       _data.radios[2].modulation = 0
+ --       _data.radios[3].modulation = 0
  --   end
 
-    _data.radios[2].volume = 1.0
-    _data.radios[2].volMode = 1
-
-    _data.radios[3].name = "FR 24"
-	_data.radios[3].freq =  SR.getRadioFrequency(30)
-    _data.radios[3].modulation = 0
-    _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
+    _data.radios[3].volume = 1.0
     _data.radios[3].volMode = 1
 
     -- Expansion Radio - Server Side Controlled
@@ -1574,4 +1571,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.4")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.2.9.5")

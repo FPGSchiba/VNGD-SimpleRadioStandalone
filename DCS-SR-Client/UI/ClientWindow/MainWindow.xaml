@@ -686,6 +686,33 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
+                        <Label Grid.Row="20"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Enable Radio Voice Effect" />
+
+                        <ToggleButton Name="RadioSoundEffects"
+                                      Grid.Row="20"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="RadioSoundEffects_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
                     </Grid>
                 </ScrollViewer>
             </GroupBox>
