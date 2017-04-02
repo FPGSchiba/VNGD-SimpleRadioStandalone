@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Scripts\DCS-SimpleRadioStandalone.lua = Scripts\DCS-SimpleRadioStandalone.lua
 		Scripts\DCS-SRS-AutoConnectGameGUI.lua = Scripts\DCS-SRS-AutoConnectGameGUI.lua
+		Scripts\DCS-SRS-Overlay.dlg = Scripts\DCS-SRS-Overlay.dlg
+		Scripts\DCS-SRS-OverlayGameGUI.lua = Scripts\DCS-SRS-OverlayGameGUI.lua
 		Scripts\DCS-SRSGameGUI.lua = Scripts\DCS-SRSGameGUI.lua
 		Scripts\Export.lua = Scripts\Export.lua
 	EndProjectSection

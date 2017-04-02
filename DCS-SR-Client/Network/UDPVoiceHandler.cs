@@ -76,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //play out if nothing after 200ms
                 //and Audio hasn't been played already
                 var radioState = RadioReceivingState[i];
-                if ((radioState != null) && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving())
+                if ((radioState != null) && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving)
                 {
                     radioState.PlayedEndOfTransmission = true;
                     _audioManager.PlaySoundEffectEndReceive(i, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
@@ -329,7 +329,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         var radioState = RadioReceivingState[audio.ReceivedRadio];
 
                                         if ((radioState == null) || radioState.PlayedEndOfTransmission ||
-                                            !radioState.IsReceiving())
+                                            !radioState.IsReceiving)
                                         {
                                             var decrytable = audio.Decryptable || (audio.Encryption == 0);
 

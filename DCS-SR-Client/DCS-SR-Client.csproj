@@ -176,8 +176,9 @@
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCSAutoConnectListener.cs" />
-    <Compile Include="Network\DCSLosCheckRequest.cs" />
-    <Compile Include="Network\DCSLosCheckResult.cs" />
+    <Compile Include="Network\Models\CombinedRadioState.cs" />
+    <Compile Include="Network\Models\DCSLosCheckRequest.cs" />
+    <Compile Include="Network\Models\DCSLosCheckResult.cs" />
     <Compile Include="Preferences\CsvFavouriteServerStore.cs" />
     <Compile Include="Preferences\IFavouriteServerStore.cs" />
     <Compile Include="Preferences\MockFavouriteServerStore.cs" />
@@ -216,7 +217,7 @@
     <Compile Include="UI\RadioOverlayWindow\RadioOverlay.xaml.cs">
       <DependentUpon>RadioOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Network\RadioSendingState.cs" />
+    <Compile Include="Network\Models\RadioSendingState.cs" />
     <Compile Include="Network\RadioDCSSyncServer.cs" />
     <Compile Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>

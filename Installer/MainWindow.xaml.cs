@@ -242,8 +242,17 @@ namespace Installer
 
         private void InstallProgram(string path)
         {
+            String favouritesTemp = null;
             if (Directory.Exists(path) && File.Exists(path + "\\SR-ClientRadio.exe"))
             {
+                //backup favourites file
+                if (File.Exists(path + "\\FavouriteServers.csv"))
+                {
+                    favouritesTemp = Path.GetTempPath() + "\\FavouriteServers.csv";
+                
+                    File.Copy(path + "\\FavouriteServers.csv", favouritesTemp,true);
+                }
+
                 DeleteDirectory(path);
             }
             //sleep! WTF directory is lagging behind state here...
@@ -285,6 +294,17 @@ namespace Installer
                 true);
             File.Copy(currentDirectory + "\\DCS-SRS-AutoConnectGameGUI.lua", path + "\\DCS-SRS-AutoConnectGameGUI.lua",
                 true);
+
+            File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
+                true);
+
+            File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
+                true);
+
+            if (favouritesTemp != null)
+            {
+                File.Move(favouritesTemp, path + "\\FavouriteServers.csv");
+            }
         }
 
         private void InstallScripts(string path)
@@ -336,6 +356,12 @@ namespace Installer
 
                 File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua",
                     path + "\\DCS-SRSGameGUI.lua", true);
+
+                File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
+              true);
+
+                File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
+                    true);
             }
             catch (FileNotFoundException ex)
             {
@@ -391,6 +417,7 @@ namespace Installer
             var dcsPath = savedGamesPath + "DCS";
 
             RemoveScripts(dcsPath + ".openalpha\\Scripts");
+            RemoveScripts(dcsPath + ".openbeta\\Scripts");
             RemoveScripts(dcsPath + "\\Scripts");
 
             if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\SR-ClientRadio.exe"))
@@ -438,6 +465,16 @@ namespace Installer
             if (File.Exists(path + "\\DCS-SRS-AutoConnectGameGUI.lua"))
             {
                 File.Delete(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
+            }
+
+            if (File.Exists(path + "\\DCS-SRS-Overlay.dlg"))
+            {
+                File.Delete(path + "\\DCS-SRS-Overlay.dlg");
+            }
+
+            if (File.Exists(path + "\\DCS-SRS-OverlayGameGUI.lua"))
+            {
+                File.Delete(path + "\\DCS-SRS-OverlayGameGUI.lua");
             }
         }
 

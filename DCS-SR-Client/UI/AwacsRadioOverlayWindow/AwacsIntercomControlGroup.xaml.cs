@@ -78,7 +78,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 var transmitting = UdpVoiceHandler.RadioSendingState;
                 var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
 
-                if ((receiveState != null) && receiveState.IsReceiving())
+                if ((receiveState != null) && receiveState.IsReceiving)
                 {
                     RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                 }
