@@ -480,7 +480,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         }
 
 
-        private void UpdateRadioFrequency(double frequency, bool delta = true)
+        private void UpdateRadioFrequency(double frequency)
         {
              const double MHz = 1000000;
 
@@ -489,22 +489,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo != null) 
-                && dcsPlayerRadioInfo.IsCurrent() 
-                && dcsPlayerRadioInfo.selected >=0 )
+                && dcsPlayerRadioInfo.IsCurrent()
+                && dcsPlayerRadioInfo.radios != null
+                && dcsPlayerRadioInfo.selected >=0 
+                && dcsPlayerRadioInfo.selected < dcsPlayerRadioInfo.radios.Length)
             {
 
                 var clientRadio = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected];
 
                 if (clientRadio != null 
                     && clientRadio.modulation != RadioInformation.Modulation.DISABLED
+                    && clientRadio.modulation != RadioInformation.Modulation.INTERCOM
                     && clientRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
                 {
-                    if (delta)
-                        clientRadio.freq += frequency;
-                    else
-                    {
-                        clientRadio.freq = frequency;
-                    }
+                    clientRadio.freq += frequency;
 
                     //make sure we're not over or under a limit
                     if (clientRadio.freq > clientRadio.freqMax)
