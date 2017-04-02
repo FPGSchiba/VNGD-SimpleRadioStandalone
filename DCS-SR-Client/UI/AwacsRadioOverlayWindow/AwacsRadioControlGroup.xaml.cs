@@ -475,12 +475,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
                 //check if current
 
-                if ((receiveState == null) || !receiveState.IsReceiving())
+                if ((receiveState == null) || !receiveState.IsReceiving)
                 {
                     RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                     RadioMetaData.Foreground =  new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
                 }
-                else if ((receiveState != null) && receiveState.IsReceiving())
+                else if ((receiveState != null) && receiveState.IsReceiving)
                 {
                     if (receiveState.IsSecondary)
                     {

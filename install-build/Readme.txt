@@ -8,6 +8,8 @@ Dedicated servers DO NOT need the installer run.
 
 Copy DCS-SimpleRadioStandalone.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
 Copy DCS-SRSGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
+Copy DCS-SRS-OverlayGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
+Copy DCS-SRS-Overlay.dlg to C:\Users\USERNAME\Saved Games\DCS\Scripts
 
 Create the folder if it doesnt exist
 

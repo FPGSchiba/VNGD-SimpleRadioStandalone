@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DCSState\RadioReceivingState.cs" />
     <Compile Include="Helpers\CircularBuffer.cs" />
     <Compile Include="Helpers\ConversionHelpers.cs" />
     <Compile Include="DCSState\DCSPlayerSideInfo.cs" />
@@ -111,7 +112,6 @@
     <Compile Include="DCSState\DCSPlayerRadioInfo.cs" />
     <Compile Include="Helpers\RadioCalculator.cs" />
     <Compile Include="DCSState\RadioInformation.cs" />
-    <Compile Include="DCSState\RadioReceivingState.cs" />
     <Compile Include="DCSState\RadioTransmit.cs" />
     <Compile Include="Setting\ServerSettingType.cs" />
     <Compile Include="Network\ShortGuid.cs" />

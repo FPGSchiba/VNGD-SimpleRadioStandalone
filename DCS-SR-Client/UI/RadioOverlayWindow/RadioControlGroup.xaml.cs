@@ -377,11 +377,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
                 //check if current
 
-                if ((receiveState == null) || !receiveState.IsReceiving())
+                if ((receiveState == null) || !receiveState.IsReceiving)
                 {
                     radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
-                else if ((receiveState != null) && receiveState.IsReceiving())
+                else if ((receiveState != null) && receiveState.IsReceiving)
                 {
                     if (receiveState.IsSecondary)
                     {

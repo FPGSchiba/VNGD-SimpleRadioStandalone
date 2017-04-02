@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
@@ -145,8 +146,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var _host = new IPEndPoint(IPAddress.Loopback, 7080);
             try
             {
+
+                //get currently transmitting or receiving
+                var combinedState = new CombinedRadioState()
+                {
+                    RadioInfo = DcsPlayerRadioInfo,
+                    RadioSendingState = UdpVoiceHandler.RadioSendingState,
+                    RadioReceivingState = UdpVoiceHandler.RadioReceivingState
+                };
+
                 var byteData =
-                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(DcsPlayerRadioInfo) + "\n");
+                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    }) + "\n");
 
                 _udpSocket.Send(byteData, byteData.Length, _host);
             }

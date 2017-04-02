@@ -89,11 +89,12 @@
                 Click="Remove_Plugin"
                 Content="Remove DCS-SRS" />
         <Label Width="422"
+               Height="69"
                Margin="10,189,0,0"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
                Content="Step 3: Install Or Remove DCS-SRS&#xD;&#xA;No Need to install on Dedicated Servers."
-               FontSize="20" Height="69" />
+               FontSize="20" />
 
     </Grid>
 </Window>
