@@ -1,3 +1,8 @@
+-- Version 1.2.9.6
+-- Make sure you COPY this file to the same location as the Export.lua as well! 
+-- Otherwise the Overlay will not work
+
+
 local base = _G
 
 package.path  = package.path..";.\\LuaSocket\\?.lua;"..'.\\Scripts\\?.lua;'.. '.\\Scripts\\UI\\?.lua;'
