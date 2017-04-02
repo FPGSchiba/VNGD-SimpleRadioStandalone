@@ -1,3 +1,8 @@
+-- Version 1.2.9.6
+-- Make sure you COPY this file to the same location as the Export.lua as well! 
+-- Otherwise the Overlay will not work
+
+
 local base = _G
 
 package.path  = package.path..";.\\LuaSocket\\?.lua;"..'.\\Scripts\\?.lua;'.. '.\\Scripts\\UI\\?.lua;'
@@ -35,12 +40,14 @@ local _modes = {
 
 local _isWindowCreated = false
 local _listenSocket = {}
-local _radioInfo = {}
+local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
 local WIDTH = 300
 local HEIGHT = 130
+
+local _lastReceived = 0
 
 local srsOverlay = { 
     connection = nil,
@@ -83,12 +90,12 @@ function srsOverlay.updateRadio()
 
 	_listMessages = {}
 
-	if _radioInfo and _radioInfo.radios then
+	if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
+
+        local _radioInfo  =_radioState.RadioInfo
+
 		for _i,_radio in pairs(_radioInfo.radios) do
 
-			-- TODO handle "Current"
-
-			
 			local fullMessage
 
 			if _radio.modulation == 3 then
@@ -123,19 +130,60 @@ function srsOverlay.updateRadio()
 			local _selected = _i == (_radioInfo.selected+1)
 
 			if _selected then
-				fullMessage = fullMessage.." * "
+				fullMessage = fullMessage.." *"
+
+                if _radioState.RadioSendingState
+                        and _radioState.RadioSendingState.SendingOn == _i -1
+                        and _radioState.RadioSendingState.IsSending then
+
+                    fullMessage = fullMessage.." +TR"
+                end
             end
 
        --     srsOverlay.log(fullMessage)
 
+            local _skin = typesMessage.normal
 
-    
-			local msg = {message = fullMessage, skin = typesMessage.normal, height = 20}
+            local _isReceiving = srsOverlay.isReceiving(_i)
+
+            if _isReceiving == 1 then
+                _skin = typesMessage.receive
+            elseif  _isReceiving == 2 then
+                _skin = typesMessage.guard
+            end
+
+
+			local msg = {message = fullMessage, skin =_skin, height = 20 }
+
+
 			table.insert(_listMessages, msg)
 		end
 	end
 
     srsOverlay.paintRadio()
+end
+
+function srsOverlay.isReceiving(_radioPos )
+
+    if _radioState.RadioReceivingState then
+
+        for  _i, _rxState in pairs(_radioState.RadioReceivingState) do
+
+            -- off by one in lua
+            if _rxState ~= nil and _rxState.ReceivedOn+1 == _radioPos and _rxState.IsReceiving then
+
+                if _rxState.IsSecondary then
+                    return 2
+                end
+
+                return 1
+            end
+        end
+
+    end
+
+    return 0
+
 end
 
 
@@ -144,11 +192,6 @@ function srsOverlay.paintRadio()
     local offset = 0
     for k,v in pairs(_listStatics) do
         v:setText("")
-     --   v:setSkin(typesMessage.normal)
-       -- v:setBounds(0,offset,WIDTH-20,20)
-
-       -- offset = offset +20
-
     end
    
 
@@ -169,22 +212,10 @@ function srsOverlay.paintRadio()
 
     end
 
---    if _listMessages[curMsg] then
---        while curMsg <= #_listMessages   do
---            local msg = _listMessages[curMsg]
---            _listStatics[curStatic]:setSkin(msg.skin)
---            _listStatics[curStatic]:setBounds(0,offset,WIDTH-50,msg.height)
---            _listStatics[curStatic]:setText(msg.message)
---            offset = offset + msg.height +10 --10 padding
---            curMsg = curMsg + 1
---            curStatic = curStatic + 1
---            num = num + 1
---        end
---    end
 end
 
 function srsOverlay.createWindow()
-    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Scripts\\srs_overlay.dlg', cdata)
+    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Scripts\\DCS-SRS-Overlay.dlg', cdata)
 
     box         = window.Box
     pNoVisible  = window.pNoVisible
@@ -201,6 +232,7 @@ function srsOverlay.createWindow()
     {
         normal         = pNoVisible.eYellowText:getSkin(),
         receive         = pNoVisible.eWhiteText:getSkin(),
+        guard         = pNoVisible.eRedText:getSkin(),
     }
 
     
@@ -226,7 +258,7 @@ function srsOverlay.createWindow()
 
     _isWindowCreated = true
 
-    srsOverlay.log("Window created")
+    srsOverlay.log("SRS Window created")
 --
 --    srsOverlay.addMessage("124.00 *", "AN/ARC-186(V)", typesMessage.sys)
  --   srsOverlay.addMessage("256.00", "AN/ARC-164 UHF", typesMessage.msg)
@@ -344,14 +376,19 @@ function srsOverlay.listen()
     if _received then
         local _decoded = JSON:decode(_received)
 
-        srsOverlay.log(_received)
+      --srsOverlay.log(_received)
 
         if _decoded then
 
-            srsOverlay.log("Decoded ")
-            _radioInfo = _decoded
+            _lastReceived  = os.clock()
+
+            _radioState = _decoded
+
+            return true
         end
     end
+
+    return false
 end
 
 
@@ -361,7 +398,7 @@ function srsOverlay.onSimulationFrame()
     end
 
     if not window then 
-        srsOverlay.log("Creating window...")
+        srsOverlay.log("Creating SRS window...")
         srsOverlay.show(true)
         srsOverlay.setMode(_modes.minimum)
 
@@ -370,12 +407,21 @@ function srsOverlay.onSimulationFrame()
 
     end
 
-    srsOverlay.listen()
+    if srsOverlay.listen() then
 
-    srsOverlay.updateRadio()
-    
+        srsOverlay.updateRadio()
+    else
+        local _now = os.clock()
+
+        if _now - _lastReceived > 5 and _radioState and _radioState.RadioInfo then
+            _radioState = {}
+
+            --repaint lost radio
+            srsOverlay.updateRadio()
+        end
+    end
 end 
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob")
