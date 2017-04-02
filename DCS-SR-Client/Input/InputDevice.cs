@@ -43,6 +43,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
         OverlayToggle = 112,
         ModifierOverlayToggle = 212,
+
+        Up100 = 113,
+        ModifierUp100 = 213,
+
+        Up10 = 114,
+        ModifierUp10 = 214,
+
+        Up1 = 115,
+        ModifierUp1 = 215,
+
+        Up01 = 116,
+        ModifierUp01 = 216,
+
+        Up001 = 117,
+        ModifierUp001 = 217,
+
+        Up0001 = 118,
+        ModifierUp0001 = 218,
+
+        Down100 = 119,
+        ModifierDown100 = 219,
+
+        Down10 = 120,
+        ModifierDown10 = 220,
+
+        Down1 = 121,
+        ModifierDown1 = 221,
+
+        Down01 = 122,
+        ModifierDown01 = 222,
+
+        Down001 = 123,
+        ModifierDown001 = 223,
+
+        Down0001 = 124,
+        ModifierDown0001 = 224,
+
+
     }
 
     public class InputDevice
@@ -54,7 +92,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public int Button { get; set; }
         public Guid InstanceGuid { get; internal set; }
         public int ButtonValue { get; internal set; }
-
 
         public bool IsSameBind(InputDevice compare)
         {

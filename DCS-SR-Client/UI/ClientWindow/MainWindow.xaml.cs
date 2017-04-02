@@ -208,6 +208,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio10.ControlInputBinding = InputBinding.Switch10;
             Radio10.InputDeviceManager = InputManager;
 
+            Up100.InputName = "Up 100MHz";
+            Up100.ControlInputBinding = InputBinding.Up100;
+            Up100.InputDeviceManager = InputManager;
+
+            Up10.InputName = "Up 10MHz";
+            Up10.ControlInputBinding = InputBinding.Up10;
+            Up10.InputDeviceManager = InputManager;
+
+            Up1.InputName = "Up 1MHz";
+            Up1.ControlInputBinding = InputBinding.Up1;
+            Up1.InputDeviceManager = InputManager;
+
+            Up01.InputName = "Up 0.1MHz";
+            Up01.ControlInputBinding = InputBinding.Up01;
+            Up01.InputDeviceManager = InputManager;
+
+            Up001.InputName = "Up 0.01MHz";
+            Up001.ControlInputBinding = InputBinding.Up001;
+            Up001.InputDeviceManager = InputManager;
+
+            Up0001.InputName = "Up 0.001MHz";
+            Up0001.ControlInputBinding = InputBinding.Up0001;
+            Up0001.InputDeviceManager = InputManager;
+
+
+            Down100.InputName = "Down 100MHz";
+            Down100.ControlInputBinding = InputBinding.Down100;
+            Down100.InputDeviceManager = InputManager;
+
+            Down10.InputName = "Down 10MHz";
+            Down10.ControlInputBinding = InputBinding.Down10;
+            Down10.InputDeviceManager = InputManager;
+
+            Down1.InputName = "Down 1MHz";
+            Down1.ControlInputBinding = InputBinding.Down1;
+            Down1.InputDeviceManager = InputManager;
+
+            Down01.InputName = "Down 0.1MHz";
+            Down01.ControlInputBinding = InputBinding.Down01;
+            Down01.InputDeviceManager = InputManager;
+
+            Down001.InputName = "Down 0.01MHz";
+            Down001.ControlInputBinding = InputBinding.Down001;
+            Down001.InputDeviceManager = InputManager;
+
+            Down0001.InputName = "Down 0.001MHz";
+            Down0001.ControlInputBinding = InputBinding.Down0001;
+            Down0001.InputDeviceManager = InputManager;
+
         }
 
         public InputDeviceManager InputManager { get; set; }

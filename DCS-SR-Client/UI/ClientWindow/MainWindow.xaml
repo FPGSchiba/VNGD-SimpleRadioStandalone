@@ -216,6 +216,19 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+
 
                         </Grid.RowDefinitions>
 
@@ -304,6 +317,81 @@
                                                    Grid.ColumnSpan="5"
                                                    ControlInputBinding="{x:Static input:InputBinding.Switch10}"
                                                    InputName="Radio 10" />
+
+
+                        <local:InputBindingControl x:Name="Up100"
+                                                   Grid.Row="14"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up100}"
+                                                   InputName="Up 100MHz" />
+
+                        <local:InputBindingControl x:Name="Up10"
+                                                   Grid.Row="15"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up10}"
+                                                   InputName="Up 10MHz" />
+
+                        <local:InputBindingControl x:Name="Up1"
+                                                   Grid.Row="16"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up1}"
+                                                   InputName="Up 1MHz" />
+
+                        <local:InputBindingControl x:Name="Up01"
+                                                   Grid.Row="17"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up01}"
+                                                   InputName="Up 0.1MHz" />
+
+                        <local:InputBindingControl x:Name="Up001"
+                                                   Grid.Row="18"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up001}"
+                                                   InputName="Up 0.01MHz" />
+
+                        <local:InputBindingControl x:Name="Up0001"
+                                                   Grid.Row="19"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Up0001}"
+                                                   InputName="Up 0.001MHz" />
+
+
+                        <local:InputBindingControl x:Name="Down100"
+                                                   Grid.Row="20"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down100}"
+                                                   InputName="Down 100MHz" />
+
+                        <local:InputBindingControl x:Name="Down10"
+                                                   Grid.Row="21"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down10}"
+                                                   InputName="Down 10MHz" />
+
+                        <local:InputBindingControl x:Name="Down1"
+                                                   Grid.Row="22"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down1}"
+                                                   InputName="Down 1MHz" />
+
+                        <local:InputBindingControl x:Name="Down01"
+                                                   Grid.Row="23"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down01}"
+                                                   InputName="Down 0.1MHz" />
+
+                        <local:InputBindingControl x:Name="Down001"
+                                                   Grid.Row="24"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down001}"
+                                                   InputName="Down 0.01MHz" />
+
+                        <local:InputBindingControl x:Name="Down0001"
+                                                   Grid.Row="25"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.Down0001}"
+                                                   InputName="Down 0.001MHz" />
+
                     </Grid>
                 </ScrollViewer>
             </GroupBox>
