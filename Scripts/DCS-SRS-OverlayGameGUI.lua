@@ -29,7 +29,7 @@ local U                 = require('me_utilities')
 local Skin              = require('Skin')
 local Gui               = require('dxgui')
 local DialogLoader      = require('DialogLoader')
-local EditBox           = require('EditBox')
+local Static 			= require('Static')
 local Tools             = require('tools')
 
 local _modes = {     
@@ -65,7 +65,7 @@ function srsOverlay.loadConfiguration()
         srsOverlay.config = { 
             mode = "full",
             hotkey = "Ctrl+Shift+escape",
-            windowPosition = { x = 66, y = 13 }
+            windowPosition = { x = 200, y = 200 }
         }
         srsOverlay.saveConfiguration()
     end      
@@ -190,13 +190,20 @@ end
 function srsOverlay.paintRadio()
 
     local offset = 0
+   
     for k,v in pairs(_listStatics) do
+
         v:setText("")
     end
-   
 
     local curStatic = 1
     offset = 0
+
+    if #_listMessages == 0 then
+        table.insert(_listMessages, {message = "No Radio Connected", skin =typesMessage.guard, height = 20 })
+        table.insert(_listMessages, {message = "Connect to SRS server and", skin =typesMessage.guard, height = 20 })
+        table.insert(_listMessages, {message = "start or join a mission", skin =typesMessage.guard, height = 20 })
+    end
 
     for _i,_msg in pairs(_listMessages) do
 
@@ -230,8 +237,8 @@ function srsOverlay.createWindow()
 
     typesMessage =
     {
-        normal         = pNoVisible.eYellowText:getSkin(),
-        receive         = pNoVisible.eWhiteText:getSkin(),
+        normal        = pNoVisible.eYellowText:getSkin(),
+        receive       = pNoVisible.eWhiteText:getSkin(),
         guard         = pNoVisible.eRedText:getSkin(),
     }
 
@@ -239,11 +246,11 @@ function srsOverlay.createWindow()
     _listStatics = {}
     
     for i = 1, 4 do
-        local staticNew = EditBox.new()        
+        local staticNew = Static.new()
         table.insert(_listStatics, staticNew)
-        staticNew:setReadOnly(true)   
-        staticNew:setTextWrapping(true)  
-        staticNew:setMultiline(true) 
+--        staticNew:setReadOnly(true)
+--        staticNew:setTextWrapping(true)
+--        staticNew:setMultiline(true)
         pMsg:insertWidget(staticNew)
     end
 
@@ -284,6 +291,8 @@ function srsOverlay.setMode(mode)
 
         box:setVisible(false)
         pDown:setVisible(false)
+        window:setSize(1,1) -- Make it tiny!
+        window:setHasCursor(false) -- hide cursor
 
     else
         box:setVisible(true)
@@ -296,6 +305,11 @@ function srsOverlay.setMode(mode)
             pDown:setVisible(false)
 
             window:setSkin(Skin.windowSkinChatMin())
+
+            window:setHasCursor(false) -- hide cursor
+
+
+            --  DCS.banMouse(false)
         end
         
         if srsOverlay.config.mode == _modes.full then
@@ -305,6 +319,8 @@ function srsOverlay.setMode(mode)
             pDown:setVisible(true)
 
             window:setSkin(Skin.windowSkinChatWrite())
+
+            window:setHasCursor(true) -- show cursor
         end    
     end
 
@@ -398,9 +414,9 @@ function srsOverlay.onSimulationFrame()
     end
 
     if not window then 
-        srsOverlay.log("Creating SRS window...")
+        srsOverlay.log("Creating SRS window hidden...")
         srsOverlay.show(true)
-        srsOverlay.setMode(_modes.minimum)
+        srsOverlay.setMode(_modes.hidden)
 
         -- init connection
         srsOverlay.initListener()
