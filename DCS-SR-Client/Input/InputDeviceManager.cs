@@ -553,7 +553,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.Down0001; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.EncryptionKeyDecrease; i++)
             {
                 var mainInputBind = InputConfig.InputDevices[(InputBinding) i];
 
