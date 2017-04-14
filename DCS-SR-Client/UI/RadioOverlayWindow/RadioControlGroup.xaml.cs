@@ -21,10 +21,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         public RadioControlGroup()
         {
             InitializeComponent();
+
         }
 
         public int RadioId { private get; set; }
 
+        private void Up0001_Click(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.UpdateRadioFrequency(0.001, RadioId);
+        }
 
         private void Up001_Click(object sender, RoutedEventArgs e)
         {
@@ -64,6 +69,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Down001_Click(object sender, RoutedEventArgs e)
         {
             RadioHelper.UpdateRadioFrequency(-0.01, RadioId);
+        }
+
+        private void Down0001_Click(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.UpdateRadioFrequency(-0.001, RadioId);
         }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
@@ -109,21 +119,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 up1.Visibility = Visibility.Visible;
                 up01.Visibility = Visibility.Visible;
                 up001.Visibility = Visibility.Visible;
+                up0001.Visibility = Visibility.Visible;
 
                 down10.Visibility = Visibility.Visible;
                 down1.Visibility = Visibility.Visible;
                 down01.Visibility = Visibility.Visible;
                 down001.Visibility = Visibility.Visible;
+                down0001.Visibility = Visibility.Visible;
 
                 up10.IsEnabled = true;
                 up1.IsEnabled = true;
                 up01.IsEnabled = true;
                 up001.IsEnabled = true;
+                up0001.IsEnabled = true;
 
                 down10.IsEnabled = true;
                 down1.IsEnabled = true;
                 down01.IsEnabled = true;
                 down001.IsEnabled = true;
+                down0001.IsEnabled = true;
+
+                ReloadButton.IsEnabled = true;
+                LoadFromFileButton.IsEnabled = true;
             }
             else
             {
@@ -131,11 +148,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 up1.Visibility = Visibility.Hidden;
                 up01.Visibility = Visibility.Hidden;
                 up001.Visibility = Visibility.Hidden;
+                up0001.Visibility = Visibility.Hidden;
 
                 down10.Visibility = Visibility.Hidden;
                 down1.Visibility = Visibility.Hidden;
                 down01.Visibility = Visibility.Hidden;
                 down001.Visibility = Visibility.Hidden;
+                down0001.Visibility = Visibility.Hidden;
+
+                ReloadButton.IsEnabled = false;
+                LoadFromFileButton.IsEnabled = false;
             }
         }
 
@@ -357,5 +379,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             if(EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId,(byte)EncryptionKeySpinner.Value);
         }
+
+        private void ReloadButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void LoadFromFileButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+
+        }
+
+
+        
     }
 }

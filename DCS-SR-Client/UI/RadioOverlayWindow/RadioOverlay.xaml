@@ -4,9 +4,9 @@
         xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="135"
+        Width="155"
         Height="315"
-        MinWidth="135"
+        MinWidth="155"
         MinHeight="315"
         AllowsTransparency="True"
         Background="#444"
@@ -79,11 +79,11 @@
 
         <local:IntercomControlGroup x:Name="intercom" RadioId="0" />
 
-        <Separator Width="135" Margin="0 2" />
+        <Separator Width="155" Margin="0 2" />
 
 
         <Slider x:Name="windowOpacitySlider"
-                Width="110"
+                Width="130"
                 Margin="10,2,0,0"
                 VerticalAlignment="Center"
                 Maximum="1.0"

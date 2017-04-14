@@ -6,7 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="radioControlContainer"
-             Width="135"
+             Width="155"
              Height="75">
 
     <TabControl x:Name="tabControl"
@@ -60,7 +60,7 @@
                 <Button x:Name="up10"
                         Width="15"
                         Height="10"
-                        Margin="25,0,0,0"
+                        Margin="20,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Up10_Click"
                         Content=""
@@ -70,6 +70,7 @@
                 <Button x:Name="up1"
                         Width="15"
                         Height="10"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Up1_Click"
                         Content=""
@@ -79,7 +80,7 @@
                 <Button x:Name="up01"
                         Width="15"
                         Height="10"
-                        Margin="0,0,0,0"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Up01_Click"
                         Content=""
@@ -89,16 +90,26 @@
                 <Button x:Name="up001"
                         Width="15"
                         Height="10"
-                        Margin="0,0,0,0"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Up001_Click"
                         Content=""
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+0.01MHz" />
+                <Button x:Name="up0001"
+                        Width="15"
+                        Height="10"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Center"
+                        Click="Up0001_Click"
+                        Content=""
+                        IsEnabled="False"
+                        Style="{StaticResource DarkStyle-Button}"
+                        ToolTip="+0.001MHz" />
 
                 <TextBlock x:Name="radioFrequency"
-                           Width="110"
+                           Width="130"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Top"
                            Background="Black"
@@ -124,7 +135,7 @@
                 <Button x:Name="down10"
                         Width="15"
                         Height="10"
-                        Margin="25,0,0,0"
+                        Margin="20,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Down10_Click"
                         Content=""
@@ -134,6 +145,7 @@
                 <Button x:Name="down1"
                         Width="15"
                         Height="10"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Down1_Click"
                         Content=""
@@ -143,7 +155,7 @@
                 <Button x:Name="down01"
                         Width="15"
                         Height="10"
-                        Margin="0,0,0,0"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Down01_Click"
                         Content=""
@@ -153,13 +165,23 @@
                 <Button x:Name="down001"
                         Width="15"
                         Height="10"
-                        Margin="0,0,0,0"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Center"
                         Click="Down001_Click"
                         Content=""
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.01MHz" />
+                <Button x:Name="down0001"
+                        Width="15"
+                        Height="10"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Center"
+                        Click="Down0001_Click"
+                        Content=""
+                        IsEnabled="False"
+                        Style="{StaticResource DarkStyle-Button}"
+                        ToolTip="-0.001MHz" />
                 <Slider x:Name="radioVolume"
                         Width="115"
                         Height="15"
@@ -179,7 +201,7 @@
                            FontSize="10"
                            Foreground="#E7E7E7"
                            Padding="0"
-                           Text="Set" />
+                           Text="Enc" />
             </TabItem.Header>
 
             <WrapPanel HorizontalAlignment="Center"
@@ -207,6 +229,50 @@
                             Content="Enable"
                             Style="{x:Null}" />
                 </WrapPanel>
+
+            </WrapPanel>
+
+        </TabItem>
+
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock Margin="3,0,3,0"
+                           FontSize="10"
+                           Foreground="#E7E7E7"
+                           Padding="0"
+                           Text="Ch." />
+            </TabItem.Header>
+
+            <WrapPanel HorizontalAlignment="Center"
+                       Background="#444"
+                       Orientation="Vertical">
+                <ComboBox x:Name="Mic"
+                          Width="135"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Top" />
+                <WrapPanel Width="135"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Background="#444"
+                           Orientation="Horizontal">
+                    <Button Name="ReloadButton"
+                            Width="50"
+                            Height="20"
+                            Margin="15,5,0,0"
+                            HorizontalAlignment="Center"
+                            Click="ReloadButton_OnClick"
+                            Content="Reload"
+                            Style="{x:Null}" />
+                    <Button Name="LoadFromFileButton"
+                            Width="50"
+                            Height="20"
+                            Margin="5,5,0,0"
+                            HorizontalAlignment="Center"
+                            Click="LoadFromFileButton_OnClick"
+                            Content="Load File"
+                            Style="{x:Null}" />
+                </WrapPanel>
+
 
             </WrapPanel>
 
