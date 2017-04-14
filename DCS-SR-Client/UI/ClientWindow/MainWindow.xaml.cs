@@ -127,6 +127,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioEncryptionEffectsToggle();
 
+            InitRadioSoundEffects();
+
             InitAutoConnectPrompt();
 
             InitRadioOverlayTaskbarHide();
@@ -257,6 +259,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Down0001.ControlInputBinding = InputBinding.Down0001;
             Down0001.InputDeviceManager = InputManager;
 
+            ToggleGuard.InputName = "Toggle Guard";
+            ToggleGuard.ControlInputBinding = InputBinding.ToggleGuard;
+            ToggleGuard.InputDeviceManager = InputManager;
+
+            NextRadio.InputName = "Select Next Radio";
+            NextRadio.ControlInputBinding = InputBinding.NextRadio;
+            NextRadio.InputDeviceManager = InputManager;
+
+            PreviousRadio.InputName = "Select Previous Radio";
+            PreviousRadio.ControlInputBinding = InputBinding.PreviousRadio;
+            PreviousRadio.InputDeviceManager = InputManager;
+
+            ToggleEncryption.InputName = "Toggle Encryption";
+            ToggleEncryption.ControlInputBinding = InputBinding.ToggleEncryption;
+            ToggleEncryption.InputDeviceManager = InputManager;
+
+            EncryptionKeyIncrease.InputName = "Encryption Key Up";
+            EncryptionKeyIncrease.ControlInputBinding = InputBinding.EncryptionKeyIncrease;
+            EncryptionKeyIncrease.InputDeviceManager = InputManager;
+
+            EncryptionKeyDecrease.InputName = "Encryption Key Down";
+            EncryptionKeyDecrease.ControlInputBinding = InputBinding.EncryptionKeyDecrease;
+            EncryptionKeyDecrease.InputDeviceManager = InputManager;
         }
 
         public InputDeviceManager InputManager { get; set; }

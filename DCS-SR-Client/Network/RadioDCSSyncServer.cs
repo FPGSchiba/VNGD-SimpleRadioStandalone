@@ -42,6 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private UdpClient _dcsLOSListener;
         private UdpClient _dcsUdpListener;
+        private UdpClient _dcsRadioUpdateSender;
 
         private volatile bool _stop;
 
@@ -142,8 +143,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //send updated radio info back to DCS for ingame GUI
         private void SendRadioUpdateToDCS()
         {
-            var _udpSocket = new UdpClient();
-            var _host = new IPEndPoint(IPAddress.Loopback, 7080);
+            var host = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7080);
+            if (_dcsRadioUpdateSender == null)
+            {
+                _dcsRadioUpdateSender = new UdpClient
+                {
+                    ExclusiveAddressUse = false,
+                    EnableBroadcast = true
+                };
+                _dcsRadioUpdateSender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
+               true);
+                _dcsRadioUpdateSender.ExclusiveAddressUse = false;
+            }
+
             try
             {
 
@@ -161,21 +173,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         NullValueHandling = NullValueHandling.Ignore
                     }) + "\n");
 
-                _udpSocket.Send(byteData, byteData.Length, _host);
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length, host);
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Exception Sending DCS Radio Update Message");
             }
 
-            try
-            {
-                _dcsLOSListener.Close();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Exception stoping DCS Radio Update Message ");
-            }
+           
         }
 
         private void StartDcsGameGuiBroadcastListener()
@@ -302,7 +307,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             Task.Factory.StartNew(() =>
             {
-                using (_dcsLOSListener)
+                using (_udpSocket)
                 {
                     while (!_stop)
                     {
@@ -337,7 +342,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     try
                     {
-                        _dcsLOSListener.Close();
+                        _udpSocket.Close();
                     }
                     catch (Exception e)
                     {
@@ -597,6 +602,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 _dcsLOSListener.Close();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                _dcsRadioUpdateSender.Close();
             }
             catch (Exception ex)
             {

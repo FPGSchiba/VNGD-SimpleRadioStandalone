@@ -228,6 +228,12 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
 
 
                         </Grid.RowDefinitions>
@@ -391,6 +397,45 @@
                                                    Grid.ColumnSpan="5"
                                                    ControlInputBinding="{x:Static input:InputBinding.Down0001}"
                                                    InputName="Down 0.001MHz" />
+
+                        <local:InputBindingControl x:Name="ToggleGuard"
+                                                   Grid.Row="26"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.ToggleGuard}"
+                                                   InputName="Toggle Guard" />
+
+                        <local:InputBindingControl x:Name="NextRadio"
+                                                   Grid.Row="27"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.NextRadio}"
+                                                   InputName="Next Radio" />
+
+
+                        <local:InputBindingControl x:Name="PreviousRadio"
+                                                   Grid.Row="28"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.PreviousRadio}"
+                                                   InputName="Previous Radio" />
+
+                        <local:InputBindingControl x:Name="ToggleEncryption"
+                                                   Grid.Row="29"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.ToggleEncryption}"
+                                                   InputName="Toggle Encryption" />
+
+                        <local:InputBindingControl x:Name="EncryptionKeyIncrease"
+                                                   Grid.Row="30"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.EncryptionKeyIncrease}"
+                                                   InputName="Encryption Key Increase" />
+
+                        <local:InputBindingControl x:Name="EncryptionKeyDecrease"
+                                                   Grid.Row="31"
+                                                   Grid.ColumnSpan="5"
+                                                   ControlInputBinding="{x:Static input:InputBinding.EncryptionKeyDecrease}"
+                                                   InputName="Encryption Key Decrease" />
+
+
 
                     </Grid>
                 </ScrollViewer>

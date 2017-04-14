@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
@@ -59,27 +61,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioFrequencyOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                RadioId <= dcsPlayerRadioInfo.radios.Length - 1)
+            double freq = 0;
+            if (double.TryParse(RadioFrequency.Text.Trim(), out freq))
             {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio != null && currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
-                {
-                    double freq = 0;
-                    if (double.TryParse(RadioFrequency.Text.Trim(), out freq))
-                    {
-                        SendFrequencyChange(freq*MHz, false);
-                    }
-                    else
-                    {
-                        RadioFrequency.Text = "";
-                    }
-
-                   
-                }
+                RadioHelper.UpdateRadioFrequency(freq,RadioId, false);
+            }
+            else
+            {
+                RadioFrequency.Text = "";
             }
         }
 
@@ -87,142 +76,59 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void Up001_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/100);
+            RadioHelper.UpdateRadioFrequency(0.01, RadioId);
         }
 
         private void Up01_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/10);
+            RadioHelper.UpdateRadioFrequency(0.1, RadioId);
         }
 
         private void Up1_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz);
+            RadioHelper.UpdateRadioFrequency(1, RadioId);
         }
 
         private void Up10_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*10);
+            RadioHelper.UpdateRadioFrequency(10, RadioId);
         }
 
         private void Down10_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*-10);
+            RadioHelper.UpdateRadioFrequency(-10, RadioId);
         }
 
         private void Down1_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*-1);
+            RadioHelper.UpdateRadioFrequency(-1, RadioId);
         }
 
         private void Down01_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/10*-1);
+            RadioHelper.UpdateRadioFrequency(-0.1, RadioId);
         }
 
         private void Down001_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/100*-1);
+            RadioHelper.UpdateRadioFrequency(-0.01,RadioId);
         }
 
-        private void SendFrequencyChange(double frequency, bool delta = true)
-        {
-
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                RadioId < dcsPlayerRadioInfo.radios.Length && (RadioId >= 0))
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio != null && currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
-                {
-                    //sort out the frequencies
-                    var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-
-                    if (delta)
-                        clientRadio.freq += frequency;
-                    else
-                    {
-                        clientRadio.freq = frequency;
-                    }
-
-                    //make sure we're not over or under a limit
-                    if (clientRadio.freq > clientRadio.freqMax)
-                    {
-                        clientRadio.freq = clientRadio.freqMax;
-                    }
-                    else if (clientRadio.freq < clientRadio.freqMin)
-                    {
-                        clientRadio.freq = clientRadio.freqMin;
-                    }
-
-                    //make radio data stale to force resysnc
-                    RadioDCSSyncServer.LastSent = 0;
-                }
-            }            
-        }
+       
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                RadioId < dcsPlayerRadioInfo.radios.Length && (RadioId >= 0))
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
-                    && RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                {
-                    RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short)RadioId;
-                }
-            }
-
+            RadioHelper.SelectRadio(RadioId);
         }
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                RadioId < dcsPlayerRadioInfo.radios.Length && (RadioId >= 0))
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED 
-                    && RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                {
-                    RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
-                }
-            }
-
-
+            RadioHelper.SelectRadio(RadioId);
         }
 
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
-            {
-                //sort out the frequencies
-                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                if (clientRadio.secFreq > 0)
-                {
-                    clientRadio.secFreq = 0; // 0 indicates we want it overridden + disabled
-                }
-                else
-                {
-                    clientRadio.secFreq = 1; //indicates we want it back
-                }
-
-                //make radio data stale to force resysnc
-                RadioDCSSyncServer.LastSent = 0;
-            }
-         
+            RadioHelper.ToggleGuard(RadioId);
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -352,7 +258,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         || currentRadio.freqMode == RadioInformation.FreqMode.COCKPIT 
                         || currentRadio.modulation == RadioInformation.Modulation.DISABLED)
                     {
-                        RadioFrequency.Text = (currentRadio.freq / MHz).ToString("0.000");
+                        RadioFrequency.Text = (currentRadio.freq / MHz).ToString("0.000", CultureInfo.InvariantCulture); //make nuber UK / US style with decimals not commas!
                     }
 
                     RadioMetaData.Text = (currentRadio.modulation == 0 ? "AM" : "FM");
@@ -396,7 +302,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-            if (((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
+            if (((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
                 && RadioId <= dcsPlayerRadioInfo.radios.Length - 1)
             {
             
@@ -506,58 +412,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+
+            if (currentRadio != null &&
+                currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
             {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
+                //update stuff
+                if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
                 {
-                    //update stuff
-                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-                    {
-                        if (currentRadio.enc)
-                        {
-                            currentRadio.enc = false;
-                            EncryptionButton.Content = "Enable";
-                        }
-                        else
-                        {
-                            currentRadio.enc = true;
-                            EncryptionButton.Content = "Disable";
-                        }
+                    RadioHelper.ToggleEncryption(RadioId);
 
-                        //make radio data stale to force resysnc
-                        RadioDCSSyncServer.LastSent = 0;
+                    if (currentRadio.enc)
+                    {
+                        EncryptionButton.Content = "Enable";
+                    }
+                    else
+                    {
+                        EncryptionButton.Content = "Disable";
                     }
                 }
             }
+
         }
 
         private void EncryptionKeySpinner_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
-                {
-                    //update stuff
-                    if ((currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE) ||
-                        (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY))
-                    {
-                        if (EncryptionKeySpinner.Value != null)
-                        {
-                            currentRadio.encKey = (byte) EncryptionKeySpinner.Value;
-                            //make radio data stale to force resysnc
-                            RadioDCSSyncServer.LastSent = 0;
-                        }
-                    }
-                }
-            }
+            if (EncryptionKeySpinner?.Value != null)
+                RadioHelper.SetEncryptionKey(RadioId, (byte)EncryptionKeySpinner.Value);
         }
     }
 }

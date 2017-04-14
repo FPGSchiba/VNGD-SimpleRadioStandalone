@@ -226,6 +226,7 @@
     <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
+    <Compile Include="Utils\RadioHelper.cs" />
     <Page Include="UI\ClientWindow\InputBindingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

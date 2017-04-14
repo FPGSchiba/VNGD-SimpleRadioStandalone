@@ -80,6 +80,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         Down0001 = 124,
         ModifierDown0001 = 224,
 
+        NextRadio = 125,
+        ModifierNextRadio = 225,
+
+        PreviousRadio = 126,
+        ModifierPreviousRadio = 226,
+
+        ToggleGuard = 127,
+        ModifierToggleGuard = 227,
+
+        ToggleEncryption = 128,
+        ModifierToggleEncryption = 228,
+
+        EncryptionKeyIncrease = 129,
+        ModifierEncryptionKeyIncrease = 229,
+
+        EncryptionKeyDecrease = 130,
+        ModifierEncryptionEncryptionKeyDecrease = 230,
+
 
     }
 
