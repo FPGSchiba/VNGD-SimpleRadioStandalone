@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -196,8 +197,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
                 else
                 {
-                    radioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000") +
-                                          (currentRadio.modulation == 0 ? "AM" : "FM");
+                    radioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000", CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
+                    (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secFreq > 100)
                     {
                         radioFrequency.Text += " G";
