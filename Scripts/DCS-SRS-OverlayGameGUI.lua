@@ -390,18 +390,24 @@ function srsOverlay.listen()
     local _received = _listenSocket:receive()
 
     if _received then
-        local _decoded = JSON:decode(_received)
 
-      --srsOverlay.log(_received)
+	--KNOWN BUG - Hitting Left Control + Windows Key + L causes lag
+	-- Fix by disabling overlay or hitting L CNTRL + L SHIFT + L
+		if srsOverlay.getMode() ~= _modes.hidden then
+			local _decoded = JSON:decode(_received)
 
-        if _decoded then
+		  --srsOverlay.log(_received)
 
-            _lastReceived  = os.clock()
+			if _decoded then
 
-            _radioState = _decoded
+				_lastReceived  = os.clock()
 
-            return true
-        end
+				_radioState = _decoded
+
+				return true
+			end
+
+		end
     end
 
     return false

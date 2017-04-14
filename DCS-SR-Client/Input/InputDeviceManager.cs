@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 using SharpDX.DirectInput;
@@ -44,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         private volatile bool _detectPtt;
 
         //used to trigger the update to a frequency
-        private InputBinding _lastActiveFrequencyBinding = InputBinding.ModifierIntercom; //intercom used to represent null as we cant
+        private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom; //intercom used to represent null as we cant
 
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
@@ -408,64 +409,89 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.ModifierDown001)
+                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.ModifierEncryptionEncryptionKeyDecrease)
                         {
 
-                            if (bindState.MainDevice.InputBind == _lastActiveFrequencyBinding && !bindState.IsActive)
+                            if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
                                 //Assign to a totally different binding to mark as unassign
-                                _lastActiveFrequencyBinding = InputBinding.ModifierIntercom;
+                                _lastActiveBinding = InputBinding.ModifierIntercom;
                             }
 
                             //key repeat
-                            if (bindState.IsActive && (bindState.MainDevice.InputBind != _lastActiveFrequencyBinding))
+                            if (bindState.IsActive && (bindState.MainDevice.InputBind != _lastActiveBinding))
                             {
-                                _lastActiveFrequencyBinding = bindState.MainDevice.InputBind;
+                                _lastActiveBinding = bindState.MainDevice.InputBind;
 
-                                switch (bindState.MainDevice.InputBind)
+                                var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+
+                                if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                                 {
-                                    case InputBinding.Up100:
-                                        UpdateRadioFrequency(100);
-                                        break;
-                                    case InputBinding.Up10:
-                                        UpdateRadioFrequency(10);
-                                        break;
-                                    case InputBinding.Up1:
-                                        UpdateRadioFrequency(1);
-                                        break;
-                                    case InputBinding.Up01:
-                                        UpdateRadioFrequency(0.1);
-                                        break;
-                                    case InputBinding.Up001:
-                                        UpdateRadioFrequency(0.01);
-                                        break;
-                                    case InputBinding.Up0001:
-                                        UpdateRadioFrequency(0.001);
-                                        break;
 
-                                    case InputBinding.Down100:
-                                        UpdateRadioFrequency(-100);
-                                        break;
-                                    case InputBinding.Down10:
-                                        UpdateRadioFrequency(-10);
-                                        break;
-                                    case InputBinding.Down1:
-                                        UpdateRadioFrequency(-1);
-                                        break;
-                                    case InputBinding.Down01:
-                                        UpdateRadioFrequency(-0.1);
-                                        break;
-                                    case InputBinding.Down001:
-                                        UpdateRadioFrequency(-0.01);
-                                        break;
-                                    case InputBinding.Down0001:
-                                        UpdateRadioFrequency(-0.001);
-                                        break;
+                                    switch (bindState.MainDevice.InputBind)
+                                    {
+                                        case InputBinding.Up100:
+                                            RadioHelper.UpdateRadioFrequency(100, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Up10:
+                                            RadioHelper.UpdateRadioFrequency(10, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Up1:
+                                            RadioHelper.UpdateRadioFrequency(1, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Up01:
+                                            RadioHelper.UpdateRadioFrequency(0.1, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Up001:
+                                            RadioHelper.UpdateRadioFrequency(0.01, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Up0001:
+                                            RadioHelper.UpdateRadioFrequency(0.001, dcsPlayerRadioInfo.selected);
+                                            break;
+
+                                        case InputBinding.Down100:
+                                            RadioHelper.UpdateRadioFrequency(-100, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Down10:
+                                            RadioHelper.UpdateRadioFrequency(-10, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Down1:
+                                            RadioHelper.UpdateRadioFrequency(-1, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Down01:
+                                            RadioHelper.UpdateRadioFrequency(-0.1, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Down001:
+                                            RadioHelper.UpdateRadioFrequency(-0.01, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.Down0001:
+                                            RadioHelper.UpdateRadioFrequency(-0.001, dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.ToggleGuard:
+                                            RadioHelper.ToggleGuard(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.ToggleEncryption:
+                                            RadioHelper.ToggleEncryption(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.NextRadio:
+                                            RadioHelper.SelectNextRadio();
+                                            break;
+                                        case InputBinding.PreviousRadio:
+                                            RadioHelper.SelectPreviousRadio();
+                                            break;
+                                        case InputBinding.EncryptionKeyIncrease:
+                                            RadioHelper.IncreaseEncryptionKey(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.EncryptionKeyDecrease:
+                                            RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
+                                            break;
 
 
-                                    default:
-                                        break;
+                                        default:
+                                            break;
+                                    }
                                 }
+
 
                                 break;
 
@@ -479,46 +505,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             pttInputThread.Start();
         }
 
-
-        private void UpdateRadioFrequency(double frequency)
-        {
-             const double MHz = 1000000;
-
-            frequency = frequency*MHz;
-
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) 
-                && dcsPlayerRadioInfo.IsCurrent()
-                && dcsPlayerRadioInfo.radios != null
-                && dcsPlayerRadioInfo.selected >=0 
-                && dcsPlayerRadioInfo.selected < dcsPlayerRadioInfo.radios.Length)
-            {
-
-                var clientRadio = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected];
-
-                if (clientRadio != null 
-                    && clientRadio.modulation != RadioInformation.Modulation.DISABLED
-                    && clientRadio.modulation != RadioInformation.Modulation.INTERCOM
-                    && clientRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
-                {
-                    clientRadio.freq += frequency;
-
-                    //make sure we're not over or under a limit
-                    if (clientRadio.freq > clientRadio.freqMax)
-                    {
-                        clientRadio.freq = clientRadio.freqMax;
-                    }
-                    else if (clientRadio.freq < clientRadio.freqMin)
-                    {
-                        clientRadio.freq = clientRadio.freqMin;
-                    }
-
-                    //make radio data stale to force resysnc
-                    RadioDCSSyncServer.LastSent = 0;
-                }
-            }
-        }
+       
 
         public void StopPtt()
         {

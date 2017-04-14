@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
@@ -23,135 +24,60 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public int RadioId { private get; set; }
 
+
         private void Up001_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/100);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(0.01, RadioId);
         }
 
         private void Up01_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/10);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(0.1, RadioId);
         }
 
         private void Up1_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(1, RadioId);
         }
 
         private void Up10_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*10);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(10, RadioId);
         }
 
         private void Down10_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*-10);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(-10, RadioId);
         }
 
         private void Down1_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz*-1);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(-1, RadioId);
         }
 
         private void Down01_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/10*-1);
-            FocusDCS();
+            RadioHelper.UpdateRadioFrequency(-0.1, RadioId);
         }
 
         private void Down001_Click(object sender, RoutedEventArgs e)
         {
-            SendFrequencyChange(MHz/100*-1);
-            FocusDCS();
-        }
-
-        private void FocusDCS()
-        {
-            var localByName = Process.GetProcessesByName("dcs");
-
-            if ((localByName != null) && (localByName.Length > 0))
-            {
-                //    WindowHelper.BringProcessToFront(localByName[0]);
-            }
-        }
-
-        private void SendFrequencyChange(double frequency)
-        {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-
-            if ((currentRadio.freqMode ==
-                 RadioInformation.FreqMode.OVERLAY)
-                && (RadioId >= 0)
-                && (RadioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length))
-            {
-                //sort out the frequencies
-                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                clientRadio.freq += frequency;
-
-                //make sure we're not over or under a limit
-                if (clientRadio.freq > clientRadio.freqMax)
-                {
-                    clientRadio.freq = clientRadio.freqMax;
-                }
-                else if (clientRadio.freq < clientRadio.freqMin)
-                {
-                    clientRadio.freq = clientRadio.freqMin;
-                }
-
-                //make radio data stale to force resysnc
-                RadioDCSSyncServer.LastSent = 0;
-            }
+            RadioHelper.UpdateRadioFrequency(-0.01, RadioId);
         }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-                DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-            {
-                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
-            }
-
-            FocusDCS();
+            RadioHelper.SelectRadio(RadioId);
         }
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
         {
-            if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
-                DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-            {
-                RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
-            }
-
-            FocusDCS();
+            RadioHelper.SelectRadio(RadioId);
         }
 
         private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
-            {
-                //sort out the frequencies
-                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
-                if (clientRadio.secFreq > 0)
-                {
-                    clientRadio.secFreq = 0; // 0 indicates we want it overridden + disabled
-                }
-                else
-                {
-                    clientRadio.secFreq = 1; //indicates we want it back
-                }
-
-                //make radio data stale to force resysnc
-                RadioDCSSyncServer.LastSent = 0;
-            }
-            FocusDCS();
+            RadioHelper.ToggleGuard(RadioId);
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -172,8 +98,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
             _dragging = false;
-
-            FocusDCS();
         }
 
         private void ToggleButtons(bool enable)
@@ -403,58 +327,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+
+            if (currentRadio != null && 
+                currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
             {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
+                //update stuff
+                if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
                 {
-                    //update stuff
-                    if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-                    {
-                        if (currentRadio.enc)
-                        {
-                            currentRadio.enc = false;
-                            EncryptionButton.Content = "Enable";
-                        }
-                        else
-                        {
-                            currentRadio.enc = true;
-                            EncryptionButton.Content = "Disable";
-                        }
+                    RadioHelper.ToggleEncryption(RadioId);
 
-                        //make radio data stale to force resysnc
-                        RadioDCSSyncServer.LastSent = 0;
+                    if (currentRadio.enc)
+                    { 
+                        EncryptionButton.Content = "Enable";
+                    }
+                    else
+                    {
+                        EncryptionButton.Content = "Disable";
                     }
                 }
             }
+            
         }
 
         private void EncryptionKeySpinner_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
-                {
-                    //update stuff
-                    if ((currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE) ||
-                        (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY))
-                    {
-                        if (EncryptionKeySpinner.Value != null)
-                        {
-                            currentRadio.encKey = (byte) EncryptionKeySpinner.Value;
-                            //make radio data stale to force resysnc
-                            RadioDCSSyncServer.LastSent = 0;
-                        }
-                    }
-                }
-            }
+            if(EncryptionKeySpinner?.Value != null)
+                RadioHelper.SetEncryptionKey(RadioId,(byte)EncryptionKeySpinner.Value);
         }
     }
 }
