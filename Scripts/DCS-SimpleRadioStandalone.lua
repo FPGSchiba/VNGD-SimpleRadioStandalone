@@ -168,33 +168,44 @@ LuaExportActivityNextEvent = function(tCurrent)
 			    elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
 				    _update = SR.exportRadioSU25(_update)
                 else
-                    -- FC 3
-                    _update.radios[2].name = "FC3 UHF"
-                    _update.radios[2].freq = 251.0*1000000
+					 -- FC 3
+                    _update.radios[2].name = "FC3 VHF"
+                    _update.radios[2].freq = 124.8*1000000 --116,00-151,975 MHz
                     _update.radios[2].modulation = 0
-                    _update.radios[2].secFreq = 243.0*1000000
+                    _update.radios[2].secFreq = 121.5*1000000
+                    _update.radios[2].volume = 1.0
+                    _update.radios[2].freqMin = 116*1000000
+                    _update.radios[2].freqMax = 151.975*1000000
                     _update.radios[2].volMode = 1
                     _update.radios[2].freqMode = 1
 
-                    _update.radios[3].name = "FC3 VHF"
-                    _update.radios[3].freq = 124.8*1000000
+
+                    _update.radios[3].name = "FC3 UHF"
+                    _update.radios[3].freq = 251.0*1000000 --225-399.975 MHZ
                     _update.radios[3].modulation = 0
-                    _update.radios[3].secFreq = 121.5*1000000
+                    _update.radios[3].secFreq = 243.0*1000000
+                    _update.radios[3].volume = 1.0
+                    _update.radios[3].freqMin = 225*1000000
+                    _update.radios[3].freqMax = 399.975*1000000
                     _update.radios[3].volMode = 1
                     _update.radios[3].freqMode = 1
+                    
+                    _update.radios[3].encKey = 1
+                    _update.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
                     _update.radios[4].name = "FC3 FM"
-                    _update.radios[4].freq = 30.0*1000000
+                    _update.radios[4].freq = 30.0*1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
                     _update.radios[4].modulation = 1
+                    _update.radios[4].volume = 1.0
+                    _update.radios[4].freqMin = 30*1000000
+                    _update.radios[4].freqMax = 76*1000000
                     _update.radios[4].volMode = 1
                     _update.radios[4].freqMode = 1
 
-                    _update.radios[2].volume = 1.0
-                    _update.radios[3].volume = 1.0
-                    _update.radios[4].volume = 1.0
+                    _update.radios[4].encKey = 1
+                    _update.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-                    _update.control = 0
-
+                    _update.control = 0;
                     _update.selected = 1
                 end
 

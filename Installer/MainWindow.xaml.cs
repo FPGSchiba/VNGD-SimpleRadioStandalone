@@ -252,6 +252,7 @@ namespace Installer
                 
                     File.Copy(path + "\\FavouriteServers.csv", favouritesTemp,true);
                 }
+                Thread.Sleep(200);
 
                 DeleteDirectory(path);
             }
