@@ -1,5 +1,7 @@
 ﻿using System;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Dsp;
@@ -17,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private readonly Random _random = new Random();
 
-        private Settings _settings = Settings.Instance;
+        private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
 
         private int _lastReceivedOn = -1;
 

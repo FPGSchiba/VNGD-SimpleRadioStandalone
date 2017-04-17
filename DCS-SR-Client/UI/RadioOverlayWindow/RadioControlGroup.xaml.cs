@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
@@ -18,8 +21,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private const double MHz = 1000000;
         private bool _dragging;
 
+        public PresetChannelsViewModel ChannelViewModel { get; }
+
         public RadioControlGroup()
         {
+
+            ChannelViewModel = new PresetChannelsViewModel(new MockPresetChannelsStore());
+            this.DataContext = this; // set data context
             InitializeComponent();
 
         }
@@ -139,8 +147,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 down001.IsEnabled = true;
                 down0001.IsEnabled = true;
 
-                ReloadButton.IsEnabled = true;
-                LoadFromFileButton.IsEnabled = true;
+              //  ReloadButton.IsEnabled = true;
+                //LoadFromFileButton.IsEnabled = true;
             }
             else
             {
@@ -156,8 +164,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 down001.Visibility = Visibility.Hidden;
                 down0001.Visibility = Visibility.Hidden;
 
-                ReloadButton.IsEnabled = false;
-                LoadFromFileButton.IsEnabled = false;
+               // ReloadButton.IsEnabled = false;
+              //  LoadFromFileButton.IsEnabled = false;
             }
         }
 
@@ -379,19 +387,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             if(EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId,(byte)EncryptionKeySpinner.Value);
         }
-
-        private void ReloadButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void LoadFromFileButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            
-
-        }
-
-
         
     }
 }

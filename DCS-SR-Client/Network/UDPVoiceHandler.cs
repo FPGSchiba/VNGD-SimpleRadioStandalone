@@ -5,7 +5,9 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
@@ -93,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var decoderThread = new Thread(UdpAudioDecode);
             decoderThread.Start();
 
-            var settings = Settings.Instance;
+            var settings = SettingsStore.Instance;
             _inputManager.StartDetectPtt(pressed =>
             {
                 var radios = RadioDCSSyncServer.DcsPlayerRadioInfo;

@@ -10,10 +10,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
@@ -49,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectListener _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private RadioOverlayWindow _radioOverlayWindow;
+        private Overlay.RadioOverlayWindow _radioOverlayWindow;
         private AwacsRadioOverlayWindow.RadioOverlayWindow _awacsRadioOverlay;
 
         private IPAddress _resolvedIp;
@@ -363,7 +366,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioClickEffectsToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
             if (radioEffects == "ON")
             {
                 RadioClicksToggle.IsChecked = true;
@@ -377,7 +380,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioClickEffectsTXToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
+            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
             if (radioEffects == "ON")
             {
                 RadioClicksTXToggle.IsChecked = true;
@@ -390,7 +393,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioEncryptionEffectsToggle()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
+            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
             if (radioEffects == "ON")
             {
                 RadioEncryptionEffectsToggle.IsChecked = true;
@@ -403,7 +406,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioSwitchIsPTT()
         {
-            var switchIsPTT = Settings.Instance.UserSettings[(int) SettingType.RadioSwitchIsPTT];
+            var switchIsPTT = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioSwitchIsPTT];
             if (switchIsPTT == "ON")
             {
                 RadioSwitchIsPTT.IsChecked = true;
@@ -416,7 +419,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitAutoConnectPrompt()
         {
-            var autoConnect = Settings.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
+            var autoConnect = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
             if (autoConnect == "ON")
             {
                 AutoConnectPromptToggle.IsChecked = true;
@@ -429,7 +432,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioOverlayTaskbarHide()
         {
-            var autoConnect = Settings.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide];
+            var autoConnect = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide];
             if (autoConnect == "ON")
             {
                 RadioOverlayTaskbarItem.IsChecked = true;
@@ -442,7 +445,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRefocusDCS()
         {
-            var refocus = Settings.Instance.UserSettings[(int)SettingType.RefocusDCS];
+            var refocus = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.RefocusDCS];
             if (refocus == "ON")
             {
                 RefocusDCS.IsChecked = true;
@@ -456,7 +459,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitExpandControls()
         {
-            var expand = Settings.Instance.UserSettings[(int)SettingType.ExpandControls];
+            var expand = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls];
             if (expand == "ON")
             {
                 ExpandInputDevices.IsChecked = true;
@@ -469,7 +472,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitRadioSoundEffects()
         {
-            var radioEffects = Settings.Instance.UserSettings[(int)SettingType.RadioEffects];
+            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.RadioEffects];
             if (radioEffects == "ON")
             {
                 RadioSoundEffects.IsChecked = true;
@@ -746,23 +749,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RadioClicks_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
         }
 
         private void RadioClicksTX_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string) RadioClicksTXToggle.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string) RadioClicksTXToggle.Content);
         }
 
         private void RadioEncryptionEffects_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioEncryptionEffects,
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioEncryptionEffects,
                 (string) RadioEncryptionEffectsToggle.Content);
         }
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string) RadioSwitchIsPTT.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioSwitchIsPTT, (string) RadioSwitchIsPTT.Content);
         }
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
@@ -785,9 +788,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _radioOverlayWindow?.Close();
 
-                    _radioOverlayWindow = new RadioOverlayWindow();
+                    _radioOverlayWindow = new Overlay.RadioOverlayWindow();
                     _radioOverlayWindow.ShowInTaskbar =
-                        Settings.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide] != "ON";
+                        Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioOverlayTaskbarHide] != "ON";
                     _radioOverlayWindow.Show();
 
                    
@@ -814,7 +817,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
                 _awacsRadioOverlay.ShowInTaskbar =
-                    Settings.Instance.UserSettings[(int)SettingType.RadioOverlayTaskbarHide] != "ON";
+                    Settings.SettingsStore.Instance.UserSettings[(int)SettingType.RadioOverlayTaskbarHide] != "ON";
                 _awacsRadioOverlay.Show();
             }
             else
@@ -831,7 +834,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (StartStop.Content.ToString().ToLower() == "connect")
             {
-                var autoConnect = Settings.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
+                var autoConnect = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.AutoConnectPrompt];
 
                 var connection = $"{address}:{port}";
                 if (autoConnect == "ON")
@@ -895,18 +898,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.AutoConnectPrompt, (string) AutoConnectPromptToggle.Content);
         }
 
         private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string) RadioOverlayTaskbarItem.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioOverlayTaskbarHide, (string) RadioOverlayTaskbarItem.Content);
         }
 
 
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RefocusDCS, (string)RefocusDCS.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RefocusDCS, (string)RefocusDCS.Content);
         }
 
         private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
@@ -915,7 +918,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MessageBox.Show("You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but may cause issues with other devices being detected", "Restart SimpleRadio Standalone", MessageBoxButton.OK,
                            MessageBoxImage.Warning);
 
-            Settings.Instance.WriteSetting(SettingType.ExpandControls, (string)ExpandInputDevices.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.ExpandControls, (string)ExpandInputDevices.Content);
         }
 
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
@@ -925,7 +928,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
         {
-            Settings.Instance.WriteSetting(SettingType.RadioEffects, (string)RadioSoundEffects.Content);
+            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioEffects, (string)RadioSoundEffects.Content);
         }
     }
 }

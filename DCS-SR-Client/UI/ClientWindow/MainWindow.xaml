@@ -8,6 +8,7 @@
                       xmlns:input="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Input"
                       xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       Title="DCS-SRS Client"
                       Width="550"
                       Height="570"
@@ -627,7 +628,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio1Config"
                                                     Grid.Row="5"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio1Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio1Channel}" />
 
                         <Label Grid.Row="6"
                                Grid.Column="0"
@@ -637,7 +638,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio2Config"
                                                     Grid.Row="6"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio2Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio2Channel}" />
 
                         <Label Grid.Row="7"
                                Grid.Column="0"
@@ -647,7 +648,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio3Config"
                                                     Grid.Row="7"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio3Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio3Channel}" />
                         <Label Grid.Row="8"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -656,7 +657,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio4Config"
                                                     Grid.Row="8"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio4Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio4Channel}" />
                         <Label Grid.Row="9"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -665,7 +666,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio5Config"
                                                     Grid.Row="9"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio5Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio5Channel}" />
                         <Label Grid.Row="10"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -674,7 +675,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio6Config"
                                                     Grid.Row="10"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio6Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio6Channel}" />
                         <Label Grid.Row="11"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -683,7 +684,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio7Config"
                                                     Grid.Row="11"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio7Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio7Channel}" />
                         <Label Grid.Row="12"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -692,7 +693,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio8Config"
                                                     Grid.Row="12"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio8Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio8Channel}" />
                         <Label Grid.Row="13"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -701,7 +702,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio9Config"
                                                     Grid.Row="13"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio9Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio9Channel}" />
                         <Label Grid.Row="14"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
@@ -710,7 +711,7 @@
                         <local:RadioChannelConfigUi x:Name="Radio10Config"
                                                     Grid.Row="14"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.Radio10Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.Radio10Channel}" />
 
                         <Label Grid.Row="15"
                                Grid.Column="0"
@@ -720,7 +721,7 @@
                         <local:RadioChannelConfigUi x:Name="IntercomConfig"
                                                     Grid.Row="15"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static local:SettingType.IntercomChannel}" />
+                                                    SettingConfig="{x:Static settings:SettingType.IntercomChannel}" />
 
                         <Label Grid.Row="16"
                                Grid.Column="0"

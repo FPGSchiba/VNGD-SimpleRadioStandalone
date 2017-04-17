@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
@@ -125,7 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void FocusDCS()
         {
-            var focus = Settings.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
+            var focus = SettingsStore.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
 
             if (focus)
             {

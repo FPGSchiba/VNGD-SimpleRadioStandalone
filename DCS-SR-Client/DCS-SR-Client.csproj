@@ -179,16 +179,24 @@
     <Compile Include="Network\Models\CombinedRadioState.cs" />
     <Compile Include="Network\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\Models\DCSLosCheckResult.cs" />
-    <Compile Include="Preferences\CsvFavouriteServerStore.cs" />
-    <Compile Include="Preferences\IFavouriteServerStore.cs" />
-    <Compile Include="Preferences\MockFavouriteServerStore.cs" />
+    <Compile Include="Settings\Favourites\CsvFavouriteServerStore.cs" />
+    <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
+    <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
+    <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
+    <Compile Include="Settings\SettingType.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\InputConfiguration.cs" />
     <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceManager.cs" />
+    <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
+    <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
+    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml.cs">
+      <DependentUpon>PresetChannelsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewModel.cs" />
     <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
       <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
     </Compile>
@@ -202,11 +210,11 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsOverlay.xaml.cs">
       <DependentUpon>AwacsOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\ServerAddress.cs" />
-    <Compile Include="UI\ClientWindow\FavouriteServersView.xaml.cs">
+    <Compile Include="Settings\Favourites\ServerAddress.cs" />
+    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml.cs">
       <DependentUpon>FavouriteServersView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\FavouriteServersViewModel.cs" />
+    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
     <Compile Include="UI\RadioOverlayWindow\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
     </Compile>
@@ -222,7 +230,7 @@
     <Compile Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
@@ -244,6 +252,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ClientWindow\RadioChannelConfigUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -260,7 +272,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ClientWindow\FavouriteServersView.xaml">
+    <Page Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

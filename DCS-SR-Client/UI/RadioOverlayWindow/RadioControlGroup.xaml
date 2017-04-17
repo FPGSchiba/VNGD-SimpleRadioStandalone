@@ -4,7 +4,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:presetChannels1="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
              Name="radioControlContainer"
              Width="155"
              Height="75">
@@ -243,38 +245,10 @@
                            Text="Ch." />
             </TabItem.Header>
 
-            <WrapPanel HorizontalAlignment="Center"
-                       Background="#444"
-                       Orientation="Vertical">
-                <ComboBox x:Name="Mic"
-                          Width="135"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Top" />
-                <WrapPanel Width="135"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Background="#444"
-                           Orientation="Horizontal">
-                    <Button Name="ReloadButton"
-                            Width="50"
-                            Height="20"
-                            Margin="15,5,0,0"
-                            HorizontalAlignment="Center"
-                            Click="ReloadButton_OnClick"
-                            Content="Reload"
-                            Style="{x:Null}" />
-                    <Button Name="LoadFromFileButton"
-                            Width="50"
-                            Height="20"
-                            Margin="5,5,0,0"
-                            HorizontalAlignment="Center"
-                            Click="LoadFromFileButton_OnClick"
-                            Content="Load File"
-                            Style="{x:Null}" />
-                </WrapPanel>
-
-
-            </WrapPanel>
+            <presetChannels1:PresetChannelsView HorizontalAlignment="Center"
+                                               Background="#444"
+                                               DataContext="{Binding ChannelViewModel,
+                                                                     Mode=OneWay}" />
 
         </TabItem>
     </TabControl>

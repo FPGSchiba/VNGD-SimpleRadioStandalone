@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -59,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
 
-            Logger.Info("Starting Device Search. Expand Search: "+ ((Settings.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
+            Logger.Info("Starting Device Search. Expand Search: "+ ((SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -114,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                    else if (Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
+                    else if (SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
                     {
 
                         Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
