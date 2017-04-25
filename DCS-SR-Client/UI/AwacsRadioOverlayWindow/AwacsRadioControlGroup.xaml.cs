@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -19,6 +20,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
     {
         private const double MHz = 1000000;
         private bool _dragging;
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
 
         public RadioControlGroup()
         {
@@ -37,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
                 RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
@@ -139,11 +142,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
             if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
-                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+                var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
                 clientRadio.volume = (float) RadioVolume.Value/100.0f;
             }
@@ -194,7 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             SetupEncryption();
 
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||  RadioId > dcsPlayerRadioInfo.radios.Length - 1)
             {
@@ -300,7 +303,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void SetupEncryption()
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if (((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
                 && RadioId <= dcsPlayerRadioInfo.radios.Length - 1)
@@ -370,7 +373,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         internal void RepaintRadioReceive()
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if (dcsPlayerRadioInfo == null)
             {
                 RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));

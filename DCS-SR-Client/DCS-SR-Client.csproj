@@ -99,6 +99,10 @@
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MvvmEventBinding, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -183,8 +187,10 @@
     <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
     <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
     <Compile Include="Settings\AppConfiguration.cs" />
+    <Compile Include="Settings\RadioChannels\FilePresetChannelsStore.cs" />
     <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
     <Compile Include="Settings\SettingType.cs" />
+    <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>

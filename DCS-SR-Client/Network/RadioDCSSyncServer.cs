@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
@@ -29,9 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static volatile DCSPlayerRadioInfo DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
-
-        public static volatile DCSPlayerSideInfo DcsPlayerSideInfo = new DCSPlayerSideInfo();
+       
 
         private readonly SendRadioUpdate _clientRadioUpdate;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
@@ -46,6 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private volatile bool _stop;
 
+        private ClientStateSingleton _clientStateSingleton;
 
         public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
             ConcurrentDictionary<string, SRClient> _clients, string guid)
@@ -54,6 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _clientSideUpdate = clientSideUpdate;
             this._clients = _clients;
             _guid = guid;
+            _clientStateSingleton = ClientStateSingleton.Instance;
         }
 
         public static long LastSent { get; set; }
@@ -162,7 +163,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //get currently transmitting or receiving
                 var combinedState = new CombinedRadioState()
                 {
-                    RadioInfo = DcsPlayerRadioInfo,
+                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
                     RadioSendingState = UdpVoiceHandler.RadioSendingState,
                     RadioReceivingState = UdpVoiceHandler.RadioReceivingState
                 };
@@ -215,9 +216,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             if (playerInfo != null)
                             {
+                                var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
                                 //update position
-                                playerInfo.Position = DcsPlayerRadioInfo.pos;
-                                DcsPlayerSideInfo = playerInfo;
+                                playerInfo.Position = radioInfo.pos;
+                                _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
                                 _clientSideUpdate();
                                 //     count = 0;
                             }
@@ -381,52 +383,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
+            
 
             var expansion = ClientSync.ServerSettings[(int) ServerSettingType.RADIO_EXPANSION];
 
+            var playerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
             //update common parts
-            DcsPlayerRadioInfo.name = message.name;
-            DcsPlayerRadioInfo.control = message.control;
-            DcsPlayerRadioInfo.unit = message.unit;
-            DcsPlayerRadioInfo.pos = message.pos;
+            playerRadioInfo.name = message.name;
+            playerRadioInfo.control = message.control;
+            playerRadioInfo.unit = message.unit;
+            playerRadioInfo.pos = message.pos;
 
             var overrideFreqAndVol = false;
 
+            var newAircraft = playerRadioInfo.unitId != message.unitId || !playerRadioInfo.IsCurrent();
+
             if (message.unitId >= DCSPlayerRadioInfo.UnitIdOffset &&
-                DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+                playerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
             {
                 //overriden so leave as is
             }
             else
             {
-                overrideFreqAndVol = DcsPlayerRadioInfo.unitId != message.unitId;
-                DcsPlayerRadioInfo.unitId = message.unitId;
+                overrideFreqAndVol = playerRadioInfo.unitId != message.unitId;
+                playerRadioInfo.unitId = message.unitId;
             }
 
 
             if (overrideFreqAndVol)
             {
-                DcsPlayerRadioInfo.selected = message.selected;
+                playerRadioInfo.selected = message.selected;
                 changed = true;
             }
 
             if (message.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
             {
-                DcsPlayerRadioInfo.selected = message.selected;
+                playerRadioInfo.selected = message.selected;
             }
 
 
             //copy over radio names, min + max
-            for (var i = 0; i < DcsPlayerRadioInfo.radios.Length; i++)
+            for (var i = 0; i < playerRadioInfo.radios.Length; i++)
             {
-                var clientRadio = DcsPlayerRadioInfo.radios[i];
+                var clientRadio = playerRadioInfo.radios[i];
 
                 //if awacs NOT open -  disable radios over 3
                 if (i >= message.radios.Length
                     || (RadioOverlayWindow.AwacsActive == false
                         && (i > 3 || i == 0)
                         // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
-                        && DcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+                        && playerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
                 {
                     clientRadio.freq = 1;
                     clientRadio.freqMin = 1;
@@ -494,6 +501,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             clientRadio.secFreq = updateRadio.secFreq;
                         }
+
+                         clientRadio.channel = updateRadio.channel;
                     }
                     else
                     {
@@ -554,16 +563,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         clientRadio.volume = updateRadio.volume;
                     }
+
+                    //handle Channels load for first 3 radios
+                    if ((newAircraft) && i>=1 && i<=3)
+                    {
+                        if (clientRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
+                        {
+                            var channelModel = _clientStateSingleton.FixedChannels[i - 1];
+                            channelModel.Max = clientRadio.freqMax;
+                            channelModel.Min = clientRadio.freqMin;
+                            channelModel.Reload();
+                            clientRadio.channel = -1; //reset channel
+                        }
+                        else
+                        {
+                            _clientStateSingleton.FixedChannels[i-1].Clear();
+                            //clear
+
+                        }
+                    }
                 }
             }
 
             //change PTT last
-            DcsPlayerRadioInfo.ptt = message.ptt;
-//                }
-//            }
+            playerRadioInfo.ptt = message.ptt;
+            //                }
+            //            }
 
             //update
-            DcsPlayerRadioInfo.LastUpdate = Environment.TickCount;
+            playerRadioInfo.LastUpdate = Environment.TickCount;
 
             return changed;
         }

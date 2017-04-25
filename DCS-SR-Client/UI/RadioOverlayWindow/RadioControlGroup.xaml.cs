@@ -1,17 +1,16 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioControlGroup.xaml
@@ -20,19 +19,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     {
         private const double MHz = 1000000;
         private bool _dragging;
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
-        public PresetChannelsViewModel ChannelViewModel { get; }
+        public PresetChannelsViewModel ChannelViewModel { get; set; }
 
         public RadioControlGroup()
         {
-
-            ChannelViewModel = new PresetChannelsViewModel(new MockPresetChannelsStore());
             this.DataContext = this; // set data context
+         
             InitializeComponent();
+
+
 
         }
 
-        public int RadioId { private get; set; }
+        private int _radioId;
+
+        public int RadioId
+        {
+            private get { return _radioId; } 
+            set
+            {
+                _radioId = value;
+
+                if (_radioId >= 1 && _radioId <= 3)
+                {
+                   UpdateBinding();
+                }
+
+            }
+        }
+
+        //updates the binding so the changes are picked up for the linked FixedChannelsModel
+        private void UpdateBinding()
+        {
+            ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
+
+            var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
+            bindingExpression?.UpdateTarget();
+        }
 
         private void Up0001_Click(object sender, RoutedEventArgs e)
         {
@@ -107,13 +132,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
             if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
-                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+                var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                clientRadio.volume = (float) radioVolume.Value/100.0f;
+                clientRadio.volume = (float) RadioVolume.Value/100.0f;
             }
 
             _dragging = false;
@@ -123,49 +148,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             if (enable)
             {
-                up10.Visibility = Visibility.Visible;
-                up1.Visibility = Visibility.Visible;
-                up01.Visibility = Visibility.Visible;
-                up001.Visibility = Visibility.Visible;
-                up0001.Visibility = Visibility.Visible;
+                Up10.Visibility = Visibility.Visible;
+                Up1.Visibility = Visibility.Visible;
+                Up01.Visibility = Visibility.Visible;
+                Up001.Visibility = Visibility.Visible;
+                Up0001.Visibility = Visibility.Visible;
 
-                down10.Visibility = Visibility.Visible;
-                down1.Visibility = Visibility.Visible;
-                down01.Visibility = Visibility.Visible;
-                down001.Visibility = Visibility.Visible;
-                down0001.Visibility = Visibility.Visible;
+                Down10.Visibility = Visibility.Visible;
+                Down1.Visibility = Visibility.Visible;
+                Down01.Visibility = Visibility.Visible;
+                Down001.Visibility = Visibility.Visible;
+                Down0001.Visibility = Visibility.Visible;
 
-                up10.IsEnabled = true;
-                up1.IsEnabled = true;
-                up01.IsEnabled = true;
-                up001.IsEnabled = true;
-                up0001.IsEnabled = true;
+                Up10.IsEnabled = true;
+                Up1.IsEnabled = true;
+                Up01.IsEnabled = true;
+                Up001.IsEnabled = true;
+                Up0001.IsEnabled = true;
 
-                down10.IsEnabled = true;
-                down1.IsEnabled = true;
-                down01.IsEnabled = true;
-                down001.IsEnabled = true;
-                down0001.IsEnabled = true;
+                Down10.IsEnabled = true;
+                Down1.IsEnabled = true;
+                Down01.IsEnabled = true;
+                Down001.IsEnabled = true;
+                Down0001.IsEnabled = true;
 
-              //  ReloadButton.IsEnabled = true;
+                //  ReloadButton.IsEnabled = true;
                 //LoadFromFileButton.IsEnabled = true;
+
+                PresetChannelsView.IsEnabled = true;
             }
             else
             {
-                up10.Visibility = Visibility.Hidden;
-                up1.Visibility = Visibility.Hidden;
-                up01.Visibility = Visibility.Hidden;
-                up001.Visibility = Visibility.Hidden;
-                up0001.Visibility = Visibility.Hidden;
+                Up10.Visibility = Visibility.Hidden;
+                Up1.Visibility = Visibility.Hidden;
+                Up01.Visibility = Visibility.Hidden;
+                Up001.Visibility = Visibility.Hidden;
+                Up0001.Visibility = Visibility.Hidden;
 
-                down10.Visibility = Visibility.Hidden;
-                down1.Visibility = Visibility.Hidden;
-                down01.Visibility = Visibility.Hidden;
-                down001.Visibility = Visibility.Hidden;
-                down0001.Visibility = Visibility.Hidden;
+                Down10.Visibility = Visibility.Hidden;
+                Down1.Visibility = Visibility.Hidden;
+                Down01.Visibility = Visibility.Hidden;
+                Down001.Visibility = Visibility.Hidden;
+                Down0001.Visibility = Visibility.Hidden;
 
-               // ReloadButton.IsEnabled = false;
-              //  LoadFromFileButton.IsEnabled = false;
+                PresetChannelsView.IsEnabled = false;
+
+             
             }
         }
 
@@ -173,15 +201,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             SetupEncryption();
 
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent())
             {
-                radioActive.Fill = new SolidColorBrush(Colors.Red);
-                radioLabel.Text = "No Radio";
-                radioFrequency.Text = "Unknown";
+                RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                RadioLabel.Text = "No Radio";
+                RadioFrequency.Text = "Unknown";
 
-                radioVolume.IsEnabled = false;
+                RadioVolume.IsEnabled = false;
 
                 ToggleButtons(false);
 
@@ -196,60 +224,69 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
-                        radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
-                        radioActive.Fill = new SolidColorBrush(Colors.Green);
+                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
                     }
                 }
                 else
                 {
-                    radioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
                 if (currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
-                    radioActive.Fill = new SolidColorBrush(Colors.Red);
-                    radioLabel.Text = "No Radio";
-                    radioFrequency.Text = "Unknown";
+                    RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    RadioLabel.Text = "No Radio";
+                    RadioFrequency.Text = "Unknown";
 
-                    radioVolume.IsEnabled = false;
+                    RadioVolume.IsEnabled = false;
 
                     ToggleButtons(false);
                     return;
                 }
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    radioFrequency.Text = "INTERCOM";
+                    RadioFrequency.Text = "INTERCOM";
                 }
                 else
                 {
-                    radioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000", CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
+                    RadioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000", CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
                     (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secFreq > 100)
                     {
-                        radioFrequency.Text += " G";
+                        RadioFrequency.Text += " G";
                     }
+
+                    if (currentRadio.channel >= 0)
+                    {
+                        RadioFrequency.Text += " C" + currentRadio.channel;
+                    }
+
+
                     if (currentRadio.enc && (currentRadio.encKey > 0))
                     {
-                        radioFrequency.Text += " E" + currentRadio.encKey; // ENCRYPTED
+                        RadioFrequency.Text += " E" + currentRadio.encKey; // ENCRYPTED
                     }
                 }
-                radioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
+
+              
+                RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {
-                    radioVolume.IsEnabled = true;
+                    RadioVolume.IsEnabled = true;
 
                     //reset dragging just incase
                     //    _dragging = false;
                 }
                 else
                 {
-                    radioVolume.IsEnabled = false;
+                    RadioVolume.IsEnabled = false;
 
                     //reset dragging just incase
                     //  _dragging = false;
@@ -259,14 +296,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (_dragging == false)
                 {
-                    radioVolume.Value = currentRadio.volume*100.0;
+                    RadioVolume.Value = currentRadio.volume*100.0;
                 }
             }
         }
 
         private void SetupEncryption()
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
             {
@@ -322,10 +359,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         internal void RepaintRadioReceive()
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if (dcsPlayerRadioInfo == null)
             {
-                radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
             }
             else
             {
@@ -334,22 +371,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if ((receiveState == null) || !receiveState.IsReceiving)
                 {
-                    radioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                    RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
                     if (receiveState.IsSecondary)
                     {
-                        radioFrequency.Foreground = new SolidColorBrush(Colors.Red);
+                        RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
                     }
                     else
                     {
-                        radioFrequency.Foreground = new SolidColorBrush(Colors.White);
+                        RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
                     }
                 }
                 else
                 {
-                    radioFrequency.Foreground =
+                    RadioFrequency.Foreground =
                         new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
             }

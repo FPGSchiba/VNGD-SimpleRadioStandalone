@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
              xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
              d:DataContext="{d:DesignInstance presetChannels:PresetChannelsViewModel,
                                               IsDesignTimeCreatable=False}"
@@ -17,29 +18,18 @@
                   Width="135"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Top"
+                  DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding Path=PresetChannels}"
                   SelectedItem="{Binding Path=SelectedPresetChannel}" />
-        <WrapPanel Width="135"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Background="#444"
-                   Orientation="Horizontal">
-            <Button Name="ReloadButton"
-                    Width="50"
-                    Height="20"
-                    Margin="15,5,0,0"
-                    HorizontalAlignment="Center"
-                    Command="{Binding Path=ReloadCommand}"
-                    Content="Reload"
-                    Style="{x:Null}" />
-            <Button Name="LoadFromFileButton"
-                    Width="50"
-                    Height="20"
-                    Margin="5,5,0,0"
-                    HorizontalAlignment="Center"
-                    Command="{Binding Path=LoadFromFileCommand}"
-                    Content="Load File"
-                    Style="{x:Null}" />
-        </WrapPanel>
+
+        <Button Name="ReloadButton"
+                Width="50"
+                Height="20"
+                Margin="0,5,0,0"
+                HorizontalAlignment="Center"
+                Command="{Binding Path=ReloadCommand}"
+                Content="Reload"
+                Style="{x:Null}" />
+
     </WrapPanel>
 </UserControl>

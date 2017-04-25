@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Easy.MessageHub;
@@ -29,6 +30,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private ConnectCallback _callback;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
+
+        private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid)
         {
@@ -82,15 +85,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientRadioUpdated()
         {
+            var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
             SendToServer(new NetworkMessage
             {
                 Client = new SRClient
                 {
-                    Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
-                    Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
+                    Coalition = sideInfo.side,
+                    Name = sideInfo.name,
                     ClientGuid = _guid,
-                    RadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo,
-                    Position = RadioDCSSyncServer.DcsPlayerRadioInfo.pos
+                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
+                    Position = sideInfo.Position
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             });
@@ -98,13 +102,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientCoalitionUpdate()
         {
+            var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
             SendToServer(new NetworkMessage
             {
                 Client = new SRClient
                 {
-                    Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
-                    Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
-                    Position = RadioDCSSyncServer.DcsPlayerSideInfo.Position,
+                    Coalition = sideInfo.side,
+                    Name = sideInfo.name,
+                    Position = sideInfo.Position,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
@@ -132,14 +137,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
+                    var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
                     //start the loop off by sending a SYNC Request
                     SendToServer(new NetworkMessage
                     {
                         Client = new SRClient
                         {
-                            Coalition = RadioDCSSyncServer.DcsPlayerSideInfo.side,
-                            Name = RadioDCSSyncServer.DcsPlayerSideInfo.name,
-                            Position = RadioDCSSyncServer.DcsPlayerSideInfo.Position,
+                            Coalition = sideInfo.side,
+                            Name = sideInfo.name,
+                            Position = sideInfo.Position,
                             ClientGuid = _guid
                         },
                         MsgType = NetworkMessage.MessageType.SYNC

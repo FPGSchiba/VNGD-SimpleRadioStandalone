@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -424,7 +425,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             {
                                 _lastActiveBinding = bindState.MainDevice.InputBind;
 
-                                var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+                                var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
                                 if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                                 {

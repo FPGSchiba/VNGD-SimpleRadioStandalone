@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 
@@ -22,6 +23,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly DispatcherTimer _updateTimer;
 
         public static bool AwacsActive = false; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
+
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
 
         public RadioOverlayWindow()
         {
@@ -93,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             intercom.RepaintRadioStatus();
 
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
                 var avalilableRadios = 0;

@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
@@ -12,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class IntercomControlGroup : UserControl
     {
         private bool _dragging;
-
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         public IntercomControlGroup()
         {
             InitializeComponent();
@@ -22,14 +23,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
             if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
-                if (RadioDCSSyncServer.DcsPlayerRadioInfo.control ==
+                if (_clientStateSingleton.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-                    RadioDCSSyncServer.DcsPlayerRadioInfo.selected = (short) RadioId;
+                    _clientStateSingleton.DcsPlayerRadioInfo.selected = (short) RadioId;
                 }
             }
         }
@@ -42,13 +43,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
             if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {
-                    var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioId];
+                    var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
                     clientRadio.volume = (float) radioVolume.Value/100.0f;
                 }
@@ -59,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         internal void RepaintRadioStatus()
         {
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent())
             {

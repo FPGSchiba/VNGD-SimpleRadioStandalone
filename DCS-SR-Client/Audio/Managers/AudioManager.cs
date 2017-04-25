@@ -7,6 +7,7 @@ using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
@@ -53,6 +54,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public short MicMax { get; set; }
         public float SpeakerMax { get; set; }
+
+        private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -166,9 +169,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void InitAudioBuffers()
         {
-            _effectsOutputBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
+            _effectsOutputBuffer = new RadioAudioProvider[_clientStateSingleton.DcsPlayerRadioInfo.radios.Length];
 
-            for (var i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length; i++)
+            for (var i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
             {
                 _effectsOutputBuffer[i] = new RadioAudioProvider(INPUT_SAMPLE_RATE);
                 _clientAudioMixer.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);

@@ -10,7 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
 {
     public class MockPresetChannelsStore: IPresetChannelsStore
     {
-        public IEnumerable<PresetChannel> LoadFromStore()
+        public IEnumerable<PresetChannel> LoadFromStore(string radioName)
         {
 
             IList<PresetChannel> _presetChannels = new List<PresetChannel>();

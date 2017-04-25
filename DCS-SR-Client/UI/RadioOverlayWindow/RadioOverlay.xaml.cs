@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
@@ -23,9 +24,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+        private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup = new Client.UI.RadioOverlayWindow.RadioControlGroup[3];
 
         private readonly DispatcherTimer _updateTimer;
+
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public RadioOverlayWindow()
         {
@@ -85,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             intercom.RepaintRadioStatus();
 
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
                 var avalilableRadios = 0;

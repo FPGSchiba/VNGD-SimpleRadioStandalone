@@ -15,6 +15,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -73,6 +74,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
 
             DataContext = this;
+
+            var client = ClientStateSingleton.Instance;
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.Left = AppConfiguration.Instance.ClientX;
