@@ -286,5 +286,96 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 radio.channel = selectedPresetChannel.Channel;
             }
         }
+
+        public static void  RadioChannelUp(int  radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null)
+            {
+                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                    && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
+                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                {
+
+                    var fixedChannels = ClientStateSingleton.Instance.FixedChannels;
+                
+                    //now get model
+                    if (fixedChannels != null && fixedChannels[radioId - 1] != null)
+                    {
+                        var radioChannels = fixedChannels[radioId - 1];
+
+                        if (radioChannels.PresetChannels.Count > 0)
+                        {
+                            int next = currentRadio.channel + 1;
+
+                            if (radioChannels.PresetChannels.Count < next || currentRadio.channel < 1)
+                            {
+                                //set to first radio
+                                SelectRadioChannel(radioChannels.PresetChannels[0], radioId);
+                                radioChannels.SelectedPresetChannel = radioChannels.PresetChannels[0];
+
+                            }
+                            else
+                            {
+                                var preset = radioChannels.PresetChannels[next - 1];
+                              
+                                SelectRadioChannel(preset, radioId);
+                                radioChannels.SelectedPresetChannel = preset;
+                            }
+
+                        }
+
+                    }
+
+
+                }
+            }
+
+        }
+
+        public static void RadioChannelDown(int radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null)
+            {
+                if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                    && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
+                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                {
+
+                    var fixedChannels = ClientStateSingleton.Instance.FixedChannels;
+
+                    //now get model
+                    if (fixedChannels != null && fixedChannels[radioId - 1] != null)
+                    {
+                        var radioChannels = fixedChannels[radioId - 1];
+
+                        if (radioChannels.PresetChannels.Count > 0)
+                        {
+                            int previous = currentRadio.channel -1;
+
+                            if (previous < 1)
+                            {
+                                //set to last radio
+                                SelectRadioChannel(radioChannels.PresetChannels.Last(), radioId);
+                                radioChannels.SelectedPresetChannel = radioChannels.PresetChannels.Last();
+
+                            }
+                            else
+                            {
+                                var preset = radioChannels.PresetChannels[previous - 1];
+                                //set to previous radio
+                                SelectRadioChannel(preset, radioId);
+                                radioChannels.SelectedPresetChannel = preset;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }

@@ -98,6 +98,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         EncryptionKeyDecrease = 130,
         ModifierEncryptionEncryptionKeyDecrease = 230,
 
+        RadioChannelUp = 131,
+        ModifierRadioChannelUp = 231,
+
+        RadioChannelDown = 132,
+        ModifierRadioChannelDown = 232,
+
 
     }
 

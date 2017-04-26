@@ -288,6 +288,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             EncryptionKeyDecrease.InputName = "Encryption Key Down";
             EncryptionKeyDecrease.ControlInputBinding = InputBinding.EncryptionKeyDecrease;
             EncryptionKeyDecrease.InputDeviceManager = InputManager;
+
+            RadioChannelUp.InputName = "Radio Channel Up";
+            RadioChannelUp.ControlInputBinding = InputBinding.RadioChannelUp;
+            RadioChannelUp.InputDeviceManager = InputManager;
+
+            RadioChannelDown.InputName = "Encryption Key Down";
+            RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
+            RadioChannelDown.InputDeviceManager = InputManager;
         }
 
         public InputDeviceManager InputManager { get; set; }

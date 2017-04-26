@@ -411,7 +411,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.ModifierEncryptionEncryptionKeyDecrease)
+                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.RadioChannelDown)
                         {
 
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
@@ -487,6 +487,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                         case InputBinding.EncryptionKeyDecrease:
                                             RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
                                             break;
+                                        case InputBinding.RadioChannelUp:
+                                            RadioHelper.RadioChannelUp(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.RadioChannelDown:
+                                            RadioHelper.RadioChannelDown(dcsPlayerRadioInfo.selected);
+                                            break;
 
 
                                         default:
@@ -555,7 +561,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.EncryptionKeyDecrease; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.RadioChannelDown; i++)
             {
                 var mainInputBind = InputConfig.InputDevices[(InputBinding) i];
 
