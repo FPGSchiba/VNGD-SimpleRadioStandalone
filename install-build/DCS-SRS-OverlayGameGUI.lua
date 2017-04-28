@@ -1,4 +1,4 @@
--- Version 1.3.0.0
+-- Version 1.3.1.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
@@ -120,6 +120,10 @@ function srsOverlay.updateRadio()
 
 					 if _radio.secFreq > 100 then
 						fullMessage = fullMessage.." G"
+					 end
+
+					 if _radio.channel >= 0 then
+					 	fullMessage = fullMessage.." C".._radio.channel
 					 end
 
 					 if _radio.enc and _radio.encKey > 0 then

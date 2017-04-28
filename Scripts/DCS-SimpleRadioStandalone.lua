@@ -1,4 +1,4 @@
--- Version 1.3.0.0
+-- Version 1.3.1.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -615,6 +615,13 @@ function SR.exportRadioUH1H(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 21,{0.0,1.0},true)
 
+	 -- get channel selector
+	local _selector  = SR.getSelectorPosition(15,0.1)
+
+	if _selector < 1 then
+		_data.radios[3].channel =  SR.getSelectorPosition(16,0.05) + 1 --add 1 as channel 0 is channel 1 
+	end
+
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
@@ -729,6 +736,7 @@ function SR.exportRadioKA50(_data)
     _data.radios[3].freq = SR.getRadioFrequency(49,50000)
     _data.radios[3].modulation = 1
     _data.radios[3].volume = SR.getRadioVolume(0, 372,{0.0,1.0},false)
+	_data.radios[3].channel =  SR.getSelectorPosition(371,0.1) +1
 
 	--expansion radios
     _data.radios[4].name = "SPU-9 SW"
@@ -775,6 +783,13 @@ function SR.exportRadioMI8(_data)
     else
         _data.radios[2].modulation = 0
     end
+
+	 -- get channel selector
+	local _selector  = GetDevice(0):get_argument_value(132)
+
+	if _selector > 0.5 then
+		_data.radios[2].channel =  SR.getSelectorPosition(370,0.05) + 1 --add 1 as channel 0 is channel 1 
+	end
     
     _data.radios[2].volume = SR.getRadioVolume(0, 156,{0.0,1.0},false)
 
@@ -876,6 +891,15 @@ function SR.exportRadioA10C(_data)
     _data.radios[3].freq = SR.getRadioFrequency(54)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)
+
+	-- get channel selector
+	local _selector  = SR.getSelectorPosition(167,0.1)
+
+	if _selector == 1 then
+		
+		local _channel  = SR.getSelectorPosition(161,0.05) + 1 --add 1 as channel 0 is channel 1
+		_data.radios[3].channel = _channel 
+	end
 	
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
@@ -943,6 +967,13 @@ function SR.exportRadioF86Sabre(_data)
     _data.radios[2].freq =  SR.getRadioFrequency(26)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 806,{0.1,0.9},false)
+
+	-- get channel selector
+	local _channel  = SR.getSelectorPosition(807,0.01)
+
+	if _channel >= 1 then
+		_data.radios[2].channel = _channel 
+	end
 
     _data.selected = 1
 
@@ -1044,6 +1075,8 @@ function SR.exportRadioMIG21(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 210,{0.0,1.0},false)
 
+	_data.radios[2].channel =  SR.getSelectorPosition(211,0.05)   
+
     _data.selected = 1
 
     if(SR.getButtonPosition(315)) > 0.5 then
@@ -1089,6 +1122,13 @@ function SR.exportRadioF5E(_data)
     _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 309,{0.1,0.9},false)
+
+	 -- get channel selector
+	local _selector  = SR.getSelectorPosition(307,0.1)
+
+	if _selector == 1 then
+		_data.radios[2].channel =  SR.getSelectorPosition(300,0.05) + 1 --add 1 as channel 0 is channel 1 
+	end
 
     _data.selected = 1
 
@@ -1415,12 +1455,21 @@ function SR.exportRadioHawk(_data)
     return _data;
 end
 
+local _mirageEncStatus = false
+local _previousEncState = 0
 function SR.exportRadioM2000C(_data)
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
     _data.radios[2].freq =  SR.getRadioFrequency(19)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707,{0.0,1.0},false)
+
+	 -- get channel selector
+	local _selector  = SR.getSelectorPosition(448,0.50)
+
+	if _selector == 1 then
+		_data.radios[2].channel =  SR.getSelectorPosition(445,0.05)  --add 1 as channel 0 is channel 1 
+	end
 
     _data.radios[3].name = "TRT ERA 7200 UHF"
     _data.radios[3].freq = SR.getRadioFrequency(20)
@@ -1444,9 +1493,26 @@ function SR.exportRadioM2000C(_data)
 		_data.radios[2].secFreq = 243.0*1000000 
 	end
 
-    if SR.getButtonPosition(432) > 0.5 then --431
-        _data.radios[3].enc = true
+	-- reset state on aircraft switch
+	if _lastUnitId ~= _data.unitId then
+		_mirageEncStatus = false
+		_previousEncState = 0
+	end
+
+	-- handle the button no longer toggling...
+    if SR.getButtonPosition(432) > 0.5 and  _previousEncState < 0.5 then --431
+
+    	if _mirageEncStatus  then
+    		_mirageEncStatus = false
+    	else
+    		_mirageEncStatus = true
+    	end
     end
+
+    _data.radios[3].enc = _mirageEncStatus
+
+    _previousEncState = SR.getButtonPosition(432)
+
 
     _data.control = 0; -- partial radio, allows hotkeys
 
@@ -1582,4 +1648,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.3.0.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.3.1.0")

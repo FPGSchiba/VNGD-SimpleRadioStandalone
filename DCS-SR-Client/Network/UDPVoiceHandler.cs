@@ -5,7 +5,10 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
@@ -49,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private Timer _timer;
         private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
+        private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
         public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
         {
@@ -78,8 +83,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var radioState = RadioReceivingState[i];
                 if ((radioState != null) && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving)
                 {
+
                     radioState.PlayedEndOfTransmission = true;
-                    _audioManager.PlaySoundEffectEndReceive(i, RadioDCSSyncServer.DcsPlayerRadioInfo.radios[i].volume);
+
+                    var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+                    _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume);
                 }
             }
         }
@@ -93,10 +102,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var decoderThread = new Thread(UdpAudioDecode);
             decoderThread.Start();
 
-            var settings = Settings.Instance;
+            var settings = SettingsStore.Instance;
             _inputManager.StartDetectPtt(pressed =>
             {
-                var radios = RadioDCSSyncServer.DcsPlayerRadioInfo;
+                var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
                 var radioSwitchPtt = settings.UserSettings[(int)SettingType.RadioSwitchIsPTT] == "ON";
 
@@ -112,9 +121,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //gives you radio id if you minus 100
                             var radioId = (int) inputBindState.MainDevice.InputBind - 100;
 
-                            if (radioId < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length)
+                            if (radioId < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length)
                             {
-                                var clientRadio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[radioId];
+                                var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[radioId];
 
                                 if (clientRadio.modulation != RadioInformation.Modulation.DISABLED && radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                                 {
@@ -253,7 +262,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             var myClient = IsClientMetaDataValid(_guid);
 
-                            if ((myClient != null) && RadioDCSSyncServer.DcsPlayerRadioInfo.IsCurrent())
+                            if ((myClient != null) && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
                             {
                                 //Decode bytes
                                 var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
@@ -261,7 +270,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 // check the radio
                                 RadioReceivingState receivingState = null;
                                 var receivingRadio =
-                                    RadioDCSSyncServer.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency,
+                                    _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency,
                                         (RadioInformation.Modulation) udpVoicePacket.Modulation,
                                         udpVoicePacket.UnitId, out receivingState);
 
@@ -389,8 +398,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return false;
             }
 
-            return (_ptt || RadioDCSSyncServer.DcsPlayerRadioInfo.ptt)
-                   && (RadioDCSSyncServer.DcsPlayerRadioInfo.selected == radioId);
+            return (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+                   && (_clientStateSingleton.DcsPlayerRadioInfo.selected == radioId);
         }
 
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
@@ -405,7 +414,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
 
-                var myPosition = RadioDCSSyncServer.DcsPlayerRadioInfo.pos;
+                var myPosition = _clientStateSingleton.DcsPlayerRadioInfo.pos;
 
                 var clientPos = transmittingClient.Position;
 
@@ -434,7 +443,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
-                var myPosition = RadioDCSSyncServer.DcsPlayerRadioInfo.pos;
+                var myPosition = _clientStateSingleton.DcsPlayerRadioInfo.pos;
 
                 var clientPos = transmittingClient.Position;
 
@@ -458,18 +467,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public void Send(byte[] bytes, int len)
         {
             //if either PTT is true
-            if ((_ptt || RadioDCSSyncServer.DcsPlayerRadioInfo.ptt)
-                && RadioDCSSyncServer.DcsPlayerRadioInfo.IsCurrent() && (bytes != null))
+            if ((_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+                && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent() && (bytes != null))
                 //can only send if DCS is connected
             {
                 try
                 {
-                    var currentSelected = RadioDCSSyncServer.DcsPlayerRadioInfo.selected;
+                    var currentSelected = _clientStateSingleton.DcsPlayerRadioInfo.selected;
                     //removes race condition by assigning here with the current selected changing
                     if ((currentSelected >= 0)
-                        && (currentSelected < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length))
+                        && (currentSelected < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length))
                     {
-                        var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[currentSelected];
+                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
 
                         if (((radio != null) && (radio.freq > 100) &&
                              (radio.modulation != RadioInformation.Modulation.DISABLED))
@@ -482,7 +491,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 AudioPart1Bytes = bytes,
                                 AudioPart1Length = (ushort) bytes.Length,
                                 Frequency = radio.freq,
-                                UnitId = RadioDCSSyncServer.DcsPlayerRadioInfo.unitId,
+                                UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                                 Encryption = radio.enc ? radio.encKey : (byte) 0,
                                 Modulation = (byte) radio.modulation,
                                 PacketNumber = _packetNumber++
@@ -525,7 +534,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     if (RadioSendingState.SendingOn >= 0)
                     {
-                        var radio = RadioDCSSyncServer.DcsPlayerRadioInfo.radios[RadioSendingState.SendingOn];
+                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioSendingState.SendingOn];
 
                         _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn, radio.volume);
                     }

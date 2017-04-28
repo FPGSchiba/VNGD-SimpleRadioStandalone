@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -21,14 +22,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitComboBox(object sender, RoutedEventArgs e)
         {
-            ChannelSelector.SelectedValue = Settings.Instance.UserSettings[(int) SettingConfig];
+            ChannelSelector.SelectedValue = Settings.SettingsStore.Instance.UserSettings[(int) SettingConfig];
         }
 
         private void ChannelSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selected = (string) ChannelSelector.SelectedValue;
 
-            Settings.Instance.WriteSetting(SettingConfig, selected);
+            Settings.SettingsStore.Instance.WriteSetting(SettingConfig, selected);
         }
     }
 }

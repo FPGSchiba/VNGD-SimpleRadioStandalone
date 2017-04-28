@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
@@ -18,7 +17,7 @@ using NAudio.Wave.SampleProviders;
 using NLog;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 {
     public class AudioManager
     {
@@ -55,6 +54,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public short MicMax { get; set; }
         public float SpeakerMax { get; set; }
+
+        private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -168,9 +169,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void InitAudioBuffers()
         {
-            _effectsOutputBuffer = new RadioAudioProvider[RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length];
+            _effectsOutputBuffer = new RadioAudioProvider[_clientStateSingleton.DcsPlayerRadioInfo.radios.Length];
 
-            for (var i = 0; i < RadioDCSSyncServer.DcsPlayerRadioInfo.radios.Length; i++)
+            for (var i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
             {
                 _effectsOutputBuffer[i] = new RadioAudioProvider(INPUT_SAMPLE_RATE);
                 _clientAudioMixer.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);
@@ -180,12 +181,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
             if (radioEffects == "ON")
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-                var encyptionEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
+                var encyptionEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
                 if (encrypted && (encyptionEffects == "ON"))
                 {
                     _effectsBuffer.VolumeSampleProvider.Volume = volume;
@@ -205,12 +206,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-                var encyptionEffects = Settings.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
+                var encyptionEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
 
                 if (encrypted && (encyptionEffects == "ON"))
                 {
@@ -232,7 +233,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume)
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
             if (radioEffects == "ON")
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -246,7 +247,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume)
         {
-            var radioEffects = Settings.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];

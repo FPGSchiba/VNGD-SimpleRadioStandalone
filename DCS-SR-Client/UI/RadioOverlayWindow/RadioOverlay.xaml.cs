@@ -8,6 +8,8 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
@@ -22,9 +24,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[3];
+        private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup = new Client.UI.RadioOverlayWindow.RadioControlGroup[3];
 
         private readonly DispatcherTimer _updateTimer;
+
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public RadioOverlayWindow()
         {
@@ -40,14 +44,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             AllowsTransparency = true;
             Opacity = opacity;
-            windowOpacitySlider.Value = Opacity;
+            WindowOpacitySlider.Value = Opacity;
 
-            radioControlGroup[0] = radio1;
-            radioControlGroup[1] = radio2;
-            radioControlGroup[2] = radio3;
+            radioControlGroup[0] = Radio1;
+            radioControlGroup[1] = Radio2;
+            radioControlGroup[2] = Radio3;
 
             //allows click and drag anywhere on the window
-            containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
+            ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
             Top = AppConfiguration.Instance.RadioX;
             Left = AppConfiguration.Instance.RadioY;
@@ -82,9 +86,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
             }
 
-            intercom.RepaintRadioStatus();
+            Intercom.RepaintRadioStatus();
 
-            var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
                 var avalilableRadios = 0;
@@ -125,7 +129,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void FocusDCS()
         {
-            var focus = Settings.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
+            var focus = SettingsStore.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
 
             if (focus)
             {

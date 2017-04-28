@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -59,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
 
-            Logger.Info("Starting Device Search. Expand Search: "+ ((Settings.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
+            Logger.Info("Starting Device Search. Expand Search: "+ ((SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -114,7 +116,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                    else if (Settings.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
+                    else if (SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
                     {
 
                         Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
@@ -409,7 +411,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.ModifierEncryptionEncryptionKeyDecrease)
+                          (int)bindState.MainDevice.InputBind <= (int)InputBinding.RadioChannelDown)
                         {
 
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
@@ -423,7 +425,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             {
                                 _lastActiveBinding = bindState.MainDevice.InputBind;
 
-                                var dcsPlayerRadioInfo = RadioDCSSyncServer.DcsPlayerRadioInfo;
+                                var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
                                 if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                                 {
@@ -484,6 +486,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                             break;
                                         case InputBinding.EncryptionKeyDecrease:
                                             RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.RadioChannelUp:
+                                            RadioHelper.RadioChannelUp(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.RadioChannelDown:
+                                            RadioHelper.RadioChannelDown(dcsPlayerRadioInfo.selected);
                                             break;
 
 
@@ -553,7 +561,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.EncryptionKeyDecrease; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.RadioChannelDown; i++)
             {
                 var mainInputBind = InputConfig.InputDevices[(InputBinding) i];
 
