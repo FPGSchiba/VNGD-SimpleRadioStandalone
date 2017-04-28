@@ -893,13 +893,15 @@
 
                         <Paragraph FontSize="14">
                             If you have any issues with the radio, first make sure to check the help guide on the forums
-                            <Hyperlink NavigateUri="https://forums.eagle.ru/showpost.php?p=2963204&amp;postcount=1122">here</Hyperlink> .  Make sure to follow every step to the letter, not skipping any.
+                            <Hyperlink NavigateUri="https://forums.eagle.ru/showpost.php?p=2963204&amp;postcount=1122">here</Hyperlink>.
+                            Make sure to follow every step to the letter, not skipping any.
                             
                             Feel free to post and ask for help if that doesn't solve it.
 
                             <LineBreak/>
                             <LineBreak/>
-                            Check all the options in Settings as you may find a setting there to fix your particular bug, e.g. if the taskbar doesnt disappear, there is an option that will help.
+                            Check all the options in Settings as you may find a setting there to fix your particular bug, 
+                            e.g. if the taskbar doesnt disappear, there is an option that will help.
                         </Paragraph>
                         <Paragraph FontSize="14">
                             You can also get help on the dedicated Discord channel
@@ -914,6 +916,33 @@
                             <LineBreak/>
                             <LineBreak/>
                             Just hit <Run FontWeight="Bold">Left Shift + Left Alt + L</Run> to fix. This is a DCS bug that I currently cannot work around.
+                        </Paragraph>
+
+
+                        <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">Fixed Channels</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                           To create a fixed channel list to be used on FC3 aircraft radios and expansion radios, simply create a text file with the frequencies
+                            you want, with a new frequency on each line, named after the radio you want the fixed channels for in the SimpleRadio Folder where the radio is installed. 
+                            Special characters (-,/ etc) can be ignored as can the case.
+
+                            <LineBreak/>
+                            <LineBreak/>
+                            
+                            <Hyperlink NavigateUri="https://docs.google.com/spreadsheets/d/1tzd996zJ1t0heZ-t1PpL7vNUIZbXl7pI6De0GThN1Qw/edit#gid=1869108790">
+                                Full list of Frequencies &amp; Radio Names
+                            </Hyperlink>
+
+                            For example, for the FC3 F15C Radio, AN/ARC-164 UHF 1, create a text file called "ANARC-164 UHF1.txt" or "anarc164 uhf1.txt"
+
+                            <LineBreak/>
+                            <LineBreak/>
+                            Add the frequencies within the supported ranges (check the link above for ranges) and save the file.
+                            
+                            The file will be automatically loaded for that radio when you jump into that aircraft or manually reloaded with the Reload button on the channel tab on the overlay
+                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases">here</Hyperlink>
+
                         </Paragraph>
 
                         <Paragraph>
