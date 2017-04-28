@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
@@ -141,11 +144,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRefocusDCS();
 
+            InitFlowDocument();
+
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
+        }
+
+        private void InitFlowDocument()
+        {
+            //make hyperlinks work
+            var hyperlinks = WPFElementHelper.GetVisuals(AboutFlowDocument).OfType<Hyperlink>();
+            foreach (var link in hyperlinks)
+                link.RequestNavigate += new System.Windows.Navigation.RequestNavigateEventHandler((sender, args) =>
+                {
+                    Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
+                    args.Handled = true;
+                });
+
         }
 
         private void InitDefaultAddress()
