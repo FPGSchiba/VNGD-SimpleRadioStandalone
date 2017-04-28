@@ -564,8 +564,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         clientRadio.volume = updateRadio.volume;
                     }
 
-                    //handle Channels load for first 3 radios
-                    if ((newAircraft) && i>=1 && i<=3)
+                    //handle Channels load for radios
+                    if (newAircraft && i > 0)
                     {
                         if (clientRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
                         {

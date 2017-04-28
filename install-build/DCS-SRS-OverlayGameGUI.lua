@@ -122,6 +122,10 @@ function srsOverlay.updateRadio()
 						fullMessage = fullMessage.." G"
 					 end
 
+					 if _radio.channel >= 0 then
+					 	fullMessage = fullMessage.." C".._radio.channel
+					 end
+
 					 if _radio.enc and _radio.encKey > 0 then
 						fullMessage = fullMessage.." E".._radio.encKey
 					 end

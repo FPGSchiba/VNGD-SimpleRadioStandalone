@@ -240,21 +240,34 @@ namespace Installer
             return paths;
         }
 
+        private static void DeleteFileIfExists(string path)
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+          
+        }
+
         private void InstallProgram(string path)
         {
-            String favouritesTemp = null;
             if (Directory.Exists(path) && File.Exists(path + "\\SR-ClientRadio.exe"))
             {
-                //backup favourites file
-                if (File.Exists(path + "\\FavouriteServers.csv"))
-                {
-                    favouritesTemp = Path.GetTempPath() + "\\FavouriteServers.csv";
-                
-                    File.Copy(path + "\\FavouriteServers.csv", favouritesTemp,true);
-                }
-                Thread.Sleep(200);
-
-                DeleteDirectory(path);
+                DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(path + "\\opus.dll");
+                DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(path + "\\SR-Server.exe");
+                DeleteFileIfExists(path + "\\DCS-SimpleRadioStandalone.lua");
+                DeleteFileIfExists(path + "\\DCS-SRSGameGUI.lua");
+                DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
+                DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
+                DeleteFileIfExists(path + "\\DCS-SRS-Overlay.dlg");
             }
             //sleep! WTF directory is lagging behind state here...
             Thread.Sleep(200);
@@ -301,11 +314,6 @@ namespace Installer
 
             File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
                 true);
-
-            if (favouritesTemp != null)
-            {
-                File.Move(favouritesTemp, path + "\\FavouriteServers.csv");
-            }
         }
 
         private void InstallScripts(string path)
@@ -455,28 +463,11 @@ namespace Installer
                 }
             }
 
-            if (File.Exists(path + "\\DCS-SimpleRadioStandalone.lua"))
-            {
-                File.Delete(path + "\\DCS-SimpleRadioStandalone.lua");
-            }
-            if (File.Exists(path + "\\DCS-SRSGameGUI.lua"))
-            {
-                File.Delete(path + "\\DCS-SRSGameGUI.lua");
-            }
-            if (File.Exists(path + "\\DCS-SRS-AutoConnectGameGUI.lua"))
-            {
-                File.Delete(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
-            }
-
-            if (File.Exists(path + "\\DCS-SRS-Overlay.dlg"))
-            {
-                File.Delete(path + "\\DCS-SRS-Overlay.dlg");
-            }
-
-            if (File.Exists(path + "\\DCS-SRS-OverlayGameGUI.lua"))
-            {
-                File.Delete(path + "\\DCS-SRS-OverlayGameGUI.lua");
-            }
+            DeleteFileIfExists(path + "\\DCS-SimpleRadioStandalone.lua");
+            DeleteFileIfExists(path + "\\DCS-SRSGameGUI.lua");
+            DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
+            DeleteFileIfExists(path + "\\DCS-SRS-Overlay.dlg");
+            DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
         }
 
         private void Remove_Plugin(object sender, RoutedEventArgs e)

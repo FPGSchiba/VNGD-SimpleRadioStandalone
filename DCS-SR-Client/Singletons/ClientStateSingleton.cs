@@ -30,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             DcsPlayerSideInfo = new DCSPlayerSideInfo();
 
-            FixedChannels = new PresetChannelsViewModel[3];
+            FixedChannels = new PresetChannelsViewModel[10];
 
             for (int i = 0; i < FixedChannels.Length; i++)
             {

@@ -51,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                    clientRadio.volume = (float) radioVolume.Value/100.0f;
+                    clientRadio.volume = (float) RadioVolume.Value/100.0f;
                 }
             }
 
@@ -64,9 +64,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent())
             {
-                radioActive.Fill = new SolidColorBrush(Colors.Red);
+                RadioActive.Fill = new SolidColorBrush(Colors.Red);
 
-                radioVolume.IsEnabled = false;
+                RadioVolume.IsEnabled = false;
 
                 //reset dragging just incase
                 _dragging = false;
@@ -78,43 +78,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if ((receiveState != null) && receiveState.IsReceiving)
                 {
-                    radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                    RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                 }
                 else if (RadioId == dcsPlayerRadioInfo.selected)
                 {
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
-                        radioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
-                        radioActive.Fill = new SolidColorBrush(Colors.Green);
+                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
                     }
                 }
 
                 else
                 {
-                    radioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    radioLabel.Text = "INTERCOM";
+                    RadioLabel.Text = "INTERCOM";
 
-                    radioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
+                    RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
                 }
                 else
                 {
-                    radioLabel.Text = "NO INTERCOM";
-                    radioActive.Fill = new SolidColorBrush(Colors.Red);
-                    radioVolume.IsEnabled = false;
+                    RadioLabel.Text = "NO INTERCOM";
+                    RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    RadioVolume.IsEnabled = false;
                 }
 
                 if (_dragging == false)
                 {
-                    radioVolume.Value = currentRadio.volume*100.0;
+                    RadioVolume.Value = currentRadio.volume*100.0;
                 }
             }
         }

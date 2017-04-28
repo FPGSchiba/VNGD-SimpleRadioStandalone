@@ -28,8 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private static AppConfiguration _instance;
 
-        private int _audioInputDeviceId;
-        private String _audioOutputDeviceId;
+        private string _audioInputDeviceId;
+        private string _audioOutputDeviceId;
         private string _lastServer;
         private float _micBoost;
         private double _radioHeight;
@@ -50,18 +50,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             try
             {
-                AudioInputDeviceId = (int) Registry.GetValue(RegPath,
+                AudioInputDeviceId = (string) Registry.GetValue(RegPath,
                     RegKeys.AUDIO_INPUT_DEVICE_ID.ToString(),
-                    0);
+                    "");
             }
             catch (Exception ex)
             {
-                AudioInputDeviceId = 0;
+                AudioInputDeviceId = "";
             }
 
             try
             {
-                AudioOutputDeviceId = (String) Registry.GetValue(RegPath,
+                AudioOutputDeviceId = (string) Registry.GetValue(RegPath,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     "");
             }
@@ -221,7 +221,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         }
 
 
-        public int AudioInputDeviceId
+        public string AudioInputDeviceId
         {
             get { return _audioInputDeviceId; }
             set
@@ -234,7 +234,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-        public String AudioOutputDeviceId
+        public string AudioOutputDeviceId
         {
             get { return _audioOutputDeviceId; }
             set

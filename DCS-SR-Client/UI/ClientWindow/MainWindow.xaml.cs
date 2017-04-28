@@ -319,17 +319,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             for (var i = 0; i < WaveIn.DeviceCount; i++)
             {
-                Mic.Items.Add(WaveIn.GetCapabilities(i).ProductName);
-            }
+                //first time round
+                if (i == 0)
+                {
+                    Mic.SelectedIndex = 0;
+                }
 
-            if ((WaveIn.DeviceCount >= _appConfig.AudioInputDeviceId) && (WaveIn.DeviceCount > 0))
-            {
-                Mic.SelectedIndex = _appConfig.AudioInputDeviceId;
+                var item = WaveIn.GetCapabilities(i);
+                Mic.Items.Add(new AudioDeviceListItem()
+                {
+                    Text = item.ProductName,
+                    Value = item
+                });
+
+                if (item.ProductGuid.ToString() == _appConfig.AudioInputDeviceId)
+                {
+                    Mic.SelectedIndex = i;
+                }
+
             }
-            else if (WaveIn.DeviceCount > 0)
-            {
-                Mic.SelectedIndex = 0;
-            }
+           
         }
 
         private void InitAudioOutput()
@@ -341,7 +350,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             foreach (var device in outputDeviceList)
             {
                
-                Speakers.Items.Add(device.FriendlyName);
+                Speakers.Items.Add(new AudioDeviceListItem()
+                {
+                    Text = device.DeviceFriendlyName,
+                    Value = device
+                });
 
                 //first time round the loop, select first item
                 if (i == 0)
@@ -629,8 +642,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
+
                         //save app settings
-                        _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
+                        _appConfig.AudioInputDeviceId = ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductGuid.ToString();
                         _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
                         _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
@@ -693,7 +707,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     var output = outputDeviceList[Speakers.SelectedIndex];
 
                     //save settings
-                    _appConfig.AudioInputDeviceId = Mic.SelectedIndex;
+                    _appConfig.AudioInputDeviceId = (( WaveInCapabilities )((AudioDeviceListItem)Mic.SelectedItem).Value).ProductGuid.ToString();
                     _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
 
                     _audioPreview = new AudioPreview();

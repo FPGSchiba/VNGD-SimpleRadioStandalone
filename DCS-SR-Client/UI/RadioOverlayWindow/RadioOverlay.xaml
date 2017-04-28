@@ -18,7 +18,7 @@
         Topmost="True"
         WindowStyle="None">
 
-    <WrapPanel Name="containerPanel"
+    <WrapPanel Name="ContainerPanel"
                SizeChanged="containerPanel_SizeChanged"
                Style="{x:Null}">
 
@@ -33,7 +33,7 @@
         </WrapPanel.LayoutTransform>
 
         <TextBlock Name="ControlText"
-                   Width="90"
+                   Width="115"
                    Height="12"
                    Margin="5,0,0,0"
                    VerticalAlignment="Top"
@@ -72,18 +72,18 @@
         </Button>
 
 
-        <radioOverlayWindow:RadioControlGroup x:Name="radio1" RadioId="1" />
+        <radioOverlayWindow:RadioControlGroup x:Name="Radio1" RadioId="1" />
 
-        <radioOverlayWindow:RadioControlGroup x:Name="radio2" RadioId="2" />
+        <radioOverlayWindow:RadioControlGroup x:Name="Radio2" RadioId="2" />
 
-        <radioOverlayWindow:RadioControlGroup x:Name="radio3" RadioId="3" />
+        <radioOverlayWindow:RadioControlGroup x:Name="Radio3" RadioId="3" />
 
-        <local:IntercomControlGroup x:Name="intercom" RadioId="0" />
+        <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
 
         <Separator Width="155" Margin="0 2" />
 
 
-        <Slider x:Name="windowOpacitySlider"
+        <Slider x:Name="WindowOpacitySlider"
                 Width="130"
                 Margin="10,2,0,0"
                 VerticalAlignment="Center"

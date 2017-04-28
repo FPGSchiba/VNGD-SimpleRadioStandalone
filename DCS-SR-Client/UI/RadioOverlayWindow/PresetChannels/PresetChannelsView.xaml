@@ -14,7 +14,7 @@
     <WrapPanel HorizontalAlignment="Center"
                Background="#444"
                Orientation="Vertical">
-        <ComboBox x:Name="Mic"
+        <ComboBox x:Name="FrequencyDropDown"
                   Width="135"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Top"

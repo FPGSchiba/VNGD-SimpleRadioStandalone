@@ -26,11 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         public RadioControlGroup()
         {
             this.DataContext = this; // set data context
-         
+
             InitializeComponent();
-
-
-
         }
 
         private int _radioId;
@@ -41,22 +38,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             set
             {
                 _radioId = value;
-
-                if (_radioId >= 1 && _radioId <= 3)
-                {
-                   UpdateBinding();
-                }
-
+                UpdateBinding();
             }
         }
 
         //updates the binding so the changes are picked up for the linked FixedChannelsModel
         private void UpdateBinding()
         {
-            ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
+            
+                ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
 
-            var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
-            bindingExpression?.UpdateTarget();
+                var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
+                bindingExpression?.UpdateTarget();
+            
         }
 
         private void Up0001_Click(object sender, RoutedEventArgs e)

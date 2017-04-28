@@ -283,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             {
                 var radio = GetRadio(radioId);
 
-                radio.channel = selectedPresetChannel.Channel;
+                if(radio !=null) radio.channel = selectedPresetChannel.Channel;
             }
         }
 

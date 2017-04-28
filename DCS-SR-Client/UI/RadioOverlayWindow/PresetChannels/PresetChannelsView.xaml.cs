@@ -10,6 +10,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
         public PresetChannelsView()
         {
             InitializeComponent();
+
+            //set to window width
+            FrequencyDropDown.Width = Width;
         }
     }
 }

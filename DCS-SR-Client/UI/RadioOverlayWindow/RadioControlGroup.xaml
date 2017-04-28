@@ -5,14 +5,13 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
-             xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels"
              xmlns:presetChannels1="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             Name="radioControlContainer"
+             Name="RadioControlContainer"
              Width="155"
              Height="75">
 
-    <TabControl x:Name="tabControl"
+    <TabControl x:Name="TabControl"
                 Background="#444"
                 Style="{x:Null}">
 
@@ -188,7 +187,7 @@
                 <Slider x:Name="RadioVolume"
                         Width="115"
                         Height="15"
-                        Margin="2"
+                        Margin="20,1,0,0"
                         IsEnabled="False"
                         Maximum="100"
                         Style="{x:Null}"

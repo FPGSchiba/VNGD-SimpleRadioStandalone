@@ -44,14 +44,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             AllowsTransparency = true;
             Opacity = opacity;
-            windowOpacitySlider.Value = Opacity;
+            WindowOpacitySlider.Value = Opacity;
 
-            radioControlGroup[0] = radio1;
-            radioControlGroup[1] = radio2;
-            radioControlGroup[2] = radio3;
+            radioControlGroup[0] = Radio1;
+            radioControlGroup[1] = Radio2;
+            radioControlGroup[2] = Radio3;
 
             //allows click and drag anywhere on the window
-            containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
+            ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
             Top = AppConfiguration.Instance.RadioX;
             Left = AppConfiguration.Instance.RadioY;
@@ -86,7 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
             }
 
-            intercom.RepaintRadioStatus();
+            Intercom.RepaintRadioStatus();
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
