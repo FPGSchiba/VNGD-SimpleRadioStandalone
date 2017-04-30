@@ -311,7 +311,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelUp.ControlInputBinding = InputBinding.RadioChannelUp;
             RadioChannelUp.InputDeviceManager = InputManager;
 
-            RadioChannelDown.InputName = "Encryption Key Down";
+            RadioChannelDown.InputName = "Radio Channel Down";
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
         }
