@@ -181,7 +181,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioRxEffects_Start];
             if (radioEffects == "ON")
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -206,7 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioTxEffects_Start];
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -233,7 +233,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioRxEffects_End];
             if (radioEffects == "ON")
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -247,7 +247,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
+            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioTxEffects_End];
             if (radioEffects == "ON")
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
