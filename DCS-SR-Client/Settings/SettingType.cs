@@ -22,6 +22,12 @@
         AutoConnectPrompt = 10, //message about auto connect
         RadioOverlayTaskbarHide = 11,
         RefocusDCS = 19,
-        ExpandControls = 20
+        ExpandControls = 20,
+
+        RadioRxEffects_Start = 21, // Recieving Radio Effects 
+        RadioRxEffects_End = 22,
+        RadioTxEffects_Start = 23, // Recieving Radio Effects 
+        RadioTxEffects_End = 24,
+       
     }
 }

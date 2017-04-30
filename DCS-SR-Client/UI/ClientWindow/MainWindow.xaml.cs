@@ -130,9 +130,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRadioSwitchIsPTT();
 
-            InitRadioClickEffectsToggle();
+            InitRadioRxEffectsToggle();
 
-            InitRadioClickEffectsTXToggle();
+            InitRadioTxEffectsToggle();
 
             InitRadioEncryptionEffectsToggle();
 
@@ -406,31 +406,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             } 
         }
 
-        private void InitRadioClickEffectsToggle()
+        private void InitRadioRxEffectsToggle()
         {
-            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffects];
-            if (radioEffects == "ON")
-            {
-                RadioClicksToggle.IsChecked = true;
-            }
-            else
-            {
-                RadioClicksToggle.IsChecked = false;
-            }
+     
+            RadioRxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_Start] == "ON";
+            RadioRxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_End] == "ON";
         }
 
 
-        private void InitRadioClickEffectsTXToggle()
+        private void InitRadioTxEffectsToggle()
         {
-            var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int) SettingType.RadioClickEffectsTx];
-            if (radioEffects == "ON")
-            {
-                RadioClicksTXToggle.IsChecked = true;
-            }
-            else
-            {
-                RadioClicksTXToggle.IsChecked = false;
-            }
+            RadioTxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_Start] == "ON";
+            RadioTxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_End] == "ON";
         }
 
         private void InitRadioEncryptionEffectsToggle()
@@ -790,16 +777,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void RadioClicks_Click(object sender, RoutedEventArgs e)
-        {
-            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioClickEffects, (string) RadioClicksToggle.Content);
-        }
-
-        private void RadioClicksTX_Click(object sender, RoutedEventArgs e)
-        {
-            Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioClickEffectsTx, (string) RadioClicksTXToggle.Content);
-        }
-
         private void RadioEncryptionEffects_Click(object sender, RoutedEventArgs e)
         {
             Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioEncryptionEffects,
@@ -972,6 +949,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
         {
             Settings.SettingsStore.Instance.WriteSetting(SettingType.RadioEffects, (string)RadioSoundEffects.Content);
+        }
+
+        private void RadioTxStart_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsStore.Instance.WriteSetting(SettingType.RadioTxEffects_Start, (string)RadioTxStartToggle.Content);
+        }
+
+        private void RadioTxEnd_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsStore.Instance.WriteSetting(SettingType.RadioTxEffects_End, (string) RadioTxEndToggle.Content);
+        }
+
+        private void RadioRxStart_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsStore.Instance.WriteSetting(SettingType.RadioRxEffects_Start, (string)RadioRxStartToggle.Content);
+        }
+
+        private void RadioRxEnd_Click(object sender, RoutedEventArgs e)
+        {
+
+            SettingsStore.Instance.WriteSetting(SettingType.RadioRxEffects_End, (string)RadioRxEndToggle.Content);
         }
     }
 }
