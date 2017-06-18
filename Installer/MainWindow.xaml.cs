@@ -431,12 +431,23 @@ namespace Installer
 
             if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\SR-ClientRadio.exe"))
             {
-                DeleteDirectory(srPath.Text);
+               
+                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(srPath.Text + "\\opus.dll");
+                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRSGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-AutoConnectGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-OverlayGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
+                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
+   
             }
 
             DeleteRegKeys();
 
-            MessageBox.Show("SR Standalone Removed Successfully!", "SR Standalone Installer",
+            MessageBox.Show("SR Standalone Removed Successfully!\n\nContaining folder left just incase you want favourites or frequencies", "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
             Environment.Exit(0);

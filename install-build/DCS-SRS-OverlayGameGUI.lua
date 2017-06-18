@@ -1,4 +1,4 @@
--- Version 1.3.2.0
+-- Version 1.3.3.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
@@ -295,8 +295,10 @@ function srsOverlay.setMode(mode)
 
         box:setVisible(false)
         pDown:setVisible(false)
-        window:setSize(1,1) -- Make it tiny!
+        window:setSize(0,0) -- Make it tiny!
         window:setHasCursor(false) -- hide cursor
+
+        window:setSkin(Skin.windowSkinChatMin())
 
     else
         box:setVisible(true)
@@ -426,6 +428,7 @@ function srsOverlay.onSimulationFrame()
     if not window then 
         srsOverlay.log("Creating SRS window hidden...")
         srsOverlay.show(true)
+
         srsOverlay.setMode(_modes.hidden)
 
         -- init connection

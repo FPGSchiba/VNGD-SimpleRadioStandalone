@@ -37,7 +37,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         //devices that report incorrectly but SHOULD work?
         public static readonly HashSet<Guid> _whitelistDevices = new HashSet<Guid>
         {
-            new Guid("1105231d-0000-0000-0000-504944564944") //GTX Throttle 
+            new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle 
+            new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 2 Usage: Generic Type: Supplemental
+            new Guid("11401dd2-0000-0000-0000-504944564944") //Leo Bodnar BUtton Box
         };
 
         private readonly DirectInput _directInput;
