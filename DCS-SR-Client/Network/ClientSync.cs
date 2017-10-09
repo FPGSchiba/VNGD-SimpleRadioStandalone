@@ -121,7 +121,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _callback(result); }));
+                    new ThreadStart(delegate
+                    {
+                        
+                        _callback(result); 
+                        
+                    }));
             }
             catch (Exception ex)
             {
@@ -287,6 +292,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Logger.Error(ex, "Client exception reading - Disconnecting ");
                 }
             }
+
+            //disconnected - reset DCS Info
+            ClientStateSingleton.Instance.DcsPlayerRadioInfo.LastUpdate = 0;
+
             //clear the clietns list
             _clients.Clear();
 

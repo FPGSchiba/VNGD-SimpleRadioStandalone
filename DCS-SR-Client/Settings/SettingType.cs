@@ -28,6 +28,7 @@
         RadioRxEffects_End = 22,
         RadioTxEffects_Start = 23, // Recieving Radio Effects 
         RadioTxEffects_End = 24,
-       
+
+        AutoSelectPresetChannel = 25, //auto select preset channel
     }
 }

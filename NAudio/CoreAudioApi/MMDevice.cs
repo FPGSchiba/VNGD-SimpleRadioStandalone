@@ -31,7 +31,7 @@ namespace NAudio.CoreAudioApi
     /// <summary>
     /// MM Device
     /// </summary>
-    public class MMDevice
+    public class MMDevice : IDisposable
     {
         #region Variables
         private readonly IMMDevice deviceInterface;
@@ -49,10 +49,15 @@ namespace NAudio.CoreAudioApi
         #endregion
 
         #region Init
-        private void GetPropertyInformation()
+        /// <summary>
+        /// Initializes the device's property store.
+        /// </summary>
+        /// <param name="stgmAccess">The storage-access mode to open store for.</param>
+        /// <remarks>Administrative client is required for Write and ReadWrite modes.</remarks>
+        public void GetPropertyInformation(StorageAccessMode stgmAccess = StorageAccessMode.Read)
         {
             IPropertyStore propstore;
-            Marshal.ThrowExceptionForHR(deviceInterface.OpenPropertyStore(StorageAccessMode.Read, out propstore));
+            Marshal.ThrowExceptionForHR(deviceInterface.OpenPropertyStore(stgmAccess, out propstore));
             propertyStore = new PropertyStore(propstore);
         }
 
@@ -275,5 +280,22 @@ namespace NAudio.CoreAudioApi
             return FriendlyName;
         }
 
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            this.audioEndpointVolume?.Dispose();
+            this.audioSessionManager?.Dispose();
+            GC.SuppressFinalize(this);
+        }
+        
+        /// <summary>
+        /// Finalizer
+        /// </summary>
+        ~MMDevice()
+        {
+            Dispose();
+        }
     }
 }

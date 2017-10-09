@@ -8,8 +8,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
@@ -574,6 +576,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             channelModel.Min = clientRadio.freqMin;
                             channelModel.Reload();
                             clientRadio.channel = -1; //reset channel
+
+                            var preset = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.AutoSelectPresetChannel];
+                            if (preset == "ON")
+                            {
+                                RadioHelper.RadioChannelUp(i);
+                            }
+
                         }
                         else
                         {

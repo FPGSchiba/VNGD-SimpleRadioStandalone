@@ -495,15 +495,15 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
+                        <WrapPanel />
 
                         <Label Grid.Row="0"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Connect Prompt" />
-                        <WrapPanel
-></WrapPanel>
 
                         <ToggleButton Name="AutoConnectPromptToggle"
                                       Grid.Row="0"
@@ -525,7 +525,7 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-                        
+
 
                         <Label Grid.Row="1"
                                Grid.Column="0"
@@ -533,16 +533,14 @@
                                VerticalContentAlignment="Center"
                                Content="Radio Rx Effects" />
 
-                        <WrapPanel
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                        Orientation="Horizontal">
+                        <WrapPanel Grid.Row="1"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Orientation="Horizontal">
                             <Label>Start</Label>
-                            
+
                             <ToggleButton Name="RadioRxStartToggle"
-                                      
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxStart_Click">
@@ -560,9 +558,8 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                            <Label Content="End"></Label>
+                            <Label Content="End" />
                             <ToggleButton Name="RadioRxEndToggle"
-                                      
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioRxEnd_Click">
@@ -591,16 +588,14 @@
                                VerticalContentAlignment="Center"
                                Content="Radio Tx Effects" />
 
-                        <WrapPanel
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
+                        <WrapPanel Grid.Row="2"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Orientation="Horizontal">
                             <Label>Start</Label>
 
                             <ToggleButton Name="RadioTxStartToggle"
-                                      
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxStart_Click">
@@ -618,9 +613,8 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                            <Label Content="End"></Label>
+                            <Label Content="End" />
                             <ToggleButton Name="RadioTxEndToggle"
-                                      
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
                                           Click="RadioTxEnd_Click">
@@ -922,6 +916,33 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
+                        <Label Grid.Row="21"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Auto Select First Channel Preset" />
+
+                        <ToggleButton Name="AutoSelectChannel"
+                                      Grid.Row="21"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="AudioSelectChannel_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
                     </Grid>
                 </ScrollViewer>
             </GroupBox>
@@ -939,13 +960,12 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                            <Run FontSize="14" FontWeight="Bold">Please preview your audio first</Run> using the preview option to make sure that your microphone and speakers are configured correctly.
-                          
-                        </Paragraph>
+                            <Run FontSize="14" FontWeight="Bold">Please preview your audio first</Run>
+                            using the preview option to make sure that your microphone and speakers are configured correctly.</Paragraph>
 
                         <Paragraph FontSize="14">
-                           Microphone boost should not be set high without first previewing for the comfort of other pilots. 
-                            If you make it a high boost, you'll deafen people and they won't be happy... 
+                            Microphone boost should not be set high without first previewing for the comfort of other pilots.
+                            If you make it a high boost, you'll deafen people and they won't be happy...
                             Always start with a lower boost (a minus boost is fine!) and preview audio before jumping online
                         </Paragraph>
 
@@ -955,14 +975,13 @@
 
                         <Paragraph FontSize="14">
                             If you have any issues with the radio, first make sure to check the help guide on the forums
-                            <Hyperlink NavigateUri="https://forums.eagle.ru/showpost.php?p=2963204&amp;postcount=1122">here</Hyperlink>.
+                            <Hyperlink NavigateUri="https://forums.eagle.ru/showpost.php?p=2963204&amp;postcount=1122">here</Hyperlink>
+                            .
                             Make sure to follow every step to the letter, not skipping any.
-                            
                             Feel free to post and ask for help if that doesn't solve it.
-
-                            <LineBreak/>
-                            <LineBreak/>
-                            Check all the options in Settings as you may find a setting there to fix your particular bug, 
+                            <LineBreak />
+                            <LineBreak />
+                            Check all the options in Settings as you may find a setting there to fix your particular bug,
                             e.g. if the taskbar doesnt disappear, there is an option that will help.
                         </Paragraph>
                         <Paragraph FontSize="14">
@@ -975,33 +994,29 @@
                         </Paragraph>
                         <Paragraph FontSize="14">
                             There is a known bug where pressing Alt + L will cause lag if using the in game overlay.
-                            <LineBreak/>
-                            <LineBreak/>
-                            Just hit <Run FontWeight="Bold">Left Shift + Left Alt + L</Run> to fix. This is a DCS bug that I currently cannot work around.
-                        </Paragraph>
+                            <LineBreak />
+                            <LineBreak />
+                            Just hit<Run FontWeight="Bold">Left Shift + Left Alt + L</Run>
+                            to fix. This is a DCS bug that I currently cannot work around.</Paragraph>
 
 
                         <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Fixed Channels</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                           To create a fixed channel list to be used on FC3 aircraft radios and expansion radios, simply create a text file with the frequencies
-                            you want, with a new frequency on each line, named after the radio you want the fixed channels for in the SimpleRadio Folder where the radio is installed. 
+                            To create a fixed channel list to be used on FC3 aircraft radios and expansion radios, simply create a text file with the frequencies
+                            you want, with a new frequency on each line, named after the radio you want the fixed channels for in the SimpleRadio Folder where the radio is installed.
                             Special characters (-,/ etc) can be ignored as can the case.
+                            <LineBreak />
+                            <LineBreak />
 
-                            <LineBreak/>
-                            <LineBreak/>
-                            
                             <Hyperlink NavigateUri="https://docs.google.com/spreadsheets/d/1tzd996zJ1t0heZ-t1PpL7vNUIZbXl7pI6De0GThN1Qw/edit#gid=1869108790">
                                 Full list of Frequencies &amp; Radio Names
                             </Hyperlink>
-
-                            For example, for the FC3 F15C Radio, AN/ARC-164 UHF 1, create a text file called "ANARC-164 UHF1.txt" or "anarc164 uhf1.txt"
-
-                            <LineBreak/>
-                            <LineBreak/>
+                            For example, for the FC3 F15C Radio, AN/ARC-164 UHF 1, create a text file called &quot;ANARC-164 UHF1.txt&quot; or &quot;anarc164 uhf1.txt&quot;
+                            <LineBreak />
+                            <LineBreak />
                             Add the frequencies within the supported ranges (check the link above for ranges) and save the file.
-                            
                             The file will be automatically loaded for that radio when you jump into that aircraft or manually reloaded with the Reload button on the channel tab on the overlay
                             <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases">here</Hyperlink>
 
@@ -1011,12 +1026,13 @@
                             <Run FontSize="16" FontWeight="Bold">Latest Version &amp; Updates</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            You can always get the latest version from GitHubs Release section for SRS: <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest">https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest</Hyperlink> 
-                            <LineBreak/>
-                            <LineBreak/>
+                            You can always get the latest version from GitHubs Release section for SRS:
+                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest">https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest</Hyperlink>
+                            <LineBreak />
+                            <LineBreak />
                             Older versions are
                             <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases">here</Hyperlink>
-                         
+
                         </Paragraph>
 
                     </FlowDocument>

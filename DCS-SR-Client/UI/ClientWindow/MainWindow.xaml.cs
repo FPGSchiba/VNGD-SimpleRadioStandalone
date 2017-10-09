@@ -144,6 +144,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitRefocusDCS();
 
+            InitAutoSelectPresetChannel();
+
             InitFlowDocument();
 
             _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
@@ -335,6 +337,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitAudioInput()
         {
+            Logger.Info("Audio Input - Saved ID "+_appConfig.AudioInputDeviceId);
+
             for (var i = 0; i < WaveIn.DeviceCount; i++)
             {
                 //first time round
@@ -350,6 +354,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Value = item
                 });
 
+                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " CHN:" + item.Channels );
+
                 if (item.ProductGuid.ToString() == _appConfig.AudioInputDeviceId)
                 {
                     Mic.SelectedIndex = i;
@@ -362,6 +368,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void InitAudioOutput()
         {
 
+            Logger.Info("Audio Output - Saved ID " + _appConfig.AudioOutputDeviceId);
+
             var enumerator = new MMDeviceEnumerator();
             outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             int i = 0;
@@ -373,6 +381,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Text = device.DeviceFriendlyName,
                     Value = device
                 });
+
+                Logger.Info("Audio Output - " + device.DeviceFriendlyName +" "+device.ID+" CHN:"+ device.AudioClient.MixFormat.Channels+" Rate:"+ device.AudioClient.MixFormat.SampleRate.ToString());
 
                 //first time round the loop, select first item
                 if (i == 0)
@@ -509,6 +519,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 RadioSoundEffects.IsChecked = false;
+            }
+        }
+
+        private void InitAutoSelectPresetChannel()
+        {
+            var preset = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.AutoSelectPresetChannel];
+            if (preset == "ON")
+            {
+                AutoSelectChannel.IsChecked = true;
+            }
+            else
+            {
+                AutoSelectChannel.IsChecked = false;
             }
         }
 
@@ -970,6 +993,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
 
             SettingsStore.Instance.WriteSetting(SettingType.RadioRxEffects_End, (string)RadioRxEndToggle.Content);
+        }
+
+        private void AudioSelectChannel_OnClick(object sender, RoutedEventArgs e)
+        {
+            SettingsStore.Instance.WriteSetting(SettingType.AutoSelectPresetChannel, (string)AutoSelectChannel.Content);
         }
     }
 }

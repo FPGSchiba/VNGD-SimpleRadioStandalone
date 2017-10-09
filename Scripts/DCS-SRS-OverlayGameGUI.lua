@@ -1,4 +1,4 @@
--- Version 1.3.3.0
+-- Version 1.3.4.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
