@@ -554,11 +554,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
             // Step 4. Define rules
-//            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-//            config.LoggingRules.Add(rule1);
+            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+            config.LoggingRules.Add(rule1);
 
-            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
-            config.LoggingRules.Add(rule2);
+         //   var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
+           // config.LoggingRules.Add(rule2);
 
             // Step 5. Activate the configuration
             LogManager.Configuration = config;

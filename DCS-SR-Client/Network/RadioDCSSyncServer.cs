@@ -166,8 +166,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var combinedState = new CombinedRadioState()
                 {
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    RadioSendingState = UdpVoiceHandler.RadioSendingState,
-                    RadioReceivingState = UdpVoiceHandler.RadioReceivingState
+                    RadioSendingState = TCPVoiceHandler.RadioSendingState,
+                    RadioReceivingState = TCPVoiceHandler.RadioReceivingState
                 };
 
                 var byteData =

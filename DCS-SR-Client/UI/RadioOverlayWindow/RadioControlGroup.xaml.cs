@@ -214,7 +214,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
-                    var transmitting = UdpVoiceHandler.RadioSendingState;
+                    var transmitting = TCPVoiceHandler.RadioSendingState;
 
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
@@ -360,7 +360,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
             else
             {
-                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
+                var receiveState = TCPVoiceHandler.RadioReceivingState[RadioId];
                 //check if current
 
                 if ((receiveState == null) || !receiveState.IsReceiving)

@@ -158,6 +158,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Network\TCPVoiceRouter.cs" />
     <Compile Include="Network\OutgoingVoice.cs" />
     <Compile Include="Network\PendingPacket.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />

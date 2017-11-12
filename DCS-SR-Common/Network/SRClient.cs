@@ -32,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public Socket ClientSocket { get; set; }
 
         [JsonIgnore]
-        public IPEndPoint VoipPort { get; set; }
+        public Socket VoipPort { get; set; }
 
         [JsonIgnore]
         public long LastUpdate { get; set; }

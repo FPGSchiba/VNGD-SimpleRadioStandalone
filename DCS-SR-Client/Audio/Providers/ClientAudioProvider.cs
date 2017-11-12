@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -41,6 +42,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void AddClientAudioSamples(ClientAudio audio)
         {
             //sort out volume
+            var timer = new Stopwatch();
+            timer.Start();
 
             var decrytable = audio.Decryptable || (audio.Encryption == 0);
 
@@ -71,6 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             long now = Environment.TickCount;
             if ((now - LastUpdate) > 400) //400 ms since last update
             {
+               // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
                 //append 160ms of silence - this functions as our jitter buffer??
                 var silencePad = (AudioManager.INPUT_SAMPLE_RATE/1000)*SILENCE_PAD;
 
@@ -89,6 +93,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Audio = SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
                 PacketNumber = audio.PacketNumber
             });
+
+            timer.Stop();
+           
         }
 
         private void AdjustVolume(ClientAudio clientAudio)
