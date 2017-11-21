@@ -99,10 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             _ready = false;
 
-            _listener = new TcpClient();
-            _listener.NoDelay = true;
-
-            //start 2 audio processing threads
+            //start audio processing threads
             var decoderThread = new Thread(UdpAudioDecode);
             decoderThread.Start();
 
@@ -152,61 +149,88 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _ptt = ptt;
             });
 
-            //set to false so we sent one packet to open up the radio
-            //automatically rather than the user having to press Send
-            hasSentVoicePacket = false;
-
-            _packetNumber = 1; //reset packet number
-
-            //TODO handle Exceptions!
-            _listener.Connect(_address, _port);
-
-            //contains short for audio packet length
-            byte[] lengthBuffer = new byte[2];
-
             StartTimer();
 
-            _listener.Client.Send(_guidAsciiBytes);
+            StartPing();
 
-            _ready = true;
-
-            while (_listener.Connected && !_stop)
+            //keep reconnecting until stop
+            while (!_stop)
             {
-                int received = _listener.Client.Receive(lengthBuffer, 2,SocketFlags.None);
-
-                if (received == 0)
+                try
                 {
-                    // didnt receive enough, quit.
-                    return;
+
+                    //set to false so we sent one packet to open up the radio
+                    //automatically rather than the user having to press Send
+                    hasSentVoicePacket = false;
+
+                    _packetNumber = 1; //reset packet number
+
+                    _listener = new TcpClient();
+                    _listener.NoDelay = true;
+
+                    _listener.Connect(_address, _port);
+
+                    //contains short for audio packet length
+                    byte[] lengthBuffer = new byte[2];
+
+                    _listener.Client.Send(_guidAsciiBytes);
+
+                    _ready = true;
+
+                    Logger.Info("Connected to VOIP TCP " + _port);
+
+                    while (_listener.Connected && !_stop)
+                    {
+                        int received = _listener.Client.Receive(lengthBuffer, 2, SocketFlags.None);
+
+                        if (received == 0)
+                        {
+                            // didnt receive enough, quit.
+                            //Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
+                            //break;
+                        }
+                        else
+                        {
+                            ushort packetLength = BitConverter.ToUInt16(new byte[2] {lengthBuffer[0], lengthBuffer[1]}, 0);
+
+                            byte[] audioPacketBuffer = new byte[packetLength];
+
+                            //add pack in length to full buffer for packet decode
+                            audioPacketBuffer[0] = lengthBuffer[0];
+                            audioPacketBuffer[1] = lengthBuffer[1];
+
+                            received = _listener.Client.Receive(audioPacketBuffer, 2,packetLength-2, SocketFlags.None);
+
+                            if (received == packetLength-2)
+                            {
+                                _encodedAudio.Add(audioPacketBuffer);
+                            }
+                            else
+                            {
+                                //didnt receive enough - log and reconnect
+                                Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
+                                break;
+                            }
+                        }
+
+                    }
+
+                    _ready = false;
                 }
-                else
+                catch (Exception e)
                 {
-                    ushort packetLength = BitConverter.ToUInt16(new byte[2] { lengthBuffer[0], lengthBuffer[1] }, 0);
-
-                    byte[] audioPacketBuffer = new byte[packetLength];
-
-                    //TODO handle not enough?
-                    received = _listener.Client.Receive(audioPacketBuffer, packetLength, SocketFlags.None);
-
-                    if (received == packetLength)
-                    {
-                        _encodedAudio.Add(audioPacketBuffer);
-                    }
-                    else
-                    {
-                        //didnt receive enough - log and continue
-                    }
+                    Logger.Error("Error with VOIP TCP Connection on port "+_port+" Reconnecting");
                 }
 
+                try
+                {
+                    _listener.Close();
+                }
+                catch (Exception e)
+                {
+                }
             }
-
-            try
-            {
-                _listener.Close();
-            }
-            catch (Exception e)
-            {
-            }
+           
         }
 
         public void StartTimer()
@@ -525,8 +549,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //no need to auto send packet anymore
                             hasSentVoicePacket = true;
 
-                            //send length
-                            _listener.Client.Send(BitConverter.GetBytes(Convert.ToUInt16(udpVoicePacket.Length)));
+                            //send audio
                             _listener.Client.Send(udpVoicePacket);
 
                             //not sending or really quickly switched sending
@@ -595,29 +618,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
-//        private void StartPing()
-//        {
-//            var thread = new Thread(() =>
-//            {
-//                byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-//
-//                while (!_stop)
-//                {
-//                    //Logger.Info("Pinging Server");
-//                    try
-//                    {
-//                        var ip = new IPEndPoint(_address, _port);
-//                        _listener.Send(message, message.Length, ip);
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
-//                    }
-//
-//                    Thread.Sleep(25*1000);
-//                }
-//            });
-//            thread.Start();
-//        }
+        private void StartPing()
+        {
+            var thread = new Thread(() =>
+            {
+                byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+                while (!_stop)
+                {
+                    Thread.Sleep(60 * 1000);
+                    Logger.Info("Pinging Server");
+                    try
+                    {
+
+                        if (!RadioSendingState.IsSending && _listener !=null && _listener.Connected)
+                        {
+                            var udpVoicePacket = new UDPVoicePacket
+                            {
+                                GuidBytes = _guidAsciiBytes,
+                                AudioPart1Bytes = message,
+                                AudioPart1Length = (ushort)message.Length,
+                                Frequency = 100,
+                                UnitId = 1,
+                                Encryption = 0,
+                                Modulation = 4
+                            }.EncodePacket();
+
+                            _listener.Client.Send(udpVoicePacket);
+                        } 
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
+                    }
+
+                   
+                }
+            });
+            thread.Start();
+        }
     }
 }

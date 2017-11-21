@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
         // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
-        public static readonly int INPUT_AUDIO_LENGTH_MS = 40;
+        public static readonly int INPUT_AUDIO_LENGTH_MS = 80;
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 

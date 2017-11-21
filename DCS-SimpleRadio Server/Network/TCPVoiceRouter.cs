@@ -193,14 +193,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         //read the first 2 bytes
                         int voipLength = BitConverter.ToInt16(state.ByteBuffer, 0);
 
-                        //- 2 to discount length 
-                        if (state.CurrentBufferOffset-2 >= voipLength)
+                        if (state.CurrentBufferOffset >= voipLength)
                         {
                             //great generate packet
                             byte[] voipBytes = new byte[voipLength];
 
-                            //offset by two to skip length
-                            Buffer.BlockCopy(state.ByteBuffer, 2, voipBytes, 0,voipLength);
+                           //copy buffer
+                            Buffer.BlockCopy(state.ByteBuffer, 0, voipBytes, 0,voipLength);
 
                             //horray voip bytes -- decode!
                             HandleMessage(state,voipBytes);
@@ -208,8 +207,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             //reset buffers
 
                             //clean up buffer -- shift rest of buffer back overwriting removed bytes 
-                            state.CurrentBufferOffset = state.CurrentBufferOffset - (voipLength + 2);
-                            Buffer.BlockCopy(state.ByteBuffer, voipLength+2, state.ByteBuffer, 0, state.CurrentBufferOffset);
+                            state.CurrentBufferOffset = state.CurrentBufferOffset - (voipLength);
+                            Buffer.BlockCopy(state.ByteBuffer, voipLength, state.ByteBuffer, 0, state.CurrentBufferOffset);
                         }
 
                     }
@@ -348,7 +347,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
-                         outgoingList.Add(ip);
+                     //    outgoingList.Add(ip);
                     }
                 }
             }
@@ -374,7 +373,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             try
                             {
-                                outgoingEndPoint.Send(BitConverter.GetBytes(Convert.ToUInt16(bytesLength)));
+                             //   outgoingEndPoint.Send(BitConverter.GetBytes(Convert.ToUInt16(bytesLength)));
                                
                                 outgoingEndPoint.Send(bytes, bytesLength, SocketFlags.None);
                             }
@@ -393,21 +392,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void RequestStop()
         {
+            _stop = true;
             try
             {
-//                foreach (var client in _clients)
-//                {
-//                    try
-//                    {
-//                        client.Value.ClientSocket.Close();
-//                    }
-//                    catch (Exception ex)
-//                    {
-//                    }
-//                }
+
+                _pendingProcessingCancellationToken.Cancel();
+
+                foreach (var client in _voipClients)
+                {
+                    try
+                    {
+                        client.Value.WorkSocket.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
                 listener.Close();
 
-          //      _clients.Clear();
+                _voipClients.Clear();
             }
             catch (Exception ex)
             {

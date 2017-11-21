@@ -167,7 +167,6 @@
     <Compile Include="Network\ServerLifecycleMessage.cs" />
     <Compile Include="Network\ServerSettings.cs" />
     <Compile Include="Network\ServerState.cs" />
-    <Compile Include="Network\UDPVoiceRouter.cs" />
     <Compile Include="Network\ServerSync.cs" />
     <Page Include="UI\ClientAdmin\ClientAdminView.xaml">
       <SubType>Designer</SubType>

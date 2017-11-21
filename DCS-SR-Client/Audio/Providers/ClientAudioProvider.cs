@@ -13,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudioProvider : AudioProvider
     {
-        public static readonly int SILENCE_PAD = 200;
+        public static readonly int SILENCE_PAD = 300;
 
         private readonly BiQuadFilter _highPassFilter;
         private readonly BiQuadFilter _lowPassFilter;
