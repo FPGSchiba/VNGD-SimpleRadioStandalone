@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
         // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
-        public static readonly int INPUT_AUDIO_LENGTH_MS = 40;
+        public static readonly int INPUT_AUDIO_LENGTH_MS = 80;
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -46,7 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
-        private UdpVoiceHandler _udpVoiceHandler;
+        private TCPVoiceHandler _tcpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
         private WaveIn _waveIn;
@@ -101,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 30);
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
@@ -140,8 +140,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
-                _udpVoiceHandler = new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
-                var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
+                _tcpVoiceHandler = new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
+                var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
 
                 voiceSenderThread.Start();
 
@@ -322,7 +322,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     int len;
                     var buff = _encoder.Encode(soundBuffer, soundBuffer.Length, out len);
 
-                    if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
+                    if ((_tcpVoiceHandler != null) && (buff != null) && (len > 0))
                     {
                         //create copy with small buffer
                         var encoded = new byte[len];
@@ -330,7 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                         // Console.WriteLine("Sending: " + e.BytesRecorded);
-                        _udpVoiceHandler.Send(encoded, len);
+                        _tcpVoiceHandler.Send(encoded, len);
                     }
                     else
                     {
@@ -384,10 +384,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _decoder.Dispose();
                 _decoder = null;
             }
-            if (_udpVoiceHandler != null)
+            if (_tcpVoiceHandler != null)
             {
-                _udpVoiceHandler.RequestStop();
-                _udpVoiceHandler = null;
+                _tcpVoiceHandler.RequestStop();
+                _tcpVoiceHandler = null;
             }
 
             _stop = true;

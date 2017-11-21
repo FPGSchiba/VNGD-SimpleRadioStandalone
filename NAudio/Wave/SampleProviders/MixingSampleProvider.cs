@@ -163,11 +163,11 @@ namespace NAudio.Wave.SampleProviders
                         }
                     }
                     outputSamples = Math.Max(samplesRead, outputSamples);
-//                    if (samplesRead < count)
-//                    {
-//                        MixerInputEnded?.Invoke(this, new SampleProviderEventArgs(source));
-//                        sources.RemoveAt(index);
-//                    }
+                    if (samplesRead < count)
+                    {
+                        MixerInputEnded?.Invoke(this, new SampleProviderEventArgs(source));
+                      //  sources.RemoveAt(index);
+                    }
                     index--;
                 }
             }

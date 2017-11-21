@@ -238,7 +238,7 @@
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\SettingsStore.cs" />
-    <Compile Include="Network\UDPVoiceHandler.cs" />
+    <Compile Include="Network\TCPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
