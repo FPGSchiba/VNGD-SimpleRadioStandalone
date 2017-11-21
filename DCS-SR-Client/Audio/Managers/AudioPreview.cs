@@ -49,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             try
             {
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 30);
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 _buffBufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;

@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             if ((now - LastUpdate) > 400) //400 ms since last update
             {
                // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
-                //append 160ms of silence - this functions as our jitter buffer??
+                //append ms of silence - this functions as our jitter buffer??
                 var silencePad = (AudioManager.INPUT_SAMPLE_RATE/1000)*SILENCE_PAD;
 
                 var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
