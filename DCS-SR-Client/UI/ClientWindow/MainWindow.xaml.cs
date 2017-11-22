@@ -354,9 +354,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Value = item
                 });
 
-                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " CHN:" + item.Channels );
+                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +item.NameGuid+ " - CHN:" + item.Channels );
 
-                if (item.ProductGuid.ToString() == _appConfig.AudioInputDeviceId)
+                if (item.NameGuid.ToString() == _appConfig.AudioInputDeviceId)
                 {
                     Mic.SelectedIndex = i;
                 }
@@ -390,7 +390,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Speakers.SelectedIndex = 0;
                 }
 
-                if (device.DeviceFriendlyName == _appConfig.AudioOutputDeviceId)
+                if (device.ID == _appConfig.AudioOutputDeviceId)
                 {
                     Speakers.SelectedIndex = i; //this one
                 }
@@ -554,11 +554,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
             // Step 4. Define rules
-            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-            config.LoggingRules.Add(rule1);
+//            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+//            config.LoggingRules.Add(rule1);
 
-         //   var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
-           // config.LoggingRules.Add(rule2);
+            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
+            config.LoggingRules.Add(rule2);
 
             // Step 5. Activate the configuration
             LogManager.Configuration = config;
@@ -672,8 +672,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
                         //save app settings
-                        _appConfig.AudioInputDeviceId = ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductGuid.ToString();
-                        _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
+                        _appConfig.AudioInputDeviceId = ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).NameGuid.ToString();
+                        _appConfig.AudioOutputDeviceId = output.ID;
 
                         _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
                             _resolvedIp, _port);
@@ -735,8 +735,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     var output = outputDeviceList[Speakers.SelectedIndex];
 
                     //save settings
-                    _appConfig.AudioInputDeviceId = (( WaveInCapabilities )((AudioDeviceListItem)Mic.SelectedItem).Value).ProductGuid.ToString();
-                    _appConfig.AudioOutputDeviceId = output.DeviceFriendlyName;
+                    _appConfig.AudioInputDeviceId = ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).NameGuid.ToString();
+                    _appConfig.AudioOutputDeviceId = output.ID;
 
                     _audioPreview = new AudioPreview();
 

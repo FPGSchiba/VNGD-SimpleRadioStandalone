@@ -608,12 +608,12 @@ function SR.exportRadioUH1H(_data)
     _data.radios[2].name = "AN/ARC-131"
     _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 1
-    _data.radios[2].volume = SR.getRadioVolume(0, 37,{0.3,1.0},true)
+    _data.radios[2].volume = SR.getRadioVolume(0, 37,{0.3,1.0},true) *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
 
     _data.radios[3].name = "AN/ARC-51BX - UHF"
     _data.radios[3].freq = SR.getRadioFrequency(22)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 21,{0.0,1.0},true)
+    _data.radios[3].volume = SR.getRadioVolume(0, 21,{0.0,1.0},true)  *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
 
 	 -- get channel selector
 	local _selector  = SR.getSelectorPosition(15,0.1)
@@ -625,7 +625,7 @@ function SR.exportRadioUH1H(_data)
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
-    _data.radios[4].volume =  SR.getRadioVolume(0, 8,{0.0,0.65},false )
+    _data.radios[4].volume =  SR.getRadioVolume(0, 8,{0.0,0.65},false )  *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
