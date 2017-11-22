@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,7 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static readonly HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
+        public static  HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
         {
             new Guid("1b171b1c-0000-0000-0000-504944564944"),
             //Corsair K65 Gaming keyboard  It reports as a Joystick when its a keyboard...
@@ -35,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         };
 
         //devices that report incorrectly but SHOULD work?
-        public static readonly HashSet<Guid> _whitelistDevices = new HashSet<Guid>
+        public static  HashSet<Guid> _whitelistDevices = new HashSet<Guid>
         {
             new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle 
             new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 2 Usage: Generic Type: Supplemental
@@ -63,6 +64,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
 
+            LoadWhiteList();
+
+            LoadBlackList();
+
             Logger.Info("Starting Device Search. Expand Search: "+ ((SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
 
             foreach (var deviceInstance in deviceInstances)
@@ -70,8 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 //Workaround for Bad Devices that pretend to be joysticks
                 if (!IsBlackListed(deviceInstance.ProductGuid))
                 {
-                    Logger.Info("Found " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
-                                " " +
+                    Logger.Info("Found Device ID:" + deviceInstance.ProductGuid +
+                                " "+
                                 deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
                                 deviceInstance.UsagePage + " Type: " +
                                 deviceInstance.Type);
@@ -79,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                     if (deviceInstance.Type == DeviceType.Keyboard)
                     {
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
+                        Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid +
                                     " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
                         var device = new Keyboard(_directInput);
@@ -92,8 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     }
                     else if (deviceInstance.Type == DeviceType.Mouse)
                     {
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " + deviceInstance.InstanceGuid +
-                                    " " +
+                        Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid + " "+
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
                         var device = new Mouse(_directInput);
 
@@ -108,8 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     {
                         var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
-                        Logger.Info("Adding " + deviceInstance.ProductGuid + " Instance: " +
-                                    deviceInstance.InstanceGuid + " " +
+                        Logger.Info("Adding ID:" + deviceInstance.ProductGuid + " " +
                                     deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                         device.SetCooperativeLevel(WindowHelper.Handle,
@@ -121,8 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     else if (SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
                     {
 
-                        Logger.Info("Adding (Expanded Devices) " + deviceInstance.ProductGuid + " Instance: " +
-                                 deviceInstance.InstanceGuid + " " +
+                        Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid  + " "+
                                  deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                         var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
@@ -133,8 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
 
-                        Logger.Info("Added (Expanded Device) " + deviceInstance.ProductGuid + " Instance: " +
-                                 deviceInstance.InstanceGuid + " " +
+                        Logger.Info("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
                                  deviceInstance.ProductName.Trim().Replace("\0", ""));
                     }
                     
@@ -146,6 +147,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                 deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: " + deviceInstance.Type);
                 }
 
+            }
+        }
+
+        private void LoadWhiteList()
+        {
+            var path = Environment.CurrentDirectory + "\\whitelist.txt";
+            Logger.Info("Attempt to Load Whitelist from "+ path);
+
+            LoadGuidFromPath(path,_whitelistDevices);
+           
+        }
+
+        private void LoadBlackList()
+        {
+            var path = Environment.CurrentDirectory + "\\blacklist.txt";
+            Logger.Info("Attempt to Load Blacklist from " + path);
+
+            LoadGuidFromPath(path, _blacklistedDevices);
+
+        }
+
+        private void LoadGuidFromPath(string path, HashSet<Guid> _hashSet)
+        {
+            if (File.Exists(path))
+            {
+                string[] lines = File.ReadAllLines(path);
+                if (lines?.Length > 0)
+                {
+                    foreach (var line in lines)
+                    {
+                        var trimmed = line.Trim();
+                        if (trimmed.Length > 0)
+                        {
+                            try
+                            {
+                                _hashSet.Add(new Guid(trimmed));
+                                Logger.Info("Added " + trimmed);
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Logger.Info("File doesnt exist: " + path);
             }
         }
 
