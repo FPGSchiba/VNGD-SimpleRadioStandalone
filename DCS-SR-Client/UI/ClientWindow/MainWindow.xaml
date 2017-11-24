@@ -999,6 +999,17 @@
                             Just hit<Run FontWeight="Bold">Left Shift + Left Alt + L</Run>
                             to fix. This is a DCS bug that I currently cannot work around.</Paragraph>
 
+                        <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">Input Device not detected?</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            If your input device isn't detected - try enabling "Allow more input devices" and restart the client.
+                            <LineBreak />
+                            <LineBreak />
+                            If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the forum or on
+                            <Hyperlink NavigateUri="https://discord.gg/baw7g3t">Discord Channel</Hyperlink> in order for me to help you add the device to the whitelist.
+                        </Paragraph>
+
 
                         <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Fixed Channels</Run>
