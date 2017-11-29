@@ -31,13 +31,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             var config = new LoggingConfiguration();
 
-            var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
-            config.AddTarget("console", consoleTarget);
+          //  var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
+            //config.AddTarget("console", consoleTarget);
 
             var fileTarget = new FileTarget
             {
                 FileName = "${basedir}/serverlog.txt",
-                Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"
+                Layout = @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
             };
             config.AddTarget("file", fileTarget);
 

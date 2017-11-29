@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -186,7 +187,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         if (received == 0)
                         {
                             // didnt receive enough, quit.
-                            //Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
+                            Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
                             //break;
                         }
                         else
@@ -201,14 +202,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             received = _listener.Client.Receive(audioPacketBuffer, 2,packetLength-2, SocketFlags.None);
 
-                            if (received == packetLength-2)
+                            int offset = received + 2;
+                            int remaining = packetLength - 2 - received;
+                            while (remaining >0 && received > 0)
+                            {
+                                received = _listener.Client.Receive(audioPacketBuffer, offset, remaining, SocketFlags.None);
+
+                                remaining = remaining - received;
+                                offset = offset + received;
+                            }
+
+                            if (remaining == 0)
                             {
                                 _encodedAudio.Add(audioPacketBuffer);
                             }
                             else
                             {
+
                                 //didnt receive enough - log and reconnect
-                                Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
+                                Logger.Warn("Didnt Receive any packet for VOIP - Disconnecting & Reconnecting");
                                 break;
                             }
                         }
@@ -370,7 +382,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 receivingRadio.enc,
                                             // mark if we can decrypt it
                                             RadioReceivingState = receivingState,
-                                            RecevingPower = receivingPowerLossPercent, //loss of 1.0 or greater is total loss
+                                            RecevingPower =
+                                                receivingPowerLossPercent, //loss of 1.0 or greater is total loss
                                             LineOfSightLoss = lineOfSightLoss, // Loss of 1.0 or greater is total loss
                                             PacketNumber = udpVoicePacket.PacketNumber
                                         };
@@ -409,13 +422,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         _audioManager.AddClientAudio(audio);
                                     }
+                                    else
+                                    {
+                                        Logger.Info("Failed to decode audio from Packet");
+                                    }
                                 }
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Info("Failed Decoding");
+                        Logger.Info("Failed to decode audio from Packet");
                     }
                 }
             }
@@ -549,8 +566,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             //no need to auto send packet anymore
                             hasSentVoicePacket = true;
 
+                            Stopwatch stopwatch = new Stopwatch();
+                            stopwatch.Start();
                             //send audio
                             _listener.Client.Send(udpVoicePacket);
+                            stopwatch.Stop();
+                            Logger.Info("Sent in "+stopwatch.ElapsedMilliseconds );
 
                             //not sending or really quickly switched sending
                             if (!RadioSendingState.IsSending || (RadioSendingState.SendingOn != currentSelected))
@@ -641,7 +662,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 Frequency = 100,
                                 UnitId = 1,
                                 Encryption = 0,
-                                Modulation = 4
+                                Modulation = 4,
+                                PacketNumber = 1
                             }.EncodePacket();
 
                             _listener.Client.Send(udpVoicePacket);

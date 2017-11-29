@@ -20,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     public class ClientStateObject
     {
         // Size of receive buffer.
-        public const int BufferSize = 4096;
+        public const int BufferSize = 1024;
         
         // Receive buffer.
         public byte[] ByteBuffer { get; } = new byte[BufferSize];
@@ -145,6 +145,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                  ClientStateObject returned;
                 _voipClients.TryRemove(state.ClientGUID,out returned);
+
+                Logger.Info("Disconnected Client "+state.ClientGUID);
             }
 
             try
@@ -180,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     Buffer.BlockCopy(state.ByteBuffer, 22, state.ByteBuffer, 0, bytesRead - 22);
                     state.CurrentBufferOffset += (bytesRead - 22);
                     
-                    handler.BeginReceive(state.ByteBuffer, 0, StateObject.BufferSize, 0,
+                    handler.BeginReceive(state.ByteBuffer, state.CurrentBufferOffset, ClientStateObject.BufferSize - state.CurrentBufferOffset, 0,
                         ReadCallback, state);
                 }
                 else if (bytesRead > 0)
@@ -214,7 +216,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                   
                     //continue receiving more
-                    handler.BeginReceive(state.ByteBuffer, state.CurrentBufferOffset, StateObject.BufferSize, SocketFlags.None,
+                    handler.BeginReceive(state.ByteBuffer, state.CurrentBufferOffset, ClientStateObject.BufferSize - state.CurrentBufferOffset, SocketFlags.None,
                         ReadCallback, state);
                 }
                 else
@@ -224,7 +226,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error reading from socket. Disconnecting ");
+                Logger.Error(ex, "Error reading from socket. Disconnecting");
 
                 HandleDisconnect(state);
             }
@@ -347,7 +349,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
-                     //    outgoingList.Add(ip);
+                         //outgoingList.Add(ip);
                     }
                 }
             }

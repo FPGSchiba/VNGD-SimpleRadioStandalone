@@ -542,18 +542,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var config = new LoggingConfiguration();
 
             // Step 2. Create targets and add them to the configuration 
-            var consoleTarget = new ColoredConsoleTarget();
-            config.AddTarget("console", consoleTarget);
+//            var consoleTarget = new ColoredConsoleTarget();
+//            config.AddTarget("console", consoleTarget);
 
             var fileTarget = new FileTarget();
             config.AddTarget("file", fileTarget);
 
             // Step 3. Set target properties 
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+         //   consoleTarget.Layout = @"${longdate} ${logger} ${message} ${exception}";
             fileTarget.FileName = "${basedir}/clientlog.txt";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            fileTarget.Layout =
+                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
 
-            // Step 4. Define rules
+//            // Step 4. Define rules
 //            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
 //            config.LoggingRules.Add(rule1);
 
