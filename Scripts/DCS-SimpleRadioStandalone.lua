@@ -147,28 +147,30 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
-				elseif _update.unit == "SpitfireLFMkIX" then
-				    _update = SR.exportRadioSpitfireLFMkIX(_update)	
+                elseif _update.unit == "SpitfireLFMkIX" then
+                    _update = SR.exportRadioSpitfireLFMkIX(_update) 
                 elseif _update.unit == "C-101EB" then
                     _update = SR.exportRadioC101(_update)
                 elseif _update.unit == "Hawk" then
                     _update = SR.exportRadioHawk(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
-				elseif _update.unit == "AJS37" then
+                elseif _update.unit == "AV8BNA" then
+                    _update = SR.exportRadioAV8BNA(_update)
+                elseif _update.unit == "AJS37" then
                     _update = SR.exportRadioAJS37(_update)
-			    elseif _update.unit == "A-10A" then
-				    _update = SR.exportRadioA10A(_update)
-			    elseif _update.unit == "F-15C" then
-				    _update = SR.exportRadioF15C(_update)
-			    elseif _update.unit == "MiG-29A" or  _update.unit == "MiG-29S" or  _update.unit == "MiG-29G" then
-				    _update = SR.exportRadioMiG29(_update)
-			    elseif _update.unit == "Su-27" or  _update.unit == "Su-33" then
-				    _update = SR.exportRadioSU27(_update)
-			    elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
-				    _update = SR.exportRadioSU25(_update)
+                elseif _update.unit == "A-10A" then
+                    _update = SR.exportRadioA10A(_update)
+                elseif _update.unit == "F-15C" then
+                    _update = SR.exportRadioF15C(_update)
+                elseif _update.unit == "MiG-29A" or  _update.unit == "MiG-29S" or  _update.unit == "MiG-29G" then
+                    _update = SR.exportRadioMiG29(_update)
+                elseif _update.unit == "Su-27" or  _update.unit == "Su-33" then
+                    _update = SR.exportRadioSU27(_update)
+                elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
+                    _update = SR.exportRadioSU25(_update)
                 else
-					 -- FC 3
+                     -- FC 3
                     _update.radios[2].name = "FC3 VHF"
                     _update.radios[2].freq = 124.8*1000000 --116,00-151,975 MHz
                     _update.radios[2].modulation = 0
@@ -209,7 +211,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update.selected = 1
                 end
 
-				  _lastUnitId = _update.unitId
+                  _lastUnitId = _update.unitId
             else
                 -- save last pos
                 SR.lastKnownPos ={x=0,y=0,z=0 }
@@ -222,7 +224,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     pos = {x=0,y=0,z=0},
-					unitId = 100000001, -- pass through starting unit id here
+                    unitId = 100000001, -- pass through starting unit id here
                     radios =
                     {
                         --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
@@ -230,18 +232,18 @@ LuaExportActivityNextEvent = function(tCurrent)
                         { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
                         { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1 ,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
                         { name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
-						{ name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "UHF Guard", freq = 251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false  },
                         { name = "UHF Guard", freq =251.0*1000000, modulation = 0,volume = 1.0, secFreq = 243.0*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 1 ,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
-                      	{ name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
                         { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
-						{ name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
-						{ name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
+                        { name = "VHF FM", freq = 30.0*1000000, modulation = 1,volume = 1.0, secFreq = 1, freqMin = 1*1000000, freqMax = 76*1000000,encKey = 1,enc =false, encMode = 1,freqMode = 1, volMode = 1, expansion = false   },
+                        { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false  },
                         { name = "VHF Guard", freq = 124.8*1000000, modulation = 0,volume = 1.0, secFreq = 121.5*1000000, freqMin = 1*1000000, freqMax = 400*1000000,encKey = 0 ,enc =false, encMode = 0,freqMode = 1, volMode = 1, expansion = false   },
                     },
                     radioType = 3
                 }
 
-				_lastUnitId = ""
+                _lastUnitId = ""
             end
 
             if SR.unicast then
@@ -263,10 +265,10 @@ LuaExportActivityNextEvent = function(tCurrent)
 
     -- call
     local _status,_result = pcall(function()
-       	-- Call original function if it exists
-		if _prevExport.LuaExportActivityNextEvent then
-			_prevExport.LuaExportActivityNextEvent(tCurrent)
-		end
+        -- Call original function if it exists
+        if _prevExport.LuaExportActivityNextEvent then
+            _prevExport.LuaExportActivityNextEvent(tCurrent)
+        end
 
     end)
 
@@ -424,7 +426,7 @@ function SR.exportRadioA10A(_data)
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
@@ -468,7 +470,7 @@ function SR.exportRadioMiG29(_data)
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
@@ -509,7 +511,7 @@ function SR.exportRadioSU25(_data)
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
@@ -552,7 +554,7 @@ function SR.exportRadioSU27(_data)
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
@@ -597,7 +599,7 @@ function SR.exportRadioF15C(_data)
     _data.radios[4].volMode = 1
     _data.radios[4].freqMode = 1
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
@@ -615,12 +617,12 @@ function SR.exportRadioUH1H(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 21,{0.0,1.0},true)  *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
 
-	 -- get channel selector
-	local _selector  = SR.getSelectorPosition(15,0.1)
+     -- get channel selector
+    local _selector  = SR.getSelectorPosition(15,0.1)
 
-	if _selector < 1 then
-		_data.radios[3].channel =  SR.getSelectorPosition(16,0.05) + 1 --add 1 as channel 0 is channel 1 
-	end
+    if _selector < 1 then
+        _data.radios[3].channel =  SR.getSelectorPosition(16,0.05) + 1 --add 1 as channel 0 is channel 1 
+    end
 
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
@@ -629,9 +631,9 @@ function SR.exportRadioUH1H(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
-	if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
-		_data.radios[3].secFreq = 243.0*1000000 
-	end
+    if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+        _data.radios[3].secFreq = 243.0*1000000 
+    end
 
     local _panel = GetDevice(0)
 
@@ -674,7 +676,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[3].freq = SR.getRadioFrequency(31)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
-	
+    
     _data.radios[3].encKey = 1
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
 
@@ -682,14 +684,14 @@ function SR.exportRadioSA342(_data)
     _data.radios[4].freq = SR.getRadioFrequency(28)
     _data.radios[4].modulation = 1
     _data.radios[4].volume =  SR.getRadioVolume(0, 70,{0.0,1.0},false) 
-	
+    
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
 
     --- is UHF ON?
-	if SR.getSelectorPosition(383,0.167) == 0   then
-		_data.radios[3].freq = 1
-	elseif SR.getSelectorPosition(383,0.167) == 2 then
+    if SR.getSelectorPosition(383,0.167) == 0   then
+        _data.radios[3].freq = 1
+    elseif SR.getSelectorPosition(383,0.167) == 2 then
         --check UHF encryption
         _data.radios[3].enc = true
     end
@@ -697,14 +699,14 @@ function SR.exportRadioSA342(_data)
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383,0.167)
-	if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
+    if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
         _data.radios[3].secFreq = 243.0*1000000 
-	end
+    end
     
     --- is FM ON?
-	if SR.getSelectorPosition(272,0.25) == 0  then
-		_data.radios[4].freq = 1
-	elseif SR.getSelectorPosition(272,0.25) == 2 then
+    if SR.getSelectorPosition(272,0.25) == 0  then
+        _data.radios[4].freq = 1
+    elseif SR.getSelectorPosition(272,0.25) == 2 then
         --check FM encryption
         _data.radios[4].enc = true
     end
@@ -736,9 +738,9 @@ function SR.exportRadioKA50(_data)
     _data.radios[3].freq = SR.getRadioFrequency(49,50000)
     _data.radios[3].modulation = 1
     _data.radios[3].volume = SR.getRadioVolume(0, 372,{0.0,1.0},false)
-	_data.radios[3].channel =  SR.getSelectorPosition(371,0.1) +1
+    _data.radios[3].channel =  SR.getSelectorPosition(371,0.1) +1
 
-	--expansion radios
+    --expansion radios
     _data.radios[4].name = "SPU-9 SW"
     _data.radios[4].freq = 5.0*1000000
     _data.radios[4].freqMin = 1.0*1000000
@@ -784,12 +786,12 @@ function SR.exportRadioMI8(_data)
         _data.radios[2].modulation = 0
     end
 
-	 -- get channel selector
-	local _selector  = GetDevice(0):get_argument_value(132)
+     -- get channel selector
+    local _selector  = GetDevice(0):get_argument_value(132)
 
-	if _selector > 0.5 then
-		_data.radios[2].channel =  SR.getSelectorPosition(370,0.05) + 1 --add 1 as channel 0 is channel 1 
-	end
+    if _selector > 0.5 then
+        _data.radios[2].channel =  SR.getSelectorPosition(370,0.05) + 1 --add 1 as channel 0 is channel 1 
+    end
     
     _data.radios[2].volume = SR.getRadioVolume(0, 156,{0.0,1.0},false)
 
@@ -805,9 +807,9 @@ function SR.exportRadioMI8(_data)
 
     --guard mode for R-863 Radio
     local uhfModeKnob = SR.getSelectorPosition(153,1)
-	if uhfModeKnob == 1 and _data.radios[2].freq > 1000 then
-		_data.radios[2].secFreq = 121.5*1000000 
-	end
+    if uhfModeKnob == 1 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 121.5*1000000 
+    end
 
     -- Get selected radio from SPU-9
     local _switch = SR.getSelectorPosition(550,0.1)
@@ -870,17 +872,17 @@ end
 --for A10C
 function SR.exportRadioA10C(_data)
 
-	if _lastUnitId ~= _data.unitId then
-		-- set volumes to 100%
-		local _device = GetDevice(0)
+    if _lastUnitId ~= _data.unitId then
+        -- set volumes to 100%
+        local _device = GetDevice(0)
 
-		if _device then
-		    _device:set_argument_value(133,1.0)
-		    _device:set_argument_value(171,1.0)
-		    _device:set_argument_value(147,1.0)
-		end
-	end
-	
+        if _device then
+            _device:set_argument_value(133,1.0)
+            _device:set_argument_value(171,1.0)
+            _device:set_argument_value(147,1.0)
+        end
+    end
+    
 
     _data.radios[2].name = "AN/ARC-186(V)"
     _data.radios[2].freq =  SR.getRadioFrequency(55)
@@ -892,29 +894,29 @@ function SR.exportRadioA10C(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 225,{0.0,1.0},false)*SR.getButtonPosition(226)
 
-	-- get channel selector
-	local _selector  = SR.getSelectorPosition(167,0.1)
+    -- get channel selector
+    local _selector  = SR.getSelectorPosition(167,0.1)
 
-	if _selector == 1 then
-		
-		local _channel  = SR.getSelectorPosition(161,0.05) + 1 --add 1 as channel 0 is channel 1
-		_data.radios[3].channel = _channel 
-	end
-	
+    if _selector == 1 then
+        
+        local _channel  = SR.getSelectorPosition(161,0.05) + 1 --add 1 as channel 0 is channel 1
+        _data.radios[3].channel = _channel 
+    end
+    
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
     _data.radios[4].name = "AN/ARC-186(V)FM"
     _data.radios[4].freq =  SR.getRadioFrequency(56)
     _data.radios[4].modulation = 1
     _data.radios[4].volume = SR.getRadioVolume(0, 147,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 223,{0.0,1.0},false)*SR.getButtonPosition(224)
-	
+    
     _data.radios[4].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
 
      --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(168,0.1)
-	if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
-		_data.radios[3].secFreq = 243.0*1000000 
-	end
+    if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+        _data.radios[3].secFreq = 243.0*1000000 
+    end
 
 --    local value = GetDevice(0):get_argument_value(239)
 --
@@ -968,20 +970,20 @@ function SR.exportRadioF86Sabre(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 806,{0.1,0.9},false)
 
-	-- get channel selector
-	local _channel  = SR.getSelectorPosition(807,0.01)
+    -- get channel selector
+    local _channel  = SR.getSelectorPosition(807,0.01)
 
-	if _channel >= 1 then
-		_data.radios[2].channel = _channel 
-	end
+    if _channel >= 1 then
+        _data.radios[2].channel = _channel 
+    end
 
     _data.selected = 1
 
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(805,0.1)
-	if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
-		_data.radios[2].secFreq = 243.0*1000000 
-	end
+    if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 243.0*1000000 
+    end
 
         -- Check PTT
     if(SR.getButtonPosition(213)) > 0.5 then
@@ -1075,7 +1077,7 @@ function SR.exportRadioMIG21(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 210,{0.0,1.0},false)
 
-	_data.radios[2].channel =  SR.getSelectorPosition(211,0.05)   
+    _data.radios[2].channel =  SR.getSelectorPosition(211,0.05)   
 
     _data.selected = 1
 
@@ -1123,12 +1125,12 @@ function SR.exportRadioF5E(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 309,{0.1,0.9},false)
 
-	 -- get channel selector
-	local _selector  = SR.getSelectorPosition(307,0.1)
+     -- get channel selector
+    local _selector  = SR.getSelectorPosition(307,0.1)
 
-	if _selector == 1 then
-		_data.radios[2].channel =  SR.getSelectorPosition(300,0.05) + 1 --add 1 as channel 0 is channel 1 
-	end
+    if _selector == 1 then
+        _data.radios[2].channel =  SR.getSelectorPosition(300,0.05) + 1 --add 1 as channel 0 is channel 1 
+    end
 
     _data.selected = 1
 
@@ -1229,7 +1231,7 @@ function SR.exportRadioFW190(_data)
     _data.radios[2].name = "FuG 16ZY"
     _data.radios[2].freq = SR.getRadioFrequency(15)
     _data.radios[2].modulation = 0
-	_data.radios[2].volMode = 1
+    _data.radios[2].volMode = 1
     _data.radios[2].volume = 1.0  --SR.getRadioVolume(0, 83,{0.0,1.0},true) Volume knob is not behaving..
 
     _data.selected = 1
@@ -1310,12 +1312,12 @@ function SR.exportRadioSpitfireLFMkIX (_data)
     _data.radios[2].name = "A.R.I. 1063" --minimal bug in the ME GUI and in the LUA. SRC5222 is the P-51 radio.
     _data.radios[2].freq = SR.getRadioFrequency(15)
     _data.radios[2].modulation = 0
-	_data.radios[2].volMode = 1
+    _data.radios[2].volMode = 1
     _data.radios[2].volume = 1.0 --no volume control
 
     _data.selected = 1
-	
-	  -- Expansion Radio - Server Side Controlled
+    
+      -- Expansion Radio - Server Side Controlled
     _data.radios[3].name = "AN/ARC-186(V)"
     _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
     _data.radios[3].modulation = 0
@@ -1429,19 +1431,19 @@ function SR.exportRadioHawk(_data)
 
       --guard mode for UHF Radio
     local _uhfKnob = SR.getSelectorPosition(221,0.25)
-	if _uhfKnob == 2 and _data.radios[2].freq > 1000 then
-		_data.radios[2].secFreq = 243.0*1000000 
-	end
+    if _uhfKnob == 2 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 243.0*1000000 
+    end
 
          --- is VHF ON?
-	if SR.getSelectorPosition(391,0.2) == 0   then
-		_data.radios[3].freq = 1
+    if SR.getSelectorPosition(391,0.2) == 0   then
+        _data.radios[3].freq = 1
     end
     --guard mode for VHF Radio
     local _vhfKnob = SR.getSelectorPosition(391,0.2)
-	if _vhfKnob == 2 and _data.radios[3].freq > 1000 then
-		_data.radios[3].secFreq = 121.5*1000000 
-	end
+    if _vhfKnob == 2 and _data.radios[3].freq > 1000 then
+        _data.radios[3].secFreq = 121.5*1000000 
+    end
 
     -- Radio Select Switch
     if(SR.getButtonPosition(265)) > 0.5 then
@@ -1464,12 +1466,12 @@ function SR.exportRadioM2000C(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707,{0.0,1.0},false)
 
-	 -- get channel selector
-	local _selector  = SR.getSelectorPosition(448,0.50)
+     -- get channel selector
+    local _selector  = SR.getSelectorPosition(448,0.50)
 
-	if _selector == 1 then
-		_data.radios[2].channel =  SR.getSelectorPosition(445,0.05)  --add 1 as channel 0 is channel 1 
-	end
+    if _selector == 1 then
+        _data.radios[2].channel =  SR.getSelectorPosition(445,0.05)  --add 1 as channel 0 is channel 1 
+    end
 
     _data.radios[3].name = "TRT ERA 7200 UHF"
     _data.radios[3].freq = SR.getRadioFrequency(20)
@@ -1489,24 +1491,24 @@ function SR.exportRadioM2000C(_data)
 
     --guard mode for V/UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(446,0.25) -- TODO!
-	if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
-		_data.radios[2].secFreq = 243.0*1000000 
-	end
+    if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 243.0*1000000 
+    end
 
-	-- reset state on aircraft switch
-	if _lastUnitId ~= _data.unitId then
-		_mirageEncStatus = false
-		_previousEncState = 0
-	end
+    -- reset state on aircraft switch
+    if _lastUnitId ~= _data.unitId then
+        _mirageEncStatus = false
+        _previousEncState = 0
+    end
 
-	-- handle the button no longer toggling...
+    -- handle the button no longer toggling...
     if SR.getButtonPosition(432) > 0.5 and  _previousEncState < 0.5 then --431
 
-    	if _mirageEncStatus  then
-    		_mirageEncStatus = false
-    	else
-    		_mirageEncStatus = true
-    	end
+        if _mirageEncStatus  then
+            _mirageEncStatus = false
+        else
+            _mirageEncStatus = true
+        end
     end
 
     _data.radios[3].enc = _mirageEncStatus
@@ -1519,15 +1521,45 @@ function SR.exportRadioM2000C(_data)
     return _data
 end
 
+
+function SR.exportRadioAV8BNA(_data)
+
+    _data.radios[2].name = "ARC-210 COM 1"
+    _data.radios[2].freq =  SR.getRadioFrequency(2)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 298,{0.0,1.0},false)
+
+     -- get channel selector
+--  local _selector  = SR.getSelectorPosition(448,0.50)
+
+--  SR.log(GetDevice(0):get_argument_value(178))
+--  SR.log(GetDevice(0):get_argument_value(179))
+--  SR.log(GetDevice(0):get_argument_value(300))
+--  SR.log(GetDevice(0):get_argument_value(301))
+    --if _selector == 1 then
+        --_data.radios[2].channel =  SR.getSelectorPosition(178,0.01)  --add 1 as channel 0 is channel 1 
+    --end
+
+    _data.radios[3].name = "ARC-210 COM 2"
+    _data.radios[3].freq = SR.getRadioFrequency(3)
+    _data.radios[3].modulation = 0
+    _data.radios[3].volume = SR.getRadioVolume(0, 299,{0.0,1.0},false)
+
+    _data.selected = 1
+    _data.control = 0; -- partial radio, allows hotkeys
+
+    return _data
+end
+
 function SR.exportRadioAJS37(_data)
 
     _data.radios[2].name = "FR 24"
-	_data.radios[2].freq =  SR.getRadioFrequency(30)
+    _data.radios[2].freq =  SR.getRadioFrequency(30)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[2].volMode = 1
 
-	_data.radios[3].name = "FR 22"
+    _data.radios[3].name = "FR 22"
     _data.radios[3].freq =  SR.getRadioFrequency(31)
     _data.radios[3].modulation = 0
 
@@ -1556,7 +1588,7 @@ function SR.exportRadioAJS37(_data)
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-	_data.control = 0;
+    _data.control = 0;
     _data.selected = 1
 
     return _data
