@@ -58,6 +58,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             set { _lineOfSightLoss = value; }
         }
 
+        public string ClientChannelId { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
 

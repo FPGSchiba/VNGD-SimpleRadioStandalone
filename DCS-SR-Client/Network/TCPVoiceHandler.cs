@@ -171,10 +171,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     _listener.Connect(_address, _port);
 
+                    //initial packet to get audio setup
+                    var udpVoicePacket = new UDPVoicePacket
+                    {
+                        GuidBytes = _guidAsciiBytes,
+                        AudioPart1Bytes = new byte[]{0,1,2,3,4,5},
+                        AudioPart1Length = (ushort)6,
+                        Frequency = 100,
+                        UnitId = 1,
+                        Encryption = 0,
+                        Modulation = 4,
+                        PacketNumber = 1
+                    }.EncodePacket();
+
+                    _listener.Client.Send(udpVoicePacket);
+
                     //contains short for audio packet length
                     byte[] lengthBuffer = new byte[2];
 
-                    _listener.Client.Send(_guidAsciiBytes);
+                //    _listener.Client.Send(_guidAsciiBytes);
 
                     _ready = true;
 
@@ -641,6 +656,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void StartPing()
         {
+            Logger.Info("Pinging Server - Starting");
             var thread = new Thread(() =>
             {
                 byte[] message = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -648,7 +664,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 while (!_stop)
                 {
                     Thread.Sleep(60 * 1000);
-                    Logger.Info("Pinging Server");
+                    
                     try
                     {
 
@@ -674,7 +690,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
                     }
 
-                   
                 }
             });
             thread.Start();
