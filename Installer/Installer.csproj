@@ -223,7 +223,8 @@ copy /Y "$(SolutionDir)\Scripts\DCS-SimpleRadioStandalone.lua" "$(SolutionDir)\i
 copy /Y "$(SolutionDir)\Scripts\DCS-SRSGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRSGameGUI.lua"
 copy /Y "$(SolutionDir)\Scripts\DCS-SRS-AutoConnectGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRS-AutoConnectGameGUI.lua"
 copy /Y "$(SolutionDir)\Scripts\DCS-SRS-OverlayGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRS-OverlayGameGUI.lua"
-copy /Y "$(SolutionDir)\Scripts\DCS-SRS-Overlay.dlg" "$(SolutionDir)\install-build\DCS-SRS-Overlay.dlg"</PostBuildEvent>
+copy /Y "$(SolutionDir)\Scripts\DCS-SRS-Overlay.dlg" "$(SolutionDir)\install-build\DCS-SRS-Overlay.dlg"
+copy /Y "$(SolutionDir)\Scripts\DCS-SRS-hook.lua" "$(SolutionDir)\install-build\DCS-SRS-hook.lua"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
