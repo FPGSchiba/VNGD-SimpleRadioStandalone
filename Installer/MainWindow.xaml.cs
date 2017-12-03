@@ -268,6 +268,7 @@ namespace Installer
                 DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
                 DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
                 DeleteFileIfExists(path + "\\DCS-SRS-Overlay.dlg");
+                DeleteFileIfExists(path + "\\DCS-SRS-hook.lua");
             }
             //sleep! WTF directory is lagging behind state here...
             Thread.Sleep(200);
@@ -314,12 +315,15 @@ namespace Installer
 
             File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
                 true);
+            File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\DCS-SRS-hook.lua",
+                true);
         }
 
         private void InstallScripts(string path)
         {
             //if scripts folder doesnt exist, create it
             Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path+"\\Hooks");
             Thread.Sleep(100);
 
             var write = true;
@@ -371,6 +375,9 @@ namespace Installer
 
                 File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
                     true);
+
+                File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\Hooks\\DCS-SRS-hook.lua",
+                    true);
             }
             catch (FileNotFoundException ex)
             {
@@ -379,6 +386,7 @@ namespace Installer
                     "Not Unzipped", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
+
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
@@ -442,7 +450,8 @@ namespace Installer
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-OverlayGameGUI.lua");
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
                 DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
-   
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
+
             }
 
             DeleteRegKeys();
@@ -479,6 +488,7 @@ namespace Installer
             DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
             DeleteFileIfExists(path + "\\DCS-SRS-Overlay.dlg");
             DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
+            DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-Hook.lua");
         }
 
         private void Remove_Plugin(object sender, RoutedEventArgs e)

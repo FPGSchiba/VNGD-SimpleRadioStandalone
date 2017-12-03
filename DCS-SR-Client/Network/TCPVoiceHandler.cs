@@ -189,8 +189,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //contains short for audio packet length
                     byte[] lengthBuffer = new byte[2];
 
-                //    _listener.Client.Send(_guidAsciiBytes);
-
                     _ready = true;
 
                     Logger.Info("Connected to VOIP TCP " + _port);
@@ -202,7 +200,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         if (received == 0)
                         {
                             // didnt receive enough, quit.
-                            Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting");
+                            Logger.Warn("Didnt Receive full packet for VOIP - Disconnecting & Reconnecting if next Recieve fails");
                             //break;
                         }
                         else
@@ -577,16 +575,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 PacketNumber = _packetNumber++
                             }.EncodePacket();
 
-
-                            //no need to auto send packet anymore
-                            hasSentVoicePacket = true;
-
-                            Stopwatch stopwatch = new Stopwatch();
-                            stopwatch.Start();
                             //send audio
                             _listener.Client.Send(udpVoicePacket);
-                            stopwatch.Stop();
-                            Logger.Info("Sent in "+stopwatch.ElapsedMilliseconds );
 
                             //not sending or really quickly switched sending
                             if (!RadioSendingState.IsSending || (RadioSendingState.SendingOn != currentSelected))
@@ -623,34 +613,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn, radio.volume);
                     }
                 }
-
-//                if (!hasSentVoicePacket)
-//                {
-//                    try
-//                    {
-//                        var udpVoicePacket = new UDPVoicePacket
-//                        {
-//                            GuidBytes = _guidAsciiBytes,
-//                            AudioPart1Bytes = bytes,
-//                            AudioPart1Length = (ushort) bytes.Length,
-//                            Frequency = 100,
-//                            UnitId = 1,
-//                            Encryption = 0,
-//                            Modulation = 4
-//                        }.EncodePacket();
-//
-//                        hasSentVoicePacket = true;
-//
-//                        var ip = new IPEndPoint(_address, _port);
-//                        _listener.Send(udpVoicePacket, udpVoicePacket.Length, ip);
-//
-//                        Logger.Info("Sent First Voice Packet");
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        Logger.Error(e, "Exception Sending First Audio Message " + e.Message);
-//                    }
-//                }
             }
         }
 
@@ -667,7 +629,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     
                     try
                     {
-
                         if (!RadioSendingState.IsSending && _listener !=null && _listener.Connected)
                         {
                             var udpVoicePacket = new UDPVoicePacket
