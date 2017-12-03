@@ -11,7 +11,9 @@ Copy DCS-SRSGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
 Copy DCS-SRS-OverlayGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
 Copy DCS-SRS-Overlay.dlg to C:\Users\USERNAME\Saved Games\DCS\Scripts
 
-Create the folder if it doesnt exist
+Copy DCS-SRS-Hook.luato C:\Users\USERNAME\Saved Games\DCS\Scripts\Hooks -- NOTE: Sub folder in Scripts folder
+
+Create the folders if they dont exist
 
 Add:
 
