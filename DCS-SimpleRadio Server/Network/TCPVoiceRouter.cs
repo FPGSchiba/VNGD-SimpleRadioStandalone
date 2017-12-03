@@ -10,6 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using DotNetty.Codecs;
+using DotNetty.Transport.Bootstrapping;
+using DotNetty.Transport.Channels;
+using DotNetty.Transport.Channels.Sockets;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -47,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private readonly IEventAggregator _eventAggregator;
 
         private readonly BlockingCollection<OutgoingVoice> _outGoing = new BlockingCollection<OutgoingVoice>();
-        private readonly CancellationTokenSource _outgoingCancellationToken = new CancellationTokenSource();
+        private readonly CancellationTokenSource _serverShutdownToken = new CancellationTokenSource();
 
         private readonly CancellationTokenSource _pendingProcessingCancellationToken = new CancellationTokenSource();
 
@@ -71,45 +75,82 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void StartListening()
         {
-            var ipAddress = new IPAddress(0);
-            var localEndPoint = new IPEndPoint(ipAddress, _serverSettings.ServerListeningPort()+1);
 
-            //start threads
-            //packets that need processing
-            new Thread(ProcessPackets).Start();
-            //outgoing packets
-            new Thread(SendPendingPackets).Start();
+            var bossGroup = new MultithreadEventLoopGroup();
+            var workerGroup = new MultithreadEventLoopGroup();
 
-            // Create a TCP/IP socket.
-            listener = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
-            listener.NoDelay = true;
-
-            // Bind the socket to the local endpoint and listen for incoming connections.
             try
             {
-                listener.Bind(localEndPoint);
-                listener.Listen(100);
-                listener.NoDelay = true;
-                while (true)
-                {
-                    // Set the event to nonsignaled state.
-                    _allDone.Reset();
+                var bootstrap = new ServerBootstrap();
+                bootstrap
+                    .Group(bossGroup, workerGroup)
+                    .Channel<TcpServerSocketChannel>()
+                    .Option(ChannelOption.SoBacklog, 100)
+                    .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
+                    {
+                        IChannelPipeline pipeline = channel.Pipeline;
+   
 
-                    // Start an asynchronous socket to listen for connections.
-                    Logger.Info($"Waiting for a VOIP connection on {_serverSettings.ServerListeningPort()+1}...");
-                    listener.BeginAccept(
-                        AcceptCallback,
-                        listener);
+                        pipeline.AddLast(new LengthFieldBasedFrameDecoder(1024, 0,2,0,0,true));
 
-                    // Wait until a connection is made before continuing.
-                    _allDone.WaitOne();
-                }
+                        pipeline.AddLast(new VOIPPacketHandler());
+                    }));
+
+                Task<IChannel> bootstrapChannel = bootstrap.BindAsync(_serverSettings.ServerListeningPort() + 1);
+
+                bootstrapChannel.Wait(5000);
+
+                //wait here for shutdown
+                _serverShutdownToken.Token.WaitHandle.WaitOne();
+
+                 var task =bootstrapChannel.Result.CloseAsync();
+
+                task.Wait(10000);
             }
-            catch (Exception e)
+            finally
             {
-                Logger.Error(e, "Server Listen error: " + e.Message);
+                Task.WaitAll(bossGroup.ShutdownGracefullyAsync(), workerGroup.ShutdownGracefullyAsync());
             }
+
+//            var ipAddress = new IPAddress(0);
+//            var localEndPoint = new IPEndPoint(ipAddress, _serverSettings.ServerListeningPort()+1);
+//
+//            //start threads
+//            //packets that need processing
+//            new Thread(ProcessPackets).Start();
+//            //outgoing packets
+//            new Thread(SendPendingPackets).Start();
+//
+//            // Create a TCP/IP socket.
+//            listener = new Socket(AddressFamily.InterNetwork,
+//                SocketType.Stream, ProtocolType.Tcp);
+//            listener.NoDelay = true;
+//
+//            // Bind the socket to the local endpoint and listen for incoming connections.
+//            try
+//            {
+//                listener.Bind(localEndPoint);
+//                listener.Listen(100);
+//                listener.NoDelay = true;
+//                while (true)
+//                {
+//                    // Set the event to nonsignaled state.
+//                    _allDone.Reset();
+//
+//                    // Start an asynchronous socket to listen for connections.
+//                    Logger.Info($"Waiting for a VOIP connection on {_serverSettings.ServerListeningPort()+1}...");
+//                    listener.BeginAccept(
+//                        AcceptCallback,
+//                        listener);
+//
+//                    // Wait until a connection is made before continuing.
+//                    _allDone.WaitOne();
+//                }
+//            }
+//            catch (Exception e)
+//            {
+//                Logger.Error(e, "Server Listen error: " + e.Message);
+//            }
         }
 
         public void AcceptCallback(IAsyncResult ar)
@@ -397,6 +438,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             _stop = true;
             try
             {
+
+                _serverShutdownToken.Cancel();
 
                 _pendingProcessingCancellationToken.Cancel();
 
