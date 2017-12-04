@@ -22,6 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             CLIENT_Y,
             AWACS_X,
             AWACS_Y,
+            MIC_AUDIO_OUTPUT_DEVICE_ID
         }
 
         private const string RegPath = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
@@ -45,6 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private double _awacsX;
         private double _awacsY;
+        private string _micAudioOutputDeviceId;
 
         private AppConfiguration()
         {
@@ -68,6 +70,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             catch (Exception ex)
             {
                 AudioOutputDeviceId = "";
+            }
+
+            try
+            {
+                MicAudioOutputDeviceId = (string)Registry.GetValue(RegPath,
+                    RegKeys.MIC_AUDIO_OUTPUT_DEVICE_ID.ToString(),
+                    "");
+            }
+            catch (Exception ex)
+            {
+                MicAudioOutputDeviceId = "";
             }
 
             try
@@ -244,6 +257,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 Registry.SetValue(RegPath,
                     RegKeys.AUDIO_OUTPUT_DEVICE_ID.ToString(),
                     _audioOutputDeviceId);
+            }
+        }
+
+        public string MicAudioOutputDeviceId
+        {
+            get { return _micAudioOutputDeviceId; }
+            set
+            {
+                _micAudioOutputDeviceId = value;
+
+                Registry.SetValue(RegPath,
+                    RegKeys.MIC_AUDIO_OUTPUT_DEVICE_ID.ToString(),
+                    _micAudioOutputDeviceId);
             }
         }
 

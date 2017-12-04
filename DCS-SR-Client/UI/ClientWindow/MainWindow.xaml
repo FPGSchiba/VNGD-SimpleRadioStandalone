@@ -66,11 +66,19 @@
 
                     <Label x:Name="SpeakerLabel"
                            HorizontalAlignment="Center"
-                           Content="Speakers" />
-                    <ComboBox x:Name="Speakers"
-                              Width="250"
+                           Content="Speakers &amp; Optional Mic Output" />
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                        <ComboBox x:Name="Speakers"
+                              Width="200"
                               HorizontalAlignment="Center"
-                              VerticalAlignment="Top" />
+                              VerticalAlignment="Top" Margin="0,0,5,0" />
+                        <ComboBox x:Name="MicOutput"
+                                  Width="200"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Top" Margin="5,0,0,0" />
+                    </StackPanel>
 
 
                     <StackPanel Margin="0"

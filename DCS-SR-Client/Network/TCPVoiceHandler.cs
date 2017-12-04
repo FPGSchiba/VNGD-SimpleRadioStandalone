@@ -536,7 +536,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return false;
         }
 
-        public void Send(byte[] bytes, int len)
+        public bool Send(byte[] bytes, int len)
         {
             
             //if either PTT is true && socket connected etc
@@ -592,6 +592,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 LastSentAt = Environment.TickCount,
                                 SendingOn = currentSelected
                             };
+                            return true;
                         }
                     }
                 }
@@ -614,6 +615,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                 }
             }
+            return false;
         }
 
         private void StartPing()

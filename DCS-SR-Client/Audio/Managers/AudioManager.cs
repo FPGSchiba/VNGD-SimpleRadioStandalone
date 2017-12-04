@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -56,6 +57,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public float SpeakerMax { get; set; }
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private WasapiOut _micWaveOut;
+        private BufferedWaveProvider _micWaveOutBuffer;
 
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -84,8 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port)
+        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress, int port, MMDevice micOutput)
         {
             _stop = false;
 
@@ -128,12 +130,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 Environment.Exit(1);
             }
 
+            if (micOutput != null) // && micOutput !=speakers
+            {
+                //TODO handle case when they're the same
+
+                try
+                {
+                    _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40);
+
+                    _micWaveOutBuffer = new  BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                    _micWaveOutBuffer.ReadFully = true;
+                    _micWaveOutBuffer.DiscardOnBufferOverflow = true;
+                    
+                    RadioFilter filter = new RadioFilter(_micWaveOutBuffer.ToSampleProvider());
+                    _micWaveOut.Init(filter);
+
+                    _micWaveOut.Play();
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error starting mic audio Output - Quitting! " + ex.Message);
+
+                    MessageBox.Show(
+                        $"Problem Initialising Mic Audio Output! Try a different Output device and please post your client log on the forums",
+                        "Audio Output Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    Environment.Exit(1);
+                }
+
+            }
+
+
             try
             {
                 _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                 {
                     BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
-                    DeviceNumber = mic
+                    DeviceNumber = mic,
                 };
 
                 _waveIn.NumberOfBuffers = 2;
@@ -262,11 +297,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
          //Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-           // if(_stopwatch.ElapsedMilliseconds > 22)
+            // if(_stopwatch.ElapsedMilliseconds > 22)
             //Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-           // _stopwatch.Restart();
-
-            //fill sound buffer
+            // _stopwatch.Restart();
 
             byte[] soundBuffer = null;
             if ((e.BytesRecorded == SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
@@ -330,7 +363,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                         // Console.WriteLine("Sending: " + e.BytesRecorded);
-                        _tcpVoiceHandler.Send(encoded, len);
+                        if (_tcpVoiceHandler.Send(encoded, len))
+                        {
+                            //send audio so play over local too
+                            if (_micWaveOutBuffer != null)
+                            {
+                                _micWaveOutBuffer.AddSamples(soundBuffer, 0, soundBuffer.Length);
+                            }
+                           
+                        }
                     }
                     else
                     {
@@ -371,6 +412,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveOut.Stop();
                 _waveOut.Dispose();
                 _waveOut = null;
+            }
+
+            if (_micWaveOut != null)
+            {
+                _micWaveOut.Stop();
+                _micWaveOut.Dispose();
+                _micWaveOut = null;
             }
 
             if (_encoder != null)
