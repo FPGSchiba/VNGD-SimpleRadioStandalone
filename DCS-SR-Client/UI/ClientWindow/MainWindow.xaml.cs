@@ -103,6 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitAudioInput();
 
             InitAudioOutput();
+            InitMicAudioOutput();
 
             _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
@@ -400,6 +401,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         }
 
+        private void InitMicAudioOutput()
+        {
+
+            Logger.Info("Mic Audio Output - Saved ID " + _appConfig.MicAudioOutputDeviceId);
+
+            int i = 0;
+
+            MicOutput.Items.Add(new AudioDeviceListItem()
+            {
+                Text = "NO MIC OUTPUT / PASSTHROUGH",
+                Value = null
+            });
+            foreach (var device in outputDeviceList)
+            {
+
+                MicOutput.Items.Add(new AudioDeviceListItem()
+                {
+                    Text = device.DeviceFriendlyName,
+                    Value = device
+                });
+
+                Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" + device.AudioClient.MixFormat.Channels + " Rate:" + device.AudioClient.MixFormat.SampleRate.ToString());
+
+                //first time round the loop, select first item
+                if (i == 0)
+                {
+                    MicOutput.SelectedIndex = 0;
+                }
+
+                if (device.ID == _appConfig.MicAudioOutputDeviceId)
+                {
+                    MicOutput.SelectedIndex = i; //this one
+                }
+
+                i++;
+            }
+
+        }
+
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
             ClientCount.Content = _clients.Count;
@@ -512,7 +552,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void InitRadioSoundEffects()
         {
             var radioEffects = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.RadioEffects];
-            if (radioEffects == "ON")
+            if (radioEffects != "OFF")
             {
                 RadioSoundEffects.IsChecked = true;
             }
@@ -590,6 +630,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.IsEnabled = false;
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
+                        MicOutput.IsEnabled = false;
                     }
                     else
                     {
@@ -641,6 +682,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
+            MicOutput.IsEnabled = true;
             try
             {
                 _audioManager.StopEncoding();
@@ -668,16 +710,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     {
                         var output = outputDeviceList[Speakers.SelectedIndex];
 
-                        StartStop.Content = "Disconnect";
-                        StartStop.IsEnabled = true;
-
-
                         //save app settings
                         _appConfig.AudioInputDeviceId = ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).NameGuid.ToString();
                         _appConfig.AudioOutputDeviceId = output.ID;
 
+                        //check if we have optional output
+                        MMDevice micOutput = null;
+                        if (MicOutput.SelectedIndex - 1 >= 0)
+                        {
+                            micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
+                            //save settings
+                            _appConfig.MicAudioOutputDeviceId = micOutput.ID;
+                        }
+                        else
+                        {
+                            //save settings as none
+                            _appConfig.MicAudioOutputDeviceId ="";
+                        }
+
+                        StartStop.Content = "Disconnect";
+                        StartStop.IsEnabled = true;
+
                         _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
-                            _resolvedIp, _port);
+                            _resolvedIp, _port, micOutput);
                         _stop = false;
                     }
                     catch (Exception ex)

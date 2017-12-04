@@ -53,6 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 _buffBufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;
+                _buffBufferedWaveProvider.DiscardOnBufferOverflow = true;
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
