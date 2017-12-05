@@ -118,7 +118,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                                             //only send if we can hear!
                                             if (receivingRadio != null)
-                                                matchingClients.Add(srClient.ClientChannelId);
+                                                matchingClients.Add(_client.Value.ClientChannelId);
                                         }
                                     }
                                 }
