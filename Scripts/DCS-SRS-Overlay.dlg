@@ -2,93 +2,6 @@ dialog = {
 	["children"] = {
 		["Box"] = {
 			["children"] = {
-				["pDown"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 149,
-								["w"] = 339,
-								["x"] = 9,
-								["y"] = 267,
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["layout"] = {
-							[1] = {
-							},
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "panel0",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "panelSkin",
-						},
-					},
-					["type"] = "Panel",
-				},
-				["pMsg"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 238,
-								["w"] = 316,
-								["x"] = 17,  -- offset from left of container box for text
-								["y"] = 10, -- offset from top of container box for text
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["layout"] = {
-							[1] = {
-							},
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "panel0",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "panelSkin",
-						},
-					},
-					["type"] = "Panel",
-				},
-
 			},
 			["params"] = {
 				["bounds"] = {
@@ -99,29 +12,11 @@ dialog = {
 						["y"] = 55,
 					},
 				},
-				["enabled"] = {
-					[1] = true,
-				},
-				["layout"] = {
-					[1] = {
-					},
-				},
-				["pictureFile"] = {
-				},
-				["skinName"] = {
-				},
-				["text"] = {
-					[1] = "panel0",
-				},
-				["tooltip"] = {
-					[1] = "",
-				},
-				["visible"] = {
-					[1] = true,
-				},
-				["zindex"] = {
-					[1] = 0,
-				},
+				["enabled"] = true,
+				["text"] = "",
+				["tooltip"] = "",
+				["visible"] = true,
+				["zindex"] = 0,
 			},
 			["skin"] = {
 				["params"] = {
@@ -132,39 +27,19 @@ dialog = {
 		},
 		["pNoVisible"] = {
 			["children"] = {
-
-
 				["eWhiteText"] = {
-					["children"] = {
-					},
 					["params"] = {
 						["bounds"] = {
-							[1] = {
-								["h"] = 20,
-								["w"] = 100,
-								["x"] = 6,
-								["y"] = 389,
-							},
+                            ["h"] = 20,
+                            ["w"] = 100,
+                            ["x"] = 6,
+                            ["y"] = 389,
 						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "static0",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
+						["enabled"] = true,
+						["text"] = "Static2",
+						["tooltip"] = "",
+						["visible"] = true,
+						["zindex"] = 0,
 					},
 					["skin"] = {
 						["params"] = {
@@ -175,104 +50,9 @@ dialog = {
 							["released"] = {
 								[1] = {
 									["text"] = {
-										["color"] = {
-											["a"] = 1,
-											["b"] = 1,
-											["g"] = 1,
-											["r"] = 1,
-										},
-										["horzAlign"] = {
-											["type"] = "min",
-										},
-										["shadowColor"] = {
-											["a"] = 0.2,
-											["b"] = 0,
-											["g"] = 0,
-											["r"] = 0,
-										},
-										["shadowOffset"] = {
-											["horz"] = 1,
-											["vert"] = 1,
-										},
-										["vertAlign"] = {
-											["type"] = "min",
-										},
+										["color"] = "0xffffffff",
 										["font"] = "DejaVuLGCSansCondensed-Bold.ttf",
-										["lineHeight"] = 0,
-										["fontSize"] = 12,
-									},
-								},
-							},
-						},
-					},
-					["type"] = "Static",
-
-				},
-				["eYellowText"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 20,
-								["w"] = 100,
-								["x"] = 24,
-								["y"] = 20,
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "static0",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "staticSkin",
-							["textWrapping"] = true,
-						},
-						["states"] = {
-							["released"] = {
-								[1] = {
-									["text"] = {
-										["color"] = {
-											["b"] = 0.25490196078431,
-											["g"] = 0.72549019607843,
-											["r"] = 0.9843137254902,
-										},
-										["horzAlign"] = {
-											["type"] = "min",
-										},
-										["shadowColor"] = {
-											["a"] = 0.2,
-											["b"] = 0,
-											["g"] = 0,
-											["r"] = 0,
-										},
-										["shadowOffset"] = {
-											["horz"] = 1,
-											["vert"] = 1,
-										},
-										["vertAlign"] = {
-											["type"] = "min",
-										},
-										["font"] = "DejaVuLGCSansCondensed-Bold.ttf",
-										["lineHeight"] = 0,
-										["fontSize"] = 12,
+										["lineHeight"] = 10,
 									},
 								},
 							},
@@ -280,219 +60,143 @@ dialog = {
 					},
 					["type"] = "Static",
 				},
-
-				["eRedText"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 20,
-								["w"] = 100,
-								["x"] = 24,
-								["y"] = 66,
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "Static1",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "staticSkin",
-							["textWrapping"] = true,
-						},
-						["states"] = {
-							["released"] = {
-								[1] = {
-									["text"] = {
-										["color"] = {
-											["b"] = 0.31764705882353,
-											["g"] = 0.31764705882353,
-											["r"] = 0.9921568627451,
-										},
-										["horzAlign"] = {
-											["type"] = "min",
-										},
-										["shadowColor"] = {
-											["a"] = 0.2,
-											["b"] = 0,
-											["g"] = 0,
-											["r"] = 0,
-										},
-										["shadowOffset"] = {
-											["horz"] = 1,
-											["vert"] = 1,
-										},
-										["vertAlign"] = {
-											["type"] = "min",
-										},
-										["font"] = "DejaVuLGCSansCondensed-Bold.ttf",
-										["lineHeight"] = 0,
-										["fontSize"] = 12,
-									},
-								},
-							},
-						},
-					},
-					["type"] = "Static",
-				},
-				["windowModeMin"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 30,
-								["w"] = 32,
-								["x"] = 91,
-								["y"] = 204,
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["layout"] = {
-							[1] = {
-							},
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "Panel1",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "panelSkin",
-						},
-					},
-					["type"] = "Panel",
-				},
-				["windowModeFull"] = {
-					["children"] = {
-					},
-					["params"] = {
-						["bounds"] = {
-							[1] = {
-								["h"] = 36,
-								["w"] = 40,
-								["x"] = 13,
-								["y"] = 203,
-							},
-						},
-						["enabled"] = {
-							[1] = true,
-						},
-						["layout"] = {
-							[1] = {
-							},
-						},
-						["pictureFile"] = {
-						},
-						["skinName"] = {
-						},
-						["text"] = {
-							[1] = "panel0",
-						},
-						["tooltip"] = {
-							[1] = "",
-						},
-						["visible"] = {
-							[1] = true,
-						},
-						["zindex"] = {
-							[1] = 0,
-						},
-					},
-					["skin"] = {
-						["params"] = {
-							["name"] = "panelSkin",
-						},
-						["states"] = {
-							["released"] = {
-								[1] = {
-									["bkg"] = {
-										["center_center"] = {
-											["a"] = 0.3921568627451,
-											["b"] = 0,
-											["g"] = 0,
-											["r"] = 0,
-										},
-									},
-								},
-							},
-						},
-					},
-					["type"] = "Panel",
-				},
+                ["eYellowText"] = {
+                    ["params"] = {
+                        ["bounds"] = {
+                            ["h"] = 20,
+                            ["w"] = 100,
+                            ["x"] = 24,
+                            ["y"] = 20,
+                        },
+                        ["enabled"] = true,
+                        ["text"] = "Static2",
+                        ["tooltip"] = "",
+                        ["visible"] = true,
+                        ["zindex"] = 0,
+                    },
+                    ["skin"] = {
+                        ["params"] = {
+                            ["name"] = "staticSkin",
+                            ["textWrapping"] = true,
+                        },
+                        ["states"] = {
+                            ["released"] = {
+                                [1] = {
+                                    ["text"] = {
+                                        ["color"] = "0xfbb941ff",
+                                        ["font"] = "DejaVuLGCSansCondensed-Bold.ttf",
+                                        ["lineHeight"] = 10,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["type"] = "Static",
+                },
+                ["eRedText"] = {
+                    ["params"] = {
+                        ["bounds"] = {
+                            ["h"] = 20,
+                            ["w"] = 100,
+                            ["x"] = 24,
+                            ["y"] = 66,
+                        },
+                        ["enabled"] = true,
+                        ["text"] = "Static2",
+                        ["tooltip"] = "",
+                        ["visible"] = true,
+                        ["zindex"] = 0,
+                    },
+                    ["skin"] = {
+                        ["params"] = {
+                            ["name"] = "staticSkin",
+                            ["textWrapping"] = true,
+                        },
+                        ["states"] = {
+                            ["released"] = {
+                                [1] = {
+                                    ["text"] = {
+                                        ["color"] = "0xfd5151ff",
+                                        ["font"] = "DejaVuLGCSansCondensed-Bold.ttf",
+                                        ["lineHeight"] = 10,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["type"] = "Static",
+                },
+                ["windowModeMin"] = {
+                    ["params"] = {
+                        ["bounds"] = {
+                            ["h"] = 36,
+                            ["w"] = 40,
+                            ["x"] = 13,
+                            ["y"] = 203,
+                        },
+                        ["enabled"] = true,
+                        ["text"] = "Panel1",
+                        ["tooltip"] = "",
+                        ["visible"] = true,
+                        ["zindex"] = 0,
+                    },
+                    ["skin"] = {
+                        ["params"] = {
+                            ["name"] = "panelSkin",
+                        },
+                    },
+                    ["type"] = "Panel",
+                },
+                ["windowModeFull"] = {
+                    ["params"] = {
+                        ["bounds"] = {
+                            ["h"] = 36,
+                            ["w"] = 40,
+                            ["x"] = 13,
+                            ["y"] = 203,
+                        },
+                        ["enabled"] = true,
+                        ["text"] = "panel0",
+                        ["tooltip"] = "",
+                        ["visible"] = true,
+                        ["zindex"] = 0,
+                    },
+                    ["skin"] = {
+                        ["params"] = {
+                            ["name"] = "panelSkin",
+                        },
+                        ["states"] = {
+                            ["released"] = {
+                                [1] = {
+                                    ["bkg"] = {
+                                        ["center_center"] = "0x00000064",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["type"] = "Panel",
+                },
 			},
-			["params"] = {
-				["bounds"] = {
-					[1] = {
-						["h"] = 435,
-						["w"] = 228,
-						["x"] = 442,
-						["y"] = 31,
-					},
-				},
-				["enabled"] = {
-					[1] = true,
-				},
-				["layout"] = {
-					[1] = {
-					},
-				},
-				["pictureFile"] = {
-				},
-				["skinName"] = {
-				},
-				["text"] = {
-					[1] = "panel0",
-				},
-				["tooltip"] = {
-					[1] = "",
-				},
-				["visible"] = {
-					[1] = false,
-				},
-				["zindex"] = {
-					[1] = 0,
-				},
-			},
-			["skin"] = {
-				["params"] = {
-					["name"] = "panelSkin",
-				},
-			},
-			["type"] = "Panel",
+            ["params"] = {
+                ["bounds"] = {
+                    ["h"] = 435,
+                    ["w"] = 228,
+                    ["x"] = 442,
+                    ["y"] = 31,
+                },
+                ["enabled"] = true,
+                ["text"] = "panel0",
+                ["tooltip"] = "",
+                ["visible"] = false,
+                ["zindex"] = 0,
+            },
+            ["skin"] = {
+                ["params"] = {
+                    ["name"] = "panelSkin",
+                },
+            },
+            ["type"] = "Panel",
 		},
 	},
 	["params"] = {
@@ -504,36 +208,15 @@ dialog = {
 				["y"] = 0,
 			},
 		},
-		["draggable"] = {
-			[1] = true,
-		},
-		["enabled"] = {
-			[1] = true,
-		},
-		["hasCursor"] = {
-			[1] = false,
-		},
-		["layout"] = {
-			[1] = {
-			},
-		},
-		["lockFlow"] = {
-			[1] = false,
-		},
-		["modal"] = {
-			[1] = false,
-		},
-		["offscreen"] = {
-			[1] = false,
-		},
-		["skinName"] = {
-		},
-		["text"] = {
-			[1] = "DCS SimpleRadio Standalone",
-		},
-		["zOrder"] = {
-			[1] = 120,
-		},
+		["draggable"] = true,
+		["enabled"] = true,
+		["hasCursor"] = true,
+		["lockFlow"] = false,
+		["modal"] = false,
+		["offscreen"] = false,
+		["resizable"] = false,
+		["zOrder"] = 120,
+		["text"] =  "DCS SimpleRadio Standalone",
 	},
 	["skin"] = {
 		["params"] = {
@@ -543,12 +226,7 @@ dialog = {
 			["released"] = {
 				[1] = {
 					["bkg"] = {
-						["center_center"] = {
-							["a"] = 0,
-							["b"] = 0,
-							["g"] = 0,
-							["r"] = 0,
-						},
+						["center_center"] = "0x00000000",
 					},
 				},
 			},
