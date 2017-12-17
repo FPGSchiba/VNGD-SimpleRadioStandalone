@@ -242,7 +242,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         var state = (_inputDevices[i] as Joystick).GetCurrentState();
 
-                        for (var j = 0; j < 128; j++)
+                        for (var j = 0; j < state.Buttons.Length; j++)
                         {
                             initial[i, j] = state.Buttons[j] ? 1 : 0;
                         }
@@ -262,6 +262,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         for (var j = 0; j < 128; j++)
                         {
                             initial[i, j] = state.IsPressed(state.AllKeys[j]) ? 1 : 0;
+                        }
+                    }
+                    else if (_inputDevices[i] is Mouse)
+                    {
+                        var mouse = _inputDevices[i] as Mouse;
+                        mouse.Poll();
+                       
+                        var state = mouse.GetCurrentState();
+
+                        for (var j = 0; j < state.Buttons.Length; j++)
+                        {
+                            initial[i, j] = state.Buttons[j] ? 1 : 0;
                         }
                     }
                 }
@@ -369,6 +381,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 //                                }
                             }
                         }
+                        else if (_inputDevices[i] is Mouse)
+                        {
+                            _inputDevices[i].Poll();
+
+                            var state = (_inputDevices[i] as Mouse).GetCurrentState();
+
+                            //skip left mouse button - start at 1 with j 0 is left, 1 is right, 2 is middle
+                            for (var j = 1; j < state.Buttons.Length; j++)
+                            {
+                                var buttonState = state.Buttons[j] ? 1 : 0;
+
+
+                                if (buttonState != initial[i, j])
+                                {
+                                    found = true;
+
+                                    var inputDevice = new InputDevice
+                                    {
+                                        DeviceName =
+                                            _inputDevices[i].Information.ProductName.Trim().Replace("\0", ""),
+                                        Button = j,
+                                        InstanceGuid = _inputDevices[i].Information.InstanceGuid,
+                                        ButtonValue = buttonState
+                                    };
+
+                                    Application.Current.Dispatcher.Invoke(
+                                        () => { callback(inputDevice); });
+                                    return;
+                                }
+                            }
+                        }
+
                     }
                 }
             });
@@ -601,6 +645,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         var state = keyboard.GetCurrentState();
                         return
                             state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                    }
+                    else if (device is Mouse)
+                    {
+                        device.Poll();
+                        var state = (device as Mouse).GetCurrentState();
+
+                        //just incase mouse changes number of buttons, like logitech can?
+                        if(inputDeviceBinding.Button < state.Buttons.Length)
+                        {
+                            return state.Buttons[inputDeviceBinding.Button];
+                        }
                     }
                 }
             }
