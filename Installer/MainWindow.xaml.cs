@@ -212,7 +212,14 @@ namespace Installer
             WritePath(srPath.Text, "SRPathStandalone");
             WritePath(dcsScriptsPath.Text, "ScriptsPath");
 
-            MessageBox.Show("Installation / Update Completed Succesfully!", "SR Standalone Installer",
+            string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
+
+            foreach (var path in paths)
+            {
+                message += ("\n" + path);
+            }
+                
+            MessageBox.Show(message, "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
             //open to installation location
@@ -225,18 +232,14 @@ namespace Installer
         {
             var paths = new List<string>();
 
-            var variants = new List<string>();
-            variants.Add("DCS");
-            variants.Add("DCS.openbeta");
-            variants.Add("DCS.openalpha");
-
-            foreach (var variant in variants)
+            foreach (var directory in Directory.EnumerateDirectories(path))
             {
-                if (Directory.Exists(path + "\\" + variant))
+                if (directory.Contains("\\DCS") || directory.StartsWith("\\DCS."))
                 {
-                    paths.Add(path + "\\" + variant);
+                    paths.Add(directory);
                 }
             }
+
             return paths;
         }
 

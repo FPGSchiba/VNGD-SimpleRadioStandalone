@@ -1,4 +1,4 @@
--- Version 1.4.4.0
+-- Version 1.4.5.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
@@ -201,7 +201,7 @@ function srsOverlay.paintRadio()
     end
 
     local curStatic = 1
-    offset = 0
+    offset = 10 -- 10 offset from top
 
     if #_listMessages == 0 then
         table.insert(_listMessages, {message = "No Radio Connected", skin =typesMessage.guard, height = 20 })
@@ -213,7 +213,7 @@ function srsOverlay.paintRadio()
 
         if(_msg~=nil and _msg.message ~= nil and  _listStatics[curStatic] ~= nil ) then
             _listStatics[curStatic]:setSkin(_msg.skin)
-            _listStatics[curStatic]:setBounds(0,offset,WIDTH-10,_msg.height)
+            _listStatics[curStatic]:setBounds(10,offset,WIDTH-10,_msg.height)
             _listStatics[curStatic]:setText(_msg.message)
 
             --10 padding
@@ -229,10 +229,9 @@ function srsOverlay.createWindow()
     window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Scripts\\DCS-SRS-Overlay.dlg', cdata)
 
     box         = window.Box
-    pNoVisible  = window.pNoVisible
-    pDown       = box.pDown
-    pMsg        = box.pMsg
-    
+    pNoVisible  = window.pNoVisible --PlaceHolder - Not Visible
+   -- pDown       = box.pDown
+
     window:addHotKeyCallback(srsOverlay.config.hotkey, srsOverlay.onHotkey)
 
     
@@ -252,10 +251,7 @@ function srsOverlay.createWindow()
     for i = 1, 4 do
         local staticNew = Static.new()
         table.insert(_listStatics, staticNew)
---        staticNew:setReadOnly(true)
---        staticNew:setTextWrapping(true)
---        staticNew:setMultiline(true)
-        pMsg:insertWidget(staticNew)
+        box:insertWidget(staticNew)
     end
 
     w, h = Gui.GetWindowSize()
@@ -294,7 +290,7 @@ function srsOverlay.setMode(mode)
     if srsOverlay.config.mode == _modes.hidden then
 
         box:setVisible(false)
-        pDown:setVisible(false)
+   --     pDown:setVisible(false)
         window:setSize(0,0) -- Make it tiny!
         window:setHasCursor(false) -- hide cursor
 
@@ -308,7 +304,7 @@ function srsOverlay.setMode(mode)
 
             box:setSkin(skinMinimum)
 
-            pDown:setVisible(false)
+         --   pDown:setVisible(false)
 
             window:setSkin(Skin.windowSkinChatMin())
 
@@ -322,7 +318,7 @@ function srsOverlay.setMode(mode)
             box:setSkin(skinModeFull)
 
             box:setVisible(true)
-            pDown:setVisible(true)
+           -- pDown:setVisible(true)
 
             window:setSkin(Skin.windowSkinChatWrite())
 
