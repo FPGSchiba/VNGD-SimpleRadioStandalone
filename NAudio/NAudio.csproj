@@ -69,6 +69,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\NAudio.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -435,6 +436,8 @@
     <Compile Include="Wave\WaveOutputs\AiffFileWriter.cs" />
     <Compile Include="Wave\WaveOutputs\AsioAudioAvailableEventArgs.cs" />
     <Compile Include="Wave\WaveOutputs\AsioOut.cs" />
+    <Compile Include="Wave\WaveOutputs\BextChunkInfo.cs" />
+    <Compile Include="Wave\WaveOutputs\BwfWriter.cs" />
     <Compile Include="Wave\WaveOutputs\CueWaveFileWriter.cs" />
     <Compile Include="Wave\WaveOutputs\MediaFoundationEncoder.cs" />
     <Compile Include="MediaFoundation\MediaType.cs" />

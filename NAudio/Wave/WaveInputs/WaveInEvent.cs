@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 using NAudio.Mixer;
 using System.Threading;
+using NAudio.CoreAudioApi;
 
+// ReSharper disable once CheckNamespace
 namespace NAudio.Wave
 {
     /// <summary>
@@ -17,7 +17,7 @@ namespace NAudio.Wave
         private readonly AutoResetEvent callbackEvent;
         private readonly SynchronizationContext syncContext;
         private IntPtr waveInHandle;
-        private volatile bool recording;
+        private volatile CaptureState captureState;
         private WaveInBuffer[] buffers;
 
         /// <summary>
@@ -35,24 +35,19 @@ namespace NAudio.Wave
         /// </summary>
         public WaveInEvent()
         {
-            this.callbackEvent = new AutoResetEvent(false);
-            this.syncContext = SynchronizationContext.Current;
-            this.DeviceNumber = 0;
-            this.WaveFormat = new WaveFormat(8000, 16, 1);
-            this.BufferMilliseconds = 100;
-            this.NumberOfBuffers = 3;
+            callbackEvent = new AutoResetEvent(false);
+            syncContext = SynchronizationContext.Current;
+            DeviceNumber = 0;
+            WaveFormat = new WaveFormat(8000, 16, 1);
+            BufferMilliseconds = 100;
+            NumberOfBuffers = 3;
+            captureState = CaptureState.Stopped;
         }
 
         /// <summary>
         /// Returns the number of Wave In devices available in the system
         /// </summary>
-        public static int DeviceCount
-        {
-            get
-            {
-                return WaveInterop.waveInGetNumDevs();
-            }
-        }
+        public static int DeviceCount => WaveInterop.waveInGetNumDevs();
 
         /// <summary>
         /// Retrieves the capabilities of a waveIn device
@@ -112,11 +107,11 @@ namespace NAudio.Wave
         /// </summary>
         public void StartRecording()
         {
-            if (recording)
+            if (captureState != CaptureState.Stopped)
                 throw new InvalidOperationException("Already recording"); 
             OpenWaveInDevice();
             MmException.Try(WaveInterop.waveInStart(waveInHandle), "waveInStart");
-            recording = true;
+            captureState = CaptureState.Starting;
             ThreadPool.QueueUserWorkItem((state) => RecordThread(), null);
         }
 
@@ -133,13 +128,14 @@ namespace NAudio.Wave
             }
             finally
             {
-                recording = false;
+                captureState = CaptureState.Stopped;
                 RaiseRecordingStoppedEvent(exception);
             }
         }
 
         private void DoRecording()
         {
+            captureState = CaptureState.Capturing;
             foreach (var buffer in buffers)
             {
                 if (!buffer.InQueue)
@@ -147,21 +143,18 @@ namespace NAudio.Wave
                     buffer.Reuse();
                 }
             }
-            while (recording)
+            while (captureState == CaptureState.Capturing)
             {
                 if (callbackEvent.WaitOne())
                 {
                     // requeue any buffers returned to us
-                    if (recording)
+                    foreach (var buffer in buffers)
                     {
-                        foreach (var buffer in buffers)
+                        if (buffer.Done)
                         {
-                            if (buffer.Done)
+                            DataAvailable?.Invoke(this, new WaveInEventArgs(buffer.Data, buffer.BytesRecorded));
+                            if (captureState == CaptureState.Capturing)
                             {
-                                if (DataAvailable != null)
-                                {
-                                    DataAvailable(this, new WaveInEventArgs(buffer.Data, buffer.BytesRecorded));
-                                }
                                 buffer.Reuse();
                             }
                         }
@@ -175,13 +168,13 @@ namespace NAudio.Wave
             var handler = RecordingStopped;
             if (handler != null)
             {
-                if (this.syncContext == null)
+                if (syncContext == null)
                 {
                     handler(this, new StoppedEventArgs(e));
                 }
                 else
                 {
-                    this.syncContext.Post(state => handler(this, new StoppedEventArgs(e)), null);
+                    syncContext.Post(state => handler(this, new StoppedEventArgs(e)), null);
                 }
             }
         }
@@ -190,9 +183,12 @@ namespace NAudio.Wave
         /// </summary>
         public void StopRecording()
         {
-            recording = false;
-            this.callbackEvent.Set(); // signal the thread to exit
-            MmException.Try(WaveInterop.waveInStop(waveInHandle), "waveInStop");
+            if (captureState != CaptureState.Stopped)
+            {
+                captureState = CaptureState.Stopping;
+                callbackEvent.Set(); // signal the thread to exit
+                MmException.Try(WaveInterop.waveInStop(waveInHandle), "waveInStop");
+            }
         }
 
         /// <summary>
@@ -207,7 +203,7 @@ namespace NAudio.Wave
         {
             if (disposing)
             {
-                if (recording)
+                if (captureState != CaptureState.Stopped)
                     StopRecording();
                 
                 CloseWaveInDevice();
@@ -239,7 +235,7 @@ namespace NAudio.Wave
             MixerLine mixerLine;
             if (waveInHandle != IntPtr.Zero)
             {
-                mixerLine = new MixerLine(this.waveInHandle, 0, MixerFlags.WaveInHandle);
+                mixerLine = new MixerLine(waveInHandle, 0, MixerFlags.WaveInHandle);
             }
             else
             {
