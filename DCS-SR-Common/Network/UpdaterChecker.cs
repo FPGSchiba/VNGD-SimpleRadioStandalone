@@ -13,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     {
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.4.3.0";
 
-        public static readonly string VERSION = "1.4.5.0";
+        public static readonly string VERSION = "1.4.6.0";
 
         public static async void CheckForUpdate()
         {
