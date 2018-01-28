@@ -182,7 +182,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
-                                                srClient.LastUpdate = Environment.TickCount;
                                                 srClient.Position = updatedSrClient.Position;
 
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
