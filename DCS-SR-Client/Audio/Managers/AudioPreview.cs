@@ -61,7 +61,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter, (peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
-                _waveOut.Init(_volumeSampleProvider);
+                if (speakers.AudioClient.MixFormat.Channels == 1)
+                {
+                    if (_volumeSampleProvider.WaveFormat.Channels == 2)
+                    {
+                        _waveOut.Init(_volumeSampleProvider.ToMono());
+                    }
+                    else
+                    {
+                        //already mono
+                        _waveOut.Init(_volumeSampleProvider);
+                    }
+                   
+                }
+                else
+                {
+                    if (_volumeSampleProvider.WaveFormat.Channels == 1)
+                    {
+                        _waveOut.Init(_volumeSampleProvider.ToStereo());
+                    }
+                    else
+                    {
+                        //already stereo
+                        _waveOut.Init(_volumeSampleProvider);
+                    }
+                }
 
                 _waveOut.Play();
             }

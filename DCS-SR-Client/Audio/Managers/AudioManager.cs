@@ -109,8 +109,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
-                _waveOut.Init(_volumeSampleProvider);
+                if (speakers.AudioClient.MixFormat.Channels == 1)
+                {
+                    if (_volumeSampleProvider.WaveFormat.Channels == 2)
+                    {
+                        _waveOut.Init(_volumeSampleProvider.ToMono());
+                    }
+                    else
+                    {
+                        //already mono
+                        _waveOut.Init(_volumeSampleProvider);
+                    }
 
+                }
+                else
+                {
+                    if (_volumeSampleProvider.WaveFormat.Channels == 1)
+                    {
+                        _waveOut.Init(_volumeSampleProvider.ToStereo());
+                    }
+                    else
+                    {
+                        //already stereo
+                        _waveOut.Init(_volumeSampleProvider);
+                    }
+                }
                 _waveOut.Play();
 
                 //opus
@@ -132,7 +155,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             if (micOutput != null) // && micOutput !=speakers
             {
-                //TODO handle case when they're the same
+                //TODO handle case when they're the same?
 
                 try
                 {
@@ -143,7 +166,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _micWaveOutBuffer.DiscardOnBufferOverflow = true;
                     
                     RadioFilter filter = new RadioFilter(_micWaveOutBuffer.ToSampleProvider());
-                    _micWaveOut.Init(filter);
+
+                    if (micOutput.AudioClient.MixFormat.Channels == 1)
+                    {
+                        if (filter.WaveFormat.Channels == 2)
+                        {
+                            _micWaveOut.Init(filter.ToMono());
+                        }
+                        else
+                        {
+                            //already mono
+                            _micWaveOut.Init(filter);
+                        }
+
+                    }
+                    else
+                    {
+                        if (filter.WaveFormat.Channels == 1)
+                        {
+                            _micWaveOut.Init(filter.ToStereo());
+                        }
+                        else
+                        {
+                            //already stereo
+                            _micWaveOut.Init(filter);
+                        }
+                    }
 
                     _micWaveOut.Play();
 
