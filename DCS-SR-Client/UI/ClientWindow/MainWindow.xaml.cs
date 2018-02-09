@@ -379,7 +379,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                
                 Speakers.Items.Add(new AudioDeviceListItem()
                 {
-                    Text = device.DeviceFriendlyName,
+                    Text = device.FriendlyName,
                     Value = device
                 });
 
