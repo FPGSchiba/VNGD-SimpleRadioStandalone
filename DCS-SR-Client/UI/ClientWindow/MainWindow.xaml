@@ -35,15 +35,16 @@
                         <Slider x:Name="MicrophoneBoost"
                                 Width="150"
                                 Margin="0,10,0,0"
-                                Maximum="8.0"
-                                Minimum="0.05"
+                                Maximum="1.0"
+                                Minimum="0"
                                 ValueChanged="MicrophoneBoost_ValueChanged" />
                         <ProgressBar Name="Mic_VU"
                                      Width="150"
                                      Height="20"
                                      Margin="10,10,0,0"
-                                     Maximum="32767"
-                                     Minimum="0" />
+                                     Value="-100"
+                                     Maximum="0"
+                                     Minimum="-100" />
                     </StackPanel>
 
                     <StackPanel Margin="0"
@@ -90,16 +91,17 @@
                                 Margin="0,10,0,0"
                                 VerticalAlignment="Center"
                                 VerticalContentAlignment="Center"
-                                Maximum="15.0"
-                                Minimum="0.2"
+                                Maximum="1.0"
+                                Minimum="0.0"
                                 ValueChanged="SpeakerBoost_ValueChanged" />
 
                         <ProgressBar Name="Speaker_VU"
                                      Width="150"
                                      Height="20"
                                      Margin="10,10,0,0"
-                                     Maximum="1.0"
-                                     Minimum="0" />
+                                     Value="-100"
+                                     Maximum="0"
+                                     Minimum="-100" />
                     </StackPanel>
 
                     <StackPanel Margin="0"

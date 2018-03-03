@@ -10,8 +10,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             AUDIO_INPUT_DEVICE_ID,
             AUDIO_OUTPUT_DEVICE_ID,
             LAST_SERVER,
-            MIC_BOOST,
-            SPEAKER_BOOST,
+            MIC_BOOST_V2,
+            SPEAKER_BOOST_V2,
             RADIO_X,
             RADIO_Y,
             RADIO_SIZE,
@@ -97,8 +97,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             try
             {
                 MicBoost = float.Parse((string) Registry.GetValue(RegPath,
-                    RegKeys.MIC_BOOST.ToString(),
-                    "1.0"));
+                    RegKeys.MIC_BOOST_V2.ToString(),
+                    "0.5"));
             }
             catch (Exception ex)
             {
@@ -108,8 +108,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             try
             {
                 SpeakerBoost = float.Parse((string) Registry.GetValue(RegPath,
-                    RegKeys.SPEAKER_BOOST.ToString(),
-                    "1.0"));
+                    RegKeys.SPEAKER_BOOST_V2.ToString(),
+                    "0.5"));
             }
             catch (Exception ex)
             {
@@ -294,7 +294,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _micBoost = value;
 
                 Registry.SetValue(RegPath,
-                    RegKeys.MIC_BOOST.ToString(),
+                    RegKeys.MIC_BOOST_V2.ToString(),
                     _micBoost);
             }
         }
@@ -308,7 +308,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 _speakerBoost = value;
 
                 Registry.SetValue(RegPath,
-                    RegKeys.SPEAKER_BOOST.ToString(),
+                    RegKeys.SPEAKER_BOOST_V2.ToString(),
                     _speakerBoost);
             }
         }

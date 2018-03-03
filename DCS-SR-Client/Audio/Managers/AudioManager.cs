@@ -10,6 +10,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
@@ -53,8 +54,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private WaveIn _waveIn;
         private WasapiOut _waveOut;
 
-        public short MicMax { get; set; }
-        public float SpeakerMax { get; set; }
+        public float MicMax { get; set; } = -100;
+        public float SpeakerMax { get; set; } = -100;
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private WasapiOut _micWaveOut;
@@ -106,7 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = peak));
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = (float)VolumeConversionHelper.ConvertLinearToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -378,24 +379,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     }
                 }
 
-                short max = 0;
+                float max = 0;
                 for (var n = 0; n < soundBuffer.Length; n += 2)
                 {
-                    var sample = (short) ((soundBuffer[n + 1] << 8) | soundBuffer[n + 0]);
+                    short pcmShort = ConversionHelpers.ToShort(soundBuffer[n], soundBuffer[n + 1]);
+                    float pcmFloat = (float)pcmShort / 32768F;
 
                     // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                    sample = (short) (sample*MicBoost);
+                    pcmFloat = (pcmFloat * MicBoost);
 
                     //determine peak
-                    if (sample > max)
-                        max = sample;
+                    if (pcmFloat > max)
+                        max = pcmFloat;
+
+                    pcmShort = (short)(pcmFloat * 32768F);
 
                     //convert back
-                    soundBuffer[n] = (byte) (sample & 0xFF);
-                    soundBuffer[n + 1] = (byte) (sample >> 8);   
+                    soundBuffer[n] = (byte)(pcmShort & 0xFF);
+                    soundBuffer[n + 1] = (byte)(pcmShort >> 8);
+
                 }
 
-                MicMax = max;
+                //convert to dB
+                MicMax = (float)VolumeConversionHelper.ConvertLinearToDB(max);
 
                 try
                 {
@@ -488,8 +494,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             _stop = true;
 
-            SpeakerMax = 0;
-            MicMax = 0;
+            SpeakerMax = -100;
+            MicMax = -100;
 
             MessageHub.Instance.ClearSubscriptions();
         }
