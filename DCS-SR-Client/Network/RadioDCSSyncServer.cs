@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Newtonsoft.Json;
 using NLog;
@@ -48,6 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stop;
 
         private ClientStateSingleton _clientStateSingleton;
+        private UdpClient _udpCommandListener;
 
         public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
             ConcurrentDictionary<string, SRClient> _clients, string guid)
@@ -73,6 +75,77 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StartDcsGameGuiBroadcastListener();
             StartDCSLOSBroadcastListener();
             StartDCSLOSSender();
+            StartUDPCommandListener();
+        }
+
+        private void StartUDPCommandListener()
+        {
+           
+            _udpCommandListener = new UdpClient();
+            _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
+
+            var localEp = new IPEndPoint(IPAddress.Any, 9086);
+            _udpCommandListener.Client.Bind(localEp);
+
+            Task.Factory.StartNew(() =>
+            {
+                using (_udpCommandListener)
+                {
+                    while (!_stop)
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any, 9086);
+                        var bytes = _udpCommandListener.Receive(ref groupEp);
+
+                        try
+                        {     Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(
+                                      bytes, 0, bytes.Length));
+                            var message =
+                                JsonConvert.DeserializeObject<UDPInterfaceCommand>(Encoding.UTF8.GetString(
+                                    bytes, 0, bytes.Length));
+
+                            if (message?.Command == UDPInterfaceCommand.UDPCommandType.FREQUENCY)
+                            {
+                                RadioHelper.UpdateRadioFrequency(message.Frequency, message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.ACTIVE_RADIO)
+                            {
+                                RadioHelper.SelectRadio(message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TOGGLE_GUARD)
+                            {
+                                RadioHelper.ToggleGuard(message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.CHANNEL_UP)
+                            {
+                                RadioHelper.RadioChannelUp(message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.CHANNEL_DOWN)
+                            {
+                                RadioHelper.RadioChannelDown(message.RadioId);
+                            }
+                            else
+                            {
+                                Logger.Error("Unknown UDP Command!");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, "Exception Handling DCS  Message");
+                        }
+                    }
+
+                    try
+                    {
+                        _dcsUdpListener.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Exception stoping DCS listener ");
+                    }
+                }
+            });
+            
         }
 
         private void StartDcsBroadcastListener()
@@ -146,7 +219,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //send updated radio info back to DCS for ingame GUI
         private void SendRadioUpdateToDCS()
         {
-            var host = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7080);
+
             if (_dcsRadioUpdateSender == null)
             {
                 _dcsRadioUpdateSender = new UdpClient
@@ -170,13 +243,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     RadioReceivingState = TCPVoiceHandler.RadioReceivingState
                 };
 
-                var byteData =
-                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore
-                    }) + "\n");
+                var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                }) + "\n";
 
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length, host);
+                var byteData =
+                    Encoding.UTF8.GetBytes(message);
+
+                Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
+
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7080)); //send to DCS
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7082)); // send to Flight Control Panels
             }
             catch (Exception e)
             {
@@ -622,7 +700,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             try
             {
-                _dcsUdpListener.Close();
+                _dcsUdpListener?.Close();
             }
             catch (Exception ex)
             {
@@ -630,7 +708,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             try
             {
-                _dcsGameGuiudpListener.Close();
+                _dcsGameGuiudpListener?.Close();
             }
             catch (Exception ex)
             {
@@ -638,7 +716,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             try
             {
-                _dcsLOSListener.Close();
+                _dcsLOSListener?.Close();
             }
             catch (Exception ex)
             {
@@ -646,7 +724,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             try
             {
-                _dcsRadioUpdateSender.Close();
+                _dcsRadioUpdateSender?.Close();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                _udpCommandListener?.Close();
             }
             catch (Exception ex)
             {
