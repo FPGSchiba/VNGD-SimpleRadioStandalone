@@ -197,7 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio3.ControlInputBinding = InputBinding.Switch3;
             Radio3.InputDeviceManager = InputManager;
 
-            PTT.InputName = "Common PTT";
+            PTT.InputName = "Push To Talk - PTT";
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
@@ -459,15 +459,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void InitRadioRxEffectsToggle()
         {
      
-            RadioRxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_Start] == "ON";
-            RadioRxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_End] == "ON";
+            RadioRxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_Start] != "OFF";
+            RadioRxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_End] != "OFF";
         }
 
 
         private void InitRadioTxEffectsToggle()
         {
-            RadioTxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_Start] == "ON";
-            RadioTxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_End] == "ON";
+            RadioTxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_Start] != "OFF";
+            RadioTxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_End] != "OFF";
         }
 
         private void InitRadioEncryptionEffectsToggle()
