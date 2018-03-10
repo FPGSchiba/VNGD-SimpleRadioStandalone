@@ -674,7 +674,7 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio Switch works as PTT" />
+                               Content="Radio Switch works as Push To Talk" />
 
                         <ToggleButton Name="RadioSwitchIsPTT"
                                       Grid.Row="4"
