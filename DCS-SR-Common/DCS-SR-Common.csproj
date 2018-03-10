@@ -103,6 +103,7 @@
     <Compile Include="DCSState\DCSPlayerSideInfo.cs" />
     <Compile Include="DCSState\DCSPosition.cs" />
     <Compile Include="Helpers\ListHelper.cs" />
+    <Compile Include="Helpers\VolumeConversionHelper.cs" />
     <Compile Include="Network\NetworkMessage.cs" />
     <Compile Include="Network\UDPInterfaceCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

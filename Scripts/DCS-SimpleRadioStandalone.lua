@@ -1,4 +1,4 @@
--- Version 1.4.6.0
+-- Version 1.4.7.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1543,7 +1543,27 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[3].name = "ARC-210 COM 2"
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 299,{0.0,1.0},false)
+	_data.radios[3].volume = SR.getRadioVolume(0, 299,{0.0,1.0},false)
+
+	--https://en.wikipedia.org/wiki/AN/ARC-210
+
+
+
+    -- EXTRA Radio - temporary extra radio
+	--https://en.wikipedia.org/wiki/AN/ARC-210
+    _data.radios[4].name = "ARC-210 COM 3"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 108*1000000
+    _data.radios[4].freqMax = 512*1000000
+    _data.radios[4].expansion = false
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
 
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
@@ -1680,4 +1700,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.4.6.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.4.7.0")
