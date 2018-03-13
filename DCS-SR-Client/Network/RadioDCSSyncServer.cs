@@ -45,11 +45,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private UdpClient _dcsLOSListener;
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
+        private UdpClient _udpCommandListener;
 
         private volatile bool _stop;
 
         private ClientStateSingleton _clientStateSingleton;
-        private UdpClient _udpCommandListener;
 
         public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
             ConcurrentDictionary<string, SRClient> _clients, string guid)
@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, 9086);
+            var localEp = new IPEndPoint(IPAddress.Any, 9089);
             _udpCommandListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -94,12 +94,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 9086);
+                        var groupEp = new IPEndPoint(IPAddress.Any, 9089);
                         var bytes = _udpCommandListener.Receive(ref groupEp);
 
                         try
-                        {     Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(
-                                      bytes, 0, bytes.Length));
+                        {
+                            //Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(
+                            //          bytes, 0, bytes.Length));
                             var message =
                                 JsonConvert.DeserializeObject<UDPInterfaceCommand>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
@@ -137,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     try
                     {
-                        _dcsUdpListener.Close();
+                        _udpCommandListener.Close();
                     }
                     catch (Exception e)
                     {
@@ -251,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var byteData =
                     Encoding.UTF8.GetBytes(message);
 
-                Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
+                //Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
 
                 _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7080)); //send to DCS
                 _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7082)); // send to Flight Control Panels

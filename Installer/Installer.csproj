@@ -213,6 +213,12 @@
   <ItemGroup>
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DCS-SR-Common\DCS-SR-Common.csproj">
+      <Project>{CF8DA5C1-0105-4486-9E28-CB2321D8F122}</Project>
+      <Name>DCS-SR-Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)\DCS-SimpleRadio Server\bin\x64\Release\SR-Server.exe" "$(SolutionDir)\install-build\SR-Server.exe" 

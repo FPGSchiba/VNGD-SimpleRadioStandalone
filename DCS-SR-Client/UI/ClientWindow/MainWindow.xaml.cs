@@ -26,6 +26,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
 using NAudio.CoreAudioApi;
@@ -98,6 +99,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Title = Title + " - " + UpdaterChecker.VERSION;
 
             Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
+
+            Analytics.Log("Client", "Startup");
 
             InitExpandControls();
 
