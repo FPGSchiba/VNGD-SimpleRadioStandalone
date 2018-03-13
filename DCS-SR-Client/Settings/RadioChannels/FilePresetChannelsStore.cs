@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
                     {
                         try
                         {
-                            double frequency = Double.Parse(trimmed);
+                            double frequency = Double.Parse(trimmed,CultureInfo.InvariantCulture);
                             channels.Add(new PresetChannel()
                             {
                                 Text = trimmed,

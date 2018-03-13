@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
@@ -21,6 +23,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public Bootstrapper()
         {
+            //set everything to invariant
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            
             Initialize();
             SetupLogging();
 

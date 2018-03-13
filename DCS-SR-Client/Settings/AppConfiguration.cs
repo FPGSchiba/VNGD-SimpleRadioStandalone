@@ -98,7 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 MicBoost = float.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.MIC_BOOST_V2.ToString(),
-                    "0.5"));
+                    "0.5"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 SpeakerBoost = float.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.SPEAKER_BOOST_V2.ToString(),
-                    "0.5"));
+                    "0.5"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 RadioX = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_X.ToString(),
-                    "300"));
+                    "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 RadioY = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_Y.ToString(),
-                    "300"));
+                    "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -143,7 +143,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                  AwacsX = double.Parse((string)Registry.GetValue(RegPath,
                     RegKeys.AWACS_X.ToString(),
-                    "300"));
+                    "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -154,7 +154,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AwacsY = double.Parse((string)Registry.GetValue(RegPath,
                     RegKeys.AWACS_Y.ToString(),
-                    "300"));
+                    "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -165,7 +165,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 ClientX = double.Parse((string)Registry.GetValue(RegPath,
                    RegKeys.CLIENT_X.ToString(),
-                   "300"));
+                   "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 ClientY = double.Parse((string)Registry.GetValue(RegPath,
                     RegKeys.CLIENT_Y.ToString(),
-                    "300"));
+                    "300"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -188,7 +188,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 RadioWidth = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_WIDTH.ToString(),
-                    "122"));
+                    "122"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 RadioHeight = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_HEIGHT.ToString(),
-                    "270"));
+                    "270"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -211,7 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 RadioOpacity = double.Parse((string) Registry.GetValue(RegPath,
                     RegKeys.RADIO_OPACITY.ToString(),
-                    "1.0"));
+                    "1.0"), System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -295,7 +295,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.MIC_BOOST_V2.ToString(),
-                    _micBoost);
+                    _micBoost.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -309,7 +309,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.SPEAKER_BOOST_V2.ToString(),
-                    _speakerBoost);
+                    _speakerBoost.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -322,7 +322,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_X.ToString(),
-                    _radioX);
+                    _radioX.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -335,7 +335,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_Y.ToString(),
-                    _radioY);
+                    _radioY.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -348,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_HEIGHT.ToString(),
-                    _radioHeight);
+                    _radioHeight.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -361,7 +361,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_WIDTH.ToString(),
-                    _radioWidth);
+                    _radioWidth.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -374,7 +374,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_SIZE.ToString(),
-                    _radioSize);
+                    _radioSize.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -387,7 +387,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.RADIO_OPACITY.ToString(),
-                    _radioOpacity);
+                    _radioOpacity.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -402,7 +402,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.AWACS_X.ToString(),
-                    _awacsX);
+                    _awacsX.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -415,7 +415,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.AWACS_Y.ToString(),
-                    _awacsY);
+                    _awacsY.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -429,7 +429,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.CLIENT_X.ToString(),
-                    _clientX);
+                    _clientX.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
 
@@ -442,7 +442,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 Registry.SetValue(RegPath,
                     RegKeys.CLIENT_Y.ToString(),
-                    _clientY);
+                    _clientY.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
         }
     }
