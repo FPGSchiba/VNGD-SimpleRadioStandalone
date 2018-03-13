@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Threading;
+using System.Windows;
 
 namespace Installer
 {
@@ -7,5 +9,10 @@ namespace Installer
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            //set everything to invariant
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+        }
     }
 }

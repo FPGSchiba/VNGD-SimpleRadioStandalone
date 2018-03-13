@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow;
@@ -21,10 +24,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public Bootstrapper()
         {
+            //set everything to invariant
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            
             Initialize();
             SetupLogging();
 
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+
+            Analytics.Log("Server", "Startup");
         }
 
         private void SetupLogging()

@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -23,6 +25,8 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
 using NAudio.CoreAudioApi;
@@ -74,6 +78,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public MainWindow()
         {
+            //set everything to invariant
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
             InitializeComponent();
 
             DataContext = this;
@@ -92,6 +99,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Title = Title + " - " + UpdaterChecker.VERSION;
 
             Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
+
+            Analytics.Log("Client", "Startup");
 
             InitExpandControls();
 
@@ -113,18 +122,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MicrophoneBoost.Value = _appConfig.MicBoost;
             SpeakerBoost.Value = _appConfig.SpeakerBoost;
 
+            Speaker_VU.Value = -100;
+            Mic_VU.Value = -100;
+
             _audioManager = new AudioManager(_clients);
-            _audioManager.MicBoost = (float) MicrophoneBoost.Value;
-            _audioManager.SpeakerBoost = (float) SpeakerBoost.Value;
+            _audioManager.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value); 
+            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); ;
 
             if ((BoostLabel != null) && (MicrophoneBoost != null))
             {
-                BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
+                
+                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB((float)MicrophoneBoost.Value);
+             
+
             }
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
-                SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
+                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB((float)SpeakerBoost.Value);
+
             }
 
             UpdaterChecker.CheckForUpdate();
@@ -197,7 +213,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio3.ControlInputBinding = InputBinding.Switch3;
             Radio3.InputDeviceManager = InputManager;
 
-            PTT.InputName = "Common PTT";
+            PTT.InputName = "Push To Talk - PTT";
             PTT.ControlInputBinding = InputBinding.Ptt;
             PTT.InputDeviceManager = InputManager;
 
@@ -453,21 +469,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 Mic_VU.Value = _audioManager.MicMax;
                 Speaker_VU.Value = _audioManager.SpeakerMax;
-            } 
+            }
+            else
+            {
+                Mic_VU.Value = -100;
+                Speaker_VU.Value = -100;
+            }
         }
 
         private void InitRadioRxEffectsToggle()
         {
      
-            RadioRxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_Start] == "ON";
-            RadioRxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_End] == "ON";
+            RadioRxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_Start] != "OFF";
+            RadioRxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioRxEffects_End] != "OFF";
         }
 
 
         private void InitRadioTxEffectsToggle()
         {
-            RadioTxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_Start] == "ON";
-            RadioTxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_End] == "ON";
+            RadioTxStartToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_Start] != "OFF";
+            RadioTxEndToggle.IsChecked = SettingsStore.Instance.UserSettings[(int)SettingType.RadioTxEffects_End] != "OFF";
         }
 
         private void InitRadioEncryptionEffectsToggle()
@@ -798,7 +819,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _audioPreview.StartPreview(Mic.SelectedIndex, output);
                     _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
-                    _audioPreview.MicBoost = (float) MicrophoneBoost.Value;
+                    _audioPreview.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
                     Preview.Content = "Stop Preview";
                 }
                 catch (Exception ex)
@@ -818,11 +839,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview != null)
             {
-                _audioPreview.MicBoost = (float) MicrophoneBoost.Value;
+                _audioPreview.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value);
             }
             if (_audioManager != null)
             {
-                _audioManager.MicBoost = (float) MicrophoneBoost.Value;
+                _audioManager.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value);
             }
             if (_appConfig != null)
             {
@@ -831,7 +852,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if ((BoostLabel != null) && (MicrophoneBoost != null))
             {
-                BoostLabel.Content = (int) (MicrophoneBoost.Value*100) - 100 + "%";
+                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value));
             }
         }
 
@@ -839,11 +860,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview != null)
             {
-                _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
+                _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
             }
             if (_audioManager != null)
             {
-                _audioManager.SpeakerBoost = (float) SpeakerBoost.Value;
+                _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
             }
             if (_appConfig != null)
             {
@@ -852,7 +873,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
-                SpeakerBoostLabel.Content = (int) (SpeakerBoost.Value*100) - 100 + "%";
+                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value));
             }
         }
 

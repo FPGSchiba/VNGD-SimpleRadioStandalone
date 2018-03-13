@@ -1,4 +1,4 @@
--- Version 1.4.6.0
+-- Version 1.4.8.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
@@ -35,6 +35,7 @@ local Tools             = require('tools')
 local _modes = {     
     hidden = "hidden",
     minimum = "minimum",
+	minimum_vol =  "minimum_vol",
     full = "full",
 }
 
@@ -44,7 +45,7 @@ local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
-local WIDTH = 300
+local WIDTH = 350
 local HEIGHT = 130
 
 local _lastReceived = 0
@@ -128,7 +129,11 @@ function srsOverlay.updateRadio()
 
 					 if _radio.enc and _radio.encKey > 0 then
 						fullMessage = fullMessage.." E".._radio.encKey
-					 end
+                     end
+
+					 if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+						fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+					end
 			end
 
 			local _selected = _i == (_radioInfo.selected+1)
@@ -300,7 +305,7 @@ function srsOverlay.setMode(mode)
         box:setVisible(true)
         window:setSize(WIDTH, HEIGHT)
 
-        if srsOverlay.config.mode == _modes.minimum then
+        if srsOverlay.config.mode == _modes.minimum or srsOverlay.config.mode == _modes.minimum_vol then
 
             box:setSkin(skinMinimum)
 
@@ -340,6 +345,8 @@ function srsOverlay.onHotkey()
     if (srsOverlay.getMode() == _modes.full) then
         srsOverlay.setMode(_modes.minimum)
     elseif (srsOverlay.getMode() == _modes.minimum) then
+        srsOverlay.setMode(_modes.minimum_vol)
+	elseif (srsOverlay.getMode() == _modes.minimum_vol) then
         srsOverlay.setMode(_modes.hidden)
     else
         srsOverlay.setMode(_modes.full)
