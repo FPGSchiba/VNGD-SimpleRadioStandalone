@@ -165,32 +165,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _micWaveOutBuffer = new  BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                     _micWaveOutBuffer.ReadFully = true;
                     _micWaveOutBuffer.DiscardOnBufferOverflow = true;
-                    
-                    RadioFilter filter = new RadioFilter(_micWaveOutBuffer.ToSampleProvider());
+
+                    var sampleProvider = _micWaveOutBuffer.ToSampleProvider();
 
                     if (micOutput.AudioClient.MixFormat.Channels == 1)
                     {
-                        if (filter.WaveFormat.Channels == 2)
+                        if (sampleProvider.WaveFormat.Channels == 2)
                         {
-                            _micWaveOut.Init(filter.ToMono());
+                            _micWaveOut.Init(sampleProvider.ToMono());
                         }
                         else
                         {
                             //already mono
-                            _micWaveOut.Init(filter);
+                            _micWaveOut.Init(sampleProvider);
                         }
 
                     }
                     else
                     {
-                        if (filter.WaveFormat.Channels == 1)
+                        if (sampleProvider.WaveFormat.Channels == 1)
                         {
-                            _micWaveOut.Init(filter.ToStereo());
+                            _micWaveOut.Init(sampleProvider.ToStereo());
                         }
                         else
                         {
                             //already stereo
-                            _micWaveOut.Init(filter);
+                            _micWaveOut.Init(sampleProvider);
                         }
                     }
 
