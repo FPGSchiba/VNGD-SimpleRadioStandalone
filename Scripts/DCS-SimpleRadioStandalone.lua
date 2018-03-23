@@ -133,6 +133,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioL39(_update)
                 elseif _update.unit == "A-10C" then
                     _update = SR.exportRadioA10C(_update)
+                elseif string.find(_update.unit, "F-14") then
+                    _update = SR.exportRadioF14(_update)						
                 elseif _update.unit == "F-86F Sabre" then
                     _update = SR.exportRadioF86Sabre(_update)
                 elseif _update.unit == "MiG-15bis" then
@@ -1567,6 +1569,74 @@ function SR.exportRadioAV8BNA(_data)
 
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
+
+    return _data
+end
+
+--for F-14
+function SR.exportRadioF14(_data)
+    local ics_devid = 2
+    local arc159_devid = 3
+    local arc182_devid = 4
+
+    local ICS_device = GetDevice(ics_devid)
+    local ARC159_device = GetDevice(arc159_devid)
+    local ARC182_device = GetDevice(arc182_devid)
+
+    local intercom_transmit = ICS_device:intercom_transmit()
+    local ARC159_ptt = ARC159_device:is_ptt_pressed()
+    local ARC182_ptt = ARC182_device:is_ptt_pressed()
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq =100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = ICS_device:get_volume()
+
+    _data.radios[2].name = "AN/ARC-159(V)"
+    _data.radios[2].freq =  ARC159_device:is_on() and SR.round(ARC159_device:get_frequency(),5000) or 1
+    _data.radios[2].modulation = ARC159_device:get_modulation()
+    _data.radios[2].volume = ARC159_device:get_volume()
+    if ARC159_device:is_guard_enabled() then
+        _data.radios[2].secFreq = 243.0*1000000
+    else 
+        _data.radios[2].secFreq = 0
+    end
+    _data.radios[2].freqMin = 225*1000000
+    _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].encKey = ICS_device:get_ky28_key()
+    _data.radios[2].enc = ICS_device:is_arc159_encrypted()
+    _data.radios[2].encMode = 2
+
+    _data.radios[3].name = "AN/ARC-182(V)"
+    _data.radios[3].freq = ARC182_device:is_on() and SR.round(ARC182_device:get_frequency(),5000) or 1
+    _data.radios[3].modulation = ARC182_device:get_modulation()
+    _data.radios[3].volume = ARC182_device:get_volume()	
+    if ARC182_device:is_guard_enabled() then
+        _data.radios[3].secFreq = SR.round(ARC182_device:get_guard_freq(),5000)
+    else 
+        _data.radios[3].secFreq = 0
+    end
+    _data.radios[3].freqMin = 30*1000000
+    _data.radios[3].freqMax = 399.975*1000000
+    _data.radios[3].encKey = ICS_device:get_ky28_key()
+    _data.radios[3].enc = ICS_device:is_arc182_encrypted()
+    _data.radios[3].encMode = 2
+
+    if (ARC182_ptt) then
+        _data.selected = 2 -- radios[3] ARC-182
+        _data.ptt = true
+    elseif (ARC159_ptt) then
+        _data.selected = 1 -- radios[2] ARC-159
+        _data.ptt = true
+    elseif (intercom_transmit) then
+        _data.selected = 0 -- radios[1] intercom
+        _data.ptt = true
+    else
+        _data.selected = -1
+        _data.ptt = false
+    end
+
+    _data.control = 1 -- full radio
 
     return _data
 end
