@@ -60,8 +60,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         CliendIdShort = 61,
         ClientIdLong = 62,
-
-
+        DCSLOSOutgoingUDP=63, //9086
+        DCSIncomingUDP=64, //9084
+        CommandListenerUDP =65,//=9040,
+        OutgoingDCSUDPInfo=66, //7080
+        OutgoingDCSUDPOther = 67, //7082
+        DCSIncomingGameGUIUDP = 68,// 5068
+        DCSLOSIncomingUDP = 69, //9085
     }
 
     public enum InputBinding
@@ -201,6 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 _configuration = new Configuration();
                 _configuration.Add(new Section("Position Settings"));
                 _configuration.Add(new Section("Client Settings"));
+                _configuration.Add(new Section("Network Settings"));
             }
         }
 
@@ -261,6 +267,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString() },
             {SettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString() },
+
+            {SettingsKeys.DCSLOSOutgoingUDP.ToString(), "9086" },
+            {SettingsKeys.DCSIncomingUDP.ToString(), "9084" },
+            {SettingsKeys.CommandListenerUDP.ToString(), "9040" },
+            {SettingsKeys.OutgoingDCSUDPInfo.ToString(), "7080" },
+            {SettingsKeys.OutgoingDCSUDPOther.ToString(), "7082" },
+            {SettingsKeys.DCSIncomingGameGUIUDP.ToString(), "5068" },
+            {SettingsKeys.DCSLOSIncomingUDP.ToString(), "9085" },
 
         };
 
@@ -353,6 +367,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             SetSetting("Client Settings",key.ToString(), value);
         }
 
+        public int GetNetworkSetting(SettingsKeys key)
+        {
+            return GetSetting("Network Settings", key.ToString()).IntValue;
+        }
+
+        public void SetNetworkSetting(SettingsKeys key, int value)
+        {
+            SetSetting("Network Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+        }
 
         private Setting GetSetting(string section, string setting)
         {

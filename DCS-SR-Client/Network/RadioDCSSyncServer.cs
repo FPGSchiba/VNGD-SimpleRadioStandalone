@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, 9089);
+            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
             _udpCommandListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 9089);
+                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
                         var bytes = _udpCommandListener.Receive(ref groupEp);
 
                         try
@@ -158,7 +158,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //   var multicastaddress = IPAddress.Parse("239.255.50.10");
             //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
 
-            var localEp = new IPEndPoint(IPAddress.Any, 9084);
+            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
             _dcsUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -171,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 9084);
+                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
                         var bytes = _dcsUdpListener.Receive(ref groupEp);
 
                         try
@@ -254,8 +254,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 //Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
 
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7080)); //send to DCS
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7082)); // send to Flight Control Panels
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPOther))); // send to Flight Control Panels
             }
             catch (Exception e)
             {
@@ -275,7 +275,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //    var multicastaddress = IPAddress.Parse("239.255.50.10");
             //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
 
-            var localEp = new IPEndPoint(IPAddress.Any, 5068);
+            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
             _dcsGameGuiudpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -286,7 +286,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 5068);
+                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
                         var bytes = _dcsGameGuiudpListener.Receive(ref groupEp);
 
                         try
@@ -331,7 +331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 true);
             _dcsLOSListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, 9085);
+            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
             _dcsLOSListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -341,7 +341,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, 9085);
+                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
                         var bytes = _dcsLOSListener.Receive(ref groupEp);
 
                         try
@@ -385,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private void StartDCSLOSSender()
         {
             var _udpSocket = new UdpClient();
-            var _host = new IPEndPoint(IPAddress.Loopback, 9086);
+            var _host = new IPEndPoint(IPAddress.Loopback, _settings.GetNetworkSetting(SettingsKeys.DCSLOSOutgoingUDP));
 
 
             Task.Factory.StartNew(() =>

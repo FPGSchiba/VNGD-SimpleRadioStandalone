@@ -46,7 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         public int Read(float[] buffer, int offset, int sampleCount)
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
-            if (_settings.UserSettings[(int) SettingType.RadioEffects] != "OFF")
+            if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
             {
                 if (samplesRead > 0)
                 {
