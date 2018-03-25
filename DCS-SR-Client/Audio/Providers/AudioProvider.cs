@@ -17,64 +17,64 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public byte[] SeperateAudio(byte[] pcmAudio, int radioId)
         {
-            var settingType = SettingType.Radio1Channel;
+            var settingType = SettingsKeys.Radio1Channel;
 
             if (radioId == 0)
             {
-                settingType = SettingType.IntercomChannel;
+                settingType = SettingsKeys.IntercomChannel;
             }
             else if (radioId == 1)
             {
-                settingType = SettingType.Radio1Channel;
+                settingType = SettingsKeys.Radio1Channel;
             }
             else if (radioId == 2)
             {
-                settingType = SettingType.Radio2Channel;
+                settingType = SettingsKeys.Radio2Channel;
             }
             else if (radioId == 3)
             {
-                settingType = SettingType.Radio3Channel;
+                settingType = SettingsKeys.Radio3Channel;
             }
             else if (radioId == 4)
             {
-                settingType = SettingType.Radio4Channel;
+                settingType = SettingsKeys.Radio4Channel;
             }
             else if (radioId == 5)
             {
-                settingType = SettingType.Radio5Channel;
+                settingType = SettingsKeys.Radio5Channel;
             }
             else if (radioId == 6)
             {
-                settingType = SettingType.Radio6Channel;
+                settingType = SettingsKeys.Radio6Channel;
             }
             else if (radioId == 7)
             {
-                settingType = SettingType.Radio7Channel;
+                settingType = SettingsKeys.Radio7Channel;
             }
             else if (radioId == 8)
             {
-                settingType = SettingType.Radio8Channel;
+                settingType = SettingsKeys.Radio8Channel;
             }
             else if (radioId == 9)
             {
-                settingType = SettingType.Radio9Channel;
+                settingType = SettingsKeys.Radio9Channel;
             }
             else if (radioId == 10)
             {
-                settingType = SettingType.Radio10Channel;
+                settingType = SettingsKeys.Radio10Channel;
             }
             else
             {
                 return CreateStereoMix(pcmAudio);
             }
 
-            var setting = _settings.UserSettings[(int) settingType];
+            var setting = _settings.GetClientSetting(settingType);
 
-            if (setting == "Left")
+            if (setting.StringValue == "Left")
             {
                 return CreateLeftMix(pcmAudio);
             }
-            if (setting == "Right")
+            if (setting.StringValue == "Right")
             {
                 return CreateRightMix(pcmAudio);
             }

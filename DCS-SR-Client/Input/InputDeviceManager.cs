@@ -52,10 +52,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         //used to trigger the update to a frequency
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom; //intercom used to represent null as we cant
 
+        private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
+
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
         {
-            InputConfig = new InputConfiguration();
             _directInput = new DirectInput();
             var deviceInstances = _directInput.GetDevices();
 
@@ -68,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             LoadBlackList();
 
-            Logger.Info("Starting Device Search. Expand Search: "+ ((SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls])=="ON").ToString() );
+            Logger.Info("Starting Device Search. Expand Search: "+ (_settings.GetClientSetting(SettingsKeys.ExpandControls).StringValue == "ON").ToString() );
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -121,7 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                         _inputDevices.Add(device);
                     }
-                    else if (SettingsStore.Instance.UserSettings[(int)SettingType.ExpandControls] == "ON")
+                    else if (SettingsStore.Instance.GetClientSetting(SettingsKeys.ExpandControls).BoolValue)
                     {
 
                         Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid  + " "+
@@ -200,8 +201,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         }
 
         private WindowInteropHelper WindowHelper { get; }
-
-        public InputConfiguration InputConfig { get; set; }
 
 
         public void Dispose()
@@ -668,22 +667,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int) InputBinding.RadioChannelDown; i++)
-            {
-                var mainInputBind = InputConfig.InputDevices[(InputBinding) i];
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioChannelDown; i++)
+            { 
 
-                if (mainInputBind != null)
+                if (_settings.InputDevices.ContainsKey((InputBinding)i))
                 {
+                    var input = _settings.InputDevices[(InputBinding)i];
                     //construct InputBindState
 
                     var bindState = new InputBindState()
                     {
                         IsActive = false,
-                        MainDevice = mainInputBind,
+                        MainDevice = input,
                         MainDeviceState = false,
-                        ModifierDevice = InputConfig.InputDevices[(InputBinding) i + 100], // can be null but OK
-                        ModifierState = false
+                        ModifierDevice =  null,
+                        ModifierState =   false
+
                     };
+
+                    if (_settings.InputDevices.ContainsKey((InputBinding)i + 100))
+                    {
+                        bindState.ModifierDevice = _settings.InputDevices[(InputBinding) i + 100]; 
+                    }
 
                     bindStates.Add(bindState);
                 }

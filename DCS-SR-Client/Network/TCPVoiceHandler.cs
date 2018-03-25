@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -38,6 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly int _port;
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
+        private readonly CancellationTokenSource _pingStop = new CancellationTokenSource();
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
 
@@ -56,6 +58,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
+        private readonly SettingsStore _settings = SettingsStore.Instance;
 
         public TCPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -109,7 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
-                var radioSwitchPtt = settings.UserSettings[(int)SettingType.RadioSwitchIsPTT] == "ON";
+                var radioSwitchPtt = _settings.GetClientSetting(SettingsKeys.RadioSwitchIsPTT).BoolValue;
 
                 var ptt = false;
                 foreach (var inputBindState in pressed)
@@ -289,6 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             _stopFlag.Cancel();
+            _pingStop.Cancel();
 
             _inputManager.StopPtt();
 
@@ -627,8 +632,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 while (!_stop)
                 {
-                    Thread.Sleep(60 * 1000);
-                    
+                   //wait for cancel or quit    
+                    var cancelled = _pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(60));
+
+                    if (cancelled)
+                    {
+                        return;
+                        
+                    }
+
                     try
                     {
                         if (!RadioSendingState.IsSending && _listener !=null && _listener.Connected)

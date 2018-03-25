@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
@@ -26,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
+        private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
 
         public RadioOverlayWindow()
         {
@@ -37,8 +39,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             InitializeComponent();
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
-            this.Left = AppConfiguration.Instance.AwacsX;
-            this.Top = AppConfiguration.Instance.AwacsY;
+            this.Left = _settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue;
+            this.Top = _settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue;
 
             _aspectRatio = MinWidth/MinHeight;
 
@@ -122,8 +124,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         protected override void OnClosing(CancelEventArgs e)
         {
 
-            AppConfiguration.Instance.AwacsX = this.Left;
-            AppConfiguration.Instance.AwacsY = this.Top;
+            _settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue = this.Left;
+            _settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue = this.Top;
+
+            _settings.Save();
+
 
             base.OnClosing(e);
 

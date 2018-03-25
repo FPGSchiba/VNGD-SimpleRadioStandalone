@@ -18,18 +18,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ChannelSelector.Loaded += InitComboBox;
         }
 
-        public SettingType SettingConfig { get; set; }
+        public SettingsKeys SettingConfig { get; set; }
 
         private void InitComboBox(object sender, RoutedEventArgs e)
         {
-            ChannelSelector.SelectedValue = Settings.SettingsStore.Instance.UserSettings[(int) SettingConfig];
+            //cannot be inlined or it causes an issue
+            var value = SettingsStore.Instance.GetClientSetting(SettingConfig).StringValue;
+
+            ChannelSelector.SelectedValue = value;
+
+            ChannelSelector.SelectionChanged += ChannelSelector_SelectionChanged;
         }
 
         private void ChannelSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selected = (string) ChannelSelector.SelectedValue;
 
-            Settings.SettingsStore.Instance.WriteSetting(SettingConfig, selected);
+            SettingsStore.Instance.SetClientSetting(SettingConfig, selected);
+            
         }
     }
 }
