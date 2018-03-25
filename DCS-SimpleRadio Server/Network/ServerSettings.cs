@@ -7,8 +7,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class ServerSettings
     {
-        public static readonly string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SimpleRadioStandalone";
-
         public static readonly string CFG_FILE_NAME = "server.cfg";
 
         private static ServerSettings instance;
@@ -136,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             _configuration["Server Settings"]["port"].IntValue = 5002;
-            return 5002; //5010 //UDP Port is always 8 More
+            return 5002; //UDP Port is always 1 More
         }
     }
 }

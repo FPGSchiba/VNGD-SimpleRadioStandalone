@@ -30,12 +30,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
+        private readonly SettingsStore _settings = SettingsStore.Instance;
+
         public RadioOverlayWindow()
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
-            var opacity = AppConfiguration.Instance.RadioOpacity;
-
             InitializeComponent();
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
-            Opacity = opacity;
+            Opacity = _settings.GetClientSetting(SettingsKeys.RadioOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
 
             radioControlGroup[0] = Radio1;
@@ -53,11 +53,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Top = AppConfiguration.Instance.RadioX;
-            Left = AppConfiguration.Instance.RadioY;
+            Top = _settings.GetClientSetting(SettingsKeys.RadioX).DoubleValue;
+            Left = _settings.GetClientSetting(SettingsKeys.RadioY).DoubleValue;
 
-            Width = AppConfiguration.Instance.RadioWidth;
-            Height = AppConfiguration.Instance.RadioHeight;
+            Width = _settings.GetClientSetting(SettingsKeys.RadioWidth).DoubleValue;
+            Height = _settings.GetClientSetting(SettingsKeys.RadioHeight).DoubleValue;
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -74,8 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void Location_Changed(object sender, EventArgs e)
         {
-            AppConfiguration.Instance.RadioX = Top;
-            AppConfiguration.Instance.RadioY = Left;
+            
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -129,9 +128,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void FocusDCS()
         {
-            var focus = SettingsStore.Instance.UserSettings[(int)SettingType.RefocusDCS] == "ON";
-
-            if (focus)
+            if (_settings.GetClientSetting(SettingsKeys.RefocusDCS).BoolValue)
             {
                 var overlayWindow = new WindowInteropHelper(this).Handle;
 
@@ -162,6 +159,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            _settings.GetClientSetting(SettingsKeys.RadioWidth).DoubleValue = Width;
+            _settings.GetClientSetting(SettingsKeys.RadioHeight).DoubleValue = Height;
+            _settings.GetClientSetting(SettingsKeys.RadioOpacity).DoubleValue = Opacity;
+            _settings.GetClientSetting(SettingsKeys.RadioX).DoubleValue = Top;
+            _settings.GetClientSetting(SettingsKeys.RadioY).DoubleValue = Left;
+            _settings.Save();
             base.OnClosing(e);
 
             _updateTimer.Stop();
@@ -181,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
-            AppConfiguration.Instance.RadioOpacity = Opacity;
+
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -208,8 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
                 Height = sizeInfo.NewSize.Width / _aspectRatio;
 
-            AppConfiguration.Instance.RadioWidth = Width;
-            AppConfiguration.Instance.RadioHeight = Height;
+           
             // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 

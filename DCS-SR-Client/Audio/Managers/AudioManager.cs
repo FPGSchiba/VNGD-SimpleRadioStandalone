@@ -61,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
 
+        private readonly SettingsStore _settings = SettingsStore.Instance;
+
         public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
         {
             _clientsList = clientsList;
@@ -265,13 +267,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioRxEffects_Start];
-            if (radioEffects == "ON")
+
+            if (_settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue)
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-                var encyptionEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
-                if (encrypted && (encyptionEffects == "ON"))
+                if (encrypted && (_settings.GetClientSetting(SettingsKeys.RadioEncryptionEffects).BoolValue))
                 {
                     _effectsBuffer.VolumeSampleProvider.Volume = volume;
                     _effectsBuffer.AddAudioSamples(
@@ -290,14 +291,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioTxEffects_Start];
-            if (radioEffects == "ON")
+            if (_settings.GetClientSetting(SettingsKeys.RadioTxEffects_Start).BoolValue)
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-                var encyptionEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioEncryptionEffects];
 
-                if (encrypted && (encyptionEffects == "ON"))
+                if (encrypted && (_settings.GetClientSetting(SettingsKeys.RadioEncryptionEffects).BoolValue))
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
@@ -317,8 +316,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioRxEffects_End];
-            if (radioEffects == "ON")
+
+            if( _settings.GetClientSetting(SettingsKeys.RadioRxEffects_End).BoolValue)
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
@@ -331,8 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume)
         {
-            var radioEffects = SettingsStore.Instance.UserSettings[(int) SettingType.RadioTxEffects_End];
-            if (radioEffects == "ON")
+            if (_settings.GetClientSetting(SettingsKeys.RadioTxEffects_End).BoolValue)
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 

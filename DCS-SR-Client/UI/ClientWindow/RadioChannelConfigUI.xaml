@@ -13,7 +13,7 @@
                   Grid.Row="1"
                   Grid.Column="1"
                   SelectedValuePath="Content"
-                  SelectionChanged="ChannelSelector_SelectionChanged">
+                 >
             <ComboBoxItem>Left</ComboBoxItem>
             <ComboBoxItem>Right</ComboBoxItem>
             <ComboBoxItem>Both</ComboBoxItem>

@@ -9,10 +9,6 @@ namespace Installer
     /// </summary>
     public partial class App : Application
     {
-        public App()
-        {
-            //set everything to invariant
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-        }
+        
     }
 }

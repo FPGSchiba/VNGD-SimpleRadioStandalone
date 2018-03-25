@@ -105,11 +105,14 @@
       <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpConfig, Version=3.2.7.0, Culture=neutral, PublicKeyToken=c1deedac91bd7724, processorArchitecture=MSIL">
+      <HintPath>..\packages\sharpconfig.3.2.6.1\lib\net20\SharpConfig.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
@@ -178,7 +181,6 @@
     <Compile Include="Settings\Favourites\CsvFavouriteServerStore.cs" />
     <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
     <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
-    <Compile Include="Settings\AppConfiguration.cs" />
     <Compile Include="Settings\RadioChannels\FilePresetChannelsStore.cs" />
     <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
     <Compile Include="Settings\SettingType.cs" />
@@ -186,7 +188,6 @@
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\InputConfiguration.cs" />
     <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceManager.cs" />
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />

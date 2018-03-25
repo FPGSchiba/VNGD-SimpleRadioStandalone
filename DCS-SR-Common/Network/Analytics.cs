@@ -11,7 +11,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
     public class Analytics
     {
 
-        public static void Log(string eventCategory, string eventAction)
+        public static void Log(string eventCategory, string eventAction, string guid)
         {
 #if DEBUG
             return;
@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             
             try
             {
-                var content = new StringContent($"v=1&tid=UA-115685293-1&cid={Guid.NewGuid().ToString()}&t=event&ec={eventCategory}&ea={eventAction}&el={UpdaterChecker.VERSION}", Encoding.ASCII, "application/x-www-form-urlencoded");
+                var content = new StringContent($"v=1&tid=UA-115685293-1&cid={guid}&t=event&ec={eventCategory}&ea={eventAction}&el={UpdaterChecker.VERSION}", Encoding.ASCII, "application/x-www-form-urlencoded");
                 http.PostAsync("collect", content);
             }
             catch

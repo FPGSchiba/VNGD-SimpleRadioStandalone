@@ -33,8 +33,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-       
-
         private readonly SendRadioUpdate _clientRadioUpdate;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly ClientSideUpdate _clientSideUpdate;
@@ -62,6 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         }
 
         public static long LastSent { get; set; }
+
+        private readonly SettingsStore _settings = SettingsStore.Instance;
 
 
         public void Listen()
@@ -655,9 +655,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             channelModel.Min = clientRadio.freqMin;
                             channelModel.Reload();
                             clientRadio.channel = -1; //reset channel
-
-                            var preset = Settings.SettingsStore.Instance.UserSettings[(int)SettingType.AutoSelectPresetChannel];
-                            if (preset == "ON")
+                            
+                            if (_settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue)
                             {
                                 RadioHelper.RadioChannelUp(i);
                             }

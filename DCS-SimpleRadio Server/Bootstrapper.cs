@@ -24,15 +24,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public Bootstrapper()
         {
-            //set everything to invariant
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            
             Initialize();
             SetupLogging();
 
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
-            Analytics.Log("Server", "Startup");
+            Analytics.Log("Server", "Startup", Guid.NewGuid().ToString());
         }
 
         private void SetupLogging()

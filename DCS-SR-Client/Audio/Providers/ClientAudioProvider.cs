@@ -55,7 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 ////no radio effect for intercom
                 if (audio.ReceivedRadio != 0)
                 {
-                    if (_settings.UserSettings[(int)SettingType.RadioEffects] != "OFF")
+                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).StringValue != "OFF")
                     {
                         AddRadioEffect(audio);
                     }
@@ -65,7 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AddEncryptionFailureEffect(audio);
 
-                if (_settings.UserSettings[(int) SettingType.RadioEffects] != "OFF")
+                if (_settings.GetClientSetting(SettingsKeys.RadioEffects).StringValue != "OFF")
                 {
                     AddRadioEffect(audio);
                 }
