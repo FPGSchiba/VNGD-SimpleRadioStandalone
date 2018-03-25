@@ -5,6 +5,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using MathNet.Filtering;
 using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -15,19 +16,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     {
         public static readonly int SILENCE_PAD = 300;
 
-        private readonly BiQuadFilter _highPassFilter;
-        private readonly BiQuadFilter _lowPassFilter;
-
         private readonly Random _random = new Random();
 
         private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
 
         private int _lastReceivedOn = -1;
+        private OnlineFilter[] _filters;
+
 
         public ClientAudioProvider()
         {
-            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
-            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
+            _filters = new OnlineFilter[2];
+            _filters[0] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 560, 3900);
+            _filters[1] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 100, 4500);
 
             JitterBufferProviderInterface = new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
 
@@ -42,8 +43,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void AddClientAudioSamples(ClientAudio audio)
         {
             //sort out volume
-            var timer = new Stopwatch();
-            timer.Start();
+//            var timer = new Stopwatch();
+//            timer.Start();
 
             var decrytable = audio.Decryptable || (audio.Encryption == 0);
 
@@ -94,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 PacketNumber = audio.PacketNumber
             });
 
-            timer.Stop();
+            //timer.Stop();
            
         }
 
@@ -132,25 +133,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             for (var i = 0; i < mixedAudio.Length; i++)
             {
-                var audio = mixedAudio[i]/32768f;
+                var audio =(double) mixedAudio[i]/32768f;
 
-                audio = _highPassFilter.Transform(audio);
-
-                if (float.IsNaN(audio))
-                    audio = _lowPassFilter.Transform(mixedAudio[i]);
-                else
-                    audio = _lowPassFilter.Transform(audio);
-
-                if (!float.IsNaN(audio))
+                //high and low pass filter
+                for (int j = 0; j < _filters.Length; j++)
                 {
-                    // clip
-                    if (audio > 1.0f)
-                        audio = 1.0f;
-                    if (audio < -1.0f)
-                        audio = -1.0f;
+                    var filter = _filters[j];
+                    audio = filter.ProcessSample(audio);
 
-                    mixedAudio[i] = (short) (audio*32767);
+                    if (double.IsNaN(audio))
+                        audio = (double)mixedAudio[j] / 32768f;
+                    else
+                    {
+                        // clip
+                        if (audio > 1.0f)
+                            audio = 1.0f;
+                        if (audio < -1.0f)
+                            audio = -1.0f;
+
+                    }
                 }
+
+                mixedAudio[i] = (short)(audio * 32767);
             }
         }
 
