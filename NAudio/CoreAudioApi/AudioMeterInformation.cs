@@ -19,6 +19,7 @@
      misrepresented as being the original source code.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 using System;
 using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi.Interfaces;
@@ -40,9 +41,8 @@ namespace NAudio.CoreAudioApi
 
             audioMeterInformation = realInterface;
             Marshal.ThrowExceptionForHR(audioMeterInformation.QueryHardwareSupport(out hardwareSupp));
-            hardwareSupport = (EEndpointHardwareSupport)hardwareSupp;
+            hardwareSupport = (EEndpointHardwareSupport) hardwareSupp;
             channels = new AudioMeterInformationChannels(audioMeterInformation);
-
         }
 
         /// <summary>
@@ -50,10 +50,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         public AudioMeterInformationChannels PeakValues
         {
-            get
-            {
-                return channels;
-            }
+            get { return channels; }
         }
 
         /// <summary>
@@ -61,10 +58,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         public EEndpointHardwareSupport HardwareSupport
         {
-            get
-            {
-                return hardwareSupport;
-            }
+            get { return hardwareSupport; }
         }
 
         /// <summary>

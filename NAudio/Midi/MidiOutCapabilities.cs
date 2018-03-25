@@ -13,8 +13,7 @@ namespace NAudio.Midi
         Int16 manufacturerId;
         Int16 productId;
         int driverVersion;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)]
-        string productName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)] string productName;
         Int16 wTechnology;
         Int16 wVoices;
         Int16 wNotes;
@@ -30,15 +29,18 @@ namespace NAudio.Midi
             /// MIDICAPS_VOLUME
             /// </summary>
             Volume = 1,
+
             /// <summary>
             /// separate left-right volume control
             /// MIDICAPS_LRVOLUME
             /// </summary>
             LeftRightVolume = 2,
+
             /// <summary>
             /// MIDICAPS_CACHE
             /// </summary>
             PatchCaching = 4,
+
             /// <summary>
             /// MIDICAPS_STREAM
             /// driver supports midiStreamOut directly
@@ -51,10 +53,7 @@ namespace NAudio.Midi
         /// </summary>
         public Manufacturers Manufacturer
         {
-            get
-            {
-                return (Manufacturers)manufacturerId;
-            }
+            get { return (Manufacturers) manufacturerId; }
         }
 
         /// <summary>
@@ -62,10 +61,7 @@ namespace NAudio.Midi
         /// </summary>
         public short ProductId
         {
-            get
-            {
-                return productId;
-            }
+            get { return productId; }
         }
 
         /// <summary>
@@ -73,10 +69,7 @@ namespace NAudio.Midi
         /// </summary>
         public String ProductName
         {
-            get
-            {
-                return productName;
-            }
+            get { return productName; }
         }
 
         /// <summary>
@@ -84,10 +77,7 @@ namespace NAudio.Midi
         /// </summary>
         public int Voices
         {
-            get
-            {
-                return wVoices;
-            }
+            get { return wVoices; }
         }
 
         /// <summary>
@@ -95,10 +85,7 @@ namespace NAudio.Midi
         /// </summary>
         public int Notes
         {
-            get
-            {
-                return wNotes;
-            }
+            get { return wNotes; }
         }
 
         /// <summary>
@@ -106,10 +93,7 @@ namespace NAudio.Midi
         /// </summary>
         public bool SupportsAllChannels
         {
-            get
-            {
-                return wChannelMask == 0xFFFF;
-            }
+            get { return wChannelMask == 0xFFFF; }
         }
 
         /// <summary>
@@ -127,10 +111,7 @@ namespace NAudio.Midi
         /// </summary>
         public bool SupportsPatchCaching
         {
-            get
-            {
-                return (dwSupport & MidiOutCapabilityFlags.PatchCaching) != 0;
-            }
+            get { return (dwSupport & MidiOutCapabilityFlags.PatchCaching) != 0; }
         }
 
         /// <summary>
@@ -138,10 +119,7 @@ namespace NAudio.Midi
         /// </summary>
         public bool SupportsSeparateLeftAndRightVolume
         {
-            get
-            {
-                return (dwSupport & MidiOutCapabilityFlags.LeftRightVolume) != 0;
-            }
+            get { return (dwSupport & MidiOutCapabilityFlags.LeftRightVolume) != 0; }
         }
 
         /// <summary>
@@ -149,10 +127,7 @@ namespace NAudio.Midi
         /// </summary>
         public bool SupportsMidiStreamOut
         {
-            get
-            {
-                return (dwSupport & MidiOutCapabilityFlags.Stream) != 0;
-            }
+            get { return (dwSupport & MidiOutCapabilityFlags.Stream) != 0; }
         }
 
         /// <summary>
@@ -160,10 +135,7 @@ namespace NAudio.Midi
         /// </summary>
         public bool SupportsVolumeControl
         {
-            get
-            {
-                return (dwSupport & MidiOutCapabilityFlags.Volume) != 0;
-            }
+            get { return (dwSupport & MidiOutCapabilityFlags.Volume) != 0; }
         }
 
         /// <summary>
@@ -171,11 +143,7 @@ namespace NAudio.Midi
         /// </summary>
         public MidiOutTechnology Technology
         {
-            get
-            {
-                return (MidiOutTechnology)wTechnology;
-            }
+            get { return (MidiOutTechnology) wTechnology; }
         }
-
     }
 }

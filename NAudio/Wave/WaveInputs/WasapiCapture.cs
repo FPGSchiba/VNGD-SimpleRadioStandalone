@@ -16,14 +16,17 @@ namespace NAudio.CoreAudioApi
         /// Not recording
         /// </summary>
         Stopped,
+
         /// <summary>
         /// Beginning to record
         /// </summary>
         Starting,
+
         /// <summary>
         /// Recording in progress
         /// </summary>
         Capturing,
+
         /// <summary>
         /// Requesting stop
         /// </summary>
@@ -63,7 +66,7 @@ namespace NAudio.CoreAudioApi
         /// <summary>
         /// Initialises a new instance of the WASAPI capture class
         /// </summary>
-        public WasapiCapture() : 
+        public WasapiCapture() :
             this(GetDefaultCaptureDevice())
         {
         }
@@ -75,7 +78,6 @@ namespace NAudio.CoreAudioApi
         public WasapiCapture(MMDevice captureDevice)
             : this(captureDevice, false)
         {
-
         }
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         /// <param name="captureDevice">The capture device.</param>
         /// <param name="useEventSync">true if sync is done with event. false use sleep.</param>
-        public WasapiCapture(MMDevice captureDevice, bool useEventSync) 
+        public WasapiCapture(MMDevice captureDevice, bool useEventSync)
             : this(captureDevice, useEventSync, 100)
         {
         }
@@ -103,7 +105,6 @@ namespace NAudio.CoreAudioApi
             this.audioBufferMillisecondsLength = audioBufferMillisecondsLength;
 
             waveFormat = audioClient.MixFormat;
-
         }
 
         /// <summary>
@@ -114,12 +115,15 @@ namespace NAudio.CoreAudioApi
         /// <summary>
         /// Current Capturing State
         /// </summary>
-        public CaptureState CaptureState {  get { return captureState; } }
+        public CaptureState CaptureState
+        {
+            get { return captureState; }
+        }
 
         /// <summary>
         /// Capturing wave format
         /// </summary>
-        public virtual WaveFormat WaveFormat 
+        public virtual WaveFormat WaveFormat
         {
             get
             {
@@ -161,14 +165,16 @@ namespace NAudio.CoreAudioApi
                 if (ShareMode == AudioClientShareMode.Shared)
                 {
                     // With EventCallBack and Shared, both latencies must be set to 0
-                    audioClient.Initialize(ShareMode, AudioClientStreamFlags.EventCallback | streamFlags, requestedDuration, 0,
+                    audioClient.Initialize(ShareMode, AudioClientStreamFlags.EventCallback | streamFlags,
+                        requestedDuration, 0,
                         waveFormat, Guid.Empty);
                 }
                 else
                 {
                     // With EventCallBack and Exclusive, both latencies must equals
-                    audioClient.Initialize(ShareMode, AudioClientStreamFlags.EventCallback | streamFlags, requestedDuration, requestedDuration,
-                                        waveFormat, Guid.Empty);
+                    audioClient.Initialize(ShareMode, AudioClientStreamFlags.EventCallback | streamFlags,
+                        requestedDuration, requestedDuration,
+                        waveFormat, Guid.Empty);
                 }
 
                 // Create the Wait Event Handle
@@ -179,17 +185,17 @@ namespace NAudio.CoreAudioApi
             {
                 // Normal setup for both sharedMode
                 audioClient.Initialize(ShareMode,
-                streamFlags,
-                requestedDuration,
-                0,
-                waveFormat,
-                Guid.Empty);
+                    streamFlags,
+                    requestedDuration,
+                    0,
+                    waveFormat,
+                    Guid.Empty);
             }
 
             int bufferFrameCount = audioClient.BufferSize;
             bytesPerFrame = waveFormat.Channels * waveFormat.BitsPerSample / 8;
             recordBuffer = new byte[bufferFrameCount * bytesPerFrame];
-            
+
             //Debug.WriteLine(string.Format("record buffer size = {0}", this.recordBuffer.Length));
 
             initialized = true;
@@ -255,10 +261,10 @@ namespace NAudio.CoreAudioApi
             int bufferFrameCount = client.BufferSize;
 
             // Calculate the actual duration of the allocated buffer.
-            long actualDuration = (long)((double)ReftimesPerSec *
-                             bufferFrameCount / waveFormat.SampleRate);
-            int sleepMilliseconds = (int)(actualDuration / ReftimesPerMillisec / 2);
-            int waitMilliseconds = (int)(3 * actualDuration / ReftimesPerMillisec);
+            long actualDuration = (long) ((double) ReftimesPerSec *
+                                          bufferFrameCount / waveFormat.SampleRate);
+            int sleepMilliseconds = (int) (actualDuration / ReftimesPerMillisec / 2);
+            int waitMilliseconds = (int) (3 * actualDuration / ReftimesPerMillisec);
 
             var capture = client.AudioCaptureClient;
             client.Start();
@@ -318,7 +324,8 @@ namespace NAudio.CoreAudioApi
                 int spaceRemaining = Math.Max(0, recordBuffer.Length - recordBufferOffset);
                 if (spaceRemaining < bytesAvailable && recordBufferOffset > 0)
                 {
-                    if (DataAvailable != null) DataAvailable(this, new WaveInEventArgs(recordBuffer, recordBufferOffset));
+                    if (DataAvailable != null)
+                        DataAvailable(this, new WaveInEventArgs(recordBuffer, recordBufferOffset));
                     recordBufferOffset = 0;
                 }
 

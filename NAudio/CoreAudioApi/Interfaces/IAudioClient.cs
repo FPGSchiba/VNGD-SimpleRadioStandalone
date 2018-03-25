@@ -8,9 +8,9 @@ namespace NAudio.CoreAudioApi.Interfaces
     /// Windows CoreAudio IAudioClient interface
     /// Defined in AudioClient.h
     /// </summary>
-    [Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2"), 
-        InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-        ComImport]
+    [Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2"),
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
+     ComImport]
     internal interface IAudioClient
     {
         [PreserveSig]
@@ -47,7 +47,7 @@ namespace NAudio.CoreAudioApi.Interfaces
         int Stop();
 
         int Reset();
-        
+
         int SetEventHandle(IntPtr eventHandle);
 
         /// <summary>
@@ -56,6 +56,7 @@ namespace NAudio.CoreAudioApi.Interfaces
         /// <param name="interfaceId">The interface ID for the requested service.</param>
         /// <param name="interfacePointer">Pointer to a pointer variable into which the method writes the address of an instance of the requested interface. </param>
         [PreserveSig]
-        int GetService([In, MarshalAs(UnmanagedType.LPStruct)] Guid interfaceId, [Out, MarshalAs(UnmanagedType.IUnknown)] out object interfacePointer);
+        int GetService([In, MarshalAs(UnmanagedType.LPStruct)] Guid interfaceId,
+            [Out, MarshalAs(UnmanagedType.IUnknown)] out object interfacePointer);
     }
 }

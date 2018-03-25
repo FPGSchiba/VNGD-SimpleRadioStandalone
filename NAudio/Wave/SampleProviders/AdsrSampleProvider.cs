@@ -34,10 +34,7 @@ namespace NAudio.Wave.SampleProviders
         /// </summary>
         public float AttackSeconds
         {
-            get
-            {
-                return attackSeconds;
-            }
+            get { return attackSeconds; }
             set
             {
                 attackSeconds = value;
@@ -50,10 +47,7 @@ namespace NAudio.Wave.SampleProviders
         /// </summary>
         public float ReleaseSeconds
         {
-            get
-            {
-                return releaseSeconds;
-            }
+            get { return releaseSeconds; }
             set
             {
                 releaseSeconds = value;
@@ -86,6 +80,9 @@ namespace NAudio.Wave.SampleProviders
         /// <summary>
         /// The output WaveFormat
         /// </summary>
-        public WaveFormat WaveFormat { get { return source.WaveFormat; } }
+        public WaveFormat WaveFormat
+        {
+            get { return source.WaveFormat; }
+        }
     }
 }

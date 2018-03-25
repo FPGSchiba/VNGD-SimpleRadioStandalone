@@ -43,7 +43,8 @@ namespace NAudio.Midi
             this.Velocity = velocity;
         }
 
-        private static readonly string[] NoteNames = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+        private static readonly string[] NoteNames = new string[]
+            {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
         /// <summary>
         /// <see cref="MidiEvent.GetAsShortMessage" />
@@ -58,10 +59,7 @@ namespace NAudio.Midi
         /// </summary>
         public virtual int NoteNumber
         {
-            get
-            {
-                return noteNumber;
-            }
+            get { return noteNumber; }
             set
             {
                 if (value < 0 || value > 127)
@@ -77,10 +75,7 @@ namespace NAudio.Midi
         /// </summary>
         public int Velocity
         {
-            get
-            {
-                return velocity;
-            }
+            get { return velocity; }
             set
             {
                 if (value < 0 || value > 127)
@@ -178,8 +173,8 @@ namespace NAudio.Midi
         public override void Export(ref long absoluteTime, BinaryWriter writer)
         {
             base.Export(ref absoluteTime, writer);
-            writer.Write((byte)noteNumber);
-            writer.Write((byte)velocity);
+            writer.Write((byte) noteNumber);
+            writer.Write((byte) velocity);
         }
     }
 }

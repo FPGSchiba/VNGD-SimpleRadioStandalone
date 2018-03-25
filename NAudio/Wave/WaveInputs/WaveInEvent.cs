@@ -58,7 +58,7 @@ namespace NAudio.Wave
         {
             WaveInCapabilities caps = new WaveInCapabilities();
             int structSize = Marshal.SizeOf(caps);
-            MmException.Try(WaveInterop.waveInGetDevCaps((IntPtr)devNumber, out caps, structSize), "waveInGetDevCaps");
+            MmException.Try(WaveInterop.waveInGetDevCaps((IntPtr) devNumber, out caps, structSize), "waveInGetDevCaps");
             return caps;
         }
 
@@ -96,8 +96,9 @@ namespace NAudio.Wave
         private void OpenWaveInDevice()
         {
             CloseWaveInDevice();
-            MmResult result = WaveInterop.waveInOpenWindow(out waveInHandle, (IntPtr)DeviceNumber, WaveFormat, 
-                callbackEvent.SafeWaitHandle.DangerousGetHandle(), IntPtr.Zero, WaveInterop.WaveInOutOpenFlags.CallbackEvent);
+            MmResult result = WaveInterop.waveInOpenWindow(out waveInHandle, (IntPtr) DeviceNumber, WaveFormat,
+                callbackEvent.SafeWaitHandle.DangerousGetHandle(), IntPtr.Zero,
+                WaveInterop.WaveInOutOpenFlags.CallbackEvent);
             MmException.Try(result, "waveInOpen");
             CreateBuffers();
         }
@@ -108,7 +109,7 @@ namespace NAudio.Wave
         public void StartRecording()
         {
             if (captureState != CaptureState.Stopped)
-                throw new InvalidOperationException("Already recording"); 
+                throw new InvalidOperationException("Already recording");
             OpenWaveInDevice();
             MmException.Try(WaveInterop.waveInStart(waveInHandle), "waveInStart");
             captureState = CaptureState.Starting;
@@ -178,6 +179,7 @@ namespace NAudio.Wave
                 }
             }
         }
+
         /// <summary>
         /// Stop recording
         /// </summary>
@@ -195,7 +197,7 @@ namespace NAudio.Wave
         /// WaveFormat we are recording in
         /// </summary>
         public WaveFormat WaveFormat { get; set; }
-        
+
         /// <summary>
         /// Dispose pattern
         /// </summary>
@@ -205,7 +207,7 @@ namespace NAudio.Wave
             {
                 if (captureState != CaptureState.Stopped)
                     StopRecording();
-                
+
                 CloseWaveInDevice();
             }
         }
@@ -239,7 +241,7 @@ namespace NAudio.Wave
             }
             else
             {
-                mixerLine = new MixerLine((IntPtr)DeviceNumber, 0, MixerFlags.WaveIn);
+                mixerLine = new MixerLine((IntPtr) DeviceNumber, 0, MixerFlags.WaveIn);
             }
             return mixerLine;
         }

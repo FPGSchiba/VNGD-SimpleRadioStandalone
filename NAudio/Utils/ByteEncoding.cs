@@ -8,8 +8,8 @@ namespace NAudio.Utils
     /// </summary>
     public class ByteEncoding : Encoding
     {
-        private ByteEncoding() 
-        { 
+        private ByteEncoding()
+        {
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace NAudio.Utils
         {
             for (int n = 0; n < charCount; n++)
             {
-                bytes[byteIndex + n] = (byte)chars[charIndex + n];
+                bytes[byteIndex + n] = (byte) chars[charIndex + n];
             }
             return charCount;
         }
@@ -62,7 +62,7 @@ namespace NAudio.Utils
                 {
                     return n;
                 }
-                chars[charIndex + n] = (char)b;
+                chars[charIndex + n] = (char) b;
             }
             return byteCount;
         }

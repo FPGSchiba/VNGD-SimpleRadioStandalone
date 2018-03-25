@@ -49,7 +49,7 @@ namespace NAudio.Wave.Asio
         /// <returns>the name of the error</returns>
         public static String getErrorName(AsioError error)
         {
-            return Enum.GetName(typeof(AsioError), error);            
+            return Enum.GetName(typeof(AsioError), error);
         }
     }
 
@@ -61,16 +61,15 @@ namespace NAudio.Wave.Asio
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct AsioBufferInfo
     {
-        public bool isInput;       // on input:  ASIOTrue: input, else output
-        public int channelNum;     // on input:  channel index
-        public IntPtr pBuffer0;    // on output: double buffer addresses
-        public IntPtr pBuffer1;    // on output: double buffer addresses
+        public bool isInput; // on input:  ASIOTrue: input, else output
+        public int channelNum; // on input:  channel index
+        public IntPtr pBuffer0; // on output: double buffer addresses
+        public IntPtr pBuffer1; // on output: double buffer addresses
 
         public IntPtr Buffer(int bufferIndex)
         {
             return (bufferIndex == 0) ? pBuffer0 : pBuffer1;
         }
-
     }
 
     // -------------------------------------------------------------------------------
@@ -80,12 +79,13 @@ namespace NAudio.Wave.Asio
     [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
     internal struct AsioTimeCode
     {
-        public double speed;                  // speed relation (fraction of nominal speed)
+        public double speed; // speed relation (fraction of nominal speed)
+
         // ASIOSamples     timeCodeSamples;        // time in samples
-        public Asio64Bit timeCodeSamples;        // time in samples
-        public AsioTimeCodeFlags flags;                  // some information flags (see below)
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string future;
+        public Asio64Bit timeCodeSamples; // time in samples
+
+        public AsioTimeCodeFlags flags; // some information flags (see below)
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string future;
     }
 
     [Flags]
@@ -102,20 +102,19 @@ namespace NAudio.Wave.Asio
     [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
     internal struct AsioTimeInfo
     {
-        public double speed;                  // absolute speed (1. = nominal)
-        public Asio64Bit systemTime;             // system time related to samplePosition, in nanoseconds
+        public double speed; // absolute speed (1. = nominal)
+        public Asio64Bit systemTime; // system time related to samplePosition, in nanoseconds
         public Asio64Bit samplePosition;
-        public double sampleRate;             // current rate
-        public AsioTimeInfoFlags flags;                    // (see below)
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 12)]
-        public string reserved;
+        public double sampleRate; // current rate
+        public AsioTimeInfoFlags flags; // (see below)
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 12)] public string reserved;
     }
 
     [Flags]
     internal enum AsioTimeInfoFlags
     {
-        kSystemTimeValid = 1,            // must always be valid
-        kSamplePositionValid = 1 << 1,       // must always be valid
+        kSystemTimeValid = 1, // must always be valid
+        kSamplePositionValid = 1 << 1, // must always be valid
         kSampleRateValid = 1 << 2,
         kSpeedValid = 1 << 3,
         kSampleRateChanged = 1 << 4,
@@ -124,12 +123,14 @@ namespace NAudio.Wave.Asio
 
     [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
     internal struct AsioTime
-    {                         // both input/output
+    {
+        // both input/output
         public int reserved1;
+
         public int reserved2;
         public int reserved3;
         public int reserved4;
-        public AsioTimeInfo timeInfo;       // required
-        public AsioTimeCode timeCode;       // optional, evaluated if (timeCode.flags & kTcValid)
+        public AsioTimeInfo timeInfo; // required
+        public AsioTimeCode timeCode; // optional, evaluated if (timeCode.flags & kTcValid)
     }
 }

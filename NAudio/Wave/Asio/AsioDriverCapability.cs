@@ -27,6 +27,7 @@ namespace NAudio.Wave.Asio
         /// Input Latency
         /// </summary>
         public int InputLatency;
+
         /// <summary>
         /// Output Latency
         /// </summary>
@@ -36,14 +37,17 @@ namespace NAudio.Wave.Asio
         /// Buffer Minimum Size
         /// </summary>
         public int BufferMinSize;
+
         /// <summary>
         /// Buffer Maximum Size
         /// </summary>
         public int BufferMaxSize;
+
         /// <summary>
         /// Buffer Preferred Size
         /// </summary>
         public int BufferPreferredSize;
+
         /// <summary>
         /// Buffer Granularity
         /// </summary>
@@ -58,6 +62,7 @@ namespace NAudio.Wave.Asio
         /// Input Channel Info
         /// </summary>
         public AsioChannelInfo[] InputChannelInfos;
+
         /// <summary>
         /// Output Channel Info
         /// </summary>

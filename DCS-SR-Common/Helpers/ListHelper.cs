@@ -10,7 +10,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             return source
                 .Select((x, i) => new {Index = i, Value = x})
-                .GroupBy(x => x.Index/chunkSize)
+                .GroupBy(x => x.Index / chunkSize)
                 .Select(x => x.Select(v => v.Value).ToList())
                 .ToList();
         }

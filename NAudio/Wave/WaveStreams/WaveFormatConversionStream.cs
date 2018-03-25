@@ -27,7 +27,7 @@ namespace NAudio.Wave
             this.sourceStream = sourceStream;
             this.targetFormat = targetFormat;
             conversionProvider = new WaveFormatConversionProvider(targetFormat, sourceStream);
-            length = EstimateSourceToDest((int)sourceStream.Length);
+            length = EstimateSourceToDest((int) sourceStream.Length);
             position = 0;
         }
 
@@ -51,7 +51,8 @@ namespace NAudio.Wave
                 }
                 else
                 {
-                    throw new InvalidOperationException("Invalid suggested output format, please explicitly provide a target format");
+                    throw new InvalidOperationException(
+                        "Invalid suggested output format, please explicitly provide a target format");
                 }
             }
             return new WaveFormatConversionStream(pcmFormat, sourceStream);
@@ -62,19 +63,17 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 // make sure we don't get out of sync
                 value -= (value % BlockAlign);
 
                 // this relies on conversionStream DestToSource and SourceToDest being reliable
-                var desiredSourcePosition = EstimateDestToSource(value);  //conversionStream.DestToSource((int) value); 
+                var desiredSourcePosition = EstimateDestToSource(value); //conversionStream.DestToSource((int) value); 
                 sourceStream.Position = desiredSourcePosition;
-                position = EstimateSourceToDest(sourceStream.Position);  //conversionStream.SourceToDest((int)sourceStream.Position);
+                position = EstimateSourceToDest(sourceStream
+                    .Position); //conversionStream.SourceToDest((int)sourceStream.Position);
                 conversionProvider.Reposition();
             }
         }
@@ -85,7 +84,7 @@ namespace NAudio.Wave
         [Obsolete("can be unreliable, use of this method not encouraged")]
         public int SourceToDest(int source)
         {
-            return (int)EstimateSourceToDest(source);
+            return (int) EstimateSourceToDest(source);
             //return conversionStream.SourceToDest(source);
         }
 
@@ -100,15 +99,16 @@ namespace NAudio.Wave
         {
             var source = ((dest * sourceStream.WaveFormat.AverageBytesPerSecond) / targetFormat.AverageBytesPerSecond);
             source -= (source % sourceStream.WaveFormat.BlockAlign);
-            return (int)source;
+            return (int) source;
         }
+
         /// <summary>
         /// Converts destination bytes to source bytes
         /// </summary>
         [Obsolete("can be unreliable, use of this method not encouraged")]
         public int DestToSource(int dest)
         {
-            return (int)EstimateDestToSource(dest);
+            return (int) EstimateDestToSource(dest);
             //return conversionStream.DestToSource(dest);
         }
 
@@ -117,10 +117,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Length
         {
-            get
-            {
-                return length;
-            }
+            get { return length; }
         }
 
         /// <summary>
@@ -128,10 +125,7 @@ namespace NAudio.Wave
         /// </summary>
         public override WaveFormat WaveFormat
         {
-            get
-            {
-                return targetFormat;
-            }
+            get { return targetFormat; }
         }
 
         /// <summary>

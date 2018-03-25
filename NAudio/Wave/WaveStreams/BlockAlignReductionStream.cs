@@ -70,10 +70,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 lock (lockObject)
@@ -97,11 +94,7 @@ namespace NAudio.Wave
 
         private long BufferEndPosition
         {
-            get
-            {
-
-                return bufferStartPosition + circularBuffer.Count;
-            }
+            get { return bufferStartPosition + circularBuffer.Count; }
         }
 
         /// <summary>
@@ -156,7 +149,7 @@ namespace NAudio.Wave
                 // 2. discard any unnecessary stuff from the start
                 if (bufferStartPosition < position)
                 {
-                    circularBuffer.Advance((int)(position - bufferStartPosition));
+                    circularBuffer.Advance((int) (position - bufferStartPosition));
                     bufferStartPosition = position;
                 }
 

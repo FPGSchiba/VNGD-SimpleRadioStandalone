@@ -9,20 +9,19 @@ using NAudio.Wave;
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
     //From https://raw.githubusercontent.com/naudio/NAudio/master/NAudio/Wave/SampleProviders/VolumeSampleProvider.cs
-    public class VolumeSampleProviderWithPeak:ISampleProvider
+    public class VolumeSampleProviderWithPeak : ISampleProvider
     {
-
         private readonly ISampleProvider source;
         private readonly SamplePeak _samplePeak;
         private float volume;
 
-        public  delegate void SamplePeak(float peak);
+        public delegate void SamplePeak(float peak);
 
         /// <summary>
         /// Initializes a new instance of VolumeSampleProvider
         /// </summary>
         /// <param name="source">Source Sample Provider</param>
-        public VolumeSampleProviderWithPeak(ISampleProvider source,SamplePeak samplePeak )
+        public VolumeSampleProviderWithPeak(ISampleProvider source, SamplePeak samplePeak)
         {
             this.source = source;
             _samplePeak = samplePeak;
@@ -39,6 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private int count = 0;
         private float lastPeak = 0;
+
         /// <summary>
         /// Reads samples from this sample provider
         /// </summary>
@@ -47,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         /// <param name="sampleCount">Number of samples desired</param>
         /// <returns>Number of samples read</returns>
         public int Read(float[] buffer, int offset, int sampleCount)
-        { 
+        {
             int samplesRead = source.Read(buffer, offset, sampleCount);
 
             for (int n = 0; n < sampleCount; n++)
@@ -73,8 +73,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             {
                 count++;
             }
-          
-    
+
+
             return samplesRead;
         }
 

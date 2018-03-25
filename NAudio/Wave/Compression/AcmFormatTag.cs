@@ -13,7 +13,7 @@ namespace NAudio.Wave.Compression
 
         internal AcmFormatTag(AcmFormatTagDetails formatTagDetails)
         {
-            this.formatTagDetails = formatTagDetails;                        
+            this.formatTagDetails = formatTagDetails;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public WaveFormatEncoding FormatTag
         {
-            get { return (WaveFormatEncoding)formatTagDetails.formatTag; }
+            get { return (WaveFormatEncoding) formatTagDetails.formatTag; }
         }
 
         /// <summary>
@@ -63,7 +63,5 @@ namespace NAudio.Wave.Compression
         {
             get { return formatTagDetails.formatDescription; }
         }
-
-
     }
 }

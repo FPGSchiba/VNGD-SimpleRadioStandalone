@@ -8,19 +8,20 @@ namespace NAudio.Wave
     /// Microsoft ADPCM
     /// See http://icculus.org/SDL_sound/downloads/external_documentation/wavecomp.htm
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=2)]
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public class AdpcmWaveFormat : WaveFormat
     {
         short samplesPerBlock;
+
         short numCoeff;
+
         // 7 pairs of coefficients
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)]
-        short[] coefficients;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 14)] short[] coefficients;
 
         /// <summary>
         /// Empty constructor needed for marshalling from a pointer
         /// </summary>
-        AdpcmWaveFormat() : this(8000,1)
+        AdpcmWaveFormat() : this(8000, 1)
         {
         }
 
@@ -45,17 +46,17 @@ namespace NAudio.Wave
         /// <param name="sampleRate">Sample Rate</param>
         /// <param name="channels">Channels</param>
         public AdpcmWaveFormat(int sampleRate, int channels) :
-            base(sampleRate,0,channels)
+            base(sampleRate, 0, channels)
         {
             this.waveFormatTag = WaveFormatEncoding.Adpcm;
-            
+
             // TODO: validate sampleRate, bitsPerSample
             this.extraSize = 32;
-            switch(this.sampleRate)
+            switch (this.sampleRate)
             {
-                case 8000: 
+                case 8000:
                 case 11025:
-                    blockAlign = 256; 
+                    blockAlign = 256;
                     break;
                 case 22050:
                     blockAlign = 512;
@@ -75,8 +76,9 @@ namespace NAudio.Wave
 
 
             numCoeff = 7;
-            coefficients = new short[14] {
-                256,0,512,-256,0,0,192,64,240,0,460,-208,392,-232
+            coefficients = new short[14]
+            {
+                256, 0, 512, -256, 0, 0, 192, 64, 240, 0, 460, -208, 392, -232
             };
         }
 

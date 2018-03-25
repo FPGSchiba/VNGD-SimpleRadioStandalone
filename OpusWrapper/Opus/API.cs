@@ -18,7 +18,8 @@ namespace FragLabs.Audio.Codecs.Opus
         internal static extern int opus_encode(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
 
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int opus_encode_float(IntPtr st, byte[] pcm, int frame_size, IntPtr data, int max_data_bytes);
+        internal static extern int opus_encode_float(IntPtr st, byte[] pcm, int frame_size, IntPtr data,
+            int max_data_bytes);
 
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr opus_decoder_create(int Fs, int channels, out IntPtr error);

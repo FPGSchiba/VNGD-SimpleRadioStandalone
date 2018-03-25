@@ -14,7 +14,10 @@ namespace NAudio.Wave
         /// Creates a new silence producing wave provider
         /// </summary>
         /// <param name="wf">Desired WaveFormat (should be PCM / IEE float</param>
-        public SilenceProvider(WaveFormat wf) { WaveFormat = wf; }
+        public SilenceProvider(WaveFormat wf)
+        {
+            WaveFormat = wf;
+        }
 
         /// <summary>
         /// Read silence from into the buffer

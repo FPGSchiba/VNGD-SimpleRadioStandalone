@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <changes>
   <change>
     <version>0.0.0.1</version>
@@ -114,7 +115,7 @@
     <date>3 Mar 2005</date>
     <desc>AcmStream and AcmStreamHeader bug fixes</desc>
     <desc>Improvements to WaveFileReader and WaveFileWriter</desc>
-    <desc>PCM to PCM offline conversion working</desc>		
+    <desc>PCM to PCM offline conversion working</desc>
   </change>
   <change>
     <version>0.2.26.0</version>
@@ -216,7 +217,7 @@
     <version>0.4.42.0</version>
     <date>27 May 2005</date>
     <desc>Initial VST interfaces and enums</desc>
-  </change>	
+  </change>
   <change>
     <version>0.4.43.0</version>
     <date>3 Jun 2005</date>
@@ -299,7 +300,7 @@
     <desc>Retired StreamMixer project</desc>
     <desc>WavePlayer better switching between settings</desc>
     <desc>DirectSound feeds in on a timer now, (from MSDN Coding 4 Fun Drum Machine demo)</desc>
-  </change>	
+  </change>
   <change>
     <version>0.5.57.0</version>
     <date>14 Nov 2005</date>
@@ -342,7 +343,7 @@
   <change>
     <version>0.6.63.0</version>
     <date>21 Nov 2005</date>
-    <desc>Initial support for an ACM MP3 decoder - not working yet</desc>    
+    <desc>Initial support for an ACM MP3 decoder - not working yet</desc>
   </change>
   <change>
     <version>0.6.64.0</version>
@@ -568,7 +569,7 @@
   <change>
     <version>0.9.97.3</version>
     <date>1 Nov 2006</date>
-    <desc>Bug fixes to file associations</desc>    
+    <desc>Bug fixes to file associations</desc>
   </change>
   <change>
     <version>0.9.98.0</version>
@@ -584,7 +585,7 @@
   <change>
     <version>0.9.98.2</version>
     <date>9 Nov 2006</date>
-    <desc>Pitch wheel event modifications</desc>    
+    <desc>Pitch wheel event modifications</desc>
   </change>
   <change>
     <version>0.9.98.3</version>
@@ -610,7 +611,7 @@
   <change>
     <version>1.0.101.0</version>
     <date>13 Mar 2007</date>
-    <desc>Added some new NoteEvent and NoteOnEvent constructors</desc>    
+    <desc>Added some new NoteEvent and NoteOnEvent constructors</desc>
   </change>
   <change>
     <version>1.0.102.0</version>
@@ -649,15 +650,19 @@
   <change>
     <version>1.0.107.0</version>
     <date>3 Apr 2007</date>
-    <desc>MIDI events are now sorted using a stable algorithm to allow
-    batch file processing utilities to retain original ordering of events 
-    with the same start times.</desc>
+    <desc>
+      MIDI events are now sorted using a stable algorithm to allow
+      batch file processing utilities to retain original ordering of events
+      with the same start times.
+    </desc>
   </change>
   <change>
     <version>1.0.108.0</version>
     <date>4 Apr 2007</date>
-    <desc>New MidiEventCollection class to make converting MIDI file types
-    more generic</desc>
+    <desc>
+      New MidiEventCollection class to make converting MIDI file types
+      more generic
+    </desc>
     <desc>Added an NUnit unit tests library</desc>
     <desc>Fixed a bug in meta event constructor</desc>
   </change>
@@ -749,7 +754,7 @@
     <date>28 May 2008</date>
     <desc>More WASAPI work - AudioClient, WaveFormatExtensible, AudioRenderClient</desc>
   </change>
-    <change>
+  <change>
     <version>1.2.123.0</version>
     <date>29 May 2008</date>
     <desc>AudioClient IsFormatSupported - it appears WASAPI does not do sample rate conversion for you</desc>
@@ -786,7 +791,7 @@
     <desc>Media Object can set input and output WaveFormat</desc>
     <desc>Getting caught back up with XML documentation</desc>
     <desc>Media Object can get input and output buffer sizes</desc>
-  
+
   </change>
   <change>
     <version>1.2.129.0</version>
@@ -801,7 +806,7 @@
     <desc>ResamplerDmoStream bugfixes</desc>
   </change>
   <change>
-    <version>1.2.131.0</version>    
+    <version>1.2.131.0</version>
     <date>10 June 2008</date>
     <desc>Wasapi output stream uses ResamplerDmoStream (but needs app to be MTAThread to work atm)</desc>
     <desc>Audio Client using PreserveSig</desc>
@@ -819,7 +824,7 @@
   <change>
     <version>1.2.133.0</version>
     <author>Alexandre Mutel</author>
-    <desc>WASAPI Out fixes</desc>    
+    <desc>WASAPI Out fixes</desc>
   </change>
   <change>
     <version>1.2.134.0</version>
@@ -865,7 +870,7 @@
     <date>16 Jun 2008</date>
     <desc>Added a Custom Marshaller for WaveFormat (not used everywhere yet)</desc>
     <desc>Fixed some marshalling bugs in ResamplerDMOStream caused by WaveFileReader using WaveFormatExtraData</desc>
-    <desc>Got majority of unit tests working (things had slipped a little!)</desc>    
+    <desc>Got majority of unit tests working (things had slipped a little!)</desc>
   </change>
   <change>
     <version>1.2.139.0</version>
@@ -880,7 +885,7 @@
     <author>Mark Heath</author>
     <date>19 Jun 2008</date>
     <desc>WaveStream32 has option not to pad reads out to full length</desc>
-    <desc>NAudioDemo sets volume on WaveStream rather than WaveOut</desc>    
+    <desc>NAudioDemo sets volume on WaveStream rather than WaveOut</desc>
   </change>
   <change>
     <version>1.2.141.0</version>
@@ -913,7 +918,7 @@
     <version>1.3.1.0</version>
     <author>Mark Heath</author>
     <date>27 June 2008</date>
-    <desc>IWavePlayer using IWaveProvider and WaveBuffer (initial port)</desc>    
+    <desc>IWavePlayer using IWaveProvider and WaveBuffer (initial port)</desc>
   </change>
   <change>
     <version>1.3.2.0</version>
@@ -971,5 +976,5 @@
     <author>Mark Heath</author>
     <date>7 Nov 2010</date>
     <desc>Huge improvements to MP3 File Reader</desc>
-  </change>  
+  </change>
 </changes>

@@ -65,7 +65,8 @@ namespace NAudio.Wave
 
         private object CreateResamplerComObjectUsingActivator()
         {
-            var transformActivators = MediaFoundationApi.EnumerateTransforms(MediaFoundationTransformCategories.AudioEffect);
+            var transformActivators =
+                MediaFoundationApi.EnumerateTransforms(MediaFoundationTransformCategories.AudioEffect);
             foreach (var activator in transformActivators)
             {
                 Guid clsid;
@@ -89,7 +90,6 @@ namespace NAudio.Wave
         public MediaFoundationResampler(IWaveProvider sourceProvider, int outputSampleRate)
             : this(sourceProvider, CreateOutputFormat(sourceProvider.WaveFormat, outputSampleRate))
         {
-
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace NAudio.Wave
         /// <returns>A newly created and configured resampler MFT</returns>
         protected override IMFTransform CreateTransform()
         {
-            var comObject = CreateResamplerComObject();// new ResamplerMediaComObject();
-            var resamplerTransform = (IMFTransform)comObject;
+            var comObject = CreateResamplerComObject(); // new ResamplerMediaComObject();
+            var resamplerTransform = (IMFTransform) comObject;
 
             var inputMediaFormat = MediaFoundationApi.CreateMediaTypeFromWaveFormat(sourceProvider.WaveFormat);
             resamplerTransform.SetInputType(0, inputMediaFormat, 0);
@@ -114,7 +114,7 @@ namespace NAudio.Wave
             // if pStreamInfo.dwFlags is 0, then it means we have to provide samples
 
             // setup quality
-            var resamplerProps = (IWMResamplerProps)comObject;
+            var resamplerProps = (IWMResamplerProps) comObject;
             // 60 is the best quality, 1 is linear interpolation
             resamplerProps.SetHalfFilterLength(ResamplerQuality);
             // may also be able to set this using MFPKEY_WMRESAMP_CHANNELMTX on the
@@ -130,11 +130,11 @@ namespace NAudio.Wave
         public int ResamplerQuality
         {
             get { return resamplerQuality; }
-            set 
-            { 
+            set
+            {
                 if (value < 1 || value > 60)
                     throw new ArgumentOutOfRangeException("Resampler Quality must be between 1 and 60");
-                resamplerQuality = value; 
+                resamplerQuality = value;
             }
         }
 
@@ -172,6 +172,5 @@ namespace NAudio.Wave
 
             base.Dispose(disposing);
         }
-
     }
 }

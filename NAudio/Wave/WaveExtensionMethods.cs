@@ -25,9 +25,12 @@ namespace NAudio.Wave
         /// <param name="wavePlayer">The WavePlayer</param>
         /// <param name="sampleProvider"></param>
         /// <param name="convertTo16Bit"></param>
-        public static void Init(this IWavePlayer wavePlayer, ISampleProvider sampleProvider, bool convertTo16Bit = false)
+        public static void Init(this IWavePlayer wavePlayer, ISampleProvider sampleProvider,
+            bool convertTo16Bit = false)
         {
-            IWaveProvider provider = convertTo16Bit ? (IWaveProvider)new SampleToWaveProvider16(sampleProvider) : new SampleToWaveProvider(sampleProvider);
+            IWaveProvider provider = convertTo16Bit
+                ? (IWaveProvider) new SampleToWaveProvider16(sampleProvider)
+                : new SampleToWaveProvider(sampleProvider);
             wavePlayer.Init(provider);
         }
 
@@ -70,7 +73,7 @@ namespace NAudio.Wave
         /// <returns>A single sampleprovider to play one after the other</returns>
         public static ISampleProvider FollowedBy(this ISampleProvider sampleProvider, ISampleProvider next)
         {
-            return new ConcatenatingSampleProvider(new[] { sampleProvider, next});
+            return new ConcatenatingSampleProvider(new[] {sampleProvider, next});
         }
 
         /// <summary>
@@ -80,10 +83,11 @@ namespace NAudio.Wave
         /// <param name="silenceDuration">Silence duration to insert between the two</param>
         /// <param name="next">The sample provider to play next</param>
         /// <returns>A single sample provider</returns>
-        public static ISampleProvider FollowedBy(this ISampleProvider sampleProvider, TimeSpan silenceDuration, ISampleProvider next)
+        public static ISampleProvider FollowedBy(this ISampleProvider sampleProvider, TimeSpan silenceDuration,
+            ISampleProvider next)
         {
             var silenceAppended = new OffsetSampleProvider(sampleProvider) {LeadOut = silenceDuration};
-            return new ConcatenatingSampleProvider(new[] { silenceAppended, next });
+            return new ConcatenatingSampleProvider(new[] {silenceAppended, next});
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace NAudio.Wave
         /// <returns>A sample provider that skips over the specified amount of time</returns>
         public static ISampleProvider Skip(this ISampleProvider sampleProvider, TimeSpan skipDuration)
         {
-            return new OffsetSampleProvider(sampleProvider) { SkipOver = skipDuration};            
+            return new OffsetSampleProvider(sampleProvider) {SkipOver = skipDuration};
         }
 
         /// <summary>
@@ -105,7 +109,7 @@ namespace NAudio.Wave
         /// <returns>A sample provider that reads up to the specified amount of time</returns>
         public static ISampleProvider Take(this ISampleProvider sampleProvider, TimeSpan takeDuration)
         {
-            return new OffsetSampleProvider(sampleProvider) { Take = takeDuration };
+            return new OffsetSampleProvider(sampleProvider) {Take = takeDuration};
         }
 
         /// <summary>
@@ -115,9 +119,10 @@ namespace NAudio.Wave
         /// <param name="leftVol">Amount of left channel to mix in (0 = mute, 1 = full, 0.5 for mixing half from each channel)</param>
         /// <param name="rightVol">Amount of right channel to mix in (0 = mute, 1 = full, 0.5 for mixing half from each channel)</param>
         /// <returns>A mono SampleProvider</returns>
-        public static ISampleProvider ToMono(this ISampleProvider sourceProvider, float leftVol = 0.5f, float rightVol = 0.5f)
+        public static ISampleProvider ToMono(this ISampleProvider sourceProvider, float leftVol = 0.5f,
+            float rightVol = 0.5f)
         {
-            if(sourceProvider.WaveFormat.Channels == 1) return sourceProvider;
+            if (sourceProvider.WaveFormat.Channels == 1) return sourceProvider;
             return new StereoToMonoSampleProvider(sourceProvider) {LeftVolume = leftVol, RightVolume = rightVol};
         }
 
@@ -128,10 +133,11 @@ namespace NAudio.Wave
         /// <param name="leftVol">Amount to mix to left channel (1.0 is full volume)</param>
         /// <param name="rightVol">Amount to mix to right channel (1.0 is full volume)</param>
         /// <returns></returns>
-        public static ISampleProvider ToStereo(this ISampleProvider sourceProvider, float leftVol = 1.0f, float rightVol = 1.0f)
+        public static ISampleProvider ToStereo(this ISampleProvider sourceProvider, float leftVol = 1.0f,
+            float rightVol = 1.0f)
         {
             if (sourceProvider.WaveFormat.Channels == 2) return sourceProvider;
-            return new MonoToStereoSampleProvider(sourceProvider) { LeftVolume = leftVol, RightVolume = rightVol };
+            return new MonoToStereoSampleProvider(sourceProvider) {LeftVolume = leftVol, RightVolume = rightVol};
         }
     }
 }

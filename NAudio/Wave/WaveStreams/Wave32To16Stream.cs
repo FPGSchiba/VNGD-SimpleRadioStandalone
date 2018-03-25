@@ -46,14 +46,8 @@ namespace NAudio.Wave
         /// </summary>
         public float Volume
         {
-            get
-            {
-                return volume;
-            }
-            set
-            {
-                volume = value;
-            }
+            get { return volume; }
+            set { volume = value; }
         }
 
         /// <summary>
@@ -72,10 +66,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 lock (lockObject)
@@ -99,12 +90,12 @@ namespace NAudio.Wave
         {
             lock (lockObject)
             {
-                int count = numBytes*2;
+                int count = numBytes * 2;
                 sourceBuffer = BufferHelpers.Ensure(sourceBuffer, count);
                 int bytesRead = sourceStream.Read(sourceBuffer, 0, count);
                 Convert32To16(destBuffer, offset, sourceBuffer, bytesRead);
-                position += (bytesRead/2);
-                return bytesRead/2;
+                position += (bytesRead / 2);
+                return bytesRead / 2;
             }
         }
 
@@ -116,8 +107,8 @@ namespace NAudio.Wave
             fixed (byte* pDestBuffer = &destBuffer[offset],
                 pSourceBuffer = &source[0])
             {
-                short* psDestBuffer = (short*)pDestBuffer;
-                float* pfSourceBuffer = (float*)pSourceBuffer;
+                short* psDestBuffer = (short*) pDestBuffer;
+                float* pfSourceBuffer = (float*) pSourceBuffer;
 
                 int samplesRead = bytesRead / 4;
                 for (int n = 0; n < samplesRead; n++)
@@ -135,7 +126,7 @@ namespace NAudio.Wave
                     }
                     else
                     {
-                        psDestBuffer[n] = (short)(sampleVal * 32767);
+                        psDestBuffer[n] = (short) (sampleVal * 32767);
                     }
                 }
             }
@@ -151,14 +142,8 @@ namespace NAudio.Wave
         /// </summary>
         public bool Clip
         {
-            get
-            {
-                return clip;
-            }
-            set
-            {
-                clip = value;
-            }
+            get { return clip; }
+            set { clip = value; }
         }
 
         /// <summary>

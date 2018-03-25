@@ -116,12 +116,12 @@ namespace NAudio.Wave.Compression
             formatChoose.selectedWaveFormatByteSize = maxFormatSize;
             formatChoose.title = windowTitle;
             formatChoose.name = null;
-            formatChoose.formatEnumFlags = enumFlags;//AcmFormatEnumFlags.None;
+            formatChoose.formatEnumFlags = enumFlags; //AcmFormatEnumFlags.None;
             formatChoose.waveFormatEnumPointer = IntPtr.Zero;
             if (enumFormat != null)
             {
                 IntPtr enumPointer = Marshal.AllocHGlobal(Marshal.SizeOf(enumFormat));
-                Marshal.StructureToPtr(enumFormat,enumPointer,false);
+                Marshal.StructureToPtr(enumFormat, enumPointer, false);
                 formatChoose.waveFormatEnumPointer = enumPointer;
             }
             formatChoose.instanceHandle = IntPtr.Zero;
@@ -136,16 +136,15 @@ namespace NAudio.Wave.Compression
                 selectedFormat = WaveFormat.MarshalFromPtr(formatChoose.selectedWaveFormatPointer);
                 selectedFormatDescription = formatChoose.formatDescription;
                 selectedFormatTagDescription = formatChoose.formatTagDescription;
-            }            
-            
+            }
+
             Marshal.FreeHGlobal(formatChoose.waveFormatEnumPointer);
             Marshal.FreeHGlobal(formatChoose.selectedWaveFormatPointer);
-            if(result != MmResult.AcmCancelled && result != MmResult.NoError)
-            {                
+            if (result != MmResult.AcmCancelled && result != MmResult.NoError)
+            {
                 throw new MmException(result, "acmFormatChoose");
             }
             return result == MmResult.NoError;
-            
         }
 
         /// <summary>
@@ -156,7 +155,8 @@ namespace NAudio.Wave.Compression
             get
             {
                 int maxFormatSize;
-                MmException.Try(AcmInterop.acmMetrics(driverHandle, AcmMetrics.MaxSizeFormat, out maxFormatSize), "acmMetrics");
+                MmException.Try(AcmInterop.acmMetrics(driverHandle, AcmMetrics.MaxSizeFormat, out maxFormatSize),
+                    "acmMetrics");
                 return maxFormatSize;
             }
         }
@@ -184,7 +184,9 @@ namespace NAudio.Wave.Compression
         public static IEnumerable<AcmDriver> EnumerateAcmDrivers()
         {
             drivers = new List<AcmDriver>();
-            MmException.Try(AcmInterop.acmDriverEnum(new AcmInterop.AcmDriverEnumCallback(DriverEnumCallback), IntPtr.Zero, 0), "acmDriverEnum");
+            MmException.Try(
+                AcmInterop.acmDriverEnum(new AcmInterop.AcmDriverEnumCallback(DriverEnumCallback), IntPtr.Zero, 0),
+                "acmDriverEnum");
             return drivers;
         }
 
@@ -214,10 +216,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public string ShortName
         {
-            get
-            {
-                return details.shortName;
-            }
+            get { return details.shortName; }
         }
 
         /// <summary>
@@ -225,10 +224,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public string LongName
         {
-            get
-            {
-                return details.longName;
-            }
+            get { return details.longName; }
         }
 
         /// <summary>
@@ -236,10 +232,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public IntPtr DriverId
         {
-            get
-            {
-                return driverId;
-            }
+            get { return driverId; }
         }
 
         /// <summary>
@@ -266,13 +259,15 @@ namespace NAudio.Wave.Compression
                     formatTags = new List<AcmFormatTag>();
                     AcmFormatTagDetails formatTagDetails = new AcmFormatTagDetails();
                     formatTagDetails.structureSize = Marshal.SizeOf(formatTagDetails);
-                    MmException.Try(AcmInterop.acmFormatTagEnum(this.driverHandle, ref formatTagDetails, AcmFormatTagEnumCallback, IntPtr.Zero, 0), "acmFormatTagEnum");
+                    MmException.Try(
+                        AcmInterop.acmFormatTagEnum(this.driverHandle, ref formatTagDetails, AcmFormatTagEnumCallback,
+                            IntPtr.Zero, 0), "acmFormatTagEnum");
                 }
                 return formatTags;
             }
         }
 
-        
+
         /// <summary>
         /// Gets all the supported formats for a given format tag
         /// </summary>
@@ -291,12 +286,12 @@ namespace NAudio.Wave.Compression
             // and some codecs MaxFormatSize isn't either
             formatDetails.waveFormatByteSize = 1024;
             formatDetails.waveFormatPointer = Marshal.AllocHGlobal(formatDetails.waveFormatByteSize);
-            formatDetails.formatTag = (int)formatTag.FormatTag; // (int)WaveFormatEncoding.Unknown
-            var result = AcmInterop.acmFormatEnum(driverHandle, 
-                ref formatDetails, AcmFormatEnumCallback, IntPtr.Zero, 
+            formatDetails.formatTag = (int) formatTag.FormatTag; // (int)WaveFormatEncoding.Unknown
+            var result = AcmInterop.acmFormatEnum(driverHandle,
+                ref formatDetails, AcmFormatEnumCallback, IntPtr.Zero,
                 AcmFormatEnumFlags.None);
             Marshal.FreeHGlobal(formatDetails.waveFormatPointer);
-            MmException.Try(result,"acmFormatEnum");
+            MmException.Try(result, "acmFormatEnum");
             return tempFormatsList;
         }
 
@@ -316,20 +311,22 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public void Close()
         {
-            if(driverHandle != IntPtr.Zero)
+            if (driverHandle != IntPtr.Zero)
             {
-                MmException.Try(AcmInterop.acmDriverClose(driverHandle, 0),"acmDriverClose");
+                MmException.Try(AcmInterop.acmDriverClose(driverHandle, 0), "acmDriverClose");
                 driverHandle = IntPtr.Zero;
             }
         }
 
-        private bool AcmFormatTagEnumCallback(IntPtr hAcmDriverId, ref AcmFormatTagDetails formatTagDetails, IntPtr dwInstance, AcmDriverDetailsSupportFlags flags)
+        private bool AcmFormatTagEnumCallback(IntPtr hAcmDriverId, ref AcmFormatTagDetails formatTagDetails,
+            IntPtr dwInstance, AcmDriverDetailsSupportFlags flags)
         {
             formatTags.Add(new AcmFormatTag(formatTagDetails));
             return true;
         }
 
-        private bool AcmFormatEnumCallback(IntPtr hAcmDriverId, ref AcmFormatDetails formatDetails, IntPtr dwInstance, AcmDriverDetailsSupportFlags flags)
+        private bool AcmFormatEnumCallback(IntPtr hAcmDriverId, ref AcmFormatDetails formatDetails, IntPtr dwInstance,
+            AcmDriverDetailsSupportFlags flags)
         {
             tempFormatsList.Add(new AcmFormat(formatDetails));
             return true;
@@ -351,5 +348,4 @@ namespace NAudio.Wave.Compression
 
         #endregion
     }
-
 }

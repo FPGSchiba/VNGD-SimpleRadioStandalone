@@ -29,7 +29,7 @@ namespace NAudio.CoreAudioApi
         /// Session created delegate
         /// </summary>
         public delegate void SessionCreatedDelegate(object sender, IAudioSessionControl newSession);
-        
+
         /// <summary>
         /// Occurs when audio session has been added (for example run another program that use audio playback).
         /// </summary>
@@ -102,7 +102,8 @@ namespace NAudio.CoreAudioApi
                 sessions = new SessionCollection(sessionEnum);
 
                 audioSessionNotification = new AudioSessionNotification(this);
-                Marshal.ThrowExceptionForHR(audioSessionInterface2.RegisterSessionNotification(audioSessionNotification));
+                Marshal.ThrowExceptionForHR(
+                    audioSessionInterface2.RegisterSessionNotification(audioSessionNotification));
             }
         }
 

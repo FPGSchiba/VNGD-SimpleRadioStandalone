@@ -13,7 +13,6 @@
         public Pcm32BitToSampleProvider(IWaveProvider source)
             : base(source)
         {
-
         }
 
         /// <summary>
@@ -25,7 +24,7 @@
         /// <returns>number of samples provided</returns>
         public override int Read(float[] buffer, int offset, int count)
         {
-            int sourceBytesRequired = count*4;
+            int sourceBytesRequired = count * 4;
             EnsureSourceBuffer(sourceBytesRequired);
             int bytesRead = source.Read(sourceBuffer, 0, sourceBytesRequired);
             int outIndex = offset;
@@ -34,9 +33,9 @@
                 buffer[outIndex++] = (((sbyte) sourceBuffer[n + 3] << 24 |
                                        sourceBuffer[n + 2] << 16) |
                                       (sourceBuffer[n + 1] << 8) |
-                                      sourceBuffer[n])/2147483648f;
+                                      sourceBuffer[n]) / 2147483648f;
             }
-            return bytesRead/4;
+            return bytesRead / 4;
         }
     }
 }

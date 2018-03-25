@@ -44,10 +44,7 @@ namespace NAudio
         /// </summary>
         public MmResult Result
         {
-            get
-            {
-                return result;
-            }
+            get { return result; }
         }
     }
 }

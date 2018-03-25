@@ -39,7 +39,7 @@ namespace NAudio.Wave
             {
                 throw new ArgumentException("Unsupported Output Stream format", nameof(outputFormat));
             }
-         
+
             dmoResampler.MediaObject.SetOutputWaveFormat(0, outputFormat);
             if (inputStream != null)
             {
@@ -56,9 +56,9 @@ namespace NAudio.Wave
 
         private long InputToOutputPosition(long inputPosition)
         {
-            double ratio = (double)outputFormat.AverageBytesPerSecond
-                / inputProvider.WaveFormat.AverageBytesPerSecond;
-            long outputPosition = (long)(inputPosition * ratio);
+            double ratio = (double) outputFormat.AverageBytesPerSecond
+                           / inputProvider.WaveFormat.AverageBytesPerSecond;
+            long outputPosition = (long) (inputPosition * ratio);
             if (outputPosition % outputFormat.BlockAlign != 0)
             {
                 outputPosition -= outputPosition % outputFormat.BlockAlign;
@@ -68,9 +68,9 @@ namespace NAudio.Wave
 
         private long OutputToInputPosition(long outputPosition)
         {
-            double ratio = (double)outputFormat.AverageBytesPerSecond
-                / inputProvider.WaveFormat.AverageBytesPerSecond;
-            long inputPosition = (long)(outputPosition / ratio);
+            double ratio = (double) outputFormat.AverageBytesPerSecond
+                           / inputProvider.WaveFormat.AverageBytesPerSecond;
+            long inputPosition = (long) (outputPosition / ratio);
             if (inputPosition % inputProvider.WaveFormat.BlockAlign != 0)
             {
                 inputPosition -= inputPosition % inputProvider.WaveFormat.BlockAlign;
@@ -83,13 +83,13 @@ namespace NAudio.Wave
         /// </summary>
         public override long Length
         {
-            get 
+            get
             {
                 if (inputStream == null)
                 {
                     throw new InvalidOperationException("Cannot report length if the input was an IWaveProvider");
                 }
-                return InputToOutputPosition(inputStream.Length); 
+                return InputToOutputPosition(inputStream.Length);
             }
         }
 
@@ -98,10 +98,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 if (inputStream == null)
@@ -130,7 +127,7 @@ namespace NAudio.Wave
                 if (dmoResampler.MediaObject.IsAcceptingData(0))
                 {
                     // 1. Read from the input stream 
-                    int inputBytesRequired = (int)OutputToInputPosition(count - outputBytesProvided);
+                    int inputBytesRequired = (int) OutputToInputPosition(count - outputBytesProvided);
                     byte[] inputByteArray = new byte[inputBytesRequired];
                     int inputBytesRead = inputProvider.Read(inputByteArray, 0, inputBytesRequired);
                     if (inputBytesRead == 0)
@@ -148,7 +145,7 @@ namespace NAudio.Wave
                     outputBuffer.StatusFlags = DmoOutputDataBufferFlags.None;
 
                     // 4. Now ask the DMO for some output data
-                    dmoResampler.MediaObject.ProcessOutput(DmoProcessOutputFlags.None, 1, new[] { outputBuffer });
+                    dmoResampler.MediaObject.ProcessOutput(DmoProcessOutputFlags.None, 1, new[] {outputBuffer});
 
                     if (outputBuffer.Length == 0)
                     {
@@ -167,7 +164,7 @@ namespace NAudio.Wave
                     Debug.Assert(false, "have not implemented not accepting logic yet");
                 }
             }
-            
+
             position += outputBytesProvided;
             return outputBytesProvided;
         }

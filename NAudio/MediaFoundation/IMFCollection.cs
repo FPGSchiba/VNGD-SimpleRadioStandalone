@@ -30,7 +30,7 @@ namespace NAudio.MediaFoundation
         /// Removes an object from the collection.
         /// </summary>
         void RemoveElement([In] int dwElementIndex, [Out, MarshalAs(UnmanagedType.IUnknown)] out object ppUnkElement);
-        
+
         /// <summary>
         /// Removes an object from the collection.
         /// </summary>

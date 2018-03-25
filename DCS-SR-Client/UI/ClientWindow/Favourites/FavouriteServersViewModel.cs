@@ -77,7 +77,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
         {
             var saveSucceeded = _favouriteServerStore.SaveToStore(_addresses);
 
-            var messageBoxText = saveSucceeded ? "Favourite servers saved" : "Failed to save favourite servers. Please check logs for details.";
+            var messageBoxText = saveSucceeded
+                ? "Favourite servers saved"
+                : "Failed to save favourite servers. Please check logs for details.";
             var icon = saveSucceeded ? MessageBoxImage.Information : MessageBoxImage.Error;
 
             MessageBox.Show(Application.Current.MainWindow, messageBoxText, "Save result", MessageBoxButton.OK, icon);

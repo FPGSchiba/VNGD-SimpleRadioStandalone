@@ -19,16 +19,12 @@ namespace NAudio.Wave
         /// <summary>
         /// Number of Bytes
         /// </summary>
-        [FieldOffset(0)]
-        public int numberOfBytes;
-        [FieldOffset(8)]
-        private byte[] byteBuffer;
-        [FieldOffset(8)]
-        private float[] floatBuffer;
-        [FieldOffset(8)]
-        private short[] shortBuffer;
-        [FieldOffset(8)]
-        private int[] intBuffer;
+        [FieldOffset(0)] public int numberOfBytes;
+
+        [FieldOffset(8)] private byte[] byteBuffer;
+        [FieldOffset(8)] private float[] floatBuffer;
+        [FieldOffset(8)] private short[] shortBuffer;
+        [FieldOffset(8)] private int[] intBuffer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WaveBuffer"/> class.
@@ -36,8 +32,9 @@ namespace NAudio.Wave
         /// <param name="sizeToAllocateInBytes">The number of bytes. The size of the final buffer will be aligned on 4 Bytes (upper bound)</param>
         public WaveBuffer(int sizeToAllocateInBytes)
         {
-            int aligned4Bytes = sizeToAllocateInBytes%4;
-            sizeToAllocateInBytes = (aligned4Bytes == 0) ? sizeToAllocateInBytes : sizeToAllocateInBytes + 4 - aligned4Bytes;
+            int aligned4Bytes = sizeToAllocateInBytes % 4;
+            sizeToAllocateInBytes =
+                (aligned4Bytes == 0) ? sizeToAllocateInBytes : sizeToAllocateInBytes + 4 - aligned4Bytes;
             // Allocating the byteBuffer is co-allocating the floatBuffer and the intBuffer
             byteBuffer = new byte[sizeToAllocateInBytes];
             numberOfBytes = 0;
@@ -57,7 +54,7 @@ namespace NAudio.Wave
         /// </summary>
         /// <param name="bufferToBoundTo">A byte buffer to bound the WaveBuffer to.</param>
         public void BindTo(byte[] bufferToBoundTo)
-        {   
+        {
             /* WaveBuffer assumes the caller knows what they are doing. We will let this pass
              * if ( (bufferToBoundTo.Length % 4) != 0 )
             {
@@ -160,11 +157,9 @@ namespace NAudio.Wave
         public int ByteBufferCount
         {
             get { return numberOfBytes; }
-            set
-            {
-                numberOfBytes = CheckValidityCount("ByteBufferCount", value, 1);
-            }
+            set { numberOfBytes = CheckValidityCount("ByteBufferCount", value, 1); }
         }
+
         /// <summary>
         /// Gets or sets the float buffer count.
         /// </summary>
@@ -172,11 +167,9 @@ namespace NAudio.Wave
         public int FloatBufferCount
         {
             get { return numberOfBytes / 4; }
-            set
-            {
-                numberOfBytes = CheckValidityCount("FloatBufferCount", value, 4);
-            }
+            set { numberOfBytes = CheckValidityCount("FloatBufferCount", value, 4); }
         }
+
         /// <summary>
         /// Gets or sets the short buffer count.
         /// </summary>
@@ -184,11 +177,9 @@ namespace NAudio.Wave
         public int ShortBufferCount
         {
             get { return numberOfBytes / 2; }
-            set
-            {
-                numberOfBytes = CheckValidityCount("ShortBufferCount", value, 2);
-            }
+            set { numberOfBytes = CheckValidityCount("ShortBufferCount", value, 2); }
         }
+
         /// <summary>
         /// Gets or sets the int buffer count.
         /// </summary>
@@ -196,10 +187,7 @@ namespace NAudio.Wave
         public int IntBufferCount
         {
             get { return numberOfBytes / 4; }
-            set
-            {
-                numberOfBytes = CheckValidityCount("IntBufferCount", value, 4);
-            }
+            set { numberOfBytes = CheckValidityCount("IntBufferCount", value, 4); }
         }
 
         /// <summary>
@@ -227,14 +215,18 @@ namespace NAudio.Wave
         private int CheckValidityCount(string argName, int value, int sizeOfValue)
         {
             int newNumberOfBytes = value * sizeOfValue;
-            if ( (newNumberOfBytes % 4) != 0 )
+            if ((newNumberOfBytes % 4) != 0)
             {
-                throw new ArgumentOutOfRangeException(argName, String.Format("{0} cannot set a count ({1}) that is not 4 bytes aligned ", argName, newNumberOfBytes));
+                throw new ArgumentOutOfRangeException(argName,
+                    String.Format("{0} cannot set a count ({1}) that is not 4 bytes aligned ", argName,
+                        newNumberOfBytes));
             }
 
             if (value < 0 || value > (byteBuffer.Length / sizeOfValue))
             {
-                throw new ArgumentOutOfRangeException(argName, String.Format("{0} cannot set a count that exceed max count {1}", argName, byteBuffer.Length / sizeOfValue));
+                throw new ArgumentOutOfRangeException(argName,
+                    String.Format("{0} cannot set a count that exceed max count {1}", argName,
+                        byteBuffer.Length / sizeOfValue));
             }
             return newNumberOfBytes;
         }

@@ -90,7 +90,7 @@ namespace NAudio.Wave
             const int STGM_WRITE = 0x00000001;
             const int STGM_READWRITE = 0x00000002;
 
-            var tmp = new System.Runtime.InteropServices.ComTypes.STATSTG { type = 2, cbSize = Length, grfMode = 0 };
+            var tmp = new System.Runtime.InteropServices.ComTypes.STATSTG {type = 2, cbSize = Length, grfMode = 0};
 
             if (CanWrite && CanRead)
                 tmp.grfMode |= STGM_READWRITE;

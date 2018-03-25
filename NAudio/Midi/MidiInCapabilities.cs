@@ -15,19 +15,22 @@ namespace NAudio.Midi
         /// wMid
         /// </summary>
         UInt16 manufacturerId;
+
         /// <summary>
         /// wPid
         /// </summary>
         UInt16 productId;
+
         /// <summary>
         /// vDriverVersion
         /// </summary>
         UInt32 driverVersion;
+
         /// <summary>
         /// Product Name
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)]
-        string productName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)] string productName;
+
         /// <summary>
         /// Support - Reserved
         /// </summary>
@@ -40,32 +43,23 @@ namespace NAudio.Midi
         /// </summary>
         public Manufacturers Manufacturer
         {
-            get 
-            {
-                return (Manufacturers)manufacturerId;
-            }
+            get { return (Manufacturers) manufacturerId; }
         }
-        
+
         /// <summary>
         /// Gets the product identifier (manufacturer specific)
         /// </summary>
-        public int ProductId 
+        public int ProductId
         {
-            get 
-            {
-                return productId;
-            }
+            get { return productId; }
         }
-        
+
         /// <summary>
         /// Gets the product name
         /// </summary>
-        public string ProductName 
+        public string ProductName
         {
-            get 
-            {
-                return productName;
-            }
+            get { return productName; }
         }
     }
 }

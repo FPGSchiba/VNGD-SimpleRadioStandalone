@@ -48,7 +48,7 @@ namespace NAudio.FileFormats.Wav
 
             int dataChunkId = ChunkIdentifier.ChunkIdentifierToInt32("data");
             int formatChunkId = ChunkIdentifier.ChunkIdentifierToInt32("fmt ");
-            
+
             // sometimes a file has more data than is specified after the RIFF header
             long stopPosition = Math.Min(riffSize + 8, stream.Length);
 
@@ -69,8 +69,9 @@ namespace NAudio.FileFormats.Wav
                 else if (chunkIdentifier == formatChunkId)
                 {
                     if (chunkLength > Int32.MaxValue)
-                         throw new InvalidDataException(string.Format("Format chunk length must be between 0 and {0}.", Int32.MaxValue));
-                    waveFormat = WaveFormat.FromFormatChunk(br, (int)chunkLength);
+                        throw new InvalidDataException(string.Format("Format chunk length must be between 0 and {0}.",
+                            Int32.MaxValue));
+                    waveFormat = WaveFormat.FromFormatChunk(br, (int) chunkLength);
                 }
                 else
                 {
@@ -89,8 +90,9 @@ namespace NAudio.FileFormats.Wav
                     if (storeAllChunks)
                     {
                         if (chunkLength > Int32.MaxValue)
-                            throw new InvalidDataException(string.Format("RiffChunk chunk length must be between 0 and {0}.", Int32.MaxValue));
-                        riffChunks.Add(GetRiffChunk(stream, chunkIdentifier, (int)chunkLength));
+                            throw new InvalidDataException(
+                                string.Format("RiffChunk chunk length must be between 0 and {0}.", Int32.MaxValue));
+                        riffChunks.Add(GetRiffChunk(stream, chunkIdentifier, (int) chunkLength));
                     }
                     stream.Position += chunkLength;
                 }
@@ -145,21 +147,33 @@ namespace NAudio.FileFormats.Wav
         /// <summary>
         /// WaveFormat
         /// </summary>
-        public WaveFormat WaveFormat { get { return this.waveFormat; } }
+        public WaveFormat WaveFormat
+        {
+            get { return this.waveFormat; }
+        }
 
         /// <summary>
         /// Data Chunk Position
         /// </summary>
-        public long DataChunkPosition { get { return this.dataChunkPosition; } }
+        public long DataChunkPosition
+        {
+            get { return this.dataChunkPosition; }
+        }
 
         /// <summary>
         /// Data Chunk Length
         /// </summary>
-        public long DataChunkLength { get { return this.dataChunkLength; } }
+        public long DataChunkLength
+        {
+            get { return this.dataChunkLength; }
+        }
 
         /// <summary>
         /// Riff Chunks
         /// </summary>
-        public List<RiffChunk> RiffChunks { get { return this.riffChunks; } }
+        public List<RiffChunk> RiffChunks
+        {
+            get { return this.riffChunks; }
+        }
     }
 }

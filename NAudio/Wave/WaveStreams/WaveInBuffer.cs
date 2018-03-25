@@ -35,9 +35,10 @@ namespace NAudio.Wave
             header.bufferLength = bufferSize;
             header.loops = 1;
             hThis = GCHandle.Alloc(this);
-            header.userData = (IntPtr)hThis;
+            header.userData = (IntPtr) hThis;
 
-            MmException.Try(WaveInterop.waveInPrepareHeader(waveInHandle, header, Marshal.SizeOf(header)), "waveInPrepareHeader");
+            MmException.Try(WaveInterop.waveInPrepareHeader(waveInHandle, header, Marshal.SizeOf(header)),
+                "waveInPrepareHeader");
             //MmException.Try(WaveInterop.waveInAddBuffer(waveInHandle, header, Marshal.SizeOf(header)), "waveInAddBuffer");
         }
 
@@ -47,10 +48,13 @@ namespace NAudio.Wave
         public void Reuse()
         {
             // TEST: we might not actually need to bother unpreparing and repreparing
-            MmException.Try(WaveInterop.waveInUnprepareHeader(waveInHandle, header, Marshal.SizeOf(header)), "waveUnprepareHeader");
-            MmException.Try(WaveInterop.waveInPrepareHeader(waveInHandle, header, Marshal.SizeOf(header)), "waveInPrepareHeader");
+            MmException.Try(WaveInterop.waveInUnprepareHeader(waveInHandle, header, Marshal.SizeOf(header)),
+                "waveUnprepareHeader");
+            MmException.Try(WaveInterop.waveInPrepareHeader(waveInHandle, header, Marshal.SizeOf(header)),
+                "waveInPrepareHeader");
             //System.Diagnostics.Debug.Assert(header.bytesRecorded == 0, "bytes recorded was not reset properly");
-            MmException.Try(WaveInterop.waveInAddBuffer(waveInHandle, header, Marshal.SizeOf(header)), "waveInAddBuffer");
+            MmException.Try(WaveInterop.waveInAddBuffer(waveInHandle, header, Marshal.SizeOf(header)),
+                "waveInAddBuffer");
         }
 
         #region Dispose Pattern
@@ -94,7 +98,6 @@ namespace NAudio.Wave
                 hBuffer.Free();
             if (hThis.IsAllocated)
                 hThis.Free();
-
         }
 
         #endregion
@@ -104,10 +107,7 @@ namespace NAudio.Wave
         /// </summary>
         public byte[] Data
         {
-            get
-            {
-                return buffer;
-            }
+            get { return buffer; }
         }
 
         /// <summary>
@@ -115,10 +115,7 @@ namespace NAudio.Wave
         /// </summary>
         public bool Done
         {
-            get
-            {
-                return (header.flags & WaveHeaderFlags.Done) == WaveHeaderFlags.Done;
-            }
+            get { return (header.flags & WaveHeaderFlags.Done) == WaveHeaderFlags.Done; }
         }
 
 
@@ -127,10 +124,7 @@ namespace NAudio.Wave
         /// </summary>
         public bool InQueue
         {
-            get
-            {
-                return (header.flags & WaveHeaderFlags.InQueue) == WaveHeaderFlags.InQueue;
-            }
+            get { return (header.flags & WaveHeaderFlags.InQueue) == WaveHeaderFlags.InQueue; }
         }
 
         /// <summary>
@@ -138,10 +132,7 @@ namespace NAudio.Wave
         /// </summary>
         public int BytesRecorded
         {
-            get
-            {
-                return header.bytesRecorded;
-            }
+            get { return header.bytesRecorded; }
         }
 
         /// <summary>
@@ -149,10 +140,7 @@ namespace NAudio.Wave
         /// </summary>
         public Int32 BufferSize
         {
-            get
-            {
-                return bufferSize;
-            }
+            get { return bufferSize; }
         }
     }
 }

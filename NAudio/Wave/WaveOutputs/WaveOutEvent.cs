@@ -53,7 +53,7 @@ namespace NAudio.Wave
             syncContext = SynchronizationContext.Current;
             if (syncContext != null &&
                 ((syncContext.GetType().Name == "LegacyAspNetSynchronizationContext") ||
-                (syncContext.GetType().Name == "AspNetSynchronizationContext")))
+                 (syncContext.GetType().Name == "AspNetSynchronizationContext")))
             {
                 syncContext = null;
             }
@@ -87,12 +87,16 @@ namespace NAudio.Wave
             callbackEvent = new AutoResetEvent(false);
 
             waveStream = waveProvider;
-            int bufferSize = waveProvider.WaveFormat.ConvertLatencyToByteSize((DesiredLatency + NumberOfBuffers - 1) / NumberOfBuffers);            
+            int bufferSize =
+                waveProvider.WaveFormat.ConvertLatencyToByteSize(
+                    (DesiredLatency + NumberOfBuffers - 1) / NumberOfBuffers);
 
             MmResult result;
             lock (waveOutLock)
             {
-                result = WaveInterop.waveOutOpenWindow(out hWaveOut, (IntPtr)DeviceNumber, waveStream.WaveFormat, callbackEvent.SafeWaitHandle.DangerousGetHandle(), IntPtr.Zero, WaveInterop.WaveInOutOpenFlags.CallbackEvent);
+                result = WaveInterop.waveOutOpenWindow(out hWaveOut, (IntPtr) DeviceNumber, waveStream.WaveFormat,
+                    callbackEvent.SafeWaitHandle.DangerousGetHandle(), IntPtr.Zero,
+                    WaveInterop.WaveInOutOpenFlags.CallbackEvent);
             }
             MmException.Try(result, "waveOutOpen");
 
@@ -156,8 +160,8 @@ namespace NAudio.Wave
                         Debug.WriteLine("WARNING: WaveOutEvent callback event timeout");
                     }
                 }
-                    
-                
+
+
                 // requeue any buffers returned to us
                 if (playbackState == PlaybackState.Playing)
                 {
@@ -254,11 +258,14 @@ namespace NAudio.Wave
             lock (waveOutLock)
             {
                 var mmTime = new MmTime();
-                mmTime.wType = MmTime.TIME_BYTES; // request results in bytes, TODO: perhaps make this a little more flexible and support the other types?
-                MmException.Try(WaveInterop.waveOutGetPosition(hWaveOut, out mmTime, Marshal.SizeOf(mmTime)), "waveOutGetPosition");
+                mmTime.wType =
+                    MmTime.TIME_BYTES; // request results in bytes, TODO: perhaps make this a little more flexible and support the other types?
+                MmException.Try(WaveInterop.waveOutGetPosition(hWaveOut, out mmTime, Marshal.SizeOf(mmTime)),
+                    "waveOutGetPosition");
 
                 if (mmTime.wType != MmTime.TIME_BYTES)
-                    throw new Exception(string.Format("waveOutGetPosition: wType -> Expected {0}, Received {1}", MmTime.TIME_BYTES, mmTime.wType));
+                    throw new Exception(string.Format("waveOutGetPosition: wType -> Expected {0}, Received {1}",
+                        MmTime.TIME_BYTES, mmTime.wType));
 
                 return mmTime.cb;
             }
@@ -332,7 +339,7 @@ namespace NAudio.Wave
                 if (hWaveOut != IntPtr.Zero)
                 {
                     WaveInterop.waveOutClose(hWaveOut);
-                    hWaveOut= IntPtr.Zero;
+                    hWaveOut = IntPtr.Zero;
                 }
             }
         }

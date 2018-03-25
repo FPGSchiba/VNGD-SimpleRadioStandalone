@@ -17,10 +17,12 @@ namespace NAudio.Wave.Asio
         /// most significant bits (Bits 32..63)
         /// </summary>
         public uint hi;
+
         /// <summary>
         /// least significant bits (Bits 0..31)
         /// </summary>
         public uint lo;
+
         // TODO: IMPLEMENT AN EASY WAY TO CONVERT THIS TO double  AND long
     };
 }

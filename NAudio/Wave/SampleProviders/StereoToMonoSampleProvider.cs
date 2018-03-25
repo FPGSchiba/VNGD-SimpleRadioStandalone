@@ -29,7 +29,7 @@ namespace NAudio.Wave.SampleProviders
         /// <summary>
         /// 1.0 to mix the mono source entirely to the left channel
         /// </summary>
-        public float LeftVolume { get; set; } 
+        public float LeftVolume { get; set; }
 
         /// <summary>
         /// 1.0 to mix the mono source entirely to the right channel
@@ -47,7 +47,8 @@ namespace NAudio.Wave.SampleProviders
         public int Read(float[] buffer, int offset, int count)
         {
             var sourceSamplesRequired = count * 2;
-            if (sourceBuffer == null || sourceBuffer.Length < sourceSamplesRequired) sourceBuffer = new float[sourceSamplesRequired];
+            if (sourceBuffer == null || sourceBuffer.Length < sourceSamplesRequired)
+                sourceBuffer = new float[sourceSamplesRequired];
 
             var sourceSamplesRead = sourceProvider.Read(sourceBuffer, 0, sourceSamplesRequired);
             var destOffset = offset / 2;

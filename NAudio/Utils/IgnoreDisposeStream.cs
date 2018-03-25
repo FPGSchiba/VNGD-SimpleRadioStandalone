@@ -63,14 +63,8 @@ namespace NAudio.Utils
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return SourceStream.Position;
-            }
-            set
-            {
-                SourceStream.Position = value;
-            }
+            get { return SourceStream.Position; }
+            set { SourceStream.Position = value; }
         }
 
         /// <summary>

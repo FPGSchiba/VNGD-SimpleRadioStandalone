@@ -18,6 +18,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     yield return descendants;
             }
         }
-
     }
 }

@@ -17,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public static double FrequencyToWaveLength(double frequency)
         {
             // speed of light /  frequency (hz)
-            return 299792458/frequency;
+            return 299792458 / frequency;
         }
 
         public static double FriisTransmissionReceivedPower(double distance, double frequency)
@@ -26,8 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             //Prx= Ptx(dB)+ Gtx(dB)+ Grx(dB)  -  20log(4*PI*d/lambda);
 
             return TransmissonPowerdBm + RxAntennaGain + TxAntennaGain -
-                   20*Math.Log10(
-                       4*Math.PI*distance/
+                   20 * Math.Log10(
+                       4 * Math.PI * distance /
                        FrequencyToWaveLength(frequency)
                    );
         }
@@ -42,15 +42,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             //of 40 watts
 
             //Hard coded value 995267.9264 based on re-arranged Friis with 40dbm transmissing
-            return (MagicPartiallySolvedFriis*
-                    FrequencyToWaveLength(frequency))/Math.PI;
+            return (MagicPartiallySolvedFriis *
+                    FrequencyToWaveLength(frequency)) / Math.PI;
         }
 
         //we can hear if the received power is more than the RX sensivity
         //Eventually this will scale the audio volume with distance
         public static bool CanHearTransmission(double distance, double frequency)
         {
-           // return FriisTransmissionReceivedPower(distance, frequency) > RXSensivity;
+            // return FriisTransmissionReceivedPower(distance, frequency) > RXSensivity;
             return FriisMaximumTransmissionRange(frequency) > distance;
         }
 

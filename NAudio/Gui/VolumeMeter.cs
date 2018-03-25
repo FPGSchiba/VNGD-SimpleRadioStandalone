@@ -21,7 +21,7 @@ namespace NAudio.Gui
         public VolumeMeter()
         {
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
-                ControlStyles.OptimizedDoubleBuffer, true);
+                          ControlStyles.OptimizedDoubleBuffer, true);
             MinDb = -60;
             MaxDb = 18;
             Amplitude = 0;
@@ -45,7 +45,7 @@ namespace NAudio.Gui
         /// Current Value
         /// </summary>
         [DefaultValue(-3.0)]
-        public float Amplitude 
+        public float Amplitude
         {
             get { return amplitude; }
             set
@@ -60,7 +60,7 @@ namespace NAudio.Gui
         /// </summary>
         [DefaultValue(-60.0)]
         public float MinDb { get; set; }
-        
+
         /// <summary>
         /// Maximum decibels
         /// </summary>
@@ -80,7 +80,7 @@ namespace NAudio.Gui
         {
             //base.OnPaint(pe);
 
-            
+
             pe.Graphics.DrawRectangle(Pens.Black, 0, 0, this.Width - 1, this.Height - 1);
 
             double db = 20 * Math.Log10(Amplitude);
@@ -94,16 +94,16 @@ namespace NAudio.Gui
             int height = this.Height - 2;
             if (Orientation == Orientation.Horizontal)
             {
-                width = (int)(width * percent);
+                width = (int) (width * percent);
 
                 pe.Graphics.FillRectangle(foregroundBrush, 1, 1, width, height);
             }
             else
             {
-                height = (int)(height * percent);
+                height = (int) (height * percent);
                 pe.Graphics.FillRectangle(foregroundBrush, 1, this.Height - 1 - height, width, height);
             }
-            
+
             /*
             StringFormat format = new StringFormat();
             format.LineAlignment = StringAlignment.Center;
@@ -116,7 +116,6 @@ namespace NAudio.Gui
 
             pe.Graphics.DrawString(dbValue, this.Font,
                 Brushes.Black, this.ClientRectangle, format);*/
-
         }
     }
 }

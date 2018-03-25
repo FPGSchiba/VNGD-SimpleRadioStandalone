@@ -12,6 +12,7 @@ namespace NAudio.Wave.SampleProviders
         /// Source Wave Provider
         /// </summary>
         protected IWaveProvider source;
+
         private readonly WaveFormat waveFormat;
 
         /// <summary>

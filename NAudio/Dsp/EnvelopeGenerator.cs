@@ -34,18 +34,22 @@ namespace NAudio.Dsp
             /// Idle
             /// </summary>
             Idle = 0,
+
             /// <summary>
             /// Attack
             /// </summary>
             Attack,
+
             /// <summary>
             /// Decay
             /// </summary>
             Decay,
+
             /// <summary>
             /// Sustain
             /// </summary>
             Sustain,
+
             /// <summary>
             /// Release
             /// </summary>
@@ -71,10 +75,7 @@ namespace NAudio.Dsp
         /// </summary>
         public float AttackRate
         {
-            get
-            {
-                return attackRate;
-            }
+            get { return attackRate; }
             set
             {
                 attackRate = value;
@@ -88,10 +89,7 @@ namespace NAudio.Dsp
         /// </summary>
         public float DecayRate
         {
-            get
-            {
-                return decayRate;
-            }
+            get { return decayRate; }
             set
             {
                 decayRate = value;
@@ -105,10 +103,7 @@ namespace NAudio.Dsp
         /// </summary>
         public float ReleaseRate
         {
-            get
-            {
-                return releaseRate;
-            }
+            get { return releaseRate; }
             set
             {
                 releaseRate = value;
@@ -119,7 +114,7 @@ namespace NAudio.Dsp
 
         private static float CalcCoef(float rate, float targetRatio)
         {
-            return (float)Math.Exp(-Math.Log((1.0f + targetRatio) / targetRatio) / rate);
+            return (float) Math.Exp(-Math.Log((1.0f + targetRatio) / targetRatio) / rate);
         }
 
         /// <summary>
@@ -127,10 +122,7 @@ namespace NAudio.Dsp
         /// </summary>
         public float SustainLevel
         {
-            get
-            {
-                return sustainLevel;
-            }
+            get { return sustainLevel; }
             set
             {
                 sustainLevel = value;
@@ -144,7 +136,7 @@ namespace NAudio.Dsp
         void SetTargetRatioAttack(float targetRatio)
         {
             if (targetRatio < 0.000000001f)
-                targetRatio = 0.000000001f;  // -180 dB
+                targetRatio = 0.000000001f; // -180 dB
             targetRatioAttack = targetRatio;
             attackBase = (1.0f + targetRatioAttack) * (1.0f - attackCoef);
         }
@@ -155,7 +147,7 @@ namespace NAudio.Dsp
         void SetTargetRatioDecayRelease(float targetRatio)
         {
             if (targetRatio < 0.000000001f)
-                targetRatio = 0.000000001f;  // -180 dB
+                targetRatio = 0.000000001f; // -180 dB
             targetRatioDecayRelease = targetRatio;
             decayBase = (sustainLevel - targetRatioDecayRelease) * (1.0f - decayCoef);
             releaseBase = -targetRatioDecayRelease * (1.0f - releaseCoef);
@@ -218,10 +210,7 @@ namespace NAudio.Dsp
         /// </summary>
         public EnvelopeState State
         {
-            get
-            {
-                return state;
-            }
+            get { return state; }
         }
 
         /// <summary>

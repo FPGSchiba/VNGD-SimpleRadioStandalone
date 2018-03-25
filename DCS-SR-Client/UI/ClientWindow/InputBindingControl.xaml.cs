@@ -35,22 +35,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             DeviceLabel.Content = InputName;
             ModifierLabel.Content = InputName + " Modifier";
-            ModifierBinding = (InputBinding)((int)ControlInputBinding)+100; //add 100 gets the enum of the modifier
-          
+            ModifierBinding = (InputBinding) ((int) ControlInputBinding) + 100; //add 100 gets the enum of the modifier
+
 
             if (SettingsStore.Instance.InputDevices != null)
             {
                 var devices = SettingsStore.Instance.InputDevices;
                 if (SettingsStore.Instance.InputDevices.ContainsKey(ControlInputBinding))
                 {
-                    var button = devices[ ControlInputBinding].Button;
+                    var button = devices[ControlInputBinding].Button;
                     DeviceText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
                     Device.Text = devices[ControlInputBinding].DeviceName;
                 }
 
                 if (SettingsStore.Instance.InputDevices.ContainsKey(ModifierBinding))
                 {
-                    var button = devices[ ModifierBinding].Button;
+                    var button = devices[ModifierBinding].Button;
                     ModifierText.Text = button < 128 ? button.ToString() : "POV " + (button - 127); //output POV info
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
                 }

@@ -34,7 +34,7 @@ namespace NAudio.CoreAudioApi
         {
             GC.SuppressFinalize(this);
         }
-        
+
         /// <summary>
         /// Finalizer
         /// </summary>
@@ -75,15 +75,12 @@ namespace NAudio.CoreAudioApi
             get
             {
                 bool result;
-                
+
                 Marshal.ThrowExceptionForHR(simpleAudioVolume.GetMute(out result));
-               
+
                 return result;
             }
-            set
-            {
-                Marshal.ThrowExceptionForHR(simpleAudioVolume.SetMute(value, Guid.Empty));
-            }
+            set { Marshal.ThrowExceptionForHR(simpleAudioVolume.SetMute(value, Guid.Empty)); }
         }
     }
 }

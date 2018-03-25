@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                    clientRadio.volume = (float) RadioVolume.Value/100.0f;
+                    clientRadio.volume = (float) RadioVolume.Value / 100.0f;
                 }
             }
 
@@ -113,7 +113,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
                     {
                         IntercomNumberSpinner.IsEnabled = true;
-                        IntercomNumberSpinner.Value = (int)(dcsPlayerRadioInfo.unitId - DCSPlayerRadioInfo.UnitIdOffset);
+                        IntercomNumberSpinner.Value =
+                            (int) (dcsPlayerRadioInfo.unitId - DCSPlayerRadioInfo.UnitIdOffset);
                     }
                     else
                     {
@@ -132,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (_dragging == false)
                 {
-                    RadioVolume.Value = currentRadio.volume*100.0;
+                    RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
         }
@@ -147,12 +148,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
+                (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
             {
-               
-                    dcsPlayerRadioInfo.unitId = DCSPlayerRadioInfo.UnitIdOffset + ((uint) ((uint)IntercomNumberSpinner.Value));
+                dcsPlayerRadioInfo.unitId =
+                    DCSPlayerRadioInfo.UnitIdOffset + ((uint) ((uint) IntercomNumberSpinner.Value));
                 RadioDCSSyncServer.LastSent = 0; //force refresh
-
             }
         }
     }

@@ -39,7 +39,7 @@ namespace NAudio.Midi
         public static MidiMessage StartNote(int note, int volume, int channel)
         {
             ValidateNoteParameters(note, volume, channel);
-            return new MidiMessage((int)MidiCommandCode.NoteOn + channel - 1, note, volume);
+            return new MidiMessage((int) MidiCommandCode.NoteOn + channel - 1, note, volume);
         }
 
         private static void ValidateNoteParameters(int note, int volume, int channel)
@@ -74,7 +74,7 @@ namespace NAudio.Midi
         public static MidiMessage StopNote(int note, int volume, int channel)
         {
             ValidateNoteParameters(note, volume, channel);
-            return new MidiMessage((int)MidiCommandCode.NoteOff + channel - 1, note, volume);
+            return new MidiMessage((int) MidiCommandCode.NoteOff + channel - 1, note, volume);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace NAudio.Midi
         public static MidiMessage ChangePatch(int patch, int channel)
         {
             ValidateChannel(channel);
-            return new MidiMessage((int)MidiCommandCode.PatchChange + channel - 1, patch, 0);
+            return new MidiMessage((int) MidiCommandCode.PatchChange + channel - 1, patch, 0);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace NAudio.Midi
         public static MidiMessage ChangeControl(int controller, int value, int channel)
         {
             ValidateChannel(channel);
-            return new MidiMessage((int)MidiCommandCode.ControlChange + channel - 1, controller, value);
+            return new MidiMessage((int) MidiCommandCode.ControlChange + channel - 1, controller, value);
         }
 
         /// <summary>
@@ -107,10 +107,7 @@ namespace NAudio.Midi
         /// </summary>
         public int RawData
         {
-            get
-            {
-                return rawData;
-            }
+            get { return rawData; }
         }
     }
 }

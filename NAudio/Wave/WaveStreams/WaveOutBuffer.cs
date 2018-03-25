@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace NAudio.Wave 
+namespace NAudio.Wave
 {
     /// <summary>
     /// A buffer of Wave samples for streaming to a Wave Output device
@@ -40,10 +40,11 @@ namespace NAudio.Wave
             header.bufferLength = bufferSize;
             header.loops = 1;
             hThis = GCHandle.Alloc(this);
-            header.userData = (IntPtr)hThis;
+            header.userData = (IntPtr) hThis;
             lock (waveOutLock)
             {
-                MmException.Try(WaveInterop.waveOutPrepareHeader(hWaveOut, header, Marshal.SizeOf(header)), "waveOutPrepareHeader");
+                MmException.Try(WaveInterop.waveOutPrepareHeader(hWaveOut, header, Marshal.SizeOf(header)),
+                    "waveOutPrepareHeader");
             }
         }
 
@@ -120,10 +121,7 @@ namespace NAudio.Wave
         /// </summary>
         public bool InQueue
         {
-            get
-            {
-                return (header.flags & WaveHeaderFlags.InQueue) == WaveHeaderFlags.InQueue;
-            }
+            get { return (header.flags & WaveHeaderFlags.InQueue) == WaveHeaderFlags.InQueue; }
         }
 
         /// <summary>
@@ -146,6 +144,5 @@ namespace NAudio.Wave
 
             GC.KeepAlive(this);
         }
-
     }
 }

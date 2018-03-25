@@ -32,7 +32,7 @@ namespace NAudio.Wave
 
                 while (sourceProvider.Position < sourceProvider.Length)
                 {
-                    int count = Math.Min((int)(sourceProvider.Length - sourceProvider.Position), buffer.Length);
+                    int count = Math.Min((int) (sourceProvider.Length - sourceProvider.Position), buffer.Length);
                     int bytesRead = sourceProvider.Read(buffer, 0, count);
 
                     if (bytesRead == 0)
@@ -57,7 +57,7 @@ namespace NAudio.Wave
             this.format = format;
             this.writer = new BinaryWriter(outStream, System.Text.Encoding.UTF8);
             this.writer.Write(System.Text.Encoding.UTF8.GetBytes("FORM"));
-            this.writer.Write((int)0); // placeholder
+            this.writer.Write((int) 0); // placeholder
             this.writer.Write(System.Text.Encoding.UTF8.GetBytes("AIFF"));
 
             CreateCommChunk();
@@ -79,29 +79,31 @@ namespace NAudio.Wave
         {
             this.writer.Write(System.Text.Encoding.UTF8.GetBytes("SSND"));
             dataSizePos = this.outStream.Position;
-            this.writer.Write((int)0);  // placeholder
-            this.writer.Write((int)0);  // zero offset
-            this.writer.Write(SwapEndian((int)format.BlockAlign));
+            this.writer.Write((int) 0); // placeholder
+            this.writer.Write((int) 0); // zero offset
+            this.writer.Write(SwapEndian((int) format.BlockAlign));
         }
 
         private byte[] SwapEndian(short n)
         {
-            return new byte[] { (byte)(n >> 8), (byte)(n & 0xff) };
+            return new byte[] {(byte) (n >> 8), (byte) (n & 0xff)};
         }
 
         private byte[] SwapEndian(int n)
         {
-            return new byte[] { (byte)((n >> 24) & 0xff), (byte)((n >> 16) & 0xff), (byte)((n >> 8) & 0xff), (byte)(n & 0xff), };
+            return new byte[]
+                {(byte) ((n >> 24) & 0xff), (byte) ((n >> 16) & 0xff), (byte) ((n >> 8) & 0xff), (byte) (n & 0xff),};
         }
 
         private void CreateCommChunk()
         {
             this.writer.Write(System.Text.Encoding.UTF8.GetBytes("COMM"));
-            this.writer.Write(SwapEndian((int)18));
-            this.writer.Write(SwapEndian((short)format.Channels));
-            commSampleCountPos = this.outStream.Position; ;
-            this.writer.Write((int)0);  // placeholder for total number of samples
-            this.writer.Write(SwapEndian((short)format.BitsPerSample));
+            this.writer.Write(SwapEndian((int) 18));
+            this.writer.Write(SwapEndian((short) format.Channels));
+            commSampleCountPos = this.outStream.Position;
+            ;
+            this.writer.Write((int) 0); // placeholder for total number of samples
+            this.writer.Write(SwapEndian((short) format.BitsPerSample));
             this.writer.Write(IEEE.ConvertToIeeeExtended(format.SampleRate));
         }
 
@@ -201,7 +203,7 @@ namespace NAudio.Wave
 
             for (int i = 0; i < data.Length; i++)
             {
-                int pos = (int)Math.Floor((double)i / align) * align + (align - (i % align) - 1);
+                int pos = (int) Math.Floor((double) i / align) * align + (align - (i % align) - 1);
                 swappedData[i] = data[pos];
             }
 
@@ -219,12 +221,12 @@ namespace NAudio.Wave
         {
             if (WaveFormat.BitsPerSample == 16)
             {
-                writer.Write(SwapEndian((Int16)(Int16.MaxValue * sample)));
+                writer.Write(SwapEndian((Int16) (Int16.MaxValue * sample)));
                 dataChunkSize += 2;
             }
             else if (WaveFormat.BitsPerSample == 24)
             {
-                var value = BitConverter.GetBytes((Int32)(Int32.MaxValue * sample));
+                var value = BitConverter.GetBytes((Int32) (Int32.MaxValue * sample));
                 value24[2] = value[1];
                 value24[1] = value[2];
                 value24[0] = value[3];
@@ -233,7 +235,7 @@ namespace NAudio.Wave
             }
             else if (WaveFormat.BitsPerSample == 32 && WaveFormat.Encoding == NAudio.Wave.WaveFormatEncoding.Extensible)
             {
-                writer.Write(SwapEndian(UInt16.MaxValue * (Int32)sample));
+                writer.Write(SwapEndian(UInt16.MaxValue * (Int32) sample));
                 dataChunkSize += 4;
             }
             else
@@ -280,7 +282,7 @@ namespace NAudio.Wave
                 byte[] value;
                 for (int sample = 0; sample < count; sample++)
                 {
-                    value = BitConverter.GetBytes(UInt16.MaxValue * (Int32)samples[sample + offset]);
+                    value = BitConverter.GetBytes(UInt16.MaxValue * (Int32) samples[sample + offset]);
                     value24[2] = value[1];
                     value24[1] = value[2];
                     value24[0] = value[3];
@@ -293,7 +295,7 @@ namespace NAudio.Wave
             {
                 for (int sample = 0; sample < count; sample++)
                 {
-                    writer.Write(SwapEndian(UInt16.MaxValue * (Int32)samples[sample + offset]));
+                    writer.Write(SwapEndian(UInt16.MaxValue * (Int32) samples[sample + offset]));
                 }
                 dataChunkSize += (count * 4);
             }
@@ -345,21 +347,21 @@ namespace NAudio.Wave
         {
             this.Flush();
             writer.Seek(4, SeekOrigin.Begin);
-            writer.Write(SwapEndian((int)(outStream.Length - 8)));
+            writer.Write(SwapEndian((int) (outStream.Length - 8)));
             UpdateCommChunk(writer);
             UpdateSsndChunk(writer);
         }
 
         private void UpdateCommChunk(BinaryWriter writer)
         {
-            writer.Seek((int)commSampleCountPos, SeekOrigin.Begin);
-            writer.Write(SwapEndian((int)(dataChunkSize * 8 / format.BitsPerSample / format.Channels)));
+            writer.Seek((int) commSampleCountPos, SeekOrigin.Begin);
+            writer.Write(SwapEndian((int) (dataChunkSize * 8 / format.BitsPerSample / format.Channels)));
         }
 
         private void UpdateSsndChunk(BinaryWriter writer)
         {
-            writer.Seek((int)dataSizePos, SeekOrigin.Begin);
-            writer.Write(SwapEndian((int)dataChunkSize));
+            writer.Seek((int) dataSizePos, SeekOrigin.Begin);
+            writer.Write(SwapEndian((int) dataChunkSize));
         }
 
         /// <summary>

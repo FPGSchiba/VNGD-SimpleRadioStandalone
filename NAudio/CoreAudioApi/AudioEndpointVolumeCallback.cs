@@ -37,12 +37,12 @@ namespace NAudio.CoreAudioApi
     internal class AudioEndpointVolumeCallback : IAudioEndpointVolumeCallback
     {
         private readonly AudioEndpointVolume parent;
-        
+
         internal AudioEndpointVolumeCallback(AudioEndpointVolume parent)
         {
             this.parent = parent;
         }
-        
+
         public void OnNotify(IntPtr notifyData)
         {
             //Since AUDIO_VOLUME_NOTIFICATION_DATA is dynamic in length based on the
@@ -52,14 +52,14 @@ namespace NAudio.CoreAudioApi
             //remaining floats are read from memory.
             //
             var data = MarshalHelpers.PtrToStructure<AudioVolumeNotificationDataStruct>(notifyData);
-            
+
             //Determine offset in structure of the first float
             var offset = MarshalHelpers.OffsetOf<AudioVolumeNotificationDataStruct>("ChannelVolume");
             //Determine offset in memory of the first float
-            var firstFloatPtr = (IntPtr)((long)notifyData + (long)offset);
+            var firstFloatPtr = (IntPtr) ((long) notifyData + (long) offset);
 
             var voldata = new float[data.nChannels];
-            
+
             //Read all floats from memory.
             for (int i = 0; i < data.nChannels; i++)
             {
@@ -67,7 +67,8 @@ namespace NAudio.CoreAudioApi
             }
 
             //Create combined structure and Fire Event in parent class.
-            var notificationData = new AudioVolumeNotificationData(data.guidEventContext, data.bMuted, data.fMasterVolume, voldata, data.guidEventContext);
+            var notificationData = new AudioVolumeNotificationData(data.guidEventContext, data.bMuted,
+                data.fMasterVolume, voldata, data.guidEventContext);
             parent.FireNotification(notificationData);
         }
     }

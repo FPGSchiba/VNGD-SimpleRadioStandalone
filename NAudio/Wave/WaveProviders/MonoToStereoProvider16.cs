@@ -66,8 +66,8 @@ namespace NAudio.Wave
             for (var sample = 0; sample < samplesRead; sample++)
             {
                 short sampleVal = sourceWaveBuffer.ShortBuffer[sample];
-                destWaveBuffer.ShortBuffer[destOffset++] = (short)(LeftVolume * sampleVal);
-                destWaveBuffer.ShortBuffer[destOffset++] = (short)(RightVolume * sampleVal);
+                destWaveBuffer.ShortBuffer[destOffset++] = (short) (LeftVolume * sampleVal);
+                destWaveBuffer.ShortBuffer[destOffset++] = (short) (RightVolume * sampleVal);
             }
             return samplesRead * 4;
         }

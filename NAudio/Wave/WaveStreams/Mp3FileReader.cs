@@ -23,7 +23,7 @@ namespace NAudio.Wave
         private Stream mp3Stream;
         private readonly long mp3DataLength;
         private readonly long dataStartPosition;
-        
+
         /// <summary>
         /// The MP3 wave format (n.b. NOT the output format of this stream - see the WaveFormat property)
         /// </summary>
@@ -40,7 +40,7 @@ namespace NAudio.Wave
         private readonly int bytesPerDecodedFrame;
 
         private IMp3FrameDecompressor decompressor;
-        
+
         private readonly byte[] decompressBuffer;
         private int decompressBufferOffset;
         private int decompressLeftovers;
@@ -51,7 +51,7 @@ namespace NAudio.Wave
         private readonly object repositionLock = new object();
 
         /// <summary>Supports opening a MP3 file</summary>
-        public Mp3FileReader(string mp3FileName) 
+        public Mp3FileReader(string mp3FileName)
             : this(File.OpenRead(mp3FileName), CreateAcmFrameDecompressor, true)
         {
         }
@@ -70,9 +70,8 @@ namespace NAudio.Wave
         /// </summary>
         /// <param name="inputStream">The incoming stream containing MP3 data</param>
         public Mp3FileReader(Stream inputStream)
-            : this (inputStream, CreateAcmFrameDecompressor, false)
+            : this(inputStream, CreateAcmFrameDecompressor, false)
         {
-            
         }
 
         /// <summary>
@@ -84,10 +83,10 @@ namespace NAudio.Wave
         public Mp3FileReader(Stream inputStream, FrameDecompressorBuilder frameDecompressorBuilder)
             : this(inputStream, frameDecompressorBuilder, false)
         {
-            
         }
 
-        private Mp3FileReader(Stream inputStream, FrameDecompressorBuilder frameDecompressorBuilder, bool ownInputStream)
+        private Mp3FileReader(Stream inputStream, FrameDecompressorBuilder frameDecompressorBuilder,
+            bool ownInputStream)
         {
             if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
             if (frameDecompressorBuilder == null) throw new ArgumentNullException(nameof(frameDecompressorBuilder));
@@ -145,7 +144,7 @@ namespace NAudio.Wave
 
                 // Note: in audio, 1 kilobit = 1000 bits.
                 // Calculated as a double to minimize rounding errors
-                bitRate = (mp3DataLength*8.0/TotalSeconds());
+                bitRate = (mp3DataLength * 8.0 / TotalSeconds());
 
                 mp3Stream.Position = dataStartPosition;
 
@@ -154,7 +153,7 @@ namespace NAudio.Wave
                     firstFrame.ChannelMode == ChannelMode.Mono ? 1 : 2, firstFrame.FrameLength, (int) bitRate);
                 decompressor = frameDecompressorBuilder(Mp3WaveFormat);
                 waveFormat = decompressor.OutputFormat;
-                bytesPerSample = (decompressor.OutputFormat.BitsPerSample)/8*decompressor.OutputFormat.Channels;
+                bytesPerSample = (decompressor.OutputFormat.BitsPerSample) / 8 * decompressor.OutputFormat.Channels;
                 // no MP3 frames have more than 1152 samples in them
                 bytesPerDecodedFrame = 1152 * bytesPerSample;
                 // some MP3s I seem to get double
@@ -191,7 +190,7 @@ namespace NAudio.Wave
             {
                 // Just a guess at how many entries we'll need so the internal array need not resize very much
                 // 400 bytes per frame is probably a good enough approximation.
-                tableOfContents = new List<Mp3Index>((int)(mp3DataLength / 400));
+                tableOfContents = new List<Mp3Index>((int) (mp3DataLength / 400));
                 Mp3Frame frame;
                 do
                 {
@@ -205,7 +204,7 @@ namespace NAudio.Wave
 
                         totalSamples += frame.SampleCount;
                         index.SampleCount = frame.SampleCount;
-                        index.ByteCount = (int)(mp3Stream.Position - index.FilePosition);
+                        index.ByteCount = (int) (mp3Stream.Position - index.FilePosition);
                         tableOfContents.Add(index);
                     }
                 } while (frame != null);
@@ -242,7 +241,7 @@ namespace NAudio.Wave
         /// </summary>
         private double TotalSeconds()
         {
-            return (double)totalSamples / Mp3WaveFormat.SampleRate;
+            return (double) totalSamples / Mp3WaveFormat.SampleRate;
         }
 
         /// <summary>
@@ -264,7 +263,7 @@ namespace NAudio.Wave
         public Mp3Frame ReadNextFrame()
         {
             var frame = ReadNextFrame(true);
-            if (frame != null) position += frame.SampleCount*bytesPerSample;
+            if (frame != null) position += frame.SampleCount * bytesPerSample;
             return frame;
         }
 
@@ -308,10 +307,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 lock (repositionLock)
@@ -342,7 +338,7 @@ namespace NAudio.Wave
                         var frameOffset = samplePosition - mp3Index.SamplePosition;
                         if (frameOffset > 0)
                         {
-                            decompressBufferOffset = (int)frameOffset * bytesPerSample;
+                            decompressBufferOffset = (int) frameOffset * bytesPerSample;
                         }
                     }
                     else
@@ -423,7 +419,8 @@ namespace NAudio.Wave
                         else if (tocIndex == targetTocIndex + 1 && decompressed == bytesPerDecodedFrame * 2)
                         {
                             // Purge the first frame's data
-                            Array.Copy(decompressBuffer, bytesPerDecodedFrame, decompressBuffer, 0, bytesPerDecodedFrame);
+                            Array.Copy(decompressBuffer, bytesPerDecodedFrame, decompressBuffer, 0,
+                                bytesPerDecodedFrame);
                             decompressed = bytesPerDecodedFrame;
                         }
 

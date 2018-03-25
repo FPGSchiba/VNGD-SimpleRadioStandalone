@@ -34,8 +34,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
 
              */
 
-            _filters[0] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, sampleProvider.WaveFormat.SampleRate, 560, 3900);
-            _filters[1] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, sampleProvider.WaveFormat.SampleRate, 100, 4500);
+            _filters[0] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, sampleProvider.WaveFormat.SampleRate, 560,
+                3900);
+            _filters[1] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, sampleProvider.WaveFormat.SampleRate, 100,
+                4500);
         }
 
         public WaveFormat WaveFormat

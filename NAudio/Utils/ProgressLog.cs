@@ -22,18 +22,13 @@ namespace NAudio.Utils
         }
 
 
-
         /// <summary>
         /// The contents of the log as text
         /// </summary>
         public new string Text
         {
-            get
-            {
-                return richTextBoxLog.Text;
-            }
+            get { return richTextBoxLog.Text; }
         }
-
 
 
         delegate void LogMessageDelegate(Color color, string message);
@@ -45,7 +40,7 @@ namespace NAudio.Utils
         {
             if (richTextBoxLog.InvokeRequired)
             {
-                this.Invoke(new LogMessageDelegate(LogMessage), new object[] { color, message });
+                this.Invoke(new LogMessageDelegate(LogMessage), new object[] {color, message});
             }
             else
             {
@@ -71,6 +66,6 @@ namespace NAudio.Utils
             {
                 richTextBoxLog.Clear();
             }
-        }        
+        }
     }
 }

@@ -82,7 +82,7 @@ namespace NAudio.Wave.Asio
         /// Gets the name of the driver.
         /// </summary>
         /// <returns></returns>
-        public string GetDriverName() 
+        public string GetDriverName()
         {
             var name = new StringBuilder(256);
             asioDriverVTable.getDriverName(pAsioComObject, name);
@@ -93,7 +93,8 @@ namespace NAudio.Wave.Asio
         /// Gets the driver version.
         /// </summary>
         /// <returns></returns>
-        public int GetDriverVersion() {
+        public int GetDriverVersion()
+        {
             return asioDriverVTable.getDriverVersion(pAsioComObject);
         }
 
@@ -113,7 +114,7 @@ namespace NAudio.Wave.Asio
         /// </summary>
         public void Start()
         {
-            HandleException(asioDriverVTable.start(pAsioComObject),"start");
+            HandleException(asioDriverVTable.start(pAsioComObject), "start");
         }
 
         /// <summary>
@@ -131,7 +132,8 @@ namespace NAudio.Wave.Asio
         /// <param name="numOutputChannels">The num output channels.</param>
         public void GetChannels(out int numInputChannels, out int numOutputChannels)
         {
-            HandleException(asioDriverVTable.getChannels(pAsioComObject, out numInputChannels, out numOutputChannels), "getChannels");
+            HandleException(asioDriverVTable.getChannels(pAsioComObject, out numInputChannels, out numOutputChannels),
+                "getChannels");
         }
 
         /// <summary>
@@ -153,7 +155,9 @@ namespace NAudio.Wave.Asio
         /// <param name="granularity">The granularity.</param>
         public void GetBufferSize(out int minSize, out int maxSize, out int preferredSize, out int granularity)
         {
-            HandleException(asioDriverVTable.getBufferSize(pAsioComObject, out minSize, out maxSize, out preferredSize, out granularity), "getBufferSize");
+            HandleException(
+                asioDriverVTable.getBufferSize(pAsioComObject, out minSize, out maxSize, out preferredSize,
+                    out granularity), "getBufferSize");
         }
 
         /// <summary>
@@ -169,8 +173,8 @@ namespace NAudio.Wave.Asio
             if (error == AsioError.ASE_NoClock)
             {
                 return false;
-            } 
-            if ( error == AsioError.ASE_OK )
+            }
+            if (error == AsioError.ASE_OK)
             {
                 return true;
             }
@@ -205,7 +209,8 @@ namespace NAudio.Wave.Asio
         /// <param name="numSources">The num sources.</param>
         public void GetClockSources(out long clocks, int numSources)
         {
-            HandleException(asioDriverVTable.getClockSources(pAsioComObject, out clocks,numSources), "getClockSources");
+            HandleException(asioDriverVTable.getClockSources(pAsioComObject, out clocks, numSources),
+                "getClockSources");
         }
 
         /// <summary>
@@ -224,7 +229,8 @@ namespace NAudio.Wave.Asio
         /// <param name="timeStamp">The time stamp.</param>
         public void GetSamplePosition(out long samplePos, ref Asio64Bit timeStamp)
         {
-            HandleException(asioDriverVTable.getSamplePosition(pAsioComObject, out samplePos, ref timeStamp), "getSamplePosition");
+            HandleException(asioDriverVTable.getSamplePosition(pAsioComObject, out samplePos, ref timeStamp),
+                "getSamplePosition");
         }
 
         /// <summary>
@@ -252,7 +258,9 @@ namespace NAudio.Wave.Asio
             // next two lines suggested by droidi on codeplex issue tracker
             pinnedcallbacks = Marshal.AllocHGlobal(Marshal.SizeOf(callbacks));
             Marshal.StructureToPtr(callbacks, pinnedcallbacks, false);
-            HandleException(asioDriverVTable.createBuffers(pAsioComObject, bufferInfos, numChannels, bufferSize, pinnedcallbacks), "createBuffers");
+            HandleException(
+                asioDriverVTable.createBuffers(pAsioComObject, bufferInfos, numChannels, bufferSize, pinnedcallbacks),
+                "createBuffers");
         }
 
         /// <summary>
@@ -330,10 +338,11 @@ namespace NAudio.Wave.Asio
             // USE CoCreateInstance instead of builtin COM-Class instantiation,
             // because the AsioDriver expect to have the ASIOGuid used for both COM Object and COM interface
             // The CoCreateInstance is working only in STAThread mode.
-            int hresult = CoCreateInstance(ref asioGuid, IntPtr.Zero, CLSCTX_INPROC_SERVER, ref asioGuid, out pAsioComObject);
-            if ( hresult != 0 )
+            int hresult = CoCreateInstance(ref asioGuid, IntPtr.Zero, CLSCTX_INPROC_SERVER, ref asioGuid,
+                out pAsioComObject);
+            if (hresult != 0)
             {
-                throw new COMException("Unable to instantiate ASIO. Check if STAThread is set",hresult);
+                throw new COMException("Unable to instantiate ASIO. Check if STAThread is set", hresult);
             }
 
             // The first pointer at the adress of the ASIO Com Object is a pointer to the
@@ -346,14 +355,16 @@ namespace NAudio.Wave.Asio
 
             // This loop is going to retrieve the pointer from the C++ VirtualTable
             // and attach an internal delegate in order to call the method on the COM Object.
-            FieldInfo[] fieldInfos =  typeof (AsioDriverVTable).GetFields();
+            FieldInfo[] fieldInfos = typeof(AsioDriverVTable).GetFields();
             for (int i = 0; i < fieldInfos.Length; i++)
             {
                 FieldInfo fieldInfo = fieldInfos[i];
                 // Read the method pointer from the VTable
-                IntPtr pPointerToMethodInVTable = Marshal.ReadIntPtr(pVtable, (i + INDEX_VTABLE_FIRST_METHOD) * IntPtr.Size);
+                IntPtr pPointerToMethodInVTable =
+                    Marshal.ReadIntPtr(pVtable, (i + INDEX_VTABLE_FIRST_METHOD) * IntPtr.Size);
                 // Instantiate a delegate
-                object methodDelegate = Marshal.GetDelegateForFunctionPointer(pPointerToMethodInVTable, fieldInfo.FieldType);
+                object methodDelegate =
+                    Marshal.GetDelegateForFunctionPointer(pPointerToMethodInVTable, fieldInfo.FieldType);
                 // Store the delegate in our C# VTable
                 fieldInfo.SetValue(asioDriverVTable, methodDelegate);
             }
@@ -368,95 +379,140 @@ namespace NAudio.Wave.Asio
             //3  virtual ASIOBool init(void *sysHandle) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate int ASIOInit(IntPtr _pUnknown, IntPtr sysHandle);
+
             public ASIOInit init = null;
+
             //4  virtual void getDriverName(char *name) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate void ASIOgetDriverName(IntPtr _pUnknown, StringBuilder name);
+
             public ASIOgetDriverName getDriverName = null;
+
             //5  virtual long getDriverVersion() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate int ASIOgetDriverVersion(IntPtr _pUnknown);
+
             public ASIOgetDriverVersion getDriverVersion = null;
+
             //6  virtual void getErrorMessage(char *string) = 0;	
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate void ASIOgetErrorMessage(IntPtr _pUnknown, StringBuilder errorMessage);
+
             public ASIOgetErrorMessage getErrorMessage = null;
+
             //7  virtual ASIOError start() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOstart(IntPtr _pUnknown);
+
             public ASIOstart start = null;
+
             //8  virtual ASIOError stop() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOstop(IntPtr _pUnknown);
+
             public ASIOstop stop = null;
+
             //9  virtual ASIOError getChannels(long *numInputChannels, long *numOutputChannels) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-            public delegate AsioError ASIOgetChannels(IntPtr _pUnknown, out int numInputChannels, out int numOutputChannels);
+            public delegate AsioError ASIOgetChannels(IntPtr _pUnknown, out int numInputChannels,
+                out int numOutputChannels);
+
             public ASIOgetChannels getChannels = null;
+
             //10  virtual ASIOError getLatencies(long *inputLatency, long *outputLatency) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOgetLatencies(IntPtr _pUnknown, out int inputLatency, out int outputLatency);
+
             public ASIOgetLatencies getLatencies = null;
+
             //11 virtual ASIOError getBufferSize(long *minSize, long *maxSize, long *preferredSize, long *granularity) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-            public delegate AsioError ASIOgetBufferSize(IntPtr _pUnknown, out int minSize, out int maxSize, out int preferredSize, out int granularity);
+            public delegate AsioError ASIOgetBufferSize(IntPtr _pUnknown, out int minSize, out int maxSize,
+                out int preferredSize, out int granularity);
+
             public ASIOgetBufferSize getBufferSize = null;
+
             //12 virtual ASIOError canSampleRate(ASIOSampleRate sampleRate) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOcanSampleRate(IntPtr _pUnknown, double sampleRate);
+
             public ASIOcanSampleRate canSampleRate = null;
+
             //13 virtual ASIOError getSampleRate(ASIOSampleRate *sampleRate) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOgetSampleRate(IntPtr _pUnknown, out double sampleRate);
+
             public ASIOgetSampleRate getSampleRate = null;
+
             //14 virtual ASIOError setSampleRate(ASIOSampleRate sampleRate) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOsetSampleRate(IntPtr _pUnknown, double sampleRate);
+
             public ASIOsetSampleRate setSampleRate = null;
+
             //15 virtual ASIOError getClockSources(ASIOClockSource *clocks, long *numSources) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOgetClockSources(IntPtr _pUnknown, out long clocks, int numSources);
+
             public ASIOgetClockSources getClockSources = null;
+
             //16 virtual ASIOError setClockSource(long reference) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOsetClockSource(IntPtr _pUnknown, int reference);
+
             public ASIOsetClockSource setClockSource = null;
+
             //17 virtual ASIOError getSamplePosition(ASIOSamples *sPos, ASIOTimeStamp *tStamp) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-            public delegate AsioError ASIOgetSamplePosition(IntPtr _pUnknown, out long samplePos, ref Asio64Bit timeStamp);
+            public delegate AsioError ASIOgetSamplePosition(IntPtr _pUnknown, out long samplePos,
+                ref Asio64Bit timeStamp);
+
             public ASIOgetSamplePosition getSamplePosition = null;
+
             //18 virtual ASIOError getChannelInfo(ASIOChannelInfo *info) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOgetChannelInfo(IntPtr _pUnknown, ref AsioChannelInfo info);
+
             public ASIOgetChannelInfo getChannelInfo = null;
+
             //19 virtual ASIOError createBuffers(ASIOBufferInfo *bufferInfos, long numChannels, long bufferSize, ASIOCallbacks *callbacks) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             //            public delegate ASIOError ASIOcreateBuffers(IntPtr _pUnknown, ref ASIOBufferInfo[] bufferInfos, int numChannels, int bufferSize, ref ASIOCallbacks callbacks);
-            public delegate AsioError ASIOcreateBuffers(IntPtr _pUnknown, IntPtr bufferInfos, int numChannels, int bufferSize, IntPtr callbacks);
+            public delegate AsioError ASIOcreateBuffers(IntPtr _pUnknown, IntPtr bufferInfos, int numChannels,
+                int bufferSize, IntPtr callbacks);
+
             public ASIOcreateBuffers createBuffers = null;
+
             //20 virtual ASIOError disposeBuffers() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOdisposeBuffers(IntPtr _pUnknown);
+
             public ASIOdisposeBuffers disposeBuffers = null;
+
             //21 virtual ASIOError controlPanel() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOcontrolPanel(IntPtr _pUnknown);
+
             public ASIOcontrolPanel controlPanel = null;
+
             //22 virtual ASIOError future(long selector,void *opt) = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOfuture(IntPtr _pUnknown, int selector, IntPtr opt);
+
             public ASIOfuture future = null;
+
             //23 virtual ASIOError outputReady() = 0;
             [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
             public delegate AsioError ASIOoutputReady(IntPtr _pUnknown);
+
             public ASIOoutputReady outputReady = null;
         }
 
         [DllImport("ole32.Dll")]
         private static extern int CoCreateInstance(ref Guid clsid,
-           IntPtr inner,
-           uint context,
-           ref Guid uuid,
-           out IntPtr rReturnedComObject);
+            IntPtr inner,
+            uint context,
+            ref Guid uuid,
+            out IntPtr rReturnedComObject);
     }
 }

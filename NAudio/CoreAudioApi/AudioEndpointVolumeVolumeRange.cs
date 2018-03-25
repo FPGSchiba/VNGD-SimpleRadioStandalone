@@ -20,6 +20,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 // modified for NAudio
+
 using System;
 using NAudio.CoreAudioApi.Interfaces;
 using System.Runtime.InteropServices;
@@ -37,7 +38,8 @@ namespace NAudio.CoreAudioApi
 
         internal AudioEndpointVolumeVolumeRange(IAudioEndpointVolume parent)
         {
-            Marshal.ThrowExceptionForHR(parent.GetVolumeRange(out volumeMinDecibels,out volumeMaxDecibels,out volumeIncrementDecibels));
+            Marshal.ThrowExceptionForHR(parent.GetVolumeRange(out volumeMinDecibels, out volumeMaxDecibels,
+                out volumeIncrementDecibels));
         }
 
         /// <summary>

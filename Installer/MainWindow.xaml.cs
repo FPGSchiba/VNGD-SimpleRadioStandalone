@@ -218,7 +218,7 @@ namespace Installer
             {
                 message += ("\n" + path);
             }
-                
+
             MessageBox.Show(message, "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -255,7 +255,6 @@ namespace Installer
                 {
                 }
             }
-          
         }
 
         private void InstallProgram(string path)
@@ -326,7 +325,7 @@ namespace Installer
         {
             //if scripts folder doesnt exist, create it
             Directory.CreateDirectory(path);
-            Directory.CreateDirectory(path+"\\Hooks");
+            Directory.CreateDirectory(path + "\\Hooks");
             Thread.Sleep(100);
 
             var write = true;
@@ -374,7 +373,7 @@ namespace Installer
                     path + "\\DCS-SRSGameGUI.lua", true);
 
                 File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
-              true);
+                    true);
 
                 File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
                     true);
@@ -389,7 +388,6 @@ namespace Installer
                     "Not Unzipped", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
-
         }
 
         //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
@@ -442,7 +440,6 @@ namespace Installer
 
             if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\SR-ClientRadio.exe"))
             {
-               
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(srPath.Text + "\\opus.dll");
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
@@ -454,12 +451,13 @@ namespace Installer
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
                 DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
-
             }
 
             DeleteRegKeys();
 
-            MessageBox.Show("SR Standalone Removed Successfully!\n\nContaining folder left just incase you want favourites or frequencies", "SR Standalone Installer",
+            MessageBox.Show(
+                "SR Standalone Removed Successfully!\n\nContaining folder left just incase you want favourites or frequencies",
+                "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
             Environment.Exit(0);
@@ -475,7 +473,8 @@ namespace Installer
 
                 if (contents.Contains("SimpleRadioStandalone.lua"))
                 {
-                    contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])", "");
+                    contents = contents.Replace("dofile(lfs.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
+                        "");
                     contents =
                         contents.Replace(
                             "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",

@@ -28,7 +28,6 @@ namespace NAudio.Wave
             simpleCompressor.Threshold = 16;
             simpleCompressor.Ratio = 6;
             simpleCompressor.MakeUpGain = 16;
-
         }
 
         /// <summary>
@@ -36,16 +35,13 @@ namespace NAudio.Wave
         /// </summary>
         public double MakeUpGain
         {
-            get 
-            { 
-                return simpleCompressor.MakeUpGain; 
-            }
-            set 
+            get { return simpleCompressor.MakeUpGain; }
+            set
             {
                 lock (lockObject)
                 {
                     simpleCompressor.MakeUpGain = value;
-                } 
+                }
             }
         }
 
@@ -54,11 +50,8 @@ namespace NAudio.Wave
         /// </summary>
         public double Threshold
         {
-            get 
-            { 
-                return simpleCompressor.Threshold; 
-            }
-            set 
+            get { return simpleCompressor.Threshold; }
+            set
             {
                 lock (lockObject)
                 {
@@ -72,11 +65,8 @@ namespace NAudio.Wave
         /// </summary>
         public double Ratio
         {
-            get 
-            { 
-                return simpleCompressor.Ratio; 
-            }
-            set 
+            get { return simpleCompressor.Ratio; }
+            set
             {
                 lock (lockObject)
                 {
@@ -90,10 +80,7 @@ namespace NAudio.Wave
         /// </summary>
         public double Attack
         {
-            get
-            {
-                return simpleCompressor.Attack;
-            }
+            get { return simpleCompressor.Attack; }
             set
             {
                 lock (lockObject)
@@ -108,10 +95,7 @@ namespace NAudio.Wave
         /// </summary>
         public double Release
         {
-            get
-            {
-                return simpleCompressor.Release;
-            }
+            get { return simpleCompressor.Release; }
             set
             {
                 lock (lockObject)
@@ -149,10 +133,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return sourceStream.Position;
-            }
+            get { return sourceStream.Position; }
             set
             {
                 lock (lockObject)
@@ -203,18 +184,19 @@ namespace NAudio.Wave
         {
             if (bytesPerSample == 4)
             {
-                Array.Copy(BitConverter.GetBytes((float)left), 0, buffer, start, bytesPerSample);
+                Array.Copy(BitConverter.GetBytes((float) left), 0, buffer, start, bytesPerSample);
                 if (channels > 1)
                 {
-                    Array.Copy(BitConverter.GetBytes((float)right), 0, buffer, start + bytesPerSample, bytesPerSample);
+                    Array.Copy(BitConverter.GetBytes((float) right), 0, buffer, start + bytesPerSample, bytesPerSample);
                 }
             }
             else if (bytesPerSample == 2)
             {
-                Array.Copy(BitConverter.GetBytes((short)(left * 32768.0)), 0, buffer, start, bytesPerSample);
+                Array.Copy(BitConverter.GetBytes((short) (left * 32768.0)), 0, buffer, start, bytesPerSample);
                 if (channels > 1)
                 {
-                    Array.Copy(BitConverter.GetBytes((short)(right * 32768.0)), 0, buffer, start + bytesPerSample, bytesPerSample);
+                    Array.Copy(BitConverter.GetBytes((short) (right * 32768.0)), 0, buffer, start + bytesPerSample,
+                        bytesPerSample);
                 }
             }
         }
@@ -252,7 +234,6 @@ namespace NAudio.Wave
                     return sourceStream.Read(array, offset, count);
                 }
             }
-
         }
 
         /// <summary>
@@ -289,4 +270,3 @@ namespace NAudio.Wave
         }
     }
 }
-

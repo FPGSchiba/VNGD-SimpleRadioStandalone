@@ -1,9 +1,10 @@
 // created on 27/12/2002 at 20:20
+
 using System;
 using System.IO;
 
 // ReSharper disable once CheckNamespace
-namespace NAudio.Wave 
+namespace NAudio.Wave
 {
     /// <summary>
     /// Base class for all WaveStream classes. Derives from stream.
@@ -39,7 +40,9 @@ namespace NAudio.Wave
         /// Flush does not need to do anything
         /// See <see cref="Stream.Flush"/>
         /// </summary>
-        public override void Flush() { }
+        public override void Flush()
+        {
+        }
 
         /// <summary>
         /// An alternative way of repositioning.
@@ -85,7 +88,7 @@ namespace NAudio.Wave
         /// <param name="seconds">Number of seconds to move, can be negative</param>
         public void Skip(int seconds)
         {
-            long newPosition = Position + WaveFormat.AverageBytesPerSecond*seconds;
+            long newPosition = Position + WaveFormat.AverageBytesPerSecond * seconds;
             if (newPosition > Length)
                 Position = Length;
             else if (newPosition < 0)
@@ -99,14 +102,8 @@ namespace NAudio.Wave
         /// </summary>
         public virtual TimeSpan CurrentTime
         {
-            get
-            {
-                return TimeSpan.FromSeconds((double)Position / WaveFormat.AverageBytesPerSecond);                
-            }
-            set
-            {
-                Position = (long) (value.TotalSeconds * WaveFormat.AverageBytesPerSecond);
-            }
+            get { return TimeSpan.FromSeconds((double) Position / WaveFormat.AverageBytesPerSecond); }
+            set { Position = (long) (value.TotalSeconds * WaveFormat.AverageBytesPerSecond); }
         }
 
         /// <summary>
@@ -114,10 +111,7 @@ namespace NAudio.Wave
         /// </summary>
         public virtual TimeSpan TotalTime
         {
-            get
-            {
-                return TimeSpan.FromSeconds((double) Length / WaveFormat.AverageBytesPerSecond);
-            }
+            get { return TimeSpan.FromSeconds((double) Length / WaveFormat.AverageBytesPerSecond); }
         }
 
         /// <summary>

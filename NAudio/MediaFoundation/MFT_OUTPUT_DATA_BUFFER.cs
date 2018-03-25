@@ -12,14 +12,17 @@ namespace NAudio.MediaFoundation
         /// Output stream identifier.
         /// </summary>
         public int dwStreamID;
+
         /// <summary>
         /// Pointer to the IMFSample interface. 
         /// </summary>
         public IMFSample pSample;
+
         /// <summary>
         /// Before calling ProcessOutput, set this member to zero.
         /// </summary>
         public _MFT_OUTPUT_DATA_BUFFER_FLAGS dwStatus;
+
         /// <summary>
         /// Before calling ProcessOutput, set this member to NULL.
         /// </summary>

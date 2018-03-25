@@ -45,7 +45,10 @@ namespace NAudio.FileFormats.Mp3
         /// <summary>
         /// Converted PCM WaveFormat
         /// </summary>
-        public WaveFormat OutputFormat { get { return pcmFormat; } }
+        public WaveFormat OutputFormat
+        {
+            get { return pcmFormat; }
+        }
 
         /// <summary>
         /// Decompress a single frame of MP3
@@ -68,7 +71,7 @@ namespace NAudio.FileFormats.Mp3
             outputBuffer.StatusFlags = DmoOutputDataBufferFlags.None;
 
             // 3. Now ask the DMO for some output data
-            mp3Decoder.MediaObject.ProcessOutput(DmoProcessOutputFlags.None, 1, new[] { outputBuffer });
+            mp3Decoder.MediaObject.ProcessOutput(DmoProcessOutputFlags.None, 1, new[] {outputBuffer});
 
             if (outputBuffer.Length == 0)
             {
@@ -79,7 +82,7 @@ namespace NAudio.FileFormats.Mp3
             // 5. Now get the data out of the output buffer
             outputBuffer.RetrieveData(dest, destOffset);
             Debug.Assert(!outputBuffer.MoreDataAvailable, "have not implemented more data available yet");
-            
+
             return outputBuffer.Length;
         }
 
@@ -102,7 +105,7 @@ namespace NAudio.FileFormats.Mp3
                 inputMediaBuffer = null;
             }
             outputBuffer.Dispose();
-            if (mp3Decoder!= null)
+            if (mp3Decoder != null)
             {
                 mp3Decoder.Dispose();
                 mp3Decoder = null;

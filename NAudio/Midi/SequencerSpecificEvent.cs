@@ -35,17 +35,14 @@ namespace NAudio.Midi
         /// <summary>
         /// Creates a deep clone of this MIDI event.
         /// </summary>
-        public override MidiEvent Clone() => new SequencerSpecificEvent((byte[])data.Clone(), AbsoluteTime);
+        public override MidiEvent Clone() => new SequencerSpecificEvent((byte[]) data.Clone(), AbsoluteTime);
 
         /// <summary>
         /// The contents of this sequencer specific
         /// </summary>
         public byte[] Data
         {
-            get
-            {
-                return this.data;
-            }
+            get { return this.data; }
             set
             {
                 this.data = value;

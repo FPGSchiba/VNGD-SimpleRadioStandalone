@@ -111,7 +111,7 @@ namespace FragLabs.Audio.Codecs
                 else
                     length = API.opus_decode(_decoder, null, 0, decodedPtr, FrameCount(dataLength), 0);
             }
-            decodedLength = length*2;
+            decodedLength = length * 2;
             if (length < 0)
                 throw new Exception("Decoding failed - " + (Errors) length);
 
@@ -127,8 +127,8 @@ namespace FragLabs.Audio.Codecs
         {
             //  seems like bitrate should be required
             var bitrate = 16;
-            var bytesPerSample = bitrate/8*OutputChannels;
-            return bufferSize/bytesPerSample;
+            var bytesPerSample = bitrate / 8 * OutputChannels;
+            return bufferSize / bytesPerSample;
         }
 
         ~OpusDecoder()

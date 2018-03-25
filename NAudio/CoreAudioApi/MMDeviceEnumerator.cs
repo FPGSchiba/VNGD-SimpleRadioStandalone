@@ -20,13 +20,13 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 // updated for use in NAudio
+
 using System;
 using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi.Interfaces;
 
 namespace NAudio.CoreAudioApi
 {
-
     /// <summary>
     /// MM Device Enumerator
     /// </summary>
@@ -70,7 +70,8 @@ namespace NAudio.CoreAudioApi
         public MMDevice GetDefaultAudioEndpoint(DataFlow dataFlow, Role role)
         {
             IMMDevice device = null;
-            Marshal.ThrowExceptionForHR(((IMMDeviceEnumerator)realEnumerator).GetDefaultAudioEndpoint(dataFlow, role, out device));
+            Marshal.ThrowExceptionForHR(
+                ((IMMDeviceEnumerator) realEnumerator).GetDefaultAudioEndpoint(dataFlow, role, out device));
             return new MMDevice(device);
         }
 
@@ -82,9 +83,9 @@ namespace NAudio.CoreAudioApi
         /// <returns>True if one exists, and false if one does not exist.</returns>
         public bool HasDefaultAudioEndpoint(DataFlow dataFlow, Role role)
         {
-            const int E_NOTFOUND = unchecked((int)0x80070490);
+            const int E_NOTFOUND = unchecked((int) 0x80070490);
             IMMDevice device = null;
-            int hresult = ((IMMDeviceEnumerator)realEnumerator).GetDefaultAudioEndpoint(dataFlow, role, out device);
+            int hresult = ((IMMDeviceEnumerator) realEnumerator).GetDefaultAudioEndpoint(dataFlow, role, out device);
             if (hresult == 0x0)
             {
                 Marshal.ReleaseComObject(device);
@@ -106,7 +107,7 @@ namespace NAudio.CoreAudioApi
         public MMDevice GetDevice(string id)
         {
             IMMDevice device = null;
-            Marshal.ThrowExceptionForHR(((IMMDeviceEnumerator)realEnumerator).GetDevice(id, out device));
+            Marshal.ThrowExceptionForHR(((IMMDeviceEnumerator) realEnumerator).GetDevice(id, out device));
             return new MMDevice(device);
         }
 
@@ -115,7 +116,8 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         /// <param name="client">Object implementing IMMNotificationClient type casted as IMMNotificationClient interface</param>
         /// <returns></returns>
-        public int RegisterEndpointNotificationCallback([In] [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client)
+        public int RegisterEndpointNotificationCallback(
+            [In] [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client)
         {
             return realEnumerator.RegisterEndpointNotificationCallback(client);
         }
@@ -125,7 +127,8 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         /// <param name="client">Object implementing IMMNotificationClient type casted as IMMNotificationClient interface </param>
         /// <returns></returns>
-        public int UnregisterEndpointNotificationCallback([In] [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client)
+        public int UnregisterEndpointNotificationCallback(
+            [In] [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client)
         {
             return realEnumerator.UnregisterEndpointNotificationCallback(client);
         }

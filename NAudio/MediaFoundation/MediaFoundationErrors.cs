@@ -30,6 +30,7 @@ namespace NAudio.MediaFoundation
     public static class MediaFoundationErrors
     {
         #region General Media Foundation errors
+
         ///
         /// MessageId: MF_E_PLATFORM_NOT_INITIALIZED
         ///
@@ -37,7 +38,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Platform not initialized. Please call MFStartup().%0
         ///
-        public const int MF_E_PLATFORM_NOT_INITIALIZED    = unchecked((int) 0xC00D36B0);
+        public const int MF_E_PLATFORM_NOT_INITIALIZED = unchecked((int) 0xC00D36B0);
 
         ///
         /// MessageId: MF_E_BUFFERTOOSMALL
@@ -46,7 +47,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The buffer was too small to carry out the requested action.%0
         ///
-        public const int MF_E_BUFFERTOOSMALL              = unchecked((int) 0xC00D36B1);
+        public const int MF_E_BUFFERTOOSMALL = unchecked((int) 0xC00D36B1);
 
         ///
         /// MessageId: MF_E_INVALIDREQUEST
@@ -55,7 +56,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The request is invalid in the current state.%0
         ///
-        public const int MF_E_INVALIDREQUEST              = unchecked((int) 0xC00D36B2);
+        public const int MF_E_INVALIDREQUEST = unchecked((int) 0xC00D36B2);
 
         ///
         /// MessageId: MF_E_INVALIDSTREAMNUMBER
@@ -64,7 +65,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The stream number provided was invalid.%0
         ///
-        public const int MF_E_INVALIDSTREAMNUMBER         = unchecked((int) 0xC00D36B3);
+        public const int MF_E_INVALIDSTREAMNUMBER = unchecked((int) 0xC00D36B3);
 
         ///
         /// MessageId: MF_E_INVALIDMEDIATYPE
@@ -73,7 +74,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The data specified for the media type is invalid, inconsistent, or not supported by this object.%0
         ///
-        public const int MF_E_INVALIDMEDIATYPE            = unchecked((int) 0xC00D36B4);
+        public const int MF_E_INVALIDMEDIATYPE = unchecked((int) 0xC00D36B4);
 
         ///
         /// MessageId: MF_E_NOTACCEPTING
@@ -82,7 +83,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The callee is currently not accepting further input.%0
         ///
-        public const int MF_E_NOTACCEPTING                = unchecked((int) 0xC00D36B5);
+        public const int MF_E_NOTACCEPTING = unchecked((int) 0xC00D36B5);
 
         ///
         /// MessageId: MF_E_NOT_INITIALIZED
@@ -91,7 +92,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This object needs to be initialized before the requested operation can be carried out.%0
         ///
-        public const int MF_E_NOT_INITIALIZED             = unchecked((int) 0xC00D36B6);
+        public const int MF_E_NOT_INITIALIZED = unchecked((int) 0xC00D36B6);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_REPRESENTATION
@@ -100,7 +101,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested representation is not supported by this object.%0
         ///
-        public const int MF_E_UNSUPPORTED_REPRESENTATION  = unchecked((int) 0xC00D36B7);
+        public const int MF_E_UNSUPPORTED_REPRESENTATION = unchecked((int) 0xC00D36B7);
 
         ///
         /// MessageId: MF_E_NO_MORE_TYPES
@@ -109,7 +110,7 @@ namespace NAudio.MediaFoundation
         ///
         /// An object ran out of media types to suggest therefore the requested chain of streaming objects cannot be completed.%0
         ///
-        public const int MF_E_NO_MORE_TYPES               = unchecked((int) 0xC00D36B9);
+        public const int MF_E_NO_MORE_TYPES = unchecked((int) 0xC00D36B9);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_SERVICE
@@ -118,7 +119,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The object does not support the specified service.%0
         ///
-        public const int MF_E_UNSUPPORTED_SERVICE         = unchecked((int) 0xC00D36BA);
+        public const int MF_E_UNSUPPORTED_SERVICE = unchecked((int) 0xC00D36BA);
 
         ///
         /// MessageId: MF_E_UNEXPECTED
@@ -127,7 +128,7 @@ namespace NAudio.MediaFoundation
         ///
         /// An unexpected error has occurred in the operation requested.%0
         ///
-        public const int MF_E_UNEXPECTED                  = unchecked((int) 0xC00D36BB);
+        public const int MF_E_UNEXPECTED = unchecked((int) 0xC00D36BB);
 
         ///
         /// MessageId: MF_E_INVALIDNAME
@@ -136,7 +137,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Invalid name.%0
         ///
-        public const int MF_E_INVALIDNAME                 = unchecked((int) 0xC00D36BC);
+        public const int MF_E_INVALIDNAME = unchecked((int) 0xC00D36BC);
 
         ///
         /// MessageId: MF_E_INVALIDTYPE
@@ -145,7 +146,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Invalid type.%0
         ///
-        public const int MF_E_INVALIDTYPE                 = unchecked((int) 0xC00D36BD);
+        public const int MF_E_INVALIDTYPE = unchecked((int) 0xC00D36BD);
 
         ///
         /// MessageId: MF_E_INVALID_FILE_FORMAT
@@ -154,7 +155,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The file does not conform to the relevant file format specification.
         ///
-        public const int MF_E_INVALID_FILE_FORMAT         = unchecked((int) 0xC00D36BE);
+        public const int MF_E_INVALID_FILE_FORMAT = unchecked((int) 0xC00D36BE);
 
         ///
         /// MessageId: MF_E_INVALIDINDEX
@@ -163,7 +164,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Invalid index.%0
         ///
-        public const int MF_E_INVALIDINDEX                = unchecked((int) 0xC00D36BF);
+        public const int MF_E_INVALIDINDEX = unchecked((int) 0xC00D36BF);
 
         ///
         /// MessageId: MF_E_INVALID_TIMESTAMP
@@ -172,7 +173,7 @@ namespace NAudio.MediaFoundation
         ///
         /// An invalid timestamp was given.%0
         ///
-        public const int MF_E_INVALID_TIMESTAMP           = unchecked((int) 0xC00D36C0);
+        public const int MF_E_INVALID_TIMESTAMP = unchecked((int) 0xC00D36C0);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_SCHEME
@@ -181,7 +182,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The scheme of the given URL is unsupported.%0
         ///
-        public const int MF_E_UNSUPPORTED_SCHEME          = unchecked((int) 0xC00D36C3);
+        public const int MF_E_UNSUPPORTED_SCHEME = unchecked((int) 0xC00D36C3);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_BYTESTREAM_TYPE
@@ -199,7 +200,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The given time format is unsupported.%0
         ///
-        public const int MF_E_UNSUPPORTED_TIME_FORMAT     = unchecked((int) 0xC00D36C5);
+        public const int MF_E_UNSUPPORTED_TIME_FORMAT = unchecked((int) 0xC00D36C5);
 
         ///
         /// MessageId: MF_E_NO_SAMPLE_TIMESTAMP
@@ -208,7 +209,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media Sample does not have a timestamp.%0
         ///
-        public const int MF_E_NO_SAMPLE_TIMESTAMP         = unchecked((int) 0xC00D36C8);
+        public const int MF_E_NO_SAMPLE_TIMESTAMP = unchecked((int) 0xC00D36C8);
 
         ///
         /// MessageId: MF_E_NO_SAMPLE_DURATION
@@ -217,7 +218,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media Sample does not have a duration.%0
         ///
-        public const int MF_E_NO_SAMPLE_DURATION          = unchecked((int) 0xC00D36C9);
+        public const int MF_E_NO_SAMPLE_DURATION = unchecked((int) 0xC00D36C9);
 
         ///
         /// MessageId: MF_E_INVALID_STREAM_DATA
@@ -226,7 +227,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The request failed because the data in the stream is corrupt.%0\n.
         ///
-        public const int MF_E_INVALID_STREAM_DATA         = unchecked((int) 0xC00D36CB);
+        public const int MF_E_INVALID_STREAM_DATA = unchecked((int) 0xC00D36CB);
 
         ///
         /// MessageId: MF_E_RT_UNAVAILABLE
@@ -235,7 +236,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Real time services are not available.%0
         ///
-        public const int MF_E_RT_UNAVAILABLE              = unchecked((int) 0xC00D36CF);
+        public const int MF_E_RT_UNAVAILABLE = unchecked((int) 0xC00D36CF);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_RATE
@@ -244,7 +245,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified rate is not supported.%0
         ///
-        public const int MF_E_UNSUPPORTED_RATE            = unchecked((int) 0xC00D36D0);
+        public const int MF_E_UNSUPPORTED_RATE = unchecked((int) 0xC00D36D0);
 
         ///
         /// MessageId: MF_E_THINNING_UNSUPPORTED
@@ -253,7 +254,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This component does not support stream-thinning.%0
         ///
-        public const int MF_E_THINNING_UNSUPPORTED        = unchecked((int) 0xC00D36D1);
+        public const int MF_E_THINNING_UNSUPPORTED = unchecked((int) 0xC00D36D1);
 
         ///
         /// MessageId: MF_E_REVERSE_UNSUPPORTED
@@ -262,7 +263,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The call failed because no reverse playback rates are available.%0
         ///
-        public const int MF_E_REVERSE_UNSUPPORTED         = unchecked((int) 0xC00D36D2);
+        public const int MF_E_REVERSE_UNSUPPORTED = unchecked((int) 0xC00D36D2);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_RATE_TRANSITION
@@ -280,7 +281,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested rate change has been pre-empted and will not occur.%0
         ///
-        public const int MF_E_RATE_CHANGE_PREEMPTED       = unchecked((int) 0xC00D36D4);
+        public const int MF_E_RATE_CHANGE_PREEMPTED = unchecked((int) 0xC00D36D4);
 
         ///
         /// MessageId: MF_E_NOT_FOUND
@@ -289,7 +290,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified object or value does not exist.%0
         ///
-        public const int MF_E_NOT_FOUND                   = unchecked((int) 0xC00D36D5);
+        public const int MF_E_NOT_FOUND = unchecked((int) 0xC00D36D5);
 
         ///
         /// MessageId: MF_E_NOT_AVAILABLE
@@ -298,7 +299,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested value is not available.%0
         ///
-        public const int MF_E_NOT_AVAILABLE               = unchecked((int) 0xC00D36D6);
+        public const int MF_E_NOT_AVAILABLE = unchecked((int) 0xC00D36D6);
 
         ///
         /// MessageId: MF_E_NO_CLOCK
@@ -307,7 +308,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified operation requires a clock and no clock is available.%0
         ///
-        public const int MF_E_NO_CLOCK                    = unchecked((int) 0xC00D36D7);
+        public const int MF_E_NO_CLOCK = unchecked((int) 0xC00D36D7);
 
         ///
         /// MessageId: MF_S_MULTIPLE_BEGIN
@@ -316,7 +317,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This callback and state had already been passed in to this event generator earlier.%0
         ///
-        public const int MF_S_MULTIPLE_BEGIN              = unchecked((int) 0x000D36D8);
+        public const int MF_S_MULTIPLE_BEGIN = unchecked((int) 0x000D36D8);
 
         ///
         /// MessageId: MF_E_MULTIPLE_BEGIN
@@ -325,7 +326,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This callback has already been passed in to this event generator.%0
         ///
-        public const int MF_E_MULTIPLE_BEGIN              = unchecked((int) 0xC00D36D9);
+        public const int MF_E_MULTIPLE_BEGIN = unchecked((int) 0xC00D36D9);
 
         ///
         /// MessageId: MF_E_MULTIPLE_SUBSCRIBERS
@@ -334,7 +335,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Some component is already listening to events on this event generator.%0
         ///
-        public const int MF_E_MULTIPLE_SUBSCRIBERS        = unchecked((int) 0xC00D36DA);
+        public const int MF_E_MULTIPLE_SUBSCRIBERS = unchecked((int) 0xC00D36DA);
 
         ///
         /// MessageId: MF_E_TIMER_ORPHANED
@@ -343,7 +344,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This timer was orphaned before its callback time arrived.%0
         ///
-        public const int MF_E_TIMER_ORPHANED              = unchecked((int) 0xC00D36DB);
+        public const int MF_E_TIMER_ORPHANED = unchecked((int) 0xC00D36DB);
 
         ///
         /// MessageId: MF_E_STATE_TRANSITION_PENDING
@@ -352,7 +353,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A state transition is already pending.%0
         ///
-        public const int MF_E_STATE_TRANSITION_PENDING    = unchecked((int) 0xC00D36DC);
+        public const int MF_E_STATE_TRANSITION_PENDING = unchecked((int) 0xC00D36DC);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_STATE_TRANSITION
@@ -388,7 +389,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The provided sample is not writable.%0
         ///
-        public const int MF_E_SAMPLE_NOT_WRITABLE         = unchecked((int) 0xC00D36E0);
+        public const int MF_E_SAMPLE_NOT_WRITABLE = unchecked((int) 0xC00D36E0);
 
         ///
         /// MessageId: MF_E_INVALID_KEY
@@ -397,7 +398,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified key is not valid.
         ///
-        public const int MF_E_INVALID_KEY                 = unchecked((int) 0xC00D36E2);
+        public const int MF_E_INVALID_KEY = unchecked((int) 0xC00D36E2);
 
         ///
         /// MessageId: MF_E_BAD_STARTUP_VERSION
@@ -406,7 +407,7 @@ namespace NAudio.MediaFoundation
         ///
         /// You are calling MFStartup with the wrong MF_VERSION. Mismatched bits?
         ///
-        public const int MF_E_BAD_STARTUP_VERSION         = unchecked((int) 0xC00D36E3);
+        public const int MF_E_BAD_STARTUP_VERSION = unchecked((int) 0xC00D36E3);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_CAPTION
@@ -415,7 +416,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The caption of the given URL is unsupported.%0
         ///
-        public const int MF_E_UNSUPPORTED_CAPTION         = unchecked((int) 0xC00D36E4);
+        public const int MF_E_UNSUPPORTED_CAPTION = unchecked((int) 0xC00D36E4);
 
         ///
         /// MessageId: MF_E_INVALID_POSITION
@@ -424,7 +425,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The operation on the current offset is not permitted.%0
         ///
-        public const int MF_E_INVALID_POSITION            = unchecked((int) 0xC00D36E5);
+        public const int MF_E_INVALID_POSITION = unchecked((int) 0xC00D36E5);
 
         ///
         /// MessageId: MF_E_ATTRIBUTENOTFOUND
@@ -433,7 +434,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested attribute was not found.%0
         ///
-        public const int MF_E_ATTRIBUTENOTFOUND           = unchecked((int) 0xC00D36E6);
+        public const int MF_E_ATTRIBUTENOTFOUND = unchecked((int) 0xC00D36E6);
 
         ///
         /// MessageId: MF_E_PROPERTY_TYPE_NOT_ALLOWED
@@ -442,7 +443,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified property type is not allowed in this context.%0
         ///
-        public const int MF_E_PROPERTY_TYPE_NOT_ALLOWED   = unchecked((int) 0xC00D36E7);
+        public const int MF_E_PROPERTY_TYPE_NOT_ALLOWED = unchecked((int) 0xC00D36E7);
 
         ///
         /// MessageId: MF_E_PROPERTY_TYPE_NOT_SUPPORTED
@@ -460,7 +461,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified property is empty.%0
         ///
-        public const int MF_E_PROPERTY_EMPTY              = unchecked((int) 0xC00D36E9);
+        public const int MF_E_PROPERTY_EMPTY = unchecked((int) 0xC00D36E9);
 
         ///
         /// MessageId: MF_E_PROPERTY_NOT_EMPTY
@@ -469,7 +470,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified property is not empty.%0
         ///
-        public const int MF_E_PROPERTY_NOT_EMPTY          = unchecked((int) 0xC00D36EA);
+        public const int MF_E_PROPERTY_NOT_EMPTY = unchecked((int) 0xC00D36EA);
 
         ///
         /// MessageId: MF_E_PROPERTY_VECTOR_NOT_ALLOWED
@@ -487,7 +488,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A vector property is required in this context.%0
         ///
-        public const int MF_E_PROPERTY_VECTOR_REQUIRED    = unchecked((int) 0xC00D36EC);
+        public const int MF_E_PROPERTY_VECTOR_REQUIRED = unchecked((int) 0xC00D36EC);
 
         ///
         /// MessageId: MF_E_OPERATION_CANCELLED
@@ -496,7 +497,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The operation is cancelled.%0
         ///
-        public const int MF_E_OPERATION_CANCELLED         = unchecked((int) 0xC00D36ED);
+        public const int MF_E_OPERATION_CANCELLED = unchecked((int) 0xC00D36ED);
 
         ///
         /// MessageId: MF_E_BYTESTREAM_NOT_SEEKABLE
@@ -505,7 +506,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The provided bytestream was expected to be seekable and it is not.%0
         ///
-        public const int MF_E_BYTESTREAM_NOT_SEEKABLE     = unchecked((int) 0xC00D36EE);
+        public const int MF_E_BYTESTREAM_NOT_SEEKABLE = unchecked((int) 0xC00D36EE);
 
         ///
         /// MessageId: MF_E_DISABLED_IN_SAFEMODE
@@ -514,7 +515,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media Foundation platform is disabled when the system is running in Safe Mode.%0
         ///
-        public const int MF_E_DISABLED_IN_SAFEMODE        = unchecked((int) 0xC00D36EF);
+        public const int MF_E_DISABLED_IN_SAFEMODE = unchecked((int) 0xC00D36EF);
 
         ///
         /// MessageId: MF_E_CANNOT_PARSE_BYTESTREAM
@@ -523,7 +524,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media Source could not parse the byte stream.%0
         ///
-        public const int MF_E_CANNOT_PARSE_BYTESTREAM     = unchecked((int) 0xC00D36F0);
+        public const int MF_E_CANNOT_PARSE_BYTESTREAM = unchecked((int) 0xC00D36F0);
 
         ///
         /// MessageId: MF_E_SOURCERESOLVER_MUTUALLY_EXCLUSIVE_FLAGS
@@ -541,7 +542,7 @@ namespace NAudio.MediaFoundation
         ///
         /// MediaProc is in the wrong state%0
         ///
-        public const int MF_E_MEDIAPROC_WRONGSTATE        = unchecked((int) 0xC00D36F2);
+        public const int MF_E_MEDIAPROC_WRONGSTATE = unchecked((int) 0xC00D36F2);
 
         ///
         /// MessageId: MF_E_RT_THROUGHPUT_NOT_AVAILABLE
@@ -559,7 +560,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The workqueue cannot be registered with more classes.%0
         ///
-        public const int MF_E_RT_TOO_MANY_CLASSES         = unchecked((int) 0xC00D36F4);
+        public const int MF_E_RT_TOO_MANY_CLASSES = unchecked((int) 0xC00D36F4);
 
         ///
         /// MessageId: MF_E_RT_WOULDBLOCK
@@ -568,7 +569,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This operation cannot succeed because another thread owns this object.%0
         ///
-        public const int MF_E_RT_WOULDBLOCK               = unchecked((int) 0xC00D36F5);
+        public const int MF_E_RT_WOULDBLOCK = unchecked((int) 0xC00D36F5);
 
         ///
         /// MessageId: MF_E_NO_BITPUMP
@@ -577,7 +578,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Internal. Bitpump not found.%0
         ///
-        public const int MF_E_NO_BITPUMP                  = unchecked((int) 0xC00D36F6);
+        public const int MF_E_NO_BITPUMP = unchecked((int) 0xC00D36F6);
 
         ///
         /// MessageId: MF_E_RT_OUTOFMEMORY
@@ -586,7 +587,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No more RT memory available.%0
         ///
-        public const int MF_E_RT_OUTOFMEMORY              = unchecked((int) 0xC00D36F7);
+        public const int MF_E_RT_OUTOFMEMORY = unchecked((int) 0xC00D36F7);
 
         ///
         /// MessageId: MF_E_RT_WORKQUEUE_CLASS_NOT_SPECIFIED
@@ -604,7 +605,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Insufficient memory for response.%0
         ///
-        public const int MF_E_INSUFFICIENT_BUFFER         = unchecked((int) 0xC00D7170);
+        public const int MF_E_INSUFFICIENT_BUFFER = unchecked((int) 0xC00D7170);
 
         ///
         /// MessageId: MF_E_CANNOT_CREATE_SINK
@@ -613,7 +614,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Activate failed to create mediasink. Call OutputNode::GetUINT32(MF_TOPONODE_MAJORTYPE) for more information. %0
         ///
-        public const int MF_E_CANNOT_CREATE_SINK          = unchecked((int) 0xC00D36FA);
+        public const int MF_E_CANNOT_CREATE_SINK = unchecked((int) 0xC00D36FA);
 
         ///
         /// MessageId: MF_E_BYTESTREAM_UNKNOWN_LENGTH
@@ -622,7 +623,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The length of the provided bytestream is unknown.%0
         ///
-        public const int MF_E_BYTESTREAM_UNKNOWN_LENGTH   = unchecked((int) 0xC00D36FB);
+        public const int MF_E_BYTESTREAM_UNKNOWN_LENGTH = unchecked((int) 0xC00D36FB);
 
         ///
         /// MessageId: MF_E_SESSION_PAUSEWHILESTOPPED
@@ -631,7 +632,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The media session cannot pause from a stopped state.%0
         ///
-        public const int MF_E_SESSION_PAUSEWHILESTOPPED   = unchecked((int) 0xC00D36FC);
+        public const int MF_E_SESSION_PAUSEWHILESTOPPED = unchecked((int) 0xC00D36FC);
 
         ///
         /// MessageId: MF_S_ACTIVATE_REPLACED
@@ -640,7 +641,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The activate could not be created in the remote process for some reason it was replaced with empty one.%0
         ///
-        public const int MF_S_ACTIVATE_REPLACED           = unchecked((int) 0x000D36FD);
+        public const int MF_S_ACTIVATE_REPLACED = unchecked((int) 0x000D36FD);
 
         ///
         /// MessageId: MF_E_FORMAT_CHANGE_NOT_SUPPORTED
@@ -658,7 +659,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The operation failed because an invalid combination of workqueue ID and flags was specified.%0
         ///
-        public const int MF_E_INVALID_WORKQUEUE           = unchecked((int) 0xC00D36FF);
+        public const int MF_E_INVALID_WORKQUEUE = unchecked((int) 0xC00D36FF);
 
         ///
         /// MessageId: MF_E_DRM_UNSUPPORTED
@@ -667,7 +668,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No DRM support is available.%0
         ///
-        public const int MF_E_DRM_UNSUPPORTED             = unchecked((int) 0xC00D3700);
+        public const int MF_E_DRM_UNSUPPORTED = unchecked((int) 0xC00D3700);
 
         ///
         /// MessageId: MF_E_UNAUTHORIZED
@@ -676,7 +677,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This operation is not authorized.%0
         ///
-        public const int MF_E_UNAUTHORIZED                = unchecked((int) 0xC00D3701);
+        public const int MF_E_UNAUTHORIZED = unchecked((int) 0xC00D3701);
 
         ///
         /// MessageId: MF_E_OUT_OF_RANGE
@@ -685,7 +686,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The value is not in the specified or valid range.%0
         ///
-        public const int MF_E_OUT_OF_RANGE                = unchecked((int) 0xC00D3702);
+        public const int MF_E_OUT_OF_RANGE = unchecked((int) 0xC00D3702);
 
         ///
         /// MessageId: MF_E_INVALID_CODEC_MERIT
@@ -694,7 +695,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The registered codec merit is not valid.%0
         ///
-        public const int MF_E_INVALID_CODEC_MERIT         = unchecked((int) 0xC00D3703);
+        public const int MF_E_INVALID_CODEC_MERIT = unchecked((int) 0xC00D3703);
 
         ///
         /// MessageId: MF_E_HW_MFT_FAILED_START_STREAMING
@@ -706,6 +707,7 @@ namespace NAudio.MediaFoundation
         public const int MF_E_HW_MFT_FAILED_START_STREAMING = unchecked((int) 0xC00D3704);
 
         #endregion
+
         #region MEDIAFOUNDATION ASF Parsing Informational Events
 
         ///
@@ -715,7 +717,8 @@ namespace NAudio.MediaFoundation
         ///
         /// Parsing is still in progress and is not yet complete.%0
         ///
-        public const int MF_S_ASF_PARSEINPROGRESS         = unchecked((int) 0x400D3A98);
+        public const int MF_S_ASF_PARSEINPROGRESS = unchecked((int) 0x400D3A98);
+
         #endregion
 
         #region MEDIAFOUNDATION ASF Parsing Error Events
@@ -727,7 +730,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Not enough data have been parsed to carry out the requested action.%0
         ///
-        public const int MF_E_ASF_PARSINGINCOMPLETE       = unchecked((int) 0xC00D3A98);
+        public const int MF_E_ASF_PARSINGINCOMPLETE = unchecked((int) 0xC00D3A98);
 
         ///
         /// MessageId: MF_E_ASF_MISSINGDATA
@@ -736,7 +739,7 @@ namespace NAudio.MediaFoundation
         ///
         /// There is a gap in the ASF data provided.%0
         ///
-        public const int MF_E_ASF_MISSINGDATA             = unchecked((int) 0xC00D3A99);
+        public const int MF_E_ASF_MISSINGDATA = unchecked((int) 0xC00D3A99);
 
         ///
         /// MessageId: MF_E_ASF_INVALIDDATA
@@ -745,7 +748,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The data provided are not valid ASF.%0
         ///
-        public const int MF_E_ASF_INVALIDDATA             = unchecked((int) 0xC00D3A9A);
+        public const int MF_E_ASF_INVALIDDATA = unchecked((int) 0xC00D3A9A);
 
         ///
         /// MessageId: MF_E_ASF_OPAQUEPACKET
@@ -754,7 +757,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The packet is opaque, so the requested information cannot be returned.%0
         ///
-        public const int MF_E_ASF_OPAQUEPACKET            = unchecked((int) 0xC00D3A9B);
+        public const int MF_E_ASF_OPAQUEPACKET = unchecked((int) 0xC00D3A9B);
 
         ///
         /// MessageId: MF_E_ASF_NOINDEX
@@ -763,7 +766,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested operation failed since there is no appropriate ASF index.%0
         ///
-        public const int MF_E_ASF_NOINDEX                 = unchecked((int) 0xC00D3A9C);
+        public const int MF_E_ASF_NOINDEX = unchecked((int) 0xC00D3A9C);
 
         ///
         /// MessageId: MF_E_ASF_OUTOFRANGE
@@ -772,7 +775,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The value supplied is out of range for this operation.%0
         ///
-        public const int MF_E_ASF_OUTOFRANGE              = unchecked((int) 0xC00D3A9D);
+        public const int MF_E_ASF_OUTOFRANGE = unchecked((int) 0xC00D3A9D);
 
         ///
         /// MessageId: MF_E_ASF_INDEXNOTLOADED
@@ -781,7 +784,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The index entry requested needs to be loaded before it can be available.%0
         ///
-        public const int MF_E_ASF_INDEXNOTLOADED          = unchecked((int) 0xC00D3A9E);    
+        public const int MF_E_ASF_INDEXNOTLOADED = unchecked((int) 0xC00D3A9E);
 
         ///
         /// MessageId: MF_E_ASF_TOO_MANY_PAYLOADS
@@ -790,7 +793,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The packet has reached the maximum number of payloads.%0
         ///
-        public const int MF_E_ASF_TOO_MANY_PAYLOADS       = unchecked((int) 0xC00D3A9F);    
+        public const int MF_E_ASF_TOO_MANY_PAYLOADS = unchecked((int) 0xC00D3A9F);
 
         ///
         /// MessageId: MF_E_ASF_UNSUPPORTED_STREAM_TYPE
@@ -799,7 +802,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Stream type is not supported.%0
         ///
-        public const int MF_E_ASF_UNSUPPORTED_STREAM_TYPE = unchecked((int) 0xC00D3AA0);    
+        public const int MF_E_ASF_UNSUPPORTED_STREAM_TYPE = unchecked((int) 0xC00D3AA0);
 
         ///
         /// MessageId: MF_E_ASF_DROPPED_PACKET
@@ -808,9 +811,10 @@ namespace NAudio.MediaFoundation
         ///
         /// One or more ASF packets were dropped.%0
         ///
-        public const int MF_E_ASF_DROPPED_PACKET          = unchecked((int) 0xC00D3AA1);
+        public const int MF_E_ASF_DROPPED_PACKET = unchecked((int) 0xC00D3AA1);
 
         #endregion
+
         #region MEDIAFOUNDATION Media Source Error Events
 
         ///
@@ -820,7 +824,7 @@ namespace NAudio.MediaFoundation
         ///
         /// There are no events available in the queue.%0
         ///
-        public const int MF_E_NO_EVENTS_AVAILABLE         = unchecked((int) 0xC00D3E80);
+        public const int MF_E_NO_EVENTS_AVAILABLE = unchecked((int) 0xC00D3E80);
 
         ///
         /// MessageId: MF_E_INVALID_STATE_TRANSITION
@@ -829,7 +833,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A media source cannot go from the stopped state to the paused state.%0
         ///
-        public const int MF_E_INVALID_STATE_TRANSITION    = unchecked((int) 0xC00D3E82);
+        public const int MF_E_INVALID_STATE_TRANSITION = unchecked((int) 0xC00D3E82);
 
         ///
         /// MessageId: MF_E_END_OF_STREAM
@@ -838,7 +842,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The media stream cannot process any more samples because there are no more samples in the stream.%0
         ///
-        public const int MF_E_END_OF_STREAM               = unchecked((int) 0xC00D3E84);
+        public const int MF_E_END_OF_STREAM = unchecked((int) 0xC00D3E84);
 
         ///
         /// MessageId: MF_E_SHUTDOWN
@@ -847,7 +851,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The request is invalid because Shutdown() has been called.%0
         ///
-        public const int MF_E_SHUTDOWN                    = unchecked((int) 0xC00D3E85);
+        public const int MF_E_SHUTDOWN = unchecked((int) 0xC00D3E85);
 
         ///
         /// MessageId: MF_E_MP3_NOTFOUND
@@ -856,7 +860,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The MP3 object was not found.%0
         ///
-        public const int MF_E_MP3_NOTFOUND                = unchecked((int) 0xC00D3E86);
+        public const int MF_E_MP3_NOTFOUND = unchecked((int) 0xC00D3E86);
 
         ///
         /// MessageId: MF_E_MP3_OUTOFDATA
@@ -865,7 +869,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The MP3 parser ran out of data before finding the MP3 object.%0
         ///
-        public const int MF_E_MP3_OUTOFDATA               = unchecked((int) 0xC00D3E87);
+        public const int MF_E_MP3_OUTOFDATA = unchecked((int) 0xC00D3E87);
 
         ///
         /// MessageId: MF_E_MP3_NOTMP3
@@ -874,7 +878,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The file is not really a MP3 file.%0
         ///
-        public const int MF_E_MP3_NOTMP3                  = unchecked((int) 0xC00D3E88);
+        public const int MF_E_MP3_NOTMP3 = unchecked((int) 0xC00D3E88);
 
         ///
         /// MessageId: MF_E_MP3_NOTSUPPORTED
@@ -883,7 +887,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The MP3 file is not supported.%0
         ///
-        public const int MF_E_MP3_NOTSUPPORTED            = unchecked((int) 0xC00D3E89);
+        public const int MF_E_MP3_NOTSUPPORTED = unchecked((int) 0xC00D3E89);
 
         ///
         /// MessageId: MF_E_NO_DURATION
@@ -892,7 +896,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media stream has no duration.%0
         ///
-        public const int MF_E_NO_DURATION                 = unchecked((int) 0xC00D3E8A);
+        public const int MF_E_NO_DURATION = unchecked((int) 0xC00D3E8A);
 
         ///
         /// MessageId: MF_E_INVALID_FORMAT
@@ -901,7 +905,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media format is recognized but is invalid.%0
         ///
-        public const int MF_E_INVALID_FORMAT              = unchecked((int) 0xC00D3E8C);
+        public const int MF_E_INVALID_FORMAT = unchecked((int) 0xC00D3E8C);
 
         ///
         /// MessageId: MF_E_PROPERTY_NOT_FOUND
@@ -910,7 +914,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The property requested was not found.%0
         ///
-        public const int MF_E_PROPERTY_NOT_FOUND          = unchecked((int) 0xC00D3E8D);
+        public const int MF_E_PROPERTY_NOT_FOUND = unchecked((int) 0xC00D3E8D);
 
         ///
         /// MessageId: MF_E_PROPERTY_READ_ONLY
@@ -919,7 +923,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The property is read only.%0
         ///
-        public const int MF_E_PROPERTY_READ_ONLY          = unchecked((int) 0xC00D3E8E);
+        public const int MF_E_PROPERTY_READ_ONLY = unchecked((int) 0xC00D3E8E);
 
         ///
         /// MessageId: MF_E_PROPERTY_NOT_ALLOWED
@@ -928,7 +932,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified property is not allowed in this context.%0
         ///
-        public const int MF_E_PROPERTY_NOT_ALLOWED        = unchecked((int) 0xC00D3E8F);
+        public const int MF_E_PROPERTY_NOT_ALLOWED = unchecked((int) 0xC00D3E8F);
 
         ///
         /// MessageId: MF_E_MEDIA_SOURCE_NOT_STARTED
@@ -937,7 +941,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The media source is not started.%0
         ///
-        public const int MF_E_MEDIA_SOURCE_NOT_STARTED    = unchecked((int) 0xC00D3E91);
+        public const int MF_E_MEDIA_SOURCE_NOT_STARTED = unchecked((int) 0xC00D3E91);
 
         ///
         /// MessageId: MF_E_UNSUPPORTED_FORMAT
@@ -946,7 +950,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Media format is recognized but not supported.%0
         ///
-        public const int MF_E_UNSUPPORTED_FORMAT          = unchecked((int) 0xC00D3E98);
+        public const int MF_E_UNSUPPORTED_FORMAT = unchecked((int) 0xC00D3E98);
 
         ///
         /// MessageId: MF_E_MP3_BAD_CRC
@@ -955,7 +959,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The MPEG frame has bad CRC.%0
         ///
-        public const int MF_E_MP3_BAD_CRC                 = unchecked((int) 0xC00D3E99);
+        public const int MF_E_MP3_BAD_CRC = unchecked((int) 0xC00D3E99);
 
         ///
         /// MessageId: MF_E_NOT_PROTECTED
@@ -964,7 +968,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The file is not protected.%0
         ///
-        public const int MF_E_NOT_PROTECTED               = unchecked((int) 0xC00D3E9A);
+        public const int MF_E_NOT_PROTECTED = unchecked((int) 0xC00D3E9A);
 
         ///
         /// MessageId: MF_E_MEDIA_SOURCE_WRONGSTATE
@@ -973,7 +977,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The media source is in the wrong state%0
         ///
-        public const int MF_E_MEDIA_SOURCE_WRONGSTATE     = unchecked((int) 0xC00D3E9B);
+        public const int MF_E_MEDIA_SOURCE_WRONGSTATE = unchecked((int) 0xC00D3E9B);
 
         ///
         /// MessageId: MF_E_MEDIA_SOURCE_NO_STREAMS_SELECTED
@@ -994,6 +998,7 @@ namespace NAudio.MediaFoundation
         public const int MF_E_CANNOT_FIND_KEYFRAME_SAMPLE = unchecked((int) 0xC00D3E9D);
 
         #endregion
+
         #region MEDIAFOUNDATION Network Error Events
 
         ///
@@ -1003,7 +1008,7 @@ namespace NAudio.MediaFoundation
         ///
         /// An attempt to acquire a network resource failed.%0
         ///
-        public const int MF_E_NETWORK_RESOURCE_FAILURE    = unchecked((int) 0xC00D4268);
+        public const int MF_E_NETWORK_RESOURCE_FAILURE = unchecked((int) 0xC00D4268);
 
         ///
         /// MessageId: MF_E_NET_WRITE
@@ -1012,7 +1017,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Error writing to the network.%0
         ///
-        public const int MF_E_NET_WRITE                   = unchecked((int) 0xC00D4269);
+        public const int MF_E_NET_WRITE = unchecked((int) 0xC00D4269);
 
         ///
         /// MessageId: MF_E_NET_READ
@@ -1021,7 +1026,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Error reading from the network.%0
         ///
-        public const int MF_E_NET_READ                    = unchecked((int) 0xC00D426A);
+        public const int MF_E_NET_READ = unchecked((int) 0xC00D426A);
 
         ///
         /// MessageId: MF_E_NET_REQUIRE_NETWORK
@@ -1030,7 +1035,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Internal. Entry cannot complete operation without network.%0
         ///
-        public const int MF_E_NET_REQUIRE_NETWORK         = unchecked((int) 0xC00D426B);
+        public const int MF_E_NET_REQUIRE_NETWORK = unchecked((int) 0xC00D426B);
 
         ///
         /// MessageId: MF_E_NET_REQUIRE_ASYNC
@@ -1039,7 +1044,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Internal. Async op is required.%0
         ///
-        public const int MF_E_NET_REQUIRE_ASYNC           = unchecked((int) 0xC00D426C);
+        public const int MF_E_NET_REQUIRE_ASYNC = unchecked((int) 0xC00D426C);
 
         ///
         /// MessageId: MF_E_NET_BWLEVEL_NOT_SUPPORTED
@@ -1048,7 +1053,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Internal. Bandwidth levels are not supported.%0
         ///
-        public const int MF_E_NET_BWLEVEL_NOT_SUPPORTED   = unchecked((int) 0xC00D426D);
+        public const int MF_E_NET_BWLEVEL_NOT_SUPPORTED = unchecked((int) 0xC00D426D);
 
         ///
         /// MessageId: MF_E_NET_STREAMGROUPS_NOT_SUPPORTED
@@ -1066,7 +1071,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Manual stream selection is not supported.%0
         ///
-        public const int MF_E_NET_MANUALSS_NOT_SUPPORTED  = unchecked((int) 0xC00D426F);
+        public const int MF_E_NET_MANUALSS_NOT_SUPPORTED = unchecked((int) 0xC00D426F);
 
         ///
         /// MessageId: MF_E_NET_INVALID_PRESENTATION_DESCRIPTOR
@@ -1084,7 +1089,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Cannot find cache stream.%0
         ///
-        public const int MF_E_NET_CACHESTREAM_NOT_FOUND   = unchecked((int) 0xC00D4271);
+        public const int MF_E_NET_CACHESTREAM_NOT_FOUND = unchecked((int) 0xC00D4271);
 
         ///
         /// MessageId: MF_I_MANUAL_PROXY
@@ -1093,7 +1098,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The proxy setting is manual.%0
         ///
-        public const int MF_I_MANUAL_PROXY                = unchecked((int) 0x400D4272);
+        public const int MF_I_MANUAL_PROXY = unchecked((int) 0x400D4272);
 
         ///duplicate removed
         ///MessageId=17011 Severity=Informational Facility=MEDIAFOUNDATION SymbolicName=MF_E_INVALID_REQUEST
@@ -1107,7 +1112,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Internal. Entry cannot complete operation without input.%0
         ///
-        public const int MF_E_NET_REQUIRE_INPUT           = unchecked((int) 0xC00D4274);
+        public const int MF_E_NET_REQUIRE_INPUT = unchecked((int) 0xC00D4274);
 
         ///
         /// MessageId: MF_E_NET_REDIRECT
@@ -1116,7 +1121,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The client redirected to another server.%0
         ///
-        public const int MF_E_NET_REDIRECT                = unchecked((int) 0xC00D4275);
+        public const int MF_E_NET_REDIRECT = unchecked((int) 0xC00D4275);
 
         ///
         /// MessageId: MF_E_NET_REDIRECT_TO_PROXY
@@ -1125,7 +1130,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The client is redirected to a proxy server.%0
         ///
-        public const int MF_E_NET_REDIRECT_TO_PROXY       = unchecked((int) 0xC00D4276);
+        public const int MF_E_NET_REDIRECT_TO_PROXY = unchecked((int) 0xC00D4276);
 
         ///
         /// MessageId: MF_E_NET_TOO_MANY_REDIRECTS
@@ -1134,7 +1139,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The client reached maximum redirection limit.%0
         ///
-        public const int MF_E_NET_TOO_MANY_REDIRECTS      = unchecked((int) 0xC00D4277);
+        public const int MF_E_NET_TOO_MANY_REDIRECTS = unchecked((int) 0xC00D4277);
 
         ///
         /// MessageId: MF_E_NET_TIMEOUT
@@ -1143,7 +1148,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The server, a computer set up to offer multimedia content to other computers, could not handle your request for multimedia content in a timely manner.  Please try again later.%0
         ///
-        public const int MF_E_NET_TIMEOUT                 = unchecked((int) 0xC00D4278);
+        public const int MF_E_NET_TIMEOUT = unchecked((int) 0xC00D4278);
 
         ///
         /// MessageId: MF_E_NET_CLIENT_CLOSE
@@ -1152,7 +1157,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The control socket is closed by the client.%0
         ///
-        public const int MF_E_NET_CLIENT_CLOSE            = unchecked((int) 0xC00D4279);
+        public const int MF_E_NET_CLIENT_CLOSE = unchecked((int) 0xC00D4279);
 
         ///
         /// MessageId: MF_E_NET_BAD_CONTROL_DATA
@@ -1161,7 +1166,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The server received invalid data from the client on the control connection.%0
         ///
-        public const int MF_E_NET_BAD_CONTROL_DATA        = unchecked((int) 0xC00D427A);
+        public const int MF_E_NET_BAD_CONTROL_DATA = unchecked((int) 0xC00D427A);
 
         ///
         /// MessageId: MF_E_NET_INCOMPATIBLE_SERVER
@@ -1170,7 +1175,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The server is not a compatible streaming media server.%0
         ///
-        public const int MF_E_NET_INCOMPATIBLE_SERVER     = unchecked((int) 0xC00D427B);
+        public const int MF_E_NET_INCOMPATIBLE_SERVER = unchecked((int) 0xC00D427B);
 
         ///
         /// MessageId: MF_E_NET_UNSAFE_URL
@@ -1179,7 +1184,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Url.%0
         ///
-        public const int MF_E_NET_UNSAFE_URL              = unchecked((int) 0xC00D427C);
+        public const int MF_E_NET_UNSAFE_URL = unchecked((int) 0xC00D427C);
 
         ///
         /// MessageId: MF_E_NET_CACHE_NO_DATA
@@ -1188,7 +1193,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Data is not available.%0
         ///
-        public const int MF_E_NET_CACHE_NO_DATA           = unchecked((int) 0xC00D427D);
+        public const int MF_E_NET_CACHE_NO_DATA = unchecked((int) 0xC00D427D);
 
         ///
         /// MessageId: MF_E_NET_EOL
@@ -1197,7 +1202,7 @@ namespace NAudio.MediaFoundation
         ///
         /// End of line.%0
         ///
-        public const int MF_E_NET_EOL                     = unchecked((int) 0xC00D427E);
+        public const int MF_E_NET_EOL = unchecked((int) 0xC00D427E);
 
         ///
         /// MessageId: MF_E_NET_BAD_REQUEST
@@ -1206,7 +1211,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The request could not be understood by the server.%0
         ///
-        public const int MF_E_NET_BAD_REQUEST             = unchecked((int) 0xC00D427F);
+        public const int MF_E_NET_BAD_REQUEST = unchecked((int) 0xC00D427F);
 
         ///
         /// MessageId: MF_E_NET_INTERNAL_SERVER_ERROR
@@ -1215,7 +1220,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The server encountered an unexpected condition which prevented it from fulfilling the request.%0
         ///
-        public const int MF_E_NET_INTERNAL_SERVER_ERROR   = unchecked((int) 0xC00D4280);
+        public const int MF_E_NET_INTERNAL_SERVER_ERROR = unchecked((int) 0xC00D4280);
 
         ///
         /// MessageId: MF_E_NET_SESSION_NOT_FOUND
@@ -1224,7 +1229,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Session not found.%0
         ///
-        public const int MF_E_NET_SESSION_NOT_FOUND       = unchecked((int) 0xC00D4281);
+        public const int MF_E_NET_SESSION_NOT_FOUND = unchecked((int) 0xC00D4281);
 
         ///
         /// MessageId: MF_E_NET_NOCONNECTION
@@ -1233,7 +1238,7 @@ namespace NAudio.MediaFoundation
         ///
         /// There is no connection established with the Windows Media server. The operation failed.%0
         ///
-        public const int MF_E_NET_NOCONNECTION            = unchecked((int) 0xC00D4282);
+        public const int MF_E_NET_NOCONNECTION = unchecked((int) 0xC00D4282);
 
         ///
         /// MessageId: MF_E_NET_CONNECTION_FAILURE
@@ -1242,7 +1247,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The network connection has failed.%0
         ///
-        public const int MF_E_NET_CONNECTION_FAILURE      = unchecked((int) 0xC00D4283);
+        public const int MF_E_NET_CONNECTION_FAILURE = unchecked((int) 0xC00D4283);
 
         ///
         /// MessageId: MF_E_NET_INCOMPATIBLE_PUSHSERVER
@@ -1260,7 +1265,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Windows Media server is denying access.  The username and/or password might be incorrect.%0
         ///
-        public const int MF_E_NET_SERVER_ACCESSDENIED     = unchecked((int) 0xC00D4285);
+        public const int MF_E_NET_SERVER_ACCESSDENIED = unchecked((int) 0xC00D4285);
 
         ///
         /// MessageId: MF_E_NET_PROXY_ACCESSDENIED
@@ -1269,7 +1274,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The proxy server is denying access.  The username and/or password might be incorrect.%0
         ///
-        public const int MF_E_NET_PROXY_ACCESSDENIED      = unchecked((int) 0xC00D4286);
+        public const int MF_E_NET_PROXY_ACCESSDENIED = unchecked((int) 0xC00D4286);
 
         ///
         /// MessageId: MF_E_NET_CANNOTCONNECT
@@ -1278,7 +1283,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Unable to establish a connection to the server.%0
         ///
-        public const int MF_E_NET_CANNOTCONNECT           = unchecked((int) 0xC00D4287);
+        public const int MF_E_NET_CANNOTCONNECT = unchecked((int) 0xC00D4287);
 
         ///
         /// MessageId: MF_E_NET_INVALID_PUSH_TEMPLATE
@@ -1287,7 +1292,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The specified push template is invalid.%0
         ///
-        public const int MF_E_NET_INVALID_PUSH_TEMPLATE   = unchecked((int) 0xC00D4288);
+        public const int MF_E_NET_INVALID_PUSH_TEMPLATE = unchecked((int) 0xC00D4288);
 
         ///
         /// MessageId: MF_E_NET_INVALID_PUSH_PUBLISHING_POINT
@@ -1305,7 +1310,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested resource is in use.%0
         ///
-        public const int MF_E_NET_BUSY                    = unchecked((int) 0xC00D428A);
+        public const int MF_E_NET_BUSY = unchecked((int) 0xC00D428A);
 
         ///
         /// MessageId: MF_E_NET_RESOURCE_GONE
@@ -1314,7 +1319,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Publishing Point or file on the Windows Media Server is no longer available.%0
         ///
-        public const int MF_E_NET_RESOURCE_GONE           = unchecked((int) 0xC00D428B);
+        public const int MF_E_NET_RESOURCE_GONE = unchecked((int) 0xC00D428B);
 
         ///
         /// MessageId: MF_E_NET_ERROR_FROM_PROXY
@@ -1323,7 +1328,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The proxy experienced an error while attempting to contact the media server.%0
         ///
-        public const int MF_E_NET_ERROR_FROM_PROXY        = unchecked((int) 0xC00D428C);
+        public const int MF_E_NET_ERROR_FROM_PROXY = unchecked((int) 0xC00D428C);
 
         ///
         /// MessageId: MF_E_NET_PROXY_TIMEOUT
@@ -1332,7 +1337,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The proxy did not receive a timely response while attempting to contact the media server.%0
         ///
-        public const int MF_E_NET_PROXY_TIMEOUT           = unchecked((int) 0xC00D428D);
+        public const int MF_E_NET_PROXY_TIMEOUT = unchecked((int) 0xC00D428D);
 
         ///
         /// MessageId: MF_E_NET_SERVER_UNAVAILABLE
@@ -1341,7 +1346,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The server is currently unable to handle the request due to a temporary overloading or maintenance of the server.%0
         ///
-        public const int MF_E_NET_SERVER_UNAVAILABLE      = unchecked((int) 0xC00D428E);
+        public const int MF_E_NET_SERVER_UNAVAILABLE = unchecked((int) 0xC00D428E);
 
         ///
         /// MessageId: MF_E_NET_TOO_MUCH_DATA
@@ -1350,7 +1355,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The encoding process was unable to keep up with the amount of supplied data.%0
         ///
-        public const int MF_E_NET_TOO_MUCH_DATA           = unchecked((int) 0xC00D428F);
+        public const int MF_E_NET_TOO_MUCH_DATA = unchecked((int) 0xC00D428F);
 
         ///
         /// MessageId: MF_E_NET_SESSION_INVALID
@@ -1359,7 +1364,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Session not found.%0
         ///
-        public const int MF_E_NET_SESSION_INVALID         = unchecked((int) 0xC00D4290);
+        public const int MF_E_NET_SESSION_INVALID = unchecked((int) 0xC00D4290);
 
         ///
         /// MessageId: MF_E_OFFLINE_MODE
@@ -1368,7 +1373,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested URL is not available in offline mode.%0
         ///
-        public const int MF_E_OFFLINE_MODE                = unchecked((int) 0xC00D4291);
+        public const int MF_E_OFFLINE_MODE = unchecked((int) 0xC00D4291);
 
         ///
         /// MessageId: MF_E_NET_UDP_BLOCKED
@@ -1377,7 +1382,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A device in the network is blocking UDP traffic.%0
         ///
-        public const int MF_E_NET_UDP_BLOCKED             = unchecked((int) 0xC00D4292);
+        public const int MF_E_NET_UDP_BLOCKED = unchecked((int) 0xC00D4292);
 
         ///
         /// MessageId: MF_E_NET_UNSUPPORTED_CONFIGURATION
@@ -1395,9 +1400,10 @@ namespace NAudio.MediaFoundation
         ///
         /// The networking protocol is disabled.%0
         ///
-        public const int MF_E_NET_PROTOCOL_DISABLED       = unchecked((int) 0xC00D4294);
+        public const int MF_E_NET_PROTOCOL_DISABLED = unchecked((int) 0xC00D4294);
 
         #endregion
+
         #region MEDIAFOUNDATION WMContainer Error Events
 
         ///
@@ -1407,7 +1413,7 @@ namespace NAudio.MediaFoundation
         ///
         /// This object has already been initialized and cannot be re-initialized at this time.%0
         ///
-        public const int MF_E_ALREADY_INITIALIZED         = unchecked((int) 0xC00D4650);
+        public const int MF_E_ALREADY_INITIALIZED = unchecked((int) 0xC00D4650);
 
         ///
         /// MessageId: MF_E_BANDWIDTH_OVERRUN
@@ -1416,7 +1422,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The amount of data passed in exceeds the given bitrate and buffer window.%0
         ///
-        public const int MF_E_BANDWIDTH_OVERRUN           = unchecked((int) 0xC00D4651);
+        public const int MF_E_BANDWIDTH_OVERRUN = unchecked((int) 0xC00D4651);
 
         ///
         /// MessageId: MF_E_LATE_SAMPLE
@@ -1425,7 +1431,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The sample was passed in too late to be correctly processed.%0
         ///
-        public const int MF_E_LATE_SAMPLE                 = unchecked((int) 0xC00D4652);
+        public const int MF_E_LATE_SAMPLE = unchecked((int) 0xC00D4652);
 
         ///
         /// MessageId: MF_E_FLUSH_NEEDED
@@ -1434,7 +1440,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested action cannot be carried out until the object is flushed and the queue is emptied.%0
         ///
-        public const int MF_E_FLUSH_NEEDED                = unchecked((int) 0xC00D4653);
+        public const int MF_E_FLUSH_NEEDED = unchecked((int) 0xC00D4653);
 
         ///
         /// MessageId: MF_E_INVALID_PROFILE
@@ -1443,7 +1449,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The profile is invalid.%0
         ///
-        public const int MF_E_INVALID_PROFILE             = unchecked((int) 0xC00D4654);
+        public const int MF_E_INVALID_PROFILE = unchecked((int) 0xC00D4654);
 
         ///
         /// MessageId: MF_E_INDEX_NOT_COMMITTED
@@ -1452,7 +1458,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The index that is being generated needs to be committed before the requested action can be carried out.%0
         ///
-        public const int MF_E_INDEX_NOT_COMMITTED         = unchecked((int) 0xC00D4655);
+        public const int MF_E_INDEX_NOT_COMMITTED = unchecked((int) 0xC00D4655);
 
         ///
         /// MessageId: MF_E_NO_INDEX
@@ -1461,7 +1467,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The index that is necessary for the requested action is not found.%0
         ///
-        public const int MF_E_NO_INDEX                    = unchecked((int) 0xC00D4656);
+        public const int MF_E_NO_INDEX = unchecked((int) 0xC00D4656);
 
         ///
         /// MessageId: MF_E_CANNOT_INDEX_IN_PLACE
@@ -1470,7 +1476,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested index cannot be added in-place to the specified ASF content.%0
         ///
-        public const int MF_E_CANNOT_INDEX_IN_PLACE       = unchecked((int) 0xC00D4657);
+        public const int MF_E_CANNOT_INDEX_IN_PLACE = unchecked((int) 0xC00D4657);
 
         ///
         /// MessageId: MF_E_MISSING_ASF_LEAKYBUCKET
@@ -1479,7 +1485,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The ASF leaky bucket parameters must be specified in order to carry out this request.%0
         ///
-        public const int MF_E_MISSING_ASF_LEAKYBUCKET     = unchecked((int) 0xC00D4658);
+        public const int MF_E_MISSING_ASF_LEAKYBUCKET = unchecked((int) 0xC00D4658);
 
         ///
         /// MessageId: MF_E_INVALID_ASF_STREAMID
@@ -1488,9 +1494,10 @@ namespace NAudio.MediaFoundation
         ///
         /// The stream id is invalid. The valid range for ASF stream id is from 1 to 127.%0
         ///
-        public const int MF_E_INVALID_ASF_STREAMID        = unchecked((int) 0xC00D4659);
+        public const int MF_E_INVALID_ASF_STREAMID = unchecked((int) 0xC00D4659);
 
         #endregion
+
         #region MEDIAFOUNDATION Media Sink Error Events
 
         ///
@@ -1500,7 +1507,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The requested Stream Sink has been removed and cannot be used.%0
         ///
-        public const int MF_E_STREAMSINK_REMOVED          = unchecked((int) 0xC00D4A38);
+        public const int MF_E_STREAMSINK_REMOVED = unchecked((int) 0xC00D4A38);
 
         ///
         /// MessageId: MF_E_STREAMSINKS_OUT_OF_SYNC
@@ -1509,7 +1516,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The various Stream Sinks in this Media Sink are too far out of sync for the requested action to take place.%0
         ///
-        public const int MF_E_STREAMSINKS_OUT_OF_SYNC     = unchecked((int) 0xC00D4A3A);
+        public const int MF_E_STREAMSINKS_OUT_OF_SYNC = unchecked((int) 0xC00D4A3A);
 
         ///
         /// MessageId: MF_E_STREAMSINKS_FIXED
@@ -1518,7 +1525,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Stream Sinks cannot be added to or removed from this Media Sink because its set of streams is fixed.%0
         ///
-        public const int MF_E_STREAMSINKS_FIXED           = unchecked((int) 0xC00D4A3B);
+        public const int MF_E_STREAMSINKS_FIXED = unchecked((int) 0xC00D4A3B);
 
         ///
         /// MessageId: MF_E_STREAMSINK_EXISTS
@@ -1527,7 +1534,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The given Stream Sink already exists.%0
         ///
-        public const int MF_E_STREAMSINK_EXISTS           = unchecked((int) 0xC00D4A3C);
+        public const int MF_E_STREAMSINK_EXISTS = unchecked((int) 0xC00D4A3C);
 
         ///
         /// MessageId: MF_E_SAMPLEALLOCATOR_CANCELED
@@ -1536,7 +1543,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Sample allocations have been canceled.%0
         ///
-        public const int MF_E_SAMPLEALLOCATOR_CANCELED    = unchecked((int) 0xC00D4A3D);
+        public const int MF_E_SAMPLEALLOCATOR_CANCELED = unchecked((int) 0xC00D4A3D);
 
         ///
         /// MessageId: MF_E_SAMPLEALLOCATOR_EMPTY
@@ -1545,7 +1552,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The sample allocator is currently empty, due to outstanding requests.%0
         ///
-        public const int MF_E_SAMPLEALLOCATOR_EMPTY       = unchecked((int) 0xC00D4A3E);
+        public const int MF_E_SAMPLEALLOCATOR_EMPTY = unchecked((int) 0xC00D4A3E);
 
         ///
         /// MessageId: MF_E_SINK_ALREADYSTOPPED
@@ -1554,7 +1561,7 @@ namespace NAudio.MediaFoundation
         ///
         /// When we try to sopt a stream sink, it is already stopped %0
         ///
-        public const int MF_E_SINK_ALREADYSTOPPED         = unchecked((int) 0xC00D4A3F);
+        public const int MF_E_SINK_ALREADYSTOPPED = unchecked((int) 0xC00D4A3F);
 
         ///
         /// MessageId: MF_E_ASF_FILESINK_BITRATE_UNKNOWN
@@ -1572,7 +1579,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No streams are selected in sink presentation descriptor.%0
         ///
-        public const int MF_E_SINK_NO_STREAMS             = unchecked((int) 0xC00D4A41);
+        public const int MF_E_SINK_NO_STREAMS = unchecked((int) 0xC00D4A41);
 
         ///
         /// MessageId: MF_S_SINK_NOT_FINALIZED
@@ -1581,7 +1588,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The sink has not been finalized before shut down. This may cause sink generate a corrupted content.%0
         ///
-        public const int MF_S_SINK_NOT_FINALIZED          = unchecked((int) 0x000D4A42);
+        public const int MF_S_SINK_NOT_FINALIZED = unchecked((int) 0x000D4A42);
 
         ///
         /// MessageId: MF_E_METADATA_TOO_LONG
@@ -1590,7 +1597,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A metadata item was too long to write to the output container.%0
         ///
-        public const int MF_E_METADATA_TOO_LONG           = unchecked((int) 0xC00D4A43);
+        public const int MF_E_METADATA_TOO_LONG = unchecked((int) 0xC00D4A43);
 
         ///
         /// MessageId: MF_E_SINK_NO_SAMPLES_PROCESSED
@@ -1599,9 +1606,10 @@ namespace NAudio.MediaFoundation
         ///
         /// The operation failed because no samples were processed by the sink.%0
         ///
-        public const int MF_E_SINK_NO_SAMPLES_PROCESSED   = unchecked((int) 0xC00D4A44);
+        public const int MF_E_SINK_NO_SAMPLES_PROCESSED = unchecked((int) 0xC00D4A44);
 
         #endregion
+
         #region MEDIAFOUNDATION Renderer Error Events
 
         ///
@@ -1611,7 +1619,7 @@ namespace NAudio.MediaFoundation
         ///
         /// There is no available procamp hardware with which to perform color correction.%0
         ///
-        public const int MF_E_VIDEO_REN_NO_PROCAMP_HW     = unchecked((int) 0xC00D4E20);
+        public const int MF_E_VIDEO_REN_NO_PROCAMP_HW = unchecked((int) 0xC00D4E20);
 
         ///
         /// MessageId: MF_E_VIDEO_REN_NO_DEINTERLACE_HW
@@ -1629,7 +1637,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A video stream requires copy protection to be enabled, but there was a failure in attempting to enable copy protection.%0
         ///
-        public const int MF_E_VIDEO_REN_COPYPROT_FAILED   = unchecked((int) 0xC00D4E22);
+        public const int MF_E_VIDEO_REN_COPYPROT_FAILED = unchecked((int) 0xC00D4E22);
 
         ///
         /// MessageId: MF_E_VIDEO_REN_SURFACE_NOT_SHARED
@@ -1647,7 +1655,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A component is attempting to access a shared device that is already locked by another component.%0
         ///
-        public const int MF_E_VIDEO_DEVICE_LOCKED         = unchecked((int) 0xC00D4E24);
+        public const int MF_E_VIDEO_DEVICE_LOCKED = unchecked((int) 0xC00D4E24);
 
         ///
         /// MessageId: MF_E_NEW_VIDEO_DEVICE
@@ -1656,7 +1664,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The device is no longer available. The handle should be closed and a new one opened.%0
         ///
-        public const int MF_E_NEW_VIDEO_DEVICE            = unchecked((int) 0xC00D4E25);
+        public const int MF_E_NEW_VIDEO_DEVICE = unchecked((int) 0xC00D4E25);
 
         ///
         /// MessageId: MF_E_NO_VIDEO_SAMPLE_AVAILABLE
@@ -1665,7 +1673,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A video sample is not currently queued on a stream that is required for mixing.%0
         ///
-        public const int MF_E_NO_VIDEO_SAMPLE_AVAILABLE   = unchecked((int) 0xC00D4E26);
+        public const int MF_E_NO_VIDEO_SAMPLE_AVAILABLE = unchecked((int) 0xC00D4E26);
 
         ///
         /// MessageId: MF_E_NO_AUDIO_PLAYBACK_DEVICE
@@ -1674,7 +1682,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No audio playback device was found.%0
         ///
-        public const int MF_E_NO_AUDIO_PLAYBACK_DEVICE    = unchecked((int) 0xC00D4E84);
+        public const int MF_E_NO_AUDIO_PLAYBACK_DEVICE = unchecked((int) 0xC00D4E84);
 
         ///
         /// MessageId: MF_E_AUDIO_PLAYBACK_DEVICE_IN_USE
@@ -1701,9 +1709,10 @@ namespace NAudio.MediaFoundation
         ///
         /// The audio service is not running.%0
         ///
-        public const int MF_E_AUDIO_SERVICE_NOT_RUNNING   = unchecked((int) 0xC00D4E87);
+        public const int MF_E_AUDIO_SERVICE_NOT_RUNNING = unchecked((int) 0xC00D4E87);
 
         #endregion
+
         #region MEDIAFOUNDATION Topology Error Events
 
         ///
@@ -1713,7 +1722,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The topology contains an invalid optional node.  Possible reasons are incorrect number of outputs and inputs or optional node is at the beginning or end of a segment. %0
         ///
-        public const int MF_E_TOPO_INVALID_OPTIONAL_NODE  = unchecked((int) 0xC00D520E);
+        public const int MF_E_TOPO_INVALID_OPTIONAL_NODE = unchecked((int) 0xC00D520E);
 
         ///
         /// MessageId: MF_E_TOPO_CANNOT_FIND_DECRYPTOR
@@ -1722,7 +1731,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No suitable transform was found to decrypt the content. %0
         ///
-        public const int MF_E_TOPO_CANNOT_FIND_DECRYPTOR  = unchecked((int) 0xC00D5211);
+        public const int MF_E_TOPO_CANNOT_FIND_DECRYPTOR = unchecked((int) 0xC00D5211);
 
         ///
         /// MessageId: MF_E_TOPO_CODEC_NOT_FOUND
@@ -1731,7 +1740,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No suitable transform was found to encode or decode the content. %0
         ///
-        public const int MF_E_TOPO_CODEC_NOT_FOUND        = unchecked((int) 0xC00D5212);
+        public const int MF_E_TOPO_CODEC_NOT_FOUND = unchecked((int) 0xC00D5212);
 
         ///
         /// MessageId: MF_E_TOPO_CANNOT_CONNECT
@@ -1740,7 +1749,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Unable to find a way to connect nodes%0
         ///
-        public const int MF_E_TOPO_CANNOT_CONNECT         = unchecked((int) 0xC00D5213);
+        public const int MF_E_TOPO_CANNOT_CONNECT = unchecked((int) 0xC00D5213);
 
         ///
         /// MessageId: MF_E_TOPO_UNSUPPORTED
@@ -1749,7 +1758,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Unsupported operations in topoloader%0
         ///
-        public const int MF_E_TOPO_UNSUPPORTED            = unchecked((int) 0xC00D5214);
+        public const int MF_E_TOPO_UNSUPPORTED = unchecked((int) 0xC00D5214);
 
         ///
         /// MessageId: MF_E_TOPO_INVALID_TIME_ATTRIBUTES
@@ -1767,7 +1776,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The topology contains loops, which are unsupported in media foundation topologies%0
         ///
-        public const int MF_E_TOPO_LOOPS_IN_TOPOLOGY      = unchecked((int) 0xC00D5216);
+        public const int MF_E_TOPO_LOOPS_IN_TOPOLOGY = unchecked((int) 0xC00D5216);
 
         ///
         /// MessageId: MF_E_TOPO_MISSING_PRESENTATION_DESCRIPTOR
@@ -1803,7 +1812,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A source stream node in the topology does not have a source%0
         ///
-        public const int MF_E_TOPO_MISSING_SOURCE         = unchecked((int) 0xC00D521A);
+        public const int MF_E_TOPO_MISSING_SOURCE = unchecked((int) 0xC00D521A);
 
         ///
         /// MessageId: MF_E_TOPO_SINK_ACTIVATES_UNSUPPORTED
@@ -1813,7 +1822,9 @@ namespace NAudio.MediaFoundation
         /// The topology loader does not support sink activates on output nodes.%0
         ///
         public const int MF_E_TOPO_SINK_ACTIVATES_UNSUPPORTED = unchecked((int) 0xC00D521B);
+
         #endregion
+
         #region MEDIAFOUNDATION Timeline Error Events
 
         ///
@@ -1832,7 +1843,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The context was canceled.%0\n.
         ///
-        public const int MF_S_SEQUENCER_CONTEXT_CANCELED  = unchecked((int) 0x000D61AD);
+        public const int MF_S_SEQUENCER_CONTEXT_CANCELED = unchecked((int) 0x000D61AD);
 
         ///
         /// MessageId: MF_E_NO_SOURCE_IN_CACHE
@@ -1841,7 +1852,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Cannot find source in source cache.%0\n.
         ///
-        public const int MF_E_NO_SOURCE_IN_CACHE          = unchecked((int) 0xC00D61AE);
+        public const int MF_E_NO_SOURCE_IN_CACHE = unchecked((int) 0xC00D61AE);
 
         ///
         /// MessageId: MF_S_SEQUENCER_SEGMENT_AT_END_OF_STREAM
@@ -1851,7 +1862,9 @@ namespace NAudio.MediaFoundation
         /// Cannot update topology flags.%0\n.
         ///
         public const int MF_S_SEQUENCER_SEGMENT_AT_END_OF_STREAM = unchecked((int) 0x000D61AF);
+
         #endregion
+
         #region Transform errors
 
         ///
@@ -1861,7 +1874,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A valid type has not been set for this stream or a stream that it depends on.%0
         ///
-        public const int MF_E_TRANSFORM_TYPE_NOT_SET      = unchecked((int) 0xC00D6D60);
+        public const int MF_E_TRANSFORM_TYPE_NOT_SET = unchecked((int) 0xC00D6D60);
 
         ///
         /// MessageId: MF_E_TRANSFORM_STREAM_CHANGE
@@ -1870,7 +1883,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A stream change has occurred. Output cannot be produced until the streams have been renegotiated.%0
         ///
-        public const int MF_E_TRANSFORM_STREAM_CHANGE     = unchecked((int) 0xC00D6D61);
+        public const int MF_E_TRANSFORM_STREAM_CHANGE = unchecked((int) 0xC00D6D61);
 
         ///
         /// MessageId: MF_E_TRANSFORM_INPUT_REMAINING
@@ -1879,7 +1892,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The transform cannot take the requested action until all of the input data it currently holds is processed or flushed.%0
         ///
-        public const int MF_E_TRANSFORM_INPUT_REMAINING   = unchecked((int) 0xC00D6D62);
+        public const int MF_E_TRANSFORM_INPUT_REMAINING = unchecked((int) 0xC00D6D62);
 
         ///
         /// MessageId: MF_E_TRANSFORM_PROFILE_MISSING
@@ -1888,7 +1901,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The transform requires a profile but no profile was supplied or found.%0
         ///
-        public const int MF_E_TRANSFORM_PROFILE_MISSING   = unchecked((int) 0xC00D6D63);
+        public const int MF_E_TRANSFORM_PROFILE_MISSING = unchecked((int) 0xC00D6D63);
 
         ///
         /// MessageId: MF_E_TRANSFORM_PROFILE_INVALID_OR_CORRUPT
@@ -2014,7 +2027,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The transform cannot produce output until it gets more input samples.%0
         ///
-        public const int MF_E_TRANSFORM_NEED_MORE_INPUT   = unchecked((int) 0xC00D6D72);
+        public const int MF_E_TRANSFORM_NEED_MORE_INPUT = unchecked((int) 0xC00D6D72);
 
         ///
         /// MessageId: MF_E_TRANSFORM_NOT_POSSIBLE_FOR_CURRENT_SPKR_CONFIG
@@ -2050,7 +2063,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The input type is not supported for D3D device.%0
         ///
-        public const int MF_E_UNSUPPORTED_D3D_TYPE        = unchecked((int) 0xC00D6D76);
+        public const int MF_E_UNSUPPORTED_D3D_TYPE = unchecked((int) 0xC00D6D76);
 
         ///
         /// MessageId: MF_E_TRANSFORM_ASYNC_LOCKED
@@ -2059,7 +2072,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The caller does not appear to support this transform's asynchronous capabilities.%0
         ///
-        public const int MF_E_TRANSFORM_ASYNC_LOCKED      = unchecked((int) 0xC00D6D77);
+        public const int MF_E_TRANSFORM_ASYNC_LOCKED = unchecked((int) 0xC00D6D77);
 
         ///
         /// MessageId: MF_E_TRANSFORM_CANNOT_INITIALIZE_ACM_DRIVER
@@ -2071,6 +2084,7 @@ namespace NAudio.MediaFoundation
         public const int MF_E_TRANSFORM_CANNOT_INITIALIZE_ACM_DRIVER = unchecked((int) 0xC00D6D78);
 
         #endregion
+
         #region Content Protection errors
 
         ///
@@ -2080,7 +2094,7 @@ namespace NAudio.MediaFoundation
         ///
         /// You are not allowed to open this file. Contact the content provider for further assistance.%0
         ///
-        public const int MF_E_LICENSE_INCORRECT_RIGHTS    = unchecked((int) 0xC00D7148);
+        public const int MF_E_LICENSE_INCORRECT_RIGHTS = unchecked((int) 0xC00D7148);
 
         ///
         /// MessageId: MF_E_LICENSE_OUTOFDATE
@@ -2089,7 +2103,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The license for this media file has expired. Get a new license or contact the content provider for further assistance.%0
         ///
-        public const int MF_E_LICENSE_OUTOFDATE           = unchecked((int) 0xC00D7149);
+        public const int MF_E_LICENSE_OUTOFDATE = unchecked((int) 0xC00D7149);
 
         ///
         /// MessageId: MF_E_LICENSE_REQUIRED
@@ -2098,7 +2112,7 @@ namespace NAudio.MediaFoundation
         ///
         /// You need a license to perform the requested operation on this media file.%0
         ///
-        public const int MF_E_LICENSE_REQUIRED            = unchecked((int) 0xC00D714A);
+        public const int MF_E_LICENSE_REQUIRED = unchecked((int) 0xC00D714A);
 
         ///
         /// MessageId: MF_E_DRM_HARDWARE_INCONSISTENT
@@ -2107,7 +2121,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The licenses for your media files are corrupted. Contact Microsoft product support.%0
         ///
-        public const int MF_E_DRM_HARDWARE_INCONSISTENT   = unchecked((int) 0xC00D714B);
+        public const int MF_E_DRM_HARDWARE_INCONSISTENT = unchecked((int) 0xC00D714B);
 
         ///
         /// MessageId: MF_E_NO_CONTENT_PROTECTION_MANAGER
@@ -2125,7 +2139,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Client does not have rights to restore licenses.%0
         ///
-        public const int MF_E_LICENSE_RESTORE_NO_RIGHTS   = unchecked((int) 0xC00D714D);
+        public const int MF_E_LICENSE_RESTORE_NO_RIGHTS = unchecked((int) 0xC00D714D);
 
         ///
         /// MessageId: MF_E_BACKUP_RESTRICTED_LICENSE
@@ -2134,7 +2148,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Licenses are restricted and hence can not be backed up.%0
         ///
-        public const int MF_E_BACKUP_RESTRICTED_LICENSE   = unchecked((int) 0xC00D714E);
+        public const int MF_E_BACKUP_RESTRICTED_LICENSE = unchecked((int) 0xC00D714E);
 
         ///
         /// MessageId: MF_E_LICENSE_RESTORE_NEEDS_INDIVIDUALIZATION
@@ -2152,7 +2166,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Protection for stream is not required.%0
         ///
-        public const int MF_S_PROTECTION_NOT_REQUIRED     = unchecked((int) 0x000D7150);
+        public const int MF_S_PROTECTION_NOT_REQUIRED = unchecked((int) 0x000D7150);
 
         ///
         /// MessageId: MF_E_COMPONENT_REVOKED
@@ -2161,7 +2175,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Component is revoked.%0
         ///
-        public const int MF_E_COMPONENT_REVOKED           = unchecked((int) 0xC00D7151);
+        public const int MF_E_COMPONENT_REVOKED = unchecked((int) 0xC00D7151);
 
         ///
         /// MessageId: MF_E_TRUST_DISABLED
@@ -2170,7 +2184,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Trusted functionality is currently disabled on this component.%0
         ///
-        public const int MF_E_TRUST_DISABLED              = unchecked((int) 0xC00D7152);
+        public const int MF_E_TRUST_DISABLED = unchecked((int) 0xC00D7152);
 
         ///
         /// MessageId: MF_E_WMDRMOTA_NO_ACTION
@@ -2179,7 +2193,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No Action is set on WMDRM Output Trust Authority.%0
         ///
-        public const int MF_E_WMDRMOTA_NO_ACTION          = unchecked((int) 0xC00D7153);
+        public const int MF_E_WMDRMOTA_NO_ACTION = unchecked((int) 0xC00D7153);
 
         ///
         /// MessageId: MF_E_WMDRMOTA_ACTION_ALREADY_SET
@@ -2215,7 +2229,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Action does not match with current configuration.%0
         ///
-        public const int MF_E_WMDRMOTA_ACTION_MISMATCH    = unchecked((int) 0xC00D7157);
+        public const int MF_E_WMDRMOTA_ACTION_MISMATCH = unchecked((int) 0xC00D7157);
 
         ///
         /// MessageId: MF_E_WMDRMOTA_INVALID_POLICY
@@ -2224,7 +2238,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Invalid policy for WMDRM Output Trust Authority.%0
         ///
-        public const int MF_E_WMDRMOTA_INVALID_POLICY     = unchecked((int) 0xC00D7158);
+        public const int MF_E_WMDRMOTA_INVALID_POLICY = unchecked((int) 0xC00D7158);
 
         ///
         /// MessageId: MF_E_POLICY_UNSUPPORTED
@@ -2233,7 +2247,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The policies that the Input Trust Authority requires to be enforced are unsupported by the outputs.%0
         ///
-        public const int MF_E_POLICY_UNSUPPORTED          = unchecked((int) 0xC00D7159);
+        public const int MF_E_POLICY_UNSUPPORTED = unchecked((int) 0xC00D7159);
 
         ///
         /// MessageId: MF_E_OPL_NOT_SUPPORTED
@@ -2242,7 +2256,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The OPL that the license requires to be enforced are not supported by the Input Trust Authority.%0
         ///
-        public const int MF_E_OPL_NOT_SUPPORTED           = unchecked((int) 0xC00D715A);
+        public const int MF_E_OPL_NOT_SUPPORTED = unchecked((int) 0xC00D715A);
 
         ///
         /// MessageId: MF_E_TOPOLOGY_VERIFICATION_FAILED
@@ -2269,7 +2283,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Running this process under a debugger while using protected content is not allowed.%0
         ///
-        public const int MF_E_DEBUGGING_NOT_ALLOWED       = unchecked((int) 0xC00D715D);
+        public const int MF_E_DEBUGGING_NOT_ALLOWED = unchecked((int) 0xC00D715D);
 
         ///
         /// MessageId: MF_E_CODE_EXPIRED
@@ -2278,7 +2292,7 @@ namespace NAudio.MediaFoundation
         ///
         /// MF component has expired.%0
         ///
-        public const int MF_E_CODE_EXPIRED                = unchecked((int) 0xC00D715E);
+        public const int MF_E_CODE_EXPIRED = unchecked((int) 0xC00D715E);
 
         ///
         /// MessageId: MF_E_GRL_VERSION_TOO_LOW
@@ -2287,7 +2301,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The current GRL on the machine does not meet the minimum version requirements.%0
         ///
-        public const int MF_E_GRL_VERSION_TOO_LOW         = unchecked((int) 0xC00D715F);
+        public const int MF_E_GRL_VERSION_TOO_LOW = unchecked((int) 0xC00D715F);
 
         ///
         /// MessageId: MF_E_GRL_RENEWAL_NOT_FOUND
@@ -2296,7 +2310,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The current GRL on the machine does not contain any renewal entries for the specified revocation.%0
         ///
-        public const int MF_E_GRL_RENEWAL_NOT_FOUND       = unchecked((int) 0xC00D7160);
+        public const int MF_E_GRL_RENEWAL_NOT_FOUND = unchecked((int) 0xC00D7160);
 
         ///
         /// MessageId: MF_E_GRL_EXTENSIBLE_ENTRY_NOT_FOUND
@@ -2314,7 +2328,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The kernel isn't secure for high security level content.%0
         ///
-        public const int MF_E_KERNEL_UNTRUSTED            = unchecked((int) 0xC00D7162);
+        public const int MF_E_KERNEL_UNTRUSTED = unchecked((int) 0xC00D7162);
 
         ///
         /// MessageId: MF_E_PEAUTH_UNTRUSTED
@@ -2323,7 +2337,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The response from protected environment driver isn't valid.%0
         ///
-        public const int MF_E_PEAUTH_UNTRUSTED            = unchecked((int) 0xC00D7163);
+        public const int MF_E_PEAUTH_UNTRUSTED = unchecked((int) 0xC00D7163);
 
         ///
         /// MessageId: MF_E_NON_PE_PROCESS
@@ -2332,7 +2346,7 @@ namespace NAudio.MediaFoundation
         ///
         /// A non-PE process tried to talk to PEAuth.%0
         ///
-        public const int MF_E_NON_PE_PROCESS              = unchecked((int) 0xC00D7165);
+        public const int MF_E_NON_PE_PROCESS = unchecked((int) 0xC00D7165);
 
         ///
         /// MessageId: MF_E_REBOOT_REQUIRED
@@ -2341,7 +2355,7 @@ namespace NAudio.MediaFoundation
         ///
         /// We need to reboot the machine.%0
         ///
-        public const int MF_E_REBOOT_REQUIRED             = unchecked((int) 0xC00D7167);
+        public const int MF_E_REBOOT_REQUIRED = unchecked((int) 0xC00D7167);
 
         ///
         /// MessageId: MF_S_WAIT_FOR_POLICY_SET
@@ -2350,7 +2364,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Protection for this stream is not guaranteed to be enforced until the MEPolicySet event is fired.%0
         ///
-        public const int MF_S_WAIT_FOR_POLICY_SET         = unchecked((int) 0x000D7168);
+        public const int MF_S_WAIT_FOR_POLICY_SET = unchecked((int) 0x000D7168);
 
         ///
         /// MessageId: MF_S_VIDEO_DISABLED_WITH_UNKNOWN_SOFTWARE_OUTPUT
@@ -2368,7 +2382,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The GRL file is not correctly formed, it may have been corrupted or overwritten.%0
         ///
-        public const int MF_E_GRL_INVALID_FORMAT          = unchecked((int) 0xC00D716A);
+        public const int MF_E_GRL_INVALID_FORMAT = unchecked((int) 0xC00D716A);
 
         ///
         /// MessageId: MF_E_GRL_UNRECOGNIZED_FORMAT
@@ -2377,7 +2391,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The GRL file is in a format newer than those recognized by this GRL Reader.%0
         ///
-        public const int MF_E_GRL_UNRECOGNIZED_FORMAT     = unchecked((int) 0xC00D716B);
+        public const int MF_E_GRL_UNRECOGNIZED_FORMAT = unchecked((int) 0xC00D716B);
 
         ///
         /// MessageId: MF_E_ALL_PROCESS_RESTART_REQUIRED
@@ -2395,7 +2409,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The GRL was reloaded and the current process needs to restart.%0
         ///
-        public const int MF_E_PROCESS_RESTART_REQUIRED    = unchecked((int) 0xC00D716D);
+        public const int MF_E_PROCESS_RESTART_REQUIRED = unchecked((int) 0xC00D716D);
 
         ///
         /// MessageId: MF_E_USERMODE_UNTRUSTED
@@ -2404,7 +2418,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The user space is untrusted for protected content play.%0
         ///
-        public const int MF_E_USERMODE_UNTRUSTED          = unchecked((int) 0xC00D716E);
+        public const int MF_E_USERMODE_UNTRUSTED = unchecked((int) 0xC00D716E);
 
         ///
         /// MessageId: MF_E_PEAUTH_SESSION_NOT_STARTED
@@ -2413,7 +2427,7 @@ namespace NAudio.MediaFoundation
         ///
         /// PEAuth communication session hasn't been started.%0
         ///
-        public const int MF_E_PEAUTH_SESSION_NOT_STARTED  = unchecked((int) 0xC00D716F);
+        public const int MF_E_PEAUTH_SESSION_NOT_STARTED = unchecked((int) 0xC00D716F);
 
         ///
         /// MessageId: MF_E_PEAUTH_PUBLICKEY_REVOKED
@@ -2422,7 +2436,7 @@ namespace NAudio.MediaFoundation
         ///
         /// PEAuth's public key is revoked.%0
         ///
-        public const int MF_E_PEAUTH_PUBLICKEY_REVOKED    = unchecked((int) 0xC00D7171);
+        public const int MF_E_PEAUTH_PUBLICKEY_REVOKED = unchecked((int) 0xC00D7171);
 
         ///
         /// MessageId: MF_E_GRL_ABSENT
@@ -2431,7 +2445,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The GRL is absent.%0
         ///
-        public const int MF_E_GRL_ABSENT                  = unchecked((int) 0xC00D7172);
+        public const int MF_E_GRL_ABSENT = unchecked((int) 0xC00D7172);
 
         ///
         /// MessageId: MF_S_PE_TRUSTED
@@ -2440,7 +2454,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Protected Environment is trusted.%0
         ///
-        public const int MF_S_PE_TRUSTED                  = unchecked((int) 0x000D7173);
+        public const int MF_S_PE_TRUSTED = unchecked((int) 0x000D7173);
 
         ///
         /// MessageId: MF_E_PE_UNTRUSTED
@@ -2449,7 +2463,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Protected Environment is untrusted.%0
         ///
-        public const int MF_E_PE_UNTRUSTED                = unchecked((int) 0xC00D7174);
+        public const int MF_E_PE_UNTRUSTED = unchecked((int) 0xC00D7174);
 
         ///
         /// MessageId: MF_E_PEAUTH_NOT_STARTED
@@ -2458,7 +2472,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The Protected Environment Authorization service (PEAUTH) has not been started.%0
         ///
-        public const int MF_E_PEAUTH_NOT_STARTED          = unchecked((int) 0xC00D7175);
+        public const int MF_E_PEAUTH_NOT_STARTED = unchecked((int) 0xC00D7175);
 
         ///
         /// MessageId: MF_E_INCOMPATIBLE_SAMPLE_PROTECTION
@@ -2476,7 +2490,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No more protected environment sessions can be supported.%0
         ///
-        public const int MF_E_PE_SESSIONS_MAXED           = unchecked((int) 0xC00D7177);
+        public const int MF_E_PE_SESSIONS_MAXED = unchecked((int) 0xC00D7177);
 
         ///
         /// MessageId: MF_E_HIGH_SECURITY_LEVEL_CONTENT_NOT_ALLOWED
@@ -2503,7 +2517,7 @@ namespace NAudio.MediaFoundation
         ///
         /// WMDRM ITA does not support the requested action.%0
         ///
-        public const int MF_E_ITA_UNSUPPORTED_ACTION      = unchecked((int) 0xC00D717A);
+        public const int MF_E_ITA_UNSUPPORTED_ACTION = unchecked((int) 0xC00D717A);
 
         ///
         /// MessageId: MF_E_ITA_ERROR_PARSING_SAP_PARAMETERS
@@ -2530,7 +2544,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The structure specifying Output Protection Level is not the correct format.%0
         ///
-        public const int MF_E_BAD_OPL_STRUCTURE_FORMAT    = unchecked((int) 0xC00D717D);
+        public const int MF_E_BAD_OPL_STRUCTURE_FORMAT = unchecked((int) 0xC00D717D);
 
         ///
         /// MessageId: MF_E_ITA_UNRECOGNIZED_ANALOG_VIDEO_PROTECTION_GUID
@@ -2548,7 +2562,7 @@ namespace NAudio.MediaFoundation
         ///
         /// IMFPMPHost object not available.%0
         ///
-        public const int MF_E_NO_PMP_HOST                 = unchecked((int) 0xC00D717F);
+        public const int MF_E_NO_PMP_HOST = unchecked((int) 0xC00D717F);
 
         ///
         /// MessageId: MF_E_ITA_OPL_DATA_NOT_INITIALIZED
@@ -2578,6 +2592,7 @@ namespace NAudio.MediaFoundation
         public const int MF_E_ITA_UNRECOGNIZED_DIGITAL_VIDEO_OUTPUT = unchecked((int) 0xC00D7182);
 
         #endregion
+
         #region Clock errors
 
         ///
@@ -2596,7 +2611,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No Presentation Time Source has been specified.%0
         ///
-        public const int MF_E_CLOCK_NO_TIME_SOURCE        = unchecked((int) 0xC00D9C41);
+        public const int MF_E_CLOCK_NO_TIME_SOURCE = unchecked((int) 0xC00D9C41);
 
         ///
         /// MessageId: MF_E_CLOCK_STATE_ALREADY_SET
@@ -2605,7 +2620,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The clock is already in the requested state.%0
         ///
-        public const int MF_E_CLOCK_STATE_ALREADY_SET     = unchecked((int) 0xC00D9C42);
+        public const int MF_E_CLOCK_STATE_ALREADY_SET = unchecked((int) 0xC00D9C42);
 
         ///
         /// MessageId: MF_E_CLOCK_NOT_SIMPLE
@@ -2614,7 +2629,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The clock has too many advanced features to carry out the request.%0
         ///
-        public const int MF_E_CLOCK_NOT_SIMPLE            = unchecked((int) 0xC00D9C43);
+        public const int MF_E_CLOCK_NOT_SIMPLE = unchecked((int) 0xC00D9C43);
 
         ///
         /// MessageId: MF_S_CLOCK_STOPPED
@@ -2623,8 +2638,10 @@ namespace NAudio.MediaFoundation
         ///
         /// Timer::SetTimer returns this success code if called happened while timer is stopped. Timer is not going to be dispatched until clock is running%0
         ///
-        public const int MF_S_CLOCK_STOPPED               = unchecked((int) 0x000D9C44);
+        public const int MF_S_CLOCK_STOPPED = unchecked((int) 0x000D9C44);
+
         #endregion
+
         #region MF Quality Management errors
 
         ///
@@ -2634,7 +2651,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The component does not support any more drop modes.%0
         ///
-        public const int MF_E_NO_MORE_DROP_MODES          = unchecked((int) 0xC00DA028);
+        public const int MF_E_NO_MORE_DROP_MODES = unchecked((int) 0xC00DA028);
 
         ///
         /// MessageId: MF_E_NO_MORE_QUALITY_LEVELS
@@ -2643,7 +2660,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The component does not support any more quality levels.%0
         ///
-        public const int MF_E_NO_MORE_QUALITY_LEVELS      = unchecked((int) 0xC00DA029);
+        public const int MF_E_NO_MORE_QUALITY_LEVELS = unchecked((int) 0xC00DA029);
 
         ///
         /// MessageId: MF_E_DROPTIME_NOT_SUPPORTED
@@ -2652,7 +2669,7 @@ namespace NAudio.MediaFoundation
         ///
         /// The component does not support drop time functionality.%0
         ///
-        public const int MF_E_DROPTIME_NOT_SUPPORTED      = unchecked((int) 0xC00DA02A);
+        public const int MF_E_DROPTIME_NOT_SUPPORTED = unchecked((int) 0xC00DA02A);
 
         ///
         /// MessageId: MF_E_QUALITYKNOB_WAIT_LONGER
@@ -2661,7 +2678,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Quality Manager needs to wait longer before bumping the Quality Level up.%0
         ///
-        public const int MF_E_QUALITYKNOB_WAIT_LONGER     = unchecked((int) 0xC00DA02B);
+        public const int MF_E_QUALITYKNOB_WAIT_LONGER = unchecked((int) 0xC00DA02B);
 
         ///
         /// MessageId: MF_E_QM_INVALIDSTATE
@@ -2670,9 +2687,10 @@ namespace NAudio.MediaFoundation
         ///
         /// Quality Manager is in an invalid state. Quality Management is off at this moment.%0
         ///
-        public const int MF_E_QM_INVALIDSTATE             = unchecked((int) 0xC00DA02C);
+        public const int MF_E_QM_INVALIDSTATE = unchecked((int) 0xC00DA02C);
 
         #endregion
+
         #region MF Transcode errors
 
         ///
@@ -2682,7 +2700,7 @@ namespace NAudio.MediaFoundation
         ///
         /// No transcode output container type is specified.%0
         ///
-        public const int MF_E_TRANSCODE_NO_CONTAINERTYPE  = unchecked((int) 0xC00DA410);
+        public const int MF_E_TRANSCODE_NO_CONTAINERTYPE = unchecked((int) 0xC00DA410);
 
         ///
         /// MessageId: MF_E_TRANSCODE_PROFILE_NO_MATCHING_STREAMS
@@ -2703,6 +2721,7 @@ namespace NAudio.MediaFoundation
         public const int MF_E_TRANSCODE_NO_MATCHING_ENCODER = unchecked((int) 0xC00DA412);
 
         #endregion
+
         #region MF HW Device Proxy errors
 
         ///
@@ -2712,7 +2731,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Memory allocator is not initialized.%0
         ///
-        public const int MF_E_ALLOCATOR_NOT_INITIALIZED   = unchecked((int) 0xC00DA7F8);
+        public const int MF_E_ALLOCATOR_NOT_INITIALIZED = unchecked((int) 0xC00DA7F8);
 
         ///
         /// MessageId: MF_E_ALLOCATOR_NOT_COMMITED
@@ -2721,7 +2740,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Memory allocator is not committed yet.%0
         ///
-        public const int MF_E_ALLOCATOR_NOT_COMMITED      = unchecked((int) 0xC00DA7F9);
+        public const int MF_E_ALLOCATOR_NOT_COMMITED = unchecked((int) 0xC00DA7F9);
 
         ///
         /// MessageId: MF_E_ALLOCATOR_ALREADY_COMMITED
@@ -2730,7 +2749,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Memory allocator has already been committed.%0
         ///
-        public const int MF_E_ALLOCATOR_ALREADY_COMMITED  = unchecked((int) 0xC00DA7FA);
+        public const int MF_E_ALLOCATOR_ALREADY_COMMITED = unchecked((int) 0xC00DA7FA);
 
         ///
         /// MessageId: MF_E_STREAM_ERROR
@@ -2739,7 +2758,7 @@ namespace NAudio.MediaFoundation
         ///
         /// An error occurred in media stream.%0
         ///
-        public const int MF_E_STREAM_ERROR                = unchecked((int) 0xC00DA7FB);
+        public const int MF_E_STREAM_ERROR = unchecked((int) 0xC00DA7FB);
 
         ///
         /// MessageId: MF_E_INVALID_STREAM_STATE
@@ -2748,7 +2767,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Stream is not in a state to handle the request.%0
         ///
-        public const int MF_E_INVALID_STREAM_STATE        = unchecked((int) 0xC00DA7FC);
+        public const int MF_E_INVALID_STREAM_STATE = unchecked((int) 0xC00DA7FC);
 
         ///
         /// MessageId: MF_E_HW_STREAM_NOT_CONNECTED
@@ -2757,7 +2776,7 @@ namespace NAudio.MediaFoundation
         ///
         /// Hardware stream is not connected yet.%0
         ///
-        public const int MF_E_HW_STREAM_NOT_CONNECTED     = unchecked((int) 0xC00DA7FD);
+        public const int MF_E_HW_STREAM_NOT_CONNECTED = unchecked((int) 0xC00DA7FD);
 
         #endregion
     }

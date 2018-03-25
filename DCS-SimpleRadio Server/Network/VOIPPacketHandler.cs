@@ -12,10 +12,8 @@ using Xceed.Wpf.Toolkit.Converters;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-
     using System;
     using System.Collections.Concurrent;
-
     using System.Text;
     using DotNetty.Buffers;
     using DotNetty.Transport.Channels;
@@ -95,7 +93,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         if (decodedPacket.Modulation != 4)
                             //magical ignore message 4 - just used for ping
                         {
-
                             var coalitionSecurity =
                                 _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY];
 
@@ -133,19 +130,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                 }
             }
-            
         }
 
-        
+
         public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
 
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
-            Logger.Log(LogLevel.Error,exception,"Exception processing voip: "+exception.Message);
+            Logger.Log(LogLevel.Error, exception, "Exception processing voip: " + exception.Message);
             context.CloseAsync();
         }
 
         public override bool IsSharable => true;
     }
-   
 }

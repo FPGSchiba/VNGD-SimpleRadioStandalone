@@ -35,7 +35,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var selected = (string) ChannelSelector.SelectedValue;
 
             SettingsStore.Instance.SetClientSetting(SettingConfig, selected);
-            
         }
     }
 }

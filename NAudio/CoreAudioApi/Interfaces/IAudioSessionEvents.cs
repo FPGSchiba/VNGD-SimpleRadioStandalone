@@ -1,4 +1,4 @@
-﻿﻿// -----------------------------------------
+﻿// -----------------------------------------
 // SoundScribe (TM) and related software.
 // 
 // Copyright (C) 2007-2011 Vannatech
@@ -19,7 +19,7 @@
 // milligan22963 - ported to nAudio
 // -----------------------------------------
 
- using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace NAudio.CoreAudioApi.Interfaces
@@ -92,7 +92,7 @@ namespace NAudio.CoreAudioApi.Interfaces
     /// Defined in AudioPolicy.h
     /// </summary>
     [Guid("24918ACC-64B3-37C1-8CA9-74A66E9957A8"),
-        InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IAudioSessionEvents
     {
         /// <summary>

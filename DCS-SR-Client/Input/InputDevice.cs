@@ -3,8 +3,6 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
-   
-
     public class InputDevice
     {
         public InputBinding InputBind { get; set; }
@@ -17,11 +15,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
         public bool IsSameBind(InputDevice compare)
         {
-            return Button == compare.Button && 
-                compare.InstanceGuid == InstanceGuid &&
+            return Button == compare.Button &&
+                   compare.InstanceGuid == InstanceGuid &&
                    ButtonValue == compare.ButtonValue;
         }
     }
-
-
 }

@@ -32,6 +32,5 @@ namespace NAudio.Utils
         {
             return Math.Exp(dB * DB_2_LOG);
         }
-
     }
 }

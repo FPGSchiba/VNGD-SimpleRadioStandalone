@@ -48,7 +48,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX] ? "ON" : "OFF";
 
-                RadioRXInterference.Content = settings[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
+                RadioRXInterference.Content =
+                    settings[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
 
                 RadioExpansion.Content = settings[(int) ServerSettingType.RADIO_EXPANSION] ? "ON" : "OFF";
 

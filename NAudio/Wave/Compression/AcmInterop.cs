@@ -10,11 +10,14 @@ namespace NAudio.Wave.Compression
     class AcmInterop
     {
         // http://msdn.microsoft.com/en-us/library/dd742891%28VS.85%29.aspx
-        public delegate bool AcmDriverEnumCallback(IntPtr hAcmDriverId, IntPtr instance, AcmDriverDetailsSupportFlags flags);
+        public delegate bool AcmDriverEnumCallback(IntPtr hAcmDriverId, IntPtr instance,
+            AcmDriverDetailsSupportFlags flags);
 
-        public delegate bool AcmFormatEnumCallback(IntPtr hAcmDriverId, ref AcmFormatDetails formatDetails, IntPtr dwInstance, AcmDriverDetailsSupportFlags flags);
+        public delegate bool AcmFormatEnumCallback(IntPtr hAcmDriverId, ref AcmFormatDetails formatDetails,
+            IntPtr dwInstance, AcmDriverDetailsSupportFlags flags);
 
-        public delegate bool AcmFormatTagEnumCallback(IntPtr hAcmDriverId, ref AcmFormatTagDetails formatTagDetails, IntPtr dwInstance, AcmDriverDetailsSupportFlags flags);
+        public delegate bool AcmFormatTagEnumCallback(IntPtr hAcmDriverId, ref AcmFormatTagDetails formatTagDetails,
+            IntPtr dwInstance, AcmDriverDetailsSupportFlags flags);
 
         /// <summary>
         /// http://msdn.microsoft.com/en-us/library/dd742910%28VS.85%29.aspx
@@ -64,14 +67,16 @@ namespace NAudio.Wave.Compression
         // http://msdn.microsoft.com/en-us/library/dd742886%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
         public static extern MmResult acmDriverClose(IntPtr hAcmDriver, int closeFlags);
-        
+
         // http://msdn.microsoft.com/en-us/library/dd742890%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmDriverEnum(AcmDriverEnumCallback fnCallback, IntPtr dwInstance, AcmDriverEnumFlags flags);
+        public static extern MmResult acmDriverEnum(AcmDriverEnumCallback fnCallback, IntPtr dwInstance,
+            AcmDriverEnumFlags flags);
 
         // http://msdn.microsoft.com/en-us/library/dd742887%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmDriverDetails(IntPtr hAcmDriver, ref AcmDriverDetails driverDetails, int reserved);
+        public static extern MmResult acmDriverDetails(IntPtr hAcmDriver, ref AcmDriverDetails driverDetails,
+            int reserved);
 
         // http://msdn.microsoft.com/en-us/library/dd742894%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
@@ -83,8 +88,9 @@ namespace NAudio.Wave.Compression
 
         // http://msdn.microsoft.com/en-us/library/dd742914%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmFormatEnum(IntPtr hAcmDriver, ref AcmFormatDetails formatDetails, AcmFormatEnumCallback callback, IntPtr instance, AcmFormatEnumFlags flags);
-        
+        public static extern MmResult acmFormatEnum(IntPtr hAcmDriver, ref AcmFormatDetails formatDetails,
+            AcmFormatEnumCallback callback, IntPtr instance, AcmFormatEnumFlags flags);
+
         /// <summary>
         /// http://msdn.microsoft.com/en-us/library/dd742916%28VS.85%29.aspx
         /// MMRESULT acmFormatSuggest(
@@ -97,14 +103,14 @@ namespace NAudio.Wave.Compression
         [DllImport("Msacm32.dll")]
         public static extern MmResult acmFormatSuggest(
             IntPtr hAcmDriver,
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")] 
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")]
             WaveFormat sourceFormat,
-            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")] 
-            WaveFormat destFormat, 
-            int sizeDestFormat, 
+            [In, Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")]
+            WaveFormat destFormat,
+            int sizeDestFormat,
             AcmFormatSuggestFlags suggestFlags);
 
-        [DllImport("Msacm32.dll",EntryPoint="acmFormatSuggest")]
+        [DllImport("Msacm32.dll", EntryPoint = "acmFormatSuggest")]
         public static extern MmResult acmFormatSuggest2(
             IntPtr hAcmDriver,
             IntPtr sourceFormatPointer,
@@ -114,13 +120,14 @@ namespace NAudio.Wave.Compression
 
         // http://msdn.microsoft.com/en-us/library/dd742919%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmFormatTagEnum(IntPtr hAcmDriver, ref AcmFormatTagDetails formatTagDetails, AcmFormatTagEnumCallback callback, IntPtr instance, int reserved);
+        public static extern MmResult acmFormatTagEnum(IntPtr hAcmDriver, ref AcmFormatTagDetails formatTagDetails,
+            AcmFormatTagEnumCallback callback, IntPtr instance, int reserved);
 
         // http://msdn.microsoft.com/en-us/library/dd742922%28VS.85%29.aspx
         // this version of the prototype is for metrics that output a single integer
         [DllImport("Msacm32.dll")]
         public static extern MmResult acmMetrics(IntPtr hAcmObject, AcmMetrics metric, out int output);
-        
+
         /// <summary>
         /// http://msdn.microsoft.com/en-us/library/dd742928%28VS.85%29.aspx
         /// MMRESULT acmStreamOpen(
@@ -135,21 +142,21 @@ namespace NAudio.Wave.Compression
         /// </summary>
         [DllImport("Msacm32.dll")]
         public static extern MmResult acmStreamOpen(
-            out IntPtr hAcmStream, 
-            IntPtr hAcmDriver, 
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")] 
+            out IntPtr hAcmStream,
+            IntPtr hAcmDriver,
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")]
             WaveFormat sourceFormat,
-            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")] 
-            WaveFormat destFormat, 
-            [In] WaveFilter waveFilter, 
-            IntPtr callback, 
-            IntPtr instance, 
+            [In, MarshalAs(UnmanagedType.CustomMarshaler, MarshalType = "NAudio.Wave.WaveFormatCustomMarshaler")]
+            WaveFormat destFormat,
+            [In] WaveFilter waveFilter,
+            IntPtr callback,
+            IntPtr instance,
             AcmStreamOpenFlags openFlags);
 
         /// <summary>
         /// A version with pointers for troubleshooting
         /// </summary>
-        [DllImport("Msacm32.dll",EntryPoint="acmStreamOpen")]
+        [DllImport("Msacm32.dll", EntryPoint = "acmStreamOpen")]
         public static extern MmResult acmStreamOpen2(
             out IntPtr hAcmStream,
             IntPtr hAcmDriver,
@@ -166,22 +173,26 @@ namespace NAudio.Wave.Compression
 
         // http://msdn.microsoft.com/en-us/library/dd742924%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmStreamConvert(IntPtr hAcmStream, [In, Out] AcmStreamHeaderStruct streamHeader, AcmStreamConvertFlags streamConvertFlags);
+        public static extern MmResult acmStreamConvert(IntPtr hAcmStream, [In, Out] AcmStreamHeaderStruct streamHeader,
+            AcmStreamConvertFlags streamConvertFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd742929%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmStreamPrepareHeader(IntPtr hAcmStream, [In, Out] AcmStreamHeaderStruct streamHeader, int prepareFlags);
+        public static extern MmResult acmStreamPrepareHeader(IntPtr hAcmStream,
+            [In, Out] AcmStreamHeaderStruct streamHeader, int prepareFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd742929%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
         public static extern MmResult acmStreamReset(IntPtr hAcmStream, int resetFlags);
-        
+
         // http://msdn.microsoft.com/en-us/library/dd742931%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmStreamSize(IntPtr hAcmStream, int inputBufferSize, out int outputBufferSize, AcmStreamSizeFlags flags);
+        public static extern MmResult acmStreamSize(IntPtr hAcmStream, int inputBufferSize, out int outputBufferSize,
+            AcmStreamSizeFlags flags);
 
         // http://msdn.microsoft.com/en-us/library/dd742932%28VS.85%29.aspx
         [DllImport("Msacm32.dll")]
-        public static extern MmResult acmStreamUnprepareHeader(IntPtr hAcmStream, [In, Out] AcmStreamHeaderStruct streamHeader, int flags);
+        public static extern MmResult acmStreamUnprepareHeader(IntPtr hAcmStream,
+            [In, Out] AcmStreamHeaderStruct streamHeader, int flags);
     }
 }

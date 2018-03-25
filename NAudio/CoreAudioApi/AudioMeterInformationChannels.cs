@@ -19,6 +19,7 @@
      misrepresented as being the original source code.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 using System;
 using NAudio.CoreAudioApi.Interfaces;
 using System.Runtime.InteropServices;
@@ -62,7 +63,8 @@ namespace NAudio.CoreAudioApi
                 }
                 var peakValues = new float[Count];
                 var Params = GCHandle.Alloc(peakValues, GCHandleType.Pinned);
-                Marshal.ThrowExceptionForHR(audioMeterInformation.GetChannelsPeakValues(peakValues.Length, Params.AddrOfPinnedObject()));
+                Marshal.ThrowExceptionForHR(
+                    audioMeterInformation.GetChannelsPeakValues(peakValues.Length, Params.AddrOfPinnedObject()));
                 Params.Free();
                 return peakValues[index];
             }

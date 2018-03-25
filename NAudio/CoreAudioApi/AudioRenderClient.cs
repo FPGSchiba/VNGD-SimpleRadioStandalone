@@ -33,7 +33,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         /// <param name="numFramesWritten">Number of frames written</param>
         /// <param name="bufferFlags">Buffer flags</param>
-        public void ReleaseBuffer(int numFramesWritten,AudioClientBufferFlags bufferFlags)
+        public void ReleaseBuffer(int numFramesWritten, AudioClientBufferFlags bufferFlags)
         {
             Marshal.ThrowExceptionForHR(audioRenderClientInterface.ReleaseBuffer(numFramesWritten, bufferFlags));
         }

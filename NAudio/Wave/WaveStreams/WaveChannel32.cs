@@ -32,7 +32,7 @@ namespace NAudio.Wave
         {
             PadWithZeroes = true;
 
-            var providers = new ISampleChunkConverter[] 
+            var providers = new ISampleChunkConverter[]
             {
                 new Mono8SampleChunkConverter(),
                 new Stereo8SampleChunkConverter(),
@@ -56,7 +56,7 @@ namespace NAudio.Wave
             {
                 throw new ArgumentException("Unsupported sourceStream format");
             }
-         
+
             // always outputs stereo 32 bit
             waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sourceStream.WaveFormat.SampleRate, 2);
             destBytesPerSample = 8; // includes stereo factoring
@@ -93,7 +93,7 @@ namespace NAudio.Wave
         /// <summary>
         /// Gets the block alignment for this WaveStream
         /// </summary>
-        public override int BlockAlign => (int)SourceToDest(sourceStream.BlockAlign);
+        public override int BlockAlign => (int) SourceToDest(sourceStream.BlockAlign);
 
         /// <summary>
         /// Returns the stream length
@@ -105,10 +105,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 lock (lockObject)
@@ -153,15 +150,15 @@ namespace NAudio.Wave
                 }
                 if (bytesWritten < numBytes)
                 {
-                    sampleProvider.LoadNextChunk(sourceStream, (numBytes - bytesWritten)/8);
+                    sampleProvider.LoadNextChunk(sourceStream, (numBytes - bytesWritten) / 8);
                     float left, right;
 
-                    int outIndex = (offset/4) + bytesWritten/4;
+                    int outIndex = (offset / 4) + bytesWritten / 4;
                     while (this.sampleProvider.GetNextSample(out left, out right) && bytesWritten < numBytes)
                     {
                         // implement better panning laws. 
-                        left = (pan <= 0) ? left : (left*(1 - pan)/2.0f);
-                        right = (pan >= 0) ? right : (right*(pan + 1)/2.0f);
+                        left = (pan <= 0) ? left : (left * (1 - pan) / 2.0f);
+                        right = (pan >= 0) ? right : (right * (pan + 1) / 2.0f);
                         left *= volume;
                         right *= volume;
                         destWaveBuffer.FloatBuffer[outIndex++] = left;
@@ -185,7 +182,7 @@ namespace NAudio.Wave
         /// If true, Read always returns the number of bytes requested
         /// </summary>
         public bool PadWithZeroes { get; set; }
-      
+
 
         /// <summary>
         /// <see cref="WaveStream.WaveFormat"/>
@@ -254,7 +251,7 @@ namespace NAudio.Wave
         public event EventHandler<SampleEventArgs> Sample;
 
         // reuse the same object every time to avoid making lots of work for the garbage collector
-        private SampleEventArgs sampleEventArgs = new SampleEventArgs(0,0);
+        private SampleEventArgs sampleEventArgs = new SampleEventArgs(0, 0);
 
         /// <summary>
         /// Raise the sample event (no check for null because it has already been done)

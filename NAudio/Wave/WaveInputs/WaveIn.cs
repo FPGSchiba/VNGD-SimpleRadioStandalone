@@ -19,6 +19,7 @@ namespace NAudio.Wave
         private WaveCallbackInfo callbackInfo;
         private readonly SynchronizationContext syncContext;
         private int lastReturnedBufferIndex;
+
         /// <summary>
         /// Indicates recorded data is available 
         /// </summary>
@@ -35,7 +36,6 @@ namespace NAudio.Wave
         public WaveIn()
             : this(WaveCallbackInfo.NewWindow())
         {
-
         }
 
         /// <summary>
@@ -45,7 +45,6 @@ namespace NAudio.Wave
         public WaveIn(IntPtr windowHandle)
             : this(WaveCallbackInfo.ExistingWindow(windowHandle))
         {
-
         }
 
         /// <summary>
@@ -54,7 +53,8 @@ namespace NAudio.Wave
         public WaveIn(WaveCallbackInfo callbackInfo)
         {
             syncContext = SynchronizationContext.Current;
-            if ((callbackInfo.Strategy == WaveCallbackStrategy.NewWindow || callbackInfo.Strategy == WaveCallbackStrategy.ExistingWindow) &&
+            if ((callbackInfo.Strategy == WaveCallbackStrategy.NewWindow ||
+                 callbackInfo.Strategy == WaveCallbackStrategy.ExistingWindow) &&
                 syncContext == null)
             {
                 throw new InvalidOperationException("Use WaveInEvent to record on a background thread");
@@ -73,10 +73,7 @@ namespace NAudio.Wave
         /// </summary>
         public static int DeviceCount
         {
-            get
-            {
-                return WaveInterop.waveInGetNumDevs();
-            }
+            get { return WaveInterop.waveInGetNumDevs(); }
         }
 
         /// <summary>
@@ -88,7 +85,7 @@ namespace NAudio.Wave
         {
             var caps = new WaveInCapabilities();
             int structSize = Marshal.SizeOf(caps);
-            MmException.Try(WaveInterop.waveInGetDevCaps((IntPtr)devNumber, out caps, structSize), "waveInGetDevCaps");
+            MmException.Try(WaveInterop.waveInGetDevCaps((IntPtr) devNumber, out caps, structSize), "waveInGetDevCaps");
             return caps;
         }
 
@@ -126,16 +123,17 @@ namespace NAudio.Wave
         /// <summary>
         /// Called when we get a new buffer of recorded data
         /// </summary>
-        private void Callback(IntPtr waveInHandle, WaveInterop.WaveMessage message, IntPtr userData, WaveHeader waveHeader, IntPtr reserved)
+        private void Callback(IntPtr waveInHandle, WaveInterop.WaveMessage message, IntPtr userData,
+            WaveHeader waveHeader, IntPtr reserved)
         {
             if (message == WaveInterop.WaveMessage.WaveInData)
             {
                 if (recording)
                 {
-                    var hBuffer = (GCHandle)waveHeader.userData;
-                    var buffer = (WaveInBuffer)hBuffer.Target;
+                    var hBuffer = (GCHandle) waveHeader.userData;
+                    var buffer = (WaveInBuffer) hBuffer.Target;
                     if (buffer == null) return;
-                
+
                     lastReturnedBufferIndex = Array.IndexOf(buffers, buffer);
                     RaiseDataAvailable(buffer);
                     try
@@ -148,7 +146,6 @@ namespace NAudio.Wave
                         RaiseRecordingStopped(e);
                     }
                 }
-                
             }
         }
 
@@ -219,7 +216,7 @@ namespace NAudio.Wave
                 // report the last buffers, sometimes more than one, so taking care to report them in the right order
                 for (int n = 0; n < buffers.Length; n++)
                 {
-                    int index = (n + lastReturnedBufferIndex + 1)%buffers.Length;
+                    int index = (n + lastReturnedBufferIndex + 1) % buffers.Length;
                     var buffer = buffers[index];
                     if (buffer.Done)
                     {
@@ -236,7 +233,7 @@ namespace NAudio.Wave
         /// WaveFormat we are recording in
         /// </summary>
         public WaveFormat WaveFormat { get; set; }
-        
+
         /// <summary>
         /// Dispose pattern
         /// </summary>
@@ -270,7 +267,6 @@ namespace NAudio.Wave
             }
             WaveInterop.waveInClose(waveInHandle);
             waveInHandle = IntPtr.Zero;
-
         }
 
         /// <summary>
@@ -286,7 +282,7 @@ namespace NAudio.Wave
             }
             else
             {
-                mixerLine = new MixerLine((IntPtr)DeviceNumber, 0, MixerFlags.WaveIn);
+                mixerLine = new MixerLine((IntPtr) DeviceNumber, 0, MixerFlags.WaveIn);
             }
             return mixerLine;
         }

@@ -18,12 +18,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private List<RadioUpdatedCallback> _radioCallbacks = new List<RadioUpdatedCallback>();
 
-        public DCSPlayerRadioInfo DcsPlayerRadioInfo { get;}
+        public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
         public DCSPlayerSideInfo DcsPlayerSideInfo { get; set; }
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
-        
+
 
         private ClientStateSingleton()
         {
@@ -34,9 +34,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             for (int i = 0; i < FixedChannels.Length; i++)
             {
-                FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i+1);
+                FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
-            
         }
 
         public static ClientStateSingleton Instance
@@ -55,7 +54,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 return _instance;
             }
         }
-
-
     }
 }

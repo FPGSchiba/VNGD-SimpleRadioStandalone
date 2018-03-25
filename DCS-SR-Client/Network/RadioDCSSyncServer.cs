@@ -80,7 +80,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void StartUDPCommandListener()
         {
-           
             _udpCommandListener = new UdpClient();
             _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
@@ -94,7 +93,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
+                        var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
                         var bytes = _udpCommandListener.Receive(ref groupEp);
 
                         try
@@ -146,7 +146,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                 }
             });
-            
         }
 
         private void StartDcsBroadcastListener()
@@ -171,7 +170,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
+                        var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
                         var bytes = _dcsUdpListener.Receive(ref groupEp);
 
                         try
@@ -195,8 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
-
-                              
                             }
                         }
                         catch (Exception e)
@@ -220,7 +218,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //send updated radio info back to DCS for ingame GUI
         private void SendRadioUpdateToDCS()
         {
-
             if (_dcsRadioUpdateSender == null)
             {
                 _dcsRadioUpdateSender = new UdpClient
@@ -229,13 +226,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     EnableBroadcast = true
                 };
                 _dcsRadioUpdateSender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-               true);
+                    true);
                 _dcsRadioUpdateSender.ExclusiveAddressUse = false;
             }
 
             try
             {
-
                 //get currently transmitting or receiving
                 var combinedState = new CombinedRadioState()
                 {
@@ -254,15 +250,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 //Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
 
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPOther))); // send to Flight Control Panels
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length,
+                    new IPEndPoint(IPAddress.Parse("127.0.0.1"),
+                        _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
+                _dcsRadioUpdateSender.Send(byteData, byteData.Length,
+                    new IPEndPoint(IPAddress.Parse("127.0.0.1"),
+                        _settings.GetNetworkSetting(SettingsKeys
+                            .OutgoingDCSUDPOther))); // send to Flight Control Panels
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Exception Sending DCS Radio Update Message");
             }
-
-           
         }
 
         private void StartDcsGameGuiBroadcastListener()
@@ -275,7 +274,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //    var multicastaddress = IPAddress.Parse("239.255.50.10");
             //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
 
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+            var localEp = new IPEndPoint(IPAddress.Any,
+                _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
             _dcsGameGuiudpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -286,7 +286,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+                        var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
                         var bytes = _dcsGameGuiudpListener.Receive(ref groupEp);
 
                         try
@@ -341,7 +342,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
+                        var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
                         var bytes = _dcsLOSListener.Receive(ref groupEp);
 
                         try
@@ -360,7 +362,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 {
                                     client.LineOfSightLoss = player.los;
 
-                                  //  Logger.Debug(client.ToString());
+                                    //  Logger.Debug(client.ToString());
                                 }
                             }
                         }
@@ -464,7 +466,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
-            
+
 
             var expansion = ClientSync.ServerSettings[(int) ServerSettingType.RADIO_EXPANSION];
 
@@ -583,7 +585,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             clientRadio.secFreq = updateRadio.secFreq;
                         }
 
-                         clientRadio.channel = updateRadio.channel;
+                        clientRadio.channel = updateRadio.channel;
                     }
                     else
                     {
@@ -619,7 +621,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             clientRadio.encKey = 1;
                         }
                     }
-                    else if (clientRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                    else if (clientRadio.encMode ==
+                             RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
                     {
                         clientRadio.enc = updateRadio.enc;
 
@@ -655,18 +658,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             channelModel.Min = clientRadio.freqMin;
                             channelModel.Reload();
                             clientRadio.channel = -1; //reset channel
-                            
+
                             if (_settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue)
                             {
                                 RadioHelper.RadioChannelUp(i);
                             }
-
                         }
                         else
                         {
-                            _clientStateSingleton.FixedChannels[i-1].Clear();
+                            _clientStateSingleton.FixedChannels[i - 1].Clear();
                             //clear
-
                         }
                     }
                 }

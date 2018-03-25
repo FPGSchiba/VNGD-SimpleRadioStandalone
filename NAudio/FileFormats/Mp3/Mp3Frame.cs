@@ -5,36 +5,40 @@ using System.IO;
 
 namespace NAudio.Wave
 {
-
     /// <summary>
     /// Represents an MP3 Frame
     /// </summary>
     public class Mp3Frame
     {
-        private static readonly int[,,] bitRates = new int[,,] {
+        private static readonly int[,,] bitRates = new int[,,]
+        {
             {
                 // MPEG Version 1
-                { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 }, // Layer 1
-                { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384 }, // Layer 2
-                { 0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 }, // Layer 3
+                {0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448}, // Layer 1
+                {0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384}, // Layer 2
+                {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320}, // Layer 3
             },
             {
                 // MPEG Version 2 & 2.5
-                { 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256 }, // Layer 1
-                { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 }, // Layer 2 
-                { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 }, // Layer 3 (same as layer 2)
+                {0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256}, // Layer 1
+                {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160}, // Layer 2 
+                {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160}, // Layer 3 (same as layer 2)
             }
         };
-        private static readonly int[,] samplesPerFrame = new int[,] {
-            {   // MPEG Version 1
-                384,    // Layer1
-                1152,   // Layer2
-                1152    // Layer3
+
+        private static readonly int[,] samplesPerFrame = new int[,]
+        {
+            {
+                // MPEG Version 1
+                384, // Layer1
+                1152, // Layer2
+                1152 // Layer3
             },
-            {   // MPEG Version 2 & 2.5
-                384,    // Layer1
-                1152,   // Layer2
-                576     // Layer3
+            {
+                // MPEG Version 2 & 2.5
+                384, // Layer1
+                1152, // Layer2
+                576 // Layer3
             }
         };
 
@@ -43,7 +47,7 @@ namespace NAudio.Wave
         private static readonly int[] sampleRatesVersion25 = new int[] {11025, 12000, 8000};
 
         //private short crc;
-        private const int MaxFrameLength = 16*1024;
+        private const int MaxFrameLength = 16 * 1024;
 
         /// <summary>
         /// Reads an MP3 frame from a stream
@@ -116,7 +120,6 @@ namespace NAudio.Wave
         /// </summary>
         private Mp3Frame()
         {
-
         }
 
         /// <summary>
@@ -150,7 +153,7 @@ namespace NAudio.Wave
                     return false;
                 }
                 int versionIndex = frame.MpegVersion == Wave.MpegVersion.Version1 ? 0 : 1;
-                frame.BitRate = bitRates[versionIndex, layerIndex, frame.BitRateIndex]*1000;
+                frame.BitRate = bitRates[versionIndex, layerIndex, frame.BitRateIndex] * 1000;
                 if (frame.BitRate == 0)
                 {
                     return false;
@@ -192,14 +195,14 @@ namespace NAudio.Wave
                 int nPadding = padding ? 1 : 0;
 
                 frame.SampleCount = samplesPerFrame[versionIndex, layerIndex];
-                int coefficient = frame.SampleCount/8;
+                int coefficient = frame.SampleCount / 8;
                 if (frame.MpegLayer == MpegLayer.Layer1)
                 {
-                    frame.FrameLength = (coefficient*frame.BitRate/frame.SampleRate + nPadding)*4;
+                    frame.FrameLength = (coefficient * frame.BitRate / frame.SampleRate + nPadding) * 4;
                 }
                 else
                 {
-                    frame.FrameLength = (coefficient*frame.BitRate)/frame.SampleRate + nPadding;
+                    frame.FrameLength = (coefficient * frame.BitRate) / frame.SampleRate + nPadding;
                 }
 
                 if (frame.FrameLength > MaxFrameLength)

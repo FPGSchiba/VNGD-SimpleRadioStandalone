@@ -24,9 +24,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
     public class AudioManager
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
+
         // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
         public static readonly int INPUT_AUDIO_LENGTH_MS = 80;
-        public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
+
+        public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
+            ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly CachedAudioEffect[] _cachedAudioEffects;
@@ -42,9 +46,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         //buffer for effects
         //plays in parallel with radio output buffer
         private RadioAudioProvider[] _effectsOutputBuffer;
+
         private OpusEncoder _encoder;
 
-        private readonly Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES*3);
+        private readonly Queue<byte> _micInputQueue = new Queue<byte>(SEGMENT_FRAMES * 3);
 
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
@@ -90,7 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager, IPAddress ipAddress, int port, MMDevice micOutput)
+        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
+            IPAddress ipAddress, int port, MMDevice micOutput)
         {
             _stop = false;
 
@@ -109,7 +115,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,(peak => SpeakerMax = (float)VolumeConversionHelper.ConvertLinearToDB(peak)));
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,
+                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertLinearToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -123,7 +130,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         //already mono
                         _waveOut.Init(_volumeSampleProvider);
                     }
-
                 }
                 else
                 {
@@ -144,14 +150,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _encoder.ForwardErrorCorrection = false;
                 _decoder = OpusDecoder.Create(INPUT_SAMPLE_RATE, 1);
                 _decoder.ForwardErrorCorrection = false;
-
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
 
-                MessageBox.Show($"Problem Initialising Audio Output! Try a different Output device and please post your client log on the forums", "Audio Output Error", MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Problem Initialising Audio Output! Try a different Output device and please post your client log on the forums",
+                    "Audio Output Error", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
 
                 Environment.Exit(1);
             }
@@ -164,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40);
 
-                    _micWaveOutBuffer = new  BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                    _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                     _micWaveOutBuffer.ReadFully = true;
                     _micWaveOutBuffer.DiscardOnBufferOverflow = true;
 
@@ -181,7 +188,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             //already mono
                             _micWaveOut.Init(sampleProvider);
                         }
-
                     }
                     else
                     {
@@ -197,7 +203,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     }
 
                     _micWaveOut.Play();
-
                 }
                 catch (Exception ex)
                 {
@@ -210,7 +215,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                     Environment.Exit(1);
                 }
-
             }
 
 
@@ -226,7 +230,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
-                _tcpVoiceHandler = new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
+                _tcpVoiceHandler =
+                    new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
                 var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
 
                 voiceSenderThread.Start();
@@ -240,8 +245,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
 
-                MessageBox.Show($"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums", "Audio Input Error", MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums",
+                    "Audio Input Error", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
 
                 Environment.Exit(1);
             }
@@ -267,7 +274,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
-
             if (_settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue)
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -316,8 +322,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume)
         {
-
-            if( _settings.GetClientSetting(SettingsKeys.RadioRxEffects_End).BoolValue)
+            if (_settings.GetClientSetting(SettingsKeys.RadioRxEffects_End).BoolValue)
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
@@ -341,7 +346,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-         //Stopwatch _stopwatch = new Stopwatch();
+        //Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
             // if(_stopwatch.ElapsedMilliseconds > 22)
@@ -381,7 +386,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 for (var n = 0; n < soundBuffer.Length; n += 2)
                 {
                     short pcmShort = ConversionHelpers.ToShort(soundBuffer[n], soundBuffer[n + 1]);
-                    float pcmFloat = (float)pcmShort / 32768F;
+                    float pcmFloat = (float) pcmShort / 32768F;
 
                     // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
                     pcmFloat = (pcmFloat * MicBoost);
@@ -390,16 +395,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     if (pcmFloat > max)
                         max = pcmFloat;
 
-                    pcmShort = (short)(pcmFloat * 32768F);
+                    pcmShort = (short) (pcmFloat * 32768F);
 
                     //convert back
-                    soundBuffer[n] = (byte)(pcmShort & 0xFF);
-                    soundBuffer[n + 1] = (byte)(pcmShort >> 8);
-
+                    soundBuffer[n] = (byte) (pcmShort & 0xFF);
+                    soundBuffer[n + 1] = (byte) (pcmShort >> 8);
                 }
 
                 //convert to dB
-                MicMax = (float)VolumeConversionHelper.ConvertLinearToDB(max);
+                MicMax = (float) VolumeConversionHelper.ConvertLinearToDB(max);
 
                 try
                 {
@@ -422,7 +426,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             {
                                 _micWaveOutBuffer.AddSamples(soundBuffer, 0, soundBuffer.Length);
                             }
-                           
                         }
                     }
                     else

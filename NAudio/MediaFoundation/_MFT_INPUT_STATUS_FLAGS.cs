@@ -12,6 +12,7 @@ namespace NAudio.MediaFoundation
         /// None
         /// </summary>
         None = 0,
+
         /// <summary>
         /// The input stream can receive more data at this time.
         /// </summary>

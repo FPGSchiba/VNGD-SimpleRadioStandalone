@@ -19,6 +19,7 @@
      misrepresented as being the original source code.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 using System;
 
 namespace NAudio.CoreAudioApi
@@ -33,10 +34,12 @@ namespace NAudio.CoreAudioApi
         /// Volume
         /// </summary>
         Volume = 0x00000001,
+
         /// <summary>
         /// Mute
         /// </summary>
         Mute = 0x00000002,
+
         /// <summary>
         /// Meter
         /// </summary>

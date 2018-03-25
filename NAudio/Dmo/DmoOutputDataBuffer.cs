@@ -6,11 +6,10 @@ namespace NAudio.Dmo
     /// <summary>
     /// DMO Output Data Buffer
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack=8)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct DmoOutputDataBuffer : IDisposable
     {
-        [MarshalAs(UnmanagedType.Interface)]
-        IMediaBuffer pBuffer;
+        [MarshalAs(UnmanagedType.Interface)] IMediaBuffer pBuffer;
         DmoOutputDataBufferFlags dwStatus;
         long rtTimestamp;
         long referenceTimeDuration;
@@ -34,7 +33,7 @@ namespace NAudio.Dmo
         {
             if (pBuffer != null)
             {
-                ((MediaBuffer)pBuffer).Dispose();
+                ((MediaBuffer) pBuffer).Dispose();
                 pBuffer = null;
                 GC.SuppressFinalize(this);
             }
@@ -54,7 +53,7 @@ namespace NAudio.Dmo
         /// </summary>
         public int Length
         {
-            get { return ((MediaBuffer)pBuffer).Length; }
+            get { return ((MediaBuffer) pBuffer).Length; }
         }
 
         /// <summary>
@@ -91,7 +90,7 @@ namespace NAudio.Dmo
         /// <param name="offset">Offset into buffer</param>
         public void RetrieveData(byte[] data, int offset)
         {
-            ((MediaBuffer)pBuffer).RetrieveData(data, offset);
+            ((MediaBuffer) pBuffer).RetrieveData(data, offset);
         }
 
         /// <summary>
@@ -100,10 +99,7 @@ namespace NAudio.Dmo
         /// </summary>
         public bool MoreDataAvailable
         {
-            get
-            {
-                return (StatusFlags & DmoOutputDataBufferFlags.Incomplete) == DmoOutputDataBufferFlags.Incomplete;
-            }
+            get { return (StatusFlags & DmoOutputDataBufferFlags.Incomplete) == DmoOutputDataBufferFlags.Incomplete; }
         }
     }
 }

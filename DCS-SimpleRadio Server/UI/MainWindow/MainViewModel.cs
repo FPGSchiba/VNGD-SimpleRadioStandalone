@@ -39,21 +39,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 
         public string RadioSecurityText
             =>
-            ServerSettings.Instance.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY]
-                ? "ON"
-                : "OFF";
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY]
+                    ? "ON"
+                    : "OFF";
 
         public string SpectatorAudioText
             =>
-            ServerSettings.Instance.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED]
-                ? "DISABLED"
-                : "ENABLED";
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED]
+                    ? "DISABLED"
+                    : "ENABLED";
 
         public string ExportListText
             =>
-            ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED]
-                ? "ON"
-                : "OFF";
+                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED]
+                    ? "ON"
+                    : "OFF";
 
         public string LOSText
             => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.LOS_ENABLED] ? "ON" : "OFF";

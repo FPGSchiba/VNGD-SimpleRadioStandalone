@@ -47,6 +47,5 @@ namespace NAudio.CoreAudioApi.Interfaces
             nChannels = 0;
             ChannelVolume = 0;
         }
-
     }
 }

@@ -10,9 +10,10 @@ namespace NAudio.Utils
     public static class IEEE
     {
         #region Helper Methods
+
         private static double UnsignedToFloat(ulong u)
         {
-            return (((double)((long)(u - 2147483647L - 1))) + 2147483648.0);
+            return (((double) ((long) (u - 2147483647L - 1))) + 2147483648.0);
         }
 
         private static double ldexp(double x, int exp)
@@ -22,17 +23,19 @@ namespace NAudio.Utils
 
         private static double frexp(double x, out int exp)
         {
-            exp = (int)Math.Floor(Math.Log(x) / Math.Log(2)) + 1;
+            exp = (int) Math.Floor(Math.Log(x) / Math.Log(2)) + 1;
             return 1 - (Math.Pow(2, exp) - x) / Math.Pow(2, exp);
         }
 
         private static ulong FloatToUnsigned(double f)
         {
-            return ((ulong)(((long)(f - 2147483648.0)) + 2147483647L) + 1);
+            return ((ulong) (((long) (f - 2147483648.0)) + 2147483647L) + 1);
         }
+
         #endregion
 
         #region ConvertToIeeeExtended
+
         /// <summary>
         /// Converts a C# double precision number to an 80-bit
         /// IEEE extended double precision number (occupying 10 bytes).
@@ -58,20 +61,27 @@ namespace NAudio.Utils
 
             if (num == 0)
             {
-                expon = 0; hiMant = 0; loMant = 0;
+                expon = 0;
+                hiMant = 0;
+                loMant = 0;
             }
             else
             {
                 fMant = frexp(num, out expon);
                 if ((expon > 16384) || !(fMant < 1))
-                {   //  Infinity or NaN 
-                    expon = sign | 0x7FFF; hiMant = 0; loMant = 0; // infinity 
+                {
+                    //  Infinity or NaN 
+                    expon = sign | 0x7FFF;
+                    hiMant = 0;
+                    loMant = 0; // infinity 
                 }
                 else
-                {    // Finite 
+                {
+                    // Finite 
                     expon += 16382;
                     if (expon < 0)
-                    {    // denormalized
+                    {
+                        // denormalized
                         fMant = ldexp(fMant, expon);
                         expon = 0;
                     }
@@ -87,22 +97,24 @@ namespace NAudio.Utils
 
             byte[] bytes = new byte[10];
 
-            bytes[0] = (byte)(expon >> 8);
-            bytes[1] = (byte)(expon);
-            bytes[2] = (byte)(hiMant >> 24);
-            bytes[3] = (byte)(hiMant >> 16);
-            bytes[4] = (byte)(hiMant >> 8);
-            bytes[5] = (byte)(hiMant);
-            bytes[6] = (byte)(loMant >> 24);
-            bytes[7] = (byte)(loMant >> 16);
-            bytes[8] = (byte)(loMant >> 8);
-            bytes[9] = (byte)(loMant);
+            bytes[0] = (byte) (expon >> 8);
+            bytes[1] = (byte) (expon);
+            bytes[2] = (byte) (hiMant >> 24);
+            bytes[3] = (byte) (hiMant >> 16);
+            bytes[4] = (byte) (hiMant >> 8);
+            bytes[5] = (byte) (hiMant);
+            bytes[6] = (byte) (loMant >> 24);
+            bytes[7] = (byte) (loMant >> 16);
+            bytes[8] = (byte) (loMant >> 8);
+            bytes[9] = (byte) (loMant);
 
             return bytes;
         }
+
         #endregion
 
         #region ConvertFromIeeeExtended
+
         /// <summary>
         /// Converts an IEEE 80-bit extended precision number to a
         /// C# double precision number.
@@ -117,8 +129,8 @@ namespace NAudio.Utils
             uint hiMant, loMant;
 
             expon = ((bytes[0] & 0x7F) << 8) | bytes[1];
-            hiMant = (uint)((bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5]);
-            loMant = (uint)((bytes[6] << 24) | (bytes[7] << 16) | (bytes[8] << 8) | bytes[9]);
+            hiMant = (uint) ((bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5]);
+            loMant = (uint) ((bytes[6] << 24) | (bytes[7] << 16) | (bytes[8] << 8) | bytes[9]);
 
             if (expon == 0 && hiMant == 0 && loMant == 0)
             {
@@ -126,7 +138,7 @@ namespace NAudio.Utils
             }
             else
             {
-                if (expon == 0x7FFF)    /* Infinity or NaN */
+                if (expon == 0x7FFF) /* Infinity or NaN */
                 {
                     f = double.NaN;
                 }
@@ -141,6 +153,7 @@ namespace NAudio.Utils
             if ((bytes[0] & 0x80) == 0x80) return -f;
             else return f;
         }
+
         #endregion
     }
 }

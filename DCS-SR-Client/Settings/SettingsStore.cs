@@ -60,18 +60,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         CliendIdShort = 61,
         ClientIdLong = 62,
-        DCSLOSOutgoingUDP=63, //9086
-        DCSIncomingUDP=64, //9084
-        CommandListenerUDP =65,//=9040,
-        OutgoingDCSUDPInfo=66, //7080
+        DCSLOSOutgoingUDP = 63, //9086
+        DCSIncomingUDP = 64, //9084
+        CommandListenerUDP = 65, //=9040,
+        OutgoingDCSUDPInfo = 66, //7080
         OutgoingDCSUDPOther = 67, //7082
-        DCSIncomingGameGUIUDP = 68,// 5068
+        DCSIncomingGameGUIUDP = 68, // 5068
         DCSLOSIncomingUDP = 69, //9085
     }
 
     public enum InputBinding
     {
-
         Intercom = 100,
         ModifierIntercom = 200,
 
@@ -170,10 +169,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioChannelDown = 132,
         ModifierRadioChannelDown = 232,
-
-
     }
-
 
 
     public class SettingsStore
@@ -184,6 +180,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Configuration _configuration;
+
         private SettingsStore()
         {
             try
@@ -198,7 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         InputDevices[bind] = device;
                     }
-                    
                 }
             }
             catch (FileNotFoundException ex)
@@ -224,58 +220,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
 
-        private readonly Dictionary<string, string> defaultSettings = new Dictionary<string,string>()
+        private readonly Dictionary<string, string> defaultSettings = new Dictionary<string, string>()
         {
-            {SettingsKeys.RadioEffects.ToString(), "true" },
-            {SettingsKeys.RadioSwitchIsPTT.ToString(), "false" },
+            {SettingsKeys.RadioEffects.ToString(), "true"},
+            {SettingsKeys.RadioSwitchIsPTT.ToString(), "false"},
 
-            {SettingsKeys.RadioEncryptionEffects.ToString(), "true" },
-            {SettingsKeys.AutoConnectPrompt.ToString(), "false" },
-            {SettingsKeys.RadioOverlayTaskbarHide.ToString(), "false" },
-            {SettingsKeys.RefocusDCS.ToString(), "false" },
-            {SettingsKeys.ExpandControls.ToString(), "false" },
+            {SettingsKeys.RadioEncryptionEffects.ToString(), "true"},
+            {SettingsKeys.AutoConnectPrompt.ToString(), "false"},
+            {SettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
+            {SettingsKeys.RefocusDCS.ToString(), "false"},
+            {SettingsKeys.ExpandControls.ToString(), "false"},
 
-            {SettingsKeys.RadioRxEffects_Start.ToString(), "true" },
-            {SettingsKeys.RadioRxEffects_End.ToString(), "true" },
-            {SettingsKeys.RadioTxEffects_Start.ToString(), "true" },
-            {SettingsKeys.RadioTxEffects_End.ToString(), "true" },
+            {SettingsKeys.RadioRxEffects_Start.ToString(), "true"},
+            {SettingsKeys.RadioRxEffects_End.ToString(), "true"},
+            {SettingsKeys.RadioTxEffects_Start.ToString(), "true"},
+            {SettingsKeys.RadioTxEffects_End.ToString(), "true"},
 
-            {SettingsKeys.AutoSelectPresetChannel.ToString(), "true" },
+            {SettingsKeys.AutoSelectPresetChannel.ToString(), "true"},
 
-            {SettingsKeys.AudioInputDeviceId.ToString(), "" },
-            {SettingsKeys.AudioOutputDeviceId.ToString(), "" },
-            {SettingsKeys.MicAudioOutputDeviceId.ToString(), "" },
+            {SettingsKeys.AudioInputDeviceId.ToString(), ""},
+            {SettingsKeys.AudioOutputDeviceId.ToString(), ""},
+            {SettingsKeys.MicAudioOutputDeviceId.ToString(), ""},
 
-            {SettingsKeys.LastServer.ToString(), "127.0.0.1" },
+            {SettingsKeys.LastServer.ToString(), "127.0.0.1"},
 
-            {SettingsKeys.MicBoost.ToString(), "0.5" },
-            {SettingsKeys.SpeakerBoost.ToString(), "0.5" },
+            {SettingsKeys.MicBoost.ToString(), "0.5"},
+            {SettingsKeys.SpeakerBoost.ToString(), "0.5"},
 
-            {SettingsKeys.RadioX.ToString(), "300" },
-            {SettingsKeys.RadioY.ToString(), "300" },
-            {SettingsKeys.RadioSize.ToString(), "1.0" },
-            {SettingsKeys.RadioOpacity.ToString(), "1.0" },
+            {SettingsKeys.RadioX.ToString(), "300"},
+            {SettingsKeys.RadioY.ToString(), "300"},
+            {SettingsKeys.RadioSize.ToString(), "1.0"},
+            {SettingsKeys.RadioOpacity.ToString(), "1.0"},
 
-            {SettingsKeys.RadioWidth.ToString(), "122" },
-            {SettingsKeys.RadioHeight.ToString(), "270" },
+            {SettingsKeys.RadioWidth.ToString(), "122"},
+            {SettingsKeys.RadioHeight.ToString(), "270"},
 
-            {SettingsKeys.ClientX.ToString(), "500" },
-            {SettingsKeys.ClientY.ToString(), "500" },
+            {SettingsKeys.ClientX.ToString(), "500"},
+            {SettingsKeys.ClientY.ToString(), "500"},
 
-            {SettingsKeys.AwacsX.ToString(), "300" },
-            {SettingsKeys.AwacsY.ToString(), "300" },
+            {SettingsKeys.AwacsX.ToString(), "300"},
+            {SettingsKeys.AwacsY.ToString(), "300"},
 
-            {SettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString() },
-            {SettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString() },
+            {SettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
+            {SettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString()},
 
-            {SettingsKeys.DCSLOSOutgoingUDP.ToString(), "9086" },
-            {SettingsKeys.DCSIncomingUDP.ToString(), "9084" },
-            {SettingsKeys.CommandListenerUDP.ToString(), "9040" },
-            {SettingsKeys.OutgoingDCSUDPInfo.ToString(), "7080" },
-            {SettingsKeys.OutgoingDCSUDPOther.ToString(), "7082" },
-            {SettingsKeys.DCSIncomingGameGUIUDP.ToString(), "5068" },
-            {SettingsKeys.DCSLOSIncomingUDP.ToString(), "9085" },
-
+            {SettingsKeys.DCSLOSOutgoingUDP.ToString(), "9086"},
+            {SettingsKeys.DCSIncomingUDP.ToString(), "9084"},
+            {SettingsKeys.CommandListenerUDP.ToString(), "9040"},
+            {SettingsKeys.OutgoingDCSUDPInfo.ToString(), "7080"},
+            {SettingsKeys.OutgoingDCSUDPOther.ToString(), "7082"},
+            {SettingsKeys.DCSIncomingGameGUIUDP.ToString(), "5068"},
+            {SettingsKeys.DCSLOSIncomingUDP.ToString(), "9085"},
         };
 
         public InputDevice GetControlSetting(InputBinding key)
@@ -305,46 +300,39 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 Logger.Error(e, "Error reading input device saved settings ");
             }
-            
+
 
             return null;
         }
 
         public void SetControlSetting(InputDevice device)
         {
-        
-          
             RemoveControlSetting(device.InputBind);
 
             _configuration.Add(new Section(device.InputBind.ToString()));
-      
+
             //create the sections
             var section = _configuration[device.InputBind.ToString()];
 
             section.Add(new Setting("name", device.DeviceName.Replace("\0", "")));
             section.Add(new Setting("button", device.Button));
-            section.Add(new Setting("value",device.ButtonValue));
+            section.Add(new Setting("value", device.ButtonValue));
             section.Add(new Setting("guid", device.InstanceGuid.ToString()));
 
             InputDevices[device.InputBind] = device;
 
             Save();
-          
         }
 
         public void RemoveControlSetting(InputBinding binding
-            )
+        )
         {
-
             if (_configuration.Contains(binding.ToString()))
             {
                 _configuration.Remove(binding.ToString());
             }
 
             InputDevices.Remove(binding);
-
-      
-
         }
 
         public Setting GetPositionSetting(SettingsKeys key)
@@ -364,7 +352,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetClientSetting(SettingsKeys key, string value)
         {
-            SetSetting("Client Settings",key.ToString(), value);
+            SetSetting("Client Settings", key.ToString(), value);
         }
 
         public int GetNetworkSetting(SettingsKeys key)
@@ -386,7 +374,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             if (!_configuration[section].Contains(setting))
             {
-
                 if (defaultSettings.ContainsKey(setting))
                 {
                     //save
@@ -446,7 +433,4 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
     }
-
-
 }
- 

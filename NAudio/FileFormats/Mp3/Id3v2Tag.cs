@@ -78,15 +78,15 @@ namespace NAudio.Wave
             }
 
             const byte UnicodeEncoding = 01; // encode text in Unicode
-            byte[] UnicodeOrder = new byte[] { 0xff, 0xfe }; // Unicode byte order mark
-            byte[] language = new byte[] { 0, 0, 0 }; // language is empty (only used in COMM -> comment)
-            byte[] shortDescription = new byte[] { 0, 0 }; // short description is empty (only used in COMM -> comment)
+            byte[] UnicodeOrder = new byte[] {0xff, 0xfe}; // Unicode byte order mark
+            byte[] language = new byte[] {0, 0, 0}; // language is empty (only used in COMM -> comment)
+            byte[] shortDescription = new byte[] {0, 0}; // short description is empty (only used in COMM -> comment)
 
             byte[] body;
             if (key == "COMM") // comment
             {
                 body = ByteArrayExtensions.Concat(
-                    new byte[] { UnicodeEncoding },
+                    new byte[] {UnicodeEncoding},
                     language,
                     shortDescription,
                     UnicodeOrder,
@@ -95,7 +95,7 @@ namespace NAudio.Wave
             else
             {
                 body = ByteArrayExtensions.Concat(
-                    new byte[] { UnicodeEncoding },
+                    new byte[] {UnicodeEncoding},
                     UnicodeOrder,
                     Encoding.Unicode.GetBytes(value));
             }
@@ -105,7 +105,7 @@ namespace NAudio.Wave
                 // need to check what the rules are for ID3v2 tag identifiers
                 Encoding.UTF8.GetBytes(key),
                 FrameSizeToBytes(body.Length),
-                new byte[] { 0, 0 }, // flags
+                new byte[] {0, 0}, // flags
                 body);
         }
 
@@ -119,7 +119,7 @@ namespace NAudio.Wave
             byte[] result = new byte[4];
             for (int idx = result.Length - 1; idx >= 0; idx--)
             {
-                result[idx] = (byte)(size % 128);
+                result[idx] = (byte) (size % 128);
                 size = size / 128;
             }
 
@@ -141,8 +141,8 @@ namespace NAudio.Wave
 
             byte[] tagHeader = ByteArrayExtensions.Concat(
                 Encoding.UTF8.GetBytes("ID3"),
-                new byte[] { 3, 0 }, // version
-                new byte[] { 0 }, // flags
+                new byte[] {3, 0}, // version
+                new byte[] {0}, // flags
                 GetId3TagHeaderSize(size));
             return tagHeader;
         }
@@ -181,11 +181,10 @@ namespace NAudio.Wave
             var reader = new BinaryReader(input);
             byte[] headerBytes = reader.ReadBytes(10);
             if ((headerBytes.Length >= 3) &&
-                (headerBytes[0] == (byte)'I') &&
-                (headerBytes[1] == (byte)'D') &&
+                (headerBytes[0] == (byte) 'I') &&
+                (headerBytes[1] == (byte) 'D') &&
                 (headerBytes[2] == '3'))
             {
-
                 // http://www.id3.org/develop.html
                 // OK found an ID3 tag
                 // bytes 3 & 4 are ID3v2 version
@@ -220,8 +219,7 @@ namespace NAudio.Wave
             }
             tagEndPosition = input.Position;
             input.Position = tagStartPosition;
-            rawData = reader.ReadBytes((int)(tagEndPosition - tagStartPosition));
-
+            rawData = reader.ReadBytes((int) (tagEndPosition - tagStartPosition));
         }
 
         /// <summary>
@@ -229,10 +227,7 @@ namespace NAudio.Wave
         /// </summary>
         public byte[] RawData
         {
-            get
-            {
-                return rawData;
-            }
+            get { return rawData; }
         }
     }
 }

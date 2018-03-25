@@ -8,18 +8,26 @@ namespace NAudio.MediaFoundation
     /// <summary>
     /// Creates an instance of either the sink writer or the source reader.
     /// </summary>
-    [ComImport,Guid("E7FE2E12-661C-40DA-92F9-4F002AB67627"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [ComImport, Guid("E7FE2E12-661C-40DA-92F9-4F002AB67627"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMFReadWriteClassFactory
     {
         /// <summary>
         /// Creates an instance of the sink writer or source reader, given a URL.
         /// </summary>
-        void CreateInstanceFromURL([In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid, [In, MarshalAs(UnmanagedType.LPWStr)] string pwszURL, [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pAttributes, [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid, [Out, MarshalAs(UnmanagedType.Interface)] out object ppvObject);
+        void CreateInstanceFromURL([In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string pwszURL,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pAttributes,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [Out, MarshalAs(UnmanagedType.Interface)] out object ppvObject);
 
         /// <summary>
         /// Creates an instance of the sink writer or source reader, given an IUnknown pointer. 
         /// </summary>
-        void CreateInstanceFromObject([In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid, [In, MarshalAs(UnmanagedType.IUnknown)] object punkObject, [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pAttributes, [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid, [Out, MarshalAs(UnmanagedType.Interface)] out object ppvObject);
+        void CreateInstanceFromObject([In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object punkObject,
+            [In, MarshalAs(UnmanagedType.Interface)] IMFAttributes pAttributes,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [Out, MarshalAs(UnmanagedType.Interface)] out object ppvObject);
     }
 
     /// <summary>

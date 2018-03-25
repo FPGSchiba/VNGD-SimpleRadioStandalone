@@ -12,8 +12,7 @@
         <ComboBox Name="ChannelSelector"
                   Grid.Row="1"
                   Grid.Column="1"
-                  SelectedValuePath="Content"
-                 >
+                  SelectedValuePath="Content">
             <ComboBoxItem>Left</ComboBoxItem>
             <ComboBoxItem>Right</ComboBoxItem>
             <ComboBoxItem>Both</ComboBoxItem>

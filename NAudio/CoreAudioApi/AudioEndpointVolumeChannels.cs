@@ -52,10 +52,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         public AudioEndpointVolumeChannel this[int index]
         {
-            get
-            {
-                return channels[index];
-            }
+            get { return channels[index]; }
         }
 
         internal AudioEndpointVolumeChannels(IAudioEndpointVolume parent)
@@ -70,7 +67,5 @@ namespace NAudio.CoreAudioApi
                 channels[i] = new AudioEndpointVolumeChannel(audioEndPointVolume, i);
             }
         }
-
-
     }
 }

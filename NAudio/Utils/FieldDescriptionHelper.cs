@@ -21,7 +21,7 @@ namespace NAudio.Utils
                 .GetFields(BindingFlags.Static | BindingFlags.Public))
 #endif
             {
-                if (f.IsPublic && f.IsStatic && f.FieldType == typeof (Guid) && (Guid) f.GetValue(null) == guid)
+                if (f.IsPublic && f.IsStatic && f.FieldType == typeof(Guid) && (Guid) f.GetValue(null) == guid)
                 {
                     foreach (var a in f.GetCustomAttributes(false))
                     {

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
 
-namespace NAudio.Wave 
+namespace NAudio.Wave
 {
     /// <summary>
     /// Represents a wave out device
@@ -35,7 +35,8 @@ namespace NAudio.Wave
         {
             var caps = new WaveOutCapabilities();
             var structSize = Marshal.SizeOf(caps);
-            MmException.Try(WaveInterop.waveOutGetDevCaps((IntPtr)devNumber, out caps, structSize), "waveOutGetDevCaps");
+            MmException.Try(WaveInterop.waveOutGetDevCaps((IntPtr) devNumber, out caps, structSize),
+                "waveOutGetDevCaps");
             return caps;
         }
 
@@ -71,7 +72,9 @@ namespace NAudio.Wave
         /// callbacks
         /// </summary>
         public WaveOut()
-            : this(SynchronizationContext.Current == null ? WaveCallbackInfo.FunctionCallback() : WaveCallbackInfo.NewWindow())
+            : this(SynchronizationContext.Current == null
+                ? WaveCallbackInfo.FunctionCallback()
+                : WaveCallbackInfo.NewWindow())
         {
         }
 
@@ -82,7 +85,6 @@ namespace NAudio.Wave
         public WaveOut(IntPtr windowHandle)
             : this(WaveCallbackInfo.ExistingWindow(windowHandle))
         {
-
         }
 
         /// <summary>
@@ -108,7 +110,9 @@ namespace NAudio.Wave
         public void Init(IWaveProvider waveProvider)
         {
             waveStream = waveProvider;
-            int bufferSize = waveProvider.WaveFormat.ConvertLatencyToByteSize((DesiredLatency + NumberOfBuffers - 1) / NumberOfBuffers);            
+            int bufferSize =
+                waveProvider.WaveFormat.ConvertLatencyToByteSize(
+                    (DesiredLatency + NumberOfBuffers - 1) / NumberOfBuffers);
 
             MmResult result;
             lock (waveOutLock)
@@ -215,7 +219,6 @@ namespace NAudio.Wave
         {
             if (playbackState != PlaybackState.Stopped)
             {
-
                 // in the call to waveOutReset with function callbacks
                 // some drivers will block here until OnDone is called
                 // for every buffer
@@ -251,11 +254,14 @@ namespace NAudio.Wave
             lock (waveOutLock)
             {
                 MmTime mmTime = new MmTime();
-                mmTime.wType = MmTime.TIME_BYTES; // request results in bytes, TODO: perhaps make this a little more flexible and support the other types?
-                MmException.Try(WaveInterop.waveOutGetPosition(hWaveOut, out mmTime, Marshal.SizeOf(mmTime)), "waveOutGetPosition");
+                mmTime.wType =
+                    MmTime.TIME_BYTES; // request results in bytes, TODO: perhaps make this a little more flexible and support the other types?
+                MmException.Try(WaveInterop.waveOutGetPosition(hWaveOut, out mmTime, Marshal.SizeOf(mmTime)),
+                    "waveOutGetPosition");
 
                 if (mmTime.wType != MmTime.TIME_BYTES)
-                    throw new Exception(string.Format("waveOutGetPosition: wType -> Expected {0}, Received {1}", MmTime.TIME_BYTES, mmTime.wType));
+                    throw new Exception(string.Format("waveOutGetPosition: wType -> Expected {0}, Received {1}",
+                        MmTime.TIME_BYTES, mmTime.wType));
 
                 return mmTime.cb;
             }
@@ -277,7 +283,7 @@ namespace NAudio.Wave
         public float Volume
         {
             get => volume;
-            set 
+            set
             {
                 SetWaveOutVolume(value, hWaveOut, waveOutLock);
                 volume = value;
@@ -291,7 +297,7 @@ namespace NAudio.Wave
             float left = value;
             float right = value;
 
-            int stereoVolume = (int) (left*0xFFFF) + ((int) (right*0xFFFF) << 16);
+            int stereoVolume = (int) (left * 0xFFFF) + ((int) (right * 0xFFFF) << 16);
             MmResult result;
             lock (lockObject)
             {
@@ -356,12 +362,13 @@ namespace NAudio.Wave
         #endregion
 
         // made non-static so that playing can be stopped here
-        private void Callback(IntPtr hWaveOut, WaveInterop.WaveMessage uMsg, IntPtr dwInstance, WaveHeader wavhdr, IntPtr dwReserved)
+        private void Callback(IntPtr hWaveOut, WaveInterop.WaveMessage uMsg, IntPtr dwInstance, WaveHeader wavhdr,
+            IntPtr dwReserved)
         {
             if (uMsg == WaveInterop.WaveMessage.WaveOutDone)
             {
-                GCHandle hBuffer = (GCHandle)wavhdr.userData;
-                WaveOutBuffer buffer = (WaveOutBuffer)hBuffer.Target;
+                GCHandle hBuffer = (GCHandle) wavhdr.userData;
+                WaveOutBuffer buffer = (WaveOutBuffer) hBuffer.Target;
                 Interlocked.Decrement(ref queuedBuffers);
                 Exception exception = null;
                 // check that we're not here through pressing stop
@@ -372,7 +379,7 @@ namespace NAudio.Wave
                     // reading from the stream.
                     // this protects us from calling waveOutReset on another 
                     // thread while a WaveOutWrite is in progress
-                    lock (waveOutLock) 
+                    lock (waveOutLock)
                     {
                         try
                         {
@@ -390,7 +397,8 @@ namespace NAudio.Wave
                 }
                 if (queuedBuffers == 0)
                 {
-                    if (callbackInfo.Strategy == WaveCallbackStrategy.FunctionCallback && playbackState == Wave.PlaybackState.Stopped)
+                    if (callbackInfo.Strategy == WaveCallbackStrategy.FunctionCallback &&
+                        playbackState == Wave.PlaybackState.Stopped)
                     {
                         // the user has pressed stop
                         // DO NOT raise the playback stopped event from here

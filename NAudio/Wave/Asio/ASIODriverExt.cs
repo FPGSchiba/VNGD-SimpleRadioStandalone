@@ -78,8 +78,7 @@ namespace NAudio.Wave.Asio
             {
                 throw new ArgumentException("Invalid channel offset");
             }
-
-       }
+        }
 
         /// <summary>
         /// Gets the driver used.
@@ -119,7 +118,8 @@ namespace NAudio.Wave.Asio
             try
             {
                 driver.DisposeBuffers();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.Out.WriteLine(ex.ToString());
             }
@@ -280,7 +280,8 @@ namespace NAudio.Wave.Asio
             }
 
             // Get BufferSize
-            driver.GetBufferSize(out capability.BufferMinSize, out capability.BufferMaxSize, out capability.BufferPreferredSize, out capability.BufferGranularity);
+            driver.GetBufferSize(out capability.BufferMinSize, out capability.BufferMaxSize,
+                out capability.BufferPreferredSize, out capability.BufferGranularity);
         }
 
         /// <summary>
@@ -297,7 +298,8 @@ namespace NAudio.Wave.Asio
 
             for (int i = 0; i < numberOfOutputChannels; i++)
             {
-                currentOutputBuffers[i] = bufferInfos[i + outputChannelOffset + capability.NbInputChannels].Buffer(doubleBufferIndex);
+                currentOutputBuffers[i] = bufferInfos[i + outputChannelOffset + capability.NbInputChannels]
+                    .Buffer(doubleBufferIndex);
             }
 
             fillBufferCallback?.Invoke(currentInputBuffers, currentOutputBuffers);
@@ -332,7 +334,8 @@ namespace NAudio.Wave.Asio
             switch (selector)
             {
                 case AsioMessageSelector.kAsioSelectorSupported:
-                    AsioMessageSelector subValue = (AsioMessageSelector)Enum.ToObject(typeof(AsioMessageSelector), value);
+                    AsioMessageSelector subValue =
+                        (AsioMessageSelector) Enum.ToObject(typeof(AsioMessageSelector), value);
                     switch (subValue)
                     {
                         case AsioMessageSelector.kAsioEngineVersion:

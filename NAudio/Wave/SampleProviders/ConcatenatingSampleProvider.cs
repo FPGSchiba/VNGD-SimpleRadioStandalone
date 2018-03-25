@@ -20,9 +20,12 @@ namespace NAudio.Wave.SampleProviders
         {
             if (providers == null) throw new ArgumentNullException(nameof(providers));
             this.providers = providers.ToArray();
-            if (this.providers.Length == 0) throw new ArgumentException("Must provide at least one input", nameof(providers));
-            if (this.providers.Any(p => p.WaveFormat.Channels != WaveFormat.Channels)) throw new ArgumentException("All inputs must have the same channel count", nameof(providers));
-            if (this.providers.Any(p => p.WaveFormat.SampleRate != WaveFormat.SampleRate)) throw new ArgumentException("All inputs must have the same sample rate", nameof(providers));
+            if (this.providers.Length == 0)
+                throw new ArgumentException("Must provide at least one input", nameof(providers));
+            if (this.providers.Any(p => p.WaveFormat.Channels != WaveFormat.Channels))
+                throw new ArgumentException("All inputs must have the same channel count", nameof(providers));
+            if (this.providers.Any(p => p.WaveFormat.SampleRate != WaveFormat.SampleRate))
+                throw new ArgumentException("All inputs must have the same sample rate", nameof(providers));
         }
 
         /// <summary>

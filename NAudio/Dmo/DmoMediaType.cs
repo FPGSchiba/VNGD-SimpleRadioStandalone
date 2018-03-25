@@ -18,8 +18,8 @@ namespace NAudio.Dmo
         Guid formattype;
         IntPtr pUnk; // not used
         int cbFormat;
-        IntPtr pbFormat; 
-        
+        IntPtr pbFormat;
+
         /// <summary>
         /// Major type
         /// </summary>
@@ -72,7 +72,7 @@ namespace NAudio.Dmo
         {
             get
             {
-                if(formattype == DmoMediaTypeGuids.FORMAT_None)
+                if (formattype == DmoMediaTypeGuids.FORMAT_None)
                 {
                     return "None";
                 }
@@ -80,7 +80,7 @@ namespace NAudio.Dmo
                 {
                     return "Null";
                 }
-                if(formattype == DmoMediaTypeGuids.FORMAT_WaveFormatEx)
+                if (formattype == DmoMediaTypeGuids.FORMAT_WaveFormatEx)
                 {
                     return "WaveFormatEx";
                 }
@@ -94,7 +94,7 @@ namespace NAudio.Dmo
         public WaveFormat GetWaveFormat()
         {
             if (formattype == DmoMediaTypeGuids.FORMAT_WaveFormatEx)
-            {                
+            {
                 return WaveFormat.MarshalFromPtr(pbFormat);
             }
             throw new InvalidOperationException("Not a WaveFormat type");
@@ -107,7 +107,7 @@ namespace NAudio.Dmo
         public void SetWaveFormat(WaveFormat waveFormat)
         {
             majortype = MediaTypes.MEDIATYPE_Audio;
-            
+
             var wfe = waveFormat as WaveFormatExtensible;
             if (wfe != null)
             {
@@ -130,7 +130,8 @@ namespace NAudio.Dmo
                         throw new ArgumentException($"Not a supported encoding {waveFormat.Encoding}");
                 }
             }
-            bFixedSizeSamples = SubType == AudioMediaSubtypes.MEDIASUBTYPE_PCM || SubType == AudioMediaSubtypes.MEDIASUBTYPE_IEEE_FLOAT;
+            bFixedSizeSamples = SubType == AudioMediaSubtypes.MEDIASUBTYPE_PCM ||
+                                SubType == AudioMediaSubtypes.MEDIASUBTYPE_IEEE_FLOAT;
             formattype = DmoMediaTypeGuids.FORMAT_WaveFormatEx;
             if (cbFormat < Marshal.SizeOf(waveFormat))
                 throw new InvalidOperationException("Not enough memory assigned for a WaveFormat structure");

@@ -1,4 +1,5 @@
 // created on 10/12/2002 at 21:11
+
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -36,12 +37,12 @@ namespace NAudio.Mixer
         /// <param name="mixerHandleType">Mixer Handle Type</param>
         /// <returns></returns>
         public static IList<MixerControl> GetMixerControls(IntPtr mixerHandle, MixerLine mixerLine,
-                                                           MixerFlags mixerHandleType)
+            MixerFlags mixerHandleType)
         {
             var controls = new List<MixerControl>();
             if (mixerLine.ControlsCount > 0)
             {
-                int mixerControlSize = Marshal.SizeOf(typeof (MixerInterop.MIXERCONTROL));
+                int mixerControlSize = Marshal.SizeOf(typeof(MixerInterop.MIXERCONTROL));
                 var mlc = new MixerInterop.MIXERLINECONTROLS();
                 IntPtr pmc = Marshal.AllocHGlobal(mixerControlSize * mixerLine.ControlsCount);
                 mlc.cbStruct = Marshal.SizeOf(mlc);
@@ -51,7 +52,8 @@ namespace NAudio.Mixer
                 mlc.cbmxctrl = Marshal.SizeOf(typeof(MixerInterop.MIXERCONTROL));
                 try
                 {
-                    MmResult err = MixerInterop.mixerGetLineControls(mixerHandle, ref mlc, MixerFlags.All | mixerHandleType);
+                    MmResult err =
+                        MixerInterop.mixerGetLineControls(mixerHandle, ref mlc, MixerFlags.All | mixerHandleType);
                     if (err != MmResult.NoError)
                     {
                         throw new MmException(err, "mixerGetLineControls");
@@ -61,18 +63,18 @@ namespace NAudio.Mixer
                         Int64 address = pmc.ToInt64() + mixerControlSize * i;
 
                         var mc = (MixerInterop.MIXERCONTROL)
-                            Marshal.PtrToStructure((IntPtr)address, typeof(MixerInterop.MIXERCONTROL));
-                        var mixerControl = GetMixerControl(mixerHandle, mixerLine.LineId, mc.dwControlID, mixerLine.Channels,
-                                                                                 mixerHandleType);
+                            Marshal.PtrToStructure((IntPtr) address, typeof(MixerInterop.MIXERCONTROL));
+                        var mixerControl = GetMixerControl(mixerHandle, mixerLine.LineId, mc.dwControlID,
+                            mixerLine.Channels,
+                            mixerHandleType);
 
                         controls.Add(mixerControl);
                     }
                 }
-                finally 
+                finally
                 {
                     Marshal.FreeHGlobal(pmc);
                 }
-
             }
             return controls;
         }
@@ -87,7 +89,7 @@ namespace NAudio.Mixer
         /// <param name="mixerFlags">Flags to use (indicates the meaning of mixerHandle)</param>
         /// <returns></returns>
         public static MixerControl GetMixerControl(IntPtr mixerHandle, int nLineID, int controlId, int nChannels,
-                                                   MixerFlags mixerFlags)
+            MixerFlags mixerFlags)
         {
             MixerInterop.MIXERLINECONTROLS mlc = new MixerInterop.MIXERLINECONTROLS();
             MixerInterop.MIXERCONTROL mc = new MixerInterop.MIXERCONTROL();
@@ -110,7 +112,7 @@ namespace NAudio.Mixer
             }
 
             // retrieve the structure from the pointer
-            mc = (MixerInterop.MIXERCONTROL) Marshal.PtrToStructure(mlc.pamxctrl, typeof (MixerInterop.MIXERCONTROL));
+            mc = (MixerInterop.MIXERCONTROL) Marshal.PtrToStructure(mlc.pamxctrl, typeof(MixerInterop.MIXERCONTROL));
             Marshal.FreeCoTaskMem(pMixerControl);
 
             if (MixerControl.IsControlBoolean(mc.dwControlType))
@@ -194,7 +196,7 @@ namespace NAudio.Mixer
                 // must be custom
                 mixerControlDetails.cbDetails = mixerControl.Metrics.customData;
             }
-            var detailsSize = mixerControlDetails.cbDetails*mixerControlDetails.cChannels;
+            var detailsSize = mixerControlDetails.cbDetails * mixerControlDetails.cChannels;
             if ((mixerControl.fdwControl & MixerInterop.MIXERCONTROL_CONTROLF_MULTIPLE) != 0)
             {
                 // fixing issue 16390 - calculating size correctly for multiple items
@@ -205,7 +207,7 @@ namespace NAudio.Mixer
             // Marshal.StructureToPtr( theStruct, buffer, false );
             mixerControlDetails.paDetails = buffer;
             MmResult err = MixerInterop.mixerGetControlDetails(mixerHandle, ref mixerControlDetails,
-                                                               MixerFlags.Value | mixerHandleType);
+                MixerFlags.Value | mixerHandleType);
             // let the derived classes get the details before we free the handle			
             if (err == MmResult.NoError)
             {

@@ -33,7 +33,7 @@ namespace NAudio.Wave
             CreateReaderStream(fileName);
             sourceBytesPerSample = (readerStream.WaveFormat.BitsPerSample / 8) * readerStream.WaveFormat.Channels;
             sampleChannel = new SampleChannel(readerStream, false);
-            destBytesPerSample = 4*sampleChannel.WaveFormat.Channels;
+            destBytesPerSample = 4 * sampleChannel.WaveFormat.Channels;
             length = SourceToDest(readerStream.Length);
         }
 
@@ -47,7 +47,8 @@ namespace NAudio.Wave
             if (fileName.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
             {
                 readerStream = new WaveFileReader(fileName);
-                if (readerStream.WaveFormat.Encoding != WaveFormatEncoding.Pcm && readerStream.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+                if (readerStream.WaveFormat.Encoding != WaveFormatEncoding.Pcm &&
+                    readerStream.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
                 {
                     readerStream = WaveFormatConversionStream.CreatePcmStream(readerStream);
                     readerStream = new BlockAlignReductionStream(readerStream);
@@ -57,7 +58,8 @@ namespace NAudio.Wave
             {
                 readerStream = new Mp3FileReader(fileName);
             }
-            else if (fileName.EndsWith(".aiff", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".aif", StringComparison.OrdinalIgnoreCase))
+            else if (fileName.EndsWith(".aiff", StringComparison.OrdinalIgnoreCase) ||
+                     fileName.EndsWith(".aif", StringComparison.OrdinalIgnoreCase))
             {
                 readerStream = new AiffFileReader(fileName);
             }
@@ -67,6 +69,7 @@ namespace NAudio.Wave
                 readerStream = new MediaFoundationReader(fileName);
             }
         }
+
         /// <summary>
         /// File Name
         /// </summary>
@@ -88,7 +91,13 @@ namespace NAudio.Wave
         public override long Position
         {
             get { return SourceToDest(readerStream.Position); }
-            set { lock (lockObject) { readerStream.Position = DestToSource(value); }  }
+            set
+            {
+                lock (lockObject)
+                {
+                    readerStream.Position = DestToSource(value);
+                }
+            }
         }
 
         /// <summary>
@@ -127,7 +136,7 @@ namespace NAudio.Wave
         public float Volume
         {
             get { return sampleChannel.Volume; }
-            set { sampleChannel.Volume = value; } 
+            set { sampleChannel.Volume = value; }
         }
 
         /// <summary>
@@ -154,7 +163,8 @@ namespace NAudio.Wave
         {
             if (disposing)
             {
-                if (readerStream != null) {
+                if (readerStream != null)
+                {
                     readerStream.Dispose();
                     readerStream = null;
                 }

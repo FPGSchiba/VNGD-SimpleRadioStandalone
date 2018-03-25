@@ -193,7 +193,7 @@ namespace FragLabs.Audio.Codecs
             }
             encodedLength = length;
             if (length < 0)
-                throw new Exception("Encoding failed - " + (Errors)length);
+                throw new Exception("Encoding failed - " + (Errors) length);
 
             return encoded;
         }
@@ -206,8 +206,8 @@ namespace FragLabs.Audio.Codecs
         public int FrameCount(byte[] pcmSamples, int bitrate = 16)
         {
             //  seems like bitrate should be required
-            var bytesPerSample = bitrate/8*InputChannels;
-            return pcmSamples.Length/bytesPerSample;
+            var bytesPerSample = bitrate / 8 * InputChannels;
+            return pcmSamples.Length / bytesPerSample;
         }
 
         /// <summary>
@@ -218,8 +218,8 @@ namespace FragLabs.Audio.Codecs
         public int FrameByteCount(int frameCount)
         {
             var bitrate = 16;
-            var bytesPerSample = bitrate/8*InputChannels;
-            return frameCount*bytesPerSample;
+            var bytesPerSample = bitrate / 8 * InputChannels;
+            return frameCount * bytesPerSample;
         }
 
         ~OpusEncoder()

@@ -12,6 +12,7 @@ namespace NAudio.Dmo
         /// None
         /// </summary>
         None,
+
         /// <summary>
         /// DMO_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER
         /// </summary>

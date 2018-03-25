@@ -39,6 +39,5 @@ namespace NAudio.Dmo
         {
             return $"Size: {Size}, Alignment {Alignment}, MaxLookahead {MaxLookahead}";
         }
-
     }
 }

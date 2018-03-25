@@ -8,7 +8,8 @@ namespace NAudio.Wave.Asio
     /// </summary>
     internal class AsioSampleConvertor
     {
-        public delegate void SampleConvertor(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples);
+        public delegate void SampleConvertor(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels,
+            int nbSamples);
 
         /// <summary>
         /// Selects the sample convertor based on the input WaveFormat and the output ASIOSampleTtype.
@@ -28,10 +29,14 @@ namespace NAudio.Wave.Asio
                     switch (waveFormat.BitsPerSample)
                     {
                         case 16:
-                            convertor = (is2Channels) ? (SampleConvertor)ConvertorShortToInt2Channels : (SampleConvertor)ConvertorShortToIntGeneric;
+                            convertor = (is2Channels)
+                                ? (SampleConvertor) ConvertorShortToInt2Channels
+                                : (SampleConvertor) ConvertorShortToIntGeneric;
                             break;
                         case 32:
-                            convertor = (is2Channels) ? (SampleConvertor)ConvertorFloatToInt2Channels : (SampleConvertor)ConvertorFloatToIntGeneric;
+                            convertor = (is2Channels)
+                                ? (SampleConvertor) ConvertorFloatToInt2Channels
+                                : (SampleConvertor) ConvertorFloatToIntGeneric;
                             break;
                     }
                     break;
@@ -39,10 +44,14 @@ namespace NAudio.Wave.Asio
                     switch (waveFormat.BitsPerSample)
                     {
                         case 16:
-                            convertor = (is2Channels) ? (SampleConvertor)ConvertorShortToShort2Channels : (SampleConvertor)ConvertorShortToShortGeneric;
+                            convertor = (is2Channels)
+                                ? (SampleConvertor) ConvertorShortToShort2Channels
+                                : (SampleConvertor) ConvertorShortToShortGeneric;
                             break;
                         case 32:
-                            convertor = (is2Channels) ? (SampleConvertor)ConvertorFloatToShort2Channels : (SampleConvertor)ConvertorFloatToShortGeneric;
+                            convertor = (is2Channels)
+                                ? (SampleConvertor) ConvertorFloatToShort2Channels
+                                : (SampleConvertor) ConvertorFloatToShortGeneric;
                             break;
                     }
                     break;
@@ -70,7 +79,7 @@ namespace NAudio.Wave.Asio
                 default:
                     throw new ArgumentException(
                         String.Format("ASIO Buffer Type {0} is not yet supported.",
-                                      Enum.GetName(typeof(AsioSampleType), asioType)));
+                            Enum.GetName(typeof(AsioSampleType), asioType)));
             }
             return convertor;
         }
@@ -79,14 +88,15 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Optimized convertor for 2 channels SHORT
         /// </summary>
-        public static void ConvertorShortToInt2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorShortToInt2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                short* inputSamples = (short*)inputInterleavedBuffer;
+                short* inputSamples = (short*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
-                short* leftSamples = (short*)asioOutputBuffers[0];
-                short* rightSamples = (short*)asioOutputBuffers[1];
+                short* leftSamples = (short*) asioOutputBuffers[0];
+                short* rightSamples = (short*) asioOutputBuffers[1];
 
                 // Point to upper 16 bits of the 32Bits.
                 leftSamples++;
@@ -107,16 +117,17 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic convertor for SHORT
         /// </summary>
-        public static void ConvertorShortToIntGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorShortToIntGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                short* inputSamples = (short*)inputInterleavedBuffer;
+                short* inputSamples = (short*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
                 short*[] samples = new short*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (short*)asioOutputBuffers[i];
+                    samples[i] = (short*) asioOutputBuffers[i];
                     // Point to upper 16 bits of the 32Bits.
                     samples[i]++;
                 }
@@ -135,13 +146,14 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Optimized convertor for 2 channels FLOAT
         /// </summary>
-        public static void ConvertorFloatToInt2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorFloatToInt2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
-                int* leftSamples = (int*)asioOutputBuffers[0];
-                int* rightSamples = (int*)asioOutputBuffers[1];
+                float* inputSamples = (float*) inputInterleavedBuffer;
+                int* leftSamples = (int*) asioOutputBuffers[0];
+                int* rightSamples = (int*) asioOutputBuffers[1];
 
                 for (int i = 0; i < nbSamples; i++)
                 {
@@ -155,15 +167,16 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic convertor SHORT
         /// </summary>
-        public static void ConvertorFloatToIntGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorFloatToIntGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
+                float* inputSamples = (float*) inputInterleavedBuffer;
                 int*[] samples = new int*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (int*)asioOutputBuffers[i];
+                    samples[i] = (int*) asioOutputBuffers[i];
                 }
 
                 for (int i = 0; i < nbSamples; i++)
@@ -179,14 +192,15 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Optimized convertor for 2 channels SHORT
         /// </summary>
-        public static void ConvertorShortToShort2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorShortToShort2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                short* inputSamples = (short*)inputInterleavedBuffer;
+                short* inputSamples = (short*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
-                short* leftSamples = (short*)asioOutputBuffers[0];
-                short* rightSamples = (short*)asioOutputBuffers[1];
+                short* leftSamples = (short*) asioOutputBuffers[0];
+                short* rightSamples = (short*) asioOutputBuffers[1];
 
                 // Point to upper 16 bits of the 32Bits.
                 for (int i = 0; i < nbSamples; i++)
@@ -202,16 +216,17 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic convertor for SHORT
         /// </summary>
-        public static void ConvertorShortToShortGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorShortToShortGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                short* inputSamples = (short*)inputInterleavedBuffer;
+                short* inputSamples = (short*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
                 short*[] samples = new short*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (short*)asioOutputBuffers[i];
+                    samples[i] = (short*) asioOutputBuffers[i];
                 }
 
                 for (int i = 0; i < nbSamples; i++)
@@ -227,14 +242,15 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Optimized convertor for 2 channels FLOAT
         /// </summary>
-        public static void ConvertorFloatToShort2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorFloatToShort2Channels(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
+                float* inputSamples = (float*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
-                short* leftSamples = (short*)asioOutputBuffers[0];
-                short* rightSamples = (short*)asioOutputBuffers[1];
+                short* leftSamples = (short*) asioOutputBuffers[0];
+                short* rightSamples = (short*) asioOutputBuffers[1];
 
                 for (int i = 0; i < nbSamples; i++)
                 {
@@ -248,16 +264,17 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic convertor SHORT
         /// </summary>
-        public static void ConvertorFloatToShortGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConvertorFloatToShortGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
+                float* inputSamples = (float*) inputInterleavedBuffer;
                 // Use a trick (short instead of int to avoid any convertion from 16Bit to 32Bit)
                 short*[] samples = new short*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (short*)asioOutputBuffers[i];
+                    samples[i] = (short*) asioOutputBuffers[i];
                 }
 
                 for (int i = 0; i < nbSamples; i++)
@@ -273,16 +290,17 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic converter 24 LSB
         /// </summary>
-        public static void ConverterFloatTo24LSBGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConverterFloatTo24LSBGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
-                
+                float* inputSamples = (float*) inputInterleavedBuffer;
+
                 byte*[] samples = new byte*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (byte*)asioOutputBuffers[i];
+                    samples[i] = (byte*) asioOutputBuffers[i];
                 }
 
                 for (int i = 0; i < nbSamples; i++)
@@ -290,9 +308,9 @@ namespace NAudio.Wave.Asio
                     for (int j = 0; j < nbChannels; j++)
                     {
                         int sample24 = clampTo24Bit(*inputSamples++);
-                        *(samples[j]++) = (byte)(sample24);
-                        *(samples[j]++) = (byte)(sample24 >> 8);
-                        *(samples[j]++) = (byte)(sample24 >> 16);
+                        *(samples[j]++) = (byte) (sample24);
+                        *(samples[j]++) = (byte) (sample24 >> 8);
+                        *(samples[j]++) = (byte) (sample24 >> 16);
                     }
                 }
             }
@@ -301,15 +319,16 @@ namespace NAudio.Wave.Asio
         /// <summary>
         /// Generic convertor for float
         /// </summary>
-        public static void ConverterFloatToFloatGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers, int nbChannels, int nbSamples)
+        public static void ConverterFloatToFloatGeneric(IntPtr inputInterleavedBuffer, IntPtr[] asioOutputBuffers,
+            int nbChannels, int nbSamples)
         {
             unsafe
             {
-                float* inputSamples = (float*)inputInterleavedBuffer;
+                float* inputSamples = (float*) inputInterleavedBuffer;
                 float*[] samples = new float*[nbChannels];
                 for (int i = 0; i < nbChannels; i++)
                 {
-                    samples[i] = (float*)asioOutputBuffers[i];
+                    samples[i] = (float*) asioOutputBuffers[i];
                 }
 
                 for (int i = 0; i < nbSamples; i++)
@@ -325,19 +344,19 @@ namespace NAudio.Wave.Asio
         private static int clampTo24Bit(double sampleValue)
         {
             sampleValue = (sampleValue < -1.0) ? -1.0 : (sampleValue > 1.0) ? 1.0 : sampleValue;
-            return (int)(sampleValue * 8388607.0);
+            return (int) (sampleValue * 8388607.0);
         }
 
         private static int clampToInt(double sampleValue)
         {
             sampleValue = (sampleValue < -1.0) ? -1.0 : (sampleValue > 1.0) ? 1.0 : sampleValue;
-            return (int)(sampleValue * 2147483647.0);
+            return (int) (sampleValue * 2147483647.0);
         }
 
         private static short clampToShort(double sampleValue)
         {
             sampleValue = (sampleValue < -1.0) ? -1.0 : (sampleValue > 1.0) ? 1.0 : sampleValue;
-            return (short)(sampleValue * 32767.0);
+            return (short) (sampleValue * 32767.0);
         }
     }
 }

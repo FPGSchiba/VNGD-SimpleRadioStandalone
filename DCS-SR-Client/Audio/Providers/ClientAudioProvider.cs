@@ -27,10 +27,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public ClientAudioProvider()
         {
             _filters = new OnlineFilter[2];
-            _filters[0] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 560, 3900);
-            _filters[1] = OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 100, 4500);
+            _filters[0] =
+                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 560, 3900);
+            _filters[1] =
+                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 100, 4500);
 
-            JitterBufferProviderInterface = new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
+            JitterBufferProviderInterface =
+                new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
 
             SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
         }
@@ -75,9 +78,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             long now = Environment.TickCount;
             if ((now - LastUpdate) > 400) //400 ms since last update
             {
-               // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
+                // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
                 //append ms of silence - this functions as our jitter buffer??
-                var silencePad = (AudioManager.INPUT_SAMPLE_RATE/1000)*SILENCE_PAD;
+                var silencePad = (AudioManager.INPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
 
                 var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
 
@@ -91,12 +94,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
             {
-                Audio = SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
+                Audio =
+                    SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort), audio.ReceivedRadio),
                 PacketNumber = audio.PacketNumber
             });
 
             //timer.Stop();
-           
         }
 
         private void AdjustVolume(ClientAudio clientAudio)
@@ -104,8 +107,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var audio = clientAudio.PcmAudioShort;
             for (var i = 0; i < audio.Length; i++)
             {
-                var speaker1Short = (short) (audio[i]*clientAudio.Volume);
-               
+                var speaker1Short = (short) (audio[i] * clientAudio.Volume);
+
                 //calculate % loss 
                 var loss = 1 - clientAudio.RecevingPower;
                 //add in radio loss
@@ -113,13 +116,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 if (clientAudio.RecevingPower <= 0.1) // less than 10% or lower left
                 {
                     //gives linear signal loss from 10% down to 0%
-                    speaker1Short = (short) (speaker1Short* loss/0.1);
+                    speaker1Short = (short) (speaker1Short * loss / 0.1);
                 }
 
                 //0 is no loss so if more than 0 reduce volume
                 if (clientAudio.LineOfSightLoss > 0)
                 {
-                    speaker1Short = (short) (speaker1Short*(1.0f - clientAudio.LineOfSightLoss));
+                    speaker1Short = (short) (speaker1Short * (1.0f - clientAudio.LineOfSightLoss));
                 }
 
                 audio[i] = speaker1Short;
@@ -133,7 +136,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             for (var i = 0; i < mixedAudio.Length; i++)
             {
-                var audio =(double) mixedAudio[i]/32768f;
+                var audio = (double) mixedAudio[i] / 32768f;
 
                 //high and low pass filter
                 for (int j = 0; j < _filters.Length; j++)
@@ -142,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     audio = filter.ProcessSample(audio);
 
                     if (double.IsNaN(audio))
-                        audio = (double)mixedAudio[j] / 32768f;
+                        audio = (double) mixedAudio[j] / 32768f;
                     else
                     {
                         // clip
@@ -150,11 +153,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             audio = 1.0f;
                         if (audio < -1.0f)
                             audio = -1.0f;
-
                     }
                 }
 
-                mixedAudio[i] = (short)(audio * 32767);
+                mixedAudio[i] = (short) (audio * 32767);
             }
         }
 
@@ -171,7 +173,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private short RandomShort()
         {
             //random short at max volume at eights
-            return (short) _random.Next(-32768/8, 32768/8);
+            return (short) _random.Next(-32768 / 8, 32768 / 8);
         }
     }
 }

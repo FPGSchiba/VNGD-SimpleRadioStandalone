@@ -13,14 +13,14 @@ namespace NAudio.Wave.WaveFormats
     class WmaWaveFormat : WaveFormat
     {
         short wValidBitsPerSample; // bits of precision 
-        int dwChannelMask;       // which channels are present in stream 
+        int dwChannelMask; // which channels are present in stream 
         int dwReserved1;
         int dwReserved2;
         short wEncodeOptions;
         short wReserved3;
 
         public WmaWaveFormat(int sampleRate, int bitsPerSample, int channels)
-            : base(sampleRate,bitsPerSample,channels)
+            : base(sampleRate, bitsPerSample, channels)
         {
             wValidBitsPerSample = (short) bitsPerSample;
             if (channels == 1)

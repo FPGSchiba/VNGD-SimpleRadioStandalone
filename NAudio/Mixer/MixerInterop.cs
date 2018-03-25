@@ -1,4 +1,5 @@
 // created on 09/12/2002 at 21:03
+
 using System;
 using System.Runtime.InteropServices;
 using NAudio.Wave;
@@ -23,7 +24,8 @@ namespace NAudio.Mixer
 
         // http://msdn.microsoft.com/en-us/library/dd757308%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
-        public static extern MmResult mixerOpen(out IntPtr hMixer, int uMxId, IntPtr dwCallback, IntPtr dwInstance, MixerFlags dwOpenFlags);
+        public static extern MmResult mixerOpen(out IntPtr hMixer, int uMxId, IntPtr dwCallback, IntPtr dwInstance,
+            MixerFlags dwOpenFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd757292%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
@@ -31,7 +33,8 @@ namespace NAudio.Mixer
 
         // http://msdn.microsoft.com/en-us/library/dd757299%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
-        public static extern MmResult mixerGetControlDetails(IntPtr hMixer, ref MIXERCONTROLDETAILS mixerControlDetails, MixerFlags dwDetailsFlags);
+        public static extern MmResult mixerGetControlDetails(IntPtr hMixer, ref MIXERCONTROLDETAILS mixerControlDetails,
+            MixerFlags dwDetailsFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd757300%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
@@ -43,7 +46,8 @@ namespace NAudio.Mixer
 
         // http://msdn.microsoft.com/en-us/library/dd757302%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
-        public static extern MmResult mixerGetLineControls(IntPtr hMixer, ref MIXERLINECONTROLS mixerLineControls, MixerFlags dwControlFlags);
+        public static extern MmResult mixerGetLineControls(IntPtr hMixer, ref MIXERLINECONTROLS mixerLineControls,
+            MixerFlags dwControlFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd757303%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
@@ -55,7 +59,8 @@ namespace NAudio.Mixer
 
         // http://msdn.microsoft.com/en-us/library/dd757309%28VS.85%29.aspx
         [DllImport("winmm.dll", CharSet = CharSet.Ansi)]
-        public static extern MmResult mixerSetControlDetails(IntPtr hMixer, ref MIXERCONTROLDETAILS mixerControlDetails, MixerFlags dwDetailsFlags);
+        public static extern MmResult mixerSetControlDetails(IntPtr hMixer, ref MIXERCONTROLDETAILS mixerControlDetails,
+            MixerFlags dwDetailsFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd757294%28VS.85%29.aspx
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 1)]
@@ -76,8 +81,7 @@ namespace NAudio.Mixer
             public UInt16 wMid;
             public UInt16 wPid;
             public UInt32 vDriverVersion; // MMVERSION - major high byte, minor low byte
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAXPNAMELEN)]
-            public String szPname;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAXPNAMELEN)] public String szPname;
             public UInt32 fdwSupport;
             public UInt32 cDestinations;
         }
@@ -117,7 +121,7 @@ namespace NAudio.Mixer
             /// If this flag is not set, this line is an audio destination line associated with zero 
             /// or more audio source lines.
             /// </summary>
-            MIXERLINE_LINEF_SOURCE = (unchecked((int)0x80000000))
+            MIXERLINE_LINEF_SOURCE = (unchecked((int) 0x80000000))
         }
 
         // http://msdn.microsoft.com/en-us/library/dd757305%28VS.85%29.aspx
@@ -134,18 +138,19 @@ namespace NAudio.Mixer
             public Int32 cChannels;
             public Int32 cConnections;
             public Int32 cControls;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_SHORT_NAME_CHARS)]
-            public String szShortName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)]
-            public String szName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_SHORT_NAME_CHARS)] public String szShortName;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)] public String szName;
+
             // start of target struct 'Target'
             public UInt32 dwType;
+
             public UInt32 dwDeviceID;
             public UInt16 wMid;
             public UInt16 wPid;
             public UInt32 vDriverVersion; // MMVERSION - major high byte, minor low byte
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAXPNAMELEN)]
-            public String szPname;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAXPNAMELEN)] public String szPname;
             // end of target struct
         }
 
@@ -159,22 +164,27 @@ namespace NAudio.Mixer
             /// dwMinimum / lMinimum / reserved 0
             /// </summary>
             public int minimum;
+
             /// <summary>
             /// dwMaximum / lMaximum / reserved 1
             /// </summary>
             public int maximum;
+
             /// <summary>
             /// reserved 2
             /// </summary>
             public int reserved2;
+
             /// <summary>
             /// reserved 3
             /// </summary>
             public int reserved3;
+
             /// <summary>
             /// reserved 4
             /// </summary>
             public int reserved4;
+
             /// <summary>
             /// reserved 5
             /// </summary>
@@ -191,22 +201,27 @@ namespace NAudio.Mixer
             /// cSteps / reserved[0]
             /// </summary>
             public int step;
+
             /// <summary>
             /// cbCustomData / reserved[1], number of bytes for control details
             /// </summary>
             public int customData;
+
             /// <summary>
             /// reserved 2
             /// </summary>
             public int reserved2;
+
             /// <summary>
             /// reserved 3
             /// </summary>
             public int reserved3;
+
             /// <summary>
             /// reserved 4
             /// </summary>
             public int reserved4;
+
             /// <summary>
             /// reserved 5
             /// </summary>
@@ -225,10 +240,8 @@ namespace NAudio.Mixer
             public MixerControlType dwControlType;
             public UInt32 fdwControl;
             public UInt32 cMultipleItems;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_SHORT_NAME_CHARS)]
-            public String szShortName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)]
-            public String szName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_SHORT_NAME_CHARS)] public String szShortName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)] public String szName;
             public Bounds Bounds;
             public Metrics Metrics;
         }
@@ -253,8 +266,7 @@ namespace NAudio.Mixer
         {
             public UInt32 dwParam1;
             public UInt32 dwParam2;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)]
-            public String szName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MIXER_LONG_NAME_CHARS)] public String szName;
         }
 
         // http://msdn.microsoft.com/en-us/library/dd757298%28VS.85%29.aspx

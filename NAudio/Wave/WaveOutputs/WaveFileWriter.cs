@@ -55,7 +55,7 @@ namespace NAudio.Wave
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes to a stream by reading all the data from a WaveProvider
         /// BEWARE: the WaveProvider MUST return 0 from its Read method when it is finished,
@@ -65,13 +65,13 @@ namespace NAudio.Wave
         /// <param name="sourceProvider">The source WaveProvider</param>
         public static void WriteWavFileToStream(Stream outStream, IWaveProvider sourceProvider)
         {
-            using (var writer = new WaveFileWriter(new IgnoreDisposeStream(outStream), sourceProvider.WaveFormat)) 
+            using (var writer = new WaveFileWriter(new IgnoreDisposeStream(outStream), sourceProvider.WaveFormat))
             {
                 var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
-                while(true) 
+                while (true)
                 {
                     var bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
-                    if (bytesRead == 0) 
+                    if (bytesRead == 0)
                     {
                         // end of source provider
                         outStream.Flush();
@@ -82,7 +82,7 @@ namespace NAudio.Wave
                 }
             }
         }
-        
+
         /// <summary>
         /// WaveFileWriter that actually writes to a stream
         /// </summary>
@@ -94,7 +94,7 @@ namespace NAudio.Wave
             this.format = format;
             writer = new BinaryWriter(outStream, System.Text.Encoding.UTF8);
             writer.Write(System.Text.Encoding.UTF8.GetBytes("RIFF"));
-            writer.Write((int)0); // placeholder
+            writer.Write((int) 0); // placeholder
             writer.Write(System.Text.Encoding.UTF8.GetBytes("WAVE"));
 
             writer.Write(System.Text.Encoding.UTF8.GetBytes("fmt "));
@@ -119,7 +119,7 @@ namespace NAudio.Wave
         {
             writer.Write(System.Text.Encoding.UTF8.GetBytes("data"));
             dataSizePos = outStream.Position;
-            writer.Write((int)0); // placeholder
+            writer.Write((int) 0); // placeholder
         }
 
         private void CreateFactChunk()
@@ -127,16 +127,16 @@ namespace NAudio.Wave
             if (HasFactChunk())
             {
                 writer.Write(System.Text.Encoding.UTF8.GetBytes("fact"));
-                writer.Write((int)4);
+                writer.Write((int) 4);
                 factSampleCountPos = outStream.Position;
-                writer.Write((int)0); // number of samples
+                writer.Write((int) 0); // number of samples
             }
         }
 
         private bool HasFactChunk()
         {
-            return format.Encoding != WaveFormatEncoding.Pcm && 
-                format.BitsPerSample != 0;
+            return format.Encoding != WaveFormatEncoding.Pcm &&
+                   format.BitsPerSample != 0;
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace NAudio.Wave
         /// <summary>
         /// Total time (calculated from Length and average bytes per second)
         /// </summary>
-        public TimeSpan TotalTime => TimeSpan.FromSeconds((double)Length / WaveFormat.AverageBytesPerSecond);
+        public TimeSpan TotalTime => TimeSpan.FromSeconds((double) Length / WaveFormat.AverageBytesPerSecond);
 
         /// <summary>
         /// WaveFormat of this wave file
@@ -235,7 +235,7 @@ namespace NAudio.Wave
         }
 
         private readonly byte[] value24 = new byte[3]; // keep this around to save us creating it every time
-        
+
         /// <summary>
         /// Writes a single sample to the Wave file
         /// </summary>
@@ -244,12 +244,12 @@ namespace NAudio.Wave
         {
             if (WaveFormat.BitsPerSample == 16)
             {
-                writer.Write((Int16)(Int16.MaxValue * sample));
+                writer.Write((Int16) (Int16.MaxValue * sample));
                 dataChunkSize += 2;
             }
             else if (WaveFormat.BitsPerSample == 24)
             {
-                var value = BitConverter.GetBytes((Int32)(Int32.MaxValue * sample));
+                var value = BitConverter.GetBytes((Int32) (Int32.MaxValue * sample));
                 value24[0] = value[1];
                 value24[1] = value[2];
                 value24[2] = value[3];
@@ -258,7 +258,7 @@ namespace NAudio.Wave
             }
             else if (WaveFormat.BitsPerSample == 32 && WaveFormat.Encoding == WaveFormatEncoding.Extensible)
             {
-                writer.Write(UInt16.MaxValue * (Int32)sample);
+                writer.Write(UInt16.MaxValue * (Int32) sample);
                 dataChunkSize += 4;
             }
             else if (WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
@@ -322,7 +322,7 @@ namespace NAudio.Wave
             {
                 for (int sample = 0; sample < count; sample++)
                 {
-                    var value = BitConverter.GetBytes(UInt16.MaxValue * (Int32)samples[sample + offset]);
+                    var value = BitConverter.GetBytes(UInt16.MaxValue * (Int32) samples[sample + offset]);
                     value24[0] = value[1];
                     value24[1] = value[2];
                     value24[2] = value[3];
@@ -335,7 +335,7 @@ namespace NAudio.Wave
             {
                 for (int sample = 0; sample < count; sample++)
                 {
-                    writer.Write(UInt16.MaxValue * (Int32)samples[sample + offset]);
+                    writer.Write(UInt16.MaxValue * (Int32) samples[sample + offset]);
                 }
                 dataChunkSize += (count * 4);
             }
@@ -344,7 +344,7 @@ namespace NAudio.Wave
             {
                 for (int sample = 0; sample < count; sample++)
                 {
-                    writer.Write((float)samples[sample + offset] / (float)(Int16.MaxValue + 1));
+                    writer.Write((float) samples[sample + offset] / (float) (Int16.MaxValue + 1));
                 }
                 dataChunkSize += (count * 4);
             }
@@ -405,14 +405,14 @@ namespace NAudio.Wave
 
         private void UpdateDataChunk(BinaryWriter writer)
         {
-            writer.Seek((int)dataSizePos, SeekOrigin.Begin);
-            writer.Write((UInt32)dataChunkSize);
+            writer.Seek((int) dataSizePos, SeekOrigin.Begin);
+            writer.Write((UInt32) dataChunkSize);
         }
 
         private void UpdateRiffChunk(BinaryWriter writer)
         {
             writer.Seek(4, SeekOrigin.Begin);
-            writer.Write((UInt32)(outStream.Length - 8));
+            writer.Write((UInt32) (outStream.Length - 8));
         }
 
         private void UpdateFactChunk(BinaryWriter writer)
@@ -422,9 +422,9 @@ namespace NAudio.Wave
                 int bitsPerSample = (format.BitsPerSample * format.Channels);
                 if (bitsPerSample != 0)
                 {
-                    writer.Seek((int)factSampleCountPos, SeekOrigin.Begin);
-                    
-                    writer.Write((int)((dataChunkSize * 8) / bitsPerSample));
+                    writer.Seek((int) factSampleCountPos, SeekOrigin.Begin);
+
+                    writer.Write((int) ((dataChunkSize * 8) / bitsPerSample));
                 }
             }
         }

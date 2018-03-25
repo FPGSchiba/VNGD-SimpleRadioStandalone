@@ -64,10 +64,13 @@ namespace NAudio.Wave.Compression
             {
                 streamHeader.sourceBufferLength = bytesToConvert;
                 streamHeader.sourceBufferLengthUsed = bytesToConvert;
-                AcmStreamConvertFlags flags = firstTime ? (AcmStreamConvertFlags.Start | AcmStreamConvertFlags.BlockAlign) : AcmStreamConvertFlags.BlockAlign;
+                AcmStreamConvertFlags flags = firstTime
+                    ? (AcmStreamConvertFlags.Start | AcmStreamConvertFlags.BlockAlign)
+                    : AcmStreamConvertFlags.BlockAlign;
                 MmException.Try(AcmInterop.acmStreamConvert(streamHandle, streamHeader, flags), "acmStreamConvert");
                 firstTime = false;
-                System.Diagnostics.Debug.Assert(streamHeader.destBufferLength == destBuffer.Length, "Codecs should not change dest buffer length");
+                System.Diagnostics.Debug.Assert(streamHeader.destBufferLength == destBuffer.Length,
+                    "Codecs should not change dest buffer length");
                 sourceBytesConverted = streamHeader.sourceBufferLengthUsed;
             }
             finally
@@ -80,18 +83,12 @@ namespace NAudio.Wave.Compression
 
         public byte[] SourceBuffer
         {
-            get
-            {
-                return sourceBuffer;
-            }
+            get { return sourceBuffer; }
         }
 
         public byte[] DestBuffer
         {
-            get
-            {
-                return destBuffer;
-            }
+            get { return destBuffer; }
         }
 
         #region IDisposable Members
@@ -122,7 +119,7 @@ namespace NAudio.Wave.Compression
             System.Diagnostics.Debug.Assert(false, "AcmStreamHeader dispose was not called");
             Dispose(false);
         }
+
         #endregion
     }
-
 }

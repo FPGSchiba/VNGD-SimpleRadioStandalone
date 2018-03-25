@@ -34,7 +34,7 @@ namespace NAudio.Wave.SampleProviders
             for (int n = 0; n < bytesRead; n += 8)
             {
                 long sample64 = BitConverter.ToInt64(sourceBuffer, n);
-                buffer[outputIndex++] = (float)BitConverter.Int64BitsToDouble(sample64);
+                buffer[outputIndex++] = (float) BitConverter.Int64BitsToDouble(sample64);
             }
             return samplesRead;
         }

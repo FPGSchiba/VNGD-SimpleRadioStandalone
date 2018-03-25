@@ -24,7 +24,7 @@ namespace NAudio.Gui
         public WaveformPainter()
         {
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
-                ControlStyles.OptimizedDoubleBuffer, true);
+                          ControlStyles.OptimizedDoubleBuffer, true);
             InitializeComponent();
             OnForeColorChanged(EventArgs.Empty);
             OnResize(EventArgs.Empty);
@@ -70,7 +70,7 @@ namespace NAudio.Gui
             }
             insertPos++;
             insertPos %= maxSamples;
-            
+
             this.Invalidate();
         }
 

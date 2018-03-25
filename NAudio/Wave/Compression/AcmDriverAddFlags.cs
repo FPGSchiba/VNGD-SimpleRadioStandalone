@@ -15,14 +15,17 @@ namespace NAudio.Wave.Compression
         /// ACM_DRIVERADDF_LOCAL
         /// </summary>
         Local = 0,
+
         /// <summary>
         /// ACM_DRIVERADDF_GLOBAL
         /// </summary>
         Global = 8,
+
         /// <summary>
         /// ACM_DRIVERADDF_FUNCTION
         /// </summary>
         Function = 3,
+
         /// <summary>
         /// ACM_DRIVERADDF_NOTIFYHWND
         /// </summary>

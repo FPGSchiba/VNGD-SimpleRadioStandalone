@@ -19,6 +19,7 @@
      misrepresented as being the original source code.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 using System;
 
 namespace NAudio.CoreAudioApi
@@ -91,7 +92,8 @@ namespace NAudio.CoreAudioApi
         /// <param name="masterVolume"></param>
         /// <param name="channelVolume"></param>
         /// <param name="guid"></param>
-        public AudioVolumeNotificationData(Guid eventContext, bool muted, float masterVolume, float[] channelVolume, Guid guid)
+        public AudioVolumeNotificationData(Guid eventContext, bool muted, float masterVolume, float[] channelVolume,
+            Guid guid)
         {
             this.eventContext = eventContext;
             this.muted = muted;

@@ -121,12 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate
-                    {
-                        
-                        _callback(result); 
-                        
-                    }));
+                    new ThreadStart(delegate { _callback(result); }));
             }
             catch (Exception ex)
             {
@@ -213,7 +208,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         //check server version
                                         if (serverMessage.Version == null)
                                         {
-                                          
                                             Logger.Error("Disconnecting Unversioned Server");
                                             Disconnect();
                                             break;
@@ -226,7 +220,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         if (serverVersion < protocolVersion)
                                         {
-                                            Logger.Warn($"Disconnecting From Unsupported Server Version - Version {serverMessage.Version}");
+                                            Logger.Warn(
+                                                $"Disconnecting From Unsupported Server Version - Version {serverMessage.Version}");
                                             Disconnect();
                                             break;
                                         }
@@ -308,7 +303,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 message.Version = UpdaterChecker.VERSION;
 
-                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n" );
+                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
 
                 _tcpClient.GetStream().Write(json, 0, json.Length);
                 //Need to flush?

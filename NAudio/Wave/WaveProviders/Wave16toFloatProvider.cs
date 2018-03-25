@@ -27,7 +27,8 @@ namespace NAudio.Wave
             if (sourceProvider.WaveFormat.BitsPerSample != 16)
                 throw new ArgumentException("Only 16 bit audio supported");
 
-            waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sourceProvider.WaveFormat.SampleRate, sourceProvider.WaveFormat.Channels);
+            waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sourceProvider.WaveFormat.SampleRate,
+                sourceProvider.WaveFormat.Channels);
 
             this.sourceProvider = sourceProvider;
             this.volume = 1.0f;

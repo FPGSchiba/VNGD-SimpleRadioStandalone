@@ -22,6 +22,7 @@ namespace NAudio.Wave.SampleProviders
     {
         //Shifter objects
         private readonly ISampleProvider sourceStream;
+
         private readonly WaveFormat waveFormat;
         private float pitch = 1f;
         private readonly int fftSize;
@@ -31,8 +32,9 @@ namespace NAudio.Wave.SampleProviders
 
         //Limiter constants
         const float LIM_THRESH = 0.95f;
+
         const float LIM_RANGE = (1f - LIM_THRESH);
-        const float M_PI_2 = (float) (Math.PI/2);
+        const float M_PI_2 = (float) (Math.PI / 2);
 
         /// <summary>
         /// Creates a new SMB Pitch Shifting Sample Provider with default settings
@@ -133,13 +135,13 @@ namespace NAudio.Wave.SampleProviders
             float res;
             if ((LIM_THRESH < sample))
             {
-                res = (sample - LIM_THRESH)/LIM_RANGE;
-                res = (float) ((Math.Atan(res)/M_PI_2)*LIM_RANGE + LIM_THRESH);
+                res = (sample - LIM_THRESH) / LIM_RANGE;
+                res = (float) ((Math.Atan(res) / M_PI_2) * LIM_RANGE + LIM_THRESH);
             }
             else if ((sample < -LIM_THRESH))
             {
-                res = -(sample + LIM_THRESH)/LIM_RANGE;
-                res = -(float) ((Math.Atan(res)/M_PI_2)*LIM_RANGE + LIM_THRESH);
+                res = -(sample + LIM_THRESH) / LIM_RANGE;
+                res = -(float) ((Math.Atan(res) / M_PI_2) * LIM_RANGE + LIM_THRESH);
             }
             else
             {

@@ -53,7 +53,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public void Handle(StartServerMessage message)
         {
             StartServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_connectedClients.Values)));
+            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                new List<SRClient>(_connectedClients.Values)));
         }
 
         public void Handle(StopServerMessage message)

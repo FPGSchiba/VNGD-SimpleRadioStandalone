@@ -16,7 +16,7 @@ namespace NAudio.Dmo
     class WindowsMediaMp3DecoderComObject
     {
     }
-    
+
     /// <summary>
     /// Windows Media MP3 Decoder (as a DMO)
     /// WORK IN PROGRESS - DO NOT USE!
@@ -24,7 +24,9 @@ namespace NAudio.Dmo
     public class WindowsMediaMp3Decoder : IDisposable
     {
         MediaObject mediaObject;
+
         IPropertyStore propertyStoreInterface;
+
         //IWMResamplerProps resamplerPropsInterface;
         WindowsMediaMp3DecoderComObject mediaComObject;
 
@@ -34,8 +36,8 @@ namespace NAudio.Dmo
         public WindowsMediaMp3Decoder()
         {
             mediaComObject = new WindowsMediaMp3DecoderComObject();
-            mediaObject = new MediaObject((IMediaObject)mediaComObject);
-            propertyStoreInterface = (IPropertyStore)mediaComObject;
+            mediaObject = new MediaObject((IMediaObject) mediaComObject);
+            propertyStoreInterface = (IPropertyStore) mediaComObject;
             //resamplerPropsInterface = (IWMResamplerProps)mediaComObject;
         }
 
@@ -44,10 +46,7 @@ namespace NAudio.Dmo
         /// </summary>
         public MediaObject MediaObject
         {
-            get
-            {
-                return mediaObject;
-            }
+            get { return mediaObject; }
         }
 
 
@@ -60,7 +59,7 @@ namespace NAudio.Dmo
         /// </summary>
         public void Dispose()
         {
-            if(propertyStoreInterface != null)
+            if (propertyStoreInterface != null)
             {
                 Marshal.ReleaseComObject(propertyStoreInterface);
                 propertyStoreInterface = null;
@@ -84,5 +83,4 @@ namespace NAudio.Dmo
 
         #endregion
     }
-
 }

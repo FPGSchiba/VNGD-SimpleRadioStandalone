@@ -18,11 +18,11 @@ namespace NAudio.Wave
             VbrScale = 8
         }
 
-        private static int[] sr_table = { 44100, 48000, 32000, 99999 };
+        private static int[] sr_table = {44100, 48000, 32000, 99999};
         private int vbrScale = -1;
         private int startOffset;
         private int endOffset;
-        
+
         private int tocOffset = -1;
         private int framesOffset = -1;
         private int bytesOffset = -1;
@@ -32,13 +32,13 @@ namespace NAudio.Wave
         {
             int x;
             // big endian extract
-            x = buffer[offset+0];
+            x = buffer[offset + 0];
             x <<= 8;
-            x |= buffer[offset+1];
+            x |= buffer[offset + 1];
             x <<= 8;
-            x |= buffer[offset+2];
+            x |= buffer[offset + 2];
             x <<= 8;
-            x |= buffer[offset+3];
+            x |= buffer[offset + 3];
 
             return x;
         }
@@ -96,7 +96,7 @@ namespace NAudio.Wave
                 return null;
             }
 
-            XingHeaderOptions flags = (XingHeaderOptions)ReadBigEndian(frame.RawData, offset);
+            XingHeaderOptions flags = (XingHeaderOptions) ReadBigEndian(frame.RawData, offset);
             offset += 4;
 
             if ((flags & XingHeaderOptions.Frames) != 0)
@@ -135,11 +135,11 @@ namespace NAudio.Wave
         /// </summary>
         public int Frames
         {
-            get 
-            { 
-                if(framesOffset == -1) 
+            get
+            {
+                if (framesOffset == -1)
                     return -1;
-                return ReadBigEndian(frame.RawData, framesOffset); 
+                return ReadBigEndian(frame.RawData, framesOffset);
             }
             set
             {
@@ -154,11 +154,11 @@ namespace NAudio.Wave
         /// </summary>
         public int Bytes
         {
-            get 
-            { 
-                if(bytesOffset == -1) 
+            get
+            {
+                if (bytesOffset == -1)
                     return -1;
-                return ReadBigEndian(frame.RawData, bytesOffset); 
+                return ReadBigEndian(frame.RawData, bytesOffset);
             }
             set
             {
@@ -183,6 +183,5 @@ namespace NAudio.Wave
         {
             get { return frame; }
         }
-
     }
 }

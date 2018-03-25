@@ -23,7 +23,7 @@ namespace NAudio.Wave
             this.sourceStream = sourceStream;
             this.waveFormat = waveFormat;
         }
-        
+
         /// <summary>
         /// Initialises a new instance of RawSourceWaveStream
         /// </summary>
@@ -52,14 +52,8 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return sourceStream.Position;
-            }
-            set
-            {
-                sourceStream.Position = value - (value % waveFormat.BlockAlign);
-            }
+            get { return sourceStream.Position; }
+            set { sourceStream.Position = value - (value % waveFormat.BlockAlign); }
         }
 
         /// <summary>
@@ -78,4 +72,3 @@ namespace NAudio.Wave
         }
     }
 }
-

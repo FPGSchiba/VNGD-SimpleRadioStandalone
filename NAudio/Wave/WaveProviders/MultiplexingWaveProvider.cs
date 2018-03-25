@@ -26,7 +26,6 @@ namespace NAudio.Wave
         /// <param name="inputs">Input wave providers. Must all be of the same format, but can have any number of channels</param>
         public MultiplexingWaveProvider(IEnumerable<IWaveProvider> inputs) : this(inputs, -1)
         {
-            
         }
 
         /// <summary>
@@ -38,8 +37,10 @@ namespace NAudio.Wave
         public MultiplexingWaveProvider(IEnumerable<IWaveProvider> inputs, int numberOfOutputChannels)
         {
             this.inputs = new List<IWaveProvider>(inputs);
-            
-            outputChannelCount = numberOfOutputChannels == -1 ? this.inputs.Sum(i => i.WaveFormat.Channels)  : numberOfOutputChannels;
+
+            outputChannelCount = numberOfOutputChannels == -1
+                ? this.inputs.Sum(i => i.WaveFormat.Channels)
+                : numberOfOutputChannels;
 
             if (this.inputs.Count == 0)
             {
@@ -55,11 +56,13 @@ namespace NAudio.Wave
                 {
                     if (input.WaveFormat.Encoding == WaveFormatEncoding.Pcm)
                     {
-                        WaveFormat = new WaveFormat(input.WaveFormat.SampleRate, input.WaveFormat.BitsPerSample, outputChannelCount);
+                        WaveFormat = new WaveFormat(input.WaveFormat.SampleRate, input.WaveFormat.BitsPerSample,
+                            outputChannelCount);
                     }
                     else if (input.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
                     {
-                        WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(input.WaveFormat.SampleRate, outputChannelCount);
+                        WaveFormat =
+                            WaveFormat.CreateIeeeFloatWaveFormat(input.WaveFormat.SampleRate, outputChannelCount);
                     }
                     else
                     {

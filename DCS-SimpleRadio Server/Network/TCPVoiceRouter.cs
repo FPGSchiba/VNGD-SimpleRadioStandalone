@@ -18,7 +18,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class TCPVoiceRouter
     {
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
 
@@ -57,16 +56,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         pipeline.AddLast(new LengthFieldBasedFrameDecoder(ByteOrder.LittleEndian, 1024, 0, 2, -2, 0,
                             true));
                         pipeline.AddLast(new VOIPPacketHandler(_clientsList));
-
                     })).ChildOption(ChannelOption.TcpNodelay, true);
 
-                TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info, "VOIP Listener Binding to "+ _serverSettings.ServerListeningPort() + 1);
+                TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info,
+                    "VOIP Listener Binding to " + _serverSettings.ServerListeningPort() + 1);
                 Task<IChannel> bootstrapChannel = bootstrap.BindAsync(_serverSettings.ServerListeningPort() + 1);
 
                 bootstrapChannel.Wait(5000);
 
 
-                TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info, "VOIP Listener Bound to " + _serverSettings.ServerListeningPort() + 1);
+                TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info,
+                    "VOIP Listener Bound to " + _serverSettings.ServerListeningPort() + 1);
 
                 TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info, "VOIP Listener Waiting for Shutdown...");
                 //wait here for shutdown
@@ -97,6 +97,4 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
     }
-
-
 }

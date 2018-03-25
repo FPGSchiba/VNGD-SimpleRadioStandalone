@@ -90,7 +90,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             Logger.Error(ex, "Exception Parsing DCS AutoConnect Message");
                         }
-                        
                     }
                     else
                     {

@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         public int RadioId
         {
-            private get { return _radioId; } 
+            private get { return _radioId; }
             set
             {
                 _radioId = value;
@@ -45,12 +45,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         //updates the binding so the changes are picked up for the linked FixedChannelsModel
         private void UpdateBinding()
         {
-            
-                ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
+            ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
 
-                var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
-                bindingExpression?.UpdateTarget();
-            
+            var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
+            bindingExpression?.UpdateTarget();
         }
 
         private void Up0001_Click(object sender, RoutedEventArgs e)
@@ -132,7 +130,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                clientRadio.volume = (float) RadioVolume.Value/100.0f;
+                clientRadio.volume = (float) RadioVolume.Value / 100.0f;
             }
 
             _dragging = false;
@@ -186,8 +184,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 Down0001.Visibility = Visibility.Hidden;
 
                 PresetChannelsView.IsEnabled = false;
-
-             
             }
         }
 
@@ -249,8 +245,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else
                 {
-                    RadioFrequency.Text = (currentRadio.freq/MHz).ToString("0.000", CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
-                    (currentRadio.modulation == 0 ? "AM" : "FM");
+                    RadioFrequency.Text =
+                        (currentRadio.freq / MHz).ToString("0.000",
+                            CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
+                        (currentRadio.modulation == 0 ? "AM" : "FM");
                     if (currentRadio.secFreq > 100)
                     {
                         RadioFrequency.Text += " G";
@@ -268,7 +266,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     }
                 }
 
-              
+
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
@@ -290,7 +288,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if (_dragging == false)
                 {
-                    RadioVolume.Value = currentRadio.volume*100.0;
+                    RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
         }
@@ -365,7 +363,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                 if ((receiveState == null) || !receiveState.IsReceiving)
                 {
-                    RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                    RadioFrequency.Foreground =
+                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
@@ -389,10 +388,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
         {
-
             var currentRadio = RadioHelper.GetRadio(RadioId);
 
-            if (currentRadio != null && 
+            if (currentRadio != null &&
                 currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
             {
                 //update stuff
@@ -401,7 +399,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioHelper.ToggleEncryption(RadioId);
 
                     if (currentRadio.enc)
-                    { 
+                    {
                         EncryptionButton.Content = "Enable";
                     }
                     else
@@ -410,14 +408,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     }
                 }
             }
-            
         }
 
         private void EncryptionKeySpinner_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if(EncryptionKeySpinner?.Value != null)
-                RadioHelper.SetEncryptionKey(RadioId,(byte)EncryptionKeySpinner.Value);
+            if (EncryptionKeySpinner?.Value != null)
+                RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
         }
-        
     }
 }

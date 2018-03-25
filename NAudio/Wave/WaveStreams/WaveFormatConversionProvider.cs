@@ -30,8 +30,9 @@ namespace NAudio.Wave
 
             conversionStream = new AcmStream(sourceProvider.WaveFormat, targetFormat);
 
-            preferredSourceReadSize = Math.Min(sourceProvider.WaveFormat.AverageBytesPerSecond, conversionStream.SourceBuffer.Length);
-            preferredSourceReadSize -= (preferredSourceReadSize% sourceProvider.WaveFormat.BlockAlign);
+            preferredSourceReadSize = Math.Min(sourceProvider.WaveFormat.AverageBytesPerSecond,
+                conversionStream.SourceBuffer.Length);
+            preferredSourceReadSize -= (preferredSourceReadSize % sourceProvider.WaveFormat.BlockAlign);
         }
 
         /// <summary>
@@ -72,7 +73,8 @@ namespace NAudio.Wave
                 int readFromLeftoverDest = Math.Min(count - bytesRead, leftoverDestBytes);
                 if (readFromLeftoverDest > 0)
                 {
-                    Array.Copy(conversionStream.DestBuffer, leftoverDestOffset, buffer, offset+bytesRead, readFromLeftoverDest);
+                    Array.Copy(conversionStream.DestBuffer, leftoverDestOffset, buffer, offset + bytesRead,
+                        readFromLeftoverDest);
                     leftoverDestOffset += readFromLeftoverDest;
                     leftoverDestBytes -= readFromLeftoverDest;
                     bytesRead += readFromLeftoverDest;
@@ -89,7 +91,8 @@ namespace NAudio.Wave
 
                 // always read our preferred size, we can always keep leftovers for the next call to Read if we get
                 // too much
-                int sourceBytesRead = sourceProvider.Read(conversionStream.SourceBuffer, leftoverSourceBytes, sourceReadSize);
+                int sourceBytesRead =
+                    sourceProvider.Read(conversionStream.SourceBuffer, leftoverSourceBytes, sourceReadSize);
                 int sourceBytesAvailable = sourceBytesRead + leftoverSourceBytes;
                 if (sourceBytesAvailable == 0)
                 {
@@ -118,7 +121,7 @@ namespace NAudio.Wave
                 {
                     int bytesRequired = count - bytesRead;
                     int toCopy = Math.Min(destBytesConverted, bytesRequired);
-                    
+
                     // save leftovers
                     if (toCopy < destBytesConverted)
                     {

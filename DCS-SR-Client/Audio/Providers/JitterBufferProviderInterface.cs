@@ -10,21 +10,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
     {
         private readonly CircularBuffer _circularBuffer;
 
-        private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES*2]; //*2 for stereo
+        private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES * 2]; //*2 for stereo
 
         private uint _lastRead; // gives current index
 
         private readonly object _lock = new object();
         private uint _missing; // counts missing packets
 
-      //  private const int INITIAL_DELAY_MS = 200;
-     //   private long _delayedUntil = -1; //holds audio for a period of time
+        //  private const int INITIAL_DELAY_MS = 200;
+        //   private long _delayedUntil = -1; //holds audio for a period of time
 
         public JitterBufferProviderInterface(WaveFormat waveFormat)
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond*6);
+            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 6);
 
             Array.Clear(_silence, 0, _silence.Length);
         }
@@ -40,7 +40,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             _circularBuffer.Write(jitterBufferAudio.Audio, 0, jitterBufferAudio.Audio.Length);
         }
-
-       
     }
 }

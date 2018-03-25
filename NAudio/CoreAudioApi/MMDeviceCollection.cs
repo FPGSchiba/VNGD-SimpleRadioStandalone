@@ -20,6 +20,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 // updated for NAudio
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -74,7 +75,7 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         /// <returns>Device enumerator</returns>
         public IEnumerator<MMDevice> GetEnumerator()
-        {            
+        {
             for (int index = 0; index < Count; index++)
             {
                 yield return this[index];

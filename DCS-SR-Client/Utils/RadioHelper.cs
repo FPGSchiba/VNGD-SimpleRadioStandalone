@@ -12,7 +12,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 {
     public static class RadioHelper
     {
-
         public static void ToggleGuard(int radioId)
         {
             var radio = GetRadio(radioId);
@@ -54,8 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     && radio.modulation != RadioInformation.Modulation.INTERCOM
                     && radio.freqMode == RadioInformation.FreqMode.OVERLAY)
                 {
-
-                    if(delta)
+                    if (delta)
                         radio.freq += frequency;
                     else
                     {
@@ -79,7 +77,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
                     //make radio data stale to force resysnc
                     RadioDCSSyncServer.LastSent = 0;
-
                 }
             }
             return inLimit;
@@ -89,13 +86,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio !=null)
+            if (radio != null)
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-                    ClientStateSingleton.Instance.DcsPlayerRadioInfo.selected = (short)radioId;
+                    ClientStateSingleton.Instance.DcsPlayerRadioInfo.selected = (short) radioId;
                     return true;
                 }
             }
@@ -122,7 +119,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (radio != null)
             {
-                
                 if (radio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
                     //update stuff
@@ -144,18 +140,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             }
         }
 
-        public static void SetEncryptionKey(int radioId,int encKey)
+        public static void SetEncryptionKey(int radioId, int encKey)
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
             if (currentRadio != null &&
                 currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
             {
-
                 if (currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
                     //update stuff
-                    if ((currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE) ||
+                    if ((currentRadio.encMode ==
+                         RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE) ||
                         (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY))
                     {
                         if (encKey > 252)
@@ -173,7 +169,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static void SelectNextRadio()
         {
-
             var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
@@ -184,7 +179,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     || dcsPlayerRadioInfo.selected + 1 > dcsPlayerRadioInfo.radios.Length)
                 {
                     SelectRadio(1);
-                  
+
                     return;
                 }
                 else
@@ -208,17 +203,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                             return;
                         }
                     }
-
                 }
             }
         }
 
         public static void SelectPreviousRadio()
         {
-
             var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
+                dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
             {
                 if (dcsPlayerRadioInfo.selected < 0
                     || dcsPlayerRadioInfo.selected > dcsPlayerRadioInfo.radios.Length)
@@ -247,11 +241,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                             return;
                         }
                     }
-
                 }
             }
-
-
         }
 
         public static void IncreaseEncryptionKey(int radioId)
@@ -260,9 +251,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (currentRadio != null)
             {
-                SetEncryptionKey(radioId,currentRadio.encKey + 1);
+                SetEncryptionKey(radioId, currentRadio.encKey + 1);
             }
-
         }
 
         public static void DecreaseEncryptionKey(int radioId)
@@ -273,21 +263,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             {
                 SetEncryptionKey(radioId, currentRadio.encKey - 1);
             }
-
         }
 
         public static void SelectRadioChannel(PresetChannel selectedPresetChannel, int radioId)
         {
-
-            if (UpdateRadioFrequency((double) selectedPresetChannel.Value, radioId, false,false))
+            if (UpdateRadioFrequency((double) selectedPresetChannel.Value, radioId, false, false))
             {
                 var radio = GetRadio(radioId);
 
-                if(radio !=null) radio.channel = selectedPresetChannel.Channel;
+                if (radio != null) radio.channel = selectedPresetChannel.Channel;
             }
         }
 
-        public static void  RadioChannelUp(int  radioId)
+        public static void RadioChannelUp(int radioId)
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
@@ -297,9 +285,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-
                     var fixedChannels = ClientStateSingleton.Instance.FixedChannels;
-                
+
                     //now get model
                     if (fixedChannels != null && fixedChannels[radioId - 1] != null)
                     {
@@ -314,24 +301,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                                 //set to first radio
                                 SelectRadioChannel(radioChannels.PresetChannels[0], radioId);
                                 radioChannels.SelectedPresetChannel = radioChannels.PresetChannels[0];
-
                             }
                             else
                             {
                                 var preset = radioChannels.PresetChannels[next - 1];
-                              
+
                                 SelectRadioChannel(preset, radioId);
                                 radioChannels.SelectedPresetChannel = preset;
                             }
-
                         }
-
                     }
-
-
                 }
             }
-
         }
 
         public static void RadioChannelDown(int radioId)
@@ -344,7 +325,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-
                     var fixedChannels = ClientStateSingleton.Instance.FixedChannels;
 
                     //now get model
@@ -354,14 +334,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
                         if (radioChannels.PresetChannels.Count > 0)
                         {
-                            int previous = currentRadio.channel -1;
+                            int previous = currentRadio.channel - 1;
 
                             if (previous < 1)
                             {
                                 //set to last radio
                                 SelectRadioChannel(radioChannels.PresetChannels.Last(), radioId);
                                 radioChannels.SelectedPresetChannel = radioChannels.PresetChannels.Last();
-
                             }
                             else
                             {
@@ -370,9 +349,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                                 SelectRadioChannel(preset, radioId);
                                 radioChannels.SelectedPresetChannel = preset;
                             }
-
                         }
-
                     }
                 }
             }

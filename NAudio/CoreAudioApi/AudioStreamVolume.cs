@@ -30,7 +30,8 @@ namespace NAudio.CoreAudioApi
             int channelCount = ChannelCount;
             if (channelIndex >= channelCount)
             {
-                throw new ArgumentOutOfRangeException(parameter, "You must supply a valid channel index < current count of channels: " + channelCount.ToString());
+                throw new ArgumentOutOfRangeException(parameter,
+                    "You must supply a valid channel index < current count of channels: " + channelCount.ToString());
             }
         }
 
@@ -59,7 +60,7 @@ namespace NAudio.CoreAudioApi
                 Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.GetChannelCount(out channels));
                 unchecked
                 {
-                    return (int)channels;
+                    return (int) channels;
                 }
             }
         }
@@ -75,9 +76,9 @@ namespace NAudio.CoreAudioApi
 
             uint index;
             float level;
-            unchecked 
+            unchecked
             {
-                index = (uint)channelIndex;
+                index = (uint) channelIndex;
             }
             Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.GetChannelVolume(index, out level));
             return level;
@@ -105,18 +106,23 @@ namespace NAudio.CoreAudioApi
             {
                 throw new ArgumentOutOfRangeException(
                     "levels",
-                    String.Format(CultureInfo.InvariantCulture, "SetAllVolumes MUST be supplied with a volume level for ALL channels. The AudioStream has {0} channels and you supplied {1} channels.",
-                                  channelCount, levels.Length));
+                    String.Format(CultureInfo.InvariantCulture,
+                        "SetAllVolumes MUST be supplied with a volume level for ALL channels. The AudioStream has {0} channels and you supplied {1} channels.",
+                        channelCount, levels.Length));
             }
             for (int i = 0; i < levels.Length; i++)
             {
                 float level = levels[i];
-                if (level < 0.0f) throw new ArgumentOutOfRangeException("levels", "All volumes must be between 0.0 and 1.0. Invalid volume at index: " + i.ToString());
-                if (level > 1.0f) throw new ArgumentOutOfRangeException("levels", "All volumes must be between 0.0 and 1.0. Invalid volume at index: " + i.ToString());
+                if (level < 0.0f)
+                    throw new ArgumentOutOfRangeException("levels",
+                        "All volumes must be between 0.0 and 1.0. Invalid volume at index: " + i.ToString());
+                if (level > 1.0f)
+                    throw new ArgumentOutOfRangeException("levels",
+                        "All volumes must be between 0.0 and 1.0. Invalid volume at index: " + i.ToString());
             }
             unchecked
             {
-                Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.SetAllVoumes((uint)channelCount, levels));
+                Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.SetAllVoumes((uint) channelCount, levels));
             }
         }
 
@@ -133,7 +139,7 @@ namespace NAudio.CoreAudioApi
             if (level > 1.0f) throw new ArgumentOutOfRangeException("level", "Volume must be between 0.0 and 1.0");
             unchecked
             {
-                Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.SetChannelVolume((uint)index, level));
+                Marshal.ThrowExceptionForHR(audioStreamVolumeInterface.SetChannelVolume((uint) index, level));
             }
         }
 

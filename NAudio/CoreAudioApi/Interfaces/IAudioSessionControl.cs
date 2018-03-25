@@ -1,4 +1,4 @@
-﻿﻿// -----------------------------------------
+﻿// -----------------------------------------
 // SoundScribe (TM) and related software.
 // 
 // Copyright (C) 2007-2011 Vannatech
@@ -215,7 +215,8 @@ namespace NAudio.CoreAudioApi.Interfaces
         [PreserveSig]
         new int UnregisterAudioSessionNotification(
             [In] IAudioSessionEvents client);
-    /// <summary>
+
+        /// <summary>
         /// Retrieves the identifier for the audio session.
         /// </summary>
         /// <param name="retVal">Receives the session identifier.</param>

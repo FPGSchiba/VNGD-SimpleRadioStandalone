@@ -27,11 +27,12 @@ namespace NAudio.CoreAudioApi.Interfaces
         [PreserveSig]
         int SetAllVoumes(
             [In] uint dwCount,
-            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R4, SizeParamIndex=0)] float[] fVolumes);
+            [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R4, SizeParamIndex = 0)]
+            float[] fVolumes);
 
         [PreserveSig]
         int GetAllVolumes(
-          [In]   uint dwCount,
-          [MarshalAs(UnmanagedType.LPArray)]  float []pfVolumes);
+            [In] uint dwCount,
+            [MarshalAs(UnmanagedType.LPArray)] float[]pfVolumes);
     }
 }

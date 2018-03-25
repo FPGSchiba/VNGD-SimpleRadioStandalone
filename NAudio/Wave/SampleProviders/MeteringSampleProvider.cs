@@ -47,7 +47,10 @@ namespace NAudio.Wave.SampleProviders
             channels = source.WaveFormat.Channels;
             maxSamples = new float[channels];
             SamplesPerNotification = samplesPerNotification;
-            args = new StreamVolumeEventArgs() { MaxSampleValues = maxSamples }; // create objects up front giving GC little to do
+            args = new StreamVolumeEventArgs()
+            {
+                MaxSampleValues = maxSamples
+            }; // create objects up front giving GC little to do
         }
 
         /// <summary>

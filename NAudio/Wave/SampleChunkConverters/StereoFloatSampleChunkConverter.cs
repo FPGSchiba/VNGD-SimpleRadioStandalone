@@ -15,7 +15,7 @@ namespace NAudio.Wave.SampleProviders
         public bool Supports(WaveFormat waveFormat)
         {
             return waveFormat.Encoding == WaveFormatEncoding.IeeeFloat &&
-                waveFormat.Channels == 2;
+                   waveFormat.Channels == 2;
         }
 
         public void LoadNextChunk(IWaveProvider source, int samplePairsRequired)

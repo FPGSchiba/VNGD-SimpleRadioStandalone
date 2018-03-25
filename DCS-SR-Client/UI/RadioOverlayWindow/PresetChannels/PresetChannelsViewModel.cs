@@ -12,13 +12,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
 {
     public class PresetChannelsViewModel
     {
-
         private IPresetChannelsStore _channelsStore;
         private int _radioId;
 
         public DelegateCommand DropDownClosedCommand { get; set; }
 
-  
+
         private readonly object _presetChannelLock = new object();
         private ObservableCollection<PresetChannel> _presetChannels;
 
@@ -51,14 +50,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
             PresetChannels = new ObservableCollection<PresetChannel>();
         }
 
-      
+
         public ICommand ReloadCommand { get; }
 
         private void DropDownClosed(object args)
         {
             if (SelectedPresetChannel != null
-                    && SelectedPresetChannel.Value is Double
-                    && (Double)SelectedPresetChannel.Value > 0 && RadioId > 0)
+                && SelectedPresetChannel.Value is Double
+                && (Double) SelectedPresetChannel.Value > 0 && RadioId > 0)
             {
                 RadioHelper.SelectRadioChannel(SelectedPresetChannel, RadioId);
             }
@@ -71,8 +70,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
 
         public void Reload()
         {
-           
-
             PresetChannels.Clear();
 
             var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios;
@@ -82,8 +79,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
             int i = 1;
             foreach (var channel in _channelsStore.LoadFromStore(radio.name))
             {
-                if(((double)channel.Value) < Max 
-                    && ((double)channel.Value) > Min)
+                if (((double) channel.Value) < Max
+                    && ((double) channel.Value) > Min)
                 {
                     channel.Channel = i++;
                     PresetChannels.Add(channel);

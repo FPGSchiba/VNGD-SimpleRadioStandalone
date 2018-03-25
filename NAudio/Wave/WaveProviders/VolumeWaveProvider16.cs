@@ -66,9 +66,9 @@ namespace NAudio.Wave
             {
                 for (int n = 0; n < bytesRead; n += 2)
                 {
-                    short sample = (short)((buffer[offset + 1] << 8) | buffer[offset]);
+                    short sample = (short) ((buffer[offset + 1] << 8) | buffer[offset]);
                     var newSample = sample * this.volume;
-                    sample = (short)newSample;
+                    sample = (short) newSample;
                     // clip if necessary
                     if (this.Volume > 1.0f)
                     {
@@ -76,8 +76,8 @@ namespace NAudio.Wave
                         else if (newSample < Int16.MinValue) sample = Int16.MinValue;
                     }
 
-                    buffer[offset++] = (byte)(sample & 0xFF);
-                    buffer[offset++] = (byte)(sample >> 8);
+                    buffer[offset++] = (byte) (sample & 0xFF);
+                    buffer[offset++] = (byte) (sample >> 8);
                 }
             }
             return bytesRead;

@@ -31,7 +31,7 @@ namespace NAudio.Wave.SampleProviders
             int bytesRead = source.Read(sourceBuffer, 0, bytesNeeded);
             int samplesRead = bytesRead / 4;
             int outputIndex = offset;
-            for (int n = 0; n < bytesRead; n+=4)
+            for (int n = 0; n < bytesRead; n += 4)
             {
                 buffer[outputIndex++] = BitConverter.ToSingle(sourceBuffer, n);
             }

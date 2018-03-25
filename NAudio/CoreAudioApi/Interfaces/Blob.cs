@@ -20,6 +20,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 // Adapted for NAudio
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,6 +37,7 @@ namespace NAudio.CoreAudioApi.Interfaces
         /// Length of binary object.
         /// </summary>
         public int Length;
+
         /// <summary>
         /// Pointer to buffer storing data.
         /// </summary>
@@ -55,4 +57,3 @@ namespace NAudio.CoreAudioApi.Interfaces
         }
     }
 }
-

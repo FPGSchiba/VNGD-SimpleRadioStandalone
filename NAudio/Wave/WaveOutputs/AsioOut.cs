@@ -64,7 +64,7 @@ namespace NAudio.Wave
         /// <param name="driverIndex">Device number (zero based)</param>
         public AsioOut(int driverIndex)
         {
-            this.syncContext = SynchronizationContext.Current; 
+            this.syncContext = SynchronizationContext.Current;
             String[] names = GetDriverNames();
             if (names.Length == 0)
             {
@@ -72,7 +72,8 @@ namespace NAudio.Wave
             }
             if (driverIndex < 0 || driverIndex > names.Length)
             {
-                throw new ArgumentException(String.Format("Invalid device number. Must be in the range [0,{0}]", names.Length));
+                throw new ArgumentException(String.Format("Invalid device number. Must be in the range [0,{0}]",
+                    names.Length));
             }
             InitFromName(names[driverIndex]);
         }
@@ -196,7 +197,8 @@ namespace NAudio.Wave
         {
             if (isInitialized)
             {
-                throw new InvalidOperationException("Already initialised this instance of AsioOut - dispose and create a new one");
+                throw new InvalidOperationException(
+                    "Already initialised this instance of AsioOut - dispose and create a new one");
             }
             isInitialized = true;
             int desiredSampleRate = waveProvider != null ? waveProvider.WaveFormat.SampleRate : recordOnlySampleRate;
@@ -208,7 +210,8 @@ namespace NAudio.Wave
                 this.NumberOfOutputChannels = waveProvider.WaveFormat.Channels;
 
                 // Select the correct sample convertor from WaveFormat -> ASIOFormat
-                convertor = AsioSampleConvertor.SelectSampleConvertor(waveProvider.WaveFormat, driver.Capabilities.OutputChannelInfos[0].type);
+                convertor = AsioSampleConvertor.SelectSampleConvertor(waveProvider.WaveFormat,
+                    driver.Capabilities.OutputChannelInfos[0].type);
             }
             else
             {
@@ -231,7 +234,8 @@ namespace NAudio.Wave
             this.NumberOfInputChannels = recordChannels;
             // Used Prefered size of ASIO Buffer
             nbSamples = driver.CreateBuffers(NumberOfOutputChannels, NumberOfInputChannels, false);
-            driver.SetChannelOffset(ChannelOffset, InputChannelOffset); // will throw an exception if channel offset is too high
+            driver.SetChannelOffset(ChannelOffset,
+                InputChannelOffset); // will throw an exception if channel offset is too high
 
             if (waveProvider != null)
             {
@@ -253,7 +257,7 @@ namespace NAudio.Wave
                 if (audioAvailable != null)
                 {
                     var args = new AsioAudioAvailableEventArgs(inputChannels, outputChannels, nbSamples,
-                                                               driver.Capabilities.InputChannelInfos[0].type);
+                        driver.Capabilities.InputChannelInfos[0].type);
                     audioAvailable(this, args);
                     if (args.WrittenToOutputBuffers)
                         return;
@@ -363,13 +367,11 @@ namespace NAudio.Wave
         /// Sets the volume (1.0 is unity gain)
         /// Not supported for ASIO Out. Set the volume on the input stream instead
         /// </summary>
-        [Obsolete("this function will be removed in a future NAudio as ASIO does not support setting the volume on the device")]
+        [Obsolete(
+            "this function will be removed in a future NAudio as ASIO does not support setting the volume on the device")]
         public float Volume
         {
-            get
-            {
-                return 1.0f;
-            }
+            get { return 1.0f; }
             set
             {
                 if (value != 1.0f)

@@ -11,7 +11,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
 {
-    public class FilePresetChannelsStore: IPresetChannelsStore
+    public class FilePresetChannelsStore : IPresetChannelsStore
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -25,7 +25,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
             }
 
             return new List<PresetChannel>();
-
         }
 
         private List<PresetChannel> ReadFrequenciesFromFile(string filePath)
@@ -38,19 +37,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
             {
                 foreach (var line in lines)
                 {
-
                     var trimmed = line.Trim();
                     if (trimmed.Length > 0)
                     {
                         try
                         {
-                            double frequency = Double.Parse(trimmed,CultureInfo.InvariantCulture);
+                            double frequency = Double.Parse(trimmed, CultureInfo.InvariantCulture);
                             channels.Add(new PresetChannel()
                             {
                                 Text = trimmed,
-                                Value = frequency*MHz,
-                               
-                                
+                                Value = frequency * MHz,
                             });
                         }
                         catch (Exception ex)
@@ -66,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
 
         private string FindRadioFile(string radioName)
         {
-             var files = Directory.GetFiles(Environment.CurrentDirectory);
+            var files = Directory.GetFiles(Environment.CurrentDirectory);
 
             foreach (var fileAndPath in files)
             {
@@ -85,7 +81,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
             //only allow alphanumeric, remove all spaces etc
             return Regex.Replace(str, "[^a-zA-Z0-9]", "").ToLower();
         }
-
-
     }
 }

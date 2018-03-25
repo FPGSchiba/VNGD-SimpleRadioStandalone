@@ -125,7 +125,7 @@ namespace NAudio.Wave
             if (AutoStop)
             {
                 if (position + count > length)
-                    count = (int)(length - position);
+                    count = (int) (length - position);
 
                 // was a bug here, should be fixed now
                 System.Diagnostics.Debug.Assert(count >= 0, "length and position mismatch");
@@ -170,10 +170,10 @@ namespace NAudio.Wave
         static unsafe void Sum32BitAudio(byte[] destBuffer, int offset, byte[] sourceBuffer, int bytesRead)
         {
             fixed (byte* pDestBuffer = &destBuffer[offset],
-                      pSourceBuffer = &sourceBuffer[0])
+                pSourceBuffer = &sourceBuffer[0])
             {
-                float* pfDestBuffer = (float*)pDestBuffer;
-                float* pfReadBuffer = (float*)pSourceBuffer;
+                float* pfDestBuffer = (float*) pDestBuffer;
+                float* pfReadBuffer = (float*) pSourceBuffer;
                 int samplesRead = bytesRead / 4;
                 for (int n = 0; n < samplesRead; n++)
                 {

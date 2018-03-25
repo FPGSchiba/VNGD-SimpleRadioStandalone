@@ -34,9 +34,9 @@ namespace NAudio.Dmo
         public DmoResampler()
         {
             mediaComObject = new ResamplerMediaComObject();
-            mediaObject = new MediaObject((IMediaObject)mediaComObject);
-            propertyStoreInterface = (IPropertyStore)mediaComObject;
-            resamplerPropsInterface = (IWMResamplerProps)mediaComObject;
+            mediaObject = new MediaObject((IMediaObject) mediaComObject);
+            propertyStoreInterface = (IPropertyStore) mediaComObject;
+            resamplerPropsInterface = (IWMResamplerProps) mediaComObject;
         }
 
         /// <summary>
@@ -53,12 +53,12 @@ namespace NAudio.Dmo
         /// </summary>
         public void Dispose()
         {
-            if(propertyStoreInterface != null)
+            if (propertyStoreInterface != null)
             {
                 Marshal.ReleaseComObject(propertyStoreInterface);
                 propertyStoreInterface = null;
             }
-            if(resamplerPropsInterface != null)
+            if (resamplerPropsInterface != null)
             {
                 Marshal.ReleaseComObject(resamplerPropsInterface);
                 resamplerPropsInterface = null;

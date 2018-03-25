@@ -24,7 +24,7 @@ namespace NAudio.Wave
         {
             return GetOutputMediaTypes(audioSubtype)
                 .Where(mt => mt.SampleRate == sampleRate && mt.ChannelCount == channels)
-                .Select(mt => mt.AverageBytesPerSecond*8)
+                .Select(mt => mt.AverageBytesPerSecond * 8)
                 .Distinct()
                 .OrderBy(br => br)
                 .ToArray();
@@ -62,7 +62,7 @@ namespace NAudio.Wave
             {
                 object mediaTypeObject;
                 availableTypes.GetElement(n, out mediaTypeObject);
-                var mediaType = (IMFMediaType)mediaTypeObject;
+                var mediaType = (IMFMediaType) mediaTypeObject;
                 mediaTypes.Add(new MediaType(mediaType));
             }
             Marshal.ReleaseComObject(availableTypes);
@@ -78,7 +78,8 @@ namespace NAudio.Wave
         /// <param name="desiredBitRate">Desired bitrate. Use GetEncodeBitrates to find the possibilities for your input type</param>
         public static void EncodeToWma(IWaveProvider inputProvider, string outputFile, int desiredBitRate = 192000)
         {
-            var mediaType = SelectMediaType(AudioSubtypes.MFAudioFormat_WMAudioV8, inputProvider.WaveFormat, desiredBitRate);
+            var mediaType = SelectMediaType(AudioSubtypes.MFAudioFormat_WMAudioV8, inputProvider.WaveFormat,
+                desiredBitRate);
             if (mediaType == null) throw new InvalidOperationException("No suitable WMA encoders available");
             using (var encoder = new MediaFoundationEncoder(mediaType))
             {
@@ -135,7 +136,7 @@ namespace NAudio.Wave
         {
             return GetOutputMediaTypes(audioSubtype)
                 .Where(mt => mt.SampleRate == inputFormat.SampleRate && mt.ChannelCount == inputFormat.Channels)
-                .Select(mt => new { MediaType = mt, Delta = Math.Abs(desiredBitRate - mt.AverageBytesPerSecond * 8) } )
+                .Select(mt => new {MediaType = mt, Delta = Math.Abs(desiredBitRate - mt.AverageBytesPerSecond * 8)})
                 .OrderBy(mt => mt.Delta)
                 .Select(mt => mt.MediaType)
                 .FirstOrDefault();
@@ -161,7 +162,8 @@ namespace NAudio.Wave
         /// <param name="inputProvider">Input provider (should be PCM, some encoders will also allow IEEE float)</param>
         public void Encode(string outputFile, IWaveProvider inputProvider)
         {
-            if (inputProvider.WaveFormat.Encoding != WaveFormatEncoding.Pcm && inputProvider.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+            if (inputProvider.WaveFormat.Encoding != WaveFormatEncoding.Pcm &&
+                inputProvider.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
             {
                 throw new ArgumentException("Encode input format must be PCM or IEEE float");
             }
@@ -238,7 +240,8 @@ namespace NAudio.Wave
             return nsPosition;
         }
 
-        private long ConvertOneBuffer(IMFSinkWriter writer, int streamIndex, IWaveProvider inputProvider, long position, byte[] managedBuffer)
+        private long ConvertOneBuffer(IMFSinkWriter writer, int streamIndex, IWaveProvider inputProvider, long position,
+            byte[] managedBuffer)
         {
             long durationConverted = 0;
             int maxLength;

@@ -5,11 +5,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class DCSPlayerRadioInfo
     {
-
         //HOTAS or IN COCKPIT controls
         public enum RadioSwitchControls
         {
-            HOTAS = 0, 
+            HOTAS = 0,
             IN_COCKPIT = 1
         }
 
@@ -23,7 +22,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string unit = "";
         public uint unitId;
 
-        public readonly static uint UnitIdOffset = 100000001; // this is where non aircraft "Unit" Ids start from for satcom intercom
+        public readonly static uint UnitIdOffset = 100000001
+            ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
         public DCSPlayerRadioInfo()
         {
@@ -95,7 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > Environment.TickCount - 10000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation, uint sendingUnitId,
+        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation,
+            uint sendingUnitId,
             out RadioReceivingState receivingState)
         {
             if (!IsCurrent())
@@ -110,7 +111,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) && (modulation == RadioInformation.Modulation.INTERCOM))
+                    if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) &&
+                        (modulation == RadioInformation.Modulation.INTERCOM))
                     {
                         if ((unitId > 0) && (sendingUnitId > 0)
                             && (unitId == sendingUnitId))
@@ -129,7 +131,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         return null;
                     }
 
-                    if (modulation == RadioInformation.Modulation.DISABLED 
+                    if (modulation == RadioInformation.Modulation.DISABLED
                         || receivingRadio.modulation == RadioInformation.Modulation.DISABLED)
                     {
                         continue;

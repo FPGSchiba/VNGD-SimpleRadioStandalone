@@ -23,6 +23,7 @@ namespace NAudio.Wave
         /// Left sample
         /// </summary>
         public float Left { get; set; }
+
         /// <summary>
         /// Right sample
         /// </summary>

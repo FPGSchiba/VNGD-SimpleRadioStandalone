@@ -48,7 +48,7 @@ namespace NAudio.FileFormats.Map
         public override string ToString()
         {
             return String.Format("{0} In:{1} Out:{2} Ch:{3} Port:{4} Vel+:{5} Vel:{6}%",
-                NoteName, InNote, OutNote, Channel, OutPort, VelocityAdjust, VelocityScale*100);
+                NoteName, InNote, OutNote, Channel, OutPort, VelocityAdjust, VelocityScale * 100);
         }
     }
 }

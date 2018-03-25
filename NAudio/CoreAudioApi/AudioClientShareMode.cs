@@ -11,6 +11,7 @@ namespace NAudio.CoreAudioApi
         /// AUDCLNT_SHAREMODE_SHARED,
         /// </summary>
         Shared,
+
         /// <summary>
         /// AUDCLNT_SHAREMODE_EXCLUSIVE
         /// </summary>

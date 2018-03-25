@@ -13,7 +13,7 @@ namespace NAudio.Dmo
         private IntPtr buffer;
         private int length;
         private readonly int maxLength;
-        
+
         /// <summary>
         /// Creates a new Media Buffer
         /// </summary>
@@ -83,7 +83,6 @@ namespace NAudio.Dmo
         /// <returns>HRESULT</returns>
         int IMediaBuffer.GetBufferAndLength(IntPtr bufferPointerPointer, IntPtr validDataLengthPointer)
         {
-
             //System.Diagnostics.Debug.WriteLine(String.Format("Get Buffer and Length {0},{1}",
             //    bufferPointerPointer,validDataLengthPointer));
             if (bufferPointerPointer != IntPtr.Zero)
@@ -93,11 +92,9 @@ namespace NAudio.Dmo
             if (validDataLengthPointer != IntPtr.Zero)
             {
                 Marshal.WriteInt32(validDataLengthPointer, this.length);
-
             }
             //System.Diagnostics.Debug.WriteLine("Finished Getting Buffer and Length");
             return HResult.S_OK;
-
         }
 
         #endregion
@@ -108,13 +105,13 @@ namespace NAudio.Dmo
         public int Length
         {
             get { return length; }
-            set 
+            set
             {
                 if (length > maxLength)
                 {
                     throw new ArgumentException("Cannot be greater than maximum buffer size");
                 }
-                length = value; 
+                length = value;
             }
         }
 

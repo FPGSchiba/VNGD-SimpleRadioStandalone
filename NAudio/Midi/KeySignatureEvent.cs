@@ -39,17 +39,14 @@ namespace NAudio.Midi
         /// <summary>
         /// Creates a deep clone of this MIDI event.
         /// </summary>
-        public override MidiEvent Clone() => (KeySignatureEvent)MemberwiseClone();
+        public override MidiEvent Clone() => (KeySignatureEvent) MemberwiseClone();
 
         /// <summary>
         /// Number of sharps or flats
         /// </summary>
         public int SharpsFlats
         {
-            get
-            {
-                return sharpsFlats;
-            }
+            get { return sharpsFlats; }
         }
 
         /// <summary>
@@ -57,10 +54,7 @@ namespace NAudio.Midi
         /// </summary>
         public int MajorMinor
         {
-            get
-            {
-                return majorMinor;
-            }
+            get { return majorMinor; }
         }
 
         /// <summary>
@@ -85,6 +79,3 @@ namespace NAudio.Midi
         }
     }
 }
-
-
-

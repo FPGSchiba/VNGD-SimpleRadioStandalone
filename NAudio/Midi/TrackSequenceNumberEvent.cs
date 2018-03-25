@@ -29,7 +29,7 @@ namespace NAudio.Midi
         {
             // TODO: there is a form of the TrackSequenceNumberEvent that
             // has a length of zero
-            if(length != 2) 
+            if (length != 2)
             {
                 throw new FormatException("Invalid sequence number length");
             }
@@ -39,7 +39,7 @@ namespace NAudio.Midi
         /// <summary>
         /// Creates a deep clone of this MIDI event.
         /// </summary>
-        public override MidiEvent Clone() => (TrackSequenceNumberEvent)MemberwiseClone();
+        public override MidiEvent Clone() => (TrackSequenceNumberEvent) MemberwiseClone();
 
         /// <summary>
         /// Describes this event
@@ -58,8 +58,8 @@ namespace NAudio.Midi
         public override void Export(ref long absoluteTime, BinaryWriter writer)
         {
             base.Export(ref absoluteTime, writer);
-            writer.Write((byte)((sequenceNumber >> 8) & 0xFF));
-            writer.Write((byte)(sequenceNumber & 0xFF));
+            writer.Write((byte) ((sequenceNumber >> 8) & 0xFF));
+            writer.Write((byte) (sequenceNumber & 0xFF));
         }
     }
 }

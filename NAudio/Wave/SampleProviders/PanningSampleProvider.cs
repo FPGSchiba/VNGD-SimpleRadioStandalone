@@ -36,10 +36,7 @@ namespace NAudio.Wave.SampleProviders
         /// </summary>
         public float Pan
         {
-            get
-            {
-                return pan;
-            }
+            get { return pan; }
             set
             {
                 if (value < -1.0f || value > 1.0f)
@@ -56,10 +53,7 @@ namespace NAudio.Wave.SampleProviders
         /// </summary>
         public IPanStrategy PanStrategy
         {
-            get
-            {
-                return panStrategy;
-            }
+            get { return panStrategy; }
             set
             {
                 panStrategy = value;
@@ -110,6 +104,7 @@ namespace NAudio.Wave.SampleProviders
         /// Left value
         /// </summary>
         public float Left { get; set; }
+
         /// <summary>
         /// Right value
         /// </summary>
@@ -146,7 +141,7 @@ namespace NAudio.Wave.SampleProviders
             float leftChannel = (pan <= 0) ? 1.0f : ((1 - pan) / 2.0f);
             float rightChannel = (pan >= 0) ? 1.0f : ((pan + 1) / 2.0f);
             // Console.WriteLine(pan + ": " + leftChannel + "," + rightChannel);
-            return new StereoSamplePair() { Left = leftChannel, Right = rightChannel };
+            return new StereoSamplePair() {Left = leftChannel, Right = rightChannel};
         }
     }
 
@@ -165,10 +160,10 @@ namespace NAudio.Wave.SampleProviders
         {
             // -1..+1  -> 1..0
             float normPan = (-pan + 1) / 2;
-            float leftChannel = (float)Math.Sqrt(normPan);
-            float rightChannel = (float)Math.Sqrt(1 - normPan);
+            float leftChannel = (float) Math.Sqrt(normPan);
+            float rightChannel = (float) Math.Sqrt(1 - normPan);
             // Console.WriteLine(pan + ": " + leftChannel + "," + rightChannel);
-            return new StereoSamplePair() { Left = leftChannel, Right = rightChannel };
+            return new StereoSamplePair() {Left = leftChannel, Right = rightChannel};
         }
     }
 
@@ -177,7 +172,7 @@ namespace NAudio.Wave.SampleProviders
     /// </summary>
     public class SinPanStrategy : IPanStrategy
     {
-        private const float HalfPi = (float)Math.PI / 2;
+        private const float HalfPi = (float) Math.PI / 2;
 
         /// <summary>
         /// Gets the left and right channel multipliers for this pan value
@@ -188,10 +183,10 @@ namespace NAudio.Wave.SampleProviders
         {
             // -1..+1  -> 1..0
             float normPan = (-pan + 1) / 2;
-            float leftChannel = (float)Math.Sin(normPan * HalfPi);
-            float rightChannel = (float)Math.Cos(normPan * HalfPi);
+            float leftChannel = (float) Math.Sin(normPan * HalfPi);
+            float rightChannel = (float) Math.Cos(normPan * HalfPi);
             // Console.WriteLine(pan + ": " + leftChannel + "," + rightChannel);
-            return new StereoSamplePair() { Left = leftChannel, Right = rightChannel };
+            return new StereoSamplePair() {Left = leftChannel, Right = rightChannel};
         }
     }
 
@@ -211,7 +206,7 @@ namespace NAudio.Wave.SampleProviders
             float normPan = (-pan + 1) / 2;
             float leftChannel = normPan;
             float rightChannel = 1 - normPan;
-            return new StereoSamplePair() { Left = leftChannel, Right = rightChannel };
+            return new StereoSamplePair() {Left = leftChannel, Right = rightChannel};
         }
     }
 }

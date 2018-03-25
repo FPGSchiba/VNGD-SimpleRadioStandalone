@@ -22,10 +22,14 @@ namespace NAudio.Gui
     {
         // control properties
         private double minimum = 0.0;
+
         private double maximum = 1.0;
+
         private double value = 0.5;
+
         //
         private int beginDragY;
+
         private double beginDragValue;
         private bool dragging;
 
@@ -40,8 +44,8 @@ namespace NAudio.Gui
         public Pot()
         {
             this.SetStyle(ControlStyles.DoubleBuffer |
-                ControlStyles.AllPaintingInWmPaint |
-                ControlStyles.UserPaint, true);
+                          ControlStyles.AllPaintingInWmPaint |
+                          ControlStyles.UserPaint, true);
             InitializeComponent();
         }
 
@@ -50,10 +54,7 @@ namespace NAudio.Gui
         /// </summary>
         public double Minimum
         {
-            get
-            {
-                return minimum;
-            }
+            get { return minimum; }
             set
             {
                 if (value >= maximum)
@@ -69,10 +70,7 @@ namespace NAudio.Gui
         /// </summary>
         public double Maximum
         {
-            get
-            {
-                return maximum;
-            }
+            get { return maximum; }
             set
             {
                 if (value <= minimum)
@@ -88,14 +86,8 @@ namespace NAudio.Gui
         /// </summary>
         public double Value
         {
-            get
-            {
-                return value;
-            }
-            set
-            {
-                SetValue(value, false);
-            }
+            get { return value; }
+            set { SetValue(value, false); }
         }
 
         private void SetValue(double newValue, bool raiseEvents)
@@ -117,16 +109,16 @@ namespace NAudio.Gui
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-            int diameter = Math.Min(this.Width-4,this.Height-4);
-                        
-            Pen potPen = new Pen(ForeColor,3.0f);
+            int diameter = Math.Min(this.Width - 4, this.Height - 4);
+
+            Pen potPen = new Pen(ForeColor, 3.0f);
             potPen.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
             System.Drawing.Drawing2D.GraphicsState state = e.Graphics.Save();
             //e.Graphics.TranslateTransform(diameter / 2f, diameter / 2f);
             e.Graphics.TranslateTransform(this.Width / 2, this.Height / 2);
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             e.Graphics.DrawArc(potPen, new Rectangle(diameter / -2, diameter / -2, diameter, diameter), 135, 270);
-            
+
             double percent = (value - minimum) / (maximum - minimum);
             double degrees = 135 + (percent * 270);
             double x = (diameter / 2.0) * Math.Cos(Math.PI * degrees / 180);
@@ -171,11 +163,9 @@ namespace NAudio.Gui
                     newValue = minimum;
                 if (newValue > maximum)
                     newValue = maximum;
-                SetValue(newValue,true);
+                SetValue(newValue, true);
             }
             base.OnMouseMove(e);
         }
     }
-
-
 }

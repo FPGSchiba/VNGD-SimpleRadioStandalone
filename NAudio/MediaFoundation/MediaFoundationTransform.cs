@@ -15,12 +15,14 @@ namespace NAudio.MediaFoundation
         /// The Source Provider
         /// </summary>
         protected readonly IWaveProvider sourceProvider;
+
         /// <summary>
         /// The Output WaveFormat
         /// </summary>
         protected readonly WaveFormat outputWaveFormat;
+
         private readonly byte[] sourceBuffer;
-        
+
         private byte[] outputBuffer;
         private int outputBufferOffset;
         private int outputBufferCount;
@@ -42,7 +44,10 @@ namespace NAudio.MediaFoundation
             this.outputWaveFormat = outputFormat;
             this.sourceProvider = sourceProvider;
             sourceBuffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond];
-            outputBuffer = new byte[outputWaveFormat.AverageBytesPerSecond + outputWaveFormat.BlockAlign]; // we will grow this buffer if needed, but try to make something big enough
+            outputBuffer =
+                new byte[outputWaveFormat.AverageBytesPerSecond +
+                         outputWaveFormat
+                             .BlockAlign]; // we will grow this buffer if needed, but try to make something big enough
         }
 
         private void InitializeTransformForStreaming()
@@ -95,7 +100,10 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// The output WaveFormat of this Media Foundation Transform
         /// </summary>
-        public WaveFormat WaveFormat { get { return outputWaveFormat; } }
+        public WaveFormat WaveFormat
+        {
+            get { return outputWaveFormat; }
+        }
 
         /// <summary>
         /// Reads data out of the source, passing it through the transform
@@ -114,7 +122,7 @@ namespace NAudio.MediaFoundation
 
             // strategy will be to always read 1 second from the source, and give it to the resampler
             int bytesWritten = 0;
-            
+
             // read in any leftovers from last time
             if (outputBufferCount > 0)
             {
@@ -193,10 +201,10 @@ namespace NAudio.MediaFoundation
             sample.AddBuffer(pBuffer);
             sample.SetSampleTime(outputPosition); // hopefully this is not needed
             outputDataBuffer[0].pSample = sample;
-            
+
             _MFT_PROCESS_OUTPUT_STATUS status;
-            var hr = transform.ProcessOutput(_MFT_PROCESS_OUTPUT_FLAGS.None, 
-                                             1, outputDataBuffer, out status);
+            var hr = transform.ProcessOutput(_MFT_PROCESS_OUTPUT_FLAGS.None,
+                1, outputDataBuffer, out status);
             if (hr == MediaFoundationErrors.MF_E_TRANSFORM_NEED_MORE_INPUT)
             {
                 Marshal.ReleaseComObject(pBuffer);
@@ -227,7 +235,7 @@ namespace NAudio.MediaFoundation
             Marshal.ReleaseComObject(outputMediaBuffer);
             return outputBufferLength;
         }
-        
+
         private static long BytesToNsPosition(int bytes, WaveFormat waveFormat)
         {
             long nsPosition = (10000000L * bytes) / waveFormat.AverageBytesPerSecond;

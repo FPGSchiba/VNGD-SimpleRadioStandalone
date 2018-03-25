@@ -13,18 +13,22 @@ namespace NAudio.Wave
         /// Wave format ID (wID)
         /// </summary>
         public Mp3WaveFormatId id;
+
         /// <summary>
         /// Padding flags (fdwFlags)
         /// </summary>
         public Mp3WaveFormatFlags flags;
+
         /// <summary>
         /// Block Size (nBlockSize)
         /// </summary>
         public ushort blockSize;
+
         /// <summary>
         /// Frames per block (nFramesPerBlock)
         /// </summary>
         public ushort framesPerBlock;
+
         /// <summary>
         /// Codec Delay (nCodecDelay)
         /// </summary>
@@ -38,7 +42,7 @@ namespace NAudio.Wave
         public Mp3WaveFormat(int sampleRate, int channels, int blockSize, int bitRate)
         {
             waveFormatTag = WaveFormatEncoding.MpegLayer3;
-            this.channels = (short)channels;
+            this.channels = (short) channels;
             this.averageBytesPerSecond = bitRate / 8;
             this.bitsPerSample = 0; // must be zero
             this.blockAlign = 1; // must be 1
@@ -47,7 +51,7 @@ namespace NAudio.Wave
             this.extraSize = Mp3WaveFormatExtraBytes;
             this.id = Mp3WaveFormatId.Mpeg;
             this.flags = Mp3WaveFormatFlags.PaddingIso;
-            this.blockSize = (ushort)blockSize;
+            this.blockSize = (ushort) blockSize;
             this.framesPerBlock = 1;
             this.codecDelay = 0;
         }
@@ -63,10 +67,12 @@ namespace NAudio.Wave
         /// MPEGLAYER3_FLAG_PADDING_ISO
         /// </summary>
         PaddingIso = 0,
+
         /// <summary>
         /// MPEGLAYER3_FLAG_PADDING_ON
         /// </summary>
         PaddingOn = 1,
+
         /// <summary>
         /// MPEGLAYER3_FLAG_PADDING_OFF
         /// </summary>
@@ -80,8 +86,10 @@ namespace NAudio.Wave
     {
         /// <summary>MPEGLAYER3_ID_UNKNOWN</summary>
         Unknown = 0,
+
         /// <summary>MPEGLAYER3_ID_MPEG</summary>
         Mpeg = 1,
+
         /// <summary>MPEGLAYER3_ID_CONSTANTFRAMESIZE</summary>
         ConstantFrameSize = 2
     }

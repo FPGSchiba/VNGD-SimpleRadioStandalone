@@ -41,14 +41,8 @@ namespace NAudio.Wave
         /// </summary>
         public TimeSpan BufferDuration
         {
-            get
-            {
-                return TimeSpan.FromSeconds((double)BufferLength / WaveFormat.AverageBytesPerSecond);
-            }
-            set
-            {
-                BufferLength = (int)(value.TotalSeconds * WaveFormat.AverageBytesPerSecond);
-            }
+            get { return TimeSpan.FromSeconds((double) BufferLength / WaveFormat.AverageBytesPerSecond); }
+            set { BufferLength = (int) (value.TotalSeconds * WaveFormat.AverageBytesPerSecond); }
         }
 
         /// <summary>
@@ -62,10 +56,7 @@ namespace NAudio.Wave
         /// </summary>
         public int BufferedBytes
         {
-            get
-            {
-                return circularBuffer == null ? 0 : circularBuffer.Count;
-            }
+            get { return circularBuffer == null ? 0 : circularBuffer.Count; }
         }
 
         /// <summary>
@@ -73,7 +64,7 @@ namespace NAudio.Wave
         /// </summary>
         public TimeSpan BufferedDuration
         {
-            get { return TimeSpan.FromSeconds((double)BufferedBytes / WaveFormat.AverageBytesPerSecond); }
+            get { return TimeSpan.FromSeconds((double) BufferedBytes / WaveFormat.AverageBytesPerSecond); }
         }
 
         /// <summary>
@@ -91,7 +82,7 @@ namespace NAudio.Wave
         {
             // create buffer here to allow user to customise buffer length
             if (circularBuffer == null)
-            { 
+            {
                 circularBuffer = new CircularBuffer(BufferLength);
             }
 
@@ -106,11 +97,11 @@ namespace NAudio.Wave
         /// Reads from this WaveProvider
         /// Will always return count bytes, since we will zero-fill the buffer if not enough available
         /// </summary>
-        public int Read(byte[] buffer, int offset, int count) 
+        public int Read(byte[] buffer, int offset, int count)
         {
             int read = 0;
             if (circularBuffer != null) // not yet created
-            { 
+            {
                 read = circularBuffer.Read(buffer, offset, count);
             }
             if (ReadFully && read < count)

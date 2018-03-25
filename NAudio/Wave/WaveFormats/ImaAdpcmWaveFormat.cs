@@ -31,9 +31,9 @@ namespace NAudio.Wave
         {
             this.waveFormatTag = WaveFormatEncoding.DviAdpcm; // can also be ImaAdpcm - they are the same
             this.sampleRate = sampleRate;
-            this.channels = (short)channels;
-            this.bitsPerSample = (short)bitsPerSample; // TODO: can be 3 or 4
-            this.extraSize = 2;            
+            this.channels = (short) channels;
+            this.bitsPerSample = (short) bitsPerSample; // TODO: can be 3 or 4
+            this.extraSize = 2;
             this.blockAlign = 0; //TODO
             this.averageBytesPerSecond = 0; //TODO
             this.samplesPerBlock = 0; // TODO

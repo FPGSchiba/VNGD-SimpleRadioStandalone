@@ -11,7 +11,7 @@ namespace NAudio.Wave.Compression
     public class AcmFormat
     {
         private readonly AcmFormatDetails formatDetails;
-        private readonly WaveFormat waveFormat; 
+        private readonly WaveFormat waveFormat;
 
         internal AcmFormat(AcmFormatDetails formatDetails)
         {
@@ -32,7 +32,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public WaveFormatEncoding FormatTag
         {
-            get { return (WaveFormatEncoding)formatDetails.formatTag; }
+            get { return (WaveFormatEncoding) formatDetails.formatTag; }
         }
 
         /// <summary>
@@ -48,10 +48,7 @@ namespace NAudio.Wave.Compression
         /// </summary>
         public WaveFormat WaveFormat
         {
-            get 
-            {
-                return waveFormat; 
-            }
+            get { return waveFormat; }
         }
 
         /// <summary>

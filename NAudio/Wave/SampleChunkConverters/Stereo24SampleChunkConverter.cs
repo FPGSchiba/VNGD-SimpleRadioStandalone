@@ -14,8 +14,8 @@ namespace NAudio.Wave.SampleProviders
         public bool Supports(WaveFormat waveFormat)
         {
             return waveFormat.Encoding == WaveFormatEncoding.Pcm &&
-                waveFormat.BitsPerSample == 24 &&
-                waveFormat.Channels == 2;
+                   waveFormat.BitsPerSample == 24 &&
+                   waveFormat.Channels == 2;
         }
 
 
@@ -31,9 +31,11 @@ namespace NAudio.Wave.SampleProviders
         {
             if (offset < sourceBytes)
             {
-                sampleLeft = (((sbyte)sourceBuffer[offset + 2] << 16) | (sourceBuffer[offset + 1] << 8) | sourceBuffer[offset]) / 8388608f;
+                sampleLeft = (((sbyte) sourceBuffer[offset + 2] << 16) | (sourceBuffer[offset + 1] << 8) |
+                              sourceBuffer[offset]) / 8388608f;
                 offset += 3;
-                sampleRight = (((sbyte)sourceBuffer[offset + 2] << 16) | (sourceBuffer[offset + 1] << 8) | sourceBuffer[offset]) / 8388608f;
+                sampleRight = (((sbyte) sourceBuffer[offset + 2] << 16) | (sourceBuffer[offset + 1] << 8) |
+                               sourceBuffer[offset]) / 8388608f;
                 offset += 3;
                 return true;
             }
@@ -44,6 +46,5 @@ namespace NAudio.Wave.SampleProviders
                 return false;
             }
         }
-
     }
 }

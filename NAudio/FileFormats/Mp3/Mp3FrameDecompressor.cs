@@ -34,7 +34,10 @@ namespace NAudio.Wave
         /// <summary>
         /// Output format (PCM)
         /// </summary>
-        public WaveFormat OutputFormat { get { return pcmFormat; } }
+        public WaveFormat OutputFormat
+        {
+            get { return pcmFormat; }
+        }
 
         /// <summary>
         /// Decompresses a frame
@@ -54,7 +57,8 @@ namespace NAudio.Wave
             int converted = conversionStream.Convert(frame.FrameLength, out sourceBytesConverted);
             if (sourceBytesConverted != frame.FrameLength)
             {
-                throw new InvalidOperationException(String.Format("Couldn't convert the whole MP3 frame (converted {0}/{1})",
+                throw new InvalidOperationException(String.Format(
+                    "Couldn't convert the whole MP3 frame (converted {0}/{1})",
                     sourceBytesConverted, frame.FrameLength));
             }
             Array.Copy(conversionStream.DestBuffer, 0, dest, destOffset, converted);
@@ -77,8 +81,8 @@ namespace NAudio.Wave
             if (!disposed)
             {
                 disposed = true;
-				if(conversionStream != null)
-					conversionStream.Dispose();
+                if (conversionStream != null)
+                    conversionStream.Dispose();
                 GC.SuppressFinalize(this);
             }
         }

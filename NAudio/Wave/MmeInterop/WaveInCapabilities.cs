@@ -15,28 +15,33 @@ namespace NAudio.Wave
         /// wMid
         /// </summary>
         private short manufacturerId;
+
         /// <summary>
         /// wPid
         /// </summary>
         private short productId;
+
         /// <summary>
         /// vDriverVersion
         /// </summary>
         private int driverVersion;
+
         /// <summary>
         /// Product Name (szPname)
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)]
-        private string productName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxProductNameLength)] private string productName;
+
         /// <summary>
         /// Supported formats (bit flags) dwFormats 
         /// </summary>
         private SupportedWaveFormat supportedFormats;
+
         /// <summary>
         /// Supported channels (1 for mono 2 for stereo) (wChannels)
         /// Seems to be set to -1 on a lot of devices
         /// </summary>
         private short channels;
+
         /// <summary>
         /// wReserved1
         /// </summary>
@@ -44,6 +49,7 @@ namespace NAudio.Wave
 
         // extra WAVEINCAPS2 members
         private Guid manufacturerGuid;
+
         private Guid productGuid;
         private Guid nameGuid;
 
@@ -54,10 +60,7 @@ namespace NAudio.Wave
         /// </summary>
         public int Channels
         {
-            get
-            {
-                return channels;
-            }
+            get { return channels; }
         }
 
         /// <summary>
@@ -65,24 +68,32 @@ namespace NAudio.Wave
         /// </summary>
         public string ProductName
         {
-            get
-            {
-                return productName;
-            }
+            get { return productName; }
         }
 
         /// <summary>
         /// The device name Guid (if provided)
         /// </summary>
-        public Guid NameGuid { get { return nameGuid; } }
+        public Guid NameGuid
+        {
+            get { return nameGuid; }
+        }
+
         /// <summary>
         /// The product name Guid (if provided)
         /// </summary>
-        public Guid ProductGuid { get { return productGuid; } }
+        public Guid ProductGuid
+        {
+            get { return productGuid; }
+        }
+
         /// <summary>
         /// The manufacturer guid (if provided)
         /// </summary>
-        public Guid ManufacturerGuid { get { return manufacturerGuid; } }
+        public Guid ManufacturerGuid
+        {
+            get { return manufacturerGuid; }
+        }
 
         /// <summary>
         /// Checks to see if a given SupportedWaveFormat is supported
@@ -93,7 +104,6 @@ namespace NAudio.Wave
         {
             return (supportedFormats & waveFormat) == waveFormat;
         }
-
     }
 
     internal static class WaveCapabilitiesHelpers

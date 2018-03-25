@@ -14,14 +14,17 @@ namespace NAudio.CoreAudioApi
         /// The size of the buffer for the audio stream.
         /// </summary>
         public UInt32 cbSize;
+
         /// <summary>
         /// Boolean value to indicate whether or not the audio stream is hardware-offloaded
         /// </summary>
         public int bIsOffload;
+
         /// <summary>
         /// An enumeration that is used to specify the category of the audio stream.
         /// </summary>
         public AudioStreamCategory eCategory;
+
         /// <summary>
         /// A bit-field describing the characteristics of the stream. Supported in Windows 8.1 and later.
         /// </summary>

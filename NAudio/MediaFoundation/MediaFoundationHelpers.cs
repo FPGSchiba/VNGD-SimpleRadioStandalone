@@ -13,7 +13,7 @@ namespace NAudio.MediaFoundation
     public static class MediaFoundationApi
     {
         private static bool initialized;
-        
+
         /// <summary>
         /// initializes MediaFoundation - only needs to be called once per process
         /// </summary>
@@ -32,7 +32,7 @@ namespace NAudio.MediaFoundation
             }
         }
 
-#if !NETFX_CORE  
+#if !NETFX_CORE
         /// <summary>
         /// Enumerate the installed MediaFoundation transforms in the specified category
         /// </summary>
@@ -48,7 +48,7 @@ namespace NAudio.MediaFoundation
             for (int n = 0; n < interfaceCount; n++)
             {
                 var ptr =
-                    Marshal.ReadIntPtr(new IntPtr(interfacesPointer.ToInt64() + n*Marshal.SizeOf(interfacesPointer)));
+                    Marshal.ReadIntPtr(new IntPtr(interfacesPointer.ToInt64() + n * Marshal.SizeOf(interfacesPointer)));
                 interfaces[n] = (IMFActivate) Marshal.GetObjectForIUnknown(ptr);
             }
 
@@ -90,7 +90,8 @@ namespace NAudio.MediaFoundation
             var mediaType = CreateMediaType();
             try
             {
-                MediaFoundationInterop.MFInitMediaTypeFromWaveFormatEx(mediaType, waveFormat, Marshal.SizeOf(waveFormat));
+                MediaFoundationInterop.MFInitMediaTypeFromWaveFormatEx(mediaType, waveFormat,
+                    Marshal.SizeOf(waveFormat));
             }
             catch (Exception)
             {

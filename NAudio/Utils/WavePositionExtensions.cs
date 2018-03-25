@@ -13,7 +13,8 @@ namespace NAudio.Utils
         /// </summary>
         public static TimeSpan GetPositionTimeSpan(this IWavePosition @this)
         {
-            var pos = @this.GetPosition() / (@this.OutputWaveFormat.Channels * @this.OutputWaveFormat.BitsPerSample / 8);
+            var pos = @this.GetPosition() /
+                      (@this.OutputWaveFormat.Channels * @this.OutputWaveFormat.BitsPerSample / 8);
             return TimeSpan.FromMilliseconds(pos * 1000.0 / @this.OutputWaveFormat.SampleRate);
         }
     }

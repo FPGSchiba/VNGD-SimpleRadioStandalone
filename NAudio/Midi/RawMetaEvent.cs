@@ -16,7 +16,8 @@ namespace NAudio.Midi
         /// <summary>
         ///  Creates a meta event with raw data
         /// </summary>
-        public RawMetaEvent(MetaEventType metaEventType, long absoluteTime, byte[] data) : base(metaEventType, data?.Length ?? 0, absoluteTime)
+        public RawMetaEvent(MetaEventType metaEventType, long absoluteTime, byte[] data) : base(metaEventType,
+            data?.Length ?? 0, absoluteTime)
         {
             Data = data;
         }
@@ -24,7 +25,7 @@ namespace NAudio.Midi
         /// <summary>
         /// Creates a deep clone of this MIDI event.
         /// </summary>
-        public override MidiEvent Clone() => new RawMetaEvent(MetaEventType, AbsoluteTime, (byte[])Data?.Clone());
+        public override MidiEvent Clone() => new RawMetaEvent(MetaEventType, AbsoluteTime, (byte[]) Data?.Clone());
 
         /// <summary>
         /// Describes this meta event

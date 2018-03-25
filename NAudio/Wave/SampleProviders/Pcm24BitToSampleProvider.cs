@@ -15,7 +15,6 @@ namespace NAudio.Wave.SampleProviders
         public Pcm24BitToSampleProvider(IWaveProvider source)
             : base(source)
         {
-            
         }
 
         /// <summary>
@@ -33,7 +32,8 @@ namespace NAudio.Wave.SampleProviders
             int outIndex = offset;
             for (int n = 0; n < bytesRead; n += 3)
             {
-                buffer[outIndex++] = (((sbyte)sourceBuffer[n + 2] << 16) | (sourceBuffer[n + 1] << 8) | sourceBuffer[n]) / 8388608f;
+                buffer[outIndex++] =
+                    (((sbyte) sourceBuffer[n + 2] << 16) | (sourceBuffer[n + 1] << 8) | sourceBuffer[n]) / 8388608f;
             }
             return bytesRead / 3;
         }

@@ -24,7 +24,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup = new Client.UI.RadioOverlayWindow.RadioControlGroup[3];
+        private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup =
+            new Client.UI.RadioOverlayWindow.RadioControlGroup[3];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -67,14 +68,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             RadioRefresh(null, null);
 
             //init radio refresh
-            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(80) };
+            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
         }
 
         private void Location_Changed(object sender, EventArgs e)
         {
-            
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -140,7 +140,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (localByName != null && localByName.Length > 0)
                 {
                     //either DCS is in focus OR Overlay window is not in focus
-                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround || this.IsMouseOver)
+                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
+                        this.IsMouseOver)
                     {
                         _lastFocus = Environment.TickCount;
                     }
@@ -184,7 +185,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
-
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -201,7 +201,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var yScale = ActualHeight / RadioOverlayWin.MinWidth;
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
-            ScaleValue = (double)OnCoerceScaleValue(RadioOverlayWin, value);
+            ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -211,7 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
                 Height = sizeInfo.NewSize.Width / _aspectRatio;
 
-           
+
             // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 
@@ -222,13 +222,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
-        
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
             var mainWindow = o as RadioOverlayWindow;
             if (mainWindow != null)
-                return mainWindow.OnCoerceScaleValue((double)value);
+                return mainWindow.OnCoerceScaleValue((double) value);
             return value;
         }
 
@@ -236,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             var mainWindow = o as RadioOverlayWindow;
             if (mainWindow != null)
-                mainWindow.OnScaleValueChanged((double)e.OldValue, (double)e.NewValue);
+                mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
         }
 
         protected virtual double OnCoerceScaleValue(double value)
@@ -254,7 +253,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public double ScaleValue
         {
-            get { return (double)GetValue(ScaleValueProperty); }
+            get { return (double) GetValue(ScaleValueProperty); }
             set { SetValue(ScaleValueProperty, value); }
         }
 
@@ -264,7 +263,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             //reset last focus so we dont switch back to dcs while dragging
             _lastFocus = Environment.TickCount;
-
         }
     }
 }

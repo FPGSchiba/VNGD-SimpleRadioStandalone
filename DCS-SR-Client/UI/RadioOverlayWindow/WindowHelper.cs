@@ -31,6 +31,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         [DllImport("User32.dll")]
         public static extern IntPtr GetForegroundWindow();
-
     }
 }

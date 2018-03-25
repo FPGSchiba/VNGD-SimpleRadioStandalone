@@ -12,6 +12,7 @@ namespace NAudio.MediaFoundation
         /// None
         /// </summary>
         None = 0,
+
         /// <summary>
         /// There is a sample available for at least one output stream.
         /// </summary>

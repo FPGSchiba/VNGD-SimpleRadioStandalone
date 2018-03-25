@@ -19,6 +19,7 @@
      misrepresented as being the original source code.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -30,7 +31,7 @@ namespace NAudio.CoreAudioApi.Interfaces
     {
         int GetPeakValue(out float pfPeak);
         int GetMeteringChannelCount(out int pnChannelCount);
-        int GetChannelsPeakValues(int u32ChannelCount, [In]   IntPtr afPeakValues);
+        int GetChannelsPeakValues(int u32ChannelCount, [In] IntPtr afPeakValues);
         int QueryHardwareSupport(out int pdwHardwareSupportMask);
     };
 }

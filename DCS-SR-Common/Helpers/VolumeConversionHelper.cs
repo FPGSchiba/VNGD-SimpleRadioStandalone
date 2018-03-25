@@ -21,8 +21,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
 
         public static string ConvertLinearDiffToDB(float delta)
         {
-           
-            float diff = (float)VolumeConversionHelper.ConvertLinearToDB((float)(delta)) - (float)VolumeConversionHelper.ConvertLinearToDB((float)(1.0));
+            float diff = (float) VolumeConversionHelper.ConvertLinearToDB((float) (delta)) -
+                         (float) VolumeConversionHelper.ConvertLinearToDB((float) (1.0));
 
             return Math.Round(diff) + " dB";
             //convert diff into db
@@ -33,6 +33,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
             var db = (-30) + (25 - (-30)) * volume;
             return (float) Math.Exp(db / 20 * Math.Log(10));
         }
-
     }
 }

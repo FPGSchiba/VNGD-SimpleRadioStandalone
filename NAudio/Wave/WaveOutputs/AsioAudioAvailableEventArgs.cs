@@ -18,7 +18,8 @@ namespace NAudio.Wave
         /// <param name="outputBuffers">Pointers to the ASIO buffers for each channel</param>
         /// <param name="samplesPerBuffer">Number of samples in each buffer</param>
         /// <param name="asioSampleType">Audio format within each buffer</param>
-        public AsioAudioAvailableEventArgs(IntPtr[] inputBuffers, IntPtr[] outputBuffers, int samplesPerBuffer, AsioSampleType asioSampleType)
+        public AsioAudioAvailableEventArgs(IntPtr[] inputBuffers, IntPtr[] outputBuffers, int samplesPerBuffer,
+            AsioSampleType asioSampleType)
         {
             InputBuffers = inputBuffers;
             OutputBuffers = outputBuffers;
@@ -57,7 +58,7 @@ namespace NAudio.Wave
         public int GetAsInterleavedSamples(float[] samples)
         {
             int channels = InputBuffers.Length;
-            if (samples.Length < SamplesPerBuffer*channels) throw new ArgumentException("Buffer not big enough");
+            if (samples.Length < SamplesPerBuffer * channels) throw new ArgumentException("Buffer not big enough");
             int index = 0;
             unsafe
             {
@@ -67,7 +68,7 @@ namespace NAudio.Wave
                     {
                         for (int ch = 0; ch < channels; ch++)
                         {
-                            samples[index++] = *((int*)InputBuffers[ch] + n) / (float)Int32.MaxValue;
+                            samples[index++] = *((int*) InputBuffers[ch] + n) / (float) Int32.MaxValue;
                         }
                     }
                 }
@@ -77,7 +78,7 @@ namespace NAudio.Wave
                     {
                         for (int ch = 0; ch < channels; ch++)
                         {
-                            samples[index++] = *((short*)InputBuffers[ch] + n) / (float)Int16.MaxValue;
+                            samples[index++] = *((short*) InputBuffers[ch] + n) / (float) Int16.MaxValue;
                         }
                     }
                 }
@@ -87,10 +88,10 @@ namespace NAudio.Wave
                     {
                         for (int ch = 0; ch < channels; ch++)
                         {
-                            byte *pSample = ((byte*)InputBuffers[ch] + n * 3);
+                            byte* pSample = ((byte*) InputBuffers[ch] + n * 3);
 
                             //int sample = *pSample + *(pSample+1) << 8 + (sbyte)*(pSample+2) << 16;
-                            int sample = pSample[0] | (pSample[1] << 8) | ((sbyte)pSample[2] << 16);
+                            int sample = pSample[0] | (pSample[1] << 8) | ((sbyte) pSample[2] << 16);
                             samples[index++] = sample / 8388608.0f;
                         }
                     }
@@ -101,16 +102,17 @@ namespace NAudio.Wave
                     {
                         for (int ch = 0; ch < channels; ch++)
                         {
-                            samples[index++] = *((float*)InputBuffers[ch] + n);
+                            samples[index++] = *((float*) InputBuffers[ch] + n);
                         }
                     }
                 }
                 else
                 {
-                    throw new NotImplementedException(String.Format("ASIO Sample Type {0} not supported", AsioSampleType));
+                    throw new NotImplementedException(String.Format("ASIO Sample Type {0} not supported",
+                        AsioSampleType));
                 }
             }
-            return SamplesPerBuffer*channels;
+            return SamplesPerBuffer * channels;
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace NAudio.Wave
         public float[] GetAsInterleavedSamples()
         {
             int channels = InputBuffers.Length;
-            var samples = new float[SamplesPerBuffer*channels];
+            var samples = new float[SamplesPerBuffer * channels];
             GetAsInterleavedSamples(samples);
             return samples;
         }

@@ -14,34 +14,36 @@ namespace NAudio.Dmo
         public float mpdMinValue; // MP_DATA is a float
         public float mpdMaxValue;
         public float mpdNeutralValue;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string szUnitText;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string szLabel;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string szUnitText;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string szLabel;
 #pragma warning restore 0649
     }
 
     /// <summary>
     /// MP_TYPE
     /// </summary>
-    enum MediaParamType 
+    enum MediaParamType
     {
         /// <summary>
         /// MPT_INT
         /// </summary>
         Int,
+
         /// <summary>
         /// MPT_FLOAT
         /// </summary>
         Float,
+
         /// <summary>
         /// MPT_BOOL
         /// </summary>
         Bool,
+
         /// <summary>
         /// MPT_ENUM
         /// </summary>
         Enum,
+
         /// <summary>
         /// MPT_MAX
         /// </summary>
@@ -60,5 +62,4 @@ namespace NAudio.Dmo
         MP_CURVE_INVSQUARE = 0x8,
         MP_CURVE_SINE = 0x10
     }
-
 }

@@ -18,12 +18,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     {
         // Size of receive buffer.
         public const int BufferSize = 1024;
+
         // Receive buffer.
         public byte[] buffer = new byte[BufferSize];
 
         public string guid;
+
         // Received data string.
         public StringBuilder sb = new StringBuilder();
+
         // Client  socket.
         public Socket workSocket;
     }
@@ -31,8 +34,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     internal class ServerSync : IHandle<ServerSettingsChangedMessage>
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         // Thread signal.
         public static ManualResetEvent _allDone = new ManualResetEvent(false);
+
         private readonly HashSet<IPAddress> _bannedIps;
 
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
@@ -147,7 +152,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 try
                 {
-                    _eventAggregator.PublishOnUIThread(new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
+                    _eventAggregator.PublishOnUIThread(
+                        new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
                 }
                 catch (Exception ex)
                 {
@@ -203,7 +209,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 _logger.Error(ex, "Server - Client Exception reading");
                             }
                         }
-                       
                     }
 
                     //continue receiving more

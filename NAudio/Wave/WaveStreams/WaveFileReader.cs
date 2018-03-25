@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using NAudio.FileFormats.Wav;
 
-namespace NAudio.Wave 
+namespace NAudio.Wave
 {
     /// <summary>This class supports the reading of WAV files,
     /// providing a repositionable WaveStream that returns the raw data
@@ -28,7 +28,7 @@ namespace NAudio.Wave
         /// </remarks>
         public WaveFileReader(String waveFile) :
             this(File.OpenRead(waveFile), true)
-        {            
+        {
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace NAudio.Wave
         /// </summary>
         /// <param name="inputStream">The input stream containing a WAV file including header</param>
         public WaveFileReader(Stream inputStream) :
-           this(inputStream, false)
+            this(inputStream, false)
         {
         }
 
@@ -150,10 +150,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return waveStream.Position - dataPosition;
-            }
+            get { return waveStream.Position - dataPosition; }
             set
             {
                 lock (lockObject)
@@ -187,7 +184,7 @@ namespace NAudio.Wave
                 return waveStream.Read(array, offset, count);
             }
         }
-        
+
         /// <summary>
         /// Attempts to read the next sample or group of samples as floating point normalised into the range -1.0f to 1.0f
         /// </summary>
@@ -199,13 +196,14 @@ namespace NAudio.Wave
             {
                 case WaveFormatEncoding.Pcm:
                 case WaveFormatEncoding.IeeeFloat:
-                case WaveFormatEncoding.Extensible: // n.b. not necessarily PCM, should probably write more code to handle this case
+                case WaveFormatEncoding.Extensible
+                : // n.b. not necessarily PCM, should probably write more code to handle this case
                     break;
                 default:
                     throw new InvalidOperationException("Only 16, 24 or 32 bit PCM or IEEE float audio data supported");
             }
             var sampleFrame = new float[waveFormat.Channels];
-            int bytesToRead = waveFormat.Channels*(waveFormat.BitsPerSample/8);
+            int bytesToRead = waveFormat.Channels * (waveFormat.BitsPerSample / 8);
             byte[] raw = new byte[bytesToRead];
             int bytesRead = Read(raw, 0, bytesToRead);
             if (bytesRead == 0) return null; // end of file
@@ -215,12 +213,13 @@ namespace NAudio.Wave
             {
                 if (waveFormat.BitsPerSample == 16)
                 {
-                    sampleFrame[channel] = BitConverter.ToInt16(raw, offset)/32768f;
+                    sampleFrame[channel] = BitConverter.ToInt16(raw, offset) / 32768f;
                     offset += 2;
                 }
                 else if (waveFormat.BitsPerSample == 24)
                 {
-                    sampleFrame[channel] = (((sbyte)raw[offset + 2] << 16) | (raw[offset + 1] << 8) | raw[offset]) / 8388608f;
+                    sampleFrame[channel] = (((sbyte) raw[offset + 2] << 16) | (raw[offset + 1] << 8) | raw[offset]) /
+                                           8388608f;
                     offset += 3;
                 }
                 else if (waveFormat.BitsPerSample == 32 && waveFormat.Encoding == WaveFormatEncoding.IeeeFloat)

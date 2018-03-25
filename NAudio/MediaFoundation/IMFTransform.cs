@@ -19,7 +19,8 @@ namespace NAudio.MediaFoundation
         ///     /* [out] */ __RPC__out DWORD *pdwOutputMinimum,
         ///     /* [out] */ __RPC__out DWORD *pdwOutputMaximum) = 0;
         /// </remarks>
-        void GetStreamLimits([Out] out int pdwInputMinimum, [Out] out int pdwInputMaximum, [Out] out int pdwOutputMinimum, [Out] out int pdwOutputMaximum);
+        void GetStreamLimits([Out] out int pdwInputMinimum, [Out] out int pdwInputMaximum,
+            [Out] out int pdwOutputMinimum, [Out] out int pdwOutputMaximum);
 
         /// <summary>
         /// Retrieves the current number of input and output streams on this MFT.
@@ -41,7 +42,8 @@ namespace NAudio.MediaFoundation
         ///     DWORD dwOutputIDArraySize,
         ///     /* [size_is][out] */ __RPC__out_ecount_full(dwOutputIDArraySize) DWORD *pdwOutputIDs) = 0;
         /// </remarks>
-        void GetStreamIds([In] int dwInputIdArraySize, [In, Out] IntPtr pdwInputIDs, [In] int dwOutputIdArraySize, [In, Out] IntPtr pdwOutputIDs);
+        void GetStreamIds([In] int dwInputIdArraySize, [In, Out] IntPtr pdwInputIDs, [In] int dwOutputIdArraySize,
+            [In, Out] IntPtr pdwOutputIDs);
 
         /// <summary>
         /// Gets the buffer requirements and other information for an input stream on this Media Foundation transform (MFT). 
@@ -246,9 +248,9 @@ namespace NAudio.MediaFoundation
         ///     /* [out] */ DWORD *pdwStatus) = 0;
         /// </remarks>
         [PreserveSig]
-        int ProcessOutput([In] _MFT_PROCESS_OUTPUT_FLAGS dwFlags, 
-                           [In] int cOutputBufferCount,
-                           [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] MFT_OUTPUT_DATA_BUFFER[] pOutputSamples,
-                           [Out] out _MFT_PROCESS_OUTPUT_STATUS pdwStatus);
+        int ProcessOutput([In] _MFT_PROCESS_OUTPUT_FLAGS dwFlags,
+            [In] int cOutputBufferCount,
+            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] MFT_OUTPUT_DATA_BUFFER[] pOutputSamples,
+            [Out] out _MFT_PROCESS_OUTPUT_STATUS pdwStatus);
     }
 }

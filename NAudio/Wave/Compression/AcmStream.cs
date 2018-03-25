@@ -28,7 +28,9 @@ namespace NAudio.Wave.Compression
                 this.sourceFormat = sourceFormat;
                 int sourceBufferSize = Math.Max(65536, sourceFormat.AverageBytesPerSecond);
                 sourceBufferSize -= (sourceBufferSize % sourceFormat.BlockAlign);
-                MmException.Try(AcmInterop.acmStreamOpen(out streamHandle, IntPtr.Zero, sourceFormat, destFormat, null, IntPtr.Zero, IntPtr.Zero, AcmStreamOpenFlags.NonRealTime), "acmStreamOpen");
+                MmException.Try(
+                    AcmInterop.acmStreamOpen(out streamHandle, IntPtr.Zero, sourceFormat, destFormat, null, IntPtr.Zero,
+                        IntPtr.Zero, AcmStreamOpenFlags.NonRealTime), "acmStreamOpen");
 
                 int destBufferSize = SourceToDest(sourceBufferSize);
                 streamHeader = new AcmStreamHeader(streamHandle, sourceBufferSize, destBufferSize);
@@ -56,7 +58,8 @@ namespace NAudio.Wave.Compression
             sourceBufferSize -= (sourceBufferSize % sourceFormat.BlockAlign);
             MmException.Try(AcmInterop.acmDriverOpen(out driverHandle, driverId, 0), "acmDriverOpen");
             MmException.Try(AcmInterop.acmStreamOpen(out streamHandle, driverHandle,
-                          sourceFormat, sourceFormat, waveFilter, IntPtr.Zero, IntPtr.Zero, AcmStreamOpenFlags.NonRealTime), "acmStreamOpen");
+                    sourceFormat, sourceFormat, waveFilter, IntPtr.Zero, IntPtr.Zero, AcmStreamOpenFlags.NonRealTime),
+                "acmStreamOpen");
             streamHeader = new AcmStreamHeader(streamHandle, sourceBufferSize, SourceToDest(sourceBufferSize));
         }
 
@@ -71,7 +74,8 @@ namespace NAudio.Wave.Compression
             if (source == 0) // zero is an invalid parameter to acmStreamSize
                 return 0;
             int convertedBytes;
-            var mmResult = AcmInterop.acmStreamSize(streamHandle, source, out convertedBytes, AcmStreamSizeFlags.Source);
+            var mmResult =
+                AcmInterop.acmStreamSize(streamHandle, source, out convertedBytes, AcmStreamSizeFlags.Source);
             MmException.Try(mmResult, "acmStreamSize");
             return convertedBytes;
         }
@@ -86,7 +90,9 @@ namespace NAudio.Wave.Compression
             if (dest == 0) // zero is an invalid parameter to acmStreamSize
                 return 0;
             int convertedBytes;
-            MmException.Try(AcmInterop.acmStreamSize(streamHandle, dest, out convertedBytes, AcmStreamSizeFlags.Destination), "acmStreamSize");
+            MmException.Try(
+                AcmInterop.acmStreamSize(streamHandle, dest, out convertedBytes, AcmStreamSizeFlags.Destination),
+                "acmStreamSize");
             return convertedBytes;
         }
 
@@ -100,8 +106,10 @@ namespace NAudio.Wave.Compression
         {
             // create a PCM format
             WaveFormat suggestedFormat = new WaveFormat(compressedFormat.SampleRate, 16, compressedFormat.Channels);
-            MmException.Try(AcmInterop.acmFormatSuggest(IntPtr.Zero, compressedFormat, suggestedFormat, Marshal.SizeOf(suggestedFormat), AcmFormatSuggestFlags.FormatTag), "acmFormatSuggest");
-            
+            MmException.Try(
+                AcmInterop.acmFormatSuggest(IntPtr.Zero, compressedFormat, suggestedFormat,
+                    Marshal.SizeOf(suggestedFormat), AcmFormatSuggestFlags.FormatTag), "acmFormatSuggest");
+
             /*IntPtr suggestedFormatPointer = WaveFormat.MarshalToPtr(suggestedFormat);
             IntPtr compressedFormatPointer = WaveFormat.MarshalToPtr(compressedFormat);
             MmResult result = AcmInterop.acmFormatSuggest2(IntPtr.Zero, compressedFormatPointer, suggestedFormatPointer, Marshal.SizeOf(suggestedFormat), AcmFormatSuggestFlags.FormatTag);
@@ -110,7 +118,7 @@ namespace NAudio.Wave.Compression
             Marshal.FreeHGlobal(compressedFormatPointer);
             MmException.Try(result, "acmFormatSuggest");*/
 
-            
+
             return suggestedFormat;
         }
 
@@ -144,7 +152,8 @@ namespace NAudio.Wave.Compression
         {
             if (bytesToConvert % sourceFormat.BlockAlign != 0)
             {
-                System.Diagnostics.Debug.WriteLine(String.Format("Not a whole number of blocks: {0} ({1})", bytesToConvert, sourceFormat.BlockAlign));
+                System.Diagnostics.Debug.WriteLine(String.Format("Not a whole number of blocks: {0} ({1})",
+                    bytesToConvert, sourceFormat.BlockAlign));
                 bytesToConvert -= (bytesToConvert % sourceFormat.BlockAlign);
             }
 
@@ -212,7 +221,6 @@ namespace NAudio.Wave.Compression
                 {
                     throw new MmException(result, "acmStreamClose");
                 }
-
             }
             // Set large fields to null.
             if (driverHandle != IntPtr.Zero)

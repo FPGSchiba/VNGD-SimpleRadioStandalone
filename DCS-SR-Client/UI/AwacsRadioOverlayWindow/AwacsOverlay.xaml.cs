@@ -23,7 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private readonly DispatcherTimer _updateTimer;
 
-        public static bool AwacsActive = false; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
+        public static bool AwacsActive = false
+            ; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
@@ -33,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
-       //     var opacity = AppConfiguration.Instance.RadioOpacity;
+            //     var opacity = AppConfiguration.Instance.RadioOpacity;
             AwacsActive = true;
 
             InitializeComponent();
@@ -42,10 +43,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             this.Left = _settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue;
             this.Top = _settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue;
 
-            _aspectRatio = MinWidth/MinHeight;
+            _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
-        //    Opacity = opacity;
+            //    Opacity = opacity;
             windowOpacitySlider.Value = Opacity;
 
             radioControlGroup[0] = radio1;
@@ -85,8 +86,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void Location_Changed(object sender, EventArgs e)
         {
-         //   AppConfiguration.Instance.RadioX = Top;
-          //  AppConfiguration.Instance.RadioY = Left;
+            //   AppConfiguration.Instance.RadioX = Top;
+            //  AppConfiguration.Instance.RadioY = Left;
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
@@ -111,9 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         avalilableRadios++;
                     }
                 }
-
             }
-           
         }
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -123,7 +122,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         protected override void OnClosing(CancelEventArgs e)
         {
-
             _settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue = this.Left;
             _settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue = this.Top;
 
@@ -160,12 +158,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             WindowState = WindowState.Normal;
         }
+
 //
 //
         private void CalculateScale()
         {
-            var yScale = ActualHeight/RadioOverlayWin.MinWidth;
-            var xScale = ActualWidth/RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight / RadioOverlayWin.MinWidth;
+            var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Max(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
@@ -173,12 +172,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             if (sizeInfo.WidthChanged)
-                Width = sizeInfo.NewSize.Height*_aspectRatio;
+                Width = sizeInfo.NewSize.Height * _aspectRatio;
             else
-                Height = sizeInfo.NewSize.Width/_aspectRatio;
+                Height = sizeInfo.NewSize.Width / _aspectRatio;
 
-          //  AppConfiguration.Instance.RadioWidth = Width;
-           // AppConfiguration.Instance.RadioHeight = Height;
+            //  AppConfiguration.Instance.RadioWidth = Width;
+            // AppConfiguration.Instance.RadioHeight = Height;
             // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 

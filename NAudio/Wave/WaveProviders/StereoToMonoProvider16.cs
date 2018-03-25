@@ -64,16 +64,16 @@ namespace NAudio.Wave
             int sourceBytesRead = sourceProvider.Read(sourceBuffer, 0, sourceBytesRequired);
             int samplesRead = sourceBytesRead / 2;
             int destOffset = offset / 2;
-            for (int sample = 0; sample < samplesRead; sample+=2)
+            for (int sample = 0; sample < samplesRead; sample += 2)
             {
                 short left = sourceWaveBuffer.ShortBuffer[sample];
-                short right = sourceWaveBuffer.ShortBuffer[sample+1];
+                short right = sourceWaveBuffer.ShortBuffer[sample + 1];
                 float outSample = (left * LeftVolume) + (right * RightVolume);
                 // hard limiting
                 if (outSample > Int16.MaxValue) outSample = Int16.MaxValue;
                 if (outSample < Int16.MinValue) outSample = Int16.MinValue;
 
-                destWaveBuffer.ShortBuffer[destOffset++] = (short)outSample;
+                destWaveBuffer.ShortBuffer[destOffset++] = (short) outSample;
             }
             return sourceBytesRead / 2;
         }

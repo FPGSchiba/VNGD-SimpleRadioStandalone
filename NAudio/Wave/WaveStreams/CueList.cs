@@ -17,6 +17,7 @@ namespace NAudio.Wave
         /// Cue position in samples
         /// </summary>
         public int Position { get; }
+
         /// <summary>
         /// Label of the cue
         /// </summary>
@@ -85,12 +86,12 @@ namespace NAudio.Wave
     public class CueList
     {
         private readonly List<Cue> cues = new List<Cue>();
+
         /// <summary>
         /// Creates an empty cue list
         /// </summary>
         public CueList()
         {
-
         }
 
         /// <summary>

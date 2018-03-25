@@ -14,6 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     {
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
         public IntercomControlGroup()
         {
             InitializeComponent();
@@ -51,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                    clientRadio.volume = (float) RadioVolume.Value/100.0f;
+                    clientRadio.volume = (float) RadioVolume.Value / 100.0f;
                 }
             }
 
@@ -114,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (_dragging == false)
                 {
-                    RadioVolume.Value = currentRadio.volume*100.0;
+                    RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
         }

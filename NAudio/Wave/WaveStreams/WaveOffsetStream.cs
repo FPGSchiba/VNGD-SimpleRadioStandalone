@@ -29,20 +29,20 @@ namespace NAudio.Wave
         /// <param name="startTime">the time at which we should start reading from the source stream</param>
         /// <param name="sourceOffset">amount to trim off the front of the source stream</param>
         /// <param name="sourceLength">length of time to play from source stream</param>
-        public WaveOffsetStream(WaveStream sourceStream, TimeSpan startTime, TimeSpan sourceOffset, TimeSpan sourceLength)
+        public WaveOffsetStream(WaveStream sourceStream, TimeSpan startTime, TimeSpan sourceOffset,
+            TimeSpan sourceLength)
         {
             if (sourceStream.WaveFormat.Encoding != WaveFormatEncoding.Pcm)
                 throw new ArgumentException("Only PCM supported");
             // TODO: add support for IEEE float + perhaps some others -
             // anything with a fixed bytes per sample
-            
+
             this.sourceStream = sourceStream;
             position = 0;
             bytesPerSample = (sourceStream.WaveFormat.BitsPerSample / 8) * sourceStream.WaveFormat.Channels;
             StartTime = startTime;
             SourceOffset = sourceOffset;
             SourceLength = sourceLength;
-            
         }
 
         /// <summary>
@@ -60,16 +60,14 @@ namespace NAudio.Wave
         /// </summary>
         public TimeSpan StartTime
         {
-            get 
-            { 
-                return startTime; 
-            }
-            set 
+            get { return startTime; }
+            set
             {
                 lock (lockObject)
                 {
                     startTime = value;
-                    audioStartPosition = (long)(startTime.TotalSeconds * sourceStream.WaveFormat.SampleRate) * bytesPerSample;
+                    audioStartPosition = (long) (startTime.TotalSeconds * sourceStream.WaveFormat.SampleRate) *
+                                         bytesPerSample;
                     // fix up our length and position
                     length = audioStartPosition + sourceLengthBytes;
                     Position = Position;
@@ -82,16 +80,14 @@ namespace NAudio.Wave
         /// </summary>
         public TimeSpan SourceOffset
         {
-            get
-            {
-                return sourceOffset;
-            }
+            get { return sourceOffset; }
             set
             {
                 lock (lockObject)
                 {
                     sourceOffset = value;
-                    sourceOffsetBytes = (long)(sourceOffset.TotalSeconds * sourceStream.WaveFormat.SampleRate) * bytesPerSample;
+                    sourceOffsetBytes = (long) (sourceOffset.TotalSeconds * sourceStream.WaveFormat.SampleRate) *
+                                        bytesPerSample;
                     // fix up our position
                     Position = Position;
                 }
@@ -103,22 +99,19 @@ namespace NAudio.Wave
         /// </summary>
         public TimeSpan SourceLength
         {
-            get
-            {
-                return sourceLength;
-            }
+            get { return sourceLength; }
             set
             {
                 lock (lockObject)
                 {
                     sourceLength = value;
-                    sourceLengthBytes = (long)(sourceLength.TotalSeconds * sourceStream.WaveFormat.SampleRate) * bytesPerSample;
+                    sourceLengthBytes = (long) (sourceLength.TotalSeconds * sourceStream.WaveFormat.SampleRate) *
+                                        bytesPerSample;
                     // fix up our length and position
                     length = audioStartPosition + sourceLengthBytes;
                     Position = Position;
                 }
             }
-    
         }
 
         /// <summary>
@@ -136,10 +129,7 @@ namespace NAudio.Wave
         /// </summary>
         public override long Position
         {
-            get
-            {
-                return position;
-            }
+            get { return position; }
             set
             {
                 lock (lockObject)
@@ -170,14 +160,14 @@ namespace NAudio.Wave
                 // 1. fill with silence
                 if (position < audioStartPosition)
                 {
-                    bytesWritten = (int)Math.Min(numBytes, audioStartPosition - position);
+                    bytesWritten = (int) Math.Min(numBytes, audioStartPosition - position);
                     for (int n = 0; n < bytesWritten; n++)
                         destBuffer[n + offset] = 0;
                 }
                 if (bytesWritten < numBytes)
                 {
                     // don't read too far into source stream
-                    int sourceBytesRequired = (int)Math.Min(
+                    int sourceBytesRequired = (int) Math.Min(
                         numBytes - bytesWritten,
                         sourceLengthBytes + sourceOffsetBytes - sourceStream.Position);
                     int read = sourceStream.Read(destBuffer, bytesWritten + offset, sourceBytesRequired);

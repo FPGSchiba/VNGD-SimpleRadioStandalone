@@ -166,7 +166,7 @@ namespace NAudio.Wave.SampleProviders
                     if (samplesRead < count)
                     {
                         MixerInputEnded?.Invoke(this, new SampleProviderEventArgs(source));
-                      //  sources.RemoveAt(index);
+                        //  sources.RemoveAt(index);
                     }
                     index--;
                 }

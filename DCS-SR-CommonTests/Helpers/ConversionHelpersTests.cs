@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
         [TestMethod()]
         public void ConversionTestByteShortArray()
         {
-            byte[] bytes = new byte[] {255, 253, 102, 0, 5,0,0,0};
+            byte[] bytes = new byte[] {255, 253, 102, 0, 5, 0, 0, 0};
 
             var shorts = ConversionHelpers.ByteArrayToShortArray(bytes);
 
@@ -28,7 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
         [TestMethod()]
         public void ConversionTestShortByteArray()
         {
-            short[] shorts = new short[] { 1, short.MaxValue, short.MinValue, 0 };
+            short[] shorts = new short[] {1, short.MaxValue, short.MinValue, 0};
 
             var bytes = ConversionHelpers.ShortArrayToByteArray(shorts);
 
@@ -42,13 +42,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
         [TestMethod()]
         public void ConversionShortToBytes()
         {
-            short[] shorts = new short[] { 1, short.MaxValue, short.MinValue, 0 };
+            short[] shorts = new short[] {1, short.MaxValue, short.MinValue, 0};
 
             foreach (var shortTest in shorts)
             {
                 byte byte1;
                 byte byte2;
-                ConversionHelpers.FromShort(shortTest,out byte1,out byte2);
+                ConversionHelpers.FromShort(shortTest, out byte1, out byte2);
 
                 byte[] converted = BitConverter.GetBytes(shortTest);
 
@@ -56,9 +56,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 Assert.AreEqual(byte2, converted[1]);
 
                 //convert back
-                Assert.AreEqual(shortTest,ConversionHelpers.ToShort(byte1,byte2));
+                Assert.AreEqual(shortTest, ConversionHelpers.ToShort(byte1, byte2));
             }
         }
+
         //      
         //        [TestMethod()]
         //        public void FromShortTest()

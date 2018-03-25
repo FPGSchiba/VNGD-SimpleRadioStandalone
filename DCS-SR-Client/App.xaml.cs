@@ -9,6 +9,5 @@ namespace DCS_SR_Client
     /// </summary>
     public partial class App : Application
     {
-
     }
 }

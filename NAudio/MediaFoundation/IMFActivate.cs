@@ -23,12 +23,14 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Queries whether a stored attribute value equals a specified PROPVARIANT.
         /// </summary>
-        new void CompareItem([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, IntPtr value, [MarshalAs(UnmanagedType.Bool)] out bool pbResult);
+        new void CompareItem([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, IntPtr value,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult);
 
         /// <summary>
         /// Compares the attributes on this object with the attributes on another object.
         /// </summary>
-        new void Compare([MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs, int matchType, [MarshalAs(UnmanagedType.Bool)] out bool pbResult);
+        new void Compare([MarshalAs(UnmanagedType.Interface)] IMFAttributes pTheirs, int matchType,
+            [MarshalAs(UnmanagedType.Bool)] out bool pbResult);
 
         /// <summary>
         /// Retrieves a UINT32 value associated with a key.
@@ -58,14 +60,16 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Retrieves a wide-character string associated with a key.
         /// </summary>
-        new void GetString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue, int cchBufSize,
-                       out int pcchLength);
+        new void GetString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszValue, int cchBufSize,
+            out int pcchLength);
 
         /// <summary>
         /// Retrieves a wide-character string associated with a key. This method allocates the memory for the string.
         /// </summary>
-        new void GetAllocatedString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
-                                out int pcchLength);
+        new void GetAllocatedString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [MarshalAs(UnmanagedType.LPWStr)] out string ppwszValue,
+            out int pcchLength);
 
         /// <summary>
         /// Retrieves the length of a byte array associated with a key.
@@ -75,8 +79,9 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Retrieves a byte array associated with a key.
         /// </summary>
-        new void GetBlob([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf, int cbBufSize,
-                     out int pcbBlobSize);
+        new void GetBlob([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [Out, MarshalAs(UnmanagedType.LPArray)] byte[] pBuf, int cbBufSize,
+            out int pcbBlobSize);
 
         /// <summary>
         /// Retrieves a byte array associated with a key. This method allocates the memory for the array.
@@ -86,8 +91,9 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Retrieves an interface pointer associated with a key.
         /// </summary>
-        new void GetUnknown([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
-                        [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
+        new void GetUnknown([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
 
         /// <summary>
         /// Associates an attribute value with a key.
@@ -122,23 +128,27 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Associates a GUID value with a key.
         /// </summary>
-        new void SetGUID([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue);
+        new void SetGUID([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid guidValue);
 
         /// <summary>
         /// Associates a wide-character string with a key.
         /// </summary>
-        new void SetString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue);
+        new void SetString([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [In, MarshalAs(UnmanagedType.LPWStr)] string wszValue);
 
         /// <summary>
         /// Associates a byte array with a key.
         /// </summary>
-        new void SetBlob([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
-                     int cbBufSize);
+        new void SetBlob([In, MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] pBuf,
+            int cbBufSize);
 
         /// <summary>
         /// Associates an IUnknown pointer with a key.
         /// </summary>
-        new void SetUnknown([MarshalAs(UnmanagedType.LPStruct)] Guid guidKey, [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown);
+        new void SetUnknown([MarshalAs(UnmanagedType.LPStruct)] Guid guidKey,
+            [In, MarshalAs(UnmanagedType.IUnknown)] object pUnknown);
 
         /// <summary>
         /// Locks the attribute store so that no other thread can access it.
@@ -168,13 +178,14 @@ namespace NAudio.MediaFoundation
         /// <summary>
         /// Creates the object associated with this activation object. 
         /// </summary>
-        void ActivateObject([In, MarshalAs(UnmanagedType.LPStruct)] Guid riid, [Out,MarshalAs(UnmanagedType.Interface)] out object ppv);
-        
+        void ActivateObject([In, MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+            [Out, MarshalAs(UnmanagedType.Interface)] out object ppv);
+
         /// <summary>
         /// Shuts down the created object.
         /// </summary>
         void ShutdownObject();
-        
+
         /// <summary>
         /// Detaches the created object from the activation object.
         /// </summary>

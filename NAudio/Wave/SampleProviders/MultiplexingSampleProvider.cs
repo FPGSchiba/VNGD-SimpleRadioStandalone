@@ -44,7 +44,8 @@ namespace NAudio.Wave.SampleProviders
                     {
                         throw new ArgumentException("Only 32 bit float is supported");
                     }
-                    waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(input.WaveFormat.SampleRate, numberOfOutputChannels);
+                    waveFormat =
+                        WaveFormat.CreateIeeeFloatWaveFormat(input.WaveFormat.SampleRate, numberOfOutputChannels);
                 }
                 else
                 {

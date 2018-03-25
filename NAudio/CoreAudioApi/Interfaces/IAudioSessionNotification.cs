@@ -11,10 +11,9 @@ namespace NAudio.CoreAudioApi.Interfaces
     /// Defined in AudioPolicy.h
     /// </summary>
     [Guid("641DD20B-4D41-49CC-ABA3-174B9477BB08"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IAudioSessionNotification
     {
-
         /// <summary>
         /// 
         /// </summary>

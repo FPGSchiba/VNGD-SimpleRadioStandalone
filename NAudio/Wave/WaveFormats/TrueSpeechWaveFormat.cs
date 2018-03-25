@@ -12,8 +12,7 @@ namespace NAudio.Wave
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public class TrueSpeechWaveFormat : WaveFormat
     {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        short[] unknown;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)] short[] unknown;
 
         /// <summary>
         /// DSP Group TrueSpeech WaveFormat

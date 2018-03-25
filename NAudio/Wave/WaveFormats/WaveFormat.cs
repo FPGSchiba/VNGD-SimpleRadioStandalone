@@ -9,32 +9,37 @@ namespace NAudio.Wave
     /// <summary>
     /// Represents a Wave file format
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi, Pack=2)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 2)]
     public class WaveFormat
     {
         /// <summary>format type</summary>
         protected WaveFormatEncoding waveFormatTag;
+
         /// <summary>number of channels</summary>
         protected short channels;
+
         /// <summary>sample rate</summary>
         protected int sampleRate;
+
         /// <summary>for buffer estimation</summary>
         protected int averageBytesPerSecond;
+
         /// <summary>block size of data</summary>
         protected short blockAlign;
+
         /// <summary>number of bits per sample of mono data</summary>
         protected short bitsPerSample;
+
         /// <summary>number of following bytes</summary>
         protected short extraSize;
 
         /// <summary>
         /// Creates a new PCM 44.1Khz stereo 16 bit format
         /// </summary>
-        public WaveFormat() : this(44100,16,2)
+        public WaveFormat() : this(44100, 16, 2)
         {
-
         }
-        
+
         /// <summary>
         /// Creates a new 16 bit wave format with the specified sample
         /// rate and channel count
@@ -53,8 +58,8 @@ namespace NAudio.Wave
         /// <returns></returns>
         public int ConvertLatencyToByteSize(int milliseconds)
         {
-            int bytes = (int) ((AverageBytesPerSecond/1000.0)*milliseconds);
-            if ((bytes%BlockAlign) != 0)
+            int bytes = (int) ((AverageBytesPerSecond / 1000.0) * milliseconds);
+            if ((bytes % BlockAlign) != 0)
             {
                 // Return the upper BlockAligned
                 bytes = bytes + BlockAlign - (bytes % BlockAlign);
@@ -72,15 +77,16 @@ namespace NAudio.Wave
         /// <param name="blockAlign">Block Align</param>
         /// <param name="bitsPerSample">Bits Per Sample</param>
         /// <returns></returns>
-        public static WaveFormat CreateCustomFormat(WaveFormatEncoding tag, int sampleRate, int channels, int averageBytesPerSecond, int blockAlign, int bitsPerSample)
+        public static WaveFormat CreateCustomFormat(WaveFormatEncoding tag, int sampleRate, int channels,
+            int averageBytesPerSecond, int blockAlign, int bitsPerSample)
         {
             WaveFormat waveFormat = new WaveFormat();
             waveFormat.waveFormatTag = tag;
-            waveFormat.channels = (short)channels;
+            waveFormat.channels = (short) channels;
             waveFormat.sampleRate = sampleRate;
             waveFormat.averageBytesPerSecond = averageBytesPerSecond;
-            waveFormat.blockAlign = (short)blockAlign;
-            waveFormat.bitsPerSample = (short)bitsPerSample;
+            waveFormat.blockAlign = (short) blockAlign;
+            waveFormat.bitsPerSample = (short) bitsPerSample;
             waveFormat.extraSize = 0;
             return waveFormat;
         }
@@ -93,7 +99,8 @@ namespace NAudio.Wave
         /// <returns>Wave Format</returns>
         public static WaveFormat CreateALawFormat(int sampleRate, int channels)
         {
-            return CreateCustomFormat(WaveFormatEncoding.ALaw, sampleRate, channels, sampleRate * channels, channels, 8);
+            return CreateCustomFormat(WaveFormatEncoding.ALaw, sampleRate, channels, sampleRate * channels, channels,
+                8);
         }
 
         /// <summary>
@@ -104,7 +111,8 @@ namespace NAudio.Wave
         /// <returns>Wave Format</returns>
         public static WaveFormat CreateMuLawFormat(int sampleRate, int channels)
         {
-            return CreateCustomFormat(WaveFormatEncoding.MuLaw, sampleRate, channels, sampleRate * channels, channels, 8);
+            return CreateCustomFormat(WaveFormatEncoding.MuLaw, sampleRate, channels, sampleRate * channels, channels,
+                8);
         }
 
         /// <summary>
@@ -118,12 +126,12 @@ namespace NAudio.Wave
             }
             // minimum 16 bytes, sometimes 18 for PCM
             waveFormatTag = WaveFormatEncoding.Pcm;
-            this.channels = (short)channels;
+            this.channels = (short) channels;
             sampleRate = rate;
-            bitsPerSample = (short)bits;
+            bitsPerSample = (short) bits;
             extraSize = 0;
 
-            blockAlign = (short)(channels * (bits / 8));
+            blockAlign = (short) (channels * (bits / 8));
             averageBytesPerSecond = this.sampleRate * this.blockAlign;
         }
 
@@ -136,10 +144,10 @@ namespace NAudio.Wave
         {
             var wf = new WaveFormat();
             wf.waveFormatTag = WaveFormatEncoding.IeeeFloat;
-            wf.channels = (short)channels;
+            wf.channels = (short) channels;
             wf.bitsPerSample = 32;
             wf.sampleRate = sampleRate;
-            wf.blockAlign = (short) (4*channels);
+            wf.blockAlign = (short) (4 * channels);
             wf.averageBytesPerSecond = sampleRate * wf.blockAlign;
             wf.extraSize = 0;
             return wf;
@@ -211,7 +219,7 @@ namespace NAudio.Wave
         {
             if (formatChunkLength < 16)
                 throw new InvalidDataException("Invalid WaveFormat Structure");
-            waveFormatTag = (WaveFormatEncoding)br.ReadUInt16();
+            waveFormatTag = (WaveFormatEncoding) br.ReadUInt16();
             channels = br.ReadInt16();
             sampleRate = br.ReadInt32();
             averageBytesPerSecond = br.ReadInt32();
@@ -223,7 +231,7 @@ namespace NAudio.Wave
                 if (extraSize != formatChunkLength - 18)
                 {
                     Debug.WriteLine("Format chunk mismatch");
-                    extraSize = (short)(formatChunkLength - 18);
+                    extraSize = (short) (formatChunkLength - 18);
                 }
             }
         }
@@ -249,7 +257,7 @@ namespace NAudio.Wave
                 case WaveFormatEncoding.Pcm:
                 case WaveFormatEncoding.Extensible:
                     // extensible just has some extra bits after the PCM header
-                    return $"{bitsPerSample} bit PCM: {sampleRate/1000}kHz {channels} channels";
+                    return $"{bitsPerSample} bit PCM: {sampleRate / 1000}kHz {channels} channels";
                 default:
                     return waveFormatTag.ToString();
             }
@@ -263,14 +271,14 @@ namespace NAudio.Wave
         public override bool Equals(object obj)
         {
             var other = obj as WaveFormat;
-            if(other != null)
+            if (other != null)
             {
                 return waveFormatTag == other.waveFormatTag &&
-                    channels == other.channels &&
-                    sampleRate == other.sampleRate &&
-                    averageBytesPerSecond == other.averageBytesPerSecond &&
-                    blockAlign == other.blockAlign &&
-                    bitsPerSample == other.bitsPerSample;
+                       channels == other.channels &&
+                       sampleRate == other.sampleRate &&
+                       averageBytesPerSecond == other.averageBytesPerSecond &&
+                       blockAlign == other.blockAlign &&
+                       bitsPerSample == other.bitsPerSample;
             }
             return false;
         }
@@ -281,12 +289,12 @@ namespace NAudio.Wave
         /// <returns>A hashcode</returns>
         public override int GetHashCode()
         {
-            return (int) waveFormatTag ^ 
-                (int) channels ^ 
-                sampleRate ^ 
-                averageBytesPerSecond ^ 
-                (int) blockAlign ^ 
-                (int) bitsPerSample;
+            return (int) waveFormatTag ^
+                   (int) channels ^
+                   sampleRate ^
+                   averageBytesPerSecond ^
+                   (int) blockAlign ^
+                   (int) bitsPerSample;
         }
 
         /// <summary>
@@ -300,14 +308,14 @@ namespace NAudio.Wave
         /// <param name="writer">the output stream</param>
         public virtual void Serialize(BinaryWriter writer)
         {
-            writer.Write((int)(18 + extraSize)); // wave format length
-            writer.Write((short)Encoding);
-            writer.Write((short)Channels);
-            writer.Write((int)SampleRate);
-            writer.Write((int)AverageBytesPerSecond);
-            writer.Write((short)BlockAlign);
-            writer.Write((short)BitsPerSample);
-            writer.Write((short)extraSize);
+            writer.Write((int) (18 + extraSize)); // wave format length
+            writer.Write((short) Encoding);
+            writer.Write((short) Channels);
+            writer.Write((int) SampleRate);
+            writer.Write((int) AverageBytesPerSecond);
+            writer.Write((short) BlockAlign);
+            writer.Write((short) BitsPerSample);
+            writer.Write((short) extraSize);
         }
 
         /// <summary>

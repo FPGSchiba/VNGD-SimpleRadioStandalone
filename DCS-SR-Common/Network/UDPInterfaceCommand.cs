@@ -8,7 +8,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     public class UDPInterfaceCommand
     {
-        public enum UDPCommandType  
+        public enum UDPCommandType
         {
             FREQUENCY = 0,
             ACTIVE_RADIO = 1,

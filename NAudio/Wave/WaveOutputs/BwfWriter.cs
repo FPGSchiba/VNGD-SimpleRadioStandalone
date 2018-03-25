@@ -57,7 +57,7 @@ namespace NAudio.Wave
             writer.Write(bextChunkInfo.Reserved); // for version 1 this is 190 bytes
             writer.Write(codingHistory);
             if (codingHistory.Length % 2 != 0)
-                writer.Write((byte)0);
+                writer.Write((byte) 0);
             Debug.Assert(writer.BaseStream.Position == bextStart + bextLength, "Invalid bext chunk size");
 
             // write the format chunk
@@ -114,16 +114,15 @@ namespace NAudio.Wave
             {
                 // fix up the RIFF size
                 writer.BaseStream.Position = 4;
-                writer.Write((uint)riffSize);
+                writer.Write((uint) riffSize);
                 // fix up the data chunk size
                 writer.BaseStream.Position = dataChunkSizePosition;
-                writer.Write((uint)dataLength);
+                writer.Write((uint) dataLength);
             }
             if (restorePosition)
             {
                 writer.BaseStream.Position = pos;
             }
-
         }
 
         /// <summary>

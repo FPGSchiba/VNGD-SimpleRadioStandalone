@@ -47,12 +47,13 @@ namespace NAudio.CoreAudioApi
         {
             if (audioSessionEventCallback != null)
             {
-                Marshal.ThrowExceptionForHR(audioSessionControlInterface.UnregisterAudioSessionNotification(audioSessionEventCallback));
+                Marshal.ThrowExceptionForHR(
+                    audioSessionControlInterface.UnregisterAudioSessionNotification(audioSessionEventCallback));
                 audioSessionEventCallback = null;
             }
             GC.SuppressFinalize(this);
         }
-        
+
         /// <summary>
         /// Finalizer
         /// </summary>
@@ -139,7 +140,8 @@ namespace NAudio.CoreAudioApi
         {
             get
             {
-                if (audioSessionControlInterface2 == null) throw new InvalidOperationException("Not supported on this version of Windows");
+                if (audioSessionControlInterface2 == null)
+                    throw new InvalidOperationException("Not supported on this version of Windows");
                 string str;
                 Marshal.ThrowExceptionForHR(audioSessionControlInterface2.GetSessionIdentifier(out str));
                 return str;
@@ -153,7 +155,8 @@ namespace NAudio.CoreAudioApi
         {
             get
             {
-                if (audioSessionControlInterface2 == null) throw new InvalidOperationException("Not supported on this version of Windows");
+                if (audioSessionControlInterface2 == null)
+                    throw new InvalidOperationException("Not supported on this version of Windows");
                 string str;
                 Marshal.ThrowExceptionForHR(audioSessionControlInterface2.GetSessionInstanceIdentifier(out str));
                 return str;
@@ -167,7 +170,8 @@ namespace NAudio.CoreAudioApi
         {
             get
             {
-                if (audioSessionControlInterface2 == null) throw new InvalidOperationException("Not supported on this version of Windows");
+                if (audioSessionControlInterface2 == null)
+                    throw new InvalidOperationException("Not supported on this version of Windows");
                 uint pid;
                 Marshal.ThrowExceptionForHR(audioSessionControlInterface2.GetProcessId(out pid));
                 return pid;
@@ -181,7 +185,8 @@ namespace NAudio.CoreAudioApi
         {
             get
             {
-                if (audioSessionControlInterface2 == null) throw new InvalidOperationException("Not supported on this version of Windows");
+                if (audioSessionControlInterface2 == null)
+                    throw new InvalidOperationException("Not supported on this version of Windows");
                 return (audioSessionControlInterface2.IsSystemSoundsSession() == 0);
             }
         }
@@ -217,7 +222,8 @@ namespace NAudio.CoreAudioApi
         {
             // we could have an array or list of listeners if we like
             audioSessionEventCallback = new AudioSessionEventsCallback(eventClient);
-            Marshal.ThrowExceptionForHR(audioSessionControlInterface.RegisterAudioSessionNotification(audioSessionEventCallback));
+            Marshal.ThrowExceptionForHR(
+                audioSessionControlInterface.RegisterAudioSessionNotification(audioSessionEventCallback));
         }
 
         /// <summary>
@@ -229,7 +235,8 @@ namespace NAudio.CoreAudioApi
             // if one is registered, let it go
             if (audioSessionEventCallback != null)
             {
-                Marshal.ThrowExceptionForHR(audioSessionControlInterface.UnregisterAudioSessionNotification(audioSessionEventCallback));
+                Marshal.ThrowExceptionForHR(
+                    audioSessionControlInterface.UnregisterAudioSessionNotification(audioSessionEventCallback));
                 audioSessionEventCallback = null;
             }
         }

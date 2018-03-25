@@ -14,8 +14,8 @@ namespace NAudio.Wave.SampleProviders
         public bool Supports(WaveFormat waveFormat)
         {
             return waveFormat.Encoding == WaveFormatEncoding.Pcm &&
-                waveFormat.BitsPerSample == 8 &&
-                waveFormat.Channels == 1;
+                   waveFormat.BitsPerSample == 8 &&
+                   waveFormat.Channels == 1;
         }
 
         public void LoadNextChunk(IWaveProvider source, int samplePairsRequired)

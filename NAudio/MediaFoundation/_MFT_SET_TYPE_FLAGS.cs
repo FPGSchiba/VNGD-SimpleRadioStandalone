@@ -12,6 +12,7 @@ namespace NAudio.MediaFoundation
         /// None
         /// </summary>
         None = 0,
+
         /// <summary>
         /// Test the proposed media type, but do not set it.
         /// </summary>

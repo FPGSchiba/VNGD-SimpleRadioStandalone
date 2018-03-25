@@ -8,10 +8,10 @@ namespace NAudio.Dmo
     /// </summary>
     [ComImport,
 #if !NETFX_CORE
-    System.Security.SuppressUnmanagedCodeSecurity,
+     System.Security.SuppressUnmanagedCodeSecurity,
 #endif
-    Guid("59eff8b9-938c-4a26-82f2-95cb84cdc837"),
-    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+     Guid("59eff8b9-938c-4a26-82f2-95cb84cdc837"),
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IMediaBuffer
     {
         /// <summary>
@@ -21,7 +21,7 @@ namespace NAudio.Dmo
         /// <returns>HRESULT</returns>
         [PreserveSig]
         int SetLength(int length);
-        
+
         /// <summary>
         /// Get Max Length
         /// </summary>
@@ -29,7 +29,7 @@ namespace NAudio.Dmo
         /// <returns>HRESULT</returns>
         [PreserveSig]
         int GetMaxLength(out int maxLength);
-        
+
         /// <summary>
         /// Get Buffer and Length
         /// </summary>
