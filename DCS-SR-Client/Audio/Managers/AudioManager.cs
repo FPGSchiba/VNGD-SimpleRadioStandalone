@@ -118,7 +118,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,
-                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertLinearToDB(peak)));
+                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -389,32 +389,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     }
                 }
 
-                float max = 0;
-                int total = 0;
-                for (var i = 0; i < pcmShort.Length; i++)
+                //null sound buffer so read from the queue
+                if (pcmShort == null)
                 {
+                    pcmShort = new short[AudioManager.SEGMENT_FRAMES];
 
-                    float pcmFloat = (float)pcmShort[i] / 32768F;
-
-                    // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                    pcmFloat = (pcmFloat * MicBoost);
-
-                    //determine peak
-                    if (pcmFloat > 0)
+                    for (var i = 0; i < AudioManager.SEGMENT_FRAMES; i++)
                     {
-                        total++;
-                        max += pcmFloat;
+                        pcmShort[i] = _micInputQueue.Dequeue();
                     }
-
-                    pcmShort[i] = (short)(pcmFloat * 32768F);
                 }
 
-                //convert to dB
-                MicMax = (float)VolumeConversionHelper.ConvertLinearToDB(max / total);
                 try
                 {
+                    //volume boost pre
+                    for (var i = 0; i < pcmShort.Length; i++)
+                    {
+                        // n.b. no clipping test going on here
+                        pcmShort[i] = (short)(pcmShort[i] * MicBoost);
+                    }
+
                     //process with Speex
                     _speex.Process(new ArraySegment<short>(pcmShort));
+
+                    float max = 0;
+                    for (var i = 0; i < pcmShort.Length; i++)
+                    {
+                        //determine peak
+                        if (pcmShort[i] > max)
+                        {
+
+                            max = pcmShort[i];
+                        }
+                    }
+                    //convert to dB
+                    MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
 
                     var pcmBytes = new byte[pcmShort.Length * 2];
                     Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
@@ -434,10 +443,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         if (_tcpVoiceHandler.Send(encoded, len))
                         {
                             //send audio so play over local too
-                            if (_micWaveOutBuffer != null)
-                            {
-                                _micWaveOutBuffer.AddSamples(pcmBytes, 0, pcmBytes.Length);
-                            }
+                            _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
                         }
                     }
                     else
@@ -456,55 +462,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void StopEncoding()
         {
-            if (_clientAudioMixer != null)
-            {
-                _effectsOutputBuffer = null;
+         
+             _effectsOutputBuffer = null;
 
-                _volumeSampleProvider = null;
-                _clientAudioMixer.RemoveAllMixerInputs();
-                _clientAudioMixer = null;
-            }
-
+            _volumeSampleProvider = null;
+            _clientAudioMixer?.RemoveAllMixerInputs();
+            _clientAudioMixer = null;
+          
             _clientsBufferedAudio.Clear();
 
-            if (_waveIn != null)
-            {
-                _waveIn.StopRecording();
-                _waveIn.Dispose();
-                _waveIn = null;
-            }
+            
+            _waveIn?.StopRecording();
+            _waveIn?.Dispose();
+            _waveIn = null;
+          
+            _waveOut?.Stop();
+            _waveOut?.Dispose();
+            _waveOut = null;
+           
 
-            if (_waveOut != null)
-            {
-                _waveOut.Stop();
-                _waveOut.Dispose();
-                _waveOut = null;
-            }
+        
+            _micWaveOut?.Stop();
+            _micWaveOut?.Dispose();
+            _micWaveOut = null;
+         
+          
+            _encoder?.Dispose();
+            _encoder = null;
+       
 
-            if (_micWaveOut != null)
-            {
-                _micWaveOut.Stop();
-                _micWaveOut.Dispose();
-                _micWaveOut = null;
-            }
-
-            if (_encoder != null)
-            {
-                _encoder.Dispose();
-                _encoder = null;
-            }
-
-            if (_decoder != null)
-            {
-                _decoder.Dispose();
-                _decoder = null;
-            }
-            if (_tcpVoiceHandler != null)
-            {
-                _tcpVoiceHandler.RequestStop();
-                _tcpVoiceHandler = null;
-            }
-
+        
+            _decoder?.Dispose();
+            _decoder = null;
+          
+            _tcpVoiceHandler?.RequestStop();
+            _tcpVoiceHandler = null;
+          
             _speex?.Dispose();
             _speex = null;
 

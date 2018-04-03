@@ -109,14 +109,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 var speaker1Short = (short) (audio[i] * clientAudio.Volume);
 
-                //calculate % loss 
-                var loss = 1 - clientAudio.RecevingPower;
                 //add in radio loss
                 //if less than loss reduce volume
-                if (clientAudio.RecevingPower <= 0.1) // less than 10% or lower left
+                if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
                 {
-                    //gives linear signal loss from 10% down to 0%
-                    speaker1Short = (short) (speaker1Short * loss / 0.1);
+                    //gives linear signal loss from 15% down to 0%
+                    speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.RecevingPower));
                 }
 
                 //0 is no loss so if more than 0 reduce volume

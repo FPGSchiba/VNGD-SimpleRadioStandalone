@@ -533,7 +533,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
 
                 var max = RadioCalculator.FriisMaximumTransmissionRange(udpVoicePacket.Frequency);
-
+                // % loss of signal
+                // 0 is no loss 1.0 is full loss
                 signalStrength = (dist / max);
 
                 return max > dist;

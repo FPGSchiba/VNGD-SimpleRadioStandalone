@@ -48,8 +48,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             }
         }
 
-        public float MicMax { get; set; }
-        public float SpeakerMax { get; set; }
+        public float MicMax { get; set; } = -100;
+        public float SpeakerMax { get; set; } = -100;
 
         public void StartPreview(int mic, MMDevice speakers)
         {
@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter,
-                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertLinearToDB(peak)));
+                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -110,8 +110,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             try
             {
-                
-
                 _speex = new Preprocessor(AudioManager.SEGMENT_FRAMES, AudioManager.INPUT_SAMPLE_RATE);
                 //opus
                 _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1,
@@ -183,32 +181,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     }
                 }
 
-                float max = 0;
-                int total = 0;
-                for (var i = 0; i < pcmShort.Length; i++)
-                {
-
-                    float pcmFloat = (float)pcmShort[i] / 32768F;
-
-                    // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
-                    pcmFloat = (pcmFloat * MicBoost);
-
-                    //determine peak
-                    if (pcmFloat > 0)
-                    {
-                        total++;
-                        max += pcmFloat;
-                    }
-                    
-                    pcmShort[i] = (short)(pcmFloat * 32768F);
-                }
-
-                //convert to dB
-                MicMax = (float)VolumeConversionHelper.ConvertLinearToDB(max / total);
                 try
                 {
+                    //volume boost pre
+                    for (var i = 0; i < pcmShort.Length; i++)
+                    {
+                        // n.b. no clipping test going on here
+                        pcmShort[i] = (short) (pcmShort[i] * MicBoost);
+                    }
+
                     //process with Speex
                     _speex.Process(new ArraySegment<short>(pcmShort));
+
+                    float max = 0;
+                    for (var i = 0; i < pcmShort.Length; i++)
+                    {
+                        //determine peak
+                        if (pcmShort[i] > max)
+                        {
+
+                            max = pcmShort[i];
+                        }
+                    }
+                    //convert to dB
+                    MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
 
                     var pcmBytes = new byte[pcmShort.Length * 2];
                     Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
@@ -232,8 +228,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                         _buffBufferedWaveProvider.AddSamples(decodedBytes, 0, decodedLength);
 
-                        _waveFile.Write(decodedBytes, 0,decodedLength);
-                        _waveFile.Flush();
+                        //_waveFile.Write(decodedBytes, 0,decodedLength);
+                       // _waveFile.Flush();
                     }
                     else
                     {
@@ -252,11 +248,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public void StopEncoding()
         {
-            _waveIn?.StopRecording();
+           // _waveIn?.StopRecording();
             _waveIn?.Dispose();
             _waveIn = null;
        
-            _waveOut?.Stop();
+        //    _waveOut?.Stop();
             _waveOut?.Dispose();
             _waveOut = null;
         

@@ -8,21 +8,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
 {
     public static class VolumeConversionHelper
     {
-        public static double ConvertLinearToDB(float linear)
+
+        public static double ConvertFloatToDB(float linear)
         {
             if (linear == 0)
             {
                 //basically nothing but not 0 or we'll get -nan
-                linear = 0.00000001f;
+                linear = 0.0000158f;
             }
 
-            return ((Math.Log(Math.Abs(linear) / 2.302585092994046)) * 20f);
+            return ((Math.Log(linear) * 20f));
         }
+
 
         public static string ConvertLinearDiffToDB(float delta)
         {
-            float diff = (float) VolumeConversionHelper.ConvertLinearToDB((float) (delta)) -
-                         (float) VolumeConversionHelper.ConvertLinearToDB((float) (1.0));
+            float diff = (float) VolumeConversionHelper.ConvertFloatToDB((float) (delta)) -
+                         (float) VolumeConversionHelper.ConvertFloatToDB((float) (1.0));
 
             return Math.Round(diff) + " dB";
             //convert diff into db
