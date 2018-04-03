@@ -125,7 +125,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioManager = new AudioManager(_clients);
             _audioManager.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
-            ;
 
             if ((BoostLabel != null) && (MicrophoneBoost != null))
             {
@@ -703,11 +702,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
                     _audioPreview = new AudioPreview();
-
-                    _audioPreview.StartPreview(Mic.SelectedIndex, output);
-                    _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
+                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); ;
                     _audioPreview.MicBoost =
-                        VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
+                        VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value);
+                    _audioPreview.StartPreview(Mic.SelectedIndex, output);
+                  
                     Preview.Content = "Stop Preview";
                 }
                 catch (Exception ex)
@@ -767,7 +766,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(convertedValue);
-                ;
             }
         }
 

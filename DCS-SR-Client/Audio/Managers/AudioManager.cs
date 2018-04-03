@@ -462,36 +462,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void StopEncoding()
         {
-         
-             _effectsOutputBuffer = null;
+
+            _waveIn?.StopRecording();
+            _waveIn?.Dispose();
+            _waveIn = null;
+
+            _waveOut?.Stop();
+            _waveOut?.Dispose();
+            _waveOut = null;
+
+            _micWaveOut?.Stop();
+            _micWaveOut?.Dispose();
+            _micWaveOut = null;
 
             _volumeSampleProvider = null;
             _clientAudioMixer?.RemoveAllMixerInputs();
             _clientAudioMixer = null;
           
             _clientsBufferedAudio.Clear();
-
-            
-            _waveIn?.StopRecording();
-            _waveIn?.Dispose();
-            _waveIn = null;
-          
-            _waveOut?.Stop();
-            _waveOut?.Dispose();
-            _waveOut = null;
-           
-
-        
-            _micWaveOut?.Stop();
-            _micWaveOut?.Dispose();
-            _micWaveOut = null;
-         
           
             _encoder?.Dispose();
             _encoder = null;
        
-
-        
             _decoder?.Dispose();
             _decoder = null;
           
@@ -505,6 +497,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             SpeakerMax = -100;
             MicMax = -100;
+
+            _effectsOutputBuffer = null;
 
             MessageHub.Instance.ClearSubscriptions();
         }

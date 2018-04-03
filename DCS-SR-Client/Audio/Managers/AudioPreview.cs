@@ -248,11 +248,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public void StopEncoding()
         {
-           // _waveIn?.StopRecording();
             _waveIn?.Dispose();
             _waveIn = null;
        
-        //    _waveOut?.Stop();
             _waveOut?.Dispose();
             _waveOut = null;
         
