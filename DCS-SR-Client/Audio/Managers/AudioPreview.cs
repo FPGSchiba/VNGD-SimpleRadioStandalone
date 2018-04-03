@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
@@ -29,7 +30,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private OpusEncoder _encoder;
         private OpusDecoder _decoder;
 
+        private Preprocessor _speex;
+
         private readonly Queue<byte> _micInputQueue = new Queue<byte>(AudioManager.SEGMENT_FRAMES * 3);
+        private WaveFileWriter _waveFile;
 
         public float SpeakerBoost
         {
@@ -106,6 +110,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             try
             {
+                
+
+                _speex = new Preprocessor(AudioManager.SEGMENT_FRAMES, AudioManager.INPUT_SAMPLE_RATE);
                 //opus
                 _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1,
                     FragLabs.Audio.Codecs.Opus.Application.Voip);
@@ -122,6 +129,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _waveIn.NumberOfBuffers = 2;
                 _waveIn.DataAvailable += _waveIn_DataAvailable;
                 _waveIn.WaveFormat = new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1);
+
+                //debug wave file
+                //_waveFile = new WaveFileWriter(@"C:\Temp\Test-Preview.wav", _waveIn.WaveFormat);
 
                 _waveIn.StartRecording();
             }
@@ -142,12 +152,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             //fill sound buffer
 
-            byte[] soundBuffer = null;
-            if ((e.BytesRecorded == AudioManager.SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
+            short[] pcmShort = null;
+
+
+            if ((e.BytesRecorded / 2 == AudioManager.SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
             {
                 //perfect!
-                soundBuffer = new byte[e.BytesRecorded];
-                Buffer.BlockCopy(e.Buffer, 0, soundBuffer, 0, e.BytesRecorded);
+                pcmShort = new short[AudioManager.SEGMENT_FRAMES];
+                Buffer.BlockCopy(e.Buffer, 0, pcmShort, 0, e.BytesRecorded);
             }
             else
             {
@@ -158,46 +170,54 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             }
 
             //read out the queue
-            while ((soundBuffer != null) || (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES))
+            while ((pcmShort != null) || (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES))
             {
                 //null sound buffer so read from the queue
-                if (soundBuffer == null)
+                if (pcmShort == null)
                 {
-                    soundBuffer = new byte[AudioManager.SEGMENT_FRAMES];
+                    pcmShort = new short[AudioManager.SEGMENT_FRAMES];
 
                     for (var i = 0; i < AudioManager.SEGMENT_FRAMES; i++)
                     {
-                        soundBuffer[i] = _micInputQueue.Dequeue();
+                        pcmShort[i] = _micInputQueue.Dequeue();
                     }
                 }
+
                 float max = 0;
-                for (var n = 0; n < soundBuffer.Length; n += 2)
+                int total = 0;
+                for (var i = 0; i < pcmShort.Length; i++)
                 {
-                    short pcmShort = ConversionHelpers.ToShort(soundBuffer[n], soundBuffer[n + 1]);
-                    float pcmFloat = (float) pcmShort / 32768F;
+
+                    float pcmFloat = (float)pcmShort[i] / 32768F;
 
                     // n.b. no clipping test going on here // FROM NAUDIO SOURCE !
                     pcmFloat = (pcmFloat * MicBoost);
 
                     //determine peak
-                    if (pcmFloat > max)
-                        max = pcmFloat;
-
-                    pcmShort = (short) (pcmFloat * 32768F);
-
-                    //convert back
-                    soundBuffer[n] = (byte) (pcmShort & 0xFF);
-                    soundBuffer[n + 1] = (byte) (pcmShort >> 8);
+                    if (pcmFloat > 0)
+                    {
+                        total++;
+                        max += pcmFloat;
+                    }
+                    
+                    pcmShort[i] = (short)(pcmFloat * 32768F);
                 }
 
                 //convert to dB
-                MicMax = (float) VolumeConversionHelper.ConvertLinearToDB(max);
-
+                MicMax = (float)VolumeConversionHelper.ConvertLinearToDB(max / total);
                 try
                 {
+                    //process with Speex
+                    _speex.Process(new ArraySegment<short>(pcmShort));
+
+                    var pcmBytes = new byte[pcmShort.Length * 2];
+                    Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+
+   //                 _buffBufferedWaveProvider.AddSamples(pcmBytes, 0, pcmBytes.Length);
                     //encode as opus bytes
                     int len;
-                    var buff = _encoder.Encode(soundBuffer, soundBuffer.Length, out len);
+                    //need to get framing right for opus - 
+                    var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
 
                     if ((buff != null) && (len > 0))
                     {
@@ -211,6 +231,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         var decodedBytes = _decoder.Decode(encoded, len, out decodedLength);
 
                         _buffBufferedWaveProvider.AddSamples(decodedBytes, 0, decodedLength);
+
+                        _waveFile.Write(decodedBytes, 0,decodedLength);
+                        _waveFile.Flush();
                     }
                     else
                     {
@@ -223,50 +246,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     Logger.Error(ex, "Error encoding Opus! " + ex.Message);
                 }
 
-                soundBuffer = null;
+                pcmShort = null;
             }
         }
 
         public void StopEncoding()
         {
-            if (_waveIn != null)
-            {
-                _waveIn.StopRecording();
-                _waveIn.Dispose();
-                _waveIn = null;
-            }
+            _waveIn?.StopRecording();
+            _waveIn?.Dispose();
+            _waveIn = null;
+       
+            _waveOut?.Stop();
+            _waveOut?.Dispose();
+            _waveOut = null;
+        
+            _playBuffer?.ClearBuffer();
+            _playBuffer = null;
+          
+            _encoder?.Dispose();
+            _encoder = null;
+     
+            _decoder?.Dispose();
+            _decoder = null;
+         
+            _playBuffer?.ClearBuffer();
+            _playBuffer = null;
 
-            if (_waveOut != null)
-            {
-                _waveOut.Stop();
-                _waveOut.Dispose();
-                _waveOut = null;
-            }
+            _speex?.Dispose();
+            _speex = null;
 
-            if (_playBuffer != null)
-            {
-                _playBuffer.ClearBuffer();
-                _playBuffer = null;
-            }
-
-
-            if (_encoder != null)
-            {
-                _encoder.Dispose();
-                _encoder = null;
-            }
-
-            if (_decoder != null)
-            {
-                _decoder.Dispose();
-                _decoder = null;
-            }
-
-            if (_playBuffer != null)
-            {
-                _playBuffer.ClearBuffer();
-                _playBuffer = null;
-            }
+            _waveFile?.Dispose();
+            _waveFile = null;
 
             SpeakerMax = -100;
             MicMax = -100;
