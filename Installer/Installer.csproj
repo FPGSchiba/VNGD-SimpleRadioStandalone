@@ -224,6 +224,7 @@
     <PostBuildEvent>copy /Y "$(SolutionDir)\DCS-SimpleRadio Server\bin\x64\Release\SR-Server.exe" "$(SolutionDir)\install-build\SR-Server.exe" 
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\SR-ClientRadio.exe"  "$(SolutionDir)\install-build\SR-ClientRadio.exe" 
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\opus.dll"  "$(SolutionDir)\install-build\opus.dll" 
+copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\speexdsp.dll"  "$(SolutionDir)\install-build\speexdsp.dll" 
 copy /Y "$(SolutionDir)\Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)\install-build\Installer.exe" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SimpleRadioStandalone.lua" "$(SolutionDir)\install-build\DCS-SimpleRadioStandalone.lua" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SRSGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRSGameGUI.lua"
