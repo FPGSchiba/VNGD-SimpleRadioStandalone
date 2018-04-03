@@ -32,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
 
         public static float ConvertVolumeSliderToScale(float volume)
         {
-            var db = (-30) + (25 - (-30)) * volume;
+            var db = (-30) + (28 - (-30)) * volume;
             return (float) Math.Exp(db / 20 * Math.Log(10));
         }
     }

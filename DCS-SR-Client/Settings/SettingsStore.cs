@@ -244,8 +244,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.LastServer.ToString(), "127.0.0.1"},
 
-            {SettingsKeys.MicBoost.ToString(), "0.5"},
-            {SettingsKeys.SpeakerBoost.ToString(), "0.5"},
+            {SettingsKeys.MicBoost.ToString(), "0.514"},
+            {SettingsKeys.SpeakerBoost.ToString(), "0.514"},
 
             {SettingsKeys.RadioX.ToString(), "300"},
             {SettingsKeys.RadioY.ToString(), "300"},
