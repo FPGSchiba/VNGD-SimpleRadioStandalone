@@ -116,20 +116,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitDefaultAddress();
 
-            MicrophoneBoost.Value = _settings.GetClientSetting(SettingsKeys.MicBoost).DoubleValue;
+        
             SpeakerBoost.Value = _settings.GetClientSetting(SettingsKeys.SpeakerBoost).DoubleValue;
 
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
 
             _audioManager = new AudioManager(_clients);
-            _audioManager.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
-            if ((BoostLabel != null) && (MicrophoneBoost != null))
-            {
-                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.MicBoost);
-            }
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
@@ -497,6 +492,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioRxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
 
             RadioSoundEffects.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue;
+            RadioSoundEffectsClipping.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue;
             AutoSelectChannel.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue;
         }
 
@@ -740,9 +736,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
                     _audioPreview = new AudioPreview();
-                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); ;
-                    _audioPreview.MicBoost =
-                        VolumeConversionHelper.ConvertVolumeSliderToScale((float)MicrophoneBoost.Value);
+                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); 
                     _audioPreview.StartPreview(inputId, output);
                   
                     Preview.Content = "Stop Preview";
@@ -758,29 +752,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Preview.Content = "Audio Preview";
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
-            }
-        }
-
-        private void MicrophoneBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            var convertedValue = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
-            if (_audioPreview != null)
-            {
-                _audioPreview.MicBoost = (float) convertedValue;
-            }
-            if (_audioManager != null)
-            {
-                _audioManager.MicBoost = (float) convertedValue;
-            }
-
-            _settings.SetClientSetting(SettingsKeys.MicBoost,
-                MicrophoneBoost.Value.ToString(CultureInfo.InvariantCulture));
-
-
-            if ((BoostLabel != null) && (MicrophoneBoost != null))
-            {
-                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(convertedValue);
-                ;
             }
         }
 
@@ -1024,6 +995,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue =
                 (bool) AutoSelectChannel.IsChecked;
             _settings.Save();
+        }
+
+        private void RadioSoundEffectsClipping_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue =
+                (bool)RadioSoundEffectsClipping.IsChecked;
+            _settings.Save();
+
         }
     }
 }

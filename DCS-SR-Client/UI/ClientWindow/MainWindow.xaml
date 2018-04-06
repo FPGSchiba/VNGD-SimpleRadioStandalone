@@ -32,29 +32,18 @@
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
-                        <Slider x:Name="MicrophoneBoost"
-                                Width="150"
-                                Margin="0,10,0,0"
-                                Maximum="1.0"
-                                Minimum="0"
-                                ValueChanged="MicrophoneBoost_ValueChanged" />
                         <ProgressBar Name="Mic_VU"
                                      Width="150"
                                      Height="20"
                                      Margin="10,10,0,0"
                                      Value="-100"
-                                     Maximum="0"
-                                     Minimum="-100" />
+                                     Maximum="18"
+                                     Minimum="-100"  />
                     </StackPanel>
 
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <Label HorizontalAlignment="Center" Content="Microphone Boost:" />
-                        <Label x:Name="BoostLabel"
-                               HorizontalAlignment="Center"
-                               Content="+/- %" />
-                    </StackPanel>
+                                Orientation="Horizontal"/>
 
                     <Button x:Name="Preview"
                             Margin="0,10,0,0"
@@ -93,6 +82,7 @@
                                 VerticalContentAlignment="Center"
                                 Maximum="1.0"
                                 Minimum="0.0"
+                                IsMoveToPointEnabled="true"
                                 ValueChanged="SpeakerBoost_ValueChanged" />
 
                         <ProgressBar Name="Speaker_VU"
@@ -100,7 +90,7 @@
                                      Height="20"
                                      Margin="10,10,0,0"
                                      Value="-100"
-                                     Maximum="0"
+                                     Maximum="18"
                                      Minimum="-100" />
                     </StackPanel>
 
@@ -499,6 +489,8 @@
                             <RowDefinition />
                             <RowDefinition />
 
+                            <RowDefinition />
+                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
@@ -924,14 +916,42 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
+
                         <Label Grid.Row="21"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Enable Clipping Effect (Requires Radio effects on!)" />
+
+                        <ToggleButton Name="RadioSoundEffectsClipping"
+                                      Grid.Row="21"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="RadioSoundEffectsClipping_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
+                        <Label Grid.Row="22"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Select First Channel Preset" />
 
                         <ToggleButton Name="AutoSelectChannel"
-                                      Grid.Row="21"
+                                      Grid.Row="22"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"

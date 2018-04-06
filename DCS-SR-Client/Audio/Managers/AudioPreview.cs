@@ -4,6 +4,7 @@ using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using FragLabs.Audio.Codecs;
@@ -34,6 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private readonly Queue<byte> _micInputQueue = new Queue<byte>(AudioManager.SEGMENT_FRAMES * 3);
         private WaveFileWriter _waveFile;
+        private SettingsStore _settings;
 
         public float SpeakerBoost
         {
@@ -55,6 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             try
             {
+                _settings = SettingsStore.Instance;
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
 
                 _buffBufferedWaveProvider =
@@ -184,11 +187,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 try
                 {
                     //volume boost pre
-                    for (var i = 0; i < pcmShort.Length; i++)
-                    {
-                        // n.b. no clipping test going on here
-                        pcmShort[i] = (short) (pcmShort[i] * MicBoost);
-                    }
+//                    for (var i = 0; i < pcmShort.Length; i++)
+//                    {
+//                        //clipping tests thanks to Coug4r
+//                        if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+//                        {
+//                            if (pcmShort[i] > 4000)
+//                            {
+//                                pcmShort[i] = 4000;
+//                            }
+//                            else if (pcmShort[i] < -4000)
+//                            {
+//                                pcmShort[i] = -4000;
+//                            }
+//                        }
+//
+//                        // n.b. no clipping test going on here
+//                        //pcmShort[i] = (short) (pcmShort[i] * MicBoost);
+//                    }
 
                     //process with Speex
                     _speex.Process(new ArraySegment<short>(pcmShort));
@@ -196,11 +212,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     float max = 0;
                     for (var i = 0; i < pcmShort.Length; i++)
                     {
+
+
                         //determine peak
                         if (pcmShort[i] > max)
                         {
 
                             max = pcmShort[i];
+
                         }
                     }
                     //convert to dB
