@@ -329,44 +329,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Audio Input - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue);
 
-            var inputDevices =  GetInputAudioDevices();
-
-            Mic.SelectedIndex = 0;
-            int i = 0;
-            foreach (var entry  in inputDevices)
+            for (var i = 0; i < WaveIn.DeviceCount; i++)
             {
+                //first time round
+                if (i == 0)
+                {
+                    Mic.SelectedIndex = 0;
+                }
+
+                var item = WaveIn.GetCapabilities(i);
                 Mic.Items.Add(new AudioDeviceListItem()
                 {
-                    Text = entry.Key,
-                    Value = entry.Value
+                    Text = item.ProductName,
+                    Value = item
                 });
 
-                if (entry.Key.Trim().StartsWith(_settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue.Trim()))
+                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
+                            item.NameGuid + " - CHN:" + item.Channels);
+
+                if (item.ProductName.Trim().StartsWith(_settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue.Trim()))
                 {
                     Mic.SelectedIndex = i;
                     Logger.Info("Audio Input - Found Saved ");
                 }
-
-                i++;
-            }
-        }
-
-        private Dictionary<string, int> GetInputAudioDevices()
-        {
-            Dictionary<string, int> retVal = new Dictionary<string, int>();
-            int waveInDevices = WaveIn.DeviceCount;
-            for (int waveInDevice = 0; waveInDevice < waveInDevices; waveInDevice++)
-            {
-                WaveInCapabilities item = WaveIn.GetCapabilities(waveInDevice);
-
-                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
-                            item.NameGuid + " - CHN:" + item.Channels);
-              
-                retVal.Add(item.ProductName.Trim(), waveInDevice);
-                
             }
 
-            return retVal;
         }
 
         private void InitAudioOutput()
@@ -623,7 +610,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
           
             //save app settings
-            _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((AudioDeviceListItem)Mic.SelectedItem).Text);
+            _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
 
             _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
 
@@ -650,7 +637,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     try
                     {
 
-                        var inputId = (int)((AudioDeviceListItem)Mic.SelectedItem).Value;
+                        var inputId = Mic.SelectedIndex;
                         var output = outputDeviceList[Speakers.SelectedIndex];
 
                         //check if we have optional output
@@ -722,7 +709,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //get device
                 try
                 {
-                    var inputId = (int)((AudioDeviceListItem)Mic.SelectedItem).Value;
+                    var inputId = Mic.SelectedIndex;
                     var output = outputDeviceList[Speakers.SelectedIndex];
 
                     SaveSelectedInputAndOutput();
