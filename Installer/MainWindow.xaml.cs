@@ -263,6 +263,7 @@ namespace Installer
             {
                 DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(path + "\\opus.dll");
+                DeleteFileIfExists(path + "\\speexdsp.dll");
                 DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(path + "\\SR-Server.exe");
                 DeleteFileIfExists(path + "\\DCS-SimpleRadioStandalone.lua");
@@ -301,6 +302,7 @@ namespace Installer
             Thread.Sleep(200);
 
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
+            File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
 
@@ -442,6 +444,7 @@ namespace Installer
             {
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(srPath.Text + "\\opus.dll");
+                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
                 DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");

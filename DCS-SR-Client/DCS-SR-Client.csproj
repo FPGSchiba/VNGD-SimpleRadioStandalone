@@ -180,6 +180,7 @@
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
+    <Compile Include="Audio\Utility\SpeexWrapper.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCSAutoConnectListener.cs" />
     <Compile Include="Network\Models\CombinedRadioState.cs" />
@@ -397,7 +398,11 @@
   <ItemGroup>
     <None Include="Resources\mic_click_on_16_1600_reversed.wav" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="speexdsp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />

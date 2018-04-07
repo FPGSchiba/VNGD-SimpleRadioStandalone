@@ -9,6 +9,7 @@ using MathNet.Filtering;
 using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -59,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 ////no radio effect for intercom
                 if (audio.ReceivedRadio != 0)
                 {
-                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).StringValue != "OFF")
+                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
                     {
                         AddRadioEffect(audio);
                     }
@@ -69,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AddEncryptionFailureEffect(audio);
 
-                if (_settings.GetClientSetting(SettingsKeys.RadioEffects).StringValue != "OFF")
+                if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
                 {
                     AddRadioEffect(audio);
                 }
@@ -109,14 +110,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 var speaker1Short = (short) (audio[i] * clientAudio.Volume);
 
-                //calculate % loss 
-                var loss = 1 - clientAudio.RecevingPower;
                 //add in radio loss
                 //if less than loss reduce volume
-                if (clientAudio.RecevingPower <= 0.1) // less than 10% or lower left
+                if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
                 {
-                    //gives linear signal loss from 10% down to 0%
-                    speaker1Short = (short) (speaker1Short * loss / 0.1);
+                    //gives linear signal loss from 15% down to 0%
+                    speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.RecevingPower));
                 }
 
                 //0 is no loss so if more than 0 reduce volume
@@ -137,6 +136,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             for (var i = 0; i < mixedAudio.Length; i++)
             {
                 var audio = (double) mixedAudio[i] / 32768f;
+
+                if (_settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue)
+                {
+                    if (audio > RadioFilter.CLIPPING_MAX)
+                    {
+                        audio = RadioFilter.CLIPPING_MAX;
+                    }
+                    else if (audio < RadioFilter.CLIPPING_MIN)
+                    {
+                        audio = RadioFilter.CLIPPING_MIN;
+                    }
+                }
 
                 //high and low pass filter
                 for (int j = 0; j < _filters.Length; j++)

@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             LoadBlackList();
 
             Logger.Info("Starting Device Search. Expand Search: " +
-                        (_settings.GetClientSetting(SettingsKeys.ExpandControls).StringValue == "ON").ToString());
+                        (_settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue));
 
             foreach (var deviceInstance in deviceInstances)
             {

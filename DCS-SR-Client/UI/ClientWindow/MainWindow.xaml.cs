@@ -116,21 +116,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitDefaultAddress();
 
-            MicrophoneBoost.Value = _settings.GetClientSetting(SettingsKeys.MicBoost).DoubleValue;
+        
             SpeakerBoost.Value = _settings.GetClientSetting(SettingsKeys.SpeakerBoost).DoubleValue;
 
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
 
             _audioManager = new AudioManager(_clients);
-            _audioManager.MicBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
-            ;
 
-            if ((BoostLabel != null) && (MicrophoneBoost != null))
-            {
-                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.MicBoost);
-            }
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
@@ -335,29 +329,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Audio Input - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue);
 
-            for (var i = 0; i < WaveIn.DeviceCount; i++)
-            {
-                //first time round
-                if (i == 0)
-                {
-                    Mic.SelectedIndex = 0;
-                }
+            var inputDevices =  GetInputAudioDevices();
 
-                var item = WaveIn.GetCapabilities(i);
+            Mic.SelectedIndex = 0;
+            int i = 0;
+            foreach (var entry  in inputDevices)
+            {
                 Mic.Items.Add(new AudioDeviceListItem()
                 {
-                    Text = item.ProductName,
-                    Value = item
+                    Text = entry.Key,
+                    Value = entry.Value
                 });
+
+                if (entry.Key.Trim().StartsWith(_settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue.Trim()))
+                {
+                    Mic.SelectedIndex = i;
+                    Logger.Info("Audio Input - Found Saved ");
+                }
+
+                i++;
+            }
+        }
+
+        private Dictionary<string, int> GetInputAudioDevices()
+        {
+            Dictionary<string, int> retVal = new Dictionary<string, int>();
+            int waveInDevices = WaveIn.DeviceCount;
+            for (int waveInDevice = 0; waveInDevice < waveInDevices; waveInDevice++)
+            {
+                WaveInCapabilities item = WaveIn.GetCapabilities(waveInDevice);
 
                 Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
                             item.NameGuid + " - CHN:" + item.Channels);
-
-                if (item.NameGuid.ToString() == _settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).RawValue)
-                {
-                    Mic.SelectedIndex = i;
-                }
+              
+                retVal.Add(item.ProductName.Trim(), waveInDevice);
+                
             }
+
+            return retVal;
         }
 
         private void InitAudioOutput()
@@ -411,7 +420,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 MicOutput.Items.Add(new AudioDeviceListItem()
                 {
-                    Text = device.DeviceFriendlyName,
+                    Text = device.FriendlyName,
                     Value = device
                 });
 
@@ -476,6 +485,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioRxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
 
             RadioSoundEffects.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue;
+            RadioSoundEffectsClipping.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue;
             AutoSelectChannel.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue;
         }
 
@@ -517,6 +527,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
+                SaveSelectedInputAndOutput();
+
                 try
                 {
                     //process hostname
@@ -604,6 +616,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void SaveSelectedInputAndOutput()
+        {
+
+            var output = outputDeviceList[Speakers.SelectedIndex];
+
+          
+            //save app settings
+            _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((AudioDeviceListItem)Mic.SelectedItem).Text);
+
+            _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
+
+            //check if we have optional output
+            if (MicOutput.SelectedIndex - 1 >= 0)
+            {
+                var micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
+                //save settings
+                _settings.SetClientSetting(SettingsKeys.MicAudioOutputDeviceId, micOutput.ID);
+            }
+            else
+            {
+                //save settings as none
+                _settings.SetClientSetting(SettingsKeys.MicAudioOutputDeviceId, "");
+            }
+        }
+
         private void ConnectCallback(bool result)
         {
             if (result)
@@ -612,32 +649,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     try
                     {
+
+                        var inputId = (int)((AudioDeviceListItem)Mic.SelectedItem).Value;
                         var output = outputDeviceList[Speakers.SelectedIndex];
-
-                        //save app settings
-                        _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId,
-                            ((WaveInCapabilities) ((AudioDeviceListItem) Mic.SelectedItem).Value).NameGuid.ToString());
-                        _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
-
 
                         //check if we have optional output
                         MMDevice micOutput = null;
                         if (MicOutput.SelectedIndex - 1 >= 0)
                         {
                             micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
-                            //save settings
-                            _settings.SetClientSetting(SettingsKeys.MicAudioOutputDeviceId, micOutput.ID);
                         }
-                        else
-                        {
-                            //save settings as none
-                            _settings.SetClientSetting(SettingsKeys.MicAudioOutputDeviceId, "");
-                        }
-
+                     
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
-                        _audioManager.StartEncoding(Mic.SelectedIndex, output, _guid, InputManager,
+                        _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
+
+                        _audioManager.StartEncoding(inputId, output, _guid, InputManager,
                             _resolvedIp, _port, micOutput);
                         _stop = false;
                     }
@@ -694,20 +722,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //get device
                 try
                 {
+                    var inputId = (int)((AudioDeviceListItem)Mic.SelectedItem).Value;
                     var output = outputDeviceList[Speakers.SelectedIndex];
 
-                    //save settings
-                    _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId,
-                        ((WaveInCapabilities) ((AudioDeviceListItem) Mic.SelectedItem).Value).NameGuid.ToString());
-                    _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
+                    SaveSelectedInputAndOutput();
 
 
                     _audioPreview = new AudioPreview();
-
-                    _audioPreview.StartPreview(Mic.SelectedIndex, output);
-                    _audioPreview.SpeakerBoost = (float) SpeakerBoost.Value;
-                    _audioPreview.MicBoost =
-                        VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
+                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); 
+                    _audioPreview.StartPreview(inputId, output);
+                  
                     Preview.Content = "Stop Preview";
                 }
                 catch (Exception ex)
@@ -721,29 +745,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Preview.Content = "Audio Preview";
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
-            }
-        }
-
-        private void MicrophoneBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            var convertedValue = VolumeConversionHelper.ConvertVolumeSliderToScale((float) MicrophoneBoost.Value);
-            if (_audioPreview != null)
-            {
-                _audioPreview.MicBoost = (float) convertedValue;
-            }
-            if (_audioManager != null)
-            {
-                _audioManager.MicBoost = (float) convertedValue;
-            }
-
-            _settings.SetClientSetting(SettingsKeys.MicBoost,
-                MicrophoneBoost.Value.ToString(CultureInfo.InvariantCulture));
-
-
-            if ((BoostLabel != null) && (MicrophoneBoost != null))
-            {
-                BoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(convertedValue);
-                ;
             }
         }
 
@@ -767,7 +768,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(convertedValue);
-                ;
             }
         }
 
@@ -988,6 +988,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue =
                 (bool) AutoSelectChannel.IsChecked;
             _settings.Save();
+        }
+
+        private void RadioSoundEffectsClipping_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue =
+                (bool)RadioSoundEffectsClipping.IsChecked;
+            _settings.Save();
+
         }
     }
 }

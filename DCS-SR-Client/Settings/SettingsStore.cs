@@ -33,6 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RefocusDCS = 19,
         ExpandControls = 20,
 
+        RadioEffectsClipping = 21,
+
         RadioRxEffects_Start = 40, // Recieving Radio Effects 
         RadioRxEffects_End = 41,
         RadioTxEffects_Start = 42, // Recieving Radio Effects 
@@ -223,6 +225,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly Dictionary<string, string> defaultSettings = new Dictionary<string, string>()
         {
             {SettingsKeys.RadioEffects.ToString(), "true"},
+            {SettingsKeys.RadioEffectsClipping.ToString(), "true"},
             {SettingsKeys.RadioSwitchIsPTT.ToString(), "false"},
 
             {SettingsKeys.RadioEncryptionEffects.ToString(), "true"},
@@ -244,8 +247,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.LastServer.ToString(), "127.0.0.1"},
 
-            {SettingsKeys.MicBoost.ToString(), "0.5"},
-            {SettingsKeys.SpeakerBoost.ToString(), "0.5"},
+            {SettingsKeys.MicBoost.ToString(), "0.514"},
+            {SettingsKeys.SpeakerBoost.ToString(), "0.514"},
 
             {SettingsKeys.RadioX.ToString(), "300"},
             {SettingsKeys.RadioY.ToString(), "300"},
