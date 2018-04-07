@@ -121,6 +121,9 @@
   <data name="ARC_164_Rx_End_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ARC-164_Rx_End_16_1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="audio_headset" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\audio-headset.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="KY_58_RX_PREAMBLE_SHORT_16_1600" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\KY-58 RX PREAMBLE SHORT 16 1600.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
