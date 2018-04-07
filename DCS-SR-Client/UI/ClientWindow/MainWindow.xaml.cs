@@ -341,7 +341,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Value = entry.Value
                 });
 
-                if (entry.Key == _settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue)
+                if (entry.Key.Trim().StartsWith(_settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue.Trim()))
                 {
                     Mic.SelectedIndex = i;
                     Logger.Info("Audio Input - Found Saved ");
@@ -354,7 +354,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private Dictionary<string, int> GetInputAudioDevices()
         {
             Dictionary<string, int> retVal = new Dictionary<string, int>();
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
             int waveInDevices = WaveIn.DeviceCount;
             for (int waveInDevice = 0; waveInDevice < waveInDevices; waveInDevice++)
             {
@@ -362,15 +361,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
                             item.NameGuid + " - CHN:" + item.Channels);
-                foreach (MMDevice device in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
-                {
-                    if (device.FriendlyName.StartsWith(item.ProductName))
-                    {
-                        Logger.Info("Audio Input - Matches "+device.FriendlyName );
-                        retVal.Add(device.FriendlyName, waveInDevice );
-                        break;
-                    }
-                }
+              
+                retVal.Add(item.ProductName.Trim(), waveInDevice);
+                
             }
 
             return retVal;
