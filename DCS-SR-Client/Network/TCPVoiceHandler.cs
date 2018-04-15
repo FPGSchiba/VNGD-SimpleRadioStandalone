@@ -544,13 +544,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         public bool Send(byte[] bytes, int len)
         {
-            //if either PTT is true && socket connected etc
-            if (_ready &&
-                _listener != null
+            //if either PTT is true, a microphone is available && socket connected etc
+            if (_ready
+                && _listener != null
                 && _listener.Connected
-                &&
-                (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
-                && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent() && (bytes != null))
+                && (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+                && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
+                && _clientStateSingleton.MicrophoneAvailable
+                && (bytes != null))
                 //can only send if DCS is connected
             {
                 try
