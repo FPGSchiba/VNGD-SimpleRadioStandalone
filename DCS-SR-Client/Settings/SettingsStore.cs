@@ -35,6 +35,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioEffectsClipping = 21,
 
+        MinimiseToTray = 22,
+        StartMinimised = 23,
+
         RadioRxEffects_Start = 40, // Recieving Radio Effects 
         RadioRxEffects_End = 41,
         RadioTxEffects_Start = 42, // Recieving Radio Effects 
@@ -233,6 +236,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {SettingsKeys.RefocusDCS.ToString(), "false"},
             {SettingsKeys.ExpandControls.ToString(), "false"},
+
+            {SettingsKeys.MinimiseToTray.ToString(), "true"},
+            {SettingsKeys.StartMinimised.ToString(), "false"},
 
             {SettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {SettingsKeys.RadioRxEffects_End.ToString(), "true"},
