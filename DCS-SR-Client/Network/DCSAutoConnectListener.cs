@@ -50,31 +50,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             var groupEp = new IPEndPoint(IPAddress.Any, 5069);
                             var bytes = _dcsUdpListener.Receive(ref groupEp);
 
-<<<<<<< HEAD
-=======
-                        
->>>>>>> refs/remotes/origin/master
                             var message = Encoding.UTF8.GetString(
                                 bytes, 0, bytes.Length);
 
                             HandleMessage(message);
                         }
                         catch (SocketException e)
-<<<<<<< HEAD
                         {
                             // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
                             if (!_stop)
                             {
                                 Logger.Error(e, "SocketException Handling DCS AutoConnect Message");
                             }
-=======
-                        {
-                            // SocketException is raised when closing app, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "Socket-Exception Handling DCS AutoConnect Message");
-                            }
->>>>>>> refs/remotes/origin/master
                         }
                         catch (Exception e)
                         {
