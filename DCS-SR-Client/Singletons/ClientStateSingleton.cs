@@ -24,6 +24,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
 
+        // Indicates whether a valid microphone is available - deactivating audio input controls and transmissions otherwise
+        public bool MicrophoneAvailable { get; set; }
 
         private ClientStateSingleton()
         {
@@ -36,6 +38,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             {
                 FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
+
+            MicrophoneAvailable = true;
         }
 
         public static ClientStateSingleton Instance
