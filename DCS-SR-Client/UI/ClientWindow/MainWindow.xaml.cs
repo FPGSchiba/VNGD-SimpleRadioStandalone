@@ -91,12 +91,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             this.Left = _settings.GetPositionSetting(SettingsKeys.ClientX).FloatValue;
             this.Top = _settings.GetPositionSetting(SettingsKeys.ClientY).FloatValue;
 
+            // Notification/tray bar icon is initialised as soon as possible so it is visible immediately if the "StartMinimised" setting is enabled
+            InitNotificationIcon();
 
             SetupLogging();
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
-            Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
+            if (_settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue)
+            {
+                Hide();
+                WindowState = WindowState.Minimized;
+
+                Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION + " minimized");
+            }
+            else
+            {
+                Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
+            }
 
             _guid = _settings.GetClientSetting(SettingsKeys.CliendIdShort).StringValue;
 
@@ -522,9 +534,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue;
             RadioTxStartToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_Start).BoolValue;
             RadioTxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_End).BoolValue;
-            ;
+            
             RadioRxStartToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
             RadioRxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
+
+            MinimiseToTray.IsChecked = _settings.GetClientSetting(SettingsKeys.MinimiseToTray).BoolValue;
+            StartMinimised.IsChecked = _settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue;
 
             RadioSoundEffects.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue;
             RadioSoundEffectsClipping.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue;
@@ -559,6 +574,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             // Step 5. Activate the configuration
             LogManager.Configuration = config;
+        }
+
+        private void InitNotificationIcon()
+        {
+            System.Windows.Forms.MenuItem notifyIconContextMenuShow = new System.Windows.Forms.MenuItem
+            {
+                Index = 0,
+                Text = "Show"
+            };
+            notifyIconContextMenuShow.Click += new EventHandler(NotifyIcon_Show);
+
+            System.Windows.Forms.MenuItem notifyIconContextMenuQuit = new System.Windows.Forms.MenuItem
+            {
+                Index = 1,
+                Text = "Quit"
+            };
+            notifyIconContextMenuQuit.Click += new EventHandler(NotifyIcon_Quit);
+
+            System.Windows.Forms.ContextMenu notifyIconContextMenu = new System.Windows.Forms.ContextMenu();
+            notifyIconContextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
+
+            System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon
+            {
+                Icon = Properties.Resources.audio_headset,
+                Visible = true
+            };
+            notifyIcon.ContextMenu = notifyIconContextMenu;
+            notifyIcon.DoubleClick += new EventHandler(NotifyIcon_Show);
         }
 
         private void Connect()
@@ -761,6 +804,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _dcsAutoConnectListener = null;
         }
 
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized && _settings.GetClientSetting(SettingsKeys.MinimiseToTray).BoolValue)
+            {
+                Hide();
+            }
+
+            base.OnStateChanged(e);
+        }
+
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
             if (_audioPreview == null)
@@ -798,6 +851,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _audioPreview.StopEncoding();
                 _audioPreview = null;
             }
+        }
+
+        private void NotifyIcon_Show(object sender, EventArgs args)
+        {
+            Show();
+            WindowState = WindowState.Normal;
+        }
+
+        private void NotifyIcon_Quit(object sender, EventArgs args)
+        {
+            Close();
         }
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1048,6 +1112,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 (bool)RadioSoundEffectsClipping.IsChecked;
             _settings.Save();
 
+        }
+
+        private void MinimiseToTray_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.MinimiseToTray).BoolValue =
+                (bool)MinimiseToTray.IsChecked;
+            _settings.Save();
+        }
+
+        private void StartMinimised_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue =
+                (bool)StartMinimised.IsChecked;
+            _settings.Save();
         }
     }
 }

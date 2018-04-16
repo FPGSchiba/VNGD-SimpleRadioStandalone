@@ -499,6 +499,7 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <WrapPanel />
 
@@ -957,6 +958,60 @@
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Click="AudioSelectChannel_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
+                        <Label Grid.Row="23"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Minimise to tray" />
+
+                        <ToggleButton Name="MinimiseToTray"
+                                      Grid.Row="23"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="MinimiseToTray_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
+                        <Label Grid.Row="24"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Start minimised" />
+
+                        <ToggleButton Name="StartMinimised"
+                                      Grid.Row="24"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="StartMinimised_OnClick">
                             <ToggleButton.Style>
                                 <Style TargetType="{x:Type ToggleButton}">
                                     <Setter Property="Content" Value="ON" />

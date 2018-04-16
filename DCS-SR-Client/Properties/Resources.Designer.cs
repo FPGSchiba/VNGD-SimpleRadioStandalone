@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -66,6 +66,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         internal static System.IO.UnmanagedMemoryStream ARC_164_Rx_End_16_1600 {
             get {
                 return ResourceManager.GetStream("ARC_164_Rx_End_16_1600", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon audio_headset {
+            get {
+                object obj = ResourceManager.GetObject("audio_headset", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
