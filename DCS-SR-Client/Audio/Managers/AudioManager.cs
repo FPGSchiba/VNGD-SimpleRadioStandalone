@@ -223,39 +223,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
 
 
-            try
+            if (mic != -1)
             {
-                _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
+                try
                 {
-                    BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
-                    DeviceNumber = mic,
-                };
+                    _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
+                    {
+                        BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
+                        DeviceNumber = mic,
+                    };
 
-                _waveIn.NumberOfBuffers = 2;
-                _waveIn.DataAvailable += _waveIn_DataAvailable;
-                _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
+                    _waveIn.NumberOfBuffers = 2;
+                    _waveIn.DataAvailable += _waveIn_DataAvailable;
+                    _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
-                _tcpVoiceHandler =
-                    new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
-                var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
+                    _tcpVoiceHandler =
+                        new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
+                    var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
 
-                voiceSenderThread.Start();
+                    voiceSenderThread.Start();
 
-                _waveIn.StartRecording();
+                    _waveIn.StartRecording();
 
 
-                MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
+                    MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
 
-                MessageBox.Show(
-                    $"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums",
-                    "Audio Input Error", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    MessageBox.Show(
+                        $"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums",
+                        "Audio Input Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
 
-                Environment.Exit(1);
+                    Environment.Exit(1);
+                }
             }
         }
 

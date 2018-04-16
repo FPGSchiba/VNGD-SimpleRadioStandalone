@@ -75,6 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DelegateCommand _connectCommand;
 
         private readonly Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public MainWindow()
         {
@@ -366,6 +367,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
 
+            // No microphone is available - users can still connect/listen, but audio input controls are disabled and sending is prevented
+            if (WaveIn.DeviceCount == 0 || Mic.SelectedIndex < 0)
+            {
+                Logger.Info("Audio Input - No audio input devices available, disabling mic preview");
+
+                _clientStateSingleton.MicrophoneAvailable = false;
+
+                var noMicAvailableToolTip = new System.Windows.Controls.ToolTip();
+                var noMicAvailableToolTipContent = new System.Windows.Controls.StackPanel();
+
+                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = "No microphone available",
+                    FontWeight = FontWeights.Bold
+                });
+                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = "No valid microphone is available - others will not be able to hear you."
+                });
+                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
+                {
+                    Text = "You can still use SRS to listen to radio calls, but will not be able to transmit anything yourself."
+                });
+
+                noMicAvailableToolTip.Content = noMicAvailableToolTipContent;
+
+                Preview.IsEnabled = false;
+
+                Preview.ToolTip = noMicAvailableToolTip;
+                StartStop.ToolTip = noMicAvailableToolTip;
+                Mic.ToolTip = noMicAvailableToolTip;
+                Mic_VU.ToolTip = noMicAvailableToolTip;
+            }
+            else
+            {
+                Logger.Info("Audio Input - " + WaveIn.DeviceCount + " audio input devices available, configuring as usual");
+
+                _clientStateSingleton.MicrophoneAvailable = true;
+
+                Preview.IsEnabled = true;
+
+                Preview.ToolTip = null;
+                StartStop.ToolTip = null;
+                Mic.ToolTip = null;
+                Mic_VU.ToolTip = null;
+            }
         }
 
         private void InitAudioOutput()
@@ -448,12 +495,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (_audioPreview != null)
             {
-                Mic_VU.Value = _audioPreview.MicMax;
+                // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
+                if (_clientStateSingleton.MicrophoneAvailable)
+                {
+                    Mic_VU.Value = _audioPreview.MicMax;
+                }
                 Speaker_VU.Value = _audioPreview.SpeakerMax;
             }
             else if (_audioManager != null)
             {
-                Mic_VU.Value = _audioManager.MicMax;
+                // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
+                if (_clientStateSingleton.MicrophoneAvailable)
+                {
+                    Mic_VU.Value = _audioManager.MicMax;
+                }
                 Speaker_VU.Value = _audioManager.SpeakerMax;
             }
             else
@@ -653,7 +708,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
           
             //save app settings
-            _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+            // Only save selected microphone if one is actually available, resulting in a crash otherwise
+            if (_clientStateSingleton.MicrophoneAvailable)
+            {
+                _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+            }
 
             _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
 
@@ -759,6 +818,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview == null)
             {
+                if (!_clientStateSingleton.MicrophoneAvailable)
+                {
+                    Logger.Info("Unable to preview audio, no valid audio input device available or selected");
+                    return;
+                }
+
                 //get device
                 try
                 {

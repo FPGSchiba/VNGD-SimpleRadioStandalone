@@ -51,7 +51,8 @@
                             VerticalAlignment="Top"
                             Click="PreviewAudio"
                             Content="Preview Audio"
-                            Style="{DynamicResource SquareButtonStyle}" />
+                            Style="{DynamicResource SquareButtonStyle}"
+                            ToolTipService.ShowOnDisabled="True" />
 
 
                     <Label x:Name="SpeakerLabel"

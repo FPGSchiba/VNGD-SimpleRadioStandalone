@@ -93,12 +93,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
-                        var bytes = _udpCommandListener.Receive(ref groupEp);
-
                         try
                         {
+                            var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
+                            var bytes = _udpCommandListener.Receive(ref groupEp);
+
                             //Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(
                             //          bytes, 0, bytes.Length));
                             var message =
@@ -128,6 +128,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             else
                             {
                                 Logger.Error("Unknown UDP Command!");
+                            }
+                        }
+                        catch (SocketException e)
+                        {
+                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                            if (!_stop)
+                            {
+                                Logger.Error(e, "SocketException Handling DCS  Message");
                             }
                         }
                         catch (Exception e)
@@ -170,12 +178,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
-                        var bytes = _dcsUdpListener.Receive(ref groupEp);
-
                         try
                         {
+                            var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
+                            var bytes = _dcsUdpListener.Receive(ref groupEp);
+
                             var message =
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
@@ -195,6 +203,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
+                            }
+                        }
+                        catch (SocketException e)
+                        {
+                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                            if (!_stop)
+                            {
+                                Logger.Error(e, "SocketException Handling DCS AutoConnect Message");
                             }
                         }
                         catch (Exception e)
@@ -286,12 +302,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
-                        var bytes = _dcsGameGuiudpListener.Receive(ref groupEp);
-
                         try
                         {
+                            var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+                            var bytes = _dcsGameGuiudpListener.Receive(ref groupEp);
+
                             var playerInfo =
                                 JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
@@ -304,6 +320,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
                                 _clientSideUpdate();
                                 //     count = 0;
+                            }
+                        }
+                        catch (SocketException e)
+                        {
+                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                            if (!_stop)
+                            {
+                                Logger.Error(e, "SocketException Handling DCS GameGUI Message");
                             }
                         }
                         catch (Exception e)
@@ -342,12 +366,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     //    var count = 0;
                     while (!_stop)
                     {
-                        var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
-                        var bytes = _dcsLOSListener.Receive(ref groupEp);
-
                         try
                         {
+                            var groupEp = new IPEndPoint(IPAddress.Any,
+                            _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
+                            var bytes = _dcsLOSListener.Receive(ref groupEp);
+
                             /*   Logger.Debug(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));*/
                             var playerInfo =
@@ -364,6 +388,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                     //  Logger.Debug(client.ToString());
                                 }
+                            }
+                        }
+                        catch (SocketException e)
+                        {
+                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                            if (!_stop)
+                            {
+                                Logger.Error(e, "SocketException Handling DCS Los Result Message");
                             }
                         }
                         catch (Exception e)
