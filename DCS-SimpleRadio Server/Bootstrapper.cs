@@ -33,26 +33,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         }
 
         private void SetupLogging()
-        {
+        {  
             var config = new LoggingConfiguration();
 
-            //  var consoleTarget = new ColoredConsoleTarget {Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}"};
-            //config.AddTarget("console", consoleTarget);
-
-            var fileTarget = new FileTarget
-            {
-                FileName = "${basedir}/serverlog.txt",
-                Layout =
-                    @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
-            };
+            var fileTarget = new FileTarget();
             config.AddTarget("file", fileTarget);
 
-//            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-//            config.LoggingRules.Add(rule1);
+            fileTarget.FileName = "${basedir}/serverlog.txt";
+            fileTarget.Layout =
+                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
 
-            var rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
-            config.LoggingRules.Add(rule2);
-
+#if DEBUG
+            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Debug, fileTarget));
+#else
+            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileTarget));
+#endif
+           
             LogManager.Configuration = config;
         }
 

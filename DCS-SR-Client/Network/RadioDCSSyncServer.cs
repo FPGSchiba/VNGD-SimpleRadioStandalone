@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _clientStateSingleton = ClientStateSingleton.Instance;
         }
 
-        public static long LastSent { get; set; }
+        
 
         private readonly SettingsStore _settings = SettingsStore.Instance;
 
@@ -170,7 +170,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
             //reset last sent
-            LastSent = 0;
+            _clientStateSingleton.LastSent = 0;
 
             Task.Factory.StartNew(() =>
             {
@@ -184,24 +184,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
                             var bytes = _dcsUdpListener.Receive(ref groupEp);
 
+                            var str = Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length).Trim();
+                            
                             var message =
-                                JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
+                                JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
 
-                            //  Logger.Info("Recevied Message from DCS: "+ Encoding.UTF8.GetString(
-                            //          bytes, 0, bytes.Length));
+                            Logger.Debug($"Recevied Message from DCS {str}");
 
                             //sync with others
                             //Radio info is marked as Stale for FC3 aircraft after every frequency change
 
                             var update = UpdateRadio(message);
+                            
+                            Logger.Debug("Radio Updated");
 
                             //send to DCS UI
                             SendRadioUpdateToDCS();
+                            
+                            Logger.Debug("Update sent to DCS");
 
                             if (update || IsRadioInfoStale(message))
                             {
-                                LastSent = Environment.TickCount;
+                                Logger.Debug("Sending Radio Info To Server - Stale");
+                                _clientStateSingleton.LastSent = Environment.TickCount;
                                 _clientRadioUpdate();
                             }
                         }
@@ -719,11 +725,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale
-            if (Environment.TickCount - LastSent < 5000)
+            if (Environment.TickCount - _clientStateSingleton.LastSent < 5000)
             {
+                Logger.Debug($"Not Stale - Tick: {Environment.TickCount} Last sent: {_clientStateSingleton.LastSent} ");
                 return false;
             }
-
+            Logger.Debug($"Stale Radio - Tick: {Environment.TickCount} Last sent: {_clientStateSingleton.LastSent} ");
             return true;
         }
 

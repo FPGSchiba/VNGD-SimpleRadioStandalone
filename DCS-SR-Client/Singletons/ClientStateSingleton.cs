@@ -26,6 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         // Indicates whether a valid microphone is available - deactivating audio input controls and transmissions otherwise
         public bool MicrophoneAvailable { get; set; }
+        
+        public long LastSent { get; set; }
 
         private ClientStateSingleton()
         {

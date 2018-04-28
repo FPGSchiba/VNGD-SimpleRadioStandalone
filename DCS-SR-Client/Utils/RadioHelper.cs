@@ -30,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     }
 
                     //make radio data stale to force resysnc
-                    RadioDCSSyncServer.LastSent = 0;
+                    ClientStateSingleton.Instance.LastSent = 0;
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     radio.channel = -1;
 
                     //make radio data stale to force resysnc
-                    RadioDCSSyncServer.LastSent = 0;
+                    ClientStateSingleton.Instance.LastSent = 0;
                 }
             }
             return inLimit;
@@ -134,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                         }
 
                         //make radio data stale to force resysnc
-                        RadioDCSSyncServer.LastSent = 0;
+                        ClientStateSingleton.Instance.LastSent = 0;
                     }
                 }
             }
@@ -161,7 +161,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
                         currentRadio.encKey = (byte) encKey;
                         //make radio data stale to force resysnc
-                        RadioDCSSyncServer.LastSent = 0;
+                        ClientStateSingleton.Instance.LastSent = 0;
                     }
                 }
             }

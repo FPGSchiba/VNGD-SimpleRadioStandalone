@@ -85,6 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientRadioUpdated()
         {
+            Logger.Debug("Sending Radio Update to Server");
             var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
             SendToServer(new NetworkMessage
             {
@@ -301,16 +302,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             try
             {
+               
                 message.Version = UpdaterChecker.VERSION;
 
-                var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message) + "\n");
+                var json = (JsonConvert.SerializeObject(message) + "\n");
 
-                _tcpClient.GetStream().Write(json, 0, json.Length);
+                if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
+                {
+                    Logger.Debug("Sending Radio Update To Server: "+ (json));
+                }
+
+
+                var bytes = Encoding.UTF8.GetBytes(json);
+                _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
                 //Need to flush?
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Client exception sending so server");
+                Logger.Error(ex, "Client exception sending to server");
 
                 Disconnect();
             }
