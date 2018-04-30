@@ -629,8 +629,9 @@ function SR.exportRadioUH1H(_data)
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
-    _data.radios[4].volume =  SR.getRadioVolume(0, 8,{0.0,0.65},false )  *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
+    _data.radios[4].volume =  SR.getRadioVolume(0, 9,{0.0,0.60},false )  *  SR.getRadioVolume(0, 29,{0.3,1.0},true)
 
+    --_device:get_argument_value(_arg)
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17,0.1)
     if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
@@ -870,71 +871,70 @@ function SR.exportRadioL39(_data)
 
     return _data
 end
-
 --for A10C
 function SR.exportRadioA10C(_data)
 
+	-- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
-        -- set volumes to 100%
+        -- New aircraft; Reset volumes to 100%
         local _device = GetDevice(0)
 
         if _device then
-            _device:set_argument_value(133,1.0)
-            _device:set_argument_value(171,1.0)
-            _device:set_argument_value(147,1.0)
+            _device:set_argument_value(133,1.0) -- VHF AM
+            _device:set_argument_value(171,1.0) -- UHF
+            _device:set_argument_value(147,1.0) -- VHF FM
         end
     end
     
-
-    _data.radios[2].name = "AN/ARC-186(V)"
+	
+	-- VHF AM
+	-- Set radio data
+    _data.radios[2].name = "AN/ARC-186(V) AM"
     _data.radios[2].freq =  SR.getRadioFrequency(55)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 133,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 227,{0.0,1.0},false)*SR.getButtonPosition(228)
 
+	
+	-- UHF
+	-- Set radio data
     _data.radios[3].name = "AN/ARC-164 UHF"
     _data.radios[3].freq = SR.getRadioFrequency(54)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 225,{0.0,1.0},false)*SR.getButtonPosition(226)
+    _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
-    -- get channel selector
-    local _selector  = SR.getSelectorPosition(167,0.1)
-
+    -- Check UHF frequency mode (0 = MNL, 1 = PRESET, 2 = GRD)
+    local _selector = SR.getSelectorPosition(167,0.1)
     if _selector == 1 then
-        
+		-- Using UHF preset channels
         local _channel  = SR.getSelectorPosition(161,0.05) + 1 --add 1 as channel 0 is channel 1
         _data.radios[3].channel = _channel 
     end
     
-    _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
+    -- Check UHF function mode (0 = OFF, 1 = MAIN, 2 = BOTH, 3 = ADF)
+    local uhfModeKnob = SR.getSelectorPosition(168,0.1)
+    if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+		-- Function dial set to BOTH
+		-- Listen to Guard as well as designated frequency
+        _data.radios[3].secFreq = 243.0*1000000
+	else
+		-- Function dial set to OFF, MAIN, or ADF
+		-- Not listening to Guard secondarily
+		_data.radios[3].secFreq = 0
+    end
 
+	
+	-- VHF FM
+	-- Set radio data
     _data.radios[4].name = "AN/ARC-186(V)FM"
     _data.radios[4].freq =  SR.getRadioFrequency(56)
     _data.radios[4].modulation = 1
     _data.radios[4].volume = SR.getRadioVolume(0, 147,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 223,{0.0,1.0},false)*SR.getButtonPosition(224)
-    
     _data.radios[4].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
+	
 
-     --guard mode for UHF Radio
-    local uhfModeKnob = SR.getSelectorPosition(168,0.1)
-    if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
-        _data.radios[3].secFreq = 243.0*1000000 
-    end
-
---    local value = GetDevice(0):get_argument_value(239)
---
---    local n = math.abs(tonumber(string.format("%.0f", (value - 0.4) / 0.1)))
---
---    if n == 3 then
---        _data.selected = 2
---    elseif  n == 2 then
---        _data.selected = 1
---    elseif  n == 1 then
---        _data.selected = 0
---    else
---        _data.selected = -1
---    end
-
-    -- Figure out Encryption
+    -- KY-58 Radio Encryption
+	-- Check if encryption is being used
     local _ky58Power = SR.getButtonPosition(784)
     if _ky58Power > 0.5 and SR.getButtonPosition(783) == 0 then -- mode switch set to OP and powered on
         -- Power on!
@@ -948,22 +948,52 @@ function SR.exportRadioA10C(_data)
             _radio = _data.radios[3]
         end
 
-        local _channel = SR.getSelectorPosition(782,0.1) +1
+		-- Get encryption key
+        local _channel = SR.getSelectorPosition(782,0.1) + 1
 
         if _radio ~= nil and _channel ~= nil then
+			-- Set encryption key for selected radio
             _radio.encKey = _channel
             _radio.enc = true
---            SR.log("Radio Select".._radio.name)
---            SR.log("Channel Select".._channel)
         end
     end
 
-    _data.selected = 1
-
-    _data.control = 0; -- Partial Radio (switched from FUll due to HOTAS controls)
+	
+	-- Mic Switch Radio Select and Transmit - by Dyram	
+    -- Check Mic Switch position (UP: 751 1.0, DOWN: 751 -1.0, FWD: 752 1.0, AFT: 752 -1.0)
+    if SR.getButtonPosition(752) == 1 then
+	    -- Mic Switch FWD pressed
+		-- Check Intercom panel Rotary Selector Dial (0: INT, 1: FM, 2: VHF, 3: HF, 4: "")
+		if SR.getSelectorPosition(239,0.1) == 2 then
+			-- Intercom panel set to VHF
+			_data.selected = 1 -- radios[2] VHF AM
+			_data.ptt = true
+		elseif SR.getSelectorPosition(239,0.1) == 0 then
+			-- Intercom panel set to INT
+			-- Intercom not functional, but select it anyway to be proper
+			_data.selected = 0 -- radios[1] Intercom
+		else
+			_data.selected = -1
+		end
+    elseif SR.getButtonPosition(751) == -1 then
+        -- Mic Switch DOWN pressed
+        _data.selected = 2 -- radios[3] UHF
+        _data.ptt = true
+    elseif SR.getButtonPosition(752) == -1 then
+        -- Mic Switch AFT pressed
+        _data.selected = 3 -- radios[4] VHF FM
+        _data.ptt = true
+    else
+		-- Mic Switch released
+		_data.selected = -1
+        _data.ptt = false
+    end
+	
+	_data.control = 1 -- Full radio
 
     return _data
 end
+
 
 function SR.exportRadioF86Sabre(_data)
 
