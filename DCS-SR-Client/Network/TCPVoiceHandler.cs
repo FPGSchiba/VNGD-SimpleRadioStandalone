@@ -434,7 +434,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         RadioReceivingState[audio.ReceivedRadio] = new RadioReceivingState
                                         {
                                             IsSecondary = receivingState.IsSecondary,
-                                            LastReceviedAt = Environment.TickCount,
+                                            LastReceviedAt = DateTime.Now.Ticks,
                                             PlayedEndOfTransmission = false,
                                             ReceivedOn = receivingState.ReceivedOn
                                         };
@@ -594,7 +594,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             RadioSendingState = new RadioSendingState
                             {
                                 IsSending = true,
-                                LastSentAt = Environment.TickCount,
+                                LastSentAt = DateTime.Now.Ticks,
                                 SendingOn = currentSelected
                             };
                             return true;

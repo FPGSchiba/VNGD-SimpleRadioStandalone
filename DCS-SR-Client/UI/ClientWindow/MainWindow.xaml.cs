@@ -67,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private bool _stop = true;
 
         //used to debounce toggle
-        private double _toggleShowHide;
+        private long _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
         private MMDeviceCollection outputDeviceList;
@@ -896,10 +896,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ToggleOverlay(bool uiButton)
         {
-            //debounce show hide
-            if ((Environment.TickCount - _toggleShowHide > 600) || uiButton)
+            //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
+            if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
             {
-                _toggleShowHide = Environment.TickCount;
+                _toggleShowHide = DateTime.Now.Ticks;
                 if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
                     (_radioOverlayWindow.WindowState == WindowState.Minimized))
                 {

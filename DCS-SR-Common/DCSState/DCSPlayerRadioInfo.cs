@@ -92,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public bool IsCurrent()
         {
-            return LastUpdate > Environment.TickCount - 10000;
+            return LastUpdate > DateTime.Now.Ticks - 100000000;
         }
 
         public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation,
@@ -120,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                             receivingState = new RadioReceivingState
                             {
                                 IsSecondary = false,
-                                LastReceviedAt = Environment.TickCount,
+                                LastReceviedAt = DateTime.Now.Ticks,
                                 ReceivedOn = i
                             };
 
@@ -144,7 +144,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         receivingState = new RadioReceivingState
                         {
                             IsSecondary = false,
-                            LastReceviedAt = Environment.TickCount,
+                            LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
 
@@ -156,7 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         receivingState = new RadioReceivingState
                         {
                             IsSecondary = true,
-                            LastReceviedAt = Environment.TickCount,
+                            LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
 
