@@ -367,7 +367,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (client != null)
                 {
                     //copy the data we need
-                    client.LastUpdate = Environment.TickCount;
+                    client.LastUpdate = DateTime.Now.Ticks;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.Position = message.Client.Position;
@@ -421,9 +421,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (client != null)
                 {
                     //update to local ticks
-                    message.Client.RadioInfo.LastUpdate = Environment.TickCount;
+                    message.Client.RadioInfo.LastUpdate = DateTime.Now.Ticks;
 
-                    client.LastUpdate = Environment.TickCount;
+                    client.LastUpdate = DateTime.Now.Ticks;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.RadioInfo = message.Client.RadioInfo;

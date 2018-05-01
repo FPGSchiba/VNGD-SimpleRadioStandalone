@@ -76,8 +76,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
             }
 
-            long now = Environment.TickCount;
-            if ((now - LastUpdate) > 400) //400 ms since last update
+            long now = DateTime.Now.Ticks;
+            if ((now - LastUpdate) > 4000000) //400 ms since last update
             {
                 // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
                 //append ms of silence - this functions as our jitter buffer??

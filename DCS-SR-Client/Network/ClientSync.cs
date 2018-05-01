@@ -175,7 +175,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             var updatedSrClient = serverMessage.Client;
                                             if (srClient != null)
                                             {
-                                                srClient.LastUpdate = Environment.TickCount;
+                                                srClient.LastUpdate = DateTime.Now.Ticks;
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.Position = updatedSrClient.Position;
@@ -188,7 +188,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         else
                                         {
                                             var connectedClient = serverMessage.Client;
-                                            connectedClient.LastUpdate = Environment.TickCount;
+                                            connectedClient.LastUpdate = DateTime.Now.Ticks;
 
                                             //init with LOS true so you can hear them incase of bad DCS install where
                                             //LOS isnt working
@@ -231,7 +231,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             foreach (var client in serverMessage.Clients)
                                             {
-                                                client.LastUpdate = Environment.TickCount;
+                                                client.LastUpdate = DateTime.Now.Ticks;
                                                 //init with LOS true so you can hear them incase of bad DCS install where
                                                 //LOS isnt working
                                                 client.LineOfSightLoss = 0.0f;

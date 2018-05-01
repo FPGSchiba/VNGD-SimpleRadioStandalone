@@ -7,13 +7,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
     public class RadioReceivingState
     {
         [JsonIgnore]
-        public double LastReceviedAt { get; set; }
+        public long LastReceviedAt { get; set; }
 
         public bool IsSecondary { get; set; }
         public int ReceivedOn { get; set; }
 
         public bool PlayedEndOfTransmission { get; set; }
 
-        public bool IsReceiving => (Environment.TickCount - LastReceviedAt) < 500;
+        public bool IsReceiving => (DateTime.Now.Ticks - LastReceviedAt) < 5000000;
     }
 }
