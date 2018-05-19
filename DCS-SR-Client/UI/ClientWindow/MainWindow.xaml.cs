@@ -524,10 +524,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             AutoConnectPromptToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue;
             RadioOverlayTaskbarItem.IsChecked =
                 _settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
-            RefocusDCS.IsChecked = RadioOverlayTaskbarItem.IsChecked =
-                _settings.GetClientSetting(SettingsKeys.RefocusDCS).BoolValue;
-            ExpandInputDevices.IsChecked = RadioOverlayTaskbarItem.IsChecked =
-                _settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue;
+            RefocusDCS.IsChecked = _settings.GetClientSetting(SettingsKeys.RefocusDCS).BoolValue;
+            ExpandInputDevices.IsChecked = _settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue;
             RadioTxStartToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_Start).BoolValue;
             RadioTxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_End).BoolValue;
             
@@ -853,7 +851,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
                     _radioOverlayWindow.ShowInTaskbar =
-                        _settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
+                        !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
                     _radioOverlayWindow.Show();
                 }
                 else
@@ -877,7 +875,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
                 _awacsRadioOverlay.ShowInTaskbar =
-                    _settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
+                    !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
                 _awacsRadioOverlay.Show();
             }
             else
@@ -968,6 +966,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue =
                 (bool) RadioOverlayTaskbarItem.IsChecked;
             _settings.Save();
+
+            if (_radioOverlayWindow != null)
+            {
+                _radioOverlayWindow.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
+            }
+            else if (_awacsRadioOverlay != null)
+            {
+                _awacsRadioOverlay.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
+            }
         }
 
 
