@@ -90,7 +90,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void RadioFrequencyOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
         {
             double freq = 0;
-            if (double.TryParse(RadioFrequency.Text.Trim(), out freq))
+            // Some locales/cultures (e.g. German) do not parse "." as decimal points since they use decimal commas ("123,45"), leading to "123.45" being parsed as "12345" and frequencies being set too high
+            // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
+            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out freq))
             {
                 RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
             }
