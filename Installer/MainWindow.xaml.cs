@@ -276,6 +276,42 @@ namespace Installer
             //sleep! WTF directory is lagging behind state here...
             Thread.Sleep(200);
 
+            CreateDirectory(path);
+            CreateDirectory(path + "\\AudioEffects");
+
+            //sleep! WTF directory is lagging behind state here...
+            Thread.Sleep(200);
+
+            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
+            File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
+            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
+            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
+
+            File.Copy(currentDirectory + "\\KY-58-TX-1600.wav", path + "\\AudioEffects\\KY-58-TX-1600.wav", true);
+            File.Copy(currentDirectory + "\\KY-58-RX-1600.wav", path + "\\AudioEffects\\KY-58-RX-1600.wav", true);
+            File.Copy(currentDirectory + "\\Radio-TX-1600.wav", path + "\\AudioEffects\\Radio-TX-1600.wav", true);
+            File.Copy(currentDirectory + "\\Radio-RX-1600.wav", path + "\\AudioEffects\\Radio-RX-1600.wav", true);
+
+
+            //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
+                true);
+            File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
+                true);
+            File.Copy(currentDirectory + "\\DCS-SRS-AutoConnectGameGUI.lua", path + "\\DCS-SRS-AutoConnectGameGUI.lua",
+                true);
+
+            File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
+                true);
+
+            File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
+                true);
+            File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\DCS-SRS-hook.lua",
+                true);
+        }
+
+        private void CreateDirectory(string path)
+        {
             if (!Directory.Exists(path))
             {
                 var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
@@ -297,30 +333,6 @@ namespace Installer
                 dir.SetAccessControl(dSecurity);
                 dir.Refresh();
             }
-
-            //sleep! WTF directory is lagging behind state here...
-            Thread.Sleep(200);
-
-            File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
-            File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
-            File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
-            File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
-
-            //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
-            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRS-AutoConnectGameGUI.lua", path + "\\DCS-SRS-AutoConnectGameGUI.lua",
-                true);
-
-            File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
-                true);
-
-            File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\DCS-SRS-hook.lua",
-                true);
         }
 
         private void InstallScripts(string path)
@@ -454,6 +466,10 @@ namespace Installer
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
                 DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
                 DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-RX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-TX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-RX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-TX-1600.wav");
             }
 
             DeleteRegKeys();

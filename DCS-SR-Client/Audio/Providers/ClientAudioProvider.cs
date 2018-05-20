@@ -19,8 +19,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private readonly Random _random = new Random();
 
-        private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
-
         private int _lastReceivedOn = -1;
         private OnlineFilter[] _filters;
 
