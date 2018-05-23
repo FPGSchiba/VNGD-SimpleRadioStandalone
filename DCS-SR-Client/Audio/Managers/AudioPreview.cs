@@ -103,10 +103,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             {
                 Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
 
-                MessageBox.Show(
-                    $"Problem Initialising Audio Output! Try a different Output device and please post your client log on the forums",
-                    "Audio Output Error", MessageBoxButton.OK,
+                var messageBoxResult = MessageBox.Show(
+                    "Problem initialising Audio Output!\n\nTry a different Output device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
+                    "Audio Output Error",
+                    MessageBoxButton.YesNo,
                     MessageBoxImage.Error);
+
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start("https://discord.gg/baw7g3t");
+                }
 
                 Environment.Exit(1);
             }
@@ -140,10 +146,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             {
                 Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
 
-                MessageBox.Show(
-                    $"Problem Initialising Audio Input! Try a different Input device and please post your client log on the forums",
-                    "Audio Input Error", MessageBoxButton.OK,
+                var messageBoxResult = MessageBox.Show(
+                    "Problem initialising Audio Input!\n\nIf you are using Windows 10, this could be caused by your privacy settings (Microphone Privacy Settings -> Allow apps to access your microphone).\nAlternatively, try a different Input device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
+                    "Audio Input Error",
+                    MessageBoxButton.YesNo,
                     MessageBoxImage.Error);
+
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start("https://discord.gg/baw7g3t");
+                }
 
                 Environment.Exit(1);
             }

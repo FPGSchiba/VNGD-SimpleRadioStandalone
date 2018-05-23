@@ -704,9 +704,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             ex.Message);
                         Stop();
 
-                        MessageBox.Show($"Problem Initialising Audio Output! Try selecting a different Output device.",
-                            "Audio Output Error", MessageBoxButton.OK,
+                        var messageBoxResult = MessageBox.Show(
+                            "Problem initialising Audio Output!\n\nTry a different Output device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
+                            "Audio Output Error",
+                            MessageBoxButton.YesNo,
                             MessageBoxImage.Error);
+
+                        if (messageBoxResult == MessageBoxResult.Yes)
+                        {
+                            Process.Start("https://discord.gg/baw7g3t");
+                        }
                     }
                 }
             }
