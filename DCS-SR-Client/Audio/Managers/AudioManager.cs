@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -18,6 +19,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using WPFCustomMessageBox;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
@@ -252,15 +254,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     Logger.Error(ex, "Error starting audio Input - Quitting! " + ex.Message);
 
-                    var messageBoxResult = MessageBox.Show(
-                        "Problem initialising Audio Input!\n\nIf you are using Windows 10, this could be caused by your privacy settings (Microphone Privacy Settings -> Allow apps to access your microphone).\nAlternatively, try a different Input device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
-                        "Audio Input Error",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Error);
-
-                    if (messageBoxResult == MessageBoxResult.Yes)
+                    if (Environment.OSVersion.Version.Major == 10)
                     {
-                        System.Diagnostics.Process.Start("https://discord.gg/baw7g3t");
+                        var messageBoxResult = CustomMessageBox.ShowYesNoCancel(
+                            "Problem initialising Audio Input!\n\nIf you are using Windows 10, this could be caused by your privacy settings (make sure to allow apps to access your microphone).\nAlternatively, try a different Input device and please post your client log to the support Discord server.",
+                            "Audio Input Error",
+                            "OPEN PRIVACY SETTINGS",
+                            "JOIN DISCORD SERVER",
+                            "CLOSE",
+                            MessageBoxImage.Error);
+
+                        if (messageBoxResult == MessageBoxResult.Yes)
+                        {
+                            Process.Start("ms-settings:privacy-microphone");
+                        }
+                        else if (messageBoxResult == MessageBoxResult.No)
+                        {
+                            Process.Start("https://discord.gg/baw7g3t");
+                        }
+                    }
+                    else
+                    {
+                        var messageBoxResult = CustomMessageBox.ShowYesNo(
+                            "Problem initialising Audio Input!\n\nTry a different Input device and please post your client log to the support Discord server.",
+                            "Audio Input Error",
+                            "JOIN DISCORD SERVER",
+                            "CLOSE",
+                            MessageBoxImage.Error);
+
+                        if (messageBoxResult == MessageBoxResult.Yes)
+                        {
+                            Process.Start("https://discord.gg/baw7g3t");
+                        }
                     }
 
                     Environment.Exit(1);
