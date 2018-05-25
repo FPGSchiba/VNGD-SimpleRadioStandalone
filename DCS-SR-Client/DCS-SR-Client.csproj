@@ -34,7 +34,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -186,6 +186,11 @@
     <Compile Include="Network\Models\CombinedRadioState.cs" />
     <Compile Include="Network\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\Models\DCSLosCheckResult.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Favourites\CsvFavouriteServerStore.cs" />
     <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
     <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
@@ -310,19 +315,15 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -375,30 +376,18 @@
     <Resource Include="audio-headset.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\mic_click_on.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mic_click_off.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mic_click_off_16_1600.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mic_click_on_16_1600.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ARC-164_Rx_End_16_1600.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\KY-58 TX PREAMBLE SHORT 16 1600.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\KY-58 RX PREAMBLE SHORT 16 1600.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mic_click_on_16_1600_reversed.wav" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="AudioEffects\KY-58-RX-1600.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="AudioEffects\KY-58-TX-1600.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="AudioEffects\Radio-RX-1600.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="AudioEffects\Radio-TX-1600.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
