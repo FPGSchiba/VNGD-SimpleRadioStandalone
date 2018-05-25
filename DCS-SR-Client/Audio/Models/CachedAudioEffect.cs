@@ -1,11 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Properties;
 using NAudio.Wave;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class CachedAudioEffect
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public enum AudioEffectTypes
         {
             RADIO_TX = 0,
@@ -14,39 +18,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             KY_58_RX = 3
         }
 
+        //order must match ENUM above
+        private static readonly string[] FileNameLookup = new[] { "Radio-TX-1600.wav","Radio-RX-1600.wav",
+            "KY-58-TX-1600.wav","KY-58-RX-1600.wav"};
+
         public CachedAudioEffect(AudioEffectTypes audioEffect)
         {
             AudioEffectType = audioEffect;
 
             var file = GetFile();
 
-            using (var reader = new WaveFileReader(file))
+            AudioEffectBytes = new byte[0];
+
+            if (file != null)
             {
-                //    Assert.AreEqual(16, reader.WaveFormat.BitsPerSample, "Only works with 16 bit audio");
-                AudioEffectBytes = new byte[reader.Length];
-                var read = reader.Read(AudioEffectBytes, 0, AudioEffectBytes.Length);
+                using (var reader = new WaveFileReader(file))
+                {
+                    //    Assert.AreEqual(16, reader.WaveFormat.BitsPerSample, "Only works with 16 bit audio");
+                    if (reader.WaveFormat.BitsPerSample == 16 && reader.WaveFormat.Channels == 1)
+                    {
+                        AudioEffectBytes = new byte[reader.Length];
+                        var read = reader.Read(AudioEffectBytes, 0, AudioEffectBytes.Length);
+                        Logger.Info($"Read Effect {audioEffect} from {file} Successfully");
+                    }
+                    else
+                    {
+                        Logger.Info($"Unable to read Effect {audioEffect} from {file} Successfully - not 16 bits!");
+                    }
+                   
+                }
             }
+            else
+            {
+                Logger.Info($"Unable to find file for effect {audioEffect} in AudioEffects\\{FileNameLookup[(int) audioEffect]} ");
+            }
+          
         }
 
         public AudioEffectTypes AudioEffectType { get; }
 
         public byte[] AudioEffectBytes { get; }
 
-        private UnmanagedMemoryStream GetFile()
+        private string GetFile()
         {
-            switch (AudioEffectType)
+            var location = AppDomain.CurrentDomain.BaseDirectory+"\\AudioEffects\\";
+
+            if(File.Exists(location + FileNameLookup[(int)AudioEffectType]))
             {
-                case AudioEffectTypes.KY_58_RX:
-                    return Resources.KY_58_RX_PREAMBLE_SHORT_16_1600;
-                case AudioEffectTypes.KY_58_TX:
-                    return Resources.KY_58_TX_PREAMBLE_SHORT_16_1600;
-                case AudioEffectTypes.RADIO_RX:
-                    return Resources.mic_click_on_16_1600_reversed;
-                case AudioEffectTypes.RADIO_TX:
-                    return Resources.mic_click_on_16_1600;
-                default:
-                    return Resources.mic_click_on_16_1600;
+                return location + FileNameLookup[(int) AudioEffectType];
             }
+
+            return null;
         }
     }
 }
