@@ -34,6 +34,7 @@ using NAudio.Wave;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
@@ -704,9 +705,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             ex.Message);
                         Stop();
 
-                        MessageBox.Show($"Problem Initialising Audio Output! Try selecting a different Output device.",
-                            "Audio Output Error", MessageBoxButton.OK,
+                        var messageBoxResult = CustomMessageBox.ShowYesNo(
+                            "Problem initialising Audio Output!\n\nTry a different Output device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
+                            "Audio Output Error",
+                            "OPEN PRIVACY SETTINGS",
+                            "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
+
+                        if (messageBoxResult == MessageBoxResult.Yes)
+                        {
+                            Process.Start("https://discord.gg/baw7g3t");
+                        }
                     }
                 }
             }
