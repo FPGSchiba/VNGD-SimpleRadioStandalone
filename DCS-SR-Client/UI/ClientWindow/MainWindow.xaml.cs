@@ -743,6 +743,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
 
+            _awacsRadioOverlay?.Close();
+            _awacsRadioOverlay = null;
+
             _dcsAutoConnectListener.Stop();
             _dcsAutoConnectListener = null;
         }
