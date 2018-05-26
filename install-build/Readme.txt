@@ -27,6 +27,8 @@ Copy the rest of the zip file where ever you like and then run, don't forget to 
 
 Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
 
+Create a folder called AudioEffects where ever your SR-ClientRadio.exe is - Drag all 4 sound files into that folder or you wont have sound effects
+
 
 *** To Install AutoConnect System for SERVERS only ***
 To enable SRS clients to be prompted automatically to connect just add the DCS-SRS-AutoConnectGameGUI.lua 

@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
-        private readonly Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
+        private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         public MainWindow()
@@ -88,9 +88,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             var client = ClientStateSingleton.Instance;
 
-            this.WindowStartupLocation = WindowStartupLocation.Manual;
-            this.Left = _settings.GetPositionSetting(SettingsKeys.ClientX).FloatValue;
-            this.Top = _settings.GetPositionSetting(SettingsKeys.ClientY).FloatValue;
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = _settings.GetPositionSetting(SettingsKeys.ClientX).FloatValue;
+            Top = _settings.GetPositionSetting(SettingsKeys.ClientY).FloatValue;
 
            
 
@@ -419,7 +419,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             var enumerator = new MMDeviceEnumerator();
             outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            int i = 0;
+            var i = 0;
             foreach (var device in outputDeviceList)
             {
                 Speakers.Items.Add(new AudioDeviceListItem()
@@ -452,7 +452,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Mic Audio Output - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue);
 
-            int i = 0;
+            var i = 0;
 
             MicOutput.Items.Add(new AudioDeviceListItem()
             {
@@ -675,7 +675,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (result)
             {
                 if (_stop)
-                {
                     try
                     {
 
@@ -688,7 +687,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         {
                             micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
                         }
-                     
+
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
@@ -706,18 +705,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Stop();
 
                         var messageBoxResult = CustomMessageBox.ShowYesNo(
-                            "Problem initialising Audio Output!\n\nTry a different Output device and please post your client log to the support Discord server.\n\nJoin support Discord server now?",
+                            "Problem initialising Audio Output!\n\nTry a different Output device and please post your clientlog.txt to the support Discord server.\n\nJoin support Discord server now?",
                             "Audio Output Error",
                             "OPEN PRIVACY SETTINGS",
                             "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
 
-                        if (messageBoxResult == MessageBoxResult.Yes)
-                        {
-                            Process.Start("https://discord.gg/baw7g3t");
-                        }
+                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/baw7g3t");
                     }
-                }
             }
             else
             {
@@ -728,8 +723,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _settings.SetPositionSetting(SettingsKeys.ClientX, this.Left);
-            _settings.SetPositionSetting(SettingsKeys.ClientY, this.Top);
+            _settings.SetPositionSetting(SettingsKeys.ClientX, Left);
+            _settings.SetPositionSetting(SettingsKeys.ClientY, Top);
 
             //save window position
             base.OnClosing(e);
@@ -791,6 +786,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     Logger.Error(ex,
                         "Unable to preview audio - likely output device error - Pick another. Error:" + ex.Message);
+
                 }
             }
             else
@@ -977,13 +973,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _settings.Save();
 
             if (_radioOverlayWindow != null)
-            {
                 _radioOverlayWindow.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
-            }
-            else if (_awacsRadioOverlay != null)
-            {
-                _awacsRadioOverlay.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
-            }
+            else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
         }
 
 

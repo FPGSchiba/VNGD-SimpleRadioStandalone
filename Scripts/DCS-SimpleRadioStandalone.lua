@@ -1,4 +1,4 @@
--- Version 1.5.0.0
+-- Version 1.5.1.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1789,10 +1789,16 @@ end
 function SR.getRadioModulation(_deviceId)
     local _device = GetDevice(_deviceId)
 
-    if _device then
-        return _device:get_modulation()
+    local _modulation = 0
+
+     if _device then
+
+   		pcall(function() 
+    		_modulation =  _device:get_modulation()
+    	end)
+
     end
-    return 0
+    return _modulation
 end
 
 function SR.rerange(_val,_minMax,_limitMinMax)

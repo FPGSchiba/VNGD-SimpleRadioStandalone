@@ -670,7 +670,7 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio Switch works as Push To Talk" />
+                               Content="Radio Switch works as Push To Talk (PTT)" />
 
                         <ToggleButton Name="RadioSwitchIsPTT"
                                       Grid.Row="4"
@@ -933,7 +933,7 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Always allow SRS Hotkeys" />
+                               Content="ALWAYS allow SRS Hotkeys" />
 
 
                         <ToggleButton Name="AlwaysAllowHotas"
@@ -961,7 +961,7 @@
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Allow DCS Push to Talk (PTT)" />
+                               Content="Allow INCOCKPIT DCS Controlled PTT" />
 
                         <ToggleButton Name="AllowDCSPTT"
                                       Grid.Row="15"
