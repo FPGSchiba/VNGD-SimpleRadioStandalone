@@ -516,6 +516,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
+                message.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
                 playerRadioInfo.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
             }
             else
@@ -548,7 +549,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 changed = true;
             }
 
-            if (message.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
+            if (playerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
             {
                 playerRadioInfo.selected = message.selected;
             }
