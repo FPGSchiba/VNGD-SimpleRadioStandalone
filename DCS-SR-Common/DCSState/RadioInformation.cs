@@ -54,6 +54,8 @@
 
         public int channel = -1;
 
+        public bool simul = false;
+
         /**
          * Used to determine if we should send an update to the server or not
          * We only need to do that if something that would stop us Receiving happens which
@@ -75,8 +77,15 @@
             {
                 return false;
             }
-
             if (modulation != compare.modulation)
+            {
+                return false;
+            }
+            if (enc != compare.enc)
+            {
+                return false;
+            }
+            if (encKey != compare.encKey)
             {
                 return false;
             }

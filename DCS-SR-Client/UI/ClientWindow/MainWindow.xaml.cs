@@ -572,18 +572,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
                         MicOutput.IsEnabled = false;
+
+                        _clientStateSingleton.IsConnected = true;
                     }
                     else
                     {
                         //invalid ID
                         MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
+
+                        _clientStateSingleton.IsConnected = false;
                     }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
+
+                    _clientStateSingleton.IsConnected = false;
                 }
             }
         }
@@ -624,6 +630,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
             MicOutput.IsEnabled = true;
+            _clientStateSingleton.IsConnected = false;
             try
             {
                 _audioManager.StopEncoding();
@@ -742,6 +749,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
+
+            _awacsRadioOverlay?.Close();
+            _awacsRadioOverlay = null;
 
             _dcsAutoConnectListener.Stop();
             _dcsAutoConnectListener = null;

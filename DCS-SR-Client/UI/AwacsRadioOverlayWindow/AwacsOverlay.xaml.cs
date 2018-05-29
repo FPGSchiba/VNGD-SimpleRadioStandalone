@@ -101,15 +101,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             intercom.RepaintRadioStatus();
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            if (dcsPlayerRadioInfo != null)
             {
-                var avalilableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
+                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent())
                 {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
+                    ToggleGlobalSimultaneousTransmissionButton.IsEnabled = true;
+
+                    var avalilableRadios = 0;
+
+                    for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                     {
-                        avalilableRadios++;
+                        if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            avalilableRadios++;
+                        }
+                    }
+                }
+                else
+                {
+                    ToggleGlobalSimultaneousTransmissionButton.IsEnabled = false;
+                    ToggleGlobalSimultaneousTransmissionButton.Content = "Simul. Transmission OFF";
+
+                    dcsPlayerRadioInfo.simultaneousTransmission = false;
+
+                    foreach (var radio in dcsPlayerRadioInfo.radios)
+                    {
+                        radio.simul = false;
                     }
                 }
             }
@@ -233,5 +250,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         }
 
         #endregion
+
+        private void ToggleGlobalSimultaneousTransmissionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+            if (dcsPlayerRadioInfo != null)
+            {
+                dcsPlayerRadioInfo.simultaneousTransmission = !dcsPlayerRadioInfo.simultaneousTransmission;
+
+                if (!dcsPlayerRadioInfo.simultaneousTransmission)
+                {
+                    foreach (var radio in dcsPlayerRadioInfo.radios)
+                    {
+                        radio.simul = false;
+                    }
+                }
+
+                ToggleGlobalSimultaneousTransmissionButton.Content = _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission ? "Simul. Transmission ON" : "Simul. Transmission OFF";
+
+                foreach (var radio in radioControlGroup)
+                {
+                    if (!dcsPlayerRadioInfo.simultaneousTransmission)
+                    {
+                        radio.ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
+                    }
+
+                    radio.RepaintRadioStatus();
+                }
+            }
+        }
     }
 }

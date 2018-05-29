@@ -12,7 +12,7 @@
     <StackPanel Orientation="Horizontal">
 
         <TextBlock x:Name="RadioLabel"
-                   Width="110"
+                   Width="75"
                    Margin="2"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
@@ -20,7 +20,7 @@
                    Foreground="#E7E7E7"
                    Padding="0"
                    Style="{x:Null}"
-                   Text="Telephone / Sat Comms"
+                   Text="INTERCOM"
                    TextAlignment="Center" />
 
         <Ellipse x:Name="RadioActive"

@@ -97,6 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DCSState\RadioReceivingPriority.cs" />
     <Compile Include="DCSState\RadioReceivingState.cs" />
     <Compile Include="Helpers\CircularBuffer.cs" />
     <Compile Include="Helpers\ConversionHelpers.cs" />

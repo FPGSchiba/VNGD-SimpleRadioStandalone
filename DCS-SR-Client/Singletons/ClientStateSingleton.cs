@@ -29,6 +29,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         
         public long LastSent { get; set; }
 
+        public bool IsConnected { get; set; }
+
         private ClientStateSingleton()
         {
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
@@ -42,6 +44,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
 
             MicrophoneAvailable = true;
+
+            IsConnected = false;
         }
 
         public static ClientStateSingleton Instance
