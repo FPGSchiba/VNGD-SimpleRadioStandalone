@@ -1,3 +1,4 @@
+-- Version 1.5.2.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1000,6 +1001,7 @@ function SR.exportRadioFA18C(_data)
     
      -- VHF AM
     -- Set radio data
+    _data.radios[2].name = "AN/ARC-210 - 1"
     _data.radios[2].freq =  SR.getRadioFrequency(39)
     _data.radios[2].modulation = SR.getRadioModulation(39)
     _data.radios[2].volume = SR.getRadioVolume(0, 108,{0.0,1.0},false)*  SR.getRadioVolume(0, 362,{0.0,1.0},false)
@@ -1007,6 +1009,7 @@ function SR.exportRadioFA18C(_data)
 
     -- UHF
     -- Set radio data
+    _data.radios[3].name = "AN/ARC-210 - 2"
     _data.radios[3].freq = SR.getRadioFrequency(40)
     _data.radios[3].modulation = SR.getRadioModulation(40)
     _data.radios[3].volume = SR.getRadioVolume(0, 123,{0.0,1.0},false) *  SR.getRadioVolume(0, 361,{0.0,1.0},false)
