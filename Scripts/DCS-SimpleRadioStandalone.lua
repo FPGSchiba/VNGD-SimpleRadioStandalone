@@ -1,4 +1,3 @@
--- Version 1.5.1.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -133,8 +132,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioL39(_update)
                 elseif _update.unit == "A-10C" then
                     _update = SR.exportRadioA10C(_update)
-                  -- elseif _update.unit == "FA-18C_hornet" then
-                  --   _update = SR.exportRadioFA18C(_update)
+                  elseif _update.unit == "FA-18C_hornet" then
+                    _update = SR.exportRadioFA18C(_update)
                 elseif string.find(_update.unit, "F-14") then
                     _update = SR.exportRadioF14(_update)                        
                 elseif _update.unit == "F-86F Sabre" then
@@ -997,6 +996,47 @@ function SR.exportRadioA10C(_data)
 end
 
 
+function SR.exportRadioFA18C(_data)
+    
+     -- VHF AM
+    -- Set radio data
+    _data.radios[2].freq =  SR.getRadioFrequency(39)
+    _data.radios[2].modulation = SR.getRadioModulation(39)
+    _data.radios[2].volume = SR.getRadioVolume(0, 108,{0.0,1.0},false)*  SR.getRadioVolume(0, 362,{0.0,1.0},false)
+    -- _data.radios[2].encMode = 2 -- Mode 2 is set by aircraft
+
+    -- UHF
+    -- Set radio data
+    _data.radios[3].freq = SR.getRadioFrequency(40)
+    _data.radios[3].modulation = SR.getRadioModulation(40)
+    _data.radios[3].volume = SR.getRadioVolume(0, 123,{0.0,1.0},false) *  SR.getRadioVolume(0, 361,{0.0,1.0},false)
+    _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
+
+ 
+    -- KY-58 Radio Encryption
+    local _ky58Power = SR.round(SR.getButtonPosition(447),0.1)
+    if _ky58Power == 0.1 and SR.round(SR.getButtonPosition(444),0.1) == 0.1 then -- mode switch set to C and powered on
+        -- Power on!
+
+        -- Get encryption key
+        local _channel =  SR.getSelectorPosition(446,0.1)+1
+        if _channel > 6 then
+            _channel = 6 -- has two other options - lock to 6
+        end
+
+        -- _data.radios[2].encKey = _channel
+        -- _data.radios[2].enc = true
+       
+        _data.radios[3].encKey = _channel
+        _data.radios[3].enc = true
+    
+    end
+    
+    _data.control = 0; -- SRS Hotas Controls
+
+    return _data
+end
+
 
 function SR.exportRadioF86Sabre(_data)
 
@@ -1818,4 +1858,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.5.1.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.2.0")
