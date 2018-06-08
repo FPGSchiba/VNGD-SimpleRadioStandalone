@@ -5,141 +5,212 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     /**
        * UDP PACKET LAYOUT
+       * 
+       * - HEADER SEGMENT
        * UInt16 Packet Length - 2 bytes
        * UInt16 AudioPart1 Length - 2 bytes
+       * UInt16 FrequencyPart Length - 2 bytes
+       * - AUDIO SEGMENT
        * Bytes AudioPart1 - variable bytes
-       * Double Frequency Length - 8 bytes
-       * byte Modulation Length - 1 byte
-       * byte Encryption Length - 1 byte
-       * UInt UnitId Length - 4 bytes
-       * UInt PacketId Length - 4 bytes
-       * Byte[] / Ascii String GUID length - 22
+       * - FREQUENCY SEGMENT (one or multiple)
+       * double Frequency - 8 bytes
+       * byte Modulation - 1 byte
+       * byte Encryption - 1 byte
+       * - FIXED SEGMENT
+       * UInt UnitId - 4 bytes
+       * UInt64 PacketId - 8 bytes
+       * Bytes / ASCII String GUID - 22 bytes
        */
 
     public class UDPVoicePacket
     {
         public static readonly int GuidLength = 22;
 
-        public static readonly int FixedPacketLength =
-            sizeof(ushort)
-            + sizeof(ushort)
-            + sizeof(double)
-            + sizeof(int)
-            + sizeof(byte)
-            + sizeof(byte)
-            + sizeof(uint)
-            + sizeof(uint)
-            + GuidLength;
+        public static readonly int PacketHeaderLength =
+            sizeof(ushort) // UInt16 Packet Length - 2 bytes
+            + sizeof(ushort) // UInt16 AudioPart1 Length - 2 bytes
+            + sizeof(ushort); // UInt16 FrequencyPart Length - 2 bytes
 
+        public static readonly int FrequencySegmentLength =
+            sizeof(double) // double Frequency - 8 bytes
+            + sizeof(byte) // byte Modulation - 1 byte
+            + sizeof(byte); // byte Encryption - 1 byte
+
+        public static readonly int FixedPacketLength =
+            sizeof(uint) // UInt UnitId - 4 bytes
+            + sizeof(ulong) // UInt64 PacketId - 8 bytes
+            + GuidLength; // Bytes / ASCII String GUID - 22 bytes
+
+        // HEADER SEGMENT
+        public ushort PacketLength { get; set; }
+
+        // AUDIO SEGMENT
         public ushort AudioPart1Length { get; set; }
         public byte[] AudioPart1Bytes { get; set; }
 
-        public double Frequency { get; set; }
-        public byte Modulation { get; set; } //0 - AM, 1 - FM, 2- Intercom, 3 - disabled
-        public byte Encryption { get; set; }
+        // FREQUENCY SEGMENT
+        public double[] Frequencies { get; set; }
+        public byte[] Modulations { get; set; } // 0 - AM, 1 - FM, 2- Intercom, 3 - disabled
+        public byte[] Encryptions { get; set; }
+
+        // FIXED SEGMENT
         public uint UnitId { get; set; }
         public byte[] GuidBytes { get; set; }
         public string Guid { get; set; }
-        public uint PacketNumber { get; set; }
-
-        public ushort PacketLength { get; set; }
+        public ulong PacketNumber { get; set; }
 
         public byte[] EncodePacket()
         {
-            //1 * int16 at the start giving the segment
-            //
-            var combinedLength = AudioPart1Length + 2;
-            //calculate first part of packet length + 2 for 1* int16
-            var combinedBytes = new byte[combinedLength + FixedPacketLength];
+            // Calculate length of different packet segments for header
+            var frequencyPartLength = Frequencies.Length * FrequencySegmentLength;
 
-            //calculate full packet length including 2 bytes containing the length
-            var packetLength = BitConverter.GetBytes(Convert.ToUInt16(combinedBytes.Length));
+            var dynamicSegmentLength = AudioPart1Length + frequencyPartLength;
+            var staticSegmentLength = PacketHeaderLength + FixedPacketLength;
+            var totalPacketLength = staticSegmentLength + dynamicSegmentLength;
+
+            PacketLength = (ushort) totalPacketLength;
+
+            // Allocate memory for all combined packet segments
+            var combinedBytes = new byte[totalPacketLength];
+
+            /**
+             * HEADER SEGMENT
+             */
+
+            // Total packet length
+            var packetLength = BitConverter.GetBytes(Convert.ToUInt16(totalPacketLength));
             combinedBytes[0] = packetLength[0];
             combinedBytes[1] = packetLength[1];
 
-            var part1Size = BitConverter.GetBytes(Convert.ToUInt16(AudioPart1Bytes.Length));
+            // Length of audio part
+            var part1Size = BitConverter.GetBytes(Convert.ToUInt16(AudioPart1Length));
             combinedBytes[2] = part1Size[0];
             combinedBytes[3] = part1Size[1];
 
-            //copy audio segments after we've added the length header
-            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 4, AudioPart1Bytes.Length); // copy audio
+            // Length of frequencies part
+            var freqSize = BitConverter.GetBytes(Convert.ToUInt16(frequencyPartLength));
+            combinedBytes[4] = freqSize[0];
+            combinedBytes[5] = freqSize[1];
 
-            var freq = BitConverter.GetBytes(Frequency); //8 bytes
+            /**
+             * AUDIO SEGMENT
+             */
 
-            combinedBytes[combinedLength + 2] = freq[0];
-            combinedBytes[combinedLength + 1 + 2] = freq[1];
-            combinedBytes[combinedLength + 2 + 2] = freq[2];
-            combinedBytes[combinedLength + 3 + 2] = freq[3];
-            combinedBytes[combinedLength + 4 + 2] = freq[4];
-            combinedBytes[combinedLength + 5 + 2] = freq[5];
-            combinedBytes[combinedLength + 6 + 2] = freq[6];
-            combinedBytes[combinedLength + 7 + 2] = freq[7];
+            // Copy segment after length headers
+            Buffer.BlockCopy(AudioPart1Bytes, 0, combinedBytes, 6, AudioPart1Bytes.Length);
 
-            //modulation
-            combinedBytes[combinedLength + 8 + 2] = Modulation; //1 byte;
+            /**
+             * FREQUENCY SEGMENT
+             */
 
-            //encryption
-            combinedBytes[combinedLength + 9 + 2] = Encryption; //1 byte;
+            // Offset for frequency info, incremented by iteration below
+            var frequencyOffset = PacketHeaderLength + AudioPart1Length;
 
-            //unit Id
-            var unitId = BitConverter.GetBytes(UnitId); //4 bytes
-            combinedBytes[combinedLength + 10 + 2] = unitId[0];
-            combinedBytes[combinedLength + 11 + 2] = unitId[1];
-            combinedBytes[combinedLength + 12 + 2] = unitId[2];
-            combinedBytes[combinedLength + 13 + 2] = unitId[3];
+            // Add freq/modulation/encryption info for each transmitted frequency
+            for (var i = 0; i < Frequencies.Length; i++)
+            {
+                var freq = BitConverter.GetBytes(Frequencies[i]);
 
-            //Packet Id
-            var packetNumber = BitConverter.GetBytes(PacketNumber); //4 bytes
-            combinedBytes[combinedLength + 14 + 2] = packetNumber[0];
-            combinedBytes[combinedLength + 15 + 2] = packetNumber[1];
-            combinedBytes[combinedLength + 16 + 2] = packetNumber[2];
-            combinedBytes[combinedLength + 17 + 2] = packetNumber[3];
+                // Radio frequency (double, 8 bytes)
+                combinedBytes[frequencyOffset] = freq[0];
+                combinedBytes[frequencyOffset + 1] = freq[1];
+                combinedBytes[frequencyOffset + 2] = freq[2];
+                combinedBytes[frequencyOffset + 3] = freq[3];
+                combinedBytes[frequencyOffset + 4] = freq[4];
+                combinedBytes[frequencyOffset + 5] = freq[5];
+                combinedBytes[frequencyOffset + 6] = freq[6];
+                combinedBytes[frequencyOffset + 7] = freq[7];
 
-            Buffer.BlockCopy(GuidBytes, 0, combinedBytes, combinedLength + FixedPacketLength - GuidLength, GuidLength);
-            // copy short guid
+                // Radio modulation (1 byte), defaults to AM if not defined for all frequencies
+                var mod = Modulations.Length > i ? Modulations[i] : (byte)4;
+                combinedBytes[frequencyOffset + 8] = mod;
+
+                // Radio encryption (1 byte), defaults to disabled if not defined for all frequencies
+                var enc = Encryptions.Length > i ? Encryptions[i] : (byte)0;
+                combinedBytes[frequencyOffset + 9] = enc;
+
+                frequencyOffset += FrequencySegmentLength;
+            }
+
+            /**
+             * FIXED SEGMENT
+             */
+            
+            // Offset for fixed segment
+            var fixedSegmentOffset = PacketHeaderLength + dynamicSegmentLength;
+
+            // Unit ID (uint, 4 bytes)
+            var unitId = BitConverter.GetBytes(UnitId);
+            combinedBytes[fixedSegmentOffset] = unitId[0];
+            combinedBytes[fixedSegmentOffset + 1] = unitId[1];
+            combinedBytes[fixedSegmentOffset + 2] = unitId[2];
+            combinedBytes[fixedSegmentOffset + 3] = unitId[3];
+
+            // Packet ID (ulong, 8 bytes)
+            var packetNumber = BitConverter.GetBytes(PacketNumber); //8 bytes
+            combinedBytes[fixedSegmentOffset + 4] = packetNumber[0];
+            combinedBytes[fixedSegmentOffset + 5] = packetNumber[1];
+            combinedBytes[fixedSegmentOffset + 6] = packetNumber[2];
+            combinedBytes[fixedSegmentOffset + 7] = packetNumber[3];
+            combinedBytes[fixedSegmentOffset + 8] = packetNumber[4];
+            combinedBytes[fixedSegmentOffset + 9] = packetNumber[5];
+            combinedBytes[fixedSegmentOffset + 10] = packetNumber[6];
+            combinedBytes[fixedSegmentOffset + 11] = packetNumber[7];
+
+            // Copy client GUID to end of packet
+            Buffer.BlockCopy(GuidBytes, 0, combinedBytes, totalPacketLength - GuidLength, GuidLength);
 
             return combinedBytes;
         }
 
         public static UDPVoicePacket DecodeVoicePacket(byte[] encodedOpusAudio, bool decode = true)
         {
-            //last 22 bytes are guid!
-            var recievingGuid = Encoding.ASCII.GetString(
+            // Last 22 bytes of packet are always the client GUID
+            var receivingGuid = Encoding.ASCII.GetString(
                 encodedOpusAudio, encodedOpusAudio.Length - GuidLength, GuidLength);
 
             var packetLength = BitConverter.ToUInt16(encodedOpusAudio, 0);
 
             var ecnAudio1 = BitConverter.ToUInt16(encodedOpusAudio, 2);
 
+            var freqLength = BitConverter.ToUInt16(encodedOpusAudio, 4);
+            var freqCount = freqLength / FrequencySegmentLength;
+
             byte[] part1 = null;
 
             if (decode)
             {
                 part1 = new byte[ecnAudio1];
-                Buffer.BlockCopy(encodedOpusAudio, 4, part1, 0, ecnAudio1);
+                Buffer.BlockCopy(encodedOpusAudio, 6, part1, 0, ecnAudio1);
             }
 
-            var frequency = BitConverter.ToDouble(encodedOpusAudio,
-                ecnAudio1 + 2 + 2);
+            var frequencies = new double[freqCount];
+            var modulations = new byte[freqCount];
+            var encryptions = new byte[freqCount];
 
-            //after frequency and audio
-            var modulation = encodedOpusAudio[ecnAudio1 + 2 + 8 + 2];
+            var frequencyOffset = PacketHeaderLength + ecnAudio1;
+            for (var i = 0; i < freqCount; i++)
+            {
+                frequencies[i] = BitConverter.ToDouble(encodedOpusAudio, frequencyOffset);
+                modulations[i] = encodedOpusAudio[frequencyOffset + 8];
+                encryptions[i] = encodedOpusAudio[frequencyOffset + 9];
 
-            var encryption = encodedOpusAudio[ecnAudio1 + 2 + 8 + 1 + 2];
+                frequencyOffset += FrequencySegmentLength;
+            }
 
-            var unitId = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + 2 + 8 + 1 + 1 + 2);
+            var unitId = BitConverter.ToUInt32(encodedOpusAudio, PacketHeaderLength + ecnAudio1 + freqLength);
 
-            var packetNumber = BitConverter.ToUInt32(encodedOpusAudio, ecnAudio1 + 2 + 8 + 1 + 1 + 4 + 2);
+            var packetNumber = BitConverter.ToUInt64(encodedOpusAudio, PacketHeaderLength + ecnAudio1 + freqLength + 4);
 
             return new UDPVoicePacket
             {
-                Guid = recievingGuid,
+                Guid = receivingGuid,
                 AudioPart1Bytes = part1,
                 AudioPart1Length = ecnAudio1,
-                Frequency = frequency,
+                Frequencies = frequencies,
                 UnitId = unitId,
-                Encryption = encryption,
-                Modulation = modulation,
+                Encryptions = encryptions,
+                Modulations = modulations,
                 PacketNumber = packetNumber,
                 PacketLength = packetLength
             };

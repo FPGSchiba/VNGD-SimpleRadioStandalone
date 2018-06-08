@@ -4,6 +4,6 @@
     {
         public byte[] Audio { get; set; }
 
-        public uint PacketNumber { get; set; }
+        public ulong PacketNumber { get; set; }
     }
 }

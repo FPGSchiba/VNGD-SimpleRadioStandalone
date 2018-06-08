@@ -17,6 +17,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public RadioReceivingState RadioReceivingState { get; set; }
         public double RecevingPower { get; set; }
         public float LineOfSightLoss { get; set; }
-        public uint PacketNumber { get; set; }
+        public ulong PacketNumber { get; set; }
     }
 }

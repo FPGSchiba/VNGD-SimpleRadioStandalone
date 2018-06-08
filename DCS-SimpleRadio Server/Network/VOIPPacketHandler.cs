@@ -90,11 +90,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     {
                         HashSet<string> matchingClients = new HashSet<string>();
 
-                        if (decodedPacket.Modulation != 4)
-                            //magical ignore message 4 - just used for ping
+                        for (int i = 0; i < decodedPacket.Frequencies.Length; i++)
                         {
+                            // Magical ignore message 4 - just used for ping
+                            if (decodedPacket.Modulations[0] == 4) {
+                                continue;
+                            }
+
                             var coalitionSecurity =
-                                _serverSettings.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY];
+                                _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY];
 
                             foreach (KeyValuePair<string, SRClient> _client in _clientsList)
                             {
@@ -109,23 +113,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                         if (radioInfo != null)
                                         {
                                             RadioReceivingState radioReceivingState = null;
-                                            var receivingRadio = radioInfo.CanHearTransmission(decodedPacket.Frequency,
-                                                (RadioInformation.Modulation) decodedPacket.Modulation,
-                                                decodedPacket.UnitId, out radioReceivingState);
+                                            bool decryptable;
+                                            var receivingRadio = radioInfo.CanHearTransmission(decodedPacket.Frequencies[i],
+                                                (RadioInformation.Modulation)decodedPacket.Modulations[i],
+                                                decodedPacket.Encryptions[i],
+                                                decodedPacket.UnitId, out radioReceivingState, out decryptable);
 
                                             //only send if we can hear!
-                                            if (receivingRadio != null)
+                                            if (receivingRadio != null && !matchingClients.Contains(_client.Value.ClientChannelId))
+                                            {
                                                 matchingClients.Add(_client.Value.ClientChannelId);
+                                            }
                                         }
                                     }
                                 }
                             }
+                        }
 
-                            //send to other connected clients
-                            if (matchingClients.Count > 0)
-                            {
-                                group.WriteAndFlushAsync(message, new AllMatchingChannels(matchingClients));
-                            }
+                        //send to other connected clients
+                        if (matchingClients.Count > 0)
+                        {
+                            group.WriteAndFlushAsync(message, new AllMatchingChannels(matchingClients));
                         }
                     }
                 }

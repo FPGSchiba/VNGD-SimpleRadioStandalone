@@ -25,6 +25,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public readonly static uint UnitIdOffset = 100000001
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
+        public bool simultaneousTransmission = false; // Global toggle enabling simultaneous transmission on multiple radios, activated via the AWACS panel
+
         public DCSPlayerRadioInfo()
         {
             for (var i = 0; i < 11; i++)
@@ -95,15 +97,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > DateTime.Now.Ticks - 100000000;
         }
 
-        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation,
+        public RadioInformation CanHearTransmission(double frequency, 
+            RadioInformation.Modulation modulation,
+            byte encryptionKey,
             uint sendingUnitId,
-            out RadioReceivingState receivingState)
+            out RadioReceivingState receivingState, 
+            out bool decryptable)
         {
             if (!IsCurrent())
             {
                 receivingState = null;
+                decryptable = false;
                 return null;
             }
+
+            RadioInformation bestMatchingRadio = null;
+            RadioReceivingState bestMatchingRadioState = null;
+
             for (var i = 0; i < radios.Length; i++)
             {
                 var receivingRadio = radios[i];
@@ -123,10 +133,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                                 LastReceviedAt = DateTime.Now.Ticks,
                                 ReceivedOn = i
                             };
-
-
+                            decryptable = true;
                             return receivingRadio;
                         }
+                        decryptable = false;
                         receivingState = null;
                         return null;
                     }
@@ -141,31 +151,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {
-                        receivingState = new RadioReceivingState
+                        if (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey)
+                        {
+                            receivingState = new RadioReceivingState
+                            {
+                                IsSecondary = false,
+                                LastReceviedAt = DateTime.Now.Ticks,
+                                ReceivedOn = i
+                            };
+                            decryptable = true;
+                            return receivingRadio;
+                        }
+
+                        bestMatchingRadio = receivingRadio;
+                        bestMatchingRadioState = new RadioReceivingState
                         {
                             IsSecondary = false,
                             LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
-
-                        return receivingRadio;
                     }
                     if ((receivingRadio.secFreq == frequency)
                         && (receivingRadio.secFreq > 10000))
                     {
-                        receivingState = new RadioReceivingState
+                        if (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey)
+                        {
+                            receivingState = new RadioReceivingState
+                            {
+                                IsSecondary = true,
+                                LastReceviedAt = DateTime.Now.Ticks,
+                                ReceivedOn = i
+                            };
+                            decryptable = true;
+                            return receivingRadio;
+                        }
+
+                        bestMatchingRadio = receivingRadio;
+                        bestMatchingRadioState = new RadioReceivingState
                         {
                             IsSecondary = true,
                             LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
-
-                        return receivingRadio;
                     }
                 }
             }
-            receivingState = null;
-            return null;
+
+            receivingState = bestMatchingRadioState;
+            decryptable = false;
+            return bestMatchingRadio;
         }
     }
 }
