@@ -12,9 +12,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
     {
         public static void Log(string eventCategory, string eventAction, string guid)
         {
-#if DEBUG
-            return;
-#endif
+#if !DEBUG
             var http = new HttpClient()
             {
                 BaseAddress = new Uri("http://www.google-analytics.com/")
@@ -33,6 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             catch
             {
             }
+#endif
         }
     }
 }

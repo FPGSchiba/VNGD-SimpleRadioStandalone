@@ -5,6 +5,7 @@ using System.Runtime;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -21,6 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
     public class Bootstrapper : BootstrapperBase
     {
         private readonly SimpleContainer _simpleContainer = new SimpleContainer();
+        private bool loggingReady = false;
 
         public Bootstrapper()
         {
@@ -50,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 #endif
            
             LogManager.Configuration = config;
+
+            loggingReady = true;
         }
 
 
@@ -103,6 +107,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         {
             var serverState = (ServerState) _simpleContainer.GetInstance(typeof(ServerState), null);
             serverState.StopServer();
+        }
+
+        protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            if (loggingReady)
+            {
+                Logger logger = LogManager.GetCurrentClassLogger();
+                logger.Error(e.Exception, "Received unhandled exception, exiting");
+            }
+
+            base.OnUnhandledException(sender, e);
         }
     }
 }

@@ -572,8 +572,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
                         MicOutput.IsEnabled = false;
-
-                        _clientStateSingleton.IsConnected = true;
                     }
                     else
                     {
@@ -582,6 +580,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             MessageBoxImage.Error);
 
                         _clientStateSingleton.IsConnected = false;
+                        ToggleServerSettings.IsEnabled = false;
                     }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
@@ -590,6 +589,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         MessageBoxImage.Error);
 
                     _clientStateSingleton.IsConnected = false;
+                    ToggleServerSettings.IsEnabled = false;
                 }
             }
         }
@@ -631,6 +631,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Speakers.IsEnabled = true;
             MicOutput.IsEnabled = true;
             _clientStateSingleton.IsConnected = false;
+            ToggleServerSettings.IsEnabled = false;
+
             try
             {
                 _audioManager.StopEncoding();
@@ -697,6 +699,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
+
+                        _clientStateSingleton.IsConnected = true;
+                        ToggleServerSettings.IsEnabled = true;
 
                         _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
 

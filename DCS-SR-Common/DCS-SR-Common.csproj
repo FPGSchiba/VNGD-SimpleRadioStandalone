@@ -113,7 +113,7 @@
     <Compile Include="Helpers\RadioCalculator.cs" />
     <Compile Include="DCSState\RadioInformation.cs" />
     <Compile Include="DCSState\RadioTransmit.cs" />
-    <Compile Include="Setting\ServerSettingType.cs" />
+    <Compile Include="Setting\ServerSettingsKeys.cs" />
     <Compile Include="Network\ShortGuid.cs" />
     <Compile Include="Network\SRClient.cs" />
     <Compile Include="Timers\ITimer.cs" />

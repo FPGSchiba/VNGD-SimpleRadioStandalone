@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using MahApps.Metro.Controls;
 using NLog;
 
@@ -34,24 +34,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             try
             {
-                SpectatorAudio.Content = settings[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED]
+                SpectatorAudio.Content = settings.GetSettingAsBool(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED)
                     ? "DISABLED"
                     : "ENABLED";
 
-                CoalitionSecurity.Content = settings[(int) ServerSettingType.COALITION_AUDIO_SECURITY]
+                CoalitionSecurity.Content = settings.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY)
                     ? "ON"
                     : "OFF";
 
-                LineOfSight.Content = settings[(int) ServerSettingType.LOS_ENABLED] ? "ON" : "OFF";
+                LineOfSight.Content = settings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED) ? "ON" : "OFF";
 
-                Distance.Content = settings[(int) ServerSettingType.DISTANCE_ENABLED] ? "ON" : "OFF";
+                Distance.Content = settings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) ? "ON" : "OFF";
 
-                RealRadio.Content = settings[(int) ServerSettingType.IRL_RADIO_TX] ? "ON" : "OFF";
+                RealRadio.Content = settings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX) ? "ON" : "OFF";
 
                 RadioRXInterference.Content =
-                    settings[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
+                    settings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE) ? "ON" : "OFF";
 
-                RadioExpansion.Content = settings[(int) ServerSettingType.RADIO_EXPANSION] ? "ON" : "OFF";
+                RadioExpansion.Content = settings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION) ? "ON" : "OFF";
+
+                ExternalAWACSMode.Content = settings.GetSettingAsBool(ServerSettingsKeys.EXTERNAL_AWACS_MODE) ? "ON" : "OFF";
 
                 ServerVersion.Content = ClientSync.ServerVersion;
             }

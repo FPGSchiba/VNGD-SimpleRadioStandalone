@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using NLog;
 using SharpConfig;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
@@ -17,8 +20,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public ServerSettings()
         {
-            ServerSetting = new bool[Enum.GetValues(typeof(ServerSettingType)).Length];
-
             try
             {
                 _configuration = Configuration.LoadFromFile(CFG_FILE_NAME);
@@ -28,38 +29,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 _configuration = new Configuration();
                 _configuration.Add(new Section("General Settings"));
                 _configuration.Add(new Section("Server Settings"));
+                _configuration.Add(new Section("External AWACS Mode Settings"));
             }
-
-            foreach (var section in _configuration)
-            {
-                if (section.Name.Equals("General Settings"))
-                {
-                    foreach (var setting in section)
-                    {
-                        try
-                        {
-                            ServerSettingType settingEnum;
-                            if (Enum.TryParse(setting.Name, true, out settingEnum))
-                            {
-                                ServerSetting[(int) settingEnum] = setting.BoolValue;
-                            }
-                            else
-                            {
-                                _logger.Warn("Invalid setting: " + setting.Name);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Warn("Invalid setting: " + setting.Name);
-                        }
-                    }
-                }
-            }
-
-            SaveAllGeneral(true);
         }
-
-        public bool[] ServerSetting { get; }
 
         public static ServerSettings Instance
         {
@@ -76,65 +48,130 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        public void WriteSetting(ServerSettingType settingType, bool setting)
+        private readonly Dictionary<string, string> defaultSettings = new Dictionary<string, string>()
         {
-            ServerSetting[(int) settingType] = setting;
-            try
-            {
-                var section = _configuration["General Settings"];
-                section[settingType.ToString()].BoolValue = setting;
+            { ServerSettingsKeys.CLIENT_EXPORT_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.COALITION_AUDIO_SECURITY.ToString(), "false" },
+            { ServerSettingsKeys.DISTANCE_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE.ToString(), "false" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD.ToString(), "" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD.ToString(), "" },
+            { ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE.ToString(), "false" },
+            { ServerSettingsKeys.IRL_RADIO_STATIC.ToString(), "false" },
+            { ServerSettingsKeys.IRL_RADIO_TX.ToString(), "false" },
+            { ServerSettingsKeys.LOS_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.RADIO_EXPANSION.ToString(), "false" },
+            { ServerSettingsKeys.SERVER_PORT.ToString(), "5002" },
+            { ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED.ToString(), "false" }
+        };
 
-                SaveAllGeneral(true);
-            }
-            catch (Exception ex)
+        public Setting GetGeneralSetting(ServerSettingsKeys key)
+        {
+            return GetSetting("General Settings", key.ToString());
+        }
+
+        public void SetGeneralSetting(ServerSettingsKeys key, bool value)
+        {
+            SetSetting("General Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public Setting GetServerSetting(ServerSettingsKeys key)
+        {
+            return GetSetting("Server Settings", key.ToString());
+        }
+
+        public void SetServerSetting(ServerSettingsKeys key, int value)
+        {
+            SetSetting("Server Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public Setting GetExternalAWACSModeSetting(ServerSettingsKeys key)
+        {
+            return GetSetting("External AWACS Mode Settings", key.ToString());
+        }
+
+        public void SetExternalAWACSModeSetting(ServerSettingsKeys key, string value)
+        {
+            SetSetting("External AWACS Mode Settings", key.ToString(), value);
+        }
+
+        private Setting GetSetting(string section, string setting)
+        {
+            if (!_configuration.Contains(section))
             {
-                _logger.Error(ex, "Unable to save Settings: " + ex.Message);
+                _configuration.Add(section);
+            }
+
+            if (!_configuration[section].Contains(setting))
+            {
+                if (defaultSettings.ContainsKey(setting))
+                {
+                    _configuration[section].Add(new Setting(setting, defaultSettings[setting]));
+                }
+                else
+                {
+                    _configuration[section].Add(new Setting(setting, ""));
+                }
+
+                Save();
+            }
+
+            return _configuration[section][setting];
+        }
+
+        private void SetSetting(string section, string key, string setting)
+        {
+            if (setting == null)
+            {
+                setting = "";
+            }
+
+            if (!_configuration.Contains(section))
+            {
+                _configuration.Add(section);
+            }
+
+            if (!_configuration[section].Contains(key))
+            {
+                _configuration[section].Add(new Setting(key, setting));
+            }
+            else
+            {
+                _configuration[section][key].StringValue = setting;
+            }
+
+            Save();
+        }
+
+        public void Save()
+        {
+            lock (_lock)
+            {
+                try
+                {
+                    _configuration.SaveToFile(CFG_FILE_NAME);
+                } catch (Exception ex)
+                {
+                    _logger.Error("Unable to save settings!");
+                }
             }
         }
 
-        private void SaveAllGeneral(bool savePort)
+        public Dictionary<string, string> ToDictionary()
         {
-            var section = _configuration["General Settings"];
-            for (var i = 0; i < ServerSetting.Length; i++)
+            if (!_configuration.Contains("General Settings"))
             {
-                var serverSettingType = (ServerSettingType) i;
-                section[serverSettingType.ToString()].BoolValue = ServerSetting[i];
+                _configuration.Add("General Settings");
             }
 
-            if (savePort)
+            Dictionary<string, string> settings = new Dictionary<string, string>(_configuration["General Settings"].SettingCount);
+
+            foreach (Setting setting in _configuration["General Settings"])
             {
-                //load port in too
-                ServerListeningPort();
+                settings[setting.Name] = setting.StringValue;
             }
 
-            try
-            {
-                _configuration.SaveToFile(CFG_FILE_NAME);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Unable to save Settings: " + ex.Message);
-            }
-        }
-
-
-        public int ServerListeningPort()
-        {
-            try
-            {
-                SaveAllGeneral(false);
-
-                var section = _configuration["Server Settings"];
-
-                return section["port"].IntValue;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Unable to read server port: " + ex.Message);
-            }
-
-            _configuration["Server Settings"]["port"].IntValue = 5002;
-            return 5002; //UDP Port is always 1 More
+            return settings;
         }
     }
 }

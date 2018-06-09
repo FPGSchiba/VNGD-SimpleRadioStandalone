@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
@@ -58,15 +59,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         pipeline.AddLast(new VOIPPacketHandler(_clientsList));
                     })).ChildOption(ChannelOption.TcpNodelay, true);
 
+                int serverPort = _serverSettings.GetServerSetting(ServerSettingsKeys.SERVER_PORT).IntValue;
+
                 TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info,
-                    "VOIP Listener Binding to " + _serverSettings.ServerListeningPort() + 1);
-                Task<IChannel> bootstrapChannel = bootstrap.BindAsync(_serverSettings.ServerListeningPort() + 1);
+                    "VOIP Listener Binding to " + (serverPort + 1));
+                Task<IChannel> bootstrapChannel = bootstrap.BindAsync(serverPort + 1);
 
                 bootstrapChannel.Wait(5000);
 
 
                 TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info,
-                    "VOIP Listener Bound to " + _serverSettings.ServerListeningPort() + 1);
+                    "VOIP Listener Bound to " + (serverPort + 1));
 
                 TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info, "VOIP Listener Waiting for Shutdown...");
                 //wait here for shutdown

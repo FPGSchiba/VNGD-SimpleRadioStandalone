@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -8,9 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
 using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
@@ -23,7 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static bool[] ServerSettings = new bool[Enum.GetValues(typeof(ServerSettingType)).Length];
+        public static SyncedServerSettings ServerSettings = SyncedServerSettings.Instance;
         public static string ServerVersion = "Unknown";
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
@@ -167,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         break;
                                     case NetworkMessage.MessageType.UPDATE:
 
-                                        ServerSettings = serverMessage.ServerSettings;
+                                        ServerSettings.Decode(serverMessage.ServerSettings);
 
                                         if (_clients.ContainsKey(serverMessage.Client.ClientGuid))
                                         {
@@ -240,14 +239,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             }
                                         }
                                         //add server settings
-                                        ServerSettings = serverMessage.ServerSettings;
+                                        ServerSettings.Decode(serverMessage.ServerSettings);
 
                                         break;
 
                                     case NetworkMessage.MessageType.SERVER_SETTINGS:
 
                                         //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
-                                        ServerSettings = serverMessage.ServerSettings;
+                                        ServerSettings.Decode(serverMessage.ServerSettings);
                                         ServerVersion = serverMessage.Version;
 
                                         break;

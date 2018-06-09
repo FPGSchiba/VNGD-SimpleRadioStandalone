@@ -14,7 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Newtonsoft.Json;
 using NLog;
 
@@ -481,7 +481,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var requests = new List<DCSLosCheckRequest>();
 
-            if (ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
+            if (ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 foreach (var client in clients)
                 {
@@ -506,7 +506,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var changed = false;
 
 
-            var expansion = ClientSync.ServerSettings[(int) ServerSettingType.RADIO_EXPANSION];
+            var expansion = ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION);
 
             var playerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 

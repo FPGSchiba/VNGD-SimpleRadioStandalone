@@ -14,7 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using FragLabs.Audio.Codecs;
 using NLog;
 using Timer = Cabhishek.Timers.Timer;
@@ -500,7 +500,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool ShouldBlockRxAsTransmitting(int radioId)
         {
             //Return based on server settings as well
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX])
+            if (!ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX))
             {
                 return false;
             }
@@ -518,7 +518,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
         {
             losLoss = 0; //0 is NO LOSS
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
+            if (!ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 return true;
             }
@@ -547,7 +547,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool InRange(string transmissingClientGuid, double frequency, out double signalStrength)
         {
             signalStrength = 0;
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED])
+            if (!ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED))
             {
                 return true;
             }

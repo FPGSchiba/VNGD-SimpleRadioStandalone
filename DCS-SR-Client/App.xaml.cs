@@ -16,8 +16,12 @@ namespace DCS_SR_Client
     public partial class App : Application
     {
         private System.Windows.Forms.NotifyIcon _notifyIcon;
+        private bool loggingReady = false;
+
         public App()
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
+
             var location = AppDomain.CurrentDomain.BaseDirectory;
             //var location = Assembly.GetExecutingAssembly().Location;
 
@@ -64,6 +68,8 @@ namespace DCS_SR_Client
 #endif
 
             LogManager.Configuration = config;
+
+            loggingReady = true;
         }
 
 
@@ -112,6 +118,15 @@ namespace DCS_SR_Client
         {
             _notifyIcon.Visible = false;
             base.OnExit(e);
+        }
+
+        private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (loggingReady)
+            {
+                Logger logger = LogManager.GetCurrentClassLogger();
+                logger.Error((Exception) e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
+            }
         }
     }
 }

@@ -157,6 +157,7 @@
                                 HorizontalAlignment="Center"
                                 Click="ToggleServerSettings_OnClick"
                                 Content="Show Server Settings"
+                                IsEnabled="False"
                                 Style="{DynamicResource SquareButtonStyle}" />
 
                     </StackPanel>
