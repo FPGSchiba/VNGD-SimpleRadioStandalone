@@ -31,6 +31,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool IsConnected { get; set; }
 
+        public bool InExternalAWACSMode { get; set; }
+
         private ClientStateSingleton()
         {
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
@@ -46,6 +48,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             MicrophoneAvailable = true;
 
             IsConnected = false;
+
+            InExternalAWACSMode = false;
         }
 
         public static ClientStateSingleton Instance

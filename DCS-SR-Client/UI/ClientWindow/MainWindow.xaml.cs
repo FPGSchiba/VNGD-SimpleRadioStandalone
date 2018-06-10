@@ -633,6 +633,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _clientStateSingleton.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
 
+            ToggleExternalAWACSMode.IsEnabled = false;
+            ExternalAWACSModePassword.IsEnabled = false;
+            ExternalAWACSModePasswordLabel.IsEnabled = false;
+            ConnectExternalAWACSMode.IsEnabled = false;
+            ConnectExternalAWACSMode.Content = "Connect EAM";
+
             try
             {
                 _audioManager.StopEncoding();
@@ -702,6 +708,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _clientStateSingleton.IsConnected = true;
                         ToggleServerSettings.IsEnabled = true;
+                        ToggleExternalAWACSMode.IsEnabled = true;
 
                         _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
 
@@ -1094,6 +1101,58 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 (bool)AlwaysAllowHotas.IsChecked;
             _settings.Save();
 
+        }
+
+        private void ToggleExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
+        {
+            ExternalAWACSModePasswordLabel.IsEnabled = !ExternalAWACSModePasswordLabel.IsEnabled;
+            ExternalAWACSModePassword.IsEnabled = !ExternalAWACSModePassword.IsEnabled;
+            ConnectExternalAWACSMode.IsEnabled = !ConnectExternalAWACSMode.IsEnabled;
+
+            if (_clientStateSingleton.InExternalAWACSMode && !ConnectExternalAWACSMode.IsEnabled)
+            {
+                ConnectExternalAWACSMode.Content = "Connect EAM";
+            }
+        }
+
+        private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_client == null || 
+                !_clientStateSingleton.IsConnected ||
+                !SyncedServerSettings.Instance.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
+                (!_clientStateSingleton.InExternalAWACSMode &&
+                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Text)))
+            {
+                return;
+            }
+
+            // Already connected, disconnect
+            if (_clientStateSingleton.InExternalAWACSMode)
+            {
+                _client.DisconnectExternalAWACSMode();
+            }
+            else
+            {
+                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Text.Trim(), ExternalAWACSModeConnectionChanged);
+            }
+        }
+
+        private void ExternalAWACSModeConnectionChanged(bool result, int coalition)
+        {
+            if (result)
+            {
+                _clientStateSingleton.InExternalAWACSMode = true;
+                _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
+                _clientStateSingleton.DcsPlayerSideInfo.name = "External AWACS";
+                ConnectExternalAWACSMode.Content = "Disconnect EAM";
+                ExternalAWACSModePassword.IsEnabled = false;
+            }
+            else
+            {
+                _clientStateSingleton.InExternalAWACSMode = false;
+                ConnectExternalAWACSMode.Content = "Connect EAM";
+                ExternalAWACSModePassword.IsEnabled = ToggleExternalAWACSMode.IsEnabled;
+            }
         }
     }
 }

@@ -323,10 +323,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                         HandleRadioClientsSync(clientIp, state.workSocket, message);
 
-
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
                         HandleServerSettingsMessage(state.workSocket);
+                        break;
+                    case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
+                        HandleExternalAWACSModePassword(state.workSocket, message.ExternalAWACSModePassword, message.Client);
+                        break;
+                    case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT:
+                        HandleExternalAWACSModeDisconnect(message.Client);
                         break;
                     default:
                         _logger.Warn("Recevied unknown message type");
@@ -413,7 +418,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-
         private void HandleClientRadioUpdate(NetworkMessage message)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
@@ -437,7 +441,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-
         private void HandleRadioClientsSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
@@ -454,6 +457,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             Send(clientSocket, replyMessage);
+        }
+
+        private void HandleExternalAWACSModePassword(Socket clientSocket, string password, SRClient client)
+        {
+            // Response of clientCoalition = 0 indicates authentication success (or external AWACS mode disabled)
+            int clientCoalition = 0;
+            if (_serverSettings.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue
+                && !string.IsNullOrWhiteSpace(password))
+            {
+                if (_serverSettings.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD).StringValue == password)
+                {
+                    clientCoalition = 2;
+                }
+                else if (_serverSettings.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD).StringValue == password)
+                {
+                    clientCoalition = 1;
+                }
+            }
+
+            if (_clients.ContainsKey(client.ClientGuid))
+            {
+                _clients[client.ClientGuid].Coalition = 0;
+                _clients[client.ClientGuid].Name = "";
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                    new List<SRClient>(_clients.Values)));
+            }
+
+            var replyMessage = new NetworkMessage
+            {
+                Client = new SRClient
+                {
+                    Coalition = clientCoalition
+                },
+                MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD,
+            };
+            Send(clientSocket, replyMessage);
+        }
+
+        private void HandleExternalAWACSModeDisconnect(SRClient client)
+        {
+            if (_clients.ContainsKey(client.ClientGuid))
+            {
+                _clients[client.ClientGuid].Coalition = 0;
+                _clients[client.ClientGuid].Name = "";
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                    new List<SRClient>(_clients.Values)));
+            }
         }
 
         private static void Send(Socket handler, NetworkMessage message)
