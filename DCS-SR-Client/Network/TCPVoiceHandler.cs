@@ -47,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private TcpClient _listener;
 
-        private uint _packetNumber = 1;
+        private ulong _packetNumber = 1;
 
         private volatile bool _ptt;
 
@@ -77,9 +77,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _inputManager = inputManager;
         }
-
-        [DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
 
         private void AudioEffectCheckTick()
         {
@@ -329,7 +326,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         var encodedOpusAudio = new byte[0];
                         _encodedAudio.TryTake(out encodedOpusAudio, 100000, _stopFlag.Token);
 
-                        var time = GetTickCount64(); //should add at the receive instead?
+                        var time = DateTime.Now.Ticks; //should add at the receive instead?
 
                         if ((encodedOpusAudio != null)
                             && (encodedOpusAudio.Length >= (UDPVoicePacket.PacketHeaderLength + UDPVoicePacket.FixedPacketLength + UDPVoicePacket.FrequencySegmentLength)))
@@ -422,7 +419,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 ClientGuid = udpVoicePacket.Guid,
                                                 PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),
                                                 //Convert to Shorts!
-                                                ReceiveTime = GetTickCount64(),
+                                                ReceiveTime = DateTime.Now.Ticks,
                                                 Frequency = destinationRadio.Frequency,
                                                 Modulation = destinationRadio.Modulation,
                                                 Volume = destinationRadio.ReceivingRadio.volume,
