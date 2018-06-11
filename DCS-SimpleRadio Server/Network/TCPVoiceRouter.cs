@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
@@ -26,7 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private readonly CancellationTokenSource _serverShutdownToken = new CancellationTokenSource();
 
-        private readonly ServerSettings _serverSettings = ServerSettings.Instance;
+        private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
 
         public TCPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {

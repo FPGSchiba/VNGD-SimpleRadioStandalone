@@ -52,6 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stopExternalAWACSMode;
 
         private ClientStateSingleton _clientStateSingleton;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public bool IsListening { get; private set; }
 
@@ -114,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         LastUpdate = 0,
                         control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS,
-                        name = "External AWACS",
+                        name = _clientStateSingleton.LastSeenName,
                         pos = new DcsPosition { x = 0, y = 0, z = 0 },
                         ptt = false,
                         radios = awacsRadios,
@@ -258,6 +259,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
 
                             Logger.Debug($"Recevied Message from DCS {str}");
+
+                            if (!string.IsNullOrWhiteSpace(message.name) && message.name != "Unknown" && message.name != _clientStateSingleton.LastSeenName)
+                            {
+                                _clientStateSingleton.LastSeenName = message.name;
+                            }
 
                             //sync with others
                             //Radio info is marked as Stale for FC3 aircraft after every frequency change
@@ -534,7 +540,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var requests = new List<DCSLosCheckRequest>();
 
-            if (ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
+            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 foreach (var client in clients)
                 {
@@ -576,7 +582,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var changed = false;
 
 
-            var expansion = ClientSync.ServerSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION);
+            var expansion = _serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION);
 
             var playerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 

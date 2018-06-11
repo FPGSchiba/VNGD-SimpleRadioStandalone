@@ -8,6 +8,7 @@ using System.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -44,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private readonly IEventAggregator _eventAggregator;
 
-        private readonly ServerSettings _serverSettings;
+        private readonly ServerSettingsStore _serverSettings;
 
         private Socket listener;
 
@@ -55,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             this._bannedIps = _bannedIps;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
-            _serverSettings = ServerSettings.Instance;
+            _serverSettings = ServerSettingsStore.Instance;
         }
 
         public void Handle(ServerSettingsChangedMessage message)
@@ -478,8 +479,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             if (_clients.ContainsKey(client.ClientGuid))
             {
-                _clients[client.ClientGuid].Coalition = 0;
-                _clients[client.ClientGuid].Name = "";
+                _clients[client.ClientGuid].Coalition = clientCoalition;
+                _clients[client.ClientGuid].Name = client.Name;
 
                 _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));

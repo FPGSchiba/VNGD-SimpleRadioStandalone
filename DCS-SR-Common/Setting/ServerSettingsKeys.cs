@@ -22,4 +22,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         EXTERNAL_AWACS_MODE_BLUE_PASSWORD = 11,
         EXTERNAL_AWACS_MODE_RED_PASSWORD = 12
     }
+
+    public class DefaultServerSettings
+    {
+        public static readonly Dictionary<string, string> Defaults = new Dictionary<string, string>()
+        {
+            { ServerSettingsKeys.CLIENT_EXPORT_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.COALITION_AUDIO_SECURITY.ToString(), "false" },
+            { ServerSettingsKeys.DISTANCE_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE.ToString(), "false" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD.ToString(), "" },
+            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD.ToString(), "" },
+            { ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE.ToString(), "false" },
+            { ServerSettingsKeys.IRL_RADIO_STATIC.ToString(), "false" },
+            { ServerSettingsKeys.IRL_RADIO_TX.ToString(), "false" },
+            { ServerSettingsKeys.LOS_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.RADIO_EXPANSION.ToString(), "false" },
+            { ServerSettingsKeys.SERVER_PORT.ToString(), "5002" },
+            { ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED.ToString(), "false" }
+        };
+    }
 }

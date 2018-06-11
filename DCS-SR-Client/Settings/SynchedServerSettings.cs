@@ -31,13 +31,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
 
-        public SharpConfig.Setting GetSetting(ServerSettingsKeys key)
+        public Setting GetSetting(ServerSettingsKeys key)
         {
             string setting = key.ToString();
 
             if (!_section.Contains(setting))
             {
-                return new SharpConfig.Setting(setting, "");
+                if (DefaultServerSettings.Defaults.ContainsKey(setting))
+                {
+                    return new Setting(setting, DefaultServerSettings.Defaults[setting]);
+                }
+                else
+                {
+                    return new Setting(setting, "");
+                }
             }
 
             return _section[setting];

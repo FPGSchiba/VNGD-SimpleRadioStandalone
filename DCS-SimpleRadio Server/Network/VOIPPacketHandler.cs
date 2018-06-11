@@ -16,6 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     using System.Collections.Concurrent;
     using System.Text;
     using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+    using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
     using DotNetty.Buffers;
     using DotNetty.Transport.Channels;
 
@@ -25,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         static volatile IChannelGroup group;
         private ConcurrentDictionary<string, SRClient> _clientsList;
-        private readonly ServerSettings _serverSettings = ServerSettings.Instance;
+        private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
 
         public VOIPPacketHandler(ConcurrentDictionary<string, SRClient> clientsList)
         {

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using MahApps.Metro.Controls;
 using NLog;
@@ -17,6 +18,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly DispatcherTimer _updateTimer;
 
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+
         public ServerSettingsWindow()
         {
             InitializeComponent();
@@ -30,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void UpdateUI(object sender, EventArgs e)
         {
-            var settings = ClientSync.ServerSettings;
+            var settings = _serverSettings;
 
             try
             {

@@ -6,19 +6,19 @@ using NLog;
 using SharpConfig;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
 {
-    public class ServerSettings
+    public class ServerSettingsStore
     {
         public static readonly string CFG_FILE_NAME = "server.cfg";
 
-        private static ServerSettings instance;
+        private static ServerSettingsStore instance;
         private static readonly object _lock = new object();
 
         private readonly Configuration _configuration;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public ServerSettings()
+        public ServerSettingsStore()
         {
             try
             {
@@ -33,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        public static ServerSettings Instance
+        public static ServerSettingsStore Instance
         {
             get
             {
@@ -41,29 +41,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 {
                     if (instance == null)
                     {
-                        instance = new ServerSettings();
+                        instance = new ServerSettingsStore();
                     }
                 }
                 return instance;
             }
         }
-
-        private readonly Dictionary<string, string> defaultSettings = new Dictionary<string, string>()
-        {
-            { ServerSettingsKeys.CLIENT_EXPORT_ENABLED.ToString(), "false" },
-            { ServerSettingsKeys.COALITION_AUDIO_SECURITY.ToString(), "false" },
-            { ServerSettingsKeys.DISTANCE_ENABLED.ToString(), "false" },
-            { ServerSettingsKeys.EXTERNAL_AWACS_MODE.ToString(), "false" },
-            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD.ToString(), "" },
-            { ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD.ToString(), "" },
-            { ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE.ToString(), "false" },
-            { ServerSettingsKeys.IRL_RADIO_STATIC.ToString(), "false" },
-            { ServerSettingsKeys.IRL_RADIO_TX.ToString(), "false" },
-            { ServerSettingsKeys.LOS_ENABLED.ToString(), "false" },
-            { ServerSettingsKeys.RADIO_EXPANSION.ToString(), "false" },
-            { ServerSettingsKeys.SERVER_PORT.ToString(), "5002" },
-            { ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED.ToString(), "false" }
-        };
 
         public Setting GetGeneralSetting(ServerSettingsKeys key)
         {
@@ -104,9 +87,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             if (!_configuration[section].Contains(setting))
             {
-                if (defaultSettings.ContainsKey(setting))
+                if (DefaultServerSettings.Defaults.ContainsKey(setting))
                 {
-                    _configuration[section].Add(new Setting(setting, defaultSettings[setting]));
+                    _configuration[section].Add(new Setting(setting, DefaultServerSettings.Defaults[setting]));
                 }
                 else
                 {

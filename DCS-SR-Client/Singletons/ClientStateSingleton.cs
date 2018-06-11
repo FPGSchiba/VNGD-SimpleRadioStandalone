@@ -33,6 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool InExternalAWACSMode { get; set; }
 
+        public string LastSeenName { get; set; }
+
         private ClientStateSingleton()
         {
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
@@ -50,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             IsConnected = false;
 
             InExternalAWACSMode = false;
+
+            LastSeenName = Settings.SettingsStore.Instance.GetClientSetting(Settings.SettingsKeys.LastSeenName).StringValue;
         }
 
         public static ClientStateSingleton Instance
