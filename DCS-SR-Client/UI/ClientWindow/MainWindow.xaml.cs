@@ -80,6 +80,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitializeComponent();
 
+            // Initialize ToolTip controls
+            ToolTips.Init();
+
+            // Set up tooltips that are always defined
+            InitToolTips();
+
             DataContext = this;
 
             var client = ClientStateSingleton.Instance;
@@ -315,6 +321,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputDeviceManager = InputManager;
         }
 
+        private void InitToolTips()
+        {
+            ExternalAWACSModePassword.ToolTip = ToolTips.ExternalAWACSModePassword;
+            ExternalAWACSModeName.ToolTip = ToolTips.ExternalAWACSModeName;
+            ConnectExternalAWACSMode.ToolTip = ToolTips.ExternalAWACSMode;
+        }
+
         public InputDeviceManager InputManager { get; set; }
 
         public FavouriteServersViewModel FavouriteServersViewModel { get; }
@@ -369,31 +382,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _clientStateSingleton.MicrophoneAvailable = false;
 
-                var noMicAvailableToolTip = new System.Windows.Controls.ToolTip();
-                var noMicAvailableToolTipContent = new System.Windows.Controls.StackPanel();
-
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "No microphone available",
-                    FontWeight = FontWeights.Bold
-                });
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "No valid microphone is available - others will not be able to hear you."
-                });
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "You can still use SRS to listen to radio calls, but will not be able to transmit anything yourself."
-                });
-
-                noMicAvailableToolTip.Content = noMicAvailableToolTipContent;
-
                 Preview.IsEnabled = false;
 
-                Preview.ToolTip = noMicAvailableToolTip;
-                StartStop.ToolTip = noMicAvailableToolTip;
-                Mic.ToolTip = noMicAvailableToolTip;
-                Mic_VU.ToolTip = noMicAvailableToolTip;
+                Preview.ToolTip = ToolTips.NoMicAvailable;
+                StartStop.ToolTip = ToolTips.NoMicAvailable;
+                Mic.ToolTip = ToolTips.NoMicAvailable;
+                Mic_VU.ToolTip = ToolTips.NoMicAvailable;
             }
             else
             {
@@ -1035,7 +1029,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _radioOverlayWindow.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
             else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
         }
-
 
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
         {
