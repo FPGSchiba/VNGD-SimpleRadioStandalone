@@ -338,7 +338,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set
             {
                 _serverAddress = value;
-                ServerIp.Text = value.Address;
+                if (value != null)
+                {
+                    ServerIp.Text = value.Address;
+                }
+                
                 _connectCommand.RaiseCanExecuteChanged();
             }
         }

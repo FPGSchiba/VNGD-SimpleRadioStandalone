@@ -17,7 +17,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -66,6 +65,7 @@
 
         <DataGrid Name="FavouritesGrid"
                   Grid.Row="3"
+                  Margin="0,0,0,5"
                   HorizontalAlignment="Center"
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=Addresses}"
@@ -102,12 +102,6 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-
-        <Button Grid.Row="4"
-                Height="40"
-                Margin="0,5,0,0"
-                Command="{Binding Path=SaveCommand}"
-                Content="Save" />
     </Grid>
 
 </UserControl>
