@@ -284,6 +284,10 @@ namespace Installer
 
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
+            if (!File.Exists(path + "\\awacs-radios.json"))
+            {
+                File.Copy(currentDirectory + "\\awacs-radios.json", path + "\\awacs-radios.json", true);
+            }
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
 
@@ -457,6 +461,7 @@ namespace Installer
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(srPath.Text + "\\opus.dll");
                 DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
+                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
                 DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
                 DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");
