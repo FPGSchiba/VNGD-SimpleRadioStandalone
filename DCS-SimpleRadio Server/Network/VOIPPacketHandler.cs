@@ -15,6 +15,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     using System;
     using System.Collections.Concurrent;
     using System.Text;
+    using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+    using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
     using DotNetty.Buffers;
     using DotNetty.Transport.Channels;
 
@@ -24,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         static volatile IChannelGroup group;
         private ConcurrentDictionary<string, SRClient> _clientsList;
-        private readonly ServerSettings _serverSettings = ServerSettings.Instance;
+        private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
 
         public VOIPPacketHandler(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -80,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     srClient.ClientChannelId = context.Channel.Id.AsShortText();
 
                     var spectatorAudioDisabled =
-                        _serverSettings.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED];
+                        _serverSettings.GetGeneralSetting(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED).BoolValue;
 
                     if ((srClient.Coalition == 0) && spectatorAudioDisabled)
                     {
@@ -98,7 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             }
 
                             var coalitionSecurity =
-                                _serverSettings.ServerSetting[(int)ServerSettingType.COALITION_AUDIO_SECURITY];
+                                _serverSettings.GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY).BoolValue;
 
                             foreach (KeyValuePair<string, SRClient> _client in _clientsList)
                             {

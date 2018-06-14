@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -71,7 +73,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 while (!_stop)
                 {
-                    if (ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED])
+                    if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue)
                     {
                         var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
                         File.WriteAllText(GetCurrentDirectory() + "\\clients-list.json", json);

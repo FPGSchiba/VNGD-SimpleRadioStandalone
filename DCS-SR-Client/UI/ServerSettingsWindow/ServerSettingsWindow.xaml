@@ -6,7 +6,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="Server Settings"
                       Width="280"
-                      Height="340"
+                      Height="350"
                       ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -15,6 +15,7 @@
 
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -120,25 +121,38 @@
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
                Content="Unknown" />
+
         <Label Grid.Row="7"
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-               Content="Server Version" />
+               Content="External AWACS Mode" />
 
-
-        <Label Name="ServerVersion"
+        <Label Name="ExternalAWACSMode"
                Grid.Row="7"
                Grid.Column="1"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
                Content="Unknown" />
 
-        <Button Grid.Row="8"
+        <Label Grid.Row="8"
+               Grid.Column="0"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Content="Server Version" />
+
+        <Label Name="ServerVersion"
+               Grid.Row="8"
+               Grid.Column="1"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Content="Unknown" />
+
+        <Button Grid.Row="9"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Width="80"
-                Margin="5"
+                Margin="5,0,5,5"
                 Click="CloseButton_OnClick"
                 Content="Close" />
 

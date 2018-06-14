@@ -14,7 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using FragLabs.Audio.Codecs;
 using NLog;
 using Timer = Cabhishek.Timers.Timer;
@@ -47,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private TcpClient _listener;
 
-        private uint _packetNumber = 1;
+        private ulong _packetNumber = 1;
 
         private volatile bool _ptt;
 
@@ -61,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public TCPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -77,9 +78,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _inputManager = inputManager;
         }
-
-        [DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
 
         private void AudioEffectCheckTick()
         {
@@ -329,7 +327,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         var encodedOpusAudio = new byte[0];
                         _encodedAudio.TryTake(out encodedOpusAudio, 100000, _stopFlag.Token);
 
-                        var time = GetTickCount64(); //should add at the receive instead?
+                        var time = DateTime.Now.Ticks; //should add at the receive instead?
 
                         if ((encodedOpusAudio != null)
                             && (encodedOpusAudio.Length >= (UDPVoicePacket.PacketHeaderLength + UDPVoicePacket.FixedPacketLength + UDPVoicePacket.FrequencySegmentLength)))
@@ -422,7 +420,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 ClientGuid = udpVoicePacket.Guid,
                                                 PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),
                                                 //Convert to Shorts!
-                                                ReceiveTime = GetTickCount64(),
+                                                ReceiveTime = DateTime.Now.Ticks,
                                                 Frequency = destinationRadio.Frequency,
                                                 Modulation = destinationRadio.Modulation,
                                                 Volume = destinationRadio.ReceivingRadio.volume,
@@ -500,7 +498,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool ShouldBlockRxAsTransmitting(int radioId)
         {
             //Return based on server settings as well
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX))
             {
                 return false;
             }
@@ -518,7 +516,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
         {
             losLoss = 0; //0 is NO LOSS
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 return true;
             }
@@ -547,7 +545,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool InRange(string transmissingClientGuid, double frequency, out double signalStrength)
         {
             signalStrength = 0;
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED))
             {
                 return true;
             }
