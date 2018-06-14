@@ -495,6 +495,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD,
             };
             Send(clientSocket, replyMessage);
+
+            var message = new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.UPDATE,
+                ServerSettings = _serverSettings.ToDictionary(),
+                Client = new SRClient
+                {
+                    ClientGuid = client.ClientGuid,
+                    Coalition = clientCoalition,
+                    Name = client.Name,
+                    LastUpdate = client.LastUpdate,
+                    Position = client.Position
+                }
+            };
+
+            foreach (var clientToSent in _clients)
+            {
+                Send(clientToSent.Value.ClientSocket, message);
+            }
         }
 
         private void HandleExternalAWACSModeDisconnect(SRClient client)
@@ -506,6 +525,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
+
+                var message = new NetworkMessage
+                {
+                    MsgType = NetworkMessage.MessageType.UPDATE,
+                    ServerSettings = _serverSettings.ToDictionary(),
+                    Client = new SRClient
+                    {
+                        ClientGuid = client.ClientGuid,
+                        Coalition = client.Coalition,
+                        Name = client.Name,
+                        LastUpdate = client.LastUpdate,
+                        Position = client.Position
+                    }
+                };
+
+                foreach (var clientToSent in _clients)
+                {
+                    Send(clientToSent.Value.ClientSocket, message);
+                }
             }
         }
 

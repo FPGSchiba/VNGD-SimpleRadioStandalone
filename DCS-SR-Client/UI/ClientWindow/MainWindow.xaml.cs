@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -484,7 +485,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
-            ClientCount.Content = _clients.Count;
+            int clientCountIngame = 0;
+
+            foreach (KeyValuePair<string, SRClient> kvp in _clients)
+            {
+                if (!string.IsNullOrEmpty(kvp.Value.Name))
+                {
+                    clientCountIngame++;
+                }
+            }
+
+            ClientCount.Content = $"{_clients.Count} ({clientCountIngame} ingame)";
 
             if (_audioPreview != null)
             {
