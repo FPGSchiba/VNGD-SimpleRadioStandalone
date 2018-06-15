@@ -81,6 +81,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitializeComponent();
 
+            if (IsClientRunning())
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Another instance of the SimpleRadio client is already running!\n\nPlease note that only one SRS client can synchronise with DCS at a time - " +
+                    "all other running instances will not receive any radio frequencies from the game.\n\nExit currently started client?",
+                    "Multiple SimpleRadio clients started!",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    Close();
+                }
+            }
+
             // Initialize ToolTip controls
             ToolTips.Init();
 
@@ -156,6 +171,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
+        }
+
+        private bool IsClientRunning()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
+
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.Id != currentProcess.Id &&
+                    clsProcess.ProcessName.ToLower().Trim() == currentProcessName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void InitFlowDocument()
@@ -767,15 +799,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             base.OnClosing(e);
 
             //stop timer
-            _updateTimer.Stop();
+            _updateTimer?.Stop();
 
             Stop();
 
-            if (_audioPreview != null)
-            {
-                _audioPreview.StopEncoding();
-                _audioPreview = null;
-            }
+            _audioPreview?.StopEncoding();
+            _audioPreview = null;
 
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
@@ -783,7 +812,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _awacsRadioOverlay?.Close();
             _awacsRadioOverlay = null;
 
-            _dcsAutoConnectListener.Stop();
+            _dcsAutoConnectListener?.Stop();
             _dcsAutoConnectListener = null;
         }
 
