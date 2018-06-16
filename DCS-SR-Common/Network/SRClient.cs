@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
@@ -75,6 +76,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 //            {
 //                return true;
 //            }
+        }
+
+        public bool IsIngame()
+        {
+            // Clients are counted as ingame if they have a name and have been updated within the last 10 seconds
+            return !string.IsNullOrEmpty(Name) && DateTime.Now.Ticks - LastUpdate < 100000000;
         }
 
         public override string ToString()

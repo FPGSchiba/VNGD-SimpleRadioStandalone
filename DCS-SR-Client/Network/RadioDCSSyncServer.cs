@@ -77,6 +77,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         public void StartExternalAWACSModeLoop()
         {
+            _stopExternalAWACSMode = false;
+
             RadioInformation[] awacsRadios;
             try
             {
@@ -104,6 +106,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     };
                 }
             }
+
+            // Force an immediate update of radio information
+            _clientStateSingleton.LastSent = 0;
 
             Task.Factory.StartNew(() =>
             {
@@ -311,6 +316,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _dcsRadioUpdateSender.ExclusiveAddressUse = false;
             }
 
+            int clientCountIngame = 0;
+
+            foreach (KeyValuePair<string, SRClient> kvp in _clients)
+            {
+                if (kvp.Value.IsIngame())
+                {
+                    clientCountIngame++;
+                }
+            }
+
             try
             {
                 //get currently transmitting or receiving
@@ -318,7 +333,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
                     RadioSendingState = TCPVoiceHandler.RadioSendingState,
-                    RadioReceivingState = TCPVoiceHandler.RadioReceivingState
+                    RadioReceivingState = TCPVoiceHandler.RadioReceivingState,
+                    ClientCountConnected = _clients.Count,
+                    ClientCountIngame = clientCountIngame
                 };
 
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings

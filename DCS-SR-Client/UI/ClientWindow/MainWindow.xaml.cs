@@ -521,7 +521,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             foreach (KeyValuePair<string, SRClient> kvp in _clients)
             {
-                if (!string.IsNullOrEmpty(kvp.Value.Name))
+                if (kvp.Value.IsIngame())
                 {
                     clientCountIngame++;
                 }
@@ -700,6 +700,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _client.Disconnect();
                 _client = null;
             }
+
+            _clientStateSingleton.DcsPlayerRadioInfo.Reset();
+            _clientStateSingleton.DcsPlayerSideInfo.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1208,6 +1211,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _clientStateSingleton.InExternalAWACSMode = true;
                 _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
                 _clientStateSingleton.DcsPlayerSideInfo.name = _clientStateSingleton.LastSeenName;
+                _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
+
                 ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
                 ExternalAWACSModePassword.IsEnabled = false;
                 ExternalAWACSModeName.IsEnabled = false;
@@ -1217,6 +1222,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _clientStateSingleton.InExternalAWACSMode = false;
                 _clientStateSingleton.DcsPlayerSideInfo.side = 0;
                 _clientStateSingleton.DcsPlayerSideInfo.name = "";
+                _clientStateSingleton.DcsPlayerRadioInfo.name = "";
+                _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
+                _clientStateSingleton.LastSent = 0;
+
                 ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);

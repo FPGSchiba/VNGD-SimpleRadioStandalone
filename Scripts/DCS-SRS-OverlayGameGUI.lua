@@ -46,7 +46,7 @@ local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
 local WIDTH = 350
-local HEIGHT = 130
+local HEIGHT = 140
 
 local _lastReceived = 0
 
@@ -92,6 +92,14 @@ function srsOverlay.updateRadio()
 	_listMessages = {}
 
 	if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
+
+		if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected and _radioState.ClientCountIngame then
+			local clientCountMsg = string.format("Connected clients: %i (%i ingame)", _radioState.ClientCountConnected, _radioState.ClientCountIngame)
+
+			local countMsg = {message = clientCountMsg, skin = typesMessage.normal, height = 20 }
+
+			table.insert(_listMessages, countMsg)
+		end
 
         local _radioInfo  =_radioState.RadioInfo
 
@@ -253,7 +261,7 @@ function srsOverlay.createWindow()
     
     _listStatics = {}
     
-    for i = 1, 4 do
+    for i = 1, 5 do
         local staticNew = Static.new()
         table.insert(_listStatics, staticNew)
         box:insertWidget(staticNew)

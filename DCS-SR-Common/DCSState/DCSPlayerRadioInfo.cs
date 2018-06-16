@@ -38,6 +38,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         [JsonIgnore]
         public long LastUpdate { get; set; }
 
+        public void Reset()
+        {
+            name = "";
+            pos = new DcsPosition();
+            ptt = false;
+            selected = 0;
+            unit = "";
+            simultaneousTransmission = false;
+            LastUpdate = 0;
+        }
+
         // override object.Equals
         public override bool Equals(object compare)
         {
