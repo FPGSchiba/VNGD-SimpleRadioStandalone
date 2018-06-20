@@ -50,7 +50,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
                             Click="PreviewAudio"
-                            Content="Preview Audio"
+                            Content="Audio Preview"
                             Style="{DynamicResource SquareButtonStyle}"
                             ToolTipService.ShowOnDisabled="True" />
 

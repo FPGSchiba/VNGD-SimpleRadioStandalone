@@ -611,6 +611,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
                         MicOutput.IsEnabled = false;
+                        Preview.IsEnabled = false;
+
+                        if (_audioPreview != null)
+                        {
+                            Preview.Content = "Audio Preview";
+                            _audioPreview.StopEncoding();
+                            _audioPreview = null;
+                        }
                     }
                     else
                     {
@@ -669,6 +677,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
             MicOutput.IsEnabled = true;
+            Preview.IsEnabled = true;
             _clientStateSingleton.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
 
