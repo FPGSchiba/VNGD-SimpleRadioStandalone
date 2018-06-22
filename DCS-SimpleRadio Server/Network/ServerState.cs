@@ -19,6 +19,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>,
         IHandle<BanClientMessage>
     {
+        private static readonly string DEFAULT_CLIENT_EXPORT_FILE = "clients-list.json";
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly HashSet<IPAddress> _bannedIps = new HashSet<IPAddress>();
@@ -69,6 +71,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private void StartExport()
         {
             _stop = false;
+
+            string exportFilePath = ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.CLIENT_EXPORT_FILE_PATH).StringValue;
+            if (string.IsNullOrWhiteSpace(exportFilePath) || exportFilePath == DEFAULT_CLIENT_EXPORT_FILE)
+            {
+                // Make sure we're using a full file path in case we're falling back to default values
+                exportFilePath = Path.Combine(GetCurrentDirectory(), DEFAULT_CLIENT_EXPORT_FILE);
+            }
+            else
+            {
+                // Normalize file path read from config to ensure properly escaped local path
+                exportFilePath = NormalizePath(exportFilePath);
+            }
+
+            string exportFileDirectory = Path.GetDirectoryName(exportFilePath);
+
+            if (!Directory.Exists(exportFileDirectory))
+            {
+                Logger.Warn($"Client export directory \"{exportFileDirectory}\" does not exist, trying to create it");
+
+                try
+                {
+                    Directory.CreateDirectory(exportFileDirectory);
+                } catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to create client export directory \"{exportFileDirectory}\", falling back to default path");
+
+                    // Failed to create desired client export directory, fall back to default path in current application directory
+                    exportFilePath = NormalizePath(Path.Combine(GetCurrentDirectory(), DEFAULT_CLIENT_EXPORT_FILE));
+                }
+            }
+
             Task.Factory.StartNew(() =>
             {
                 while (!_stop)
@@ -76,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue)
                     {
                         var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
-                        File.WriteAllText(GetCurrentDirectory() + "\\clients-list.json", json);
+                        File.WriteAllText(exportFilePath, json);
                     }
                     Thread.Sleep(5000);
                 }
@@ -120,6 +153,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             return currentDirectory;
+        }
+
+        private static string NormalizePath(string path)
+        {
+            // Taken from https://stackoverflow.com/a/21058121 on 2018-06-22
+            return Path.GetFullPath(new Uri(path).LocalPath)
+               .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private void StartServer()
