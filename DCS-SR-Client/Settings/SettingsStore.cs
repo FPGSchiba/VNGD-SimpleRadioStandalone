@@ -250,7 +250,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.RefocusDCS.ToString(), "false"},
             {SettingsKeys.ExpandControls.ToString(), "false"},
 
-            {SettingsKeys.MinimiseToTray.ToString(), "true"},
+            {SettingsKeys.MinimiseToTray.ToString(), "false"},
             {SettingsKeys.StartMinimised.ToString(), "false"},
 
             {SettingsKeys.RadioRxEffects_Start.ToString(), "true"},

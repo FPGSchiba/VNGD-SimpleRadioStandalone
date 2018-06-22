@@ -77,7 +77,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public void StartListening()
         {
             var ipAddress = new IPAddress(0);
-            var port = _serverSettings.GetServerSetting(ServerSettingsKeys.SERVER_PORT).IntValue;
+            var port = _serverSettings.GetServerPort();
             var localEndPoint = new IPEndPoint(ipAddress, port);
 
             // Create a TCP/IP socket.

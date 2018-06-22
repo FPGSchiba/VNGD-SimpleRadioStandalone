@@ -140,6 +140,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             }
         }
 
+        public int GetServerPort()
+        {
+            if (!_configuration.Contains("Server Settings"))
+            {
+                return GetServerSetting(ServerSettingsKeys.SERVER_PORT).IntValue;
+            }
+
+            // Migrate from old "port" setting value to new "SERVER_PORT" one
+            if (_configuration["Server Settings"].Contains("port"))
+            {
+                Setting oldSetting = _configuration["Server Settings"]["port"];
+                if (!string.IsNullOrWhiteSpace(oldSetting.StringValue))
+                {
+                    _logger.Info($"Migrating old port value {oldSetting.StringValue} to current SERVER_PORT server setting");
+
+                    _configuration["Server Settings"][ServerSettingsKeys.SERVER_PORT.ToString()].StringValue = oldSetting.StringValue;
+                }
+
+                _logger.Info("Removing old port value from server settings");
+
+                _configuration["Server Settings"].Remove(oldSetting);
+
+                Save();
+            }
+
+            return GetServerSetting(ServerSettingsKeys.SERVER_PORT).IntValue;
+        }
+
         public Dictionary<string, string> ToDictionary()
         {
             if (!_configuration.Contains("General Settings"))

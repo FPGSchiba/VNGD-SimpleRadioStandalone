@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         pipeline.AddLast(new VOIPPacketHandler(_clientsList));
                     })).ChildOption(ChannelOption.TcpNodelay, true);
 
-                int serverPort = _serverSettings.GetServerSetting(ServerSettingsKeys.SERVER_PORT).IntValue;
+                int serverPort = _serverSettings.GetServerPort();
 
                 TCPVoiceRouter.Logger.Log(NLog.LogLevel.Info,
                     "VOIP Listener Binding to " + (serverPort + 1));
