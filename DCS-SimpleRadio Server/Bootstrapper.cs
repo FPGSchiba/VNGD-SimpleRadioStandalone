@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             DisplayRootViewFor<MainViewModel>(settings);
 
-            UpdaterChecker.CheckForUpdate();
+            UpdaterChecker.CheckForUpdate(Settings.ServerSettingsStore.Instance.GetServerSetting(Common.Setting.ServerSettingsKeys.CHECK_FOR_BETA_UPDATES).BoolValue);
         }
 
         protected override void BuildUp(object instance)
