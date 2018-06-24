@@ -1,4 +1,4 @@
--- Version 1.5.2.0
+-- Version 1.5.3.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -991,7 +991,7 @@ function SR.exportRadioA10C(_data)
         _data.ptt = false
     end
     
-    _data.control = 1 -- Full radio
+    _data.control = 0 -- HOTAS Controls - set to 1 for DCS PTT & Select controls
 
     return _data
 end
@@ -1861,4 +1861,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.2.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.1")

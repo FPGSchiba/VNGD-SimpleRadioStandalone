@@ -81,21 +81,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitializeComponent();
 
-            if (IsClientRunning())
-            {
-                MessageBoxResult result = MessageBox.Show(
-                    "Another instance of the SimpleRadio client is already running!\n\nPlease note that only one SRS client can synchronise with DCS at a time - " +
-                    "all other running instances will not receive any radio frequencies from the game.\n\nExit currently started client?",
-                    "Multiple SimpleRadio clients started!",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    Close();
-                }
-            }
-
             // Initialize ToolTip controls
             ToolTips.Init();
 
@@ -171,23 +156,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
-        }
-
-        private bool IsClientRunning()
-        {
-            Process currentProcess = Process.GetCurrentProcess();
-            string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
-
-            foreach (Process clsProcess in Process.GetProcesses())
-            {
-                if (clsProcess.Id != currentProcess.Id &&
-                    clsProcess.ProcessName.ToLower().Trim() == currentProcessName)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void InitFlowDocument()
