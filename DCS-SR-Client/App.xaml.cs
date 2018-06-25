@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -45,9 +46,43 @@ namespace DCS_SR_Client
 
                 Environment.Exit(1);
             }
+
+#if !DEBUG
+              if (IsClientRunning())
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Another instance of the SimpleRadio client is already running!\n\nThis one will now quit. Check your system tray for the SRS Icon",
+                    "Multiple SimpleRadio clients started!",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+             
+                Environment.Exit(0);
+                return;
+               
+            }
+#endif
+
+
             SetupLogging();
             InitNotificationIcon();
+        }
 
+        private bool IsClientRunning()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
+
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.Id != currentProcess.Id &&
+                    clsProcess.ProcessName.ToLower().Trim() == currentProcessName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void SetupLogging()

@@ -1,4 +1,4 @@
--- Version1.5.2.0
+-- Version 1.5.3.1
 -- ONLY COPY THIS FILE IS YOU ARE GOING TO HOST A SERVER!
 -- The file must be in Saved Games\DCS\Scripts\Hooks or Saved Games\DCS.openalpha\Scripts\Hooks
 -- Make sure you enter the correct address into SERVER_SRS_HOST below.
@@ -57,4 +57,4 @@ SRSAuto.onPlayerChangeSlot = function(id)
 end
 
 DCS.setUserCallbacks(SRSAuto)
-net.log("Loaded - DCS-SRS-AutoConnect1.5.2.0")
+net.log("Loaded - DCS-SRS-AutoConnect1.5.3.1")
