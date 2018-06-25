@@ -146,8 +146,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
             }
 
-            UpdaterChecker.CheckForUpdate();
-
+            UpdaterChecker.CheckForUpdate(_settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue);
 
             InitFlowDocument();
 
@@ -549,6 +548,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             AlwaysAllowHotas.IsChecked = _settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue;
             AllowDCSPTT.IsChecked = _settings.GetClientSetting(SettingsKeys.AllowDCSPTT).BoolValue;
+
+            CheckForBetaUpdates.IsChecked = _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue;
         }
 
         private void Connect()
@@ -1155,6 +1156,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 (bool)AlwaysAllowHotas.IsChecked;
             _settings.Save();
 
+        }
+
+        private void CheckForBetaUpdates_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue =
+                (bool)CheckForBetaUpdates.IsChecked;
+            _settings.Save();
         }
 
         private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)

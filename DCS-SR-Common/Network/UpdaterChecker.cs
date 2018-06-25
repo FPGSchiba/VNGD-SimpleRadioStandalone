@@ -5,78 +5,101 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using NLog;
+using Octokit;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker
     {
+        public static readonly string GITHUB_USERNAME = "ciribob";
+        public static readonly string GITHUB_REPOSITORY = "DCS-SimpleRadioStandalone";
+        // Required for all requests against the GitHub API, as per https://developer.github.com/v3/#user-agent-required
+        public static readonly string GITHUB_USER_AGENT = $"{GITHUB_USERNAME}_{GITHUB_REPOSITORY}";
+
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.5.3.1";
 
         public static readonly string VERSION = "1.5.3.1";
 
-        public static async void CheckForUpdate()
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        public static async void CheckForUpdate(bool checkForBetaUpdates)
         {
-            var logger = LogManager.GetCurrentClassLogger();
-            var currentVersion = Version.Parse(VERSION);
+            Version currentVersion = Version.Parse(VERSION);
+
             try
             {
-                var request = WebRequest.Create("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
-                var response = (HttpWebResponse) await Task.Factory
-                    .FromAsync(request.BeginGetResponse,
-                        request.EndGetResponse,
-                        null);
+                var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, VERSION));
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
+
+                Version latestStableVersion = new Version();
+                Release latestStableRelease = null;
+                Version latestBetaVersion = new Version();
+                Release latestBetaRelease = null;
+
+                // Retrieve last stable and beta branch release as tagged on GitHub
+                foreach (Release release in releases)
                 {
-                    var path = response.ResponseUri.AbsolutePath;
+                    Version releaseVersion;
 
-                    if (path.Contains("tag/"))
+                    if (Version.TryParse(release.TagName.Replace("v", ""), out releaseVersion))
                     {
-                        var githubVersion = path.Split('/').Last().ToLower().Replace("v", "");
-                        Version ghVersion = null;
-
-                        if (Version.TryParse(githubVersion, out ghVersion))
+                        if (release.Prerelease && releaseVersion > latestBetaVersion)
                         {
-                            //comparse parts
-                            if (ghVersion.CompareTo(currentVersion) > 0)
-                            {
-                                logger.Warn("Update Available on GitHub: " + githubVersion);
-                                var result =
-                                    MessageBox.Show("New Version Available!\n\nDo you want to Update?",
-                                        "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                                // Process message box results
-                                switch (result)
-                                {
-                                    case MessageBoxResult.Yes:
-                                        //launch browser
-                                        Process.Start(response.ResponseUri.ToString());
-                                        break;
-                                    case MessageBoxResult.No:
-
-                                        break;
-                                }
-                            }
-                            else if (ghVersion.CompareTo(currentVersion) == 0)
-                            {
-                                logger.Warn("Running Latest Version: " + githubVersion);
-                            }
-                            else
-                            {
-                                logger.Warn("Running TESTING Version!! : " + VERSION);
-                            }
+                            latestBetaRelease = release;
+                            latestBetaVersion = releaseVersion;
                         }
-                        else
+                        else if (!release.Prerelease && releaseVersion > latestStableVersion)
                         {
-                            logger.Warn("Failed to Parse version: " + githubVersion);
+                            latestStableRelease = release;
+                            latestStableVersion = releaseVersion;
                         }
                     }
+                    else
+                    {
+                        _logger.Warn($"Failed to parse GitHub release version {release.TagName}");
+                    }
+                }
+
+                // Compare latest versions with currently running version depending on user branch choice
+                if (checkForBetaUpdates && latestBetaVersion > currentVersion)
+                {
+                    ShowUpdateAvailableDialog("beta", latestBetaVersion, latestBetaRelease.HtmlUrl);
+                }
+                else if (latestStableVersion > currentVersion)
+                {
+                    ShowUpdateAvailableDialog("stable", latestStableVersion, latestStableRelease.HtmlUrl);
+                }
+                else if (checkForBetaUpdates && latestBetaVersion == currentVersion)
+                {
+                    _logger.Warn($"Running latest beta version: {currentVersion}");
+                }
+                else if (latestStableVersion == currentVersion)
+                {
+                    _logger.Warn($"Running latest stable version: {currentVersion}");
+                }
+                else
+                {
+                    _logger.Warn($"Running development version: {currentVersion}");
                 }
             }
             catch (Exception ex)
             {
-                //Ignore for now
+                _logger.Error(ex, "Failed to check for updated version");
+            }
+        }
+
+        public static void ShowUpdateAvailableDialog(string branch, Version version, string url)
+        {
+            _logger.Warn($"New {branch} version available on GitHub: {version}");
+
+            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to update?",
+                "Update available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Process.Start(url);
             }
         }
     }
