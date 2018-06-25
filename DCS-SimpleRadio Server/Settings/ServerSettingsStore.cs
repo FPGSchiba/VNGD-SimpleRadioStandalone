@@ -68,6 +68,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             SetSetting("Server Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public void SetServerSetting(ServerSettingsKeys key, bool value)
+        {
+            SetSetting("Server Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+        }
+
         public Setting GetExternalAWACSModeSetting(ServerSettingsKeys key)
         {
             return GetSetting("External AWACS Mode Settings", key.ToString());
