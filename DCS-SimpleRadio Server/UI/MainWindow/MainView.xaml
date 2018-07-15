@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="330"
-             Height="300"
+             Height="410"
              mc:Ignorable="d">
     <Grid Margin="0,0,-6,0">
         <Button x:Name="ServerStartStop"
@@ -132,6 +132,59 @@
                 VerticalAlignment="Top"
                 Content="{Binding RadioExpansion}" />
 
+        <Label Width="165"
+               Margin="18,278,0,-3"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="Check for beta updates" />
+
+        <Button x:Name="CheckForBetaUpdatesToggle"
+                Width="75"
+                Margin="206,283,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding CheckForBetaUpdates}" />
+        
+        <Label Width="165"
+               Margin="18,309,0,-3"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="External AWACS Mode (EAM)" />
+
+        <Button x:Name="ExternalAWACSModeToggle"
+                Width="75"
+                Margin="206,314,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding ExternalAWACSMode}" />
+
+        <Label Width="143"
+               Margin="18,340,0,-3"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="EAM blue coal. password" />
+
+        <TextBox x:Name="ExternalAWACSModeBluePassword"
+                Width="75"
+                Margin="206,345,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                IsEnabled="{Binding IsExternalAWACSModeEnabled}"
+                Text="{Binding Path=ExternalAWACSModeBluePassword, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <Label Width="143"
+               Margin="18,371,0,-3"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="EAM red coal. password" />
+
+        <TextBox x:Name="ExternalAWACSModeRedPassword"
+                Width="75"
+                Margin="206,376,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                IsEnabled="{Binding IsExternalAWACSModeEnabled}"
+                Text="{Binding Path=ExternalAWACSModeRedPassword, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Label Width="55"
                Margin="106,18,0,0"

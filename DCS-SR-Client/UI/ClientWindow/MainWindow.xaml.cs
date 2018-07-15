@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -9,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
-using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -32,8 +30,6 @@ using MahApps.Metro.Controls;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NLog;
-using NLog.Config;
-using NLog.Targets;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 
@@ -77,12 +73,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public MainWindow()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
             InitializeComponent();
+
+            // Initialize ToolTip controls
+            ToolTips.Init();
+
+            // Set up tooltips that are always defined
+            InitToolTips();
 
             DataContext = this;
 
@@ -132,6 +135,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
 
+            ExternalAWACSModeName.Text = _settings.GetClientSetting(SettingsKeys.LastSeenName).StringValue;
+
             _audioManager = new AudioManager(_clients);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
@@ -141,8 +146,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
             }
 
-            UpdaterChecker.CheckForUpdate();
-
+            UpdaterChecker.CheckForUpdate(_settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue);
 
             InitFlowDocument();
 
@@ -317,6 +321,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputDeviceManager = InputManager;
         }
 
+        private void InitToolTips()
+        {
+            ExternalAWACSModePassword.ToolTip = ToolTips.ExternalAWACSModePassword;
+            ExternalAWACSModeName.ToolTip = ToolTips.ExternalAWACSModeName;
+            ConnectExternalAWACSMode.ToolTip = ToolTips.ExternalAWACSMode;
+        }
+
         public InputDeviceManager InputManager { get; set; }
 
         public FavouriteServersViewModel FavouriteServersViewModel { get; }
@@ -327,7 +338,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set
             {
                 _serverAddress = value;
-                ServerIp.Text = value.Address;
+                if (value != null)
+                {
+                    ServerIp.Text = value.Address;
+                }
+                
                 _connectCommand.RaiseCanExecuteChanged();
             }
         }
@@ -371,31 +386,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _clientStateSingleton.MicrophoneAvailable = false;
 
-                var noMicAvailableToolTip = new System.Windows.Controls.ToolTip();
-                var noMicAvailableToolTipContent = new System.Windows.Controls.StackPanel();
-
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "No microphone available",
-                    FontWeight = FontWeights.Bold
-                });
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "No valid microphone is available - others will not be able to hear you."
-                });
-                noMicAvailableToolTipContent.Children.Add(new System.Windows.Controls.TextBlock
-                {
-                    Text = "You can still use SRS to listen to radio calls, but will not be able to transmit anything yourself."
-                });
-
-                noMicAvailableToolTip.Content = noMicAvailableToolTipContent;
-
                 Preview.IsEnabled = false;
 
-                Preview.ToolTip = noMicAvailableToolTip;
-                StartStop.ToolTip = noMicAvailableToolTip;
-                Mic.ToolTip = noMicAvailableToolTip;
-                Mic_VU.ToolTip = noMicAvailableToolTip;
+                Preview.ToolTip = ToolTips.NoMicAvailable;
+                StartStop.ToolTip = ToolTips.NoMicAvailable;
+                Mic.ToolTip = ToolTips.NoMicAvailable;
+                Mic_VU.ToolTip = ToolTips.NoMicAvailable;
             }
             else
             {
@@ -488,7 +484,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
-            ClientCount.Content = _clients.Count;
+            int clientCountIngame = 0;
+
+            foreach (KeyValuePair<string, SRClient> kvp in _clients)
+            {
+                if (kvp.Value.IsIngame())
+                {
+                    clientCountIngame++;
+                }
+            }
+
+            ClientCount.Content = $"{_clients.Count} ({clientCountIngame} ingame)";
 
             if (_audioPreview != null)
             {
@@ -542,6 +548,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             AlwaysAllowHotas.IsChecked = _settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue;
             AllowDCSPTT.IsChecked = _settings.GetClientSetting(SettingsKeys.AllowDCSPTT).BoolValue;
+
+            CheckForBetaUpdates.IsChecked = _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue;
         }
 
         private void Connect()
@@ -564,7 +572,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ipAddr[0];
                         _port = GetPortFromTextBox();
 
-                        _client = new ClientSync(_clients, _guid);
+                        _client = new ClientSync(_clients, _guid, UpdateUICallback);
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
@@ -572,18 +580,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Mic.IsEnabled = false;
                         Speakers.IsEnabled = false;
                         MicOutput.IsEnabled = false;
+                        Preview.IsEnabled = false;
+
+                        if (_audioPreview != null)
+                        {
+                            Preview.Content = "Audio Preview";
+                            _audioPreview.StopEncoding();
+                            _audioPreview = null;
+                        }
                     }
                     else
                     {
                         //invalid ID
                         MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
+
+                        _clientStateSingleton.IsConnected = false;
+                        ToggleServerSettings.IsEnabled = false;
                     }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
+
+                    _clientStateSingleton.IsConnected = false;
+                    ToggleServerSettings.IsEnabled = false;
                 }
             }
         }
@@ -624,6 +646,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
             MicOutput.IsEnabled = true;
+            Preview.IsEnabled = true;
+            _clientStateSingleton.IsConnected = false;
+            ToggleServerSettings.IsEnabled = false;
+
+            ExternalAWACSModePassword.IsEnabled = false;
+            ExternalAWACSModePasswordLabel.IsEnabled = false;
+            ExternalAWACSModeName.IsEnabled = false;
+            ExternalAWACSModeNameLabel.IsEnabled = false;
+            ConnectExternalAWACSMode.IsEnabled = false;
+            ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+
+            if (!string.IsNullOrWhiteSpace(_clientStateSingleton.LastSeenName) &&
+                _settings.GetClientSetting(SettingsKeys.LastSeenName).StringValue != _clientStateSingleton.LastSeenName)
+            {
+                _settings.SetClientSetting(SettingsKeys.LastSeenName, _clientStateSingleton.LastSeenName);
+            }
+
             try
             {
                 _audioManager.StopEncoding();
@@ -639,6 +678,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _client.Disconnect();
                 _client = null;
             }
+
+            _clientStateSingleton.DcsPlayerRadioInfo.Reset();
+            _clientStateSingleton.DcsPlayerSideInfo.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -691,6 +733,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
+                        _clientStateSingleton.IsConnected = true;
+
                         _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
 
                         _audioManager.StartEncoding(inputId, output, _guid, InputManager,
@@ -726,19 +770,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _settings.SetPositionSetting(SettingsKeys.ClientX, Left);
             _settings.SetPositionSetting(SettingsKeys.ClientY, Top);
 
+            if (!string.IsNullOrWhiteSpace(_clientStateSingleton.LastSeenName) &&
+                _settings.GetClientSetting(SettingsKeys.LastSeenName).StringValue != _clientStateSingleton.LastSeenName)
+            {
+                _settings.SetClientSetting(SettingsKeys.LastSeenName, _clientStateSingleton.LastSeenName);
+            }
+
             //save window position
             base.OnClosing(e);
 
             //stop timer
-            _updateTimer.Stop();
+            _updateTimer?.Stop();
 
             Stop();
 
-            if (_audioPreview != null)
-            {
-                _audioPreview.StopEncoding();
-                _audioPreview = null;
-            }
+            _audioPreview?.StopEncoding();
+            _audioPreview = null;
 
             _radioOverlayWindow?.Close();
             _radioOverlayWindow = null;
@@ -746,7 +793,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _awacsRadioOverlay?.Close();
             _awacsRadioOverlay = null;
 
-            _dcsAutoConnectListener.Stop();
+            _dcsAutoConnectListener?.Stop();
             _dcsAutoConnectListener = null;
         }
 
@@ -800,6 +847,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void UpdateUICallback()
+        {
+            if (_clientStateSingleton.IsConnected)
+            {
+                ToggleServerSettings.IsEnabled = true;
+
+                bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+
+                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode;
+                ExternalAWACSModePasswordLabel.IsEnabled = eamEnabled;
+                ExternalAWACSModeName.Text = _clientStateSingleton.LastSeenName;
+                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode;
+                ExternalAWACSModeNameLabel.IsEnabled = eamEnabled;
+                ConnectExternalAWACSMode.IsEnabled = eamEnabled;
+                ConnectExternalAWACSMode.Content = _clientStateSingleton.InExternalAWACSMode ? "Disconnect External AWACS MODE (EAM)" : "Connect External AWACS MODE (EAM)";
+            }
+            else
+            {
+                ToggleServerSettings.IsEnabled = false;
+                ExternalAWACSModePassword.IsEnabled = false;
+                ExternalAWACSModePasswordLabel.IsEnabled = false;
+                ExternalAWACSModeName.Text = _clientStateSingleton.LastSeenName;
+                ExternalAWACSModeName.IsEnabled = false;
+                ExternalAWACSModeNameLabel.IsEnabled = false;
+                ConnectExternalAWACSMode.IsEnabled = false;
+                ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+            }
+        }
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -980,7 +1055,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
         }
 
-
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
         {
             _settings.GetClientSetting(SettingsKeys.RefocusDCS).BoolValue =
@@ -1082,6 +1156,65 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 (bool)AlwaysAllowHotas.IsChecked;
             _settings.Save();
 
+        }
+
+        private void CheckForBetaUpdates_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue =
+                (bool)CheckForBetaUpdates.IsChecked;
+            _settings.Save();
+        }
+
+        private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_client == null || 
+                !_clientStateSingleton.IsConnected ||
+                !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
+                (!_clientStateSingleton.InExternalAWACSMode &&
+                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Text)))
+            {
+                return;
+            }
+
+            _clientStateSingleton.LastSeenName = ExternalAWACSModeName.Text;
+
+            // Already connected, disconnect
+            if (_clientStateSingleton.InExternalAWACSMode)
+            {
+                _client.DisconnectExternalAWACSMode();
+            }
+            else
+            {
+                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Text.Trim(), ExternalAWACSModeConnectionChanged);
+            }
+        }
+
+        private void ExternalAWACSModeConnectionChanged(bool result, int coalition)
+        {
+            if (result)
+            {
+                _clientStateSingleton.InExternalAWACSMode = true;
+                _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
+                _clientStateSingleton.DcsPlayerSideInfo.name = _clientStateSingleton.LastSeenName;
+                _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
+
+                ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
+                ExternalAWACSModePassword.IsEnabled = false;
+                ExternalAWACSModeName.IsEnabled = false;
+            }
+            else
+            {
+                _clientStateSingleton.InExternalAWACSMode = false;
+                _clientStateSingleton.DcsPlayerSideInfo.side = 0;
+                _clientStateSingleton.DcsPlayerSideInfo.name = "";
+                _clientStateSingleton.DcsPlayerRadioInfo.name = "";
+                _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
+                _clientStateSingleton.LastSent = 0;
+
+                ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+                ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+                ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+            }
         }
     }
 }

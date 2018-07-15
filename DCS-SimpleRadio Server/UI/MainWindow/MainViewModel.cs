@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -17,6 +20,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         private readonly IEventAggregator _eventAggregator;
         private readonly IWindowManager _windowManager;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private DispatcherTimer _passwordDebounceTimer = null;
 
         public MainViewModel(IWindowManager windowManager, IEventAggregator eventAggregator,
             ClientAdminViewModel clientAdminViewModel)
@@ -39,39 +44,96 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 
         public string RadioSecurityText
             =>
-                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.COALITION_AUDIO_SECURITY]
+                ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY).BoolValue
                     ? "ON"
                     : "OFF";
 
         public string SpectatorAudioText
             =>
-                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.SPECTATORS_AUDIO_DISABLED]
+                ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED).BoolValue
                     ? "DISABLED"
                     : "ENABLED";
 
         public string ExportListText
             =>
-                ServerSettings.Instance.ServerSetting[(int) ServerSettingType.CLIENT_EXPORT_ENABLED]
+                ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue
                     ? "ON"
                     : "OFF";
 
         public string LOSText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.LOS_ENABLED] ? "ON" : "OFF";
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOS_ENABLED).BoolValue ? "ON" : "OFF";
 
         public string DistanceLimitText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.DISTANCE_ENABLED] ? "ON" : "OFF";
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.DISTANCE_ENABLED).BoolValue ? "ON" : "OFF";
 
         public string RealRadioText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_TX] ? "ON" : "OFF";
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.IRL_RADIO_TX).BoolValue ? "ON" : "OFF";
 
         public string IRLRadioRxText
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.IRL_RADIO_RX_INTERFERENCE] ? "ON" : "OFF";
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE).BoolValue ? "ON" : "OFF";
 
         public string RadioExpansion
-            => ServerSettings.Instance.ServerSetting[(int) ServerSettingType.RADIO_EXPANSION] ? "ON" : "OFF";
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RADIO_EXPANSION).BoolValue ? "ON" : "OFF";
+
+        public string CheckForBetaUpdates
+            => ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.CHECK_FOR_BETA_UPDATES).BoolValue ? "ON" : "OFF";
+
+        public string ExternalAWACSMode
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue ? "ON" : "OFF";
+
+        public bool IsExternalAWACSModeEnabled { get; set; } 
+            = ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue;
+
+        private string _externalAWACSModeBluePassword = 
+            ServerSettingsStore.Instance.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD).StringValue;
+        public string ExternalAWACSModeBluePassword
+        {
+            get { return _externalAWACSModeBluePassword; }
+            set
+            {
+                _externalAWACSModeBluePassword = value.Trim();
+                if (_passwordDebounceTimer != null)
+                {
+                    _passwordDebounceTimer.Stop();
+                    _passwordDebounceTimer.Tick -= PasswordDebounceTimerTick;
+                    _passwordDebounceTimer = null;
+                }
+
+                _passwordDebounceTimer = new DispatcherTimer();
+                _passwordDebounceTimer.Tick += PasswordDebounceTimerTick;
+                _passwordDebounceTimer.Interval = TimeSpan.FromMilliseconds(500);
+                _passwordDebounceTimer.Start();
+
+                NotifyOfPropertyChange(() => ExternalAWACSModeBluePassword);
+            }
+        }
+
+        private string _externalAWACSModeRedPassword = 
+            ServerSettingsStore.Instance.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD).StringValue;
+        public string ExternalAWACSModeRedPassword
+        {
+            get { return _externalAWACSModeRedPassword; }
+            set
+            {
+                _externalAWACSModeRedPassword = value.Trim();
+                if (_passwordDebounceTimer != null)
+                {
+                    _passwordDebounceTimer.Stop();
+                    _passwordDebounceTimer.Tick -= PasswordDebounceTimerTick;
+                    _passwordDebounceTimer = null;
+                }
+
+                _passwordDebounceTimer = new DispatcherTimer();
+                _passwordDebounceTimer.Tick += PasswordDebounceTimerTick;
+                _passwordDebounceTimer.Interval = TimeSpan.FromMilliseconds(500);
+                _passwordDebounceTimer.Start();
+
+                NotifyOfPropertyChange(() => ExternalAWACSModeRedPassword);
+            }
+        }
 
         public string ListeningPort
-            => ServerSettings.Instance.ServerListeningPort() + "";
+            => ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.SERVER_PORT).StringValue;
 
         public void Handle(ServerStateMessage message)
         {
@@ -104,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void RadioSecurityToggle()
         {
             var newSetting = RadioSecurityText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.COALITION_AUDIO_SECURITY, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY, newSetting);
             NotifyOfPropertyChange(() => RadioSecurityText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -113,7 +175,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void SpectatorAudioToggle()
         {
             var newSetting = SpectatorAudioText != "DISABLED";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.SPECTATORS_AUDIO_DISABLED, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED, newSetting);
             NotifyOfPropertyChange(() => SpectatorAudioText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -122,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void ExportListToggle()
         {
             var newSetting = ExportListText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.CLIENT_EXPORT_ENABLED, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED, newSetting);
             NotifyOfPropertyChange(() => ExportListText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -131,7 +193,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void LOSToggle()
         {
             var newSetting = LOSText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.LOS_ENABLED, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOS_ENABLED, newSetting);
             NotifyOfPropertyChange(() => LOSText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -140,7 +202,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void DistanceLimitToggle()
         {
             var newSetting = DistanceLimitText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.DISTANCE_ENABLED, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.DISTANCE_ENABLED, newSetting);
             NotifyOfPropertyChange(() => DistanceLimitText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -149,7 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void RealRadioToggle()
         {
             var newSetting = RealRadioText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_TX, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.IRL_RADIO_TX, newSetting);
             NotifyOfPropertyChange(() => RealRadioText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -158,7 +220,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void IRLRadioRxBehaviourToggle()
         {
             var newSetting = IRLRadioRxText != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.IRL_RADIO_RX_INTERFERENCE, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE, newSetting);
             NotifyOfPropertyChange(() => IRLRadioRxText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
@@ -167,10 +229,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void RadioExpansionToggle()
         {
             var newSetting = RadioExpansion != "ON";
-            ServerSettings.Instance.WriteSetting(ServerSettingType.RADIO_EXPANSION, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_EXPANSION, newSetting);
             NotifyOfPropertyChange(() => RadioExpansion);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void CheckForBetaUpdatesToggle()
+        {
+            var newSetting = CheckForBetaUpdates != "ON";
+            ServerSettingsStore.Instance.SetServerSetting(ServerSettingsKeys.CHECK_FOR_BETA_UPDATES, newSetting);
+            NotifyOfPropertyChange(() => CheckForBetaUpdates);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void ExternalAWACSModeToggle()
+        {
+            var newSetting = ExternalAWACSMode != "ON";
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE, newSetting);
+
+            IsExternalAWACSModeEnabled = newSetting;
+
+            NotifyOfPropertyChange(() => ExternalAWACSMode);
+            NotifyOfPropertyChange(() => IsExternalAWACSModeEnabled);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        private void PasswordDebounceTimerTick(object sender, EventArgs e)
+        {
+            ServerSettingsStore.Instance.SetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD, _externalAWACSModeBluePassword);
+            ServerSettingsStore.Instance.SetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD, _externalAWACSModeRedPassword);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+
+            _passwordDebounceTimer.Stop();
+            _passwordDebounceTimer.Tick -= PasswordDebounceTimerTick;
+            _passwordDebounceTimer = null;
         }
     }
 }

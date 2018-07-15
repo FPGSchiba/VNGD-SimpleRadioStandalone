@@ -20,7 +20,6 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
-<<<<<<< HEAD
 [Ll]og/
 
 
@@ -255,10 +254,10 @@ _Pvt_Extensions
 # JetBrains Rider
 .idea/
 *.sln.iml
-=======
->>>>>>> 49ec92f9f197c0601077ed148a95307a47790dfd
 install-build/DCS-SimpleRadioStandalone.lua
 install-build/clientlog.txt
 install-build/serverlog.txt
 /.DS_Store
 *.DotSettings
+
+install-build/

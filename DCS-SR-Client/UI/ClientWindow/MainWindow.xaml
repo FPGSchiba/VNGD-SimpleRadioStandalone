@@ -11,7 +11,7 @@
                       xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="570"
+                      Height="630"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
@@ -50,7 +50,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
                             Click="PreviewAudio"
-                            Content="Preview Audio"
+                            Content="Audio Preview"
                             Style="{DynamicResource SquareButtonStyle}"
                             ToolTipService.ShowOnDisabled="True" />
 
@@ -157,6 +157,7 @@
                                 HorizontalAlignment="Center"
                                 Click="ToggleServerSettings_OnClick"
                                 Content="Show Server Settings"
+                                IsEnabled="False"
                                 Style="{DynamicResource SquareButtonStyle}" />
 
                     </StackPanel>
@@ -176,6 +177,59 @@
                                 HorizontalAlignment="Center"
                                 Click="ShowAwacsOverlay_OnClick"
                                 Content="Toggle AWACS Overlay"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                        <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Vertical">
+                            <Label x:Name="ExternalAWACSModePasswordLabel"
+                                HorizontalAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                Margin="0,10,10,0"
+                                Content="EAM coalition password"
+                                IsEnabled="False" />
+                            <TextBox x:Name="ExternalAWACSModePassword"
+                                 Width="150"
+                                 Height="23"
+                                 Margin="0,0,10,0"
+                                 MaxLines="1"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Center"
+                                 IsEnabled="False" />
+                        </StackPanel>
+                        <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Vertical">
+                            <Label x:Name="ExternalAWACSModeNameLabel"
+                                HorizontalAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                Margin="0,10,0,0"
+                                Content="EAM name"
+                                IsEnabled="False" />
+                            <TextBox x:Name="ExternalAWACSModeName"
+                                 Width="150"
+                                 Height="23"
+                                 Margin="0,0,0,0"
+                                 MaxLines="1"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Center"
+                                 IsEnabled="False" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                        <Button x:Name="ConnectExternalAWACSMode"
+                                Width="220"
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Center"
+                                Click="ConnectExternalAWACSMode_OnClick"
+                                Content="Connect External AWACS Mode (EAM)"
+                                IsEnabled="False"
                                 Style="{DynamicResource SquareButtonStyle}" />
                     </StackPanel>
 
@@ -489,7 +543,7 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
-
+                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
@@ -984,107 +1038,133 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-
                         <Label Grid.Row="16"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio 1 Audio Channel" />
-                        <local:RadioChannelConfigUi x:Name="Radio1Config"
-                                                    Grid.Row="16"
-                                                    Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio1Channel}" />
+                               Content="Check for beta updates" />
+
+                        <ToggleButton Name="CheckForBetaUpdates"
+                                      Grid.Row="16"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="CheckForBetaUpdates_OnClick">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
 
                         <Label Grid.Row="17"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio 2 Audio Channel" />
-                        <local:RadioChannelConfigUi x:Name="Radio2Config"
+                               Content="Radio 1 Audio Channel" />
+                        <local:RadioChannelConfigUi x:Name="Radio1Config"
                                                     Grid.Row="17"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio2Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio1Channel}" />
 
                         <Label Grid.Row="18"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio 3 Audio Channel" />
-                        <local:RadioChannelConfigUi x:Name="Radio3Config"
+                               Content="Radio 2 Audio Channel" />
+                        <local:RadioChannelConfigUi x:Name="Radio2Config"
                                                     Grid.Row="18"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio3Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio2Channel}" />
+
                         <Label Grid.Row="19"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Radio 3 Audio Channel" />
+                        <local:RadioChannelConfigUi x:Name="Radio3Config"
+                                                    Grid.Row="19"
+                                                    Grid.Column="1"
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio3Channel}" />
+                        <Label Grid.Row="20"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 4 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio4Config"
-                                                    Grid.Row="19"
+                                                    Grid.Row="20"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio4Channel}" />
-                        <Label Grid.Row="20"
+                        <Label Grid.Row="21"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 5 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio5Config"
-                                                    Grid.Row="20"
+                                                    Grid.Row="21"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio5Channel}" />
-                        <Label Grid.Row="21"
+                        <Label Grid.Row="22"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 6 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio6Config"
-                                                    Grid.Row="21"
+                                                    Grid.Row="22"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio6Channel}" />
-                        <Label Grid.Row="22"
+                        <Label Grid.Row="23"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 7 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio7Config"
-                                                    Grid.Row="22"
+                                                    Grid.Row="23"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio7Channel}" />
-                        <Label Grid.Row="23"
+                        <Label Grid.Row="24"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 8 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio8Config"
-                                                    Grid.Row="23"
+                                                    Grid.Row="24"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio8Channel}" />
-                        <Label Grid.Row="24"
+                        <Label Grid.Row="25"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 9 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio9Config"
-                                                    Grid.Row="24"
+                                                    Grid.Row="25"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio9Channel}" />
-                        <Label Grid.Row="25"
+                        <Label Grid.Row="26"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 10 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio10Config"
-                                                    Grid.Row="25"
+                                                    Grid.Row="26"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio10Channel}" />
 
-                        <Label Grid.Row="26"
+                        <Label Grid.Row="27"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Intercom Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="IntercomConfig"
-                                                    Grid.Row="26"
+                                                    Grid.Row="27"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.IntercomChannel}" />
                     </Grid>

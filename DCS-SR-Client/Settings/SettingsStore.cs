@@ -82,8 +82,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         DenoiseAttenuation = 75,
 
         AlwaysAllowHotasControls = 76,
-        AllowDCSPTT = 77
+        AllowDCSPTT = 77,
 
+        LastSeenName = 78,
+
+        CheckForBetaUpdates = 79
     }
 
     public enum InputBinding
@@ -249,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.RefocusDCS.ToString(), "false"},
             {SettingsKeys.ExpandControls.ToString(), "false"},
 
-            {SettingsKeys.MinimiseToTray.ToString(), "true"},
+            {SettingsKeys.MinimiseToTray.ToString(), "false"},
             {SettingsKeys.StartMinimised.ToString(), "false"},
 
             {SettingsKeys.RadioRxEffects_Start.ToString(), "true"},
@@ -303,6 +306,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
             {SettingsKeys.AllowDCSPTT.ToString(),"true" },
+
+            {SettingsKeys.LastSeenName.ToString(), ""},
+
+            {SettingsKeys.CheckForBetaUpdates.ToString(), "false"}
 
         };
 

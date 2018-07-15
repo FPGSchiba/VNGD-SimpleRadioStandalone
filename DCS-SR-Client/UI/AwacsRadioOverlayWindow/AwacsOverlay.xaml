@@ -143,10 +143,11 @@
         <Slider x:Name="windowOpacitySlider"
                 Grid.Row="3"
                 Grid.Column="2"
-                Grid.ColumnSpan="3"
+                Grid.ColumnSpan="2"
                 Width="280"
-                Margin="60,0,0,0"
+                Margin="0,0,20,0"
                 VerticalAlignment="Center"
+                HorizontalAlignment="Left"
                 Maximum="1.0"
                 Minimum="0.05"
                 Style="{x:Null}"
@@ -158,10 +159,16 @@
                                     Grid.Row="4"
                                     Grid.Column="0"
                                     Grid.ColumnSpan="3"
-                                    Margin="30,0,0,0"
+                                    Margin="10,0,0,0"
                                     HorizontalAlignment="Left"
                                     RadioId="0" />
 
-
+        <Button x:Name="ToggleGlobalSimultaneousTransmissionButton"
+                Grid.Row="4"
+                Grid.Column="4"
+                Click="ToggleGlobalSimultaneousTransmissionButton_Click"
+                Content="Simul. Transmission OFF"
+                Margin="0,5,25,5"
+                Style="{x:Null}" />
     </Grid>
 </Window>

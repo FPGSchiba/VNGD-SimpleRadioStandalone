@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -13,7 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Server;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using FragLabs.Audio.Codecs;
 using NLog;
 using Timer = Cabhishek.Timers.Timer;
@@ -46,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private TcpClient _listener;
 
-        private uint _packetNumber = 1;
+        private ulong _packetNumber = 1;
 
         private volatile bool _ptt;
 
@@ -60,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public TCPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
@@ -77,9 +79,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _inputManager = inputManager;
         }
 
-        [DllImport("kernel32.dll")]
-        private static extern long GetTickCount64();
-
         private void AudioEffectCheckTick()
         {
             for (var i = 0; i < RadioReceivingState.Length; i++)
@@ -94,7 +93,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-                    _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume);
+                    if (!radioState.IsSimultaneous)
+                    {
+                        _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume);
+                    }
                 }
             }
         }
@@ -180,10 +182,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         GuidBytes = _guidAsciiBytes,
                         AudioPart1Bytes = new byte[] {0, 1, 2, 3, 4, 5},
                         AudioPart1Length = (ushort) 6,
-                        Frequency = 100,
+                        Frequencies = new double[] { 100 },
                         UnitId = 1,
-                        Encryption = 0,
-                        Modulation = 4,
+                        Encryptions = new byte[] { 0 },
+                        Modulations = new byte[] { 4 },
                         PacketNumber = 1
                     }.EncodePacket();
 
@@ -325,9 +327,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         var encodedOpusAudio = new byte[0];
                         _encodedAudio.TryTake(out encodedOpusAudio, 100000, _stopFlag.Token);
 
-                        var time = GetTickCount64(); //should add at the receive instead?
+                        var time = DateTime.Now.Ticks; //should add at the receive instead?
 
-                        if ((encodedOpusAudio != null) && (encodedOpusAudio.Length > 36))
+                        if ((encodedOpusAudio != null)
+                            && (encodedOpusAudio.Length >= (UDPVoicePacket.PacketHeaderLength + UDPVoicePacket.FixedPacketLength + UDPVoicePacket.FrequencySegmentLength)))
                         {
                             //  process
                             // check if we should play audio
@@ -338,42 +341,65 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 //Decode bytes
                                 var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
+                                var frequencyCount = udpVoicePacket.Frequencies.Length;
 
-                                // check the radio
-                                RadioReceivingState receivingState = null;
-                                var receivingRadio =
-                                    _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(
-                                        udpVoicePacket.Frequency,
-                                        (RadioInformation.Modulation) udpVoicePacket.Modulation,
-                                        udpVoicePacket.UnitId, out receivingState);
+                                List<RadioReceivingPriority> radioReceivingPriorities = new List<RadioReceivingPriority>(frequencyCount);
 
-                                //Check that we're not transmitting on this radio
-
-                                double receivingPowerLossPercent = 0;
-                                float lineOfSightLoss = 0;
-
-                                if ((receivingRadio != null) && (receivingState != null)
-                                    &&
-                                    ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM)
-                                     // INTERCOM Modulation is 2 so if its two dont bother checking LOS and Range
-                                     ||
-                                     (
-                                         HasLineOfSight(udpVoicePacket, out lineOfSightLoss)
-                                         &&
-                                         InRange(udpVoicePacket, out receivingPowerLossPercent)
-                                         &&
-                                         !ShouldBlockRxAsTransmitting(receivingState.ReceivedOn)
-                                     )
-                                    )
-                                )
+                                // Parse frequencies into receiving radio priority for selection below
+                                for (var i = 0; i < frequencyCount; i++)
                                 {
-                                    //  RadioReceivingState[receivingState.ReceivedOn] = receivingState;
+                                    RadioReceivingState state = null;
+                                    bool decryptable;
+                                    var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(
+                                        udpVoicePacket.Frequencies[i],
+                                        (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
+                                        udpVoicePacket.Encryptions[i],
+                                        udpVoicePacket.UnitId, out state, out decryptable);
 
+                                    float losLoss = 0.0f;
+                                    double receivPowerLossPercent = 0.0;
+                                    bool canReceive = false;
+
+                                    if (radio != null && state != null)
+                                    {
+                                        if (
+                                            radio.modulation == RadioInformation.Modulation.INTERCOM
+                                            || (
+                                                HasLineOfSight(udpVoicePacket, out losLoss)
+                                                && InRange(udpVoicePacket.Guid, udpVoicePacket.Frequencies[i], out receivPowerLossPercent)
+                                                && !ShouldBlockRxAsTransmitting(state.ReceivedOn)
+                                            )
+                                        )
+                                        {
+                                            canReceive = true;
+                                        }
+
+                                        decryptable = (udpVoicePacket.Encryptions[i] == 0) || (udpVoicePacket.Encryptions[i] == radio.encKey && radio.enc);
+                                    }
+
+                                    radioReceivingPriorities.Add(new RadioReceivingPriority()
+                                    {
+                                        CanReceive = canReceive,
+                                        Decryptable = decryptable,
+                                        Encryption = udpVoicePacket.Encryptions[i],
+                                        Frequency = udpVoicePacket.Frequencies[i],
+                                        LineOfSightLoss = losLoss,
+                                        Modulation = udpVoicePacket.Modulations[i],
+                                        ReceivingPowerLossPercent = receivPowerLossPercent,
+                                        ReceivingRadio = radio,
+                                        ReceivingState = state
+                                    });
+                                }
+
+                                // Sort receiving radios to play audio on correct one
+                                radioReceivingPriorities.Sort(SortRadioReceivingPriorities);
+
+                                if (radioReceivingPriorities.Count > 0)
+                                {
                                     //DECODE audio
                                     int len1;
                                     var decoded = _decoder.Decode(udpVoicePacket.AudioPart1Bytes,
                                         udpVoicePacket.AudioPart1Bytes.Length, out len1);
-
 
                                     if (len1 > 0)
                                     {
@@ -384,62 +410,69 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         //ALL GOOD!
                                         //create marker for bytes
-                                        var audio = new ClientAudio
+                                        for (int i = 0; i < radioReceivingPriorities.Count; i++)
                                         {
-                                            ClientGuid = udpVoicePacket.Guid,
-                                            PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),
-                                            //Convert to Shorts!
-                                            ReceiveTime = GetTickCount64(),
-                                            Frequency = udpVoicePacket.Frequency,
-                                            Modulation = udpVoicePacket.Modulation,
-                                            Volume = receivingRadio.volume,
-                                            ReceivedRadio = receivingState.ReceivedOn,
-                                            UnitId = udpVoicePacket.UnitId,
-                                            Encryption = udpVoicePacket.Encryption,
-                                            Decryptable =
-                                                (udpVoicePacket.Encryption == receivingRadio.encKey) &&
-                                                receivingRadio.enc,
-                                            // mark if we can decrypt it
-                                            RadioReceivingState = receivingState,
-                                            RecevingPower =
-                                                receivingPowerLossPercent, //loss of 1.0 or greater is total loss
-                                            LineOfSightLoss = lineOfSightLoss, // Loss of 1.0 or greater is total loss
-                                            PacketNumber = udpVoicePacket.PacketNumber
-                                        };
+                                            var destinationRadio = radioReceivingPriorities[i];
+                                            var isSimultaneousTransmission = radioReceivingPriorities.Count > 1 && i > 0;
 
-
-                                        //handle effects
-                                        var radioState = RadioReceivingState[audio.ReceivedRadio];
-
-                                        if ((radioState == null) || radioState.PlayedEndOfTransmission ||
-                                            !radioState.IsReceiving)
-                                        {
-                                            var decrytable = audio.Decryptable || (audio.Encryption == 0);
-
-                                            //mark that we have decrpyted encrypted audio for sound effects
-                                            if (decrytable && (audio.Encryption > 0))
+                                            var audio = new ClientAudio
                                             {
-                                                _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
-                                                    true,
-                                                    audio.Volume);
+                                                ClientGuid = udpVoicePacket.Guid,
+                                                PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),
+                                                //Convert to Shorts!
+                                                ReceiveTime = DateTime.Now.Ticks,
+                                                Frequency = destinationRadio.Frequency,
+                                                Modulation = destinationRadio.Modulation,
+                                                Volume = destinationRadio.ReceivingRadio.volume,
+                                                ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
+                                                UnitId = udpVoicePacket.UnitId,
+                                                Encryption = destinationRadio.Encryption,
+                                                Decryptable = destinationRadio.Decryptable,
+                                                // mark if we can decrypt it
+                                                RadioReceivingState = destinationRadio.ReceivingState,
+                                                RecevingPower = destinationRadio.ReceivingPowerLossPercent, //loss of 1.0 or greater is total loss
+                                                LineOfSightLoss = destinationRadio.LineOfSightLoss, // Loss of 1.0 or greater is total loss
+                                                PacketNumber = udpVoicePacket.PacketNumber
+                                            };
+
+                                            //handle effects
+                                            var radioState = RadioReceivingState[audio.ReceivedRadio];
+
+                                            if (!isSimultaneousTransmission && (radioState == null || radioState.PlayedEndOfTransmission ||
+                                                !radioState.IsReceiving))
+                                            {
+                                                var decrytable = audio.Decryptable || (audio.Encryption == 0);
+
+                                                //mark that we have decrpyted encrypted audio for sound effects
+                                                if (decrytable && (audio.Encryption > 0))
+                                                {
+                                                    _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
+                                                        true,
+                                                        audio.Volume);
+                                                }
+                                                else
+                                                {
+                                                    _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
+                                                        false,
+                                                        audio.Volume);
+                                                }
                                             }
-                                            else
+
+                                            RadioReceivingState[audio.ReceivedRadio] = new RadioReceivingState
                                             {
-                                                _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
-                                                    false,
-                                                    audio.Volume);
+                                                IsSecondary = destinationRadio.ReceivingState.IsSecondary,
+                                                IsSimultaneous = isSimultaneousTransmission,
+                                                LastReceviedAt = DateTime.Now.Ticks,
+                                                PlayedEndOfTransmission = false,
+                                                ReceivedOn = destinationRadio.ReceivingState.ReceivedOn
+                                            };
+
+                                            // Only play actual audio once
+                                            if (i == 0)
+                                            {
+                                                _audioManager.AddClientAudio(audio);
                                             }
                                         }
-
-                                        RadioReceivingState[audio.ReceivedRadio] = new RadioReceivingState
-                                        {
-                                            IsSecondary = receivingState.IsSecondary,
-                                            LastReceviedAt = DateTime.Now.Ticks,
-                                            PlayedEndOfTransmission = false,
-                                            ReceivedOn = receivingState.ReceivedOn
-                                        };
-
-                                        _audioManager.AddClientAudio(audio);
                                     }
                                     else
                                     {
@@ -465,7 +498,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool ShouldBlockRxAsTransmitting(int radioId)
         {
             //Return based on server settings as well
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.IRL_RADIO_TX])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX))
             {
                 return false;
             }
@@ -483,7 +516,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
         {
             losLoss = 0; //0 is NO LOSS
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.LOS_ENABLED])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 return true;
             }
@@ -509,16 +542,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return false;
         }
 
-        private bool InRange(UDPVoicePacket udpVoicePacket, out double signalStrength)
+        private bool InRange(string transmissingClientGuid, double frequency, out double signalStrength)
         {
             signalStrength = 0;
-            if (!ClientSync.ServerSettings[(int) ServerSettingType.DISTANCE_ENABLED])
+            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED))
             {
                 return true;
             }
 
             SRClient transmittingClient;
-            if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
+            if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
                 var myPosition = _clientStateSingleton.DcsPlayerRadioInfo.pos;
 
@@ -532,7 +565,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 var dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
 
-                var max = RadioCalculator.FriisMaximumTransmissionRange(udpVoicePacket.Frequency);
+                var max = RadioCalculator.FriisMaximumTransmissionRange(frequency);
                 // % loss of signal
                 // 0 is no loss 1.0 is full loss
                 signalStrength = (dist / max);
@@ -540,6 +573,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return max > dist;
             }
             return false;
+        }
+
+        private int SortRadioReceivingPriorities(RadioReceivingPriority x, RadioReceivingPriority y)
+        {
+            int xScore = 0;
+            int yScore = 0;
+
+            if (x.ReceivingRadio == null || x.ReceivingState == null)
+            {
+                return 1;
+            }
+            if (y.ReceivingRadio == null | y.ReceivingState == null)
+            {
+                return -1;
+            }
+
+            if (x.CanReceive && x.Decryptable)
+            {
+                xScore += 16;
+            }
+            if (y.CanReceive && y.Decryptable)
+            {
+                yScore += 16;
+            }
+
+            if (_clientStateSingleton.DcsPlayerRadioInfo.selected == x.ReceivingState.ReceivedOn)
+            {
+                xScore += 8;
+            }
+            if (_clientStateSingleton.DcsPlayerRadioInfo.selected == y.ReceivingState.ReceivedOn)
+            {
+                yScore += 8;
+            }
+
+            if (x.ReceivingRadio.volume > 0)
+            {
+                xScore += 4;
+            }
+            if (y.ReceivingRadio.volume > 0)
+            {
+                yScore += 4;
+            }
+
+            return yScore - xScore;
         }
 
         public bool Send(byte[] bytes, int len)
@@ -556,49 +633,105 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
+                    // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
+                    List<RadioInformation> transmittingRadios = new List<RadioInformation>();
+
+                    // Always add currently selected radio (if valid)
                     var currentSelected = _clientStateSingleton.DcsPlayerRadioInfo.selected;
-                    //removes race condition by assigning here with the current selected changing
-                    if ((currentSelected >= 0)
-                        && (currentSelected < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length))
+                    RadioInformation currentlySelectedRadio = null;
+                    if (currentSelected >= 0 
+                        && currentSelected < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length)
                     {
-                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
-
-                        if (((radio != null) && (radio.freq > 100) &&
-                             (radio.modulation != RadioInformation.Modulation.DISABLED))
-                            || (radio.modulation == RadioInformation.Modulation.INTERCOM))
+                        currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
+                        
+                        if (currentlySelectedRadio != null && currentlySelectedRadio.modulation != RadioInformation.Modulation.DISABLED
+                            && (currentlySelectedRadio.freq > 100 || currentlySelectedRadio.modulation == RadioInformation.Modulation.INTERCOM))
                         {
-                            //generate packet
-                            var udpVoicePacket = new UDPVoicePacket
-                            {
-                                GuidBytes = _guidAsciiBytes,
-                                AudioPart1Bytes = bytes,
-                                AudioPart1Length = (ushort) bytes.Length,
-                                Frequency = radio.freq,
-                                UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
-                                Encryption = radio.enc ? radio.encKey : (byte) 0,
-                                Modulation = (byte) radio.modulation,
-                                PacketNumber = _packetNumber++
-                            }.EncodePacket();
+                            transmittingRadios.Add(currentlySelectedRadio);
+                        }
+                    }
 
-                            //send audio
-                            _listener.Client.Send(udpVoicePacket);
-
-                            //not sending or really quickly switched sending
-                            if (!RadioSendingState.IsSending || (RadioSendingState.SendingOn != currentSelected))
+                    // Add all radios toggled for simultaneous transmission if the global flag has been set
+                    if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
+                    {
+                        foreach (var radio in _clientStateSingleton.DcsPlayerRadioInfo.radios)
+                        {
+                            if (radio != null && radio.simul && radio.modulation != RadioInformation.Modulation.DISABLED
+                                && (radio.freq > 100 || radio.modulation == RadioInformation.Modulation.INTERCOM)
+                                && !transmittingRadios.Contains(radio)) // Make sure we don't add the selected radio twice
                             {
-                                _audioManager.PlaySoundEffectStartTransmit(currentSelected,
-                                    radio.enc && (radio.encKey > 0), radio.volume);
+                                transmittingRadios.Add(radio);
+                            }
+                        }
+                    }
+
+                    if (transmittingRadios.Count > 0)
+                    {
+                        List<double> frequencies = new List<double>(transmittingRadios.Count);
+                        List<byte> encryptions = new List<byte>(transmittingRadios.Count);
+                        List<byte> modulations = new List<byte>(transmittingRadios.Count);
+
+                        for (int i = 0; i < transmittingRadios.Count; i++)
+                        {
+                            var radio = transmittingRadios[i];
+
+                            // Further deduplicate transmitted frequencies if they have the same freq./modulation/encryption (caused by differently named radios)
+                            bool alreadyIncluded = false;
+                            for (int j = 0; j < frequencies.Count; j++)
+                            {
+                                if (frequencies[j] == radio.freq
+                                    && modulations[j] == (byte)radio.modulation
+                                    && encryptions[j] == (radio.enc ? radio.encKey : (byte)0))
+                                {
+                                    alreadyIncluded = true;
+                                    break;
+                                }
                             }
 
-                            //set radio overlay state
-                            RadioSendingState = new RadioSendingState
+                            if (alreadyIncluded)
                             {
-                                IsSending = true,
-                                LastSentAt = DateTime.Now.Ticks,
-                                SendingOn = currentSelected
-                            };
-                            return true;
+                                continue;
+                            }
+
+                            frequencies.Add(radio.freq);
+                            encryptions.Add(radio.enc ? radio.encKey : (byte)0);
+                            modulations.Add((byte)radio.modulation);
                         }
+
+                        //generate packet
+                        var udpVoicePacket = new UDPVoicePacket
+                        {
+                            GuidBytes = _guidAsciiBytes,
+                            AudioPart1Bytes = bytes,
+                            AudioPart1Length = (ushort)bytes.Length,
+                            Frequencies = frequencies.ToArray(),
+                            UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
+                            Encryptions = encryptions.ToArray(),
+                            Modulations = modulations.ToArray(),
+                            PacketNumber = _packetNumber++
+                        };
+
+                        var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
+
+                        //send audio
+                        _listener.Client.Send(encodedUdpVoicePacket);
+
+                        //not sending or really quickly switched sending
+                        if (currentlySelectedRadio != null &&
+                            (!RadioSendingState.IsSending || RadioSendingState.SendingOn != currentSelected))
+                        {
+                            _audioManager.PlaySoundEffectStartTransmit(currentSelected,
+                                currentlySelectedRadio.enc && (currentlySelectedRadio.encKey > 0), currentlySelectedRadio.volume);
+                        }
+
+                        //set radio overlay state
+                        RadioSendingState = new RadioSendingState
+                        {
+                            IsSending = true,
+                            LastSentAt = DateTime.Now.Ticks,
+                            SendingOn = currentSelected
+                        };
+                        return true;
                     }
                 }
                 catch (Exception e)
@@ -649,10 +782,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 GuidBytes = _guidAsciiBytes,
                                 AudioPart1Bytes = message,
                                 AudioPart1Length = (ushort) message.Length,
-                                Frequency = 100,
+                                Frequencies = new double[] { 100 },
                                 UnitId = 1,
-                                Encryption = 0,
-                                Modulation = 4,
+                                Encryptions = new byte[] { 0 },
+                                Modulations = new byte[] { 4 },
                                 PacketNumber = 1
                             }.EncodePacket();
 

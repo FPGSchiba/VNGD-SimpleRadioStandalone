@@ -28,6 +28,7 @@ Copy the rest of the zip file where ever you like and then run, don't forget to 
 Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
 
 Create a folder called AudioEffects where ever your SR-ClientRadio.exe is - Drag all 4 sound files into that folder or you wont have sound effects
+Copy awacs-radios.json to where ever your SR-ClientRadio.exe is
 
 
 *** To Install AutoConnect System for SERVERS only ***
@@ -40,7 +41,7 @@ Edit the line below to your server address where SRS server is running. Port is 
 -- CHANGE FROM
 SRSAuto.SERVER_SRS_HOST = "127.0.0.1" -- Port optional e.g. "127.0.0.1:5002"
 --TO
-SRSAuto.SERVER_SRS_HOST = "5.189.162.17:5002" -- BuddySpike One
+SRSAuto.SERVER_SRS_HOST = "5.189.162.17:5016" -- BuddySpike One
 -- OR
 SRSAuto.SERVER_SRS_HOST = " 37.59.10.136" -- TAW One (port optional)
 

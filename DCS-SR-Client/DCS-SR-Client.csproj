@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -189,6 +189,7 @@
     <Compile Include="Network\Models\CombinedRadioState.cs" />
     <Compile Include="Network\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\Models\DCSLosCheckResult.cs" />
+    <Compile Include="Settings\SynchedServerSettings.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -249,6 +250,7 @@
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Network\TCPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
+    <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
@@ -328,6 +330,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="awacs-radios.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

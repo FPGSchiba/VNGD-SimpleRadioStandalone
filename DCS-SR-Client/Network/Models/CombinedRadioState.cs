@@ -14,5 +14,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Models
         public RadioSendingState RadioSendingState;
 
         public RadioReceivingState[] RadioReceivingState;
+
+        public int ClientCountConnected;
+
+        public int ClientCountIngame;
     }
 }

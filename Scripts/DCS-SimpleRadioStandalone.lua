@@ -1,4 +1,4 @@
--- Version 1.5.2.0
+-- Version 1.5.3.2
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -991,7 +991,7 @@ function SR.exportRadioA10C(_data)
         _data.ptt = false
     end
     
-    _data.control = 1 -- Full radio
+    _data.control = 0 -- HOTAS Controls - set to 1 for DCS PTT & Select controls
 
     return _data
 end
@@ -1610,10 +1610,6 @@ function SR.exportRadioAV8BNA(_data)
      -- get channel selector
 --  local _selector  = SR.getSelectorPosition(448,0.50)
 
---  SR.log(GetDevice(0):get_argument_value(178))
---  SR.log(GetDevice(0):get_argument_value(179))
---  SR.log(GetDevice(0):get_argument_value(300))
---  SR.log(GetDevice(0):get_argument_value(301))
     --if _selector == 1 then
         --_data.radios[2].channel =  SR.getSelectorPosition(178,0.01)  --add 1 as channel 0 is channel 1 
     --end
@@ -1625,22 +1621,20 @@ function SR.exportRadioAV8BNA(_data)
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
-
-
     -- EXTRA Radio - temporary extra radio
     --https://en.wikipedia.org/wiki/AN/ARC-210
-    _data.radios[4].name = "ARC-210 COM 3"
-    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
-    _data.radios[4].modulation = 0
-    _data.radios[4].secFreq = 243.0*1000000
-    _data.radios[4].volume = 1.0
-    _data.radios[4].freqMin = 108*1000000
-    _data.radios[4].freqMax = 512*1000000
-    _data.radios[4].expansion = false
-    _data.radios[4].volMode = 1
-    _data.radios[4].freqMode = 1
-    _data.radios[4].encKey = 1
-    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+    --_data.radios[4].name = "ARC-210 COM 3"
+    --_data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    --_data.radios[4].modulation = 0
+    --_data.radios[4].secFreq = 243.0*1000000
+    --_data.radios[4].volume = 1.0
+    --_data.radios[4].freqMin = 108*1000000
+    --_data.radios[4].freqMax = 512*1000000
+    --_data.radios[4].expansion = false
+    --_data.radios[4].volMode = 1
+    --_data.radios[4].freqMode = 1
+    --_data.radios[4].encKey = 1
+    --_data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
 
     _data.selected = 1
@@ -1861,4 +1855,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.2.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.2")

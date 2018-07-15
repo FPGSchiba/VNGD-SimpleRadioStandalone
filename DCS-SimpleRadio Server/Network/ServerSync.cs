@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -43,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private readonly IEventAggregator _eventAggregator;
 
-        private readonly ServerSettings _serverSettings;
+        private readonly ServerSettingsStore _serverSettings;
 
         private Socket listener;
 
@@ -54,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             this._bannedIps = _bannedIps;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
-            _serverSettings = ServerSettings.Instance;
+            _serverSettings = ServerSettingsStore.Instance;
         }
 
         public void Handle(ServerSettingsChangedMessage message)
@@ -75,7 +77,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public void StartListening()
         {
             var ipAddress = new IPAddress(0);
-            var localEndPoint = new IPEndPoint(ipAddress, _serverSettings.ServerListeningPort());
+            var port = _serverSettings.GetServerPort();
+            var localEndPoint = new IPEndPoint(ipAddress, port);
 
             // Create a TCP/IP socket.
             listener = new Socket(AddressFamily.InterNetwork,
@@ -94,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     _allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    _logger.Info($"Waiting for a connection on {_serverSettings.ServerListeningPort()}...");
+                    _logger.Info($"Waiting for a connection on {port}...");
                     listener.BeginAccept(
                         AcceptCallback,
                         listener);
@@ -321,10 +324,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                         HandleRadioClientsSync(clientIp, state.workSocket, message);
 
-
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
                         HandleServerSettingsMessage(state.workSocket);
+                        break;
+                    case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
+                        HandleExternalAWACSModePassword(state.workSocket, message.ExternalAWACSModePassword, message.Client);
+                        break;
+                    case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT:
+                        HandleExternalAWACSModeDisconnect(message.Client);
                         break;
                     default:
                         _logger.Warn("Recevied unknown message type");
@@ -343,7 +351,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             var replyMessage = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
-                ServerSettings = _serverSettings.ServerSetting
+                ServerSettings = _serverSettings.ToDictionary()
             };
             Send(socket, replyMessage);
         }
@@ -378,7 +386,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     var replyMessage = new NetworkMessage
                     {
                         MsgType = NetworkMessage.MessageType.UPDATE,
-                        ServerSettings = _serverSettings.ServerSetting,
+                        ServerSettings = _serverSettings.ToDictionary(),
                         Client = new SRClient
                         {
                             ClientGuid = client.ClientGuid,
@@ -411,7 +419,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-
         private void HandleClientRadioUpdate(NetworkMessage message)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
@@ -435,7 +442,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-
         private void HandleRadioClientsSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
@@ -443,7 +449,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 MsgType = NetworkMessage.MessageType.SYNC,
                 Clients = new List<SRClient>(),
-                ServerSettings = _serverSettings.ServerSetting
+                ServerSettings = _serverSettings.ToDictionary()
             };
 
             foreach (var clientToSent in _clients)
@@ -452,6 +458,93 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             Send(clientSocket, replyMessage);
+        }
+
+        private void HandleExternalAWACSModePassword(Socket clientSocket, string password, SRClient client)
+        {
+            // Response of clientCoalition = 0 indicates authentication success (or external AWACS mode disabled)
+            int clientCoalition = 0;
+            if (_serverSettings.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue
+                && !string.IsNullOrWhiteSpace(password))
+            {
+                if (_serverSettings.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD).StringValue == password)
+                {
+                    clientCoalition = 2;
+                }
+                else if (_serverSettings.GetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD).StringValue == password)
+                {
+                    clientCoalition = 1;
+                }
+            }
+
+            if (_clients.ContainsKey(client.ClientGuid))
+            {
+                _clients[client.ClientGuid].Coalition = clientCoalition;
+                _clients[client.ClientGuid].Name = client.Name;
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                    new List<SRClient>(_clients.Values)));
+            }
+
+            var replyMessage = new NetworkMessage
+            {
+                Client = new SRClient
+                {
+                    Coalition = clientCoalition
+                },
+                MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD,
+            };
+            Send(clientSocket, replyMessage);
+
+            var message = new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.UPDATE,
+                ServerSettings = _serverSettings.ToDictionary(),
+                Client = new SRClient
+                {
+                    ClientGuid = client.ClientGuid,
+                    Coalition = clientCoalition,
+                    Name = client.Name,
+                    LastUpdate = client.LastUpdate,
+                    Position = client.Position
+                }
+            };
+
+            foreach (var clientToSent in _clients)
+            {
+                Send(clientToSent.Value.ClientSocket, message);
+            }
+        }
+
+        private void HandleExternalAWACSModeDisconnect(SRClient client)
+        {
+            if (_clients.ContainsKey(client.ClientGuid))
+            {
+                _clients[client.ClientGuid].Coalition = 0;
+                _clients[client.ClientGuid].Name = "";
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                    new List<SRClient>(_clients.Values)));
+
+                var message = new NetworkMessage
+                {
+                    MsgType = NetworkMessage.MessageType.UPDATE,
+                    ServerSettings = _serverSettings.ToDictionary(),
+                    Client = new SRClient
+                    {
+                        ClientGuid = client.ClientGuid,
+                        Coalition = client.Coalition,
+                        Name = client.Name,
+                        LastUpdate = client.LastUpdate,
+                        Position = client.Position
+                    }
+                };
+
+                foreach (var clientToSent in _clients)
+                {
+                    Send(clientToSent.Value.ClientSocket, message);
+                }
+            }
         }
 
         private static void Send(Socket handler, NetworkMessage message)
