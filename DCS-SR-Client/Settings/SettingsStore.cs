@@ -30,6 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioEncryptionEffects = 8, //Radio Encryption effects
         AutoConnectPrompt = 10, //message about auto connect
         RadioOverlayTaskbarHide = 11,
+        AutoConnectMismatchPrompt = 12, //message about auto connect mismatch
         RefocusDCS = 19,
         ExpandControls = 20,
 
@@ -248,6 +249,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {SettingsKeys.AutoConnectPrompt.ToString(), "false"},
+            {SettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {SettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {SettingsKeys.RefocusDCS.ToString(), "false"},
             {SettingsKeys.ExpandControls.ToString(), "false"},

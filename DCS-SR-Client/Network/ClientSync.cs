@@ -19,11 +19,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     public class ClientSync
     {
-        public delegate void ConnectCallback(bool result);
+        public delegate void ConnectCallback(bool result, string connection);
         public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
         public delegate void UpdateUICallback();
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private volatile bool _stop = false;
 
         public static string ServerVersion = "Unknown";
         private readonly ConcurrentDictionary<string, SRClient> _clients;
@@ -189,7 +191,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _callback(result); }));
+                    new ThreadStart(delegate { _callback(result, _serverEndpoint.ToString()); }));
             }
             catch (Exception ex)
             {
@@ -222,11 +224,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientSyncLoop()
         {
-            //clear the clietns list
+            //clear the clients list
             _clients.Clear();
             int decodeErrors = 0; //if the JSON is unreadable - new version likely
             
-
             using (var reader = new StreamReader(_tcpClient.GetStream(), Encoding.UTF8))
             {
                 try
@@ -412,7 +413,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         catch (Exception ex)
                         {
                             decodeErrors++;
-                            Logger.Error(ex, "Client exception reading from socket ");
+                            if (!_stop)
+                            {
+                                Logger.Error(ex, "Client exception reading from socket ");
+                            }
 
                             if (decodeErrors > MAX_DECODE_ERRORS)
                             {
@@ -427,19 +431,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception ex)
                 {
-                  
-                    Logger.Error(ex, "Client exception reading - Disconnecting ");
+                    if (!_stop)
+                    {
+                        Logger.Error(ex, "Client exception reading - Disconnecting ");
+                    }
                 }
             }
 
             //disconnected - reset DCS Info
             ClientStateSingleton.Instance.DcsPlayerRadioInfo.LastUpdate = 0;
 
-            //clear the clietns list
+            //clear the clients list
             _clients.Clear();
-
-            //disconnect callback
-            CallOnMain(false);
         }
 
         private void ShowVersionMistmatchWarning()
@@ -472,7 +475,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Client exception sending to server");
+                if (!_stop)
+                {
+                    Logger.Error(ex, "Client exception sending to server");
+                }
 
                 Disconnect();
             }
@@ -481,6 +487,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //implement IDispose? To close stuff properly?
         public void Disconnect()
         {
+            _stop = true;
+
             DisconnectExternalAWACSMode();
 
             try

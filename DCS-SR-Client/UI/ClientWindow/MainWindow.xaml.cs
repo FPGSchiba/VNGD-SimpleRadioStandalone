@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
@@ -529,6 +530,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioSwitchIsPTT.IsChecked =
                 _settings.GetClientSetting(SettingsKeys.RadioSwitchIsPTT).BoolValue;
             AutoConnectPromptToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue;
+            AutoConnectMismatchPromptToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoConnectMismatchPrompt).BoolValue;
             RadioOverlayTaskbarItem.IsChecked =
                 _settings.GetClientSetting(SettingsKeys.RadioOverlayTaskbarHide).BoolValue;
             RefocusDCS.IsChecked = _settings.GetClientSetting(SettingsKeys.RefocusDCS).BoolValue;
@@ -712,8 +714,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ConnectCallback(bool result)
+        private void ConnectCallback(bool result, string connection)
         {
+            string currentConnection = ServerIp.Text.Trim();
+            if (!currentConnection.Contains(":"))
+            {
+                currentConnection += ":5002";
+            }
+
             if (result)
             {
                 if (_stop)
@@ -758,8 +766,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/baw7g3t");
                     }
             }
-            else
+            else if (string.Equals(currentConnection, connection, StringComparison.OrdinalIgnoreCase))
             {
+                // Only stop connection/reset state if connection is currently active
+                // Autoconnect mismatch will quickly disconnect/reconnect, leading to double-callbacks
                 Stop();
             }
         }
@@ -970,33 +980,155 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoConnect(string address, int port)
         {
-            Logger.Info("Received AutoConnect " + address);
+            string connection = $"{address}:{port}";
 
-            if (StartStop.Content.ToString().ToLower() == "connect")
+            Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
+
+            if (_clientStateSingleton.IsConnected)
             {
-                var autoConnect = _settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue;
+                // Always show prompt about active/advertised SRS connection mismatch if client is already connected
+                string[] currentConnectionParts = ServerIp.Text.Trim().Split(':');
+                string currentAddress = currentConnectionParts[0];
+                int currentPort = 5002;
+                if (currentConnectionParts.Length >= 2)
+                {
+                    if (!int.TryParse(currentConnectionParts[1], out currentPort))
+                    {
+                        Logger.Warn($"Failed to parse port {currentConnectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
+                        currentPort = 5002;
+                    }
+                }
+                string currentConnection = $"{currentAddress}:{currentPort}";
 
-                var connection = $"{address}:{port}";
-                if (autoConnect)
+                if (string.Equals(address, currentAddress, StringComparison.OrdinalIgnoreCase) && port == currentPort)
+                {
+                    // Current connection matches SRS server advertised by DCS, all good
+                    Logger.Info($"Current SRS connection {currentConnection} matches advertised server {connection}, ignoring autoconnect");
+                    return;
+                }
+                else if (port != currentPort)
+                {
+                    // Port mismatch, will always be a different server, no need to perform hostname lookups
+                    HandleAutoConnectMismatch(currentConnection, connection);
+                    return;
+                }
+
+                // Perform DNS lookup of advertised and current hostnames to find hostname/resolved IP matches                
+                List<string> currentIPs = new List<string>();
+
+                if (IPAddress.TryParse(currentAddress, out IPAddress currentIP))
+                {
+                    currentIPs.Add(currentIP.ToString());
+                }
+                else
+                {
+                    try
+                    {
+                        foreach (IPAddress ip in Dns.GetHostAddresses(currentConnectionParts[0]))
+                        {
+                            // SRS currently only supports IPv4 (due to address/port parsing)
+                            if (ip.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                currentIPs.Add(ip.ToString());
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Warn(e, $"Failed to resolve current SRS host {currentConnectionParts[0]} to IP addresses, ignoring autoconnect advertisement");
+                        return;
+                    }
+                }
+
+                List<string> advertisedIPs = new List<string>();
+
+                if (IPAddress.TryParse(address, out IPAddress advertisedIP))
+                {
+                    advertisedIPs.Add(advertisedIP.ToString());
+                }
+                else
+                {
+                    try
+                    {
+                        foreach (IPAddress ip in Dns.GetHostAddresses(connection))
+                        {
+                            // SRS currently only supports IPv4 (due to address/port parsing)
+                            if (ip.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                advertisedIPs.Add(ip.ToString());
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Warn(e, $"Failed to resolve advertised SRS host {address} to IP addresses, ignoring autoconnect advertisement");
+                        return;
+                    }
+                }
+
+                if (!currentIPs.Intersect(advertisedIPs).Any())
+                {
+                    // No resolved IPs match, display mismatch warning
+                    HandleAutoConnectMismatch(currentConnection, connection);
+                }
+            }
+            else
+            {
+                // Show auto connect prompt if client is not connected yet and setting has been enabled, otherwise automatically connect
+                bool showPrompt = _settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue;
+
+                bool connectToServer = !showPrompt;
+                if (_settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue)
                 {
                     WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
                     var result = MessageBox.Show(this,
-                        $"Would you like to try to Auto-Connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
+                        $"Would you like to try to auto-connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
 
-                    if ((result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect"))
-                    {
-                        ServerIp.Text = connection;
-                        Connect();
-                    }
+                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect");
                 }
-                else
+
+                if (connectToServer)
                 {
+                    SystemSounds.Hand.Play();
+
                     ServerIp.Text = connection;
                     Connect();
                 }
+            }
+        }
+
+        private void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
+        {
+            // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
+            bool showPrompt = _settings.GetClientSetting(SettingsKeys.AutoConnectMismatchPrompt).BoolValue;
+
+            Logger.Info($"Current SRS connection {currentConnection} does not match advertised server {advertisedConnection}, {(showPrompt ? "displaying mismatch prompt" : "automatically switching server")}");
+
+            bool switchServer = !showPrompt;
+            if (showPrompt)
+            {
+                WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
+
+                var result = MessageBox.Show(this,
+                    $"The SRS server advertised by DCS @ {advertisedConnection} does not match the SRS server @ {currentConnection} you are currently connected to.\n\n" +
+                    $"Would you like to connect to the advertised SRS server?",
+                    "Auto Connect Mismatch",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                switchServer = result == MessageBoxResult.Yes;
+            }
+
+            if (switchServer)
+            {
+                SystemSounds.Hand.Play();
+
+                Stop();
+                ServerIp.Text = advertisedConnection;
+                Connect();
             }
         }
 
@@ -1041,6 +1173,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _settings.GetClientSetting(SettingsKeys.AutoConnectPrompt).BoolValue =
                 (bool) AutoConnectPromptToggle.IsChecked;
+            _settings.Save();
+        }
+
+        private void AutoConnectMismatchPromptToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.AutoConnectMismatchPrompt).BoolValue =
+                (bool)AutoConnectMismatchPromptToggle.IsChecked;
             _settings.Save();
         }
 

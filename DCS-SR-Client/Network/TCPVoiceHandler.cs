@@ -251,7 +251,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Error with VOIP TCP Connection on port " + _port + " Reconnecting");
+                    if (!_stop)
+                    {
+                        Logger.Error(e, "Error with VOIP TCP Connection on port " + _port + " Reconnecting");
+                    }
                 }
 
                 try
@@ -474,7 +477,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             }
                                         }
                                     }
-                                    else
+                                    else if (!_stop)
                                     {
                                         Logger.Info("Failed to decode audio from Packet");
                                     }
@@ -484,7 +487,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                     catch (Exception ex)
                     {
-                        Logger.Info("Failed to decode audio from Packet");
+                        if (!_stop)
+                        {
+                            Logger.Info(ex, "Failed to decode audio from Packet");
+                        }
                     }
                 }
             }

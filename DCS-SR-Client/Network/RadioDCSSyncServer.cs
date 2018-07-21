@@ -280,12 +280,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
                             if (!_stop)
                             {
-                                Logger.Error(e, "SocketException Handling DCS AutoConnect Message");
+                                Logger.Error(e, "SocketException Handling DCS Message");
                             }
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, "Exception Handling DCS  Message");
+                            Logger.Error(e, "Exception Handling DCS Message");
                         }
                     }
 
