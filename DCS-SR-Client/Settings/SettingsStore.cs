@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Microsoft.Win32;
 using NLog;
 using SharpConfig;
 
@@ -196,6 +196,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
     public class SettingsStore
     {
         public static readonly string CFG_FILE_NAME = "client.cfg";
+        public static readonly string CFG_BACKUP_FILE_NAME = "client.cfg.bak";
 
         private static readonly object _lock = new object();
 
@@ -220,10 +221,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             catch (FileNotFoundException ex)
             {
+                Logger.Info("Did not find client config file, initialising with default config");
+
                 _configuration = new Configuration();
                 _configuration.Add(new Section("Position Settings"));
                 _configuration.Add(new Section("Client Settings"));
                 _configuration.Add(new Section("Network Settings"));
+
+                Save();
+            }
+            catch (ParserException ex)
+            {
+                Logger.Error(ex, "Failed to parse client config, potentially corrupted. Creating backing and re-initialising with default config");
+
+                MessageBox.Show("Failed to read client config, it might have become corrupted.\n" +
+                    "SRS will create a backup of your current config file (client.cfg.bak) and initialise using default settings.",
+                    "Config error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                try
+                {
+                    File.Copy(CFG_FILE_NAME, CFG_BACKUP_FILE_NAME, true);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Failed to create backup of corrupted config file, ignoring");
+                }
+
+                _configuration = new Configuration();
+                _configuration.Add(new Section("Position Settings"));
+                _configuration.Add(new Section("Client Settings"));
+                _configuration.Add(new Section("Network Settings"));
+
+                Save();
             }
         }
 

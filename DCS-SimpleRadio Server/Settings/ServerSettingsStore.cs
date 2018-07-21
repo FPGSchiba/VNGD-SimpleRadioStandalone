@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using NLog;
 using SharpConfig;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
@@ -11,6 +12,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
     public class ServerSettingsStore
     {
         public static readonly string CFG_FILE_NAME = "server.cfg";
+        public static readonly string CFG_BACKUP_FILE_NAME = "server.cfg.bak";
 
         private static ServerSettingsStore instance;
         private static readonly object _lock = new object();
@@ -26,10 +28,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             }
             catch (FileNotFoundException ex)
             {
+                _logger.Info("Did not find server config file, initialising with default config");
+
                 _configuration = new Configuration();
                 _configuration.Add(new Section("General Settings"));
                 _configuration.Add(new Section("Server Settings"));
                 _configuration.Add(new Section("External AWACS Mode Settings"));
+
+                Save();
+            }
+            catch (ParserException ex)
+            {
+                _logger.Error(ex, "Failed to parse server config, potentially corrupted. Creating backing and re-initialising with default config");
+
+                MessageBox.Show("Failed to read server config, it might have become corrupted.\n" +
+                    "SRS will create a backup of your current config file (server.cfg.bak) and initialise using default settings.",
+                    "Config error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                try
+                {
+                    File.Copy(CFG_FILE_NAME, CFG_BACKUP_FILE_NAME, true);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Failed to create backup of corrupted config file, ignoring");
+                }
+
+                _configuration = new Configuration();
+                _configuration.Add(new Section("General Settings"));
+                _configuration.Add(new Section("Server Settings"));
+                _configuration.Add(new Section("External AWACS Mode Settings"));
+
+                Save();
             }
         }
 
