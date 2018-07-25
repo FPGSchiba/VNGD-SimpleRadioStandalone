@@ -62,8 +62,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
 
-        private bool _stop = true;
-
         //used to debounce toggle
         private long _toggleShowHide;
 
@@ -556,7 +554,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Connect()
         {
-            if (!_stop)
+            if (_clientStateSingleton.IsConnected)
             {
                 Stop();
             }
@@ -673,8 +671,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
             }
 
-            _stop = true;
-
             if (_client != null)
             {
                 _client.Disconnect();
@@ -724,7 +720,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (result)
             {
-                if (_stop)
+                if (!_clientStateSingleton.IsConnected)
+                {
                     try
                     {
 
@@ -747,7 +744,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _audioManager.StartEncoding(inputId, output, _guid, InputManager,
                             _resolvedIp, _port, micOutput);
-                        _stop = false;
                     }
                     catch (Exception ex)
                     {
@@ -765,6 +761,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/baw7g3t");
                     }
+                }
             }
             else if (string.Equals(currentConnection, connection, StringComparison.OrdinalIgnoreCase))
             {

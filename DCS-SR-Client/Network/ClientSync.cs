@@ -325,7 +325,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         if (serverVersion < protocolVersion)
                                         {
-                                            ShowVersionMistmatchWarning();
+                                            Logger.Error($"Server version ({serverMessage.Version}) older than minimum procotol version ({UpdaterChecker.MINIMUM_PROTOCOL_VERSION}) - disconnecting");
+
+                                            ShowVersionMistmatchWarning(serverMessage.Version);
 
                                             Disconnect();
                                             break;
@@ -384,8 +386,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         break;
                                     case NetworkMessage.MessageType.VERSION_MISMATCH:
-                                        Logger.Error("Version Mismatch Between Client & Server - Disconnecting");
-                                        ShowVersionMistmatchWarning();
+                                        Logger.Error($"Version Mismatch Between Client ({UpdaterChecker.VERSION}) & Server ({serverMessage.Version}) - Disconnecting");
+
+                                        ShowVersionMistmatchWarning(serverMessage.Version);
+
                                         Disconnect();
                                         break;
                                     case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
@@ -420,7 +424,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             if (decodeErrors > MAX_DECODE_ERRORS)
                             {
-                                ShowVersionMistmatchWarning();
+                                ShowVersionMistmatchWarning("unknown");
                                 Disconnect();
                                 break;
                             }
@@ -445,13 +449,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _clients.Clear();
         }
 
-        private void ShowVersionMistmatchWarning()
+        private void ShowVersionMistmatchWarning(string serverVersion)
         {
-
-            MessageBox.Show("The SRS server you're connecting to is incompatible with this Client. " +
-                            "\n\nMake sure to always run the latest version of the SRS Server & Client" +
-                            "\n\nMinimum Version: " + UpdaterChecker.MINIMUM_PROTOCOL_VERSION, "SRS Server Incompatible",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"The SRS server you're connecting to is incompatible with this Client. " +
+                            $"\n\nMake sure to always run the latest version of the SRS Server & Client" +
+                            $"\n\nServer Version: {serverVersion}" +
+                            $"\nClient Version: {UpdaterChecker.VERSION}" +
+                            $"\nMinimum Version: {UpdaterChecker.MINIMUM_PROTOCOL_VERSION}",
+                            "SRS Server Incompatible",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
         }
 
         private void SendToServer(NetworkMessage message)
