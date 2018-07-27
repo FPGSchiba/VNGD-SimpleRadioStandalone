@@ -66,6 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private long _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
+        private readonly DispatcherTimer _redrawUITimer;
         private MMDeviceCollection outputDeviceList;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
@@ -154,6 +155,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
+
+            _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            _redrawUITimer.Tick += RedrawUITick;
+            _redrawUITimer.Start();
         }
 
         private void InitFlowDocument()
@@ -520,6 +525,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
+        private void RedrawUITick(object sender, EventArgs e)
+        {
+            if (_clientStateSingleton.IsConnected)
+            {
+                bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+
+                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
+                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
+            }
+            else
+            {
+                ExternalAWACSModePassword.IsEnabled = false;
+                ExternalAWACSModeName.IsEnabled = false;
+            }
+        }
+
 
         private void InitSettingsScreen()
         {
@@ -789,6 +810,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             //stop timer
             _updateTimer?.Stop();
 
+            // Stop UI redraw timer
+            _redrawUITimer?.Stop();
+
             Stop();
 
             _audioPreview?.StopEncoding();
@@ -862,10 +886,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
-                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode;
+                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
                 ExternalAWACSModePasswordLabel.IsEnabled = eamEnabled;
                 ExternalAWACSModeName.Text = _clientStateSingleton.LastSeenName;
-                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode;
+                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
                 ExternalAWACSModeNameLabel.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.Content = _clientStateSingleton.InExternalAWACSMode ? "Disconnect External AWACS MODE (EAM)" : "Connect External AWACS MODE (EAM)";

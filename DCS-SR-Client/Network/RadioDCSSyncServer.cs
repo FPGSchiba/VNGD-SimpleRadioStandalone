@@ -402,6 +402,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
                                 _clientSideUpdate();
                                 //     count = 0;
+
+                                _clientStateSingleton.DcsLastReceived = DateTime.Now.Ticks;
                             }
                         }
                         catch (SocketException e)
