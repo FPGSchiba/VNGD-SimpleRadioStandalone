@@ -374,6 +374,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 if (client != null)
                 {
+                    bool redrawClientAdminList = client.Name != message.Client.Name || client.Coalition != message.Client.Coalition;
+
                     //copy the data we need
                     client.LastUpdate = DateTime.Now.Ticks;
                     client.Name = message.Client.Name;
@@ -400,6 +402,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     foreach (var clientToSent in _clients)
                     {
                         Send(clientToSent.Value.ClientSocket, replyMessage);
+                    }
+
+                    // Only redraw client admin UI of server if really needed
+                    if (redrawClientAdminList)
+                    {
+                        _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                            new List<SRClient>(_clients.Values)));
                     }
                 }
             }

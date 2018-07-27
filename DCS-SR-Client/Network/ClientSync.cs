@@ -239,7 +239,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         Client = new SRClient
                         {
                             Coalition = sideInfo.side,
-                            Name = sideInfo.name,
+                            Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
                             Position = sideInfo.Position,
                             ClientGuid = _guid
                         },
