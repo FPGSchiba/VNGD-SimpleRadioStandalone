@@ -168,12 +168,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static UDPVoicePacket DecodeVoicePacket(byte[] encodedOpusAudio, bool decode = true)
         {
-            UDPVoicePacket decodedPacket;
             Exception originalException = null;
 
             try
             {
-                decodedPacket = _DecodeVoicePacket(encodedOpusAudio, decode);
+                return _DecodeVoicePacket(encodedOpusAudio, decode);
             }
             catch (Exception ex)
             {
@@ -184,7 +183,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             try
             {
-                decodedPacket = _LegacyDecodeVoicePacket(encodedOpusAudio, decode);
+                return _LegacyDecodeVoicePacket(encodedOpusAudio, decode);
             }
             catch (Exception ex)
             {
@@ -194,8 +193,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
                 throw ex;
             }
-
-            return decodedPacket;
         }
 
         private static UDPVoicePacket _DecodeVoicePacket(byte[] encodedOpusAudio, bool decode = true)
