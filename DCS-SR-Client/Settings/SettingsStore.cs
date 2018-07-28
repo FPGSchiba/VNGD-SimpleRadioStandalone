@@ -87,7 +87,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         LastSeenName = 78,
 
-        CheckForBetaUpdates = 79
+        CheckForBetaUpdates = 79,
+
+        AllowMultipleInstances = 80 // Allow for more than one SRS instance to be ran simultaneously. Config-file only!
     }
 
     public enum InputBinding
@@ -342,8 +344,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.LastSeenName.ToString(), ""},
 
-            {SettingsKeys.CheckForBetaUpdates.ToString(), "false"}
+            {SettingsKeys.CheckForBetaUpdates.ToString(), "false"},
 
+            {SettingsKeys.AllowMultipleInstances.ToString(), "false"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)
