@@ -30,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioEncryptionEffects = 8, //Radio Encryption effects
         AutoConnectPrompt = 10, //message about auto connect
         RadioOverlayTaskbarHide = 11,
-        AutoConnectMismatchPrompt = 12, //message about auto connect mismatch
+      
         RefocusDCS = 19,
         ExpandControls = 20,
 
@@ -89,7 +89,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         CheckForBetaUpdates = 79,
 
-        AllowMultipleInstances = 80 // Allow for more than one SRS instance to be ran simultaneously. Config-file only!
+        AllowMultipleInstances = 80, // Allow for more than one SRS instance to be ran simultaneously. Config-file only!
+
+        AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
     }
 
     public enum InputBinding
