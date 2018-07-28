@@ -156,7 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer.Tick += UpdateClientCount_VUMeters;
             _updateTimer.Start();
 
-            _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _redrawUITimer.Tick += RedrawUITick;
             _redrawUITimer.Start();
         }
@@ -527,6 +527,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RedrawUITick(object sender, EventArgs e)
         {
+            // Redraw UI state (currently every 5 seconds), toggling controls as required
+            // Some other callbacks/UI state changes could also probably be moved to this...
             if (_clientStateSingleton.IsConnected)
             {
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
