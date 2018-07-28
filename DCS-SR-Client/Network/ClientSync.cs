@@ -19,11 +19,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     public class ClientSync
     {
-        public delegate void ConnectCallback(bool result);
+        public delegate void ConnectCallback(bool result, string connection);
         public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
         public delegate void UpdateUICallback();
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private volatile bool _stop = false;
 
         public static string ServerVersion = "Unknown";
         private readonly ConcurrentDictionary<string, SRClient> _clients;
@@ -189,7 +191,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _callback(result); }));
+                    new ThreadStart(delegate { _callback(result, _serverEndpoint.ToString()); }));
             }
             catch (Exception ex)
             {
@@ -222,11 +224,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientSyncLoop()
         {
-            //clear the clietns list
+            //clear the clients list
             _clients.Clear();
             int decodeErrors = 0; //if the JSON is unreadable - new version likely
             
-
             using (var reader = new StreamReader(_tcpClient.GetStream(), Encoding.UTF8))
             {
                 try
@@ -238,7 +239,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         Client = new SRClient
                         {
                             Coalition = sideInfo.side,
-                            Name = sideInfo.name,
+                            Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
                             Position = sideInfo.Position,
                             ClientGuid = _guid
                         },
@@ -324,7 +325,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         if (serverVersion < protocolVersion)
                                         {
-                                            ShowVersionMistmatchWarning();
+                                            Logger.Error($"Server version ({serverMessage.Version}) older than minimum procotol version ({UpdaterChecker.MINIMUM_PROTOCOL_VERSION}) - disconnecting");
+
+                                            ShowVersionMistmatchWarning(serverMessage.Version);
 
                                             Disconnect();
                                             break;
@@ -383,8 +386,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         break;
                                     case NetworkMessage.MessageType.VERSION_MISMATCH:
-                                        Logger.Error("Version Mismatch Between Client & Server - Disconnecting");
-                                        ShowVersionMistmatchWarning();
+                                        Logger.Error($"Version Mismatch Between Client ({UpdaterChecker.VERSION}) & Server ({serverMessage.Version}) - Disconnecting");
+
+                                        ShowVersionMistmatchWarning(serverMessage.Version);
+
                                         Disconnect();
                                         break;
                                     case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
@@ -412,11 +417,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         catch (Exception ex)
                         {
                             decodeErrors++;
-                            Logger.Error(ex, "Client exception reading from socket ");
+                            if (!_stop)
+                            {
+                                Logger.Error(ex, "Client exception reading from socket ");
+                            }
 
                             if (decodeErrors > MAX_DECODE_ERRORS)
                             {
-                                ShowVersionMistmatchWarning();
+                                ShowVersionMistmatchWarning("unknown");
                                 Disconnect();
                                 break;
                             }
@@ -427,28 +435,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception ex)
                 {
-                  
-                    Logger.Error(ex, "Client exception reading - Disconnecting ");
+                    if (!_stop)
+                    {
+                        Logger.Error(ex, "Client exception reading - Disconnecting ");
+                    }
                 }
             }
 
             //disconnected - reset DCS Info
             ClientStateSingleton.Instance.DcsPlayerRadioInfo.LastUpdate = 0;
 
-            //clear the clietns list
+            //clear the clients list
             _clients.Clear();
-
-            //disconnect callback
-            CallOnMain(false);
         }
 
-        private void ShowVersionMistmatchWarning()
+        private void ShowVersionMistmatchWarning(string serverVersion)
         {
-
-            MessageBox.Show("The SRS server you're connecting to is incompatible with this Client. " +
-                            "\n\nMake sure to always run the latest version of the SRS Server & Client" +
-                            "\n\nMinimum Version: " + UpdaterChecker.MINIMUM_PROTOCOL_VERSION, "SRS Server Incompatible",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"The SRS server you're connecting to is incompatible with this Client. " +
+                            $"\n\nMake sure to always run the latest version of the SRS Server & Client" +
+                            $"\n\nServer Version: {serverVersion}" +
+                            $"\nClient Version: {UpdaterChecker.VERSION}" +
+                            $"\nMinimum Version: {UpdaterChecker.MINIMUM_PROTOCOL_VERSION}",
+                            "SRS Server Incompatible",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
         }
 
         private void SendToServer(NetworkMessage message)
@@ -472,7 +482,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Client exception sending to server");
+                if (!_stop)
+                {
+                    Logger.Error(ex, "Client exception sending to server");
+                }
 
                 Disconnect();
             }
@@ -481,6 +494,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         //implement IDispose? To close stuff properly?
         public void Disconnect()
         {
+            _stop = true;
+
             DisconnectExternalAWACSMode();
 
             try

@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -18,6 +19,7 @@ namespace DCS_SR_Client
     {
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool loggingReady = false;
+        private readonly SettingsStore _settings = SettingsStore.Instance;
 
         public App()
         {
@@ -47,24 +49,34 @@ namespace DCS_SR_Client
                 Environment.Exit(1);
             }
 
+            SetupLogging();
+
 #if !DEBUG
-              if (IsClientRunning())
+            if (IsClientRunning())
             {
-                MessageBoxResult result = MessageBox.Show(
+                Logger logger = LogManager.GetCurrentClassLogger();
+
+                if (_settings.GetClientSetting(SettingsKeys.AllowMultipleInstances).BoolValue)
+                {
+                    logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
+                }
+                else
+                {
+                    logger.Warn("Another SRS instance is already running, preventing second instance startup");
+
+                    MessageBoxResult result = MessageBox.Show(
                     "Another instance of the SimpleRadio client is already running!\n\nThis one will now quit. Check your system tray for the SRS Icon",
                     "Multiple SimpleRadio clients started!",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
-             
-                Environment.Exit(0);
-                return;
-               
+
+                    Environment.Exit(0);
+                    return;
+                }
             }
 #endif
 
-
-            SetupLogging();
             InitNotificationIcon();
         }
 

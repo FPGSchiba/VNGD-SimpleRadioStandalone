@@ -556,6 +556,7 @@
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <WrapPanel />
 
@@ -585,15 +586,43 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-
+                        
 
                         <Label Grid.Row="1"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
+                               Content="Auto Connect Mismatch Prompt" />
+
+                        <ToggleButton Name="AutoConnectMismatchPromptToggle"
+                                      Grid.Row="1"
+                                      Grid.Column="1"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Click="AutoConnectMismatchPromptToggle_Click">
+                            <ToggleButton.Style>
+                                <Style TargetType="{x:Type ToggleButton}">
+                                    <Setter Property="Content" Value="ON" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Content" Value="ON" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="False">
+                                            <Setter Property="Content" Value="OFF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
+
+                        <Label Grid.Row="2"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
                                Content="Radio Rx Effects" />
 
-                        <WrapPanel Grid.Row="1"
+                        <WrapPanel Grid.Row="2"
                                    Grid.Column="1"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -640,13 +669,13 @@
                         </WrapPanel>
 
 
-                        <Label Grid.Row="2"
+                        <Label Grid.Row="3"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio Tx Effects" />
 
-                        <WrapPanel Grid.Row="2"
+                        <WrapPanel Grid.Row="3"
                                    Grid.Column="1"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -692,14 +721,14 @@
                             </ToggleButton>
                         </WrapPanel>
 
-                        <Label Grid.Row="3"
+                        <Label Grid.Row="4"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio Encryption Effects &#xD;&#xA;Requires Tx or Rx Effects On" />
 
                         <ToggleButton Name="RadioEncryptionEffectsToggle"
-                                      Grid.Row="3"
+                                      Grid.Row="4"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -720,14 +749,14 @@
                         </ToggleButton>
 
 
-                        <Label Grid.Row="4"
+                        <Label Grid.Row="5"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio Switch works as Push To Talk (PTT)" />
 
                         <ToggleButton Name="RadioSwitchIsPTT"
-                                      Grid.Row="4"
+                                      Grid.Row="5"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -749,13 +778,13 @@
 
                     
 
-                        <Label Grid.Row="5"
+                        <Label Grid.Row="6"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Reset Radio Overlay" />
 
-                        <Button Grid.Row="5"
+                        <Button Grid.Row="6"
                                 Grid.Column="1"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
@@ -763,14 +792,14 @@
                                 Content="Reset" />
 
 
-                        <Label Grid.Row="6"
+                        <Label Grid.Row="7"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Hide Overlay Taskbar Item" />
 
                         <ToggleButton Name="RadioOverlayTaskbarItem"
-                                      Grid.Row="6"
+                                      Grid.Row="7"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -791,14 +820,14 @@
                         </ToggleButton>
 
 
-                        <Label Grid.Row="7"
+                        <Label Grid.Row="8"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Refocus DCS" />
 
                         <ToggleButton Name="RefocusDCS"
-                                      Grid.Row="7"
+                                      Grid.Row="8"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -819,14 +848,14 @@
                         </ToggleButton>
 
 
-                        <Label Grid.Row="8"
+                        <Label Grid.Row="9"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Allow More Input Devices" />
 
                         <ToggleButton Name="ExpandInputDevices"
-                                      Grid.Row="8"
+                                      Grid.Row="9"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -846,14 +875,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="9"
+                        <Label Grid.Row="10"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Enable Radio Voice Effect" />
 
                         <ToggleButton Name="RadioSoundEffects"
-                                      Grid.Row="9"
+                                      Grid.Row="10"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -874,14 +903,14 @@
                         </ToggleButton>
 
 
-                        <Label Grid.Row="10"
+                        <Label Grid.Row="11"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Enable Clipping Effect (Requires Radio effects on!)" />
 
                         <ToggleButton Name="RadioSoundEffectsClipping"
-                                      Grid.Row="10"
+                                      Grid.Row="11"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -901,14 +930,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="11"
+                        <Label Grid.Row="12"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Select First Channel Preset" />
 
                         <ToggleButton Name="AutoSelectChannel"
-                                      Grid.Row="11"
+                                      Grid.Row="12"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -928,14 +957,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="12"
+                        <Label Grid.Row="13"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Minimise to tray" />
 
                         <ToggleButton Name="MinimiseToTray"
-                                      Grid.Row="12"
+                                      Grid.Row="13"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -955,14 +984,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="13"
+                        <Label Grid.Row="14"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Start minimised" />
 
                         <ToggleButton Name="StartMinimised"
-                                      Grid.Row="13"
+                                      Grid.Row="14"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -983,7 +1012,7 @@
                         </ToggleButton>
 
 
-                        <Label Grid.Row="14"
+                        <Label Grid.Row="15"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
@@ -991,7 +1020,7 @@
 
 
                         <ToggleButton Name="AlwaysAllowHotas"
-                                      Grid.Row="14"
+                                      Grid.Row="15"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -1011,14 +1040,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="15"
+                        <Label Grid.Row="16"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Allow INCOCKPIT DCS Controlled PTT" />
 
                         <ToggleButton Name="AllowDCSPTT"
-                                      Grid.Row="15"
+                                      Grid.Row="16"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -1038,14 +1067,14 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="16"
+                        <Label Grid.Row="17"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Check for beta updates" />
 
                         <ToggleButton Name="CheckForBetaUpdates"
-                                      Grid.Row="16"
+                                      Grid.Row="17"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -1065,106 +1094,106 @@
                             </ToggleButton.Style>
                         </ToggleButton>
 
-                        <Label Grid.Row="17"
+                        <Label Grid.Row="18"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 1 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio1Config"
-                                                    Grid.Row="17"
-                                                    Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio1Channel}" />
-
-                        <Label Grid.Row="18"
-                               Grid.Column="0"
-                               HorizontalContentAlignment="Center"
-                               VerticalContentAlignment="Center"
-                               Content="Radio 2 Audio Channel" />
-                        <local:RadioChannelConfigUi x:Name="Radio2Config"
                                                     Grid.Row="18"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio2Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio1Channel}" />
 
                         <Label Grid.Row="19"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
-                               Content="Radio 3 Audio Channel" />
-                        <local:RadioChannelConfigUi x:Name="Radio3Config"
+                               Content="Radio 2 Audio Channel" />
+                        <local:RadioChannelConfigUi x:Name="Radio2Config"
                                                     Grid.Row="19"
                                                     Grid.Column="1"
-                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio3Channel}" />
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio2Channel}" />
+
                         <Label Grid.Row="20"
+                               Grid.Column="0"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               Content="Radio 3 Audio Channel" />
+                        <local:RadioChannelConfigUi x:Name="Radio3Config"
+                                                    Grid.Row="20"
+                                                    Grid.Column="1"
+                                                    SettingConfig="{x:Static settings:SettingsKeys.Radio3Channel}" />
+                        <Label Grid.Row="21"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 4 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio4Config"
-                                                    Grid.Row="20"
+                                                    Grid.Row="21"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio4Channel}" />
-                        <Label Grid.Row="21"
+                        <Label Grid.Row="22"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 5 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio5Config"
-                                                    Grid.Row="21"
+                                                    Grid.Row="22"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio5Channel}" />
-                        <Label Grid.Row="22"
+                        <Label Grid.Row="23"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 6 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio6Config"
-                                                    Grid.Row="22"
+                                                    Grid.Row="23"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio6Channel}" />
-                        <Label Grid.Row="23"
+                        <Label Grid.Row="24"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 7 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio7Config"
-                                                    Grid.Row="23"
+                                                    Grid.Row="24"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio7Channel}" />
-                        <Label Grid.Row="24"
+                        <Label Grid.Row="25"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 8 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio8Config"
-                                                    Grid.Row="24"
+                                                    Grid.Row="25"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio8Channel}" />
-                        <Label Grid.Row="25"
+                        <Label Grid.Row="26"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 9 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio9Config"
-                                                    Grid.Row="25"
+                                                    Grid.Row="26"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio9Channel}" />
-                        <Label Grid.Row="26"
+                        <Label Grid.Row="27"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Radio 10 Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="Radio10Config"
-                                                    Grid.Row="26"
+                                                    Grid.Row="27"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.Radio10Channel}" />
 
-                        <Label Grid.Row="27"
+                        <Label Grid.Row="28"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Intercom Audio Channel" />
                         <local:RadioChannelConfigUi x:Name="IntercomConfig"
-                                                    Grid.Row="27"
+                                                    Grid.Row="28"
                                                     Grid.Column="1"
                                                     SettingConfig="{x:Static settings:SettingsKeys.IntercomChannel}" />
                     </Grid>

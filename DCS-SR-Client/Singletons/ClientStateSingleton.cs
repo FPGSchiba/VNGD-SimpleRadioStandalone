@@ -21,6 +21,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
         public DCSPlayerSideInfo DcsPlayerSideInfo { get; set; }
 
+        // Timestamp the last UDP broadcast was received from DCS, used for determining active game connection
+        public long DcsLastReceived { get; set; }
+
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
 
@@ -30,6 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public long LastSent { get; set; }
 
         public bool IsConnected { get; set; }
+        // Indicates an active game connection has been detected (1 tick = 100ns, 100000000 ticks = 10s stale timer), not updated by EAM
+        public bool IsGameConnected { get { return DcsLastReceived > DateTime.Now.Ticks - 100000000; } }
 
         public bool InExternalAWACSMode { get; set; }
 
@@ -40,6 +45,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             DcsPlayerSideInfo = new DCSPlayerSideInfo();
 
+            DcsLastReceived = 0;
+
             FixedChannels = new PresetChannelsViewModel[10];
 
             for (int i = 0; i < FixedChannels.Length; i++)
@@ -48,6 +55,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
 
             MicrophoneAvailable = true;
+
+            LastSent = 0;
 
             IsConnected = false;
 
