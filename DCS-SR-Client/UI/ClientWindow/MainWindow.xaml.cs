@@ -890,7 +890,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
                 ExternalAWACSModePasswordLabel.IsEnabled = eamEnabled;
-                ExternalAWACSModeName.Text = _clientStateSingleton.LastSeenName;
                 ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
                 ExternalAWACSModeNameLabel.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
@@ -901,7 +900,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ToggleServerSettings.IsEnabled = false;
                 ExternalAWACSModePassword.IsEnabled = false;
                 ExternalAWACSModePasswordLabel.IsEnabled = false;
-                ExternalAWACSModeName.Text = _clientStateSingleton.LastSeenName;
                 ExternalAWACSModeName.IsEnabled = false;
                 ExternalAWACSModeNameLabel.IsEnabled = false;
                 ConnectExternalAWACSMode.IsEnabled = false;

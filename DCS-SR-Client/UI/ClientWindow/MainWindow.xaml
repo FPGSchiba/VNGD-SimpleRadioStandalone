@@ -193,7 +193,7 @@
                                 Content="EAM coalition password"
                                 IsEnabled="False" />
                             <TextBox x:Name="ExternalAWACSModePassword"
-                                 Width="150"
+                                 Width="200"
                                  Height="23"
                                  Margin="0,0,10,0"
                                  MaxLines="1"
@@ -211,7 +211,7 @@
                                 Content="EAM name"
                                 IsEnabled="False" />
                             <TextBox x:Name="ExternalAWACSModeName"
-                                 Width="150"
+                                 Width="200"
                                  Height="23"
                                  Margin="0,0,0,0"
                                  MaxLines="1"
