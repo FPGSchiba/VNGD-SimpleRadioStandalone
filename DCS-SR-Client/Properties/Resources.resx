@@ -121,4 +121,13 @@
   <data name="audio_headset" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\audio-headset.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="plug_connect" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\plug-connect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="plug_disconnect" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\plug-disconnect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="plug_disconnect_prohibition" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\plug-disconnect-prohibition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

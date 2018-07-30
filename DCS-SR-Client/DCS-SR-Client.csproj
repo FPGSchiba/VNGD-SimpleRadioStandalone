@@ -210,6 +210,7 @@
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
+    <Compile Include="UI\Images.cs" />
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml.cs">
       <DependentUpon>PresetChannelsView.xaml</DependentUpon>
     </Compile>
@@ -396,6 +397,9 @@
     <None Include="AudioEffects\Radio-TX-1600.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Resource Include="plug-connect.png" />
+    <Resource Include="plug-disconnect-prohibition.png" />
+    <Resource Include="plug-disconnect.png" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

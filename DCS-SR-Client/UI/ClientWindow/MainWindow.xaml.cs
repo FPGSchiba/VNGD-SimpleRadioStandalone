@@ -84,6 +84,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Initialize ToolTip controls
             ToolTips.Init();
 
+            // Initialize images/icons
+            Images.Init();
+
             // Set up tooltips that are always defined
             InitToolTips();
 
@@ -662,7 +665,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             return 5002;
         }
 
-        private void Stop()
+        private void Stop(bool connectionError = false)
         {
             StartStop.Content = "Connect";
             StartStop.IsEnabled = true;
@@ -672,6 +675,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Preview.IsEnabled = true;
             _clientStateSingleton.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
+
+            ServerConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
+            VOIPConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
 
             ExternalAWACSModePassword.IsEnabled = false;
             ExternalAWACSModePasswordLabel.IsEnabled = false;
@@ -733,7 +739,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ConnectCallback(bool result, string connection)
+        private void ConnectCallback(bool result, bool connectionError, string connection)
         {
             string currentConnection = ServerIp.Text.Trim();
             if (!currentConnection.Contains(":"))
@@ -762,11 +768,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.IsEnabled = true;
 
                         _clientStateSingleton.IsConnected = true;
+                        ServerConnectionStatus.Source = Images.IconConnected;
+                        VOIPConnectionStatus.Source = Images.IconDisconnected;
 
                         _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
 
                         _audioManager.StartEncoding(inputId, output, _guid, InputManager,
-                            _resolvedIp, _port, micOutput);
+                            _resolvedIp, _port, micOutput, VOIPConnectCallback);
                     }
                     catch (Exception ex)
                     {
@@ -790,10 +798,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 // Only stop connection/reset state if connection is currently active
                 // Autoconnect mismatch will quickly disconnect/reconnect, leading to double-callbacks
-                Stop();
+                Stop(connectionError);
             }
         }
 
+        private void VOIPConnectCallback(bool result, bool connectionError, string connection)
+        {
+            if (result)
+            {
+                VOIPConnectionStatus.Source = Images.IconConnected;
+            }
+            else
+            {
+                VOIPConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
+            }
+        }
 
         protected override void OnClosing(CancelEventArgs e)
         {

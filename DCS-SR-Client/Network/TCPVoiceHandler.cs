@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -63,8 +65,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
+        private readonly AudioManager.VOIPConnectCallback _voipConnectCallback;
+
         public TCPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
-            int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager)
+            int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager, AudioManager.VOIPConnectCallback voipConnectCallback)
         {
             _decoder = decoder;
             _audioManager = audioManager;
@@ -77,6 +81,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _port = port + 1;
 
             _inputManager = inputManager;
+
+            _voipConnectCallback = voipConnectCallback;
         }
 
         private void AudioEffectCheckTick()
@@ -174,7 +180,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     _listener = new TcpClient();
                     _listener.NoDelay = true;
 
-                    _listener.Connect(_address, _port);
+                    try
+                    {
+                        _listener.ConnectAsync(_address, _port).Wait(TimeSpan.FromSeconds(10));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, $"Failed to connect to VOIP server @ {_address.ToString()}:{_port}");
+
+                        CallOnMainVOIPConnect(false, true);
+
+                        RequestStop();
+                        break;
+                    }
+
+                    if (!_listener.Connected)
+                    {
+                        Logger.Error($"Failed to connect to VOIP server @ {_address.ToString()}:{_port}");
+
+                        CallOnMainVOIPConnect(false, true);
+
+                        RequestStop();
+                        break;
+                    }
 
                     //initial packet to get audio setup
                     var udpVoicePacket = new UDPVoicePacket
@@ -197,6 +225,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     _ready = true;
 
                     Logger.Info("Connected to VOIP TCP " + _port);
+
+                    CallOnMainVOIPConnect(true);
 
                     while (_listener.Connected && !_stop)
                     {
@@ -264,6 +294,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 catch (Exception e)
                 {
                 }
+
+                CallOnMainVOIPConnect(false);
             }
         }
 
@@ -805,6 +837,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
             });
             thread.Start();
+        }
+
+        private void CallOnMainVOIPConnect(bool result, bool connectionError = false)
+        {
+            try
+            {
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                    new ThreadStart(delegate { _voipConnectCallback(result, connectionError, $"{_address.ToString()}:{_port}"); }));
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

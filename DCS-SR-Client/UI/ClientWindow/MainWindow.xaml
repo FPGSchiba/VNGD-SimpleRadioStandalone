@@ -11,7 +11,7 @@
                       xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="630"
+                      Height="660"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
@@ -240,6 +240,20 @@
                         <Label x:Name="ClientCount"
                                HorizontalAlignment="Center"
                                Content="0" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Server connection: " />
+                        <Image x:Name="ServerConnectionStatus"
+                               Source="/SR-ClientRadio;component/plug-disconnect.png"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,5,0"/>
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="VOIP connection: " />
+                        <Image x:Name="VOIPConnectionStatus"
+                                   Source="/SR-ClientRadio;component/plug-disconnect.png"
+                                   HorizontalAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

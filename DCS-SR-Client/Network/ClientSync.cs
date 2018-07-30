@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
     public class ClientSync
     {
-        public delegate void ConnectCallback(bool result, string connection);
+        public delegate void ConnectCallback(bool result, bool connectionError, string connection);
         public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
         public delegate void UpdateUICallback();
 
@@ -120,6 +120,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _radioDCSSync = null;
             }
 
+            bool connectionError = false;
+
             _radioDCSSync = new RadioDCSSyncServer(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
@@ -128,7 +130,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     _tcpClient.NoDelay = true;
 
-                    _tcpClient.Connect(_serverEndpoint);
+                    // Wait for 10 seconds before aborting connection attempt - no SRS server running/port opened in that case
+                    _tcpClient.ConnectAsync(_serverEndpoint.Address, _serverEndpoint.Port).Wait(TimeSpan.FromSeconds(10));
 
                     if (_tcpClient.Connected)
                     {
@@ -139,8 +142,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         CallOnMain(true);
                         ClientSyncLoop();
                     }
+                    else
+                    {
+                        Logger.Error($"Failed to connect to server @ {_serverEndpoint.ToString()}");
+
+                        // Signal disconnect including an error
+                        connectionError = true;
+                    }
                 }
-                catch (SocketException ex)
+                catch (Exception ex)
                 {
                     Logger.Error(ex, "error connecting to server");
                 }
@@ -149,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _radioDCSSync.Stop();
 
             //disconnect callback
-            CallOnMain(false);
+            CallOnMain(false, connectionError);
         }
 
         private void ClientRadioUpdated()
@@ -186,12 +196,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             });
         }
 
-        private void CallOnMain(bool result)
+        private void CallOnMain(bool result, bool connectionError = false)
         {
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _callback(result, _serverEndpoint.ToString()); }));
+                    new ThreadStart(delegate { _callback(result, connectionError, _serverEndpoint.ToString()); }));
             }
             catch (Exception ex)
             {

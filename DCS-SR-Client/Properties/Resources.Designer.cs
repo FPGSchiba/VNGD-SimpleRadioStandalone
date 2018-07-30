@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -67,6 +67,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
             get {
                 object obj = ResourceManager.GetObject("audio_headset", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap plug_connect {
+            get {
+                object obj = ResourceManager.GetObject("plug_connect", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap plug_disconnect {
+            get {
+                object obj = ResourceManager.GetObject("plug_disconnect", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap plug_disconnect_prohibition {
+            get {
+                object obj = ResourceManager.GetObject("plug_disconnect_prohibition", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
