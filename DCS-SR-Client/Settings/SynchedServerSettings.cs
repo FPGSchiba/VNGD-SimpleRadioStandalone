@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using SharpConfig;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 {
@@ -8,12 +9,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
     {
         private static SyncedServerSettings instance;
         private static readonly object _lock = new object();
+        private static readonly Dictionary<string, string> defaults = DefaultServerSettings.Defaults;
 
-        private readonly Section _section;
+        private readonly ConcurrentDictionary<string, string> _settings;
 
         public SyncedServerSettings()
         {
-            _section = new Section("Synced Server Settings");
+            _settings = new ConcurrentDictionary<string, string>();
         }
 
         public static SyncedServerSettings Instance
@@ -26,42 +28,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         instance = new SyncedServerSettings();
                     }
-                    return instance;
                 }
+                return instance;
             }
         }
 
-        public Setting GetSetting(ServerSettingsKeys key)
+        public string GetSetting(ServerSettingsKeys key)
         {
             string setting = key.ToString();
 
-            if (!_section.Contains(setting))
-            {
-                if (DefaultServerSettings.Defaults.ContainsKey(setting))
-                {
-                    return new Setting(setting, DefaultServerSettings.Defaults[setting]);
-                }
-                else
-                {
-                    return new Setting(setting, "");
-                }
-            }
-
-            return _section[setting];
+            return _settings.GetOrAdd(setting, defaults.ContainsKey(setting) ? defaults[setting] : "");
         }
 
         public bool GetSettingAsBool(ServerSettingsKeys key)
         {
-            return GetSetting(key).BoolValue;
+            return Convert.ToBoolean(GetSetting(key));
         }
 
         public void Decode(Dictionary<string, string> encoded)
         {
-            _section.Clear();
-
             foreach (KeyValuePair<string, string> kvp in encoded)
             {
-                _section.Add(kvp.Key, kvp.Value);
+                _settings.AddOrUpdate(kvp.Key, kvp.Value, (key, oldVal) => kvp.Value);
             }
         }
     }
