@@ -270,6 +270,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 _clientStateSingleton.LastSeenName = message.name;
                             }
 
+                            _clientStateSingleton.DcsExportLastReceived = DateTime.Now.Ticks;
+
                             //sync with others
                             //Radio info is marked as Stale for FC3 aircraft after every frequency change
 
@@ -403,7 +405,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 _clientSideUpdate();
                                 //     count = 0;
 
-                                _clientStateSingleton.DcsLastReceived = DateTime.Now.Ticks;
+                                _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
                             }
                         }
                         catch (SocketException e)

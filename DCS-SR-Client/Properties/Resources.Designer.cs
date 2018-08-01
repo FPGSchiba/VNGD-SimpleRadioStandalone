@@ -73,9 +73,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap plug_connect {
+        public static System.Drawing.Bitmap status_connected {
             get {
-                object obj = ResourceManager.GetObject("plug_connect", resourceCulture);
+                object obj = ResourceManager.GetObject("status_connected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap plug_disconnect {
+        public static System.Drawing.Bitmap status_disconnected {
             get {
-                object obj = ResourceManager.GetObject("plug_disconnect", resourceCulture);
+                object obj = ResourceManager.GetObject("status_disconnected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap plug_disconnect_prohibition {
+        public static System.Drawing.Bitmap status_disconnected_error {
             get {
-                object obj = ResourceManager.GetObject("plug_disconnect_prohibition", resourceCulture);
+                object obj = ResourceManager.GetObject("status_disconnected_error", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap status_disconnected_game {
+            get {
+                object obj = ResourceManager.GetObject("status_disconnected_game", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

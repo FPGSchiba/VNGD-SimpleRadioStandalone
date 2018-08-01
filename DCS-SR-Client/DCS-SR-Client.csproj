@@ -385,6 +385,10 @@
     <Resource Include="audio-headset.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="status-disconnected-game.png" />
+    <Resource Include="status-connected.png" />
+    <Resource Include="status-disconnected-error.png" />
+    <Resource Include="status-disconnected.png" />
     <None Include="AudioEffects\KY-58-RX-1600.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -397,9 +401,6 @@
     <None Include="AudioEffects\Radio-TX-1600.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Resource Include="plug-connect.png" />
-    <Resource Include="plug-disconnect-prohibition.png" />
-    <Resource Include="plug-disconnect.png" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

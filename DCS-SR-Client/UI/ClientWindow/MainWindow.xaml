@@ -245,15 +245,24 @@
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Server connection: " />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Server" />
                         <Image x:Name="ServerConnectionStatus"
-                               Source="/SR-ClientRadio;component/plug-disconnect.png"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
                                HorizontalAlignment="Center"
-                               Margin="0,0,5,0"/>
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="VOIP connection: " />
+                               Height="26"
+                               Margin="5,0,5,0" />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="VOIP" />
                         <Image x:Name="VOIPConnectionStatus"
-                                   Source="/SR-ClientRadio;component/plug-disconnect.png"
-                                   HorizontalAlignment="Center" />
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               Height="26"
+                               HorizontalAlignment="Center"
+                               Margin="5,0,5,0" />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Game" />
+                        <Image x:Name="GameConnectionStatus"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               Height="26"
+                               HorizontalAlignment="Center" 
+                               Margin="5,0,0,0" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

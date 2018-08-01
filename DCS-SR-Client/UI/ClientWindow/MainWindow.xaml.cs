@@ -530,19 +530,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void RedrawUITick(object sender, EventArgs e)
         {
-            // Redraw UI state (currently every 5 seconds), toggling controls as required
+            bool isGameGuiConnected = _clientStateSingleton.IsGameGuiConnected;
+            bool isGameExportConnected = _clientStateSingleton.IsGameExportConnected;
+
+            // Redraw UI state (currently once per second), toggling controls as required
             // Some other callbacks/UI state changes could also probably be moved to this...
             if (_clientStateSingleton.IsConnected)
             {
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
-                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
-                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
+                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !isGameExportConnected;
+                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !isGameExportConnected;
             }
             else
             {
                 ExternalAWACSModePassword.IsEnabled = false;
                 ExternalAWACSModeName.IsEnabled = false;
+            }
+
+            if (isGameGuiConnected && isGameExportConnected)
+            {
+                GameConnectionStatus.Source = Images.IconConnected;
+            }
+            else if (isGameGuiConnected || isGameGuiConnected)
+            {
+                GameConnectionStatus.Source = Images.IconDisconnectedGame;
+            }
+            else
+            {
+                GameConnectionStatus.Source = Images.IconDisconnected;
             }
         }
 
