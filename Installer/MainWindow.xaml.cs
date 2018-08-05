@@ -117,6 +117,9 @@ namespace Installer
         //
         private static bool Is_SimpleRadio_running()
         {
+#if DEBUG
+            return false;
+#endif
             foreach (var clsProcess in Process.GetProcesses())
             {
                 if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-"))
@@ -188,7 +191,7 @@ namespace Installer
             if (paths.Count == 0)
             {
                 MessageBox.Show(
-                    "Unable to find DCS Profile in Saved Games!\n\nPlease check the path to Saved Games folder",
+                    "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
                     "SR Standalone Installer",
                     MessageBoxButton.OK, MessageBoxImage.Error);
 
@@ -234,7 +237,11 @@ namespace Installer
 
             foreach (var directory in Directory.EnumerateDirectories(path))
             {
-                if (directory.Contains("\\DCS") || directory.StartsWith("\\DCS."))
+                var dirs = directory.Split('\\');
+
+                var end = dirs[dirs.Length - 1];
+
+                if (end.ToUpper().StartsWith("DCS.") || end.ToUpper().Equals("DCS"))
                 {
                     paths.Add(directory);
                 }

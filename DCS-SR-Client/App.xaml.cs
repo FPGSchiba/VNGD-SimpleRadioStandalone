@@ -99,6 +99,30 @@ namespace DCS_SR_Client
 
         private void SetupLogging()
         {
+            var location = AppDomain.CurrentDomain.BaseDirectory;
+            //rename and backup old file
+
+            if (File.Exists(location + "\\clientlog.old.txt"))
+            {
+                try
+                {
+                    File.Delete(location + "\\clientlog.old.txt");
+                }
+                catch (Exception ex)
+                {
+                }
+
+            }
+
+            if (File.Exists(location + "\\clientlog.txt"))
+            {
+                try
+                {
+                    File.Move(location + "\\clientlog.txt", location + "\\clientlog.old.txt");
+                }
+                catch (Exception ex) { }
+            }
+
             var config = new LoggingConfiguration();
 
             var fileTarget = new FileTarget();
@@ -107,6 +131,7 @@ namespace DCS_SR_Client
             fileTarget.FileName = "${basedir}/clientlog.txt";
             fileTarget.Layout =
                 @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
+            fileTarget.DeleteOldFileOnStartup = true;
 
 #if DEBUG
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));

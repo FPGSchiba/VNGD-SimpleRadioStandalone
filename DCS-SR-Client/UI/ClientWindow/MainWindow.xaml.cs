@@ -425,28 +425,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var i = 0;
             foreach (var device in outputDeviceList)
             {
-                Speakers.Items.Add(new AudioDeviceListItem()
-                {
-                    Text = device.FriendlyName,
-                    Value = device
-                });
 
-                Logger.Info("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
-                            device.AudioClient.MixFormat.Channels + " Rate:" +
-                            device.AudioClient.MixFormat.SampleRate.ToString());
-
-                //first time round the loop, select first item
-                if (i == 0)
+                try
                 {
-                    Speakers.SelectedIndex = 0;
+                    Logger.Info("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
+                                device.AudioClient.MixFormat.Channels + " Rate:" +
+                                device.AudioClient.MixFormat.SampleRate.ToString());
+
+                    Speakers.Items.Add(new AudioDeviceListItem()
+                    {
+                        Text = device.FriendlyName,
+                        Value = device
+                    });
+
+                    //first time round the loop, select first item
+                    if (i == 0)
+                    {
+                        Speakers.SelectedIndex = 0;
+                    }
+
+                    if (device.ID == _settings.GetClientSetting(SettingsKeys.AudioOutputDeviceId).RawValue)
+                    {
+                        Speakers.SelectedIndex = i; //this one
+                    }
+
+                    i++;
                 }
-
-                if (device.ID == _settings.GetClientSetting(SettingsKeys.AudioOutputDeviceId).RawValue)
+                catch (Exception e)
                 {
-                    Speakers.SelectedIndex = i; //this one
+                    Logger.Error(e,"Audio Output - Error processing device - device skipped");
                 }
-
-                i++;
+              
             }
         }
 
@@ -464,18 +473,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
             foreach (var device in outputDeviceList)
             {
-                MicOutput.Items.Add(new AudioDeviceListItem()
+                try
                 {
-                    Text = device.FriendlyName,
-                    Value = device
-                });
-
-                Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
+                    
+                    Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
                             device.AudioClient.MixFormat.Channels + " Rate:" +
                             device.AudioClient.MixFormat.SampleRate.ToString());
 
-                //first time round the loop, select first item
-                if (i == 0)
+                    MicOutput.Items.Add(new AudioDeviceListItem()
+                    {
+                        Text = device.FriendlyName,
+                        Value = device
+                    });
+
+
+                    //first time round the loop, select first item
+                    if (i == 0)
                 {
                     MicOutput.SelectedIndex = 0;
                 }
@@ -486,7 +499,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
 
                 i++;
+
             }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Audio Output - Error processing device - device skipped");
+            }
+        }
         }
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
