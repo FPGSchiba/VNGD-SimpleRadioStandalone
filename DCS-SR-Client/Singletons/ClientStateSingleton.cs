@@ -21,20 +21,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
         public DCSPlayerSideInfo DcsPlayerSideInfo { get; set; }
 
-        // Timestamp the last UDP broadcast was received from DCS, used for determining active game connection
-        public long DcsLastReceived { get; set; }
+        // Timestamp the last UDP Game GUI broadcast was received from DCS, used for determining active game connection
+        public long DcsGameGuiLastReceived { get; set; }
+        // Timestamp the last UDP Export broadcast was received from DCS, used for determining active game connection
+        public long DcsExportLastReceived { get; set; }
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
 
         // Indicates whether a valid microphone is available - deactivating audio input controls and transmissions otherwise
         public bool MicrophoneAvailable { get; set; }
-        
+
         public long LastSent { get; set; }
 
         public bool IsConnected { get; set; }
+
+        public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
+        public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
         // Indicates an active game connection has been detected (1 tick = 100ns, 100000000 ticks = 10s stale timer), not updated by EAM
-        public bool IsGameConnected { get { return DcsLastReceived > DateTime.Now.Ticks - 100000000; } }
+        public bool IsGameConnected { get { return IsGameGuiConnected && IsGameExportConnected; } }
 
         public bool InExternalAWACSMode { get; set; }
 
@@ -45,7 +50,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             DcsPlayerSideInfo = new DCSPlayerSideInfo();
 
-            DcsLastReceived = 0;
+            DcsGameGuiLastReceived = 0;
+            DcsExportLastReceived = 0;
 
             FixedChannels = new PresetChannelsViewModel[10];
 

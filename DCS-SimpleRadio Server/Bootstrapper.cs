@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Runtime;
 using System.Threading;
 using System.Windows;
@@ -35,13 +36,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
         }
 
         private void SetupLogging()
-        {  
+        {
+            var location = AppDomain.CurrentDomain.BaseDirectory;
+            //rename and backup old file
+
+            if (File.Exists(location + "\\serverlog.old.txt"))
+            {
+                try
+                {
+                    File.Delete(location + "\\serverlog.old.txt");
+                }
+                catch (Exception ex)
+                {
+                }
+
+            }
+
+            if (File.Exists(location + "\\serverlog.txt"))
+            {
+                try
+                {
+                    File.Move(location + "\\serverlog.txt", location + "\\serverlog.old.txt");
+                }catch(Exception ex) { }
+            }
+
+
             var config = new LoggingConfiguration();
 
             var fileTarget = new FileTarget();
             config.AddTarget("file", fileTarget);
 
             fileTarget.FileName = "${basedir}/serverlog.txt";
+            fileTarget.DeleteOldFileOnStartup = true;
             fileTarget.Layout =
                 @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
 

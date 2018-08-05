@@ -11,7 +11,7 @@
                       xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="630"
+                      Height="660"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
@@ -193,7 +193,7 @@
                                 Content="EAM coalition password"
                                 IsEnabled="False" />
                             <TextBox x:Name="ExternalAWACSModePassword"
-                                 Width="150"
+                                 Width="200"
                                  Height="23"
                                  Margin="0,0,10,0"
                                  MaxLines="1"
@@ -211,7 +211,7 @@
                                 Content="EAM name"
                                 IsEnabled="False" />
                             <TextBox x:Name="ExternalAWACSModeName"
-                                 Width="150"
+                                 Width="200"
                                  Height="23"
                                  Margin="0,0,0,0"
                                  MaxLines="1"
@@ -240,6 +240,29 @@
                         <Label x:Name="ClientCount"
                                HorizontalAlignment="Center"
                                Content="0" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Server" />
+                        <Image x:Name="ServerConnectionStatus"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               HorizontalAlignment="Center"
+                               Height="26"
+                               Margin="5,0,5,0" />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="VOIP" />
+                        <Image x:Name="VOIPConnectionStatus"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               Height="26"
+                               HorizontalAlignment="Center"
+                               Margin="5,0,5,0" />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Game" />
+                        <Image x:Name="GameConnectionStatus"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               Height="26"
+                               HorizontalAlignment="Center" 
+                               Margin="5,0,0,0" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

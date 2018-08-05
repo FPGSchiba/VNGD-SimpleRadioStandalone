@@ -36,6 +36,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        public delegate void VOIPConnectCallback(bool result, bool connectionError, string connection);
+
         private readonly CachedAudioEffect[] _cachedAudioEffects;
 
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
@@ -100,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         }
 
         public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port, MMDevice micOutput)
+            IPAddress ipAddress, int port, MMDevice micOutput, VOIPConnectCallback voipConnectCallback)
         {
             _stop = false;
 
@@ -237,7 +239,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
                     _tcpVoiceHandler =
-                        new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager);
+                        new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
                     var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();

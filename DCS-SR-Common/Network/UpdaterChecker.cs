@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.5.3.1";
 
-        public static readonly string VERSION = "1.5.3.4";
+        public static readonly string VERSION = "1.5.3.5";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -27,6 +27,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             Version currentVersion = Version.Parse(VERSION);
 
+#if DEBUG
+            _logger.Info("Skipping update check due to DEBUG mode");
+#else
             try
             {
                 var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, VERSION));
@@ -88,6 +91,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 _logger.Error(ex, "Failed to check for updated version");
             }
+#endif
         }
 
         public static void ShowUpdateAvailableDialog(string branch, Version version, string url)
