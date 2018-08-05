@@ -1,4 +1,4 @@
--- Version 1.5.3.4
+-- Version 1.5.3.5
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -121,6 +121,7 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                  SR.lastKnownPos = _update.pos
 
+
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
                 elseif string.find(_update.unit, "SA342") then
@@ -131,6 +132,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioMI8(_update)
                 elseif string.find(_update.unit, "L-39")  then
                     _update = SR.exportRadioL39(_update)
+				elseif _update.unit ==  "Yak-52" then
+                    _update = SR.exportRadioYak52(_update)
                 elseif _update.unit == "A-10C" then
                     _update = SR.exportRadioA10C(_update)
                   elseif _update.unit == "FA-18C_hornet" then
@@ -217,6 +220,8 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                   _lastUnitId = _update.unitId
             else
+
+
                 -- save last pos
                 SR.lastKnownPos ={x=0,y=0,z=0 }
 
@@ -869,10 +874,95 @@ function SR.exportRadioL39(_data)
          _data.ptt = false
     end
 
+          -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 1; -- full radio - for expansion radios - DCS controls must be disabled
+
     _data.control = 1; -- full radio
 
     return _data
 end
+
+function SR.exportRadioYak52(_data)
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq =100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = 1.0
+    _data.radios[1].volMode = 1
+
+    _data.radios[2].name = "Baklan 5"
+    _data.radios[2].freq = SR.getRadioFrequency(24)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 90,{0.0,1.0},false)
+
+    -- Intercom button depressed
+    if(SR.getButtonPosition(192) > 0.5 or SR.getButtonPosition(196) > 0.5) then
+        _data.selected= 1
+        _data.ptt = true
+    elseif (SR.getButtonPosition(194) > 0.5 or SR.getButtonPosition(197) > 0.5) then
+       	_data.selected = 0
+        _data.ptt = true
+    else
+        _data.selected= 1
+         _data.ptt = false
+    end
+
+      -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 1; -- full radio - for expansion radios - DCS controls must be disabled
+
+    return _data
+end
+
 --for A10C
 function SR.exportRadioA10C(_data)
 
@@ -1855,4 +1945,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.4")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.5")
