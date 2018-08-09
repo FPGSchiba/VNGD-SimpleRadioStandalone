@@ -37,29 +37,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void SetupLogging()
         {
-            var location = AppDomain.CurrentDomain.BaseDirectory;
-            //rename and backup old file
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string logFilePath = Path.Combine(baseDirectory, "serverlog.txt");
+            string oldLogFilePath = Path.Combine(baseDirectory, "serverlog.old.txt");
 
-            if (File.Exists(location + "\\serverlog.old.txt"))
+            FileInfo logFileInfo = new FileInfo(logFilePath);
+            // Cleanup logfile if > 100MB, keep one old file copy
+            if (logFileInfo.Exists && logFileInfo.Length >= 104857600)
             {
+                if (File.Exists(oldLogFilePath))
+                {
+                    try
+                    {
+                        File.Delete(oldLogFilePath);
+                    }
+                    catch (Exception) { }
+                }
+
                 try
                 {
-                    File.Delete(location + "\\serverlog.old.txt");
+                    File.Move(logFilePath, oldLogFilePath);
                 }
-                catch (Exception ex)
-                {
-                }
-
+                catch (Exception) { }
             }
-
-            if (File.Exists(location + "\\serverlog.txt"))
-            {
-                try
-                {
-                    File.Move(location + "\\serverlog.txt", location + "\\serverlog.old.txt");
-                }catch(Exception ex) { }
-            }
-
 
             var config = new LoggingConfiguration();
 
@@ -67,7 +67,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             config.AddTarget("file", fileTarget);
 
             fileTarget.FileName = "${basedir}/serverlog.txt";
-            fileTarget.DeleteOldFileOnStartup = true;
             fileTarget.Layout =
                 @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
 

@@ -99,28 +99,28 @@ namespace DCS_SR_Client
 
         private void SetupLogging()
         {
-            var location = AppDomain.CurrentDomain.BaseDirectory;
-            //rename and backup old file
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string logFilePath = Path.Combine(baseDirectory, "clientlog.txt");
+            string oldLogFilePath = Path.Combine(baseDirectory, "clientlog.old.txt");
 
-            if (File.Exists(location + "\\clientlog.old.txt"))
+            FileInfo logFileInfo = new FileInfo(logFilePath);
+            // Cleanup logfile if > 100MB, keep one old file copy
+            if (logFileInfo.Exists && logFileInfo.Length >= 104857600)
             {
+                if (File.Exists(oldLogFilePath))
+                {
+                    try
+                    {
+                        File.Delete(oldLogFilePath);
+                    }
+                    catch (Exception) { }
+                }
+
                 try
                 {
-                    File.Delete(location + "\\clientlog.old.txt");
+                    File.Move(logFilePath, oldLogFilePath);
                 }
-                catch (Exception ex)
-                {
-                }
-
-            }
-
-            if (File.Exists(location + "\\clientlog.txt"))
-            {
-                try
-                {
-                    File.Move(location + "\\clientlog.txt", location + "\\clientlog.old.txt");
-                }
-                catch (Exception ex) { }
+                catch (Exception) { }
             }
 
             var config = new LoggingConfiguration();
@@ -131,7 +131,6 @@ namespace DCS_SR_Client
             fileTarget.FileName = "${basedir}/clientlog.txt";
             fileTarget.Layout =
                 @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
-            fileTarget.DeleteOldFileOnStartup = true;
 
 #if DEBUG
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
