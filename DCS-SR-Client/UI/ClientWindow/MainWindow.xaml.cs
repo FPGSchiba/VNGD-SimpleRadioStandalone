@@ -102,6 +102,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
+            CheckMainWindowVisibility();
+
             if (_settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue)
             {
                 Hide();
@@ -162,6 +164,98 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _redrawUITimer.Tick += RedrawUITick;
             _redrawUITimer.Start();
+        }
+
+        private void CheckMainWindowVisibility()
+        {
+            bool mainWindowVisible = false;
+            bool radioWindowVisible = false;
+            bool awacsWindowVisible = false;
+
+            int mainWindowX = _settings.GetPositionSetting(SettingsKeys.ClientX).IntValue;
+            int mainWindowY = _settings.GetPositionSetting(SettingsKeys.ClientY).IntValue;
+            int radioWindowX = _settings.GetPositionSetting(SettingsKeys.RadioX).IntValue;
+            int radioWindowY = _settings.GetPositionSetting(SettingsKeys.RadioY).IntValue;
+            int awacsWindowX = _settings.GetPositionSetting(SettingsKeys.AwacsX).IntValue;
+            int awacsWindowY = _settings.GetPositionSetting(SettingsKeys.AwacsY).IntValue;
+
+            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                if (screen.Bounds.Contains(mainWindowX, mainWindowY))
+                {
+                    mainWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioWindowX, radioWindowY))
+                {
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
+                {
+                    awacsWindowVisible = true;
+                }
+            }
+
+            if (!mainWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS client window was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe client window's position has been reset to the default values to mitigate this issue.",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"Main client window outside visible area of monitors, resetting position ({mainWindowX},{mainWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.ClientX, 200);
+                _settings.SetPositionSetting(SettingsKeys.ClientY, 200);
+
+                Left = 200;
+                Top = 200;
+            }
+
+            if (!radioWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS radio overlay was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe radio overlay's position has been reset to the default values to mitigate this issue.",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"Radio overlay window outside visible area of monitors, resetting position ({radioWindowX},{radioWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.RadioX, 300);
+                _settings.SetPositionSetting(SettingsKeys.RadioY, 300);
+
+                if (_radioOverlayWindow != null)
+                {
+                    _radioOverlayWindow.Left = 300;
+                    _radioOverlayWindow.Top = 300;
+                }
+            }
+
+            if (!awacsWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS AWACS overlay was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe AWACS overlay's position has been reset to the default values to mitigate this issue.",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.AwacsX, 300);
+                _settings.SetPositionSetting(SettingsKeys.AwacsY, 300);
+
+                if (_awacsRadioOverlay != null)
+                {
+                    _awacsRadioOverlay.Left = 300;
+                    _awacsRadioOverlay.Top = 300;
+                }
+            }
+
+            if (!mainWindowVisible || !radioWindowVisible || !awacsWindowVisible)
+            {
+                _settings.Save();
+            }
         }
 
         private void InitFlowDocument()

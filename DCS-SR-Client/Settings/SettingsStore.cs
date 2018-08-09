@@ -316,8 +316,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.RadioWidth.ToString(), "122"},
             {SettingsKeys.RadioHeight.ToString(), "270"},
 
-            {SettingsKeys.ClientX.ToString(), "500"},
-            {SettingsKeys.ClientY.ToString(), "500"},
+            {SettingsKeys.ClientX.ToString(), "200"},
+            {SettingsKeys.ClientY.ToString(), "200"},
 
             {SettingsKeys.AwacsX.ToString(), "300"},
             {SettingsKeys.AwacsY.ToString(), "300"},
