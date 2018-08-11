@@ -102,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
-            CheckMainWindowVisibility();
+            CheckWindowVisibility();
 
             if (_settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue)
             {
@@ -166,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _redrawUITimer.Start();
         }
 
-        private void CheckMainWindowVisibility()
+        private void CheckWindowVisibility()
         {
             bool mainWindowVisible = false;
             bool radioWindowVisible = false;
@@ -198,7 +198,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (!mainWindowVisible)
             {
                 MessageBox.Show(this,
-                    "The SRS client window was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe client window's position has been reset to the default values to mitigate this issue.",
+                    "The SRS client window is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue.",
                     "SRS window position reset",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -215,7 +215,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (!radioWindowVisible)
             {
                 MessageBox.Show(this,
-                    "The SRS radio overlay was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe radio overlay's position has been reset to the default values to mitigate this issue.",
+                    "The SRS radio overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue.",
                     "SRS window position reset",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -235,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (!awacsWindowVisible)
             {
                 MessageBox.Show(this,
-                    "The SRS AWACS overlay was moved outside the visibible area of your monitors, preventing you from moving it elsewhere.\n\nThe AWACS overlay's position has been reset to the default values to mitigate this issue.",
+                    "The SRS AWACS overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue",
                     "SRS window position reset",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
