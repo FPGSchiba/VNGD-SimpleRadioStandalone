@@ -1308,8 +1308,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow = null;
 
 
-            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = 100;
-            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = 100;
+            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = 300;
+            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = 300;
 
             _settings.GetPositionSetting(SettingsKeys.RadioWidth).DoubleValue = 122;
             _settings.GetPositionSetting(SettingsKeys.RadioHeight).DoubleValue = 270;

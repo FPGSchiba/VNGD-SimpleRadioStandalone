@@ -54,8 +54,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Top = _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue;
-            Left = _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue;
+            Left = _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue;
+            Top = _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue;
 
             Width = _settings.GetPositionSetting(SettingsKeys.RadioWidth).DoubleValue;
             Height = _settings.GetPositionSetting(SettingsKeys.RadioHeight).DoubleValue;
@@ -163,8 +163,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _settings.GetPositionSetting(SettingsKeys.RadioWidth).DoubleValue = Width;
             _settings.GetPositionSetting(SettingsKeys.RadioHeight).DoubleValue = Height;
             _settings.GetPositionSetting(SettingsKeys.RadioOpacity).DoubleValue = Opacity;
-            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = Top;
-            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = Left;
+            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = Left;
+            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = Top;
             _settings.Save();
             base.OnClosing(e);
 
