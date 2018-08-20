@@ -44,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
                 var sb = new StringBuilder();
                 foreach (var address in addresses)
                 {
-                    sb.AppendLine($"{address.Name},{address.Address},{address.IsDefault}");
+                    sb.AppendLine($"{address.Name},{address.Address},{address.IsDefault},{address.EAMCoalitionPassword}");
                 }
                 File.WriteAllText(_fileNameAndPath, sb.ToString());
 
@@ -82,17 +82,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
         private ServerAddress Parse(string line)
         {
             var split = line.Split(',');
-            if (split.Length == 3)
+            if (split.Length >= 3)
             {
                 bool isDefault;
 
                 if (bool.TryParse(split[2], out isDefault))
                 {
-                    return new ServerAddress(split[0], split[1], isDefault);
+                    return new ServerAddress(split[0], split[1], split.Length >= 4 && !string.IsNullOrWhiteSpace(split[3]) ? split[3] : null, isDefault);
                 }
                 throw new ArgumentException("isDefault parameter cannot be cast to a boolean");
             }
-            throw new ArgumentOutOfRangeException(nameof(line), @"address can only be 3 segments");
+            throw new ArgumentOutOfRangeException(nameof(line), @"address must be at least 3 segments");
         }
     }
 }

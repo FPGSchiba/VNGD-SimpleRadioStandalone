@@ -35,6 +35,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
 
         public string NewAddress { get; set; }
 
+        public string NewEAMCoalitionPassword { get; set; }
+
         public ICommand NewAddressCommand { get; }
 
         public ICommand SaveCommand { get; set; }
@@ -61,7 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
         private void OnNewAddress()
         {
             var isDefault = _addresses.Count == 0;
-            _addresses.Add(new ServerAddress(NewName, NewAddress, isDefault));
+            _addresses.Add(new ServerAddress(NewName, NewAddress, string.IsNullOrWhiteSpace(NewEAMCoalitionPassword) ? null : NewEAMCoalitionPassword, isDefault));
 
             Save();
         }
@@ -78,7 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
             if (_addresses.Count == 0 && !string.IsNullOrEmpty(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue))
             {
                 var oldAddress = new ServerAddress(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue,
-                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, true);
+                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, null, true);
                 _addresses.Add(oldAddress);
             }
 

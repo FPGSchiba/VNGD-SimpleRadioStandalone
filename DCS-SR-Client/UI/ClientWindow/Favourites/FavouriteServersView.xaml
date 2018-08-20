@@ -16,6 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -23,29 +24,44 @@
                    Grid.Column="0"
                    Margin="0,0,0,5"
                    HorizontalAlignment="Center"
+                   FontWeight="Bold"
                    Text="Add new configuration" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Margin="0,0,5,0"
+                       VerticalAlignment="Center"
+                       Text="Name" />
+            <TextBox Grid.Column="1" Text="{Binding Path=NewName}" />
+            <TextBlock Grid.Column="2"
+                       Margin="10,0,5,0"
+                       VerticalAlignment="Center"
+                       Text="ServerAddress" />
+            <TextBox Grid.Column="3" Text="{Binding Path=NewAddress}" />
+        </Grid>
+        
+        <Grid Grid.Row="2"
+              Margin="0,5,0,0"
+              MaxWidth="350">
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="1"
+            <TextBlock Grid.Column="0"
                        Margin="0,0,5,0"
                        VerticalAlignment="Center"
-                       Text="Name" />
-            <TextBox Grid.Column="2" Text="{Binding Path=NewName}" />
-            <TextBlock Grid.Column="3"
-                       Margin="10,0,5,0"
-                       VerticalAlignment="Center"
-                       Text="ServerAddress" />
-            <TextBox Grid.Column="4" Text="{Binding Path=NewAddress}" />
-            <Button Grid.Column="5"
+                       Text="EAM coalition password" />
+            <TextBox Grid.Column="1" Text="{Binding Path=NewEAMCoalitionPassword}" />
+            <Button Grid.Column="2"
                     Height="23"
                     Margin="5,0,0,0"
                     Command="{Binding Path=NewAddressCommand}">
@@ -57,14 +73,14 @@
             </Button>
         </Grid>
 
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Width="120"
                 Margin="0,30,0,10"
                 Command="{Binding Path=RemoveSelectedCommand}"
                 Content="Remove Selected" />
 
         <DataGrid Name="FavouritesGrid"
-                  Grid.Row="3"
+                  Grid.Row="4"
                   Margin="0,0,0,5"
                   HorizontalAlignment="Center"
                   AutoGenerateColumns="False"
@@ -72,7 +88,8 @@
                   SelectedItem="{Binding Path=SelectedItem}">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name" />
-                <DataGridTextColumn Binding="{Binding Path=Address}" Header="Ip ServerAddress (and port)" />
+                <DataGridTextColumn Binding="{Binding Path=Address}" Header="ServerAddress/port" />
+                <DataGridTextColumn Binding="{Binding Path=EAMCoalitionPassword}" Header="EAM coal. pass" />
                 <DataGridTemplateColumn Header="Is Default">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">

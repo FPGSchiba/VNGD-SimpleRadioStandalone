@@ -277,7 +277,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 FavouriteServersViewModel.Addresses.Count == 0)
             {
                 var oldAddress = new ServerAddress(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue,
-                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, true);
+                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, null, true);
                 FavouriteServersViewModel.Addresses.Add(oldAddress);
             }
 
@@ -442,6 +442,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (value != null)
                 {
                     ServerIp.Text = value.Address;
+                    ExternalAWACSModePassword.Text = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
                 }
                 
                 _connectCommand.RaiseCanExecuteChanged();
