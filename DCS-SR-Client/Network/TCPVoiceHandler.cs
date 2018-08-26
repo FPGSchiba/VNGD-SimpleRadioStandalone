@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -379,6 +380,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 var frequencyCount = udpVoicePacket.Frequencies.Length;
 
                                 List<RadioReceivingPriority> radioReceivingPriorities = new List<RadioReceivingPriority>(frequencyCount);
+                                List<int> blockedRadios = CurrentlyBlockedRadios();
 
                                 // Parse frequencies into receiving radio priority for selection below
                                 for (var i = 0; i < frequencyCount; i++)
@@ -389,11 +391,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         udpVoicePacket.Frequencies[i],
                                         (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
                                         udpVoicePacket.Encryptions[i],
-                                        udpVoicePacket.UnitId, out state, out decryptable);
+                                        udpVoicePacket.UnitId,
+                                        blockedRadios,
+                                        out state, 
+                                        out decryptable);
 
                                     float losLoss = 0.0f;
                                     double receivPowerLossPercent = 0.0;
-                                    bool canReceive = false;
 
                                     if (radio != null && state != null)
                                     {
@@ -402,28 +406,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             || (
                                                 HasLineOfSight(udpVoicePacket, out losLoss)
                                                 && InRange(udpVoicePacket.Guid, udpVoicePacket.Frequencies[i], out receivPowerLossPercent)
-                                                && !ShouldBlockRxAsTransmitting(state.ReceivedOn)
+                                                && !blockedRadios.Contains(state.ReceivedOn)
                                             )
                                         )
                                         {
-                                            canReceive = true;
+                                            decryptable = (udpVoicePacket.Encryptions[i] == 0) || (udpVoicePacket.Encryptions[i] == radio.encKey && radio.enc);
+
+                                            radioReceivingPriorities.Add(new RadioReceivingPriority()
+                                            {
+                                                Decryptable = decryptable,
+                                                Encryption = udpVoicePacket.Encryptions[i],
+                                                Frequency = udpVoicePacket.Frequencies[i],
+                                                LineOfSightLoss = losLoss,
+                                                Modulation = udpVoicePacket.Modulations[i],
+                                                ReceivingPowerLossPercent = receivPowerLossPercent,
+                                                ReceivingRadio = radio,
+                                                ReceivingState = state
+                                            });
                                         }
-
-                                        decryptable = (udpVoicePacket.Encryptions[i] == 0) || (udpVoicePacket.Encryptions[i] == radio.encKey && radio.enc);
                                     }
-
-                                    radioReceivingPriorities.Add(new RadioReceivingPriority()
-                                    {
-                                        CanReceive = canReceive,
-                                        Decryptable = decryptable,
-                                        Encryption = udpVoicePacket.Encryptions[i],
-                                        Frequency = udpVoicePacket.Frequencies[i],
-                                        LineOfSightLoss = losLoss,
-                                        Modulation = udpVoicePacket.Modulations[i],
-                                        ReceivingPowerLossPercent = receivPowerLossPercent,
-                                        ReceivingRadio = radio,
-                                        ReceivingState = state
-                                    });
                                 }
 
                                 // Sort receiving radios to play audio on correct one
@@ -532,23 +533,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
-
-        private bool ShouldBlockRxAsTransmitting(int radioId)
+        private List<int> CurrentlyBlockedRadios()
         {
-            //Return based on server settings as well
+            List<int> transmitting = new List<int>();
             if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_TX))
             {
-                return false;
+                return transmitting;
             }
 
-            if (radioId == 0)
+            if (!_ptt && !_clientStateSingleton.DcsPlayerRadioInfo.ptt)
             {
-                //intercoms dont block
-                return false;
+                return transmitting;
             }
 
-            return (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
-                   && (_clientStateSingleton.DcsPlayerRadioInfo.selected == radioId);
+            transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
+
+            if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
+            {
+                // Skip intercom
+                for (int i = 1; i < 11; i++)
+                {
+                    var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
+                    if (radio.modulation != RadioInformation.Modulation.DISABLED && radio.simul && i != _clientStateSingleton.DcsPlayerRadioInfo.selected)
+                    {
+                        transmitting.Add(i);
+                    }
+                }
+            }
+
+            return transmitting;
         }
 
         private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
@@ -627,11 +640,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return -1;
             }
 
-            if (x.CanReceive && x.Decryptable)
+            if (x.Decryptable)
             {
                 xScore += 16;
             }
-            if (y.CanReceive && y.Decryptable)
+            if (y.Decryptable)
             {
                 yScore += 16;
             }
