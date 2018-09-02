@@ -27,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         static volatile IChannelGroup group;
         private ConcurrentDictionary<string, SRClient> _clientsList;
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
+        private static readonly List<int> emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
 
         public VOIPPacketHandler(ConcurrentDictionary<string, SRClient> clientsList)
         {
@@ -119,7 +120,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                             var receivingRadio = radioInfo.CanHearTransmission(decodedPacket.Frequencies[i],
                                                 (RadioInformation.Modulation)decodedPacket.Modulations[i],
                                                 decodedPacket.Encryptions[i],
-                                                decodedPacket.UnitId, out radioReceivingState, out decryptable);
+                                                decodedPacket.UnitId,
+                                                emptyBlockedRadios,
+                                                out radioReceivingState,
+                                                out decryptable);
 
                                             //only send if we can hear!
                                             if (receivingRadio != null && !matchingClients.Contains(_client.Value.ClientChannelId))
