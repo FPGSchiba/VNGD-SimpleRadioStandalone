@@ -7,16 +7,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         private bool _isDefault;
 
-        public ServerAddress(string name, string address, bool isDefault)
+        public ServerAddress(string name, string address, string eamCoalitionPassword, bool isDefault)
         {
             Name = name;
             Address = address;
+            EAMCoalitionPassword = eamCoalitionPassword;
             IsDefault = isDefault;
         }
 
         public string Name { get; set; }
 
         public string Address { get; set; }
+
+        public string EAMCoalitionPassword { get; set; }
 
         public bool IsDefault
         {

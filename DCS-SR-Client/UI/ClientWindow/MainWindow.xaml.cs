@@ -102,6 +102,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
+            CheckWindowVisibility();
+
             if (_settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue)
             {
                 Hide();
@@ -164,6 +166,98 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _redrawUITimer.Start();
         }
 
+        private void CheckWindowVisibility()
+        {
+            bool mainWindowVisible = false;
+            bool radioWindowVisible = false;
+            bool awacsWindowVisible = false;
+
+            int mainWindowX = _settings.GetPositionSetting(SettingsKeys.ClientX).IntValue;
+            int mainWindowY = _settings.GetPositionSetting(SettingsKeys.ClientY).IntValue;
+            int radioWindowX = _settings.GetPositionSetting(SettingsKeys.RadioX).IntValue;
+            int radioWindowY = _settings.GetPositionSetting(SettingsKeys.RadioY).IntValue;
+            int awacsWindowX = _settings.GetPositionSetting(SettingsKeys.AwacsX).IntValue;
+            int awacsWindowY = _settings.GetPositionSetting(SettingsKeys.AwacsY).IntValue;
+
+            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                if (screen.Bounds.Contains(mainWindowX, mainWindowY))
+                {
+                    mainWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioWindowX, radioWindowY))
+                {
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
+                {
+                    awacsWindowVisible = true;
+                }
+            }
+
+            if (!mainWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS client window is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue.",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"Main client window outside visible area of monitors, resetting position ({mainWindowX},{mainWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.ClientX, 200);
+                _settings.SetPositionSetting(SettingsKeys.ClientY, 200);
+
+                Left = 200;
+                Top = 200;
+            }
+
+            if (!radioWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS radio overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue.",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"Radio overlay window outside visible area of monitors, resetting position ({radioWindowX},{radioWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.RadioX, 300);
+                _settings.SetPositionSetting(SettingsKeys.RadioY, 300);
+
+                if (_radioOverlayWindow != null)
+                {
+                    _radioOverlayWindow.Left = 300;
+                    _radioOverlayWindow.Top = 300;
+                }
+            }
+
+            if (!awacsWindowVisible)
+            {
+                MessageBox.Show(this,
+                    "The SRS AWACS overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue",
+                    "SRS window position reset",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
+
+                _settings.SetPositionSetting(SettingsKeys.AwacsX, 300);
+                _settings.SetPositionSetting(SettingsKeys.AwacsY, 300);
+
+                if (_awacsRadioOverlay != null)
+                {
+                    _awacsRadioOverlay.Left = 300;
+                    _awacsRadioOverlay.Top = 300;
+                }
+            }
+
+            if (!mainWindowVisible || !radioWindowVisible || !awacsWindowVisible)
+            {
+                _settings.Save();
+            }
+        }
+
         private void InitFlowDocument()
         {
             //make hyperlinks work
@@ -183,7 +277,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 FavouriteServersViewModel.Addresses.Count == 0)
             {
                 var oldAddress = new ServerAddress(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue,
-                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, true);
+                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, null, true);
                 FavouriteServersViewModel.Addresses.Add(oldAddress);
             }
 
@@ -348,6 +442,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (value != null)
                 {
                     ServerIp.Text = value.Address;
+                    ExternalAWACSModePassword.Text = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
                 }
                 
                 _connectCommand.RaiseCanExecuteChanged();
@@ -1214,8 +1309,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow = null;
 
 
-            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = 100;
-            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = 100;
+            _settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue = 300;
+            _settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue = 300;
 
             _settings.GetPositionSetting(SettingsKeys.RadioWidth).DoubleValue = 122;
             _settings.GetPositionSetting(SettingsKeys.RadioHeight).DoubleValue = 270;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
@@ -112,6 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             RadioInformation.Modulation modulation,
             byte encryptionKey,
             uint sendingUnitId,
+            List<int> blockedRadios,
             out RadioReceivingState receivingState, 
             out bool decryptable)
         {
@@ -124,6 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
             RadioInformation bestMatchingRadio = null;
             RadioReceivingState bestMatchingRadioState = null;
+            bool bestMatchingDecryptable = false;
 
             for (var i = 0; i < radios.Length; i++)
             {
@@ -162,7 +165,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {
-                        if (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey)
+                        bool isDecryptable = (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey);
+
+                        if (isDecryptable && !blockedRadios.Contains(i))
                         {
                             receivingState = new RadioReceivingState
                             {
@@ -181,6 +186,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                             LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
+                        bestMatchingDecryptable = isDecryptable;
                     }
                     if ((receivingRadio.secFreq == frequency)
                         && (receivingRadio.secFreq > 10000))
@@ -208,8 +214,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 }
             }
 
+            decryptable = bestMatchingDecryptable;
             receivingState = bestMatchingRadioState;
-            decryptable = false;
             return bestMatchingRadio;
         }
     }

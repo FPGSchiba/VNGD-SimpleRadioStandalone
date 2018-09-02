@@ -1,4 +1,4 @@
--- Version 1.5.3.5
+-- Version 1.5.3.6
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -132,7 +132,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioMI8(_update)
                 elseif string.find(_update.unit, "L-39")  then
                     _update = SR.exportRadioL39(_update)
-				elseif _update.unit ==  "Yak-52" then
+                elseif _update.unit ==  "Yak-52" then
                     _update = SR.exportRadioYak52(_update)
                 elseif _update.unit == "A-10C" then
                     _update = SR.exportRadioA10C(_update)
@@ -154,7 +154,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
-                elseif _update.unit == "SpitfireLFMkIX" then
+                elseif string.find(_update.unit, "SpitfireLFMkIX") then
                     _update = SR.exportRadioSpitfireLFMkIX(_update) 
                 elseif _update.unit == "C-101EB" then
                     _update = SR.exportRadioC101(_update)
@@ -925,7 +925,7 @@ function SR.exportRadioYak52(_data)
         _data.selected= 1
         _data.ptt = true
     elseif (SR.getButtonPosition(194) > 0.5 or SR.getButtonPosition(197) > 0.5) then
-       	_data.selected = 0
+        _data.selected = 0
         _data.ptt = true
     else
         _data.selected= 1
@@ -1920,9 +1920,9 @@ function SR.getRadioModulation(_deviceId)
 
      if _device then
 
-   		pcall(function() 
-    		_modulation =  _device:get_modulation()
-    	end)
+        pcall(function() 
+            _modulation =  _device:get_modulation()
+        end)
 
     end
     return _modulation
@@ -1945,4 +1945,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.5")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.3.6")
