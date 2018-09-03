@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
-        private readonly OpusDecoder _decoder;
+
 
         private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
         private readonly string _guid;
@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public TCPVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
             int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager, AudioManager.VOIPConnectCallback voipConnectCallback)
         {
-            _decoder = decoder;
+           // _decoder = decoder;
             _audioManager = audioManager;
 
             _clientsList = clientsList;
@@ -432,17 +432,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                 if (radioReceivingPriorities.Count > 0)
                                 {
-                                    //DECODE audio
-                                    int len1;
-                                    var decoded = _decoder.Decode(udpVoicePacket.AudioPart1Bytes,
-                                        udpVoicePacket.AudioPart1Bytes.Length, out len1);
-
-                                    if (len1 > 0)
-                                    {
-                                        // for some reason if this is removed then it lags?!
-                                        //guess it makes a giant buffer and only uses a little?
-                                        var tmp = new byte[len1];
-                                        Buffer.BlockCopy(decoded, 0, tmp, 0, len1);
+                                  
 
                                         //ALL GOOD!
                                         //create marker for bytes
@@ -454,7 +444,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             var audio = new ClientAudio
                                             {
                                                 ClientGuid = udpVoicePacket.Guid,
-                                                PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp),
+                                               EncodedAudio = udpVoicePacket.AudioPart1Bytes,
                                                 //Convert to Shorts!
                                                 ReceiveTime = DateTime.Now.Ticks,
                                                 Frequency = destinationRadio.Frequency,
@@ -509,11 +499,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 _audioManager.AddClientAudio(audio);
                                             }
                                         }
-                                    }
-                                    else if (!_stop)
-                                    {
-                                        Logger.Info("Failed to decode audio from Packet");
-                                    }
+                                  
+
                                 }
                             }
                         }
