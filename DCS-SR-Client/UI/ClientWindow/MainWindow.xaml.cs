@@ -95,8 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var client = ClientStateSingleton.Instance;
 
             WindowStartupLocation = WindowStartupLocation.Manual;
-            Left = _settings.GetPositionSetting(SettingsKeys.ClientX).FloatValue;
-            Top = _settings.GetPositionSetting(SettingsKeys.ClientY).FloatValue;
+            Left = _settings.GetPositionSetting(SettingsKeys.ClientX).DoubleValue;
+            Top = _settings.GetPositionSetting(SettingsKeys.ClientY).DoubleValue;
 
            
 
@@ -172,25 +172,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             bool radioWindowVisible = false;
             bool awacsWindowVisible = false;
 
-            int mainWindowX = _settings.GetPositionSetting(SettingsKeys.ClientX).IntValue;
-            int mainWindowY = _settings.GetPositionSetting(SettingsKeys.ClientY).IntValue;
-            int radioWindowX = _settings.GetPositionSetting(SettingsKeys.RadioX).IntValue;
-            int radioWindowY = _settings.GetPositionSetting(SettingsKeys.RadioY).IntValue;
-            int awacsWindowX = _settings.GetPositionSetting(SettingsKeys.AwacsX).IntValue;
-            int awacsWindowY = _settings.GetPositionSetting(SettingsKeys.AwacsY).IntValue;
+            int mainWindowX = (int)_settings.GetPositionSetting(SettingsKeys.ClientX).DoubleValue;
+            int mainWindowY = (int)_settings.GetPositionSetting(SettingsKeys.ClientY).DoubleValue;
+            int radioWindowX = (int)_settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue;
+            int radioWindowY = (int)_settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue;
+            int awacsWindowX = (int)_settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue;
+            int awacsWindowY = (int)_settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue;
+
+            Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
+            Logger.Info($"Checking window visibility for radio overlay {{X={radioWindowX},Y={radioWindowY}}}");
+            Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
+                Logger.Info($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+
                 if (screen.Bounds.Contains(mainWindowX, mainWindowY))
                 {
+                    Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioWindowX, radioWindowY))
                 {
+                    Logger.Info($"Radio overlay {{X={radioWindowX},Y={radioWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
                 {
+                    Logger.Info($"AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     awacsWindowVisible = true;
                 }
             }
