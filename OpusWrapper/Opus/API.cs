@@ -40,6 +40,10 @@ namespace FragLabs.Audio.Codecs.Opus
 
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern int opus_encoder_ctl(IntPtr st, Ctl request, out int value);
+        
+        [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int opus_decoder_ctl(IntPtr st, int val);
+
     }
 
     public enum Ctl
