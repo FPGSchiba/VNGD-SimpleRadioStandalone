@@ -105,7 +105,7 @@ namespace FragLabs.Audio.Codecs
                 if (reset)
                 {
                     //https://notabug.org/xiph/opus/raw/v0.9.10/include/opus_defines.h
-                    var ret = API.opus_decoder_ctl(_decoder, 4028);
+                    var ret = API.opus_decoder_ctl(_decoder, 4028); //reset opus state - packets missing and it'll get confused
                     if (ret < 0)
                     {
                         throw new Exception("Error Resetting Oppus");
