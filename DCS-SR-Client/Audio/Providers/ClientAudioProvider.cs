@@ -50,16 +50,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public long LastUpdate { get; private set; }
 
+        //is it a new transmission?
+        public bool LikelyNewTransmission()
+        {
+            //400 ms since last update
+            long now = DateTime.Now.Ticks;
+            if ((now - LastUpdate) > 4000000) //400 ms since last update
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public void AddClientAudioSamples(ClientAudio audio)
         {
             //sort out volume
 //            var timer = new Stopwatch();
 //            timer.Start();
 
+            bool newTransmission = LikelyNewTransmission();
+
             int decodedLength = 0;
             
             var decoded = _decoder.Decode(audio.EncodedAudio,
-                audio.EncodedAudio.Length, out decodedLength);
+                audio.EncodedAudio.Length, out decodedLength, newTransmission);
 
             if (decodedLength > 0)
             {
@@ -98,8 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     }
                 }
 
-                long now = DateTime.Now.Ticks;
-                if ((now - LastUpdate) > 4000000) //400 ms since last update
+                if (newTransmission)
                 {
                     // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
                     //append ms of silence - this functions as our jitter buffer??
@@ -113,7 +127,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
                 _lastReceivedOn = audio.ReceivedRadio;
-                LastUpdate = now;
+                LastUpdate = DateTime.Now.Ticks; 
 
                 JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
                 {
