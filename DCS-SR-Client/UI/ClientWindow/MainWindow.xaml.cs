@@ -939,6 +939,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 // Autoconnect mismatch will quickly disconnect/reconnect, leading to double-callbacks
                 Stop(connectionError);
             }
+            else
+            {
+                if (!_clientStateSingleton.IsConnected)
+                {
+                    Stop(connectionError);
+                }
+            }
         }
 
         private void VOIPConnectCallback(bool result, bool connectionError, string connection)
