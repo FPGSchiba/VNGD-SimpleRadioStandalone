@@ -168,6 +168,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void CheckWindowVisibility()
         {
+            if (_settings.GetPositionSetting(SettingsKeys.DisableWindowVisibilityCheck).BoolValue)
+            {
+                Logger.Info("Window visibility check is disabled, skipping");
+                return;
+            }
+
             bool mainWindowVisible = false;
             bool radioWindowVisible = false;
             bool awacsWindowVisible = false;

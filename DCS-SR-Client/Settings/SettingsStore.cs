@@ -92,6 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AllowMultipleInstances = 80, // Allow for more than one SRS instance to be ran simultaneously. Config-file only!
 
         AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
+
+        DisableWindowVisibilityCheck = 82
     }
 
     public enum InputBinding
@@ -348,7 +350,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.CheckForBetaUpdates.ToString(), "false"},
 
-            {SettingsKeys.AllowMultipleInstances.ToString(), "false"}
+            {SettingsKeys.AllowMultipleInstances.ToString(), "false"},
+
+            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)
