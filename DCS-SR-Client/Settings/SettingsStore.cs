@@ -92,6 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AllowMultipleInstances = 80, // Allow for more than one SRS instance to be ran simultaneously. Config-file only!
 
         AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
+
+        DisableWindowVisibilityCheck = 82
     }
 
     public enum InputBinding
@@ -209,9 +211,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private SettingsStore()
         {
+            //check commandline
+            var args = Environment.GetCommandLineArgs();
+
+            string cfgFile = CFG_FILE_NAME;
+
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-cfg="))
+                {
+                    cfgFile = arg.Replace("-cfg=", "").Trim();
+                }
+            }
+            
             try
             {
-                _configuration = Configuration.LoadFromFile(CFG_FILE_NAME);
+                _configuration = Configuration.LoadFromFile(cfgFile);
 
                 foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
                 {
@@ -225,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             catch (FileNotFoundException ex)
             {
-                Logger.Info("Did not find client config file, initialising with default config");
+                Logger.Info($"Did not find client config file at path ${cfgFile}, initialising with default config");
 
                 _configuration = new Configuration();
                 _configuration.Add(new Section("Position Settings"));
@@ -348,7 +363,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.CheckForBetaUpdates.ToString(), "false"},
 
-            {SettingsKeys.AllowMultipleInstances.ToString(), "false"}
+            {SettingsKeys.AllowMultipleInstances.ToString(), "false"},
+
+            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)

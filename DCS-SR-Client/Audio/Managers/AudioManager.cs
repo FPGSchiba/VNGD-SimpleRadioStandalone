@@ -408,6 +408,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+        private int _errorCount = 0;
         //Stopwatch _stopwatch = new Stopwatch();
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
@@ -507,10 +508,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         Logger.Error($"Invalid Bytes for Encoding - {e.BytesRecorded} should be {SEGMENT_FRAMES} ");
                     }
+                    
+                    _errorCount = 0;
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Error encoding Opus! " + ex.Message);
+                    _errorCount++;
+                    if (_errorCount < 10)
+                    {
+                        Logger.Error(ex, "Error encoding Opus! " + ex.Message);
+                    }
+                    else if(_errorCount == 10)
+                    {
+                        Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
+                    }
+                 
                 }
 
                 pcmShort = null;

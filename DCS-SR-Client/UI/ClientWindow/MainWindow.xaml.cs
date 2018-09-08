@@ -95,8 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var client = ClientStateSingleton.Instance;
 
             WindowStartupLocation = WindowStartupLocation.Manual;
-            Left = _settings.GetPositionSetting(SettingsKeys.ClientX).FloatValue;
-            Top = _settings.GetPositionSetting(SettingsKeys.ClientY).FloatValue;
+            Left = _settings.GetPositionSetting(SettingsKeys.ClientX).DoubleValue;
+            Top = _settings.GetPositionSetting(SettingsKeys.ClientY).DoubleValue;
 
            
 
@@ -168,29 +168,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void CheckWindowVisibility()
         {
+            if (_settings.GetPositionSetting(SettingsKeys.DisableWindowVisibilityCheck).BoolValue)
+            {
+                Logger.Info("Window visibility check is disabled, skipping");
+                return;
+            }
+
             bool mainWindowVisible = false;
             bool radioWindowVisible = false;
             bool awacsWindowVisible = false;
 
-            int mainWindowX = _settings.GetPositionSetting(SettingsKeys.ClientX).IntValue;
-            int mainWindowY = _settings.GetPositionSetting(SettingsKeys.ClientY).IntValue;
-            int radioWindowX = _settings.GetPositionSetting(SettingsKeys.RadioX).IntValue;
-            int radioWindowY = _settings.GetPositionSetting(SettingsKeys.RadioY).IntValue;
-            int awacsWindowX = _settings.GetPositionSetting(SettingsKeys.AwacsX).IntValue;
-            int awacsWindowY = _settings.GetPositionSetting(SettingsKeys.AwacsY).IntValue;
+            int mainWindowX = (int)_settings.GetPositionSetting(SettingsKeys.ClientX).DoubleValue;
+            int mainWindowY = (int)_settings.GetPositionSetting(SettingsKeys.ClientY).DoubleValue;
+            int radioWindowX = (int)_settings.GetPositionSetting(SettingsKeys.RadioX).DoubleValue;
+            int radioWindowY = (int)_settings.GetPositionSetting(SettingsKeys.RadioY).DoubleValue;
+            int awacsWindowX = (int)_settings.GetPositionSetting(SettingsKeys.AwacsX).DoubleValue;
+            int awacsWindowY = (int)_settings.GetPositionSetting(SettingsKeys.AwacsY).DoubleValue;
+
+            Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
+            Logger.Info($"Checking window visibility for radio overlay {{X={radioWindowX},Y={radioWindowY}}}");
+            Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
+                Logger.Info($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+
                 if (screen.Bounds.Contains(mainWindowX, mainWindowY))
                 {
+                    Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioWindowX, radioWindowY))
                 {
+                    Logger.Info($"Radio overlay {{X={radioWindowX},Y={radioWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
                 {
+                    Logger.Info($"AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     awacsWindowVisible = true;
                 }
             }
@@ -721,11 +736,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 try
                 {
                     //process hostname
-                    var ipAddr = Dns.GetHostAddresses(GetAddressFromTextBox());
+                    var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
+                    var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
 
-                    if (ipAddr.Length > 0)
+                    if (ip != null)
                     {
-                        _resolvedIp = ipAddr[0];
+                        _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
                         _client = new ClientSync(_clients, _guid, UpdateUICallback);
@@ -929,6 +945,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 // Only stop connection/reset state if connection is currently active
                 // Autoconnect mismatch will quickly disconnect/reconnect, leading to double-callbacks
                 Stop(connectionError);
+            }
+            else
+            {
+                if (!_clientStateSingleton.IsConnected)
+                {
+                    Stop(connectionError);
+                }
             }
         }
 
