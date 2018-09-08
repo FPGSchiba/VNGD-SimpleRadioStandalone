@@ -736,11 +736,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 try
                 {
                     //process hostname
-                    var ipAddr = Dns.GetHostAddresses(GetAddressFromTextBox());
+                    var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
+                    var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
 
-                    if (ipAddr.Length > 0)
+                    if (ip != null)
                     {
-                        _resolvedIp = ipAddr[0];
+                        _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
                         _client = new ClientSync(_clients, _guid, UpdateUICallback);
@@ -944,6 +945,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 // Only stop connection/reset state if connection is currently active
                 // Autoconnect mismatch will quickly disconnect/reconnect, leading to double-callbacks
                 Stop(connectionError);
+            }
+            else
+            {
+                if (!_clientStateSingleton.IsConnected)
+                {
+                    Stop(connectionError);
+                }
             }
         }
 
