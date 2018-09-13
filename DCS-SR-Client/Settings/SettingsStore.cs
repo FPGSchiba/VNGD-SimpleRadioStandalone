@@ -201,20 +201,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
     public class SettingsStore
     {
-        public static readonly string CFG_FILE_NAME = "client.cfg";
-        public static readonly string CFG_BACKUP_FILE_NAME = "client.cfg.bak";
-
+        private static readonly string CFG_FILE_NAME = "client.cfg";
+    
         private static readonly object _lock = new object();
 
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Configuration _configuration;
 
+        private string cfgFile = CFG_FILE_NAME;
+        
         private SettingsStore()
         {
             //check commandline
             var args = Environment.GetCommandLineArgs();
-
-            string cfgFile = CFG_FILE_NAME;
 
             foreach (var arg in args)
             {
@@ -261,7 +260,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    File.Copy(CFG_FILE_NAME, CFG_BACKUP_FILE_NAME, true);
+                    File.Copy(cfgFile, cfgFile+".bak", true);
                 }
                 catch (Exception e)
                 {
@@ -519,7 +518,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 try
                 {
-                    _configuration.SaveToFile(CFG_FILE_NAME);
+                    _configuration.SaveToFile(cfgFile);
                 }
                 catch (Exception ex)
                 {
