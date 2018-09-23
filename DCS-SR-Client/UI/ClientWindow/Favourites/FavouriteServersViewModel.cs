@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -18,6 +19,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
         public FavouriteServersViewModel(IFavouriteServerStore favouriteServerStore)
         {
             _favouriteServerStore = favouriteServerStore;
+
+            _addresses.CollectionChanged += OnServerAddressesCollectionChanged;
 
             foreach (var favourite in _favouriteServerStore.LoadFromStore())
             {
@@ -124,6 +127,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
             }
 
             Save();
+        }
+
+        private void OnServerAddressesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (ServerAddress address in e.NewItems)
+                {
+                    address.PropertyChanged += OnServerAddressPropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (ServerAddress address in e.OldItems)
+                {
+                    address.PropertyChanged -= OnServerAddressPropertyChanged;
+                }
+            }
+        }
+
+        private void OnServerAddressPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Saving after changing default favourite is done by OnDefaultChanged
+            if (e.PropertyName != "IsDefault")
+            {
+                Save();
+            }
         }
     }
 }
