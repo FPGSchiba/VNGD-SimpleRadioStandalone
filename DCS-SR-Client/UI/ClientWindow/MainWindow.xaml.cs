@@ -457,7 +457,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (value != null)
                 {
                     ServerIp.Text = value.Address;
-                    ExternalAWACSModePassword.Text = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
+                    ExternalAWACSModePassword.Password = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
                 }
                 
                 _connectCommand.RaiseCanExecuteChanged();
@@ -1503,7 +1503,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 !_clientStateSingleton.IsConnected ||
                 !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
                 (!_clientStateSingleton.InExternalAWACSMode &&
-                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Text)))
+                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Password)))
             {
                 return;
             }
@@ -1517,7 +1517,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Text.Trim(), ExternalAWACSModeConnectionChanged);
+                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
             }
         }
 
