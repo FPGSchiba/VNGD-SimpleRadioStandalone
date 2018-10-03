@@ -298,6 +298,8 @@ namespace Installer
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
 
+            File.Copy(currentDirectory + "\\beep-connected.wav", path + "\\AudioEffects\\beep-connected.wav", true);
+            File.Copy(currentDirectory + "\\beep-disconnected.wav", path + "\\AudioEffects\\beep-disconnected.wav", true);
             File.Copy(currentDirectory + "\\KY-58-TX-1600.wav", path + "\\AudioEffects\\KY-58-TX-1600.wav", true);
             File.Copy(currentDirectory + "\\KY-58-RX-1600.wav", path + "\\AudioEffects\\KY-58-RX-1600.wav", true);
             File.Copy(currentDirectory + "\\Radio-TX-1600.wav", path + "\\AudioEffects\\Radio-TX-1600.wav", true);

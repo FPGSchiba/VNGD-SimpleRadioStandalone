@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
@@ -86,6 +85,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             // Initialize images/icons
             Images.Init();
+
+            // Initialise sounds
+            Sounds.Init();
 
             // Set up tooltips that are always defined
             InitToolTips();
@@ -721,6 +723,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             AllowDCSPTT.IsChecked = _settings.GetClientSetting(SettingsKeys.AllowDCSPTT).BoolValue;
 
             CheckForBetaUpdates.IsChecked = _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue;
+            PlayConnectionSounds.IsChecked = _settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue;
         }
 
         private void Connect()
@@ -813,6 +816,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Stop(bool connectionError = false)
         {
+            if (_clientStateSingleton.IsConnected && _settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue)
+            {
+                try
+                {
+                    Sounds.BeepDisconnected.Play();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex, "Failed to play disconnect sound");
+                }
+            }
+
             StartStop.Content = "Connect";
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
@@ -916,6 +931,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _clientStateSingleton.IsConnected = true;
                         ServerConnectionStatus.Source = Images.IconConnected;
                         VOIPConnectionStatus.Source = Images.IconDisconnected;
+
+                        if (_settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue)
+                        {
+                            try
+                            {
+                                Sounds.BeepConnected.Play();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Warn(ex, "Failed to play connect sound");
+                            }
+                        }
 
                         _settings.SetClientSetting(SettingsKeys.LastServer, ServerIp.Text);
 
@@ -1285,8 +1312,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 if (connectToServer)
                 {
-                    SystemSounds.Hand.Play();
-
                     ServerIp.Text = connection;
                     Connect();
                 }
@@ -1317,8 +1342,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (switchServer)
             {
-                SystemSounds.Hand.Play();
-
                 Stop();
                 ServerIp.Text = advertisedConnection;
                 Connect();
@@ -1494,6 +1517,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue =
                 (bool)CheckForBetaUpdates.IsChecked;
+            _settings.Save();
+        }
+
+        private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue =
+                (bool)PlayConnectionSounds.IsChecked;
             _settings.Save();
         }
 
