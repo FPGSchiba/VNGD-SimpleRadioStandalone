@@ -5,22 +5,66 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
     public class ServerAddress : INotifyPropertyChanged
     {
-        private bool _isDefault;
-
         public ServerAddress(string name, string address, string eamCoalitionPassword, bool isDefault)
         {
-            Name = name;
-            Address = address;
-            EAMCoalitionPassword = eamCoalitionPassword;
-            IsDefault = isDefault;
+            // Set private values directly so we don't trigger useless re-saving of favourites list when being loaded for the first time
+            _name = name;
+            _address = address;
+            _eamCoalitionPassword = eamCoalitionPassword;
+            IsDefault = isDefault; // Explicitly use property setter here since IsDefault change includes additional logic
         }
 
-        public string Name { get; set; }
+        private string _name;
+        public string Name {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public string Address { get; set; }
+        private string _address;
+        public string Address
+        {
+            get
+            {
+                return _address;
+            }
+            set
+            {
+                if (_address != value)
+                {
+                    _address = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public string EAMCoalitionPassword { get; set; }
+        private string _eamCoalitionPassword;
+        public string EAMCoalitionPassword
+        {
+            get
+            {
+                return _eamCoalitionPassword;
+            }
+            set
+            {
+                if (_eamCoalitionPassword != value)
+                {
+                    _eamCoalitionPassword = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        private bool _isDefault;
         public bool IsDefault
         {
             get { return _isDefault; }

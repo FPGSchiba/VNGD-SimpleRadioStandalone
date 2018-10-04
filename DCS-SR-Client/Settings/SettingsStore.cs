@@ -93,7 +93,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
 
-        DisableWindowVisibilityCheck = 82
+        DisableWindowVisibilityCheck = 82,
+        PlayConnectionSounds = 83
     }
 
     public enum InputBinding
@@ -201,20 +202,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
     public class SettingsStore
     {
-        public static readonly string CFG_FILE_NAME = "client.cfg";
-        public static readonly string CFG_BACKUP_FILE_NAME = "client.cfg.bak";
-
+        private static readonly string CFG_FILE_NAME = "client.cfg";
+    
         private static readonly object _lock = new object();
 
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Configuration _configuration;
 
+        private string cfgFile = CFG_FILE_NAME;
+        
         private SettingsStore()
         {
             //check commandline
             var args = Environment.GetCommandLineArgs();
-
-            string cfgFile = CFG_FILE_NAME;
 
             foreach (var arg in args)
             {
@@ -261,7 +261,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    File.Copy(CFG_FILE_NAME, CFG_BACKUP_FILE_NAME, true);
+                    File.Copy(cfgFile, cfgFile+".bak", true);
                 }
                 catch (Exception e)
                 {
@@ -365,7 +365,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.AllowMultipleInstances.ToString(), "false"},
 
-            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"}
+            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"},
+            {SettingsKeys.PlayConnectionSounds.ToString(), "true"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)
@@ -519,7 +520,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 try
                 {
-                    _configuration.SaveToFile(CFG_FILE_NAME);
+                    _configuration.SaveToFile(cfgFile);
                 }
                 catch (Exception ex)
                 {

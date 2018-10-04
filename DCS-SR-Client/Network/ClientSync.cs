@@ -152,7 +152,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "error connecting to server");
+                    Logger.Error(ex, "Could not connect to server");
+                    connectionError = true;
                 }
             }
 
@@ -205,6 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
+                 Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
             }
         }
 

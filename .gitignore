@@ -261,3 +261,4 @@ install-build/serverlog.txt
 *.DotSettings
 
 install-build/
+sign.bat

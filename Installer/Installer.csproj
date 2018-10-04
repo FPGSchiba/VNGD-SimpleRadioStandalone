@@ -231,6 +231,8 @@ copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\SR-ClientRadio.exe" "$(Sol
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\opus.dll" "$(SolutionDir)\install-build\opus.dll"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\speexdsp.dll" "$(SolutionDir)\install-build\speexdsp.dll"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\awacs-radios.json" "$(SolutionDir)\install-build\awacs-radios.json"
+copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\beep-connected.wav" "$(SolutionDir)\install-build\beep-connected.wav"
+copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\beep-disconnected.wav" "$(SolutionDir)\install-build\beep-disconnected.wav"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\KY-58-TX-1600.wav" "$(SolutionDir)\install-build\KY-58-TX-1600.wav"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\KY-58-RX-1600.wav" "$(SolutionDir)\install-build\KY-58-RX-1600.wav"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\Radio-RX-1600.wav" "$(SolutionDir)\install-build\Radio-TX-1600.wav"
