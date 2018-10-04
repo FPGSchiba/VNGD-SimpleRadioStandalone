@@ -25,6 +25,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 
         public string ClientName => Client.Name;
 
+        public string TransmittingFrequency => Client.TransmittingFrequency;
+
         public SolidColorBrush ClientCoalitionColour
         {
             get
@@ -48,6 +50,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
             if (propertyChangedEventArgs.PropertyName == "Coalition")
             {
                 NotifyOfPropertyChange(() => ClientCoalitionColour);
+            }
+            else if (propertyChangedEventArgs.PropertyName == "TransmittingFrequency")
+            {
+                NotifyOfPropertyChange(() => TransmittingFrequency);
             }
         }
 
