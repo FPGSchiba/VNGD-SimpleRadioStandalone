@@ -93,7 +93,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
 
-        DisableWindowVisibilityCheck = 82
+        DisableWindowVisibilityCheck = 82,
+        PlayConnectionSounds = 83
     }
 
     public enum InputBinding
@@ -364,7 +365,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.AllowMultipleInstances.ToString(), "false"},
 
-            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"}
+            {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"},
+            {SettingsKeys.PlayConnectionSounds.ToString(), "true"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)

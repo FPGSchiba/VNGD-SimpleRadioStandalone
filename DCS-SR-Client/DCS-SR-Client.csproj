@@ -205,7 +205,6 @@
     <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
     <Compile Include="Settings\RadioChannels\FilePresetChannelsStore.cs" />
     <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
-    <Compile Include="Settings\SettingType.cs" />
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
@@ -256,6 +255,7 @@
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Network\TCPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
+    <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
@@ -406,9 +406,18 @@
     <None Include="AudioEffects\Radio-TX-1600.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="AudioEffects\beep-disconnected.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\beep-connected.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
