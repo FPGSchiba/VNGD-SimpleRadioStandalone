@@ -87,6 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if ((srClient.Coalition == 0) && spectatorAudioDisabled)
                     {
+                        byteBuffer.Release();
                         return;
                     }
                     else
@@ -141,7 +142,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             group.WriteAndFlushAsync(message, new AllMatchingChannels(matchingClients));
                         }
+                        else
+                        {
+                            byteBuffer.Release();
+                        }
                     }
+                }
+                else
+                {
+
+                    byteBuffer.Release();
                 }
             }
         }

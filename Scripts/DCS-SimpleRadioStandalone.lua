@@ -1,4 +1,4 @@
--- Version 1.5.5.0
+-- Version 1.5.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -168,6 +168,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioAJS37(_update)
                 elseif _update.unit == "A-10A" then
                     _update = SR.exportRadioA10A(_update)
+                elseif _update.unit == "A-4E-C" then
+                    _update = SR.exportRadioA4E(_update)
                 elseif _update.unit == "F-15C" then
                     _update = SR.exportRadioF15C(_update)
                 elseif _update.unit == "MiG-29A" or  _update.unit == "MiG-29S" or  _update.unit == "MiG-29G" then
@@ -562,6 +564,47 @@ function SR.exportRadioSU27(_data)
     _data.radios[4].freqMode = 1
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0;
+    _data.selected = 1
+
+    return _data
+end
+
+function SR.exportRadioA4E(_data)
+
+    _data.radios[2].name = "AN/ARC-27A"
+    _data.radios[2].freq = 251.0*1000000 --225 to 399.975MHZ
+    _data.radios[2].modulation = 0
+    _data.radios[2].secFreq = 243.0*1000000
+    _data.radios[2].volume = 1.0
+    _data.radios[2].freqMin = 225*1000000
+    _data.radios[2].freqMax = 399.975*1000000
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].expansion = true
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-186(V)FM"
+    _data.radios[4].freq = 30.0*1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
+    _data.radios[4].modulation = 1
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 30*1000000
+    _data.radios[4].freqMax = 76*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
 
     _data.control = 0;
     _data.selected = 1
@@ -1945,4 +1988,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.5.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.6.0")
