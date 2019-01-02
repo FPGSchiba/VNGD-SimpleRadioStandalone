@@ -15,10 +15,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             TOGGLE_GUARD = 2,
             CHANNEL_UP = 3,
             CHANNEL_DOWN = 4,
+            SET_VOLUME = 5,
         }
 
         public int RadioId { get; set; }
         public double Frequency { get; set; }
         public UDPCommandType Command { get; set; }
+        public float Volume { get; set; }
     }
 }

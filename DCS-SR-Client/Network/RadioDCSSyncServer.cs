@@ -198,6 +198,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 RadioHelper.RadioChannelDown(message.RadioId);
                             }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.SET_VOLUME)
+                            {
+                                RadioHelper.SetRadioVolume(message.Volume,message.RadioId);
+                            }
                             else
                             {
                                 Logger.Error("Unknown UDP Command!");
