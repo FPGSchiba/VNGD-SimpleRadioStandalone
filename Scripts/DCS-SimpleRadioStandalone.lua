@@ -1,4 +1,4 @@
--- Version 1.5.6.0
+-- Version 1.5.7.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -157,7 +157,9 @@ LuaExportActivityNextEvent = function(tCurrent)
                 elseif string.find(_update.unit, "SpitfireLFMkIX") then
                     _update = SR.exportRadioSpitfireLFMkIX(_update) 
                 elseif _update.unit == "C-101EB" then
-                    _update = SR.exportRadioC101(_update)
+                    _update = SR.exportRadioC101EB(_update)
+                elseif _update.unit == "C-101CC" then
+                    _update = SR.exportRadioC101CC(_update)
                 elseif _update.unit == "Hawk" then
                     _update = SR.exportRadioHawk(_update)
                 elseif _update.unit == "M-2000C" then
@@ -1559,7 +1561,7 @@ function SR.exportRadioSpitfireLFMkIX (_data)
     return _data;
 end
 
-function SR.exportRadioC101(_data)
+function SR.exportRadioC101EB(_data)
 
     _data.radios[1].name = "INTERCOM"
     _data.radios[1].freq =  100
@@ -1569,32 +1571,26 @@ function SR.exportRadioC101(_data)
     _data.radios[2].name = "AN/ARC-164 UHF"
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 234,{0.0,1.0},false)
-   
+
     local _selector = SR.getSelectorPosition(232,0.25)
 
     if _selector ~= 0 then
-        _data.radios[2].freq = SR.getRadioFrequency(9)
+        _data.radios[2].freq = SR.getRadioFrequency(10)
     else
         _data.radios[2].freq = 1
     end
 
     -- UHF Guard
     if _selector == 2 then
-        _data.radios[2].secFreq = 243.0*1000000 
+        _data.radios[2].secFreq = 243.0*1000000
     end
 
     _data.radios[3].name = "AN/ARC-134"
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 412,{0.0,1.0},false)
 
-    local _vhfPower = SR.getSelectorPosition(413,1.0)
+    _data.radios[3].freq = SR.getRadioFrequency(9)
 
-    if _vhfPower == 1 then
-        _data.radios[3].freq = SR.getRadioFrequency(8)
-    else
-        _data.radios[3].freq = 1
-    end
-  
     local _selector = SR.getSelectorPosition(404,0.5)
 
     if  _selector == 1 then
@@ -1608,6 +1604,68 @@ function SR.exportRadioC101(_data)
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
     _data.control = 1; -- full radio
+
+    return _data;
+end
+
+function SR.exportRadioC101CC(_data)
+
+     -- TODO - figure out channels.... it saves state??
+    -- figure out volume
+    _data.radios[1].name = "INTERCOM"
+    _data.radios[1].freq =  100
+    _data.radios[1].modulation = 2
+    _data.radios[1].volume = SR.getRadioVolume(0, 403,{0.0,1.0},false)
+
+    _data.radios[2].name = "V/TVU-740"
+    _data.radios[2].freq = SR.getRadioFrequency(10)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = 1.0--SR.getRadioVolume(0, 234,{0.0,1.0},false)
+    _data.radios[2].volMode = 1
+
+    local _channel  = SR.getButtonPosition(231)
+
+   -- SR.log("Channel SELECTOR: ".. SR.getButtonPosition(231).."\n")
+
+    local uhfModeKnob = SR.getSelectorPosition(232,0.1)
+    if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
+        -- Function dial set to BOTH
+        -- Listen to Guard as well as designated frequency
+        _data.radios[2].secFreq = 243.0*1000000
+    else
+        -- Function dial set to OFF, MAIN, or ADF
+        -- Not listening to Guard secondarily
+        _data.radios[2].secFreq = 0
+    end
+
+    _data.radios[3].name = "VHF-20B"
+    _data.radios[3].modulation = 0
+    _data.radios[3].volume = 1.0 --SR.getRadioVolume(0, 412,{0.0,1.0},false)
+    _data.radios[3].volMode = 1
+
+    --local _vhfPower = SR.getSelectorPosition(413,1.0)
+    --
+    --if _vhfPower == 1 then
+        _data.radios[3].freq = SR.getRadioFrequency(9)
+    --else
+    --    _data.radios[3].freq = 1
+    --end
+    --
+    local _selector = SR.getSelectorPosition(404,0.05)
+
+    if  _selector == 0 then
+        _data.selected = 0
+    elseif  _selector == 2 then
+        _data.selected = 2
+    elseif  _selector == 12 then
+        _data.selected = 1
+    else
+        _data.selected = -1
+    end
+
+    --TODO figure our which cockpit you're in? So we can have controls working in the rear?
+
+    _data.control = 1;
 
     return _data;
 end
@@ -1988,4 +2046,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.6.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.7.0")
