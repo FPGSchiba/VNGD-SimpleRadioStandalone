@@ -354,5 +354,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 }
             }
         }
+
+        public static void SetRadioVolume(float volume, int radioId)
+        {
+            if (volume > 1.0)
+            {
+                volume = 1.0f;
+            }else if (volume < 0)
+            {
+                volume = 0;
+            }
+
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null 
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED 
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+                currentRadio.volume = volume;
+            }
+        }
     }
 }
