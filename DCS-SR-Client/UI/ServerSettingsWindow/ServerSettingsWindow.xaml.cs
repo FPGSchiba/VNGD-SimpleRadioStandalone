@@ -58,6 +58,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ExternalAWACSMode.Content = settings.GetSettingAsBool(ServerSettingsKeys.EXTERNAL_AWACS_MODE) ? "ON" : "OFF";
 
+                AllowRadioEncryption.Content = settings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION) ? "ON" : "OFF";
+
                 ServerVersion.Content = ClientSync.ServerVersion;
             }
             catch (IndexOutOfRangeException ex)
