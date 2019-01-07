@@ -268,8 +268,11 @@
 
         <TabItem Header="Controls">
             <GroupBox x:Name="ControlsGroupBox" Header="Controls">
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                    <Grid>
+               
+             <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                 <StackPanel>
+                     <Button Width="150px" Content="Rescan Input Devices" Click="RescanInputDevices" />
+                        <Grid>
 
 
                         <Grid.ColumnDefinitions>
@@ -528,8 +531,11 @@
 
 
                     </Grid>
+                 </StackPanel>
                 </ScrollViewer>
+             
             </GroupBox>
+            
         </TabItem>
 
         <TabItem x:Name="FavouritesSeversTab" Header="Favourites">
