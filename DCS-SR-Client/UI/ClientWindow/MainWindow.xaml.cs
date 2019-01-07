@@ -1578,5 +1578,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
             }
         }
+
+        private void RescanInputDevices(object sender, RoutedEventArgs e)
+        {
+            InputManager.InitDevices();
+            MessageBox.Show(this,
+                "Input Devices Rescanned",
+                "New input devices can now be used.",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
     }
 }
