@@ -340,6 +340,7 @@ namespace Installer
 
             shortcut.Description = "DCS-SimpleRadio Standalone Client";
             shortcut.TargetPath = executablePath;
+            shortcut.WorkingDirectory = path;
             shortcut.Save();
         }
 
