@@ -150,7 +150,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioMIG21(_update)
                 elseif _update.unit == "F-5E-3" then
                        _update = SR.exportRadioF5E(_update)
-                elseif _update.unit == "P-51D" or  _update.unit == "TF-51D" then
+                elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
                     _update = SR.exportRadioP51(_update)
                 elseif _update.unit == "FW-190D9" then
                     _update = SR.exportRadioFW190(_update)
