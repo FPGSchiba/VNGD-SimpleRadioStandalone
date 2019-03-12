@@ -1,4 +1,4 @@
--- Version 1.5.8.0
+-- Version 1.5.9.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -146,6 +146,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioF86Sabre(_update)
                 elseif _update.unit == "MiG-15bis" then
                     _update = SR.exportRadioMIG15(_update)
+				elseif _update.unit == "MiG-19P" then
+                    _update = SR.exportRadioMIG19(_update)
                 elseif _update.unit == "MiG-21Bis" then
                     _update = SR.exportRadioMIG21(_update)
                 elseif _update.unit == "F-5E-3" then
@@ -732,7 +734,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 68,{1.0,0.0},true)
 
     _data.radios[3].name = "UHF TRA 6031"
-    _data.radios[3].freq = SR.getRadioFrequency(31)
+    _data.radios[3].freq = SR.getRadioFrequency(31,500)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
     
@@ -1093,7 +1095,7 @@ function SR.exportRadioA10C(_data)
     _data.radios[2].name = "AN/ARC-186(V) AM"
     _data.radios[2].freq =  SR.getRadioFrequency(55)
     _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 133,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 227,{0.0,1.0},false)*SR.getButtonPosition(228)
+    _data.radios[2].volume = SR.getRadioVolume(0, 133,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 225,{0.0,1.0},false)*SR.getButtonPosition(226)
 
     
     -- UHF
@@ -1101,7 +1103,7 @@ function SR.exportRadioA10C(_data)
     _data.radios[3].name = "AN/ARC-164 UHF"
     _data.radios[3].freq = SR.getRadioFrequency(54)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 225,{0.0,1.0},false)*SR.getButtonPosition(226)
+    _data.radios[3].volume = SR.getRadioVolume(0, 171,{0.0,1.0},false)*SR.getRadioVolume(0, 238,{0.0,1.0},false)*SR.getRadioVolume(0, 227,{0.0,1.0},false)*SR.getButtonPosition(228)
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
     -- Check UHF frequency mode (0 = MNL, 1 = PRESET, 2 = GRD)
@@ -1315,6 +1317,48 @@ function SR.exportRadioMIG15(_data)
     else
         _data.ptt = false
     end
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8*1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5*1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116*1000000
+    _data.radios[3].freqMax = 151.975*1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0*1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0*1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225*1000000
+    _data.radios[4].freqMax = 399.975*1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0; -- Hotas Controls radio
+
+    return _data;
+end
+
+function SR.exportRadioMIG19(_data)
+
+    _data.radios[2].name = "RSIU-4V"
+    _data.radios[2].freq =  SR.getRadioFrequency(17)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume =  SR.getRadioVolume(0, 329,{0.0,1.0},false)
+
+    _data.selected = 1
+
+
 
     -- Expansion Radio - Server Side Controlled
     _data.radios[3].name = "AN/ARC-186(V)"
@@ -1968,15 +2012,11 @@ end
 
 function SR.exportRadioAJS37(_data)
 
-    _data.radios[2].name = "FR 24"
-    _data.radios[2].freq =  SR.getRadioFrequency(30)
-    _data.radios[2].modulation = SR.getRadioModulation(30)
-    _data.radios[2].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
-    _data.radios[2].volMode = 1
 
-    _data.radios[3].name = "FR 22"
-    _data.radios[3].freq =  SR.getRadioFrequency(31)
-    _data.radios[3].modulation = SR.getRadioModulation(31)
+
+    _data.radios[2].name = "FR 22"
+    _data.radios[2].freq =  SR.getRadioFrequency(31)
+    _data.radios[2].modulation = SR.getRadioModulation(31)
 
  --   local _modulation =SR.getButtonPosition(3008)
 
@@ -1986,7 +2026,13 @@ function SR.exportRadioAJS37(_data)
  --       _data.radios[3].modulation = 0
  --   end
 
-    _data.radios[3].volume = 1.0
+    _data.radios[2].volume = 1.0
+    _data.radios[2].volMode = 1
+
+	_data.radios[3].name = "FR 24"
+    _data.radios[3].freq =  SR.getRadioFrequency(30)
+    _data.radios[3].modulation = SR.getRadioModulation(30)
+    _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[3].volMode = 1
 
     -- Expansion Radio - Server Side Controlled
@@ -2110,4 +2156,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.5.8.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.5.9.0")
