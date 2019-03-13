@@ -1264,6 +1264,15 @@
                     <FlowDocument Name="AboutFlowDocument">
 
                         <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">DCS In-game SRS Overlay</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            SRS has an optional DCS in-game overlay - to toggle use
+                            <Run FontSize="16" FontWeight="Bold">Left Ctrl + Left Shift + ESC.</Run>
+                            This will toggle through various states including hidden. The position and visibily state are automatically saved
+                        </Paragraph>
+
+                        <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Speaker and Microphone Boost</Run>
                         </Paragraph>
 
@@ -1273,7 +1282,7 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                           Speaker boost can be set high to counteract the volume reduction caused by clipping and the radio effects
+                           Speaker boost can be set higher to counteract the volume reduction caused by clipping and the radio effects. If speaker boost is too high - you may have issues where other windows sounds are too loud. Reduce the boost to fix this.
                         </Paragraph>
 
                         <Paragraph>
@@ -1281,30 +1290,9 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                            If you have any issues with the radio, first make sure to check the help guide on the forums
-                            <Hyperlink NavigateUri="https://forums.eagle.ru/showpost.php?p=2963204&amp;postcount=1122">here</Hyperlink>
-                            .
-                            Make sure to follow every step to the letter, not skipping any.
-                            Feel free to post and ask for help if that doesn't solve it.
-                            <LineBreak />
-                            <LineBreak />
-                            Check all the options in Settings as you may find a setting there to fix your particular bug,
-                            e.g. if the taskbar doesnt disappear, there is an option that will help.
-                        </Paragraph>
-                        <Paragraph FontSize="14">
-                            You can also get help on the dedicated Discord channel
+                            If you have any issues with the SRS please get help on the dedicated Discord channel
                             <Hyperlink NavigateUri="https://discord.gg/baw7g3t">here</Hyperlink>
-                        </Paragraph>
-
-                        <Paragraph>
-                            <Run FontSize="16" FontWeight="Bold">Known Bug</Run>
-                        </Paragraph>
-                        <Paragraph FontSize="14">
-                            There is a known bug where pressing Alt + L will cause lag if using the in game overlay.
-                            <LineBreak />
-                            <LineBreak />
-                            Just hit<Run FontWeight="Bold">Left Shift + Left Alt + L</Run>
-                            to fix. This is a DCS bug that I currently cannot work around.
+                            and make sure to follow the information in #common-issues first before asking for help in #support
                         </Paragraph>
 
                         <Paragraph>
@@ -1314,7 +1302,7 @@
                             If your input device isn't detected - try enabling "Allow more input devices" and restart the client.
                             <LineBreak />
                             <LineBreak />
-                            If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the forum or on
+                            If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the dedicated SRS
                             <Hyperlink NavigateUri="https://discord.gg/baw7g3t">Discord Channel</Hyperlink> in order for me to help you add the device to the whitelist.
                         </Paragraph>
 
