@@ -109,7 +109,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue)
                     {
                         var json = JsonConvert.SerializeObject(_connectedClients.Values) + "\n";
-                        File.WriteAllText(exportFilePath, json);
+                        try
+                        {
+                            File.WriteAllText(exportFilePath, json);
+                        }
+                        catch (IOException e)
+                        {
+                            Logger.Error(e);
+                        }
                     }
                     Thread.Sleep(5000);
                 }
