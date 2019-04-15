@@ -1,4 +1,4 @@
--- Version 1.5.9.0
+-- Version 1.6.0.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
@@ -127,4 +127,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob -1.5.9.0")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob -1.6.0.0")

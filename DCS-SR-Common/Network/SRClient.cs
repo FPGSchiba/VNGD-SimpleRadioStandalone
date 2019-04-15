@@ -1,10 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     public class SRClient : INotifyPropertyChanged
     {

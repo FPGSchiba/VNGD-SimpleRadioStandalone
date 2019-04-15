@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     public class NetworkMessage
     {

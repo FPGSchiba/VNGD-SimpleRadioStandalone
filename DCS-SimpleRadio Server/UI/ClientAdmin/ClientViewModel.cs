@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
 using NLog;
 using LogManager = NLog.LogManager;

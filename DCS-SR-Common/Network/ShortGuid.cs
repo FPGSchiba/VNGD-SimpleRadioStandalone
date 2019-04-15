@@ -4,7 +4,7 @@
 //http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID
 //Saves a few bytes :)
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     /// <summary>
     ///     Represents a globally unique identifier (GUID) with a
