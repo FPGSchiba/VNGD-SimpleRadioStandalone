@@ -9,8 +9,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Microsoft.Win32;
 using IWshRuntimeLibrary;
+using Microsoft.Win32;
 using MessageBox = System.Windows.MessageBox;
 using File = System.IO.File;
 

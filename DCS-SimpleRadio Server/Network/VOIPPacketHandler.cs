@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using DotNetty.Transport.Channels.Groups;
 using NLog;
 using Xceed.Wpf.Toolkit.Converters;
