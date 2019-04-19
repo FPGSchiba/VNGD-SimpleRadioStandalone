@@ -20,11 +20,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
         private readonly Configuration _configuration;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private string cfgFile = CFG_FILE_NAME;
+
         public ServerSettingsStore()
         {
+            //check commandline
+            var args = Environment.GetCommandLineArgs();
+
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-cfg="))
+                {
+                    cfgFile = arg.Replace("-cfg=", "").Trim();
+                }
+            }
+
             try
             {
-                _configuration = Configuration.LoadFromFile(CFG_FILE_NAME);
+                _configuration = Configuration.LoadFromFile(cfgFile);
             }
             catch (FileNotFoundException ex)
             {
@@ -49,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
 
                 try
                 {
-                    File.Copy(CFG_FILE_NAME, CFG_BACKUP_FILE_NAME, true);
+                    File.Copy(cfgFile, CFG_BACKUP_FILE_NAME, true);
                 }
                 catch (Exception e)
                 {
@@ -169,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             {
                 try
                 {
-                    _configuration.SaveToFile(CFG_FILE_NAME);
+                    _configuration.SaveToFile(cfgFile);
                 } catch (Exception ex)
                 {
                     _logger.Error("Unable to save settings!");
