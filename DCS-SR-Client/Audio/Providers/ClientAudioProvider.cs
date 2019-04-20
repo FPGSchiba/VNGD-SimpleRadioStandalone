@@ -24,6 +24,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private int _lastReceivedOn = -1;
         private OnlineFilter[] _filters;
 
+        private readonly BiQuadFilter _highPassFilter;
+        private readonly BiQuadFilter _lowPassFilter;
+
         private OpusDecoder _decoder;
         
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -43,6 +46,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             
             _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
+
+            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
+            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
+
+
         }
 
         public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
@@ -93,15 +101,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     //adjust for LOS + Distance + Volume
                     AdjustVolume(audio);
-
-                    ////no radio effect for intercom
-                    if (audio.ReceivedRadio != 0)
+                         
+                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
                     {
-                        if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+                        if (audio.ReceivedRadio == 0)
+                        {
+                            AddRadioEffectIntercom(audio);
+                        }
+                        else
                         {
                             AddRadioEffect(audio);
                         }
                     }
+                
                 }
                 else
                 {
@@ -143,6 +155,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 Logger.Info("Failed to decode audio from Packet for client");
             }
+        }
+
+        private void AddRadioEffectIntercom(ClientAudio clientAudio)
+        {
+            var mixedAudio = clientAudio.PcmAudioShort;
+
+            for (var i = 0; i < mixedAudio.Length; i++)
+            {
+                var audio = mixedAudio[i] / 32768f;
+
+                audio = _highPassFilter.Transform(audio);
+
+                if (float.IsNaN(audio))
+                    audio = _lowPassFilter.Transform(mixedAudio[i]);
+                else
+                    audio = _lowPassFilter.Transform(audio);
+
+                if (!float.IsNaN(audio))
+                {
+                    // clip
+                    if (audio > 1.0f)
+                        audio = 1.0f;
+                    if (audio < -1.0f)
+                        audio = -1.0f;
+
+                    mixedAudio[i] = (short)(audio * 32767);
+                }
+            }
+            
         }
 
         private void AdjustVolume(ClientAudio clientAudio)
