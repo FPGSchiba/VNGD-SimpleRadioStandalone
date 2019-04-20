@@ -54,10 +54,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     && radio.freqMode == RadioInformation.FreqMode.OVERLAY)
                 {
                     if (delta)
-                        radio.freq += frequency;
+                    {
+                        radio.freq = (int)Math.Round(radio.freq + frequency);
+                    }
                     else
                     {
-                        radio.freq = frequency;
+                        radio.freq = (int)Math.Round(frequency);
                     }
 
                     //make sure we're not over or under a limit
