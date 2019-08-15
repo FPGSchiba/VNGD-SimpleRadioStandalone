@@ -1,4 +1,4 @@
--- Version 1.5.5.0
+-- Version 1.6.1.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
@@ -63,13 +63,19 @@ function srsOverlay.loadConfiguration()
         srsOverlay.config = tbl.config
     else
         srsOverlay.log("Configuration not found, creating defaults...")
-        srsOverlay.config = { 
+        srsOverlay.config = {
             mode = "full",
+            restoreAfterRestart = true,
             hotkey = "Ctrl+Shift+escape",
             windowPosition = { x = 200, y = 200 }
         }
         srsOverlay.saveConfiguration()
-    end      
+    end
+    -- migration for config values added during an update
+    if srsOverlay.config and srsOverlay.config.restoreAfterRestart == nil then
+        srsOverlay.config.restoreAfterRestart = true
+        srsOverlay.saveConfiguration()
+    end
 end
 
 function srsOverlay.saveConfiguration()
@@ -436,15 +442,24 @@ function srsOverlay.onSimulationFrame()
         srsOverlay.loadConfiguration()
     end
 
-    if not window then 
-        srsOverlay.log("Creating SRS window hidden...")
+    if not window then
         srsOverlay.show(true)
 
-        srsOverlay.setMode(_modes.hidden)
+        if srsOverlay.config and srsOverlay.config.restoreAfterRestart then
+            if srsOverlay.config.mode then
+                srsOverlay.log("Restoring SRS window in " .. srsOverlay.config.mode .. " mode...")
+                srsOverlay.setMode(srsOverlay.config.mode)
+            else
+                srsOverlay.log("Restoring SRS window in fallback full mode...")
+                srsOverlay.setMode(_modes.full)
+            end
+        else
+            srsOverlay.log("Creating SRS window hidden...")
+            srsOverlay.setMode(_modes.hidden)
+        end
 
         -- init connection
         srsOverlay.initListener()
-
     end
 
     if srsOverlay.listen() then
@@ -464,4 +479,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob - 1.5.5.0 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob - 1.6.1.0 ")

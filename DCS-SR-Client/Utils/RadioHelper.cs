@@ -54,10 +54,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     && radio.freqMode == RadioInformation.FreqMode.OVERLAY)
                 {
                     if (delta)
-                        radio.freq += frequency;
+                    {
+                        radio.freq = (int)Math.Round(radio.freq + frequency);
+                    }
                     else
                     {
-                        radio.freq = frequency;
+                        radio.freq = (int)Math.Round(frequency);
                     }
 
                     //make sure we're not over or under a limit
@@ -352,6 +354,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                         }
                     }
                 }
+            }
+        }
+
+        public static void SetRadioVolume(float volume, int radioId)
+        {
+            if (volume > 1.0)
+            {
+                volume = 1.0f;
+            }else if (volume < 0)
+            {
+                volume = 0;
+            }
+
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null 
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED 
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+                currentRadio.volume = volume;
             }
         }
     }

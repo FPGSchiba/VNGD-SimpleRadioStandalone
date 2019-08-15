@@ -9,8 +9,10 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using IWshRuntimeLibrary;
 using Microsoft.Win32;
 using MessageBox = System.Windows.MessageBox;
+using File = System.IO.File;
 
 namespace Installer
 {
@@ -215,6 +217,11 @@ namespace Installer
             WritePath(srPath.Text, "SRPathStandalone");
             WritePath(dcsScriptsPath.Text, "ScriptsPath");
 
+            if (CreateStartMenuShortcut.IsChecked ?? true)
+            {
+                InstallShortcuts(srPath.Text);
+            }
+
             string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
 
             foreach (var path in paths)
@@ -321,6 +328,20 @@ namespace Installer
                 true);
             File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\DCS-SRS-hook.lua",
                 true);
+        }
+
+        private void InstallShortcuts(string path)
+        {
+            string executablePath = Path.Combine(path, "SR-ClientRadio.exe");
+            string shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), "DCS-SRS Client.lnk");
+
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+
+            shortcut.Description = "DCS-SimpleRadio Standalone Client";
+            shortcut.TargetPath = executablePath;
+            shortcut.WorkingDirectory = path;
+            shortcut.Save();
         }
 
         private void CreateDirectory(string path)
@@ -488,6 +509,8 @@ namespace Installer
 
             DeleteRegKeys();
 
+            RemoveShortcuts();
+
             MessageBox.Show(
                 "SR Standalone Removed Successfully!\n\nContaining folder left just incase you want favourites or frequencies",
                 "SR Standalone Installer",
@@ -496,6 +519,12 @@ namespace Installer
             Environment.Exit(0);
         }
 
+        private void RemoveShortcuts()
+        {
+            string shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), "DCS-SRS Client.lnk");
+
+            DeleteFileIfExists(shortcutPath);
+        }
 
         private void RemoveScripts(string path)
         {

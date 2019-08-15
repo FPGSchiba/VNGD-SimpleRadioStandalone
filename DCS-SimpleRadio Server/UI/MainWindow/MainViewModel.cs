@@ -81,6 +81,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public string ExternalAWACSMode
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue ? "ON" : "OFF";
 
+        public string AllowRadioEncryption
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION).BoolValue ? "ON" : "OFF";
+
         public bool IsExternalAWACSModeEnabled { get; set; } 
             = ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE).BoolValue;
 
@@ -231,6 +234,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             var newSetting = RadioExpansion != "ON";
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_EXPANSION, newSetting);
             NotifyOfPropertyChange(() => RadioExpansion);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void AllowRadioEncryptionToggle()
+        {
+            var newSetting = AllowRadioEncryption != "ON";
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION, newSetting);
+            NotifyOfPropertyChange(() => AllowRadioEncryption);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }

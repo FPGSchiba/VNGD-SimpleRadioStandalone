@@ -22,7 +22,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         EXTERNAL_AWACS_MODE_BLUE_PASSWORD = 11,
         EXTERNAL_AWACS_MODE_RED_PASSWORD = 12,
         CLIENT_EXPORT_FILE_PATH = 13,
-        CHECK_FOR_BETA_UPDATES = 14
+        CHECK_FOR_BETA_UPDATES = 14,
+        ALLOW_RADIO_ENCRYPTION = 15
     }
 
     public class DefaultServerSettings
@@ -43,7 +44,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.SERVER_PORT.ToString(), "5002" },
             { ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED.ToString(), "false" },
             { ServerSettingsKeys.CLIENT_EXPORT_FILE_PATH.ToString(), "clients-list.json" },
-            { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" }
+            { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" }, 
+            { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "true" },
         };
     }
 }

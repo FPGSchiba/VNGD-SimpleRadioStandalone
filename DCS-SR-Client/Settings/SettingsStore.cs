@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using SharpConfig;
 

@@ -198,6 +198,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 RadioHelper.RadioChannelDown(message.RadioId);
                             }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.SET_VOLUME)
+                            {
+                                RadioHelper.SetRadioVolume(message.Volume,message.RadioId);
+                            }
                             else
                             {
                                 Logger.Error("Unknown UDP Command!");
@@ -708,7 +712,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     //update modes
                     clientRadio.freqMode = updateRadio.freqMode;
-                    clientRadio.encMode = updateRadio.encMode;
+
+                    if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION))
+                    {
+                        clientRadio.encMode = updateRadio.encMode;
+                    }
+                    else
+                    {
+                        clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
+                    }
+
                     clientRadio.volMode = updateRadio.volMode;
 
                     if ((updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT) || overrideFreqAndVol)
