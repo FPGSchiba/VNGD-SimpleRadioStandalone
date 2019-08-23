@@ -143,7 +143,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         if (mainFrequency > 0)
                         {
                             RadioInformation.Modulation mainModulation = (RadioInformation.Modulation)decodedPacket.Modulations[0];
-                            srClient.TransmittingFrequency = $"{(mainFrequency / 1000000).ToString("0.000", CultureInfo.InvariantCulture)} {mainModulation}";
+                            if (mainModulation == RadioInformation.Modulation.INTERCOM)
+                            {
+                                srClient.TransmittingFrequency = "INTERCOM";
+                            }
+                            else
+                            {
+                                srClient.TransmittingFrequency = $"{(mainFrequency / 1000000).ToString("0.000", CultureInfo.InvariantCulture)} {mainModulation}";
+                            }
                             srClient.LastTransmissionReceived = DateTime.Now;
                         }
 
