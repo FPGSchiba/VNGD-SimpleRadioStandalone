@@ -140,7 +140,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         }
 
                         double mainFrequency = decodedPacket.Frequencies.FirstOrDefault();
-                        if (mainFrequency > 0)
+                        // Only trigger transmitting frequency update for "proper" packets (excluding invalid frequencies and magic ping packets with modulation 4)
+                        if (mainFrequency > 0 && decodedPacket.Modulations[0] != 4)
                         {
                             RadioInformation.Modulation mainModulation = (RadioInformation.Modulation)decodedPacket.Modulations[0];
                             if (mainModulation == RadioInformation.Modulation.INTERCOM)
