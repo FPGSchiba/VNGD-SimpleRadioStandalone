@@ -86,7 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     var spectatorAudioDisabled =
                         _serverSettings.GetGeneralSetting(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED).BoolValue;
 
-                    if ((srClient.Coalition == 0) && spectatorAudioDisabled)
+                    if ((srClient.Coalition == 0 && spectatorAudioDisabled) || srClient.Muted)
                     {
                         byteBuffer.Release();
                         return;
