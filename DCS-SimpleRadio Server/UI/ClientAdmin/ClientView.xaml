@@ -33,5 +33,10 @@
                 Margin="2"
                 VerticalAlignment="Center"
                 Content="Ban!" />
+        <ToggleButton x:Name="ToggleClientMute"
+            Margin="2"
+            VerticalAlignment="Center"
+            IsChecked="{Binding ClientMuted, Mode=OneWay}"
+            Content="Mute" />
     </StackPanel>
 </UserControl>

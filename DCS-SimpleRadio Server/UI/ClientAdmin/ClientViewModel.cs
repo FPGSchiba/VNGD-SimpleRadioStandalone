@@ -28,6 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 
         public string TransmittingFrequency => Client.TransmittingFrequency;
 
+        public bool ClientMuted => Client.Muted;
+
         public SolidColorBrush ClientCoalitionColour
         {
             get
@@ -76,6 +78,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
             {
                 _eventAggregator.PublishOnBackgroundThread(new BanClientMessage(Client));
             }
+        }
+
+        public void ToggleClientMute()
+        {
+            Client.Muted = !Client.Muted;
+            NotifyOfPropertyChange(() => ClientMuted);
         }
     }
 }

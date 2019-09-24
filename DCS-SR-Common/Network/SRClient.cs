@@ -29,6 +29,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         }
 
         [JsonIgnore]
+        public bool Muted { get; set; }
+
+        [JsonIgnore]
         public Socket ClientSocket { get; set; }
 
         [JsonIgnore]
