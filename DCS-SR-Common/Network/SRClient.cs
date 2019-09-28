@@ -63,6 +63,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public string ClientChannelId { get; set; }
 
+        // Used by server client list to display last frequency client transmitted on
+        private string _transmittingFrequency;
+        [JsonIgnore]
+        public string TransmittingFrequency
+        {
+            get { return _transmittingFrequency; }
+            set
+            {
+                if (_transmittingFrequency != value)
+                {
+                    _transmittingFrequency = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TransmittingFrequency"));
+                }
+            }
+        }
+
+        // Used by server client list to remove last frequency client transmitted on after threshold
+        [JsonIgnore]
+        public DateTime LastTransmissionReceived { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
 

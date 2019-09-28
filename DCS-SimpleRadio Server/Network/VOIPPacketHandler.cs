@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -15,6 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Globalization;
     using System.Text;
     using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
     using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
@@ -136,6 +137,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     }
                                 }
                             }
+                        }
+
+                        double mainFrequency = decodedPacket.Frequencies.FirstOrDefault();
+                        // Only trigger transmitting frequency update for "proper" packets (excluding invalid frequencies and magic ping packets with modulation 4)
+                        if (mainFrequency > 0 && decodedPacket.Modulations[0] != 4)
+                        {
+                            RadioInformation.Modulation mainModulation = (RadioInformation.Modulation)decodedPacket.Modulations[0];
+                            if (mainModulation == RadioInformation.Modulation.INTERCOM)
+                            {
+                                srClient.TransmittingFrequency = "INTERCOM";
+                            }
+                            else
+                            {
+                                srClient.TransmittingFrequency = $"{(mainFrequency / 1000000).ToString("0.000", CultureInfo.InvariantCulture)} {mainModulation}";
+                            }
+                            srClient.LastTransmissionReceived = DateTime.Now;
                         }
 
                         //send to other connected clients
