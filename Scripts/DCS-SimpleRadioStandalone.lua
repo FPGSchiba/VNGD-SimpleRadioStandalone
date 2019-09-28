@@ -1,4 +1,4 @@
--- Version 1.6.1.0
+-- Version 1.6.2.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -154,7 +154,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                        _update = SR.exportRadioF5E(_update)
                 elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
                     _update = SR.exportRadioP51(_update)
-                elseif _update.unit == "FW-190D9" then
+                elseif _update.unit == "FW-190D9" or _update.unit == "FW-190A8"  then
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
@@ -734,7 +734,13 @@ function SR.exportRadioSA342(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 68,{1.0,0.0},true)
 
     _data.radios[3].name = "UHF TRA 6031"
-    _data.radios[3].freq = SR.getRadioFrequency(31,500)
+
+	-- deal with odd radio tune & rounding issue... BUG you cannot set frequency 243.000 ever again
+	local freq = SR.getRadioFrequency(31,500)
+	freq = (math.floor(freq/1000)*1000)
+
+    _data.radios[3].freq = freq
+
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 69,{0.0,1.0},false)
     
@@ -1302,6 +1308,8 @@ function SR.exportRadioF86Sabre(_data)
     return _data;
 end
 
+
+
 function SR.exportRadioMIG15(_data)
 
     _data.radios[2].name = "RSI-6K"
@@ -1354,7 +1362,7 @@ function SR.exportRadioMIG19(_data)
     _data.radios[2].name = "RSIU-4V"
     _data.radios[2].freq =  SR.getRadioFrequency(17)
     _data.radios[2].modulation = 0
-    _data.radios[2].volume =  SR.getRadioVolume(0, 329,{0.0,1.0},false)
+    _data.radios[2].volume =  SR.getRadioVolume(0, 327,{0.0,1.0},false)
 
     _data.selected = 1
 
@@ -1588,6 +1596,7 @@ function SR.exportRadioFW190(_data)
 
     return _data;
 end
+
 
 function SR.exportRadioBF109(_data)
 
@@ -2110,6 +2119,8 @@ end
 function SR.getRadioFrequency(_deviceId, _roundTo)
     local _device = GetDevice(_deviceId)
 
+	
+
     if not _roundTo then
         _roundTo = 5000
     end
@@ -2156,4 +2167,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.6.1.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.6.2.0")
