@@ -186,6 +186,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioSU27(_update)
                 elseif _update.unit == "Su-25" or  _update.unit == "Su-25T" then
                     _update = SR.exportRadioSU25(_update)
+                elseif _update.unit == "F-16C_50" then
+                    _update = SR.exportRadioF16C(_update)
                 else
                      -- FC 3
                     _update.radios[2].name = "FC3 VHF"
@@ -1245,6 +1247,57 @@ function SR.exportRadioFA18C(_data)
     _data.control = 0; -- SRS Hotas Controls
 
     return _data
+end
+
+function SR.exportRadioF16C(_data)
+
+   -- UHF
+   _data.radios[2].name = "AN/ARC-164"
+   _data.radios[2].freq =  SR.getRadioFrequency(36)
+   _data.radios[2].modulation = SR.getRadioModulation(36)
+   _data.radios[2].volume = SR.getRadioVolume(0, 430,{0.0,1.0},false)
+   _data.radios[2].encMode = 2
+
+
+   -- VHF
+   _data.radios[3].name = "AN/ARC-222"
+   _data.radios[3].freq = SR.getRadioFrequency(38)
+   _data.radios[3].modulation = SR.getRadioModulation(38)
+   _data.radios[3].volume = SR.getRadioVolume(0, 431,{0.0,1.0},false)
+   _data.radios[3].encMode = 2
+
+   -- KY-58 Radio Encryption
+   local _ky58Power = SR.round(SR.getButtonPosition(707),0.1)
+   if _ky58Power == 0.5 and SR.round(SR.getButtonPosition(705),0.1) == 0.1 then -- mode switch set to C and powered on
+       -- Power on and correct mode selected
+       -- Get encryption key
+       local _channel =  SR.getSelectorPosition(706,0.1)
+
+       local _cipherSwitch = SR.round(SR.getButtonPosition(701),1)
+       local _radio=nil
+       if _cipherSwitch == 1.0 then -- CRAD1 (UHF)
+            _radio = _data.radios[2]
+       elseif _cipherSwitch == -1.0 then -- CRAD2 (VHF)
+            _radio = _data.radios[3]
+       end
+       if _radio~=nil and _channel > 0 and _channel < 7 then
+            _radio.encKey = _channel
+            _radio.enc = true
+            _radio.volume = SR.getRadioVolume(0, 708,{0.0,1.0},false) *  SR.getRadioVolume(0, 432,{0.0,1.0},false)--User KY-58 volume if chiper is used
+       end
+   end
+
+   local _cipherOnly =  SR.round(SR.getButtonPosition(443),1) == -1.0 --If HOT MIC CIPHER Switch, HOT MIC / OFF / CIPHER set to CIPHER, allow only cipher
+   if _cipherOnly and _data.radios[3].enc ~=true then
+      _data.radios[3].freq = 0
+   end
+   if _cipherOnly and _data.radios[2].enc ~=true then
+      _data.radios[2].freq = 0
+   end
+
+   _data.control = 0; -- SRS Hotas Controls
+
+   return _data
 end
 
 
