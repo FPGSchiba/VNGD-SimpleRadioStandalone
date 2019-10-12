@@ -1,4 +1,4 @@
--- Version 1.6.3.0
+-- Version 1.6.4.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1301,6 +1301,14 @@ function SR.exportRadioF16C(_data)
         end
     end
 
+   local _cipherOnly =  SR.round(SR.getButtonPosition(443),1) < -0.5 --If HOT MIC CIPHER Switch, HOT MIC / OFF / CIPHER set to CIPHER, allow only cipher
+   if _cipherOnly and _data.radios[3].enc ~=true then
+      _data.radios[3].freq = 0
+   end
+   if _cipherOnly and _data.radios[2].enc ~=true then
+      _data.radios[2].freq = 0
+   end
+
     _data.control = 0; -- SRS Hotas Controls
 
     return _data
@@ -1746,7 +1754,7 @@ function SR.exportRadioC101EB(_data)
     local _selector = SR.getSelectorPosition(232, 0.25)
 
     if _selector ~= 0 then
-        _data.radios[2].freq = SR.getRadioFrequency(10)
+        _data.radios[2].freq = SR.getRadioFrequency(11)
     else
         _data.radios[2].freq = 1
     end
@@ -1760,7 +1768,7 @@ function SR.exportRadioC101EB(_data)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 412, { 0.0, 1.0 }, false)
 
-    _data.radios[3].freq = SR.getRadioFrequency(9)
+    _data.radios[3].freq = SR.getRadioFrequency(10)
 
     local _selector = SR.getSelectorPosition(404, 0.5)
 
@@ -1789,7 +1797,7 @@ function SR.exportRadioC101CC(_data)
     _data.radios[1].volume = SR.getRadioVolume(0, 403, { 0.0, 1.0 }, false)
 
     _data.radios[2].name = "V/TVU-740"
-    _data.radios[2].freq = SR.getRadioFrequency(10)
+    _data.radios[2].freq = SR.getRadioFrequency(11)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = 1.0--SR.getRadioVolume(0, 234,{0.0,1.0},false)
     _data.radios[2].volMode = 1
@@ -1817,7 +1825,7 @@ function SR.exportRadioC101CC(_data)
     --local _vhfPower = SR.getSelectorPosition(413,1.0)
     --
     --if _vhfPower == 1 then
-    _data.radios[3].freq = SR.getRadioFrequency(9)
+    _data.radios[3].freq = SR.getRadioFrequency(10)
     --else
     --    _data.radios[3].freq = 1
     --end
@@ -2213,4 +2221,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.6.3.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.6.4.0")
