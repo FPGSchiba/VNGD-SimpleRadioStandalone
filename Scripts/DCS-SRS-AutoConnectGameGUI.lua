@@ -148,15 +148,15 @@ SRSAuto.srsNudge = function()
         for _,v in pairs(net.get_player_list()) do
 
             local _player = net.get_player_info(v)
-            if _player.id ~= 1 then
-                --filter server owner / user
+           
+               
                 if _player.side ~= 0  then
 
                     _playerByName[_player.name] = _player
                      --SRSAuto.log("SRS NUDGE - Added ".._player.name)
 
                 end
-            end
+            
         end
         local fileContent = SRSAuto.readFile(SRSAuto.SRS_NUDGE_PATH);
 
