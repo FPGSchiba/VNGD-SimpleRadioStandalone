@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
-        private TCPVoiceHandler _tcpVoiceHandler;
+        private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
         private WaveIn _waveIn;
@@ -239,9 +239,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.DataAvailable += _waveIn_DataAvailable;
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
-                    _tcpVoiceHandler =
-                        new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
-                    var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
+                    _udpVoiceHandler =
+                        new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                    var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
 
@@ -491,7 +491,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     int len;
                     var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
 
-                    if ((_tcpVoiceHandler != null) && (buff != null) && (len > 0))
+                    if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                     {
                         //create copy with small buffer
                         var encoded = new byte[len];
@@ -499,7 +499,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                         // Console.WriteLine("Sending: " + e.BytesRecorded);
-                        if (_tcpVoiceHandler.Send(encoded, len))
+                        if (_udpVoiceHandler.Send(encoded, len))
                         {
                             //send audio so play over local too
                             _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
@@ -557,8 +557,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             _decoder?.Dispose();
             _decoder = null;
           
-            _tcpVoiceHandler?.RequestStop();
-            _tcpVoiceHandler = null;
+            if (_udpVoiceHandler != null)
+            {
+                _udpVoiceHandler.RequestStop();
+                _udpVoiceHandler = null;
+            }
           
             _speex?.Dispose();
             _speex = null;

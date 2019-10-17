@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _clientStateSingleton = ClientStateSingleton.Instance;
             IsListening = false;
         }
-
+        public static long LastSent { get; set; }
         private readonly SettingsStore _settings = SettingsStore.Instance;
 
         public void Listen()
@@ -338,8 +338,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var combinedState = new CombinedRadioState()
                 {
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    RadioSendingState = TCPVoiceHandler.RadioSendingState,
-                    RadioReceivingState = TCPVoiceHandler.RadioReceivingState,
+                    RadioSendingState = UdpVoiceHandler.RadioSendingState,
+                    RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
                     ClientCountConnected = _clients.Count,
                     ClientCountIngame = clientCountIngame
                 };

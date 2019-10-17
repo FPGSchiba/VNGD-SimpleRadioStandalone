@@ -43,7 +43,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 2 Usage: Generic Type: Supplemental
             new Guid("11401dd2-0000-0000-0000-504944564944"), //Leo Bodnar BUtton Box
             new Guid("204803eb-0000-0000-0000-504944564944"), // VPC Throttle
-            new Guid("204303eb-0000-0000-0000-504944564944") // VPC Stick
+            new Guid("204303eb-0000-0000-0000-504944564944"), // VPC Stick
+            new Guid("205403eb-0000-0000-0000-504944564944"), // VPC Throttle
+            new Guid("205603eb-0000-0000-0000-504944564944"), // VPC Throttle
+            new Guid("205503eb-0000-0000-0000-504944564944")  // VPC Throttle
+            
         };
 
         private readonly DirectInput _directInput;

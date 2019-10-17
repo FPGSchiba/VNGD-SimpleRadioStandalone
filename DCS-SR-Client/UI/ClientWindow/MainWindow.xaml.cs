@@ -61,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
 
+        private bool _stop = true;
+
         //used to debounce toggle
         private long _toggleShowHide;
 

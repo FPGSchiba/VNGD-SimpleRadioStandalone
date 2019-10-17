@@ -30,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             new ConcurrentDictionary<string, SRClient>();
 
         private readonly IEventAggregator _eventAggregator;
-        private TCPVoiceRouter _serverListener;
+        private UDPVoiceRouter _serverListener;
         private ServerSync _serverSync;
         private volatile bool _stop = true;
 
@@ -178,9 +178,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 PopulateBanList();
 
-                _serverListener = new TCPVoiceRouter(_connectedClients, _eventAggregator);
-                var voipListenerThread = new Thread(_serverListener.StartListening);
-                voipListenerThread.Start();
+                _serverListener = new UDPVoiceRouter(_connectedClients, _eventAggregator);
+                var listenerThread = new Thread(_serverListener.Listen);
+                listenerThread.Start();
 
                 _serverSync = new ServerSync(_connectedClients, _bannedIps, _eventAggregator);
                 var serverSyncThread = new Thread(_serverSync.StartListening);
