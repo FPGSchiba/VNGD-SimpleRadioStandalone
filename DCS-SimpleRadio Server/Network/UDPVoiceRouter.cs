@@ -196,12 +196,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 }
                             }
                         }
-                        else
-                        {
-                            SRClient value;
-                            _clientsList.TryRemove(guid, out value);
-                            //  logger.Info("Removing  "+guid+" From UDP pool");
-                        }
                     }
                 }
                 catch (Exception ex)
@@ -251,7 +245,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
          
             var guid = fromClient.ClientGuid;
 
-            //TODO Make this loop round all frequencies!
             foreach (var client in _clientsList)
             {
                 if (!client.Key.Equals(guid))
@@ -296,6 +289,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
+                        //DEBUG send back to sending client
                          //outgoingList.Add(ip);
                     }
                 }
