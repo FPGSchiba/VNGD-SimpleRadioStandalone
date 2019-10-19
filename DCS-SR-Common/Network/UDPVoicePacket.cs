@@ -6,7 +6,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     /**
        * UDP PACKET LAYOUT
-       * 
+       *
        * - HEADER SEGMENT
        * UInt16 Packet Length - 2 bytes
        * UInt16 AudioPart1 Length - 2 bytes
@@ -138,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             /**
              * FIXED SEGMENT
              */
-            
+
             // Offset for fixed segment
             var fixedSegmentOffset = PacketHeaderLength + dynamicSegmentLength;
 
@@ -232,4 +232,3 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         }
     }
 }
- 

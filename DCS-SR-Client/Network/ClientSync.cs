@@ -240,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //clear the clients list
             _clients.Clear();
             int decodeErrors = 0; //if the JSON is unreadable - new version likely
-            
+
             using (var reader = new StreamReader(_tcpClient.GetStream(), Encoding.UTF8))
             {
                 try
@@ -478,7 +478,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             try
             {
-               
+
                 message.Version = UpdaterChecker.VERSION;
 
                 var json = (JsonConvert.SerializeObject(message) + "\n");

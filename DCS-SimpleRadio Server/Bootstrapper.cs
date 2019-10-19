@@ -78,7 +78,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 #else
             config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileTarget));
 #endif
-           
+
             LogManager.Configuration = config;
 
             loggingReady = true;

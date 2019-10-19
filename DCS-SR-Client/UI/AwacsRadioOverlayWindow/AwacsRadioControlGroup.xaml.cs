@@ -243,7 +243,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         ToggleSimultaneousTransmissionButton.IsEnabled = false;
                         ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
                     }
-                    
+
                 }
                 else
                 {

@@ -165,9 +165,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
 
-                
+
                 ShowOutputError("Problem Initialising Audio Output!");
-             
+
 
                 Environment.Exit(1);
             }
@@ -218,7 +218,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     Logger.Error(ex, "Error starting mic audio Output - Quitting! " + ex.Message);
 
                     ShowOutputError("Problem Initialising Mic Audio Output!");
-                
+
 
                     Environment.Exit(1);
                 }
@@ -260,7 +260,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 }
             }
         }
-        
+
         private void ShowInputError(string message)
         {
             if (Environment.OSVersion.Version.Major == 10)
@@ -418,7 +418,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             // _stopwatch.Restart();
 
             short[] pcmShort = null;
-           
+
 
             if ((e.BytesRecorded/2 == SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
             {
@@ -509,7 +509,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         Logger.Error($"Invalid Bytes for Encoding - {e.BytesRecorded} should be {SEGMENT_FRAMES} ");
                     }
-                    
+
                     _errorCount = 0;
                 }
                 catch (Exception ex)
@@ -523,7 +523,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
                     }
-                 
+
                 }
 
                 pcmShort = null;
@@ -548,21 +548,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             _volumeSampleProvider = null;
             _clientAudioMixer?.RemoveAllMixerInputs();
             _clientAudioMixer = null;
-          
+
             _clientsBufferedAudio.Clear();
-          
+
             _encoder?.Dispose();
             _encoder = null;
-       
+
             _decoder?.Dispose();
             _decoder = null;
-          
+
             if (_udpVoiceHandler != null)
             {
                 _udpVoiceHandler.RequestStop();
                 _udpVoiceHandler = null;
             }
-          
+
             _speex?.Dispose();
             _speex = null;
 

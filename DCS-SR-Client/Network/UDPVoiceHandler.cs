@@ -112,7 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 CallOnMainVOIPConnect(true);
             }
-        
+
 
         }
 
@@ -200,13 +200,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StartTimer();
 
             StartPing();
-            
+
             //set to false so we sent one packet to open up the radio
             //automatically rather than the user having to press Send
             hasSentVoicePacket = false;
 
             _packetNumber = 1; //reset packet number
-            
+
             while (!_stop)
             {
                 _ready = true;
@@ -326,7 +326,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 if (udpVoicePacket != null && udpVoicePacket.Modulations[0] != 4)
                                 {
 
-                               
+
                                     var frequencyCount = udpVoicePacket.Frequencies.Length;
 
                                     List<RadioReceivingPriority> radioReceivingPriorities =
@@ -789,8 +789,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
                     }
-                    
-                    //wait for cancel or quit    
+
+                    //wait for cancel or quit
                     var cancelled = _pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
 
                     if (cancelled)

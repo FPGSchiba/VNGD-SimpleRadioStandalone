@@ -102,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Left = _settings.GetPositionSetting(SettingsKeys.ClientX).DoubleValue;
             Top = _settings.GetPositionSetting(SettingsKeys.ClientY).DoubleValue;
 
-           
+
 
             Title = Title + " - " + UpdaterChecker.VERSION;
 
@@ -138,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitDefaultAddress();
 
-        
+
             SpeakerBoost.Value = _settings.GetClientSetting(SettingsKeys.SpeakerBoost).DoubleValue;
 
             Speaker_VU.Value = -100;
@@ -463,7 +463,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     ServerIp.Text = value.Address;
                     ExternalAWACSModePassword.Password = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
                 }
-                
+
                 _connectCommand.RaiseCanExecuteChanged();
             }
         }
@@ -569,7 +569,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     Logger.Error(e,"Audio Output - Error processing device - device skipped");
                 }
-              
+
             }
         }
 
@@ -589,7 +589,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 try
                 {
-                    
+
                     Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
                             device.AudioClient.MixFormat.Channels + " Rate:" +
                             device.AudioClient.MixFormat.SampleRate.ToString());
@@ -710,7 +710,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ExpandInputDevices.IsChecked = _settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue;
             RadioTxStartToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_Start).BoolValue;
             RadioTxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioTxEffects_End).BoolValue;
-            
+
             RadioRxStartToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
             RadioRxEndToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioRxEffects_Start).BoolValue;
 
@@ -878,7 +878,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             var output = outputDeviceList[Speakers.SelectedIndex];
 
-          
+
             //save app settings
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
             if (_clientStateSingleton.MicrophoneAvailable)
@@ -1061,9 +1061,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
 
                     _audioPreview = new AudioPreview();
-                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value); 
+                    _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
                     _audioPreview.StartPreview(inputId, output);
-                  
+
                     Preview.Content = "Stop Preview";
                 }
                 catch (Exception ex)
@@ -1235,7 +1235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     return;
                 }
 
-                // Perform DNS lookup of advertised and current hostnames to find hostname/resolved IP matches                
+                // Perform DNS lookup of advertised and current hostnames to find hostname/resolved IP matches
                 List<string> currentIPs = new List<string>();
 
                 if (IPAddress.TryParse(currentAddress, out IPAddress currentIP))
@@ -1531,7 +1531,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_client == null || 
+            if (_client == null ||
                 !_clientStateSingleton.IsConnected ||
                 !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
                 (!_clientStateSingleton.InExternalAWACSMode &&

@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 using NLog;
 
 /**
-Keeps radio information in Sync Between DCS and 
+Keeps radio information in Sync Between DCS and
 
 **/
 
@@ -263,7 +263,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             var str = Encoding.UTF8.GetString(
                                 bytes, 0, bytes.Length).Trim();
-                            
+
                             var message =
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
 
@@ -613,7 +613,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             //update common parts
             playerRadioInfo.name = message.name;
-           
+
 
             if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
@@ -841,7 +841,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 playerRadioInfo.ptt = message.ptt;
             }
-           
+
             //                }
             //            }
 

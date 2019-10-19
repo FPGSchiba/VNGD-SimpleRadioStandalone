@@ -137,7 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         //iterate list
                         //if packetNumber == curentItem
                         // discard
-                        //else if packetNumber < _currentItem 
+                        //else if packetNumber < _currentItem
                         //add before
                         //else if packetNumber > _currentItem
                         //add before

@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private UdpClient _listener;
 
         private volatile bool _stop;
-        
+
         private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
 
         public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
@@ -65,7 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 {
                     var groupEP = new IPEndPoint(IPAddress.Any, port);
                     var rawBytes = _listener.Receive(ref groupEP);
-                   
+
                     if (rawBytes?.Length == 22)
                     {
                         try
@@ -169,7 +169,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                         {
                                             //Add to the processing queue
                                             _outGoing.Add(outgoingVoice);
-                                            
+
                                             //mark as transmitting for the UI
                                             double mainFrequency = udpVoicePacket.Frequencies.FirstOrDefault();
                                             // Only trigger transmitting frequency update for "proper" packets (excluding invalid frequencies and magic ping packets with modulation 4)
@@ -187,7 +187,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 client.LastTransmissionReceived = DateTime.Now;
                                             }
                                         }
-                                            
+
                                     }
                                 }
                                 catch (Exception)
@@ -242,7 +242,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             var coalitionSecurity =
                 _serverSettings.GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY).BoolValue;
-         
+
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
@@ -250,11 +250,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (!client.Key.Equals(guid))
                 {
                     var ip = client.Value.VoipPort;
-               
+
                     // check that either coalition radio security is disabled OR the coalitions match
                     if ((ip != null) && (!coalitionSecurity || (client.Value.Coalition == fromClient.Coalition)))
                     {
-                        
+
                         var radioInfo = client.Value.RadioInfo;
 
                         if (radioInfo != null)
@@ -279,7 +279,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 }
                             }
 
-                          
+
                         }
                     }
                 }
