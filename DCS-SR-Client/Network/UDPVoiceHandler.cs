@@ -767,6 +767,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             byte[] message = _guidAsciiBytes;
 
+            // Force immediate ping once to avoid race condition before starting to listen
+            _listener.Send(message, message.Length, _serverEndpoint);
+
             var thread = new Thread(() =>
             {
                 //wait for initial sync - then ping
