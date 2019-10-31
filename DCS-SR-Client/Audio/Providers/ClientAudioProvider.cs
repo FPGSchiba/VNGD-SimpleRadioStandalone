@@ -17,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     public class ClientAudioProvider : AudioProvider
     {
-        public static readonly int SILENCE_PAD = 300;
+        public static readonly int SILENCE_PAD = 200;
 
         private readonly Random _random = new Random();
 
@@ -28,7 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private readonly BiQuadFilter _lowPassFilter;
 
         private OpusDecoder _decoder;
-        
+
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public ClientAudioProvider()
@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
 
             SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
-            
+
             _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
 
@@ -80,7 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             bool newTransmission = LikelyNewTransmission();
 
             int decodedLength = 0;
-            
+
             var decoded = _decoder.Decode(audio.EncodedAudio,
                 audio.EncodedAudio.Length, out decodedLength, newTransmission);
 
@@ -101,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     //adjust for LOS + Distance + Volume
                     AdjustVolume(audio);
-                         
+
                     if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
                     {
                         if (audio.ReceivedRadio == 0)
@@ -113,7 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                             AddRadioEffect(audio);
                         }
                     }
-                
+
                 }
                 else
                 {
@@ -139,7 +139,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
                 _lastReceivedOn = audio.ReceivedRadio;
-                LastUpdate = DateTime.Now.Ticks; 
+                LastUpdate = DateTime.Now.Ticks;
 
                 JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
                 {
@@ -183,7 +183,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     mixedAudio[i] = (short)(audio * 32767);
                 }
             }
-            
+
         }
 
         private void AdjustVolume(ClientAudio clientAudio)
@@ -276,6 +276,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _decoder.Dispose();
             _decoder = null;
         }
-       
+
     }
 }

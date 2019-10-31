@@ -194,6 +194,7 @@
     <Compile Include="Network\Models\CombinedRadioState.cs" />
     <Compile Include="Network\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\Models\DCSLosCheckResult.cs" />
+    <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="Settings\SynchedServerSettings.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -253,7 +254,6 @@
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\SettingsStore.cs" />
-    <Compile Include="Network\TCPVoiceHandler.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
