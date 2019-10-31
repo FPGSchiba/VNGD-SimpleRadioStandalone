@@ -676,6 +676,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.name = "No Radio";
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
                     clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
 
@@ -697,6 +698,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.name = "No Radio";
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
                     clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
                 }
@@ -712,6 +714,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     //update modes
                     clientRadio.freqMode = updateRadio.freqMode;
+                    clientRadio.guardFreqMode = updateRadio.guardFreqMode;
 
                     if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION))
                     {
@@ -734,15 +737,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         clientRadio.freq = updateRadio.freq;
 
-                        //default overlay to off
-                        if (updateRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
+                        if (newAircraft && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                         {
+                            //default guard to off
                             clientRadio.secFreq = 0;
                         }
                         else
                         {
-                            clientRadio.secFreq = updateRadio.secFreq;
+                            if (clientRadio.secFreq != 0 && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                            {
+                                //put back
+                                clientRadio.secFreq = updateRadio.secFreq;
+                            }
+                            else if (clientRadio.secFreq == 0 && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                            {
+                                clientRadio.secFreq = 0;
+                            }
+                            else
+                            {
+                                clientRadio.secFreq = updateRadio.secFreq;
+                            }
+
                         }
+
+
 
                         clientRadio.channel = updateRadio.channel;
                     }

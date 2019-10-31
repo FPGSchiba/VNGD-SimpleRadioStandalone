@@ -18,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (radio != null)
             {
-                if (radio.freqMode == RadioInformation.FreqMode.OVERLAY)
+                if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                 {
                     if (radio.secFreq > 0)
                     {
