@@ -190,24 +190,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         if (sampleProvider.WaveFormat.Channels == 2)
                         {
-                            _micWaveOut.Init(sampleProvider.ToMono());
+                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToMono()));
                         }
                         else
                         {
                             //already mono
-                            _micWaveOut.Init(sampleProvider);
+                            _micWaveOut.Init(new RadioFilter(sampleProvider));
                         }
                     }
                     else
                     {
                         if (sampleProvider.WaveFormat.Channels == 1)
                         {
-                            _micWaveOut.Init(sampleProvider.ToStereo());
+                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToStereo()));
                         }
                         else
                         {
                             //already stereo
-                            _micWaveOut.Init(sampleProvider);
+                            _micWaveOut.Init(new RadioFilter(sampleProvider));
                         }
                     }
 
