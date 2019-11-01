@@ -18,7 +18,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
-    public class ClientSync
+    public class SRSClientSyncHandler
     {
         public delegate void ConnectCallback(bool result, bool connectionError, string connection);
         public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
@@ -40,11 +40,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
-        private RadioDCSSyncServer _radioDCSSync = null;
+        private DCSRadioSyncHandler _radioDCSSync = null;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
 
-        public ClientSync(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback)
+        public SRSClientSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback)
         {
             _clients = clients;
             _guid = guid;
@@ -123,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new RadioDCSSyncServer(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
+            _radioDCSSync = new DCSRadioSyncHandler(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
                 _tcpClient.SendTimeout = 10;

@@ -26,7 +26,7 @@ Keeps radio information in Sync Between DCS and
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
-    public class RadioDCSSyncServer
+    public class DCSRadioSyncHandler
     {
         public static readonly string AWACS_RADIOS_FILE = "awacs-radios.json";
 
@@ -43,10 +43,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private UdpClient _dcsGameGuiudpListener;
 
-        private UdpClient _dcsLOSListener;
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
-        private UdpClient _udpCommandListener;
+
+        private DCSLineOfSightHandler _lineOfSightHandler;
+        private UDPCommandHandler _udpCommandHandler;
 
         private volatile bool _stop;
         private volatile bool _stopExternalAWACSMode;
@@ -55,19 +56,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public bool IsListening { get; private set; }
+        public static long LastSent { get; set; }
+        private readonly SettingsStore _settings = SettingsStore.Instance;
 
-        public RadioDCSSyncServer(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
-            ConcurrentDictionary<string, SRClient> _clients, string guid)
+        public DCSRadioSyncHandler(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
+            ConcurrentDictionary<string, SRClient> clients, string guid)
         {
             _clientRadioUpdate = clientRadioUpdate;
             _clientSideUpdate = clientSideUpdate;
-            this._clients = _clients;
+            this._clients = clients;
             _guid = guid;
             _clientStateSingleton = ClientStateSingleton.Instance;
             IsListening = false;
+            _lineOfSightHandler = new DCSLineOfSightHandler(clients,guid);
+            _udpCommandHandler = new UDPCommandHandler();
         }
-        public static long LastSent { get; set; }
-        private readonly SettingsStore _settings = SettingsStore.Instance;
 
         public void Listen()
         {
@@ -146,91 +149,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             StartDcsBroadcastListener();
             StartDcsGameGuiBroadcastListener();
-            StartDCSLOSBroadcastListener();
-            StartDCSLOSSender();
-            StartUDPCommandListener();
-        }
-
-        private void StartUDPCommandListener()
-        {
-            _udpCommandListener = new UdpClient();
-            _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
-            _udpCommandListener.Client.Bind(localEp);
-
-            Task.Factory.StartNew(() =>
-            {
-                using (_udpCommandListener)
-                {
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
-                            var bytes = _udpCommandListener.Receive(ref groupEp);
-
-                            //Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(
-                            //          bytes, 0, bytes.Length));
-                            var message =
-                                JsonConvert.DeserializeObject<UDPInterfaceCommand>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            if (message?.Command == UDPInterfaceCommand.UDPCommandType.FREQUENCY)
-                            {
-                                RadioHelper.UpdateRadioFrequency(message.Frequency, message.RadioId);
-                            }
-                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.ACTIVE_RADIO)
-                            {
-                                RadioHelper.SelectRadio(message.RadioId);
-                            }
-                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TOGGLE_GUARD)
-                            {
-                                RadioHelper.ToggleGuard(message.RadioId);
-                            }
-                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.CHANNEL_UP)
-                            {
-                                RadioHelper.RadioChannelUp(message.RadioId);
-                            }
-                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.CHANNEL_DOWN)
-                            {
-                                RadioHelper.RadioChannelDown(message.RadioId);
-                            }
-                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.SET_VOLUME)
-                            {
-                                RadioHelper.SetRadioVolume(message.Volume,message.RadioId);
-                            }
-                            else
-                            {
-                                Logger.Error("Unknown UDP Command!");
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS  Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS  Message");
-                        }
-                    }
-
-                    try
-                    {
-                        _udpCommandListener.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Exception stoping DCS listener ");
-                    }
-                }
-            });
+            _lineOfSightHandler.Start();
+            _udpCommandHandler.Start();
         }
 
         private void StartDcsBroadcastListener()
@@ -438,152 +358,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             });
         }
 
-        //used for the result
-        private void StartDCSLOSBroadcastListener()
-        {
-            _dcsLOSListener = new UdpClient();
-            _dcsLOSListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _dcsLOSListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
-            _dcsLOSListener.Client.Bind(localEp);
-
-            Task.Factory.StartNew(() =>
-            {
-                using (_dcsLOSListener)
-                {
-                    //    var count = 0;
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
-                            var bytes = _dcsLOSListener.Receive(ref groupEp);
-
-                            /*   Logger.Debug(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));*/
-                            var playerInfo =
-                                JsonConvert.DeserializeObject<DCSLosCheckResult[]>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            foreach (var player in playerInfo)
-                            {
-                                SRClient client;
-
-                                if (_clients.TryGetValue(player.id, out client))
-                                {
-                                    client.LineOfSightLoss = player.los;
-
-                                    //  Logger.Debug(client.ToString());
-                                }
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS Los Result Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS Los Result Message");
-                        }
-                    }
-
-                    try
-                    {
-                        _dcsLOSListener.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Exception stoping DCS LOS Result listener ");
-                    }
-                }
-            });
-        }
-
-        private void StartDCSLOSSender()
-        {
-            var _udpSocket = new UdpClient();
-            var _host = new IPEndPoint(IPAddress.Loopback, _settings.GetNetworkSetting(SettingsKeys.DCSLOSOutgoingUDP));
-
-
-            Task.Factory.StartNew(() =>
-            {
-                using (_udpSocket)
-                {
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            //Chunk client list into blocks of 10 to stay below 8000 ish UDP socket limit
-                            var clientsList = GenerateDcsLosCheckRequests();
-
-                            if (clientsList.Count > 0)
-                            {
-                                var splitList = clientsList.ChunkBy(10);
-                                foreach (var clientSubList in splitList)
-                                {
-                                    // Logger.Info( "Sending LOS Request: "+ JsonConvert.SerializeObject(clientSubList));
-                                    var byteData =
-                                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(clientSubList) + "\n");
-
-                                    _udpSocket.Send(byteData, byteData.Length, _host);
-
-                                    //every 250 - Wait for the queue
-                                    Thread.Sleep(250);
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Sending DCS LOS Request Message");
-                        }
-                        //every 300 - Wait for the queue
-                        Thread.Sleep(250);
-                    }
-
-                    try
-                    {
-                        _udpSocket.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Exception stoping DCS listener ");
-                    }
-                }
-            });
-        }
-
-        private List<DCSLosCheckRequest> GenerateDcsLosCheckRequests()
-        {
-            var clients = _clients.Values.ToList();
-
-            var requests = new List<DCSLosCheckRequest>();
-
-            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
-            {
-                foreach (var client in clients)
-                {
-                    //only check if its worth it
-                    if ((client.Position.x != 0) && (client.Position.z != 0) && (client.ClientGuid != _guid))
-                    {
-                        requests.Add(new DCSLosCheckRequest
-                        {
-                            id = client.ClientGuid,
-                            x = client.Position.x,
-                            y = client.Position.y,
-                            z = client.Position.z
-                        });
-                    }
-                }
-            }
-            return requests;
-        }
 
         private void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
@@ -903,13 +677,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
             }
 
-            try
-            {
-                _dcsLOSListener?.Close();
-            }
-            catch (Exception ex)
-            {
-            }
+            _lineOfSightHandler.Stop();
+           
 
             try
             {
@@ -919,13 +688,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
             }
 
-            try
-            {
-                _udpCommandListener?.Close();
-            }
-            catch (Exception ex)
-            {
-            }
+            
         }
     }
 }

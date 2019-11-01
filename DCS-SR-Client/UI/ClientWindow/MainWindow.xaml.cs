@@ -51,8 +51,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
-        private ClientSync _client;
-        private DCSAutoConnectListener _dcsAutoConnectListener;
+        private SRSClientSyncHandler _client;
+        private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
         private Overlay.RadioOverlayWindow _radioOverlayWindow;
@@ -159,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitFlowDocument();
 
-            _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
+            _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
@@ -749,7 +749,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new ClientSync(_clients, _guid, UpdateUICallback);
+                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback);
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
