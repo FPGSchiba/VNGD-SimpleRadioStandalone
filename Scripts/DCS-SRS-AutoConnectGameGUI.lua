@@ -163,7 +163,8 @@ SRSAuto.srsNudge = function()
         local srs = {}
         srs = SRSAuto.JSON:decode(fileContent)
 
-        if srs then
+        if srs and srs.Clients then
+        	srs = srs.Clients
             -- loop through SRS and remove players
             for _,_srsPlayer in pairs(srs) do
                 _playerByName[_srsPlayer.Name] = nil
