@@ -1,4 +1,4 @@
--- Version 1.6.4.0
+-- Version 1.7.0.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -102,10 +102,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                     ptt = false,
                     radios = {
                         -- Radio 1 is always Intercom
-                        { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 0, expansion = false }, -- enc means encrypted
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false }, -- enc means encrypted
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
                     },
                     control = 0, -- HOTAS
                 }
@@ -1204,6 +1204,8 @@ function SR.exportRadioFA18C(_data)
     _data.radios[2].modulation = SR.getRadioModulation(38)
     _data.radios[2].volume = SR.getRadioVolume(0, 108, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
     -- _data.radios[2].encMode = 2 -- Mode 2 is set by aircraft
+    _data.radios[2].guardFreqMode = 1
+    _data.radios[2].secFreq = 243.0 * 1000000
 
     -- UHF
     -- Set radio data
@@ -1212,6 +1214,9 @@ function SR.exportRadioFA18C(_data)
     _data.radios[3].modulation = SR.getRadioModulation(39)
     _data.radios[3].volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
+    _data.radios[3].guardFreqMode = 1
+    _data.radios[3].secFreq = 243.0 * 1000000
+
 
 
     -- KY-58 Radio Encryption
@@ -1275,6 +1280,8 @@ function SR.exportRadioF16C(_data)
     _data.radios[3].modulation = SR.getRadioModulation(38)
     _data.radios[3].volume = SR.getRadioVolume(0, 431, { 0.0, 1.0 }, false)
     _data.radios[3].encMode = 2
+    _data.radios[3].guardFreqMode = 1
+    _data.radios[3].secFreq = 121.5 * 1000000
 
     -- KY-58 Radio Encryption
     local _ky58Power = SR.round(SR.getButtonPosition(707), 0.1)
@@ -2221,4 +2228,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version:1.6.4.0")
+SR.log("Loaded SimpleRadio Standalone Export version:1.7.0.1")

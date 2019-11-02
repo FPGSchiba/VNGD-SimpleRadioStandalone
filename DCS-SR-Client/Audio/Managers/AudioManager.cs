@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private float _speakerBoost = 1.0f;
         private volatile bool _stop = true;
-        private TCPVoiceHandler _tcpVoiceHandler;
+        private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
         private WaveIn _waveIn;
@@ -165,9 +165,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 Logger.Error(ex, "Error starting audio Output - Quitting! " + ex.Message);
 
-                
+
                 ShowOutputError("Problem Initialising Audio Output!");
-             
+
 
                 Environment.Exit(1);
             }
@@ -190,24 +190,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         if (sampleProvider.WaveFormat.Channels == 2)
                         {
-                            _micWaveOut.Init(sampleProvider.ToMono());
+                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToMono()));
                         }
                         else
                         {
                             //already mono
-                            _micWaveOut.Init(sampleProvider);
+                            _micWaveOut.Init(new RadioFilter(sampleProvider));
                         }
                     }
                     else
                     {
                         if (sampleProvider.WaveFormat.Channels == 1)
                         {
-                            _micWaveOut.Init(sampleProvider.ToStereo());
+                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToStereo()));
                         }
                         else
                         {
                             //already stereo
-                            _micWaveOut.Init(sampleProvider);
+                            _micWaveOut.Init(new RadioFilter(sampleProvider));
                         }
                     }
 
@@ -218,7 +218,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     Logger.Error(ex, "Error starting mic audio Output - Quitting! " + ex.Message);
 
                     ShowOutputError("Problem Initialising Mic Audio Output!");
-                
+
 
                     Environment.Exit(1);
                 }
@@ -239,9 +239,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.DataAvailable += _waveIn_DataAvailable;
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
-                    _tcpVoiceHandler =
-                        new TCPVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
-                    var voiceSenderThread = new Thread(_tcpVoiceHandler.Listen);
+                    _udpVoiceHandler =
+                        new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                    var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
 
@@ -260,7 +260,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 }
             }
         }
-        
+
         private void ShowInputError(string message)
         {
             if (Environment.OSVersion.Version.Major == 10)
@@ -418,7 +418,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             // _stopwatch.Restart();
 
             short[] pcmShort = null;
-           
+
 
             if ((e.BytesRecorded/2 == SEGMENT_FRAMES) && (_micInputQueue.Count == 0))
             {
@@ -491,7 +491,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     int len;
                     var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
 
-                    if ((_tcpVoiceHandler != null) && (buff != null) && (len > 0))
+                    if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                     {
                         //create copy with small buffer
                         var encoded = new byte[len];
@@ -499,7 +499,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                         // Console.WriteLine("Sending: " + e.BytesRecorded);
-                        if (_tcpVoiceHandler.Send(encoded, len))
+                        if (_udpVoiceHandler.Send(encoded, len))
                         {
                             //send audio so play over local too
                             _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
@@ -509,7 +509,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         Logger.Error($"Invalid Bytes for Encoding - {e.BytesRecorded} should be {SEGMENT_FRAMES} ");
                     }
-                    
+
                     _errorCount = 0;
                 }
                 catch (Exception ex)
@@ -523,7 +523,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
                     }
-                 
+
                 }
 
                 pcmShort = null;
@@ -548,18 +548,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             _volumeSampleProvider = null;
             _clientAudioMixer?.RemoveAllMixerInputs();
             _clientAudioMixer = null;
-          
+
             _clientsBufferedAudio.Clear();
-          
+
             _encoder?.Dispose();
             _encoder = null;
-       
+
             _decoder?.Dispose();
             _decoder = null;
-          
-            _tcpVoiceHandler?.RequestStop();
-            _tcpVoiceHandler = null;
-          
+
+            if (_udpVoiceHandler != null)
+            {
+                _udpVoiceHandler.RequestStop();
+                _udpVoiceHandler = null;
+            }
+
             _speex?.Dispose();
             _speex = null;
 

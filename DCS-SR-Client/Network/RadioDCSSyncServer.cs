@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 using NLog;
 
 /**
-Keeps radio information in Sync Between DCS and 
+Keeps radio information in Sync Between DCS and
 
 **/
 
@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _clientStateSingleton = ClientStateSingleton.Instance;
             IsListening = false;
         }
-
+        public static long LastSent { get; set; }
         private readonly SettingsStore _settings = SettingsStore.Instance;
 
         public void Listen()
@@ -263,7 +263,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                             var str = Encoding.UTF8.GetString(
                                 bytes, 0, bytes.Length).Trim();
-                            
+
                             var message =
                                 JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
 
@@ -338,8 +338,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var combinedState = new CombinedRadioState()
                 {
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    RadioSendingState = TCPVoiceHandler.RadioSendingState,
-                    RadioReceivingState = TCPVoiceHandler.RadioReceivingState,
+                    RadioSendingState = UdpVoiceHandler.RadioSendingState,
+                    RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
                     ClientCountConnected = _clients.Count,
                     ClientCountIngame = clientCountIngame
                 };
@@ -613,7 +613,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             //update common parts
             playerRadioInfo.name = message.name;
-           
+
 
             if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
@@ -676,6 +676,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.name = "No Radio";
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
                     clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
 
@@ -697,6 +698,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     clientRadio.name = "No Radio";
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
+                    clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION;
                     clientRadio.volMode = RadioInformation.VolumeMode.COCKPIT;
                 }
@@ -712,6 +714,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     //update modes
                     clientRadio.freqMode = updateRadio.freqMode;
+                    clientRadio.guardFreqMode = updateRadio.guardFreqMode;
 
                     if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION))
                     {
@@ -734,15 +737,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         clientRadio.freq = updateRadio.freq;
 
-                        //default overlay to off
-                        if (updateRadio.freqMode == RadioInformation.FreqMode.OVERLAY)
+                        if (newAircraft && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                         {
+                            //default guard to off
                             clientRadio.secFreq = 0;
                         }
                         else
                         {
-                            clientRadio.secFreq = updateRadio.secFreq;
+                            if (clientRadio.secFreq != 0 && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                            {
+                                //put back
+                                clientRadio.secFreq = updateRadio.secFreq;
+                            }
+                            else if (clientRadio.secFreq == 0 && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                            {
+                                clientRadio.secFreq = 0;
+                            }
+                            else
+                            {
+                                clientRadio.secFreq = updateRadio.secFreq;
+                            }
+
                         }
+
+
 
                         clientRadio.channel = updateRadio.channel;
                     }
@@ -841,7 +859,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 playerRadioInfo.ptt = message.ptt;
             }
-           
+
             //                }
             //            }
 
