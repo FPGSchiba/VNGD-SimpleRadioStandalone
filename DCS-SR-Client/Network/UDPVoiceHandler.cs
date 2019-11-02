@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _voipConnectCallback = voipConnectCallback;
 
-            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
             _updateTimer.Tick += UpdateVOIPStatus;
             _updateTimer.Start();
         }
@@ -103,7 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
 
-            //ping every 30 so after 35 seconds VoIP UDP issue
+            //ping every 15 so after 35 seconds VoIP UDP issue
             if (diff.Seconds > 35)
             {
                 CallOnMainVOIPConnect(false);
@@ -773,7 +773,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var thread = new Thread(() =>
             {
                 //wait for initial sync - then ping
-                if (_pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(5)))
+                if (_pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(2)))
                 {
                     return;
                 }
@@ -794,7 +794,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
 
                     //wait for cancel or quit
-                    var cancelled = _pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+                    var cancelled = _pingStop.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(15));
 
                     if (cancelled)
                     {
