@@ -26,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 3); //was 6
+            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 1); //was 3
 
             Array.Clear(_silence, 0, _silence.Length);
         }
