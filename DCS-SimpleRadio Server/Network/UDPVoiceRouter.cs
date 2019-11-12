@@ -290,7 +290,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     if (ip != null)
                     {
                         //DEBUG send back to sending client
-                         //outgoingList.Add(ip);
+                         outgoingList.Add(ip);
                     }
                 }
             }
