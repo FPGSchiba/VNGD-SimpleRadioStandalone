@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void StartListening()
         {
-            OptionNoDelay = true;
+            OptionKeepAlive = true;
             Start();
         }
 
