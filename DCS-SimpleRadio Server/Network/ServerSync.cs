@@ -104,8 +104,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 {
                     _logger.Info("Removed Disconnected Client " + state.SRSGuid);
 
-
-                    HandleClientDisconnect(client);
+                    //Dont tell others for now as a test
+                    HandleClientDisconnect(state,client);
                 }
 
                 try
@@ -188,7 +188,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 new List<SRClient>(_clients.Values)));
                         }
 
-                        HandleRadioClientsSync(state, message);
+                        HandleRadioClientsSync(state, message,srClient);
 
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
@@ -279,7 +279,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleClientDisconnect(SRClient client)
+        private void HandleClientDisconnect(SRSClientSession srsSession,SRClient client)
         {
             var message = new NetworkMessage()
             {
@@ -287,7 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
             };
 
-            Multicast(message.Encode());
+            MulticastAllExeceptOne(message.Encode(),srsSession.Id);
         }
 
         private void HandleClientRadioUpdate(SRSClientSession session,NetworkMessage message)
@@ -313,18 +313,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleRadioClientsSync(SRSClientSession session,NetworkMessage message)
+        private void HandleRadioClientsSync(SRSClientSession session,NetworkMessage message, SRClient client)
         {
             //store new client
             var replyMessage = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.SYNC,
-                Clients = new List<SRClient>(),
+                Clients = new List<SRClient>(_clients.Values),
                 ServerSettings = _serverSettings.ToDictionary(),
                 Version = UpdaterChecker.VERSION
             };
 
             session.Send(replyMessage.Encode());
+
+            //send update to everyone
+            //Remove Client Radio Info
+            var update = new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.UPDATE,
+                ServerSettings = _serverSettings.ToDictionary(),
+                Client = new SRClient
+                {
+                    ClientGuid = client.ClientGuid,
+                }
+            };
+
+            Multicast(update.Encode());
 
         }
 

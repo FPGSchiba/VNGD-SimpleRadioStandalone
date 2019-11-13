@@ -96,8 +96,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         protected override void OnError(SocketError error)
         {
-            Console.WriteLine($"Chat TCP session caught an error with code {error}");
+            Logger.Error( $"Socket Error: {error}");
         }
 
+        protected override void OnException(Exception error)
+        {
+            Logger.Error(error,$"Socket Exception: {error}");
+            Disconnect();
+        }
     }
 }

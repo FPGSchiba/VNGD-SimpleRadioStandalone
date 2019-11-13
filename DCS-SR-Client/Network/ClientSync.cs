@@ -256,7 +256,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Position = sideInfo.Position,
                             ClientGuid = _guid
                         },
-                        MsgType = NetworkMessage.MessageType.SYNC
+                        MsgType = NetworkMessage.MessageType.SYNC,
                     });
 
                     string line;
@@ -481,7 +481,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 message.Version = UpdaterChecker.VERSION;
 
-                var json = (JsonConvert.SerializeObject(message) + "\n");
+                var json = message.Encode();
 
                 if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
                 {
