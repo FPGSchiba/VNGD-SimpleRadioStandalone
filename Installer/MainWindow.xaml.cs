@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using IWshRuntimeLibrary;
 using Microsoft.Win32;
+using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using File = System.IO.File;
 
@@ -67,6 +68,15 @@ namespace Installer
             {
                 currentDirectory = currentDirectory.Replace("file:\\", "");
             }
+
+            if (((App) Application.Current).Arguments.Length > 0)
+            {
+                if (((App) Application.Current).Arguments[0].Equals("-autoupdate"))
+                {
+                    Install_Release(null,null);
+                }
+            }
+            
         }
 
 
