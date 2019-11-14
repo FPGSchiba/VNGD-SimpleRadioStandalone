@@ -126,7 +126,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _radioDCSSync = new RadioDCSSyncServer(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
-                _tcpClient.SendTimeout = 10;
                 try
                 {
                     _tcpClient.NoDelay = true;
@@ -487,7 +486,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Logger.Debug("Sending Radio Update To Server: "+ (json));
                 }
-
 
                 var bytes = Encoding.UTF8.GetBytes(json);
                 _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
