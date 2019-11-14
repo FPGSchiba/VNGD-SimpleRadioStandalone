@@ -35,6 +35,7 @@ namespace AutoUpdater
         private Uri _uri;
         private string _directory;
         private string _file;
+        private bool _cancel = false;
 
         public MainWindow()
         {
@@ -77,18 +78,18 @@ namespace AutoUpdater
                 wc.DownloadFileAsync(_uri, _file);
                 wc.DownloadFileCompleted += DownloadComplete;
             }
-
-
-            
         }
 
         private void DownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
-          
-            ZipFile.ExtractToDirectory(_file, _directory + "\\extract");
 
-            Process.Start(_directory + "\\extract\\installer.exe", "-autoupdate");
+            if (!_cancel)
+            {
+                ZipFile.ExtractToDirectory(_file, _directory + "\\extract");
 
+                Process.Start(_directory + "\\extract\\installer.exe", "-autoupdate");
+            }
+            
             Close();
         }
 
@@ -104,6 +105,17 @@ namespace AutoUpdater
         private void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             DownloadProgress.Value = e.ProgressPercentage;
+        }
+
+        private void CancelButtonClick(object sender, RoutedEventArgs e)
+        {
+            _cancel = true;
+            Close();
+        }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            _cancel = true;
         }
     }
 }
