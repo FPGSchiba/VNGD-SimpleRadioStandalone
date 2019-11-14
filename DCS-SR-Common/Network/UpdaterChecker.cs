@@ -104,7 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             if (result == MessageBoxResult.Yes)
             {
                 Process.Start(url);
-                Process.Start("Autoupdater.exe");
+                Process.Start("AutoUpdater.exe");
             }
         }
     }
