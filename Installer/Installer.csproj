@@ -249,7 +249,7 @@ copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\KY-58-RX-1600
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\Radio-RX-1600.wav" "$(SolutionDir)\install-build\Radio-TX-1600.wav"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\Radio-RX-1600.wav" "$(SolutionDir)\install-build\Radio-RX-1600.wav"
 copy /Y "$(SolutionDir)\Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)\install-build\Installer.exe"
-copy /Y "$(SolutionDir)\AutoUpdater\bin\Release\AutoUpdater.exe" "$(SolutionDir)\install-build\AutoUpdater.exe" 
+copy /Y "$(SolutionDir)\AutoUpdater\bin\Release\SRS-AutoUpdater.exe" "$(SolutionDir)\install-build\SRS-AutoUpdater.exe" 
 copy /Y "$(SolutionDir)\Scripts\DCS-SimpleRadioStandalone.lua" "$(SolutionDir)\install-build\DCS-SimpleRadioStandalone.lua"
 copy /Y "$(SolutionDir)\Scripts\DCS-SRSGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRSGameGUI.lua"
 copy /Y "$(SolutionDir)\Scripts\DCS-SRS-AutoConnectGameGUI.lua" "$(SolutionDir)\install-build\DCS-SRS-AutoConnectGameGUI.lua"

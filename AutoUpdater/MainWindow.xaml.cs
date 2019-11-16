@@ -12,14 +12,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Octokit;
+using MessageBox = System.Windows.MessageBox;
 using Path = System.IO.Path;
-
 
 namespace AutoUpdater
 {
@@ -36,16 +38,65 @@ namespace AutoUpdater
         private string _directory;
         private string _file;
         private bool _cancel = false;
+        private DispatcherTimer _progressCheckTimer;
+        private double _lastValue = -1;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            DownloadLatestVersion();
+            if (IsSimpleRadioRunning() || IsAnotherRunning())
+            {
+                MessageBox.Show("Please close DCS-SimpleRadio Standalone before running", "SRS Auto Updater",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+
+                return;
+            }
+
+            try
+            {
+                DownloadLatestVersion();
+            }
+            catch (Exception ex)
+            {
+                ShowError();
+            }
+            
+        }
+
+        private bool IsSimpleRadioRunning()
+        {
+            foreach (var clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-server") || clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-client"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsAnotherRunning()
+        {
+            Process currentProcess = Process.GetCurrentProcess();
+            string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
+
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.Id != currentProcess.Id &&
+                    clsProcess.ProcessName.ToLower().Trim() == currentProcessName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private async Task<Uri> GetPathToLatestVersion()
         {
+            Status.Content = "Finding Latest SRS Version";
             var githubClient = new GitHubClient(new ProductHeaderValue(GITHUB_USER_AGENT, "1.0.0.0"));
 
             var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
@@ -56,33 +107,78 @@ namespace AutoUpdater
                 if (!release.Prerelease)
                 {
                     var releaseAsset = release.Assets.First();
-                    return new System.Uri(releaseAsset.BrowserDownloadUrl);
+
+                    foreach (var asset in release.Assets)
+                    {
+                        if (asset.Name.ToLower().StartsWith("dcs-simpleradiostandalone") &&
+                            asset.Name.ToLower().Contains(".zip"))
+                        {
+                            Status.Content = "Downloading Version "+release.TagName;
+                            return new System.Uri(releaseAsset.BrowserDownloadUrl);
+                        }
+
+                    }
                 }
             }
 
             return null;
         }
 
+        public void ShowError()
+        {
+            MessageBox.Show("Error Auto Updating SRS - Please check internet connection and try again \n\nAlternatively: \n1. Download the latest DCS-SimpleRadioStandalone.zip from the SRS Github Release page\n2. Extract all the files to a temporary directory\n3. Run the installer.",
+                "Auto Updater Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            Close();
+        }
+
         public async void DownloadLatestVersion()
         {
-            //  System.Diagnostics.Process.Start(releaseAsset.BrowserDownloadUrl);
-
-            _uri = await GetPathToLatestVersion();
-
-            _directory = GetTemporaryDirectory();
-            _file = _directory + "\\temp.zip";
-
-            using (WebClient wc = new WebClient())
+            try
             {
-                wc.DownloadProgressChanged += DownloadProgressChanged;
-                wc.DownloadFileAsync(_uri, _file);
-                wc.DownloadFileCompleted += DownloadComplete;
+                _uri = await GetPathToLatestVersion();
+
+                _directory = GetTemporaryDirectory();
+                _file = _directory + "\\temp.zip";
+
+                using (WebClient wc = new MyWebClient())
+                {
+
+                    wc.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)");
+                    wc.DownloadProgressChanged += DownloadProgressChanged;
+                    wc.DownloadFileAsync(_uri, _file);
+                    wc.DownloadFileCompleted += DownloadComplete;
+
+                    //check download progress periodically - if the download is stalled we dont get told by anything
+                    _progressCheckTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+                    _progressCheckTimer.Tick += CheckProgress;
+                    _progressCheckTimer.Start();
+
+                }
             }
+            catch (Exception ex)
+            {
+               ShowError();
+            }
+        }
+
+        private void CheckProgress(object sender, EventArgs e)
+        {
+            if (_lastValue == DownloadProgress.Value)
+            {
+                //no progress
+                ShowError();
+            }
+
+            _lastValue = DownloadProgress.Value;
+
+
         }
 
         private void DownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
-
             if (!_cancel)
             {
                 ZipFile.ExtractToDirectory(_file, _directory + "\\extract");
@@ -116,6 +212,7 @@ namespace AutoUpdater
         private void OnClosing(object sender, CancelEventArgs e)
         {
             _cancel = true;
+            _progressCheckTimer?.Stop();
         }
     }
 }

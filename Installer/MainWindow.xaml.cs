@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -69,14 +70,14 @@ namespace Installer
                 currentDirectory = currentDirectory.Replace("file:\\", "");
             }
 
-            if (((App) Application.Current).Arguments.Length > 0)
+            if (((App)Application.Current).Arguments.Length > 0)
             {
-                if (((App) Application.Current).Arguments[0].Equals("-autoupdate"))
+                if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
                 {
-                    Install_Release(null,null);
+                    Install_Release(null, null);
                 }
             }
-            
+
         }
 
 
@@ -134,7 +135,7 @@ namespace Installer
 #endif
             foreach (var clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-"))
+                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-server") || clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-client"))
                 {
                     return true;
                 }
