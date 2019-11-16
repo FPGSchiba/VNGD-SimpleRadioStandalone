@@ -44,8 +44,8 @@ namespace AutoUpdater
         public MainWindow()
         {
             InitializeComponent();
-
-            if (IsSimpleRadioRunning() || IsAnotherRunning())
+            QuitSimpleRadio();
+            if (IsAnotherRunning())
             {
                 MessageBox.Show("Please close DCS-SimpleRadio Standalone before running", "SRS Auto Updater",
                     MessageBoxButton.OK, MessageBoxImage.Error);
@@ -65,16 +65,17 @@ namespace AutoUpdater
             
         }
 
-        private bool IsSimpleRadioRunning()
+        private void QuitSimpleRadio()
         {
             foreach (var clsProcess in Process.GetProcesses())
             {
                 if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-server") || clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-client"))
                 {
-                    return true;
+                    clsProcess.Kill();
+                    clsProcess.WaitForExit(5000);
+                    clsProcess.Dispose();
                 }
             }
-            return false;
         }
 
         private bool IsAnotherRunning()
