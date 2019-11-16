@@ -17,7 +17,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private ulong _lastRead; // gives current index
 
         private readonly object _lock = new object();
-        private ulong _missing; // counts missing packets
 
         //  private const int INITIAL_DELAY_MS = 200;
         //   private long _delayedUntil = -1; //holds audio for a period of time
@@ -26,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 3); //was 6
+            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 1); //was 3
 
             Array.Clear(_silence, 0, _silence.Length);
         }
@@ -88,17 +87,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                                     //fill with missing silence - will only add max of 5x Packet length but it could be a bunch of missing?
                                     var missing = audio.PacketNumber - (_lastRead + 1);
 
-                                    //update counter for interest
-                                    _missing += missing;
+                                    // packet number is always discontinuous at the start of a transmission if you didnt receive a transmission for a while i.e different radio channel
+                                    // if the gap is more than 4 assume its just a new transmission
 
-                                    //  Console.WriteLine("Missing Packet Total: "+_missing);
-
-                                    var fill = Math.Min(missing, 5);
-
-                                    for (var i = 0; i < (int) fill; i++)
+                                    if (missing <= 4)
                                     {
-                                        _circularBuffer.Write(_silence, 0, _silence.Length);
+                                        var fill = Math.Min(missing, 4);
+
+                                        for (var i = 0; i < (int)fill; i++)
+                                        {
+                                            _circularBuffer.Write(_silence, 0, _silence.Length);
+                                        }
                                     }
+                                  
                                 }
 
                                 _lastRead = audio.PacketNumber;

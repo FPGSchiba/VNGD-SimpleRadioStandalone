@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.7.0.0";
 
-        public static readonly string VERSION = "1.7.0.2";
+        public static readonly string VERSION = "1.7.0.3";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -104,6 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             if (result == MessageBoxResult.Yes)
             {
                 Process.Start(url);
+                Process.Start("AutoUpdater.exe");
             }
         }
     }
