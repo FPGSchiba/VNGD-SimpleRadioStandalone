@@ -325,6 +325,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
                                 //update position
                                 playerInfo.Position = radioInfo.pos;
+                                playerInfo.LngLngPosition = radioInfo.latLng;
                                 _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
                                 _clientSideUpdate();
                                 //     count = 0;

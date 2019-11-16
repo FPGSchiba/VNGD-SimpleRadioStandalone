@@ -261,6 +261,12 @@
                                Height="26"
                                HorizontalAlignment="Center" 
                                Margin="5,0,0,0" />
+                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="LotATC" />
+                        <Image x:Name="LotATCConnectionStatus"
+                               Source="/SR-ClientRadio;component/status-disconnected.png"
+                               Height="26"
+                               HorizontalAlignment="Center" 
+                               Margin="5,0,0,0" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

@@ -195,6 +195,7 @@
     <Compile Include="Network\DCS\Models\CombinedRadioState.cs" />
     <Compile Include="Network\DCS\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCS\Models\DCSLosCheckResult.cs" />
+    <Compile Include="Network\LotATC\LotATCPositionWrapper.cs" />
     <Compile Include="Network\UDPCommandHandler.cs" />
     <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="Settings\SynchedServerSettings.cs" />

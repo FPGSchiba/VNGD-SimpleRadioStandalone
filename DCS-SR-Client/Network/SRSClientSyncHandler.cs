@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Easy.MessageHub;
 using Newtonsoft.Json;
@@ -79,6 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Position = sideInfo.Position,
+                    LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
                 ExternalAWACSModePassword = password,
@@ -102,6 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         Coalition = 0,
                         Name = "",
                         Position = new DcsPosition { x = 0, y = 0, z = 0 },
+                        LatLngPosition = new DCSLatLngPosition(),
                         ClientGuid = _guid
                     },
                     MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT
@@ -176,7 +179,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Name = sideInfo.name,
                     ClientGuid = _guid,
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    Position = sideInfo.Position
+                    Position = sideInfo.Position,
+                    LatLngPosition = sideInfo.LngLngPosition
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             });
@@ -192,6 +196,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Position = sideInfo.Position,
+                    LatLngPosition = sideInfo.LngLngPosition
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE

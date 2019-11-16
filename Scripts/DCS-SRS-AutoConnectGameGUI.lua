@@ -160,6 +160,9 @@ SRSAuto.srsNudge = function()
         end
         local fileContent = SRSAuto.readFile(SRSAuto.SRS_NUDGE_PATH);
 
+		if fileContent then
+			return
+		end
         local srs = {}
         srs = SRSAuto.JSON:decode(fileContent)
 
