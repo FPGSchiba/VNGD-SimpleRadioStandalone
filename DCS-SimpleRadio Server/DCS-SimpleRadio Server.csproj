@@ -224,8 +224,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Network\NetCoreServer\Buffer.cs" />
     <Compile Include="Network\OutgoingVoice.cs" />
     <Compile Include="Network\PendingPacket.cs" />
+    <Compile Include="Network\SRSClientSession.cs" />
+    <Compile Include="Network\NetCoreServer\TcpClient.cs" />
+    <Compile Include="Network\NetCoreServer\TcpServer.cs" />
+    <Compile Include="Network\NetCoreServer\TcpSession.cs" />
     <Compile Include="Network\UDPVoiceRouter.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
     <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />

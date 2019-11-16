@@ -259,6 +259,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     Environment.Exit(1);
                 }
             }
+            else
+            {
+                //no mic....
+                _udpVoiceHandler =
+                    new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
+                var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
+                voiceSenderThread.Start();
+            }
         }
 
         private void ShowInputError(string message)

@@ -126,9 +126,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _radioDCSSync = new DCSRadioSyncHandler(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
-                _tcpClient.SendTimeout = 10;
                 try
                 {
+                    _tcpClient.SendTimeout = 10000;
                     _tcpClient.NoDelay = true;
 
                     // Wait for 10 seconds before aborting connection attempt - no SRS server running/port opened in that case
@@ -256,7 +256,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Position = sideInfo.Position,
                             ClientGuid = _guid
                         },
-                        MsgType = NetworkMessage.MessageType.SYNC
+                        MsgType = NetworkMessage.MessageType.SYNC,
                     });
 
                     string line;
@@ -481,13 +481,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 message.Version = UpdaterChecker.VERSION;
 
-                var json = (JsonConvert.SerializeObject(message) + "\n");
+                var json = message.Encode();
 
                 if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
                 {
                     Logger.Debug("Sending Radio Update To Server: "+ (json));
                 }
-
 
                 var bytes = Encoding.UTF8.GetBytes(json);
                 _tcpClient.GetStream().Write(bytes, 0, bytes.Length);

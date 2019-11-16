@@ -6,11 +6,13 @@ using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using IWshRuntimeLibrary;
 using Microsoft.Win32;
+using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using File = System.IO.File;
 
@@ -67,6 +69,15 @@ namespace Installer
             {
                 currentDirectory = currentDirectory.Replace("file:\\", "");
             }
+
+            if (((App)Application.Current).Arguments.Length > 0)
+            {
+                if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
+                {
+                    Install_Release(null, null);
+                }
+            }
+
         }
 
 
@@ -124,7 +135,7 @@ namespace Installer
 #endif
             foreach (var clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-"))
+                if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-server") || clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-client"))
                 {
                     return true;
                 }
@@ -280,6 +291,7 @@ namespace Installer
                 DeleteFileIfExists(path + "\\speexdsp.dll");
                 DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(path + "\\SR-Server.exe");
+                DeleteFileIfExists(path + "\\SRS-AutoUpdater.exe");
                 DeleteFileIfExists(path + "\\DCS-SimpleRadioStandalone.lua");
                 DeleteFileIfExists(path + "\\DCS-SRSGameGUI.lua");
                 DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
@@ -304,6 +316,7 @@ namespace Installer
             }
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
+            File.Copy(currentDirectory + "\\SRS-AutoUpdater.exe", path + "\\SRS-AutoUpdater.exe", true);
 
             File.Copy(currentDirectory + "\\beep-connected.wav", path + "\\AudioEffects\\beep-connected.wav", true);
             File.Copy(currentDirectory + "\\beep-disconnected.wav", path + "\\AudioEffects\\beep-disconnected.wav", true);
@@ -311,9 +324,9 @@ namespace Installer
             File.Copy(currentDirectory + "\\KY-58-RX-1600.wav", path + "\\AudioEffects\\KY-58-RX-1600.wav", true);
             File.Copy(currentDirectory + "\\Radio-TX-1600.wav", path + "\\AudioEffects\\Radio-TX-1600.wav", true);
             File.Copy(currentDirectory + "\\Radio-RX-1600.wav", path + "\\AudioEffects\\Radio-RX-1600.wav", true);
-
-
-            //    File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+            
+            //File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
+            
             File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
                 true);
             File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",

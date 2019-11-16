@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.7.0.0";
 
-        public static readonly string VERSION = "1.7.0.1";
+        public static readonly string VERSION = "1.7.0.3";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -98,10 +98,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
-            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to update?",
-                "Update available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to Auto update? This will close SRS",
+                "Update available", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
 
             if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    Process.Start("SRS-AutoUpdater.exe");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to Auto Update - please download latest version manually",
+                        "Auto Update Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+
+                    Process.Start(url);
+                }
+
+            }
+            else if (result == MessageBoxResult.No)
             {
                 Process.Start(url);
             }
