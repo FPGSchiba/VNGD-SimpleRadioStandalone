@@ -7,13 +7,13 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SRS AutoUpdater")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DCS-SimpleRadio Standalone Auto Updater")]
+[assembly: AssemblyDescription("Auto Updater for DCS-SimpleRadio Standalone")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SRS AutoUpdater")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Ciribob - GitHub.com/Ciribob")]
+[assembly: AssemblyProduct("DCS-SimpleRadio Standalone")]
+[assembly: AssemblyCopyright("Copyright ©  2016 - Ciribob")]
+[assembly: AssemblyTrademark("Ciribob - GitHub.com/Ciribob")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.7.0.3")]
+[assembly: AssemblyFileVersion("1.7.0.3")]

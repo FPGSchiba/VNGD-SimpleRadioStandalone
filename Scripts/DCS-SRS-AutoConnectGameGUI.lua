@@ -211,4 +211,4 @@ SRSAuto.sendMessage = function(msg, showTime, gid)
 end
 
 DCS.setUserCallbacks(SRSAuto)
-net.log("Loaded - DCS-SRS-AutoConnect1.7.0.3")
+net.log("Loaded - DCS-SRS-AutoConnect 1.7.0.3")
