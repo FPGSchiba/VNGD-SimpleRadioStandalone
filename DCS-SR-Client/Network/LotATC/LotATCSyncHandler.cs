@@ -212,8 +212,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if ((client.LatLngPosition != null && client.LatLngPosition.lat != 0) &&
-                        (client.LatLngPosition.lng != 0) && (client.ClientGuid == _guid))
+                    if ((client.LatLngPosition != null 
+                         && client.LatLngPosition.lat != 0) 
+                        && (client.LatLngPosition.lng != 0) 
+                        && (client.ClientGuid != _guid))
                     {
                         requests.Add(new LotATCLineOfSightRequest()
                         {
