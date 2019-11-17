@@ -92,7 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 return distance;
             }
 
-            return Math.Sqrt(Math.Pow(distance, 2) + Math.Pow(height , 2));
+            //distance^2 and height^2 
+            return Math.Sqrt((distance * distance) + (height * height));
 
         }
       
