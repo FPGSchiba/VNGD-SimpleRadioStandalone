@@ -717,6 +717,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MinimiseToTray.IsChecked = _settings.GetClientSetting(SettingsKeys.MinimiseToTray).BoolValue;
             StartMinimised.IsChecked = _settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue;
 
+            MicAGC.IsChecked = _settings.GetClientSetting(SettingsKeys.AGC).BoolValue;
+            MicDenoise.IsChecked = _settings.GetClientSetting(SettingsKeys.Denoise).BoolValue;
+
             RadioSoundEffects.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue;
             RadioSoundEffectsClipping.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue;
             AutoSelectChannel.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue;
@@ -1434,6 +1437,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
         {
             TabControl.SelectedItem = FavouritesSeversTab;
+        }
+
+        private void MicAGC_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.AGC).BoolValue =
+                (bool)MicAGC.IsChecked;
+            _settings.Save();
+        }
+
+        private void MicDenoise_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.Denoise).BoolValue =
+                (bool)MicDenoise.IsChecked;
+            _settings.Save();
         }
 
         private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
