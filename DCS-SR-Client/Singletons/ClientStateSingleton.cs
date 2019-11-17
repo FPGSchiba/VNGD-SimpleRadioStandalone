@@ -28,7 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public long DcsExportLastReceived { get; set; }
 
         // Timestamp for the last time 
-        private long LotATClastReceived { get; set; }
+        public long LotATCLastReceived { get; set; }
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
@@ -40,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool IsConnected { get; set; }
 
-        public bool IsLotATCConnected { get { return LotATClastReceived >= DateTime.Now.Ticks - 100000000; } }
+        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 100000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }

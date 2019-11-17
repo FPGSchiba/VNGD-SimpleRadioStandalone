@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -41,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
-        private DCSRadioSyncHandler _radioDCSSync = null;
+        private DCSRadioSyncManager _radioDCSSync = null;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
 
@@ -126,7 +127,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncHandler(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
             using (_tcpClient = new TcpClient())
             {
                 try
@@ -196,7 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Position = sideInfo.Position,
-                    LatLngPosition = sideInfo.LngLngPosition
+                    LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
@@ -292,6 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.Position = updatedSrClient.Position;
+                                                srClient.LatLngPosition = updatedSrClient.LatLngPosition,
 
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
 //                                                            srClient.Name + " Coalition: " +

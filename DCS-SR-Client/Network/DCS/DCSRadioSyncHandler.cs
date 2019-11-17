@@ -1,159 +1,48 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
 
-/**
-Keeps radio information in Sync Between DCS and
-
-**/
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
     public class DCSRadioSyncHandler
     {
-        public static readonly string AWACS_RADIOS_FILE = "awacs-radios.json";
-
-        public delegate void ClientSideUpdate();
-
-        public delegate void SendRadioUpdate();
-
+        private readonly DCSRadioSyncManager.SendRadioUpdate _radioUpdate;
+        private readonly ConcurrentDictionary<string, SRClient> _clients;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly SendRadioUpdate _clientRadioUpdate;
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
-        private readonly ClientSideUpdate _clientSideUpdate;
-        private readonly string _guid;
-
-        private UdpClient _dcsGameGuiudpListener;
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
 
-        private DCSLineOfSightHandler _lineOfSightHandler;
-        private UDPCommandHandler _udpCommandHandler;
-
-        private volatile bool _stop;
-        private volatile bool _stopExternalAWACSMode;
-
-        private ClientStateSingleton _clientStateSingleton;
-        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
-
-        public bool IsListening { get; private set; }
-        public static long LastSent { get; set; }
         private readonly SettingsStore _settings = SettingsStore.Instance;
 
-        public DCSRadioSyncHandler(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
-            ConcurrentDictionary<string, SRClient> clients, string guid)
+        private volatile bool _stop;
+
+        public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate,
+            ConcurrentDictionary<string, SRClient> clients)
         {
-            _clientRadioUpdate = clientRadioUpdate;
-            _clientSideUpdate = clientSideUpdate;
-            this._clients = clients;
-            _guid = guid;
-            _clientStateSingleton = ClientStateSingleton.Instance;
-            IsListening = false;
-            _lineOfSightHandler = new DCSLineOfSightHandler(clients,guid);
-            _udpCommandHandler = new UDPCommandHandler();
+            _radioUpdate = radioUpdate;
+            _clients = clients;
         }
 
-        public void Listen()
-        {
-            DcsListener();
-            IsListening = true;
-        }
-
-        public void StartExternalAWACSModeLoop()
-        {
-            _stopExternalAWACSMode = false;
-
-            RadioInformation[] awacsRadios;
-            try
-            {
-                string radioJson = File.ReadAllText(AWACS_RADIOS_FILE);
-                awacsRadios = JsonConvert.DeserializeObject<RadioInformation[]>(radioJson);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(ex, "Failed to load AWACS radio file");
-
-                awacsRadios = new RadioInformation[11];
-                for (int i = 0; i < 11; i++)
-                {
-                    awacsRadios[i] = new RadioInformation
-                    {
-                        freq = 1,
-                        freqMin = 1,
-                        freqMax = 1,
-                        secFreq = 0,
-                        modulation = RadioInformation.Modulation.DISABLED,
-                        name = "No Radio",
-                        freqMode = RadioInformation.FreqMode.COCKPIT,
-                        encMode = RadioInformation.EncryptionMode.NO_ENCRYPTION,
-                        volMode = RadioInformation.VolumeMode.COCKPIT
-                    };
-                }
-            }
-
-            // Force an immediate update of radio information
-            _clientStateSingleton.LastSent = 0;
-
-            Task.Factory.StartNew(() =>
-            {
-                Logger.Debug("Starting external AWACS mode loop");
-
-                while (!_stopExternalAWACSMode)
-                {
-                    ProcessRadioInfo(new DCSPlayerRadioInfo
-                    {
-                        LastUpdate = 0,
-                        control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS,
-                        name = _clientStateSingleton.LastSeenName,
-                        pos = new DcsPosition { x = 0, y = 0, z = 0 },
-                        ptt = false,
-                        radios = awacsRadios,
-                        selected = 1,
-                        simultaneousTransmission = false,
-                        unit = "External AWACS",
-                        unitId = 100000001
-                    });
-
-                    Thread.Sleep(200);
-                }
-
-                Logger.Debug("Stopping external AWACS mode loop");
-            });
-        }
-
-        public void StopExternalAWACSModeLoop()
-        {
-            _stopExternalAWACSMode = true;
-        }
-
-        private void DcsListener()
-        {
-            StartDcsBroadcastListener();
-            StartDcsGameGuiBroadcastListener();
-            _lineOfSightHandler.Start();
-            _udpCommandHandler.Start();
-        }
-
-        private void StartDcsBroadcastListener()
+        public void Start()
         {
             _dcsUdpListener = new UdpClient();
             _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -227,6 +116,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             });
         }
 
+
+        public void ProcessRadioInfo(DCSPlayerRadioInfo message)
+        {
+            var update = UpdateRadio(message);
+
+            //send to DCS UI
+            SendRadioUpdateToDCS();
+
+            Logger.Debug("Update sent to DCS");
+
+            if (update || IsRadioInfoStale(message))
+            {
+                Logger.Debug("Sending Radio Info To Server - Stale");
+                _clientStateSingleton.LastSent = DateTime.Now.Ticks;
+                _radioUpdate();
+            }
+        }
+
         //send updated radio info back to DCS for ingame GUI
         private void SendRadioUpdateToDCS()
         {
@@ -288,95 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
-        private void StartDcsGameGuiBroadcastListener()
-        {
-            _dcsGameGuiudpListener = new UdpClient();
-            _dcsGameGuiudpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _dcsGameGuiudpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            //    var multicastaddress = IPAddress.Parse("239.255.50.10");
-            //   _dcsGameGuiudpListener.JoinMulticastGroup(multicastaddress);
-
-            var localEp = new IPEndPoint(IPAddress.Any,
-                _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
-            _dcsGameGuiudpListener.Client.Bind(localEp);
-            //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
-
-            Task.Factory.StartNew(() =>
-            {
-                using (_dcsGameGuiudpListener)
-                {
-                    //    var count = 0;
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
-                            var bytes = _dcsGameGuiudpListener.Receive(ref groupEp);
-
-                            var playerInfo =
-                                JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            if (playerInfo != null)
-                            {
-                                var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-                                //update position
-                                playerInfo.Position = radioInfo.pos;
-                                playerInfo.LngLngPosition = radioInfo.latLng;
-                                _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
-                                _clientSideUpdate();
-                                //     count = 0;
-
-                                _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS GameGUI Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS GameGUI Message");
-                        }
-                    }
-
-                    try
-                    {
-                        _dcsGameGuiudpListener.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Exception stoping DCS listener ");
-                    }
-                }
-            });
-        }
-
-
-        private void ProcessRadioInfo(DCSPlayerRadioInfo message)
-        {
-            var update = UpdateRadio(message);
-
-            //send to DCS UI
-            SendRadioUpdateToDCS();
-
-            Logger.Debug("Update sent to DCS");
-
-            if (update || IsRadioInfoStale(message))
-            {
-                Logger.Debug("Sending Radio Info To Server - Stale");
-                _clientStateSingleton.LastSent = DateTime.Now.Ticks;
-                _clientRadioUpdate();
-            }
-        }
-
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
             var changed = false;
@@ -388,7 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             //update common parts
             playerRadioInfo.name = message.name;
-
+            playerRadioInfo.isFlying = message.isFlying;
 
             if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
@@ -628,7 +446,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //change PTT last
             if (!_settings.GetClientSetting(SettingsKeys.AllowDCSPTT).BoolValue)
             {
-                playerRadioInfo.ptt =false;
+                playerRadioInfo.ptt = false;
             }
             else
             {
@@ -659,9 +477,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public void Stop()
         {
             _stop = true;
-            _stopExternalAWACSMode = true;
-            IsListening = false;
-
             try
             {
                 _dcsUdpListener?.Close();
@@ -672,24 +487,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             try
             {
-                _dcsGameGuiudpListener?.Close();
-            }
-            catch (Exception ex)
-            {
-            }
-
-            _lineOfSightHandler.Stop();
-           
-
-            try
-            {
                 _dcsRadioUpdateSender?.Close();
             }
             catch (Exception ex)
             {
             }
-
-            
         }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -60,5 +61,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 Math.Abs(
                     Math.Sqrt(Math.Pow(too.x - from.x, 2) + Math.Pow(too.y - from.y, 2) + Math.Pow(too.z - from.z, 2)));
         }
+
+        public static double CalculateDistanceHaversine(DCSLatLngPosition myLatLng, DCSLatLngPosition clientLatLng)
+        {
+
+            if (myLatLng.lat == clientLatLng.lat || myLatLng.lng == clientLatLng.lng)
+            {
+                //the above will cause a divide by 0 error so this is protection against that....
+                //should be *almost* impossible...
+                return 0;
+            }
+
+            const double r = 6371; // meters
+
+            var sdlat = Math.Sin((clientLatLng.lat - myLatLng.lat) / 2);
+            var sdlon = Math.Sin((clientLatLng.lng - myLatLng.lng) / 2);
+            var q = sdlat * sdlat + Math.Cos(myLatLng.lat) * Math.Cos(clientLatLng.lat) * sdlon * sdlon;
+            var d = 2 * r * Math.Asin(Math.Sqrt(q));
+
+            return PythagDistance(d,myLatLng.alt-clientLatLng.alt);
+        }
+
+        //we have haversine great circle distance - but as they're aircraft we need to offset for height as that gives the real distance
+        private static double PythagDistance(double distance, double height)
+        {
+            height = Math.Abs(height);
+            distance = Math.Abs(distance);
+            if (height == 0)
+            {
+                return distance;
+            }
+
+            return Math.Sqrt(Math.Pow(distance, 2) + Math.Pow(height , 2));
+
+        }
+      
     }
 }

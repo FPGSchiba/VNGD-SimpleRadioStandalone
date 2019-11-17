@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models
 {
     public struct DCSLosCheckResult
     {

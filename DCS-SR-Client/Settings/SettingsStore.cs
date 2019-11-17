@@ -95,7 +95,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AutoConnectMismatchPrompt = 81, //message about auto connect mismatch
 
         DisableWindowVisibilityCheck = 82,
-        PlayConnectionSounds = 83
+        PlayConnectionSounds = 83,
+
+        //LotATC
+        LotATCIncomingUDP = 90, //10710
+        LotATCOutgoingUDP = 91 //10711
     }
 
     public enum InputBinding
@@ -367,7 +371,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.AllowMultipleInstances.ToString(), "false"},
 
             {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"},
-            {SettingsKeys.PlayConnectionSounds.ToString(), "true"}
+            {SettingsKeys.PlayConnectionSounds.ToString(), "true"},
+
+            {SettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
+            {SettingsKeys.LotATCOutgoingUDP.ToString(), "10711"}
         };
 
         public InputDevice GetControlSetting(InputBinding key)

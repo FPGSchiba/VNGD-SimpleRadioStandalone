@@ -10,7 +10,7 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
     public class DCSAutoConnectHandler
     {

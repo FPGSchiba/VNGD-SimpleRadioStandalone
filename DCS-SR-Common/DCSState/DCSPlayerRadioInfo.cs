@@ -17,6 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string name = "";
         public DcsPosition pos = new DcsPosition();
         public DCSLatLngPosition latLng = new DCSLatLngPosition();
+        public bool isFlying = false;
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom

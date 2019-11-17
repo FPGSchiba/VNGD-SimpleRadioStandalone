@@ -300,13 +300,13 @@ namespace Installer
                 DeleteFileIfExists(path + "\\DCS-SRS-hook.lua");
             }
             //sleep! WTF directory is lagging behind state here...
-            Thread.Sleep(200);
+            Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
             CreateDirectory(path);
             CreateDirectory(path + "\\AudioEffects");
 
             //sleep! WTF directory is lagging behind state here...
-            Thread.Sleep(200);
+            Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
@@ -370,7 +370,7 @@ namespace Installer
 
                 dir.Refresh();
                 //sleep! WTF directory is lagging behind state here...
-                Thread.Sleep(200);
+                Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
                 var dSecurity = dir.GetAccessControl();
                 dSecurity.AddAccessRule(new FileSystemAccessRule(
@@ -387,7 +387,7 @@ namespace Installer
             //if scripts folder doesnt exist, create it
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "\\Hooks");
-            Thread.Sleep(100);
+            Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
 
             var write = true;
             //does it contain an export.lua?

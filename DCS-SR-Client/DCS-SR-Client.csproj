@@ -191,11 +191,15 @@
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
+    <Compile Include="Network\DCS\DCSGameGuiHandler.cs" />
     <Compile Include="Network\DCS\DCSLineOfSightHandler.cs" />
+    <Compile Include="Network\DCS\DCSRadioSyncHandler.cs" />
     <Compile Include="Network\DCS\Models\CombinedRadioState.cs" />
     <Compile Include="Network\DCS\Models\DCSLosCheckRequest.cs" />
     <Compile Include="Network\DCS\Models\DCSLosCheckResult.cs" />
-    <Compile Include="Network\LotATC\LotATCPositionWrapper.cs" />
+    <Compile Include="Network\LotATC\Models\LotATCLineOfSightRequest.cs" />
+    <Compile Include="Network\LotATC\Models\LotATCMessageWrapper.cs" />
+    <Compile Include="Network\LotATC\LotATCSyncHandler.cs" />
     <Compile Include="Network\UDPCommandHandler.cs" />
     <Compile Include="Network\UDPVoiceHandler.cs" />
     <Compile Include="Settings\SynchedServerSettings.cs" />
@@ -252,7 +256,7 @@
       <DependentUpon>RadioOverlay.xaml</DependentUpon>
     </Compile>
     <Compile Include="Network\Models\RadioSendingState.cs" />
-    <Compile Include="Network\DCS\DCSRadioSyncHandler.cs" />
+    <Compile Include="Network\DCS\DCSRadioSyncManager.cs" />
     <Compile Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>

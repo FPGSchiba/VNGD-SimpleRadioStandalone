@@ -1,11 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +7,20 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCSRadioSyncHandler;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Newtonsoft.Json;
+using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
     public class DCSLineOfSightHandler
     {
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
-        private readonly ClientStateSingleton _clientStateSingleton;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
         private readonly SettingsStore _settings = SettingsStore.Instance;
@@ -33,8 +32,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             _clients = clients;
             _guid = guid;
-            _clientStateSingleton = ClientStateSingleton.Instance;
-     
         }
 
         public void Start()
