@@ -73,7 +73,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
 
                             if (lotAtcPositionWrapper != null )
                             {
-                                //TODO DO SOMETHING WITH THIS!
+                                
                                 if (lotAtcPositionWrapper.los != null)
                                 {
                                     HandleLOSResponse(lotAtcPositionWrapper.los);
@@ -116,7 +116,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             _clientStateSingleton.LotATCLastReceived = DateTime.Now.Ticks;
 
             //TODO only update position if player isnt in aircraft
-            if (_clientStateSingleton.ShouldUseLotATCPosition() && _clientStateSingleton.InExternalAWACSMode)
+            if (_clientStateSingleton.ShouldUseLotATCPosition())
             {
                 _clientStateSingleton.UpdatePlayerPosition(new DcsPosition(), new DCSLatLngPosition(controller.latitude,controller.longitude,controller.altitude));
                 long diff = DateTime.Now.Ticks - _lastSent;
@@ -206,14 +206,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             if (_clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition != null
                 && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lng != 0
                 && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lat != 0 
-                && _clientStateSingleton.IsLotATCConnected 
+                && _clientStateSingleton.ShouldUseLotATCPosition() 
                 && _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 foreach (var client in clients)
                 {
                     //only check if its worth it
                     if ((client.LatLngPosition != null && client.LatLngPosition.lat != 0) &&
-                        (client.LatLngPosition.lng != 0) && (client.ClientGuid != _guid))
+                        (client.LatLngPosition.lng != 0) && (client.ClientGuid == _guid))
                     {
                         requests.Add(new LotATCLineOfSightRequest()
                         {

@@ -205,7 +205,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             //update common parts
             playerRadioInfo.name = message.name;
-            playerRadioInfo.isFlying = message.isFlying;
+            playerRadioInfo.inAircraft = message.inAircraft;
 
             if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
@@ -219,9 +219,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             playerRadioInfo.unit = message.unit;
 
-        
-            _clientStateSingleton.UpdatePlayerPosition(message.pos,message.latLng);
 
+            if (!_clientStateSingleton.ShouldUseLotATCPosition())
+            {
+                _clientStateSingleton.UpdatePlayerPosition(message.pos, message.latLng);
+            }
+            
             var overrideFreqAndVol = false;
 
             var newAircraft = playerRadioInfo.unitId != message.unitId || !playerRadioInfo.IsCurrent();

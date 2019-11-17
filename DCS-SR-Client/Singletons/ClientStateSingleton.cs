@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool IsConnected { get; set; }
 
-        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 30000000; } }
+        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 50000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
@@ -104,7 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             if (IsGameExportConnected)
             {
-                if (DcsPlayerRadioInfo.isFlying)
+                if (DcsPlayerRadioInfo.inAircraft)
                 {
                     return false;
                 }
@@ -118,29 +118,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             //not game or Lotatc - clear it!
             if (!IsLotATCConnected && !IsGameExportConnected)
             {
-                DcsPlayerRadioInfo.pos = new DcsPosition();
+                PlayerCoaltionLocationMetadata.Position = new DcsPosition();
                 PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
             }
         }
 
         public void UpdatePlayerPosition(DcsPosition dcsPosition, DCSLatLngPosition latLngPosition)
         {
-            if (ShouldUseLotATCPosition())
-            {
-                PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-                PlayerCoaltionLocationMetadata.Position = new DcsPosition(); //clear DCS position
+            PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
+            PlayerCoaltionLocationMetadata.Position = dcsPosition;
 
-                DcsPlayerRadioInfo.pos = new DcsPosition();
-                DcsPlayerRadioInfo.latLng = latLngPosition;
-            }
-            else
-            {
-                PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-                PlayerCoaltionLocationMetadata.Position = dcsPosition;
-
-                DcsPlayerRadioInfo.pos = dcsPosition;
-                DcsPlayerRadioInfo.latLng = latLngPosition;
-            }
+            DcsPlayerRadioInfo.pos = dcsPosition;
+            DcsPlayerRadioInfo.latLng = latLngPosition;
+            
         }
 
 

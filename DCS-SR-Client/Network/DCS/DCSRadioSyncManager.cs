@@ -108,7 +108,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         simultaneousTransmission = false,
                         unit = "External AWACS",
                         unitId = 100000001,
-                        isFlying = false
+                        inAircraft = false
                     });
 
                     Thread.Sleep(200);
