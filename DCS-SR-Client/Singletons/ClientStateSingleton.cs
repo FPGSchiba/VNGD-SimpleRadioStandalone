@@ -40,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool IsConnected { get; set; }
 
-        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 100000000; } }
+        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 30000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }

@@ -58,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+                            _settings.GetNetworkSetting(SettingsKeys.LotATCIncomingUDP));
                             var bytes = _lotATCPositionListener.Receive(ref groupEp);
 
                             var lotAtcPositionWrapper =
@@ -164,7 +164,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
 
                                         _udpSocket.Send(byteData, byteData.Length, _host);
 
-                                        //every 100 - Wait for the queue
+                                        //every 50ms - Wait for the queue
                                         Thread.Sleep(50);
                                     }
                                 }
@@ -175,7 +175,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
                         {
                             Logger.Error(e, "Exception Sending LotATC LOS Request Message");
                         }
-                        //every 300 - Wait for the queue
+                        //every 2000 - Wait for the queue
                         Thread.Sleep(2000);
                     }
 
@@ -199,29 +199,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
 
             if (_clientStateSingleton.DcsPlayerSideInfo.LngLngPosition != null
                 && _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lng != 0
-                && _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat != 0)
+                && _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat != 0 
+                && _clientStateSingleton.IsLotATCConnected 
+                && _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
-                if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
+                foreach (var client in clients)
                 {
-                    foreach (var client in clients)
+                    //only check if its worth it
+                    if ((client.LatLngPosition != null && client.LatLngPosition.lat != 0) &&
+                        (client.LatLngPosition.lng != 0) && (client.ClientGuid != _guid))
                     {
-                        //only check if its worth it
-                        if ((client.LatLngPosition != null && client.LatLngPosition.lat != 0) &&
-                            (client.LatLngPosition.lng != 0) && (client.ClientGuid != _guid))
+                        requests.Add(new LotATCLineOfSightRequest()
                         {
-                            requests.Add(new LotATCLineOfSightRequest()
-                            {
-                                lat1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat,
-                                long1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lng,
-                                alt1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.alt,
+                            lat1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat,
+                            long1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lng,
+                            alt1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.alt,
 
-                                lat2 = client.LatLngPosition.lat,
-                                long2 = client.LatLngPosition.lng,
-                                alt2 = client.LatLngPosition.alt,
+                            lat2 = client.LatLngPosition.lat,
+                            long2 = client.LatLngPosition.lng,
+                            alt2 = client.LatLngPosition.alt,
 
-                                clientId = client.ClientGuid
-                            });
-                        }
+                            clientId = client.ClientGuid
+                        });
                     }
                 }
             }

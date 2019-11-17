@@ -694,6 +694,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 GameConnectionStatus.Source = Images.IconDisconnected;
             }
+
+            if (_clientStateSingleton.IsLotATCConnected)
+            {
+                LotATCConnectionStatus.Source = Images.IconConnected;
+            }
+            else
+            {
+                LotATCConnectionStatus.Source = Images.IconDisconnected;
+            }
         }
 
 

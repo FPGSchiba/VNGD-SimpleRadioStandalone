@@ -48,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _clients);
         }
 
-        public void Listen()
+        public void Start()
         {
             DcsListener();
             IsListening = true;
