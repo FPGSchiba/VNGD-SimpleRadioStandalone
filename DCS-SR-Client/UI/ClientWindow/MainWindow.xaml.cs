@@ -16,6 +16,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -51,8 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
-        private ClientSync _client;
-        private DCSAutoConnectListener _dcsAutoConnectListener;
+        private SRSClientSyncHandler _client;
+        private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
         private Overlay.RadioOverlayWindow _radioOverlayWindow;
@@ -159,7 +160,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitFlowDocument();
 
-            _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
+            _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
@@ -693,6 +694,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 GameConnectionStatus.Source = Images.IconDisconnected;
             }
+
+            if (_clientStateSingleton.IsLotATCConnected)
+            {
+                LotATCConnectionStatus.Source = Images.IconConnected;
+            }
+            else
+            {
+                LotATCConnectionStatus.Source = Images.IconDisconnected;
+            }
         }
 
 
@@ -749,7 +759,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new ClientSync(_clients, _guid, UpdateUICallback);
+                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback);
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
@@ -870,7 +880,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             _clientStateSingleton.DcsPlayerRadioInfo.Reset();
-            _clientStateSingleton.DcsPlayerSideInfo.Reset();
+            _clientStateSingleton.PlayerCoaltionLocationMetadata.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1558,8 +1568,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (result)
             {
                 _clientStateSingleton.InExternalAWACSMode = true;
-                _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
-                _clientStateSingleton.DcsPlayerSideInfo.name = _clientStateSingleton.LastSeenName;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = coalition;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = _clientStateSingleton.LastSeenName;
                 _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
@@ -1569,8 +1579,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 _clientStateSingleton.InExternalAWACSMode = false;
-                _clientStateSingleton.DcsPlayerSideInfo.side = 0;
-                _clientStateSingleton.DcsPlayerSideInfo.name = "";
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = 0;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
                 _clientStateSingleton.LastSent = 0;

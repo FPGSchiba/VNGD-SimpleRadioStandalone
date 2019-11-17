@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 {
     public struct DcsPosition
     {

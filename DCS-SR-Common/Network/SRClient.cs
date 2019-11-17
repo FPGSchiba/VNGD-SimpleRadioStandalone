@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
@@ -40,6 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
         public DcsPosition Position { get; set; }
+
+        public DCSLatLngPosition LatLngPosition { get; set; }
 
         [JsonIgnore]
         public float LineOfSightLoss

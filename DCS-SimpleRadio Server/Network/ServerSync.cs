@@ -249,7 +249,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.Position = message.Client.Position;
-
+                    client.LatLngPosition = message.Client.LatLngPosition;
 
                     //send update to everyone
                     //Remove Client Radio Info
@@ -263,7 +263,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             Coalition = client.Coalition,
                             Name = client.Name,
                             LastUpdate = client.LastUpdate,
-                            Position = client.Position
+                            Position = client.Position,
+                            LatLngPosition = client.LatLngPosition
                         }
                     };
 
@@ -306,7 +307,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Coalition = message.Client.Coalition;
                     client.RadioInfo = message.Client.RadioInfo;
                     client.Position = message.Client.Position;
-
+                    client.LatLngPosition = message.Client.LatLngPosition;
 
                     //    _logger.Info("Received Radio Update");
                 }
@@ -389,7 +390,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     Coalition = clientCoalition,
                     Name = client.Name,
                     LastUpdate = client.LastUpdate,
-                    Position = client.Position
+                    Position = client.Position,
+                    LatLngPosition = client.LatLngPosition
                 }
             };
 
@@ -416,7 +418,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         Coalition = client.Coalition,
                         Name = client.Name,
                         LastUpdate = client.LastUpdate,
-                        Position = client.Position
+                        Position = client.Position,
+                        LatLngPosition = client.LatLngPosition
                     }
                 };
 

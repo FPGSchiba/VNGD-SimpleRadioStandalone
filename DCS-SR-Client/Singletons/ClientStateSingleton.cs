@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
@@ -17,14 +18,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public delegate bool RadioUpdatedCallback();
 
         private List<RadioUpdatedCallback> _radioCallbacks = new List<RadioUpdatedCallback>();
+      
 
         public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
-        public DCSPlayerSideInfo DcsPlayerSideInfo { get; set; }
+        public DCSPlayerSideInfo PlayerCoaltionLocationMetadata { get; set; }
 
         // Timestamp the last UDP Game GUI broadcast was received from DCS, used for determining active game connection
         public long DcsGameGuiLastReceived { get; set; }
         // Timestamp the last UDP Export broadcast was received from DCS, used for determining active game connection
         public long DcsExportLastReceived { get; set; }
+
+        // Timestamp for the last time 
+        public long LotATCLastReceived { get; set; }
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
@@ -35,6 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public long LastSent { get; set; }
 
         public bool IsConnected { get; set; }
+
+        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 50000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
@@ -48,7 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private ClientStateSingleton()
         {
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
-            DcsPlayerSideInfo = new DCSPlayerSideInfo();
+            PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 
             DcsGameGuiLastReceived = 0;
             DcsExportLastReceived = 0;
@@ -87,5 +94,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 return _instance;
             }
         }
+
+        public bool ShouldUseLotATCPosition()
+        {
+            if (!IsLotATCConnected)
+            {
+                return false;
+            }
+
+            if (IsGameExportConnected)
+            {
+                if (DcsPlayerRadioInfo.inAircraft)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void ClearPositionsIfExpired()
+        {
+            //not game or Lotatc - clear it!
+            if (!IsLotATCConnected && !IsGameExportConnected)
+            {
+                PlayerCoaltionLocationMetadata.Position = new DcsPosition();
+                PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
+            }
+        }
+
+        public void UpdatePlayerPosition(DcsPosition dcsPosition, DCSLatLngPosition latLngPosition)
+        {
+            PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
+            PlayerCoaltionLocationMetadata.Position = dcsPosition;
+
+            DcsPlayerRadioInfo.pos = dcsPosition;
+            DcsPlayerRadioInfo.latLng = latLngPosition;
+            
+        }
+
+
     }
 }
