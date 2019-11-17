@@ -14,6 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             name = "";
             side = 0;
             Position = new DcsPosition();
+            LngLngPosition = new DCSLatLngPosition();
         }
     }
 }

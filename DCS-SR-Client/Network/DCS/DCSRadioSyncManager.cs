@@ -107,7 +107,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         latLng = new DCSLatLngPosition(),
                         simultaneousTransmission = false,
                         unit = "External AWACS",
-                        unitId = 100000001
+                        unitId = 100000001,
+                        isFlying = false
                     });
 
                     Thread.Sleep(200);

@@ -79,7 +79,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             var q = sdlat * sdlat + Math.Cos(myLatLng.lat) * Math.Cos(clientLatLng.lat) * sdlon * sdlon;
             var d = 2 * r * Math.Asin(Math.Sqrt(q));
 
-            return PythagDistance(d,myLatLng.alt-clientLatLng.alt);
+            return Math.Abs(PythagDistance(d, myLatLng.alt - clientLatLng.alt));
         }
 
         //we have haversine great circle distance - but as they're aircraft we need to offset for height as that gives the real distance

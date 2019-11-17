@@ -880,7 +880,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             _clientStateSingleton.DcsPlayerRadioInfo.Reset();
-            _clientStateSingleton.DcsPlayerSideInfo.Reset();
+            _clientStateSingleton.PlayerCoaltionLocationMetadata.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1568,8 +1568,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (result)
             {
                 _clientStateSingleton.InExternalAWACSMode = true;
-                _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
-                _clientStateSingleton.DcsPlayerSideInfo.name = _clientStateSingleton.LastSeenName;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = coalition;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = _clientStateSingleton.LastSeenName;
                 _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
@@ -1579,8 +1579,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 _clientStateSingleton.InExternalAWACSMode = false;
-                _clientStateSingleton.DcsPlayerSideInfo.side = 0;
-                _clientStateSingleton.DcsPlayerSideInfo.name = "";
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = 0;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
                 _clientStateSingleton.LastSent = 0;

@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -23,16 +24,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
     public class LotATCSyncHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly long UPDATE_SYNC_RATE = 5*1000 * 10000; //There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update every 5 seconds
         private UdpClient _lotATCPositionListener;
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private volatile bool _stop = false;
         private readonly ClientStateSingleton _clientStateSingleton;
+        private readonly DCSRadioSyncManager.ClientSideUpdate _clientSideUpdate;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
+        private long _lastSent = 0;
 
-        public LotATCSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid)
+        public LotATCSyncHandler(DCSRadioSyncManager.ClientSideUpdate clientSideUpdate, ConcurrentDictionary<string, SRClient> clients,
+            string guid)
         {
+            _clientSideUpdate = clientSideUpdate;
             _clients = clients;
             _guid = guid;
             _clientStateSingleton = ClientStateSingleton.Instance;
@@ -110,16 +116,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             _clientStateSingleton.LotATCLastReceived = DateTime.Now.Ticks;
 
             //TODO only update position if player isnt in aircraft
-            if (!_clientStateSingleton.DcsPlayerRadioInfo.isFlying)
+            if (_clientStateSingleton.ShouldUseLotATCPosition() && _clientStateSingleton.InExternalAWACSMode)
             {
-                _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition = new DCSLatLngPosition(
-                     controller.latitude,
-                    controller.longitude,
-                    controller.altitude
-                );
+                _clientStateSingleton.UpdatePlayerPosition(new DcsPosition(), new DCSLatLngPosition(controller.latitude,controller.longitude,controller.altitude));
+                long diff = DateTime.Now.Ticks - _lastSent;
 
-                //set normal position to 0
-                _clientStateSingleton.DcsPlayerSideInfo.Position = new DcsPosition();
+                if (diff > UPDATE_SYNC_RATE) // There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update ever 5 seconds
+                {
+                    _lastSent = DateTime.Now.Ticks;
+                    _clientSideUpdate();
+                }
             }
 
         }
@@ -197,9 +203,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
 
             var requests = new List<LotATCLineOfSightRequest>();
 
-            if (_clientStateSingleton.DcsPlayerSideInfo.LngLngPosition != null
-                && _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lng != 0
-                && _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat != 0 
+            if (_clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition != null
+                && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lng != 0
+                && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lat != 0 
                 && _clientStateSingleton.IsLotATCConnected 
                 && _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
@@ -211,9 +217,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
                     {
                         requests.Add(new LotATCLineOfSightRequest()
                         {
-                            lat1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lat,
-                            long1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.lng,
-                            alt1 = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition.alt,
+                            lat1 = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lat,
+                            long1 = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lng,
+                            alt1 = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.alt,
 
                             lat2 = client.LatLngPosition.lat,
                             long2 = client.LatLngPosition.lng,

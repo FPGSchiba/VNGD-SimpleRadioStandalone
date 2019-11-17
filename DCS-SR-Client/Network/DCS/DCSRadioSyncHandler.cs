@@ -199,7 +199,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         {
             var changed = false;
 
-
             var expansion = _serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION);
 
             var playerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
@@ -219,7 +218,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             }
 
             playerRadioInfo.unit = message.unit;
-            playerRadioInfo.pos = message.pos;
+
+        
+            _clientStateSingleton.UpdatePlayerPosition(message.pos,message.latLng);
 
             var overrideFreqAndVol = false;
 

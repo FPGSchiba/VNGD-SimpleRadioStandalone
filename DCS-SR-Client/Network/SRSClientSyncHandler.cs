@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _externalAWACSModeCallback = callback;
 
-            var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
+            var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
             sideInfo.name = _clientStateSingleton.LastSeenName;
             SendToServer(new NetworkMessage
             {
@@ -136,7 +136,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             bool connectionError = false;
 
             _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
-            _lotATCSync = new LotATCSyncHandler(_clients, _guid);
+            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate,_clients, _guid);
             using (_tcpClient = new TcpClient())
             {
                 try
@@ -182,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private void ClientRadioUpdated()
         {
             Logger.Debug("Sending Radio Update to Server");
-            var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
+            var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
             SendToServer(new NetworkMessage
             {
                 Client = new SRClient
@@ -200,7 +200,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientCoalitionUpdate()
         {
-            var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
+            var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
             SendToServer(new NetworkMessage
             {
                 Client = new SRClient
@@ -262,7 +262,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
-                    var sideInfo = _clientStateSingleton.DcsPlayerSideInfo;
+                    var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
                     //start the loop off by sending a SYNC Request
                     SendToServer(new NetworkMessage
                     {

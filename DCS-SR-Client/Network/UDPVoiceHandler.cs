@@ -520,13 +520,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.DcsPlayerSideInfo.Position;
+                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
 
                 var clientPos = transmittingClient.Position;
 
                 if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
                 {
-                    var myLatLng= _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition;
+                    var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
                     var clientLatLng = transmittingClient.LatLngPosition;
                     //No DCS Position - do we have LotATC Position?
                     if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))
@@ -555,14 +555,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.DcsPlayerSideInfo.Position;
+                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
 
                 var clientPos = transmittingClient.Position;
 
                 double dist = 0;
                 if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
                 {
-                    var myLatLng = _clientStateSingleton.DcsPlayerSideInfo.LngLngPosition;
+                    var myLatLng = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
                     var clientLatLng = transmittingClient.LatLngPosition;
                     //No DCS Position - do we have LotATC Position?
                     if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
@@ -20,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
       
 
         public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
-        public DCSPlayerSideInfo DcsPlayerSideInfo { get; set; }
+        public DCSPlayerSideInfo PlayerCoaltionLocationMetadata { get; set; }
 
         // Timestamp the last UDP Game GUI broadcast was received from DCS, used for determining active game connection
         public long DcsGameGuiLastReceived { get; set; }
@@ -54,7 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private ClientStateSingleton()
         {
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
-            DcsPlayerSideInfo = new DCSPlayerSideInfo();
+            PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 
             DcsGameGuiLastReceived = 0;
             DcsExportLastReceived = 0;
@@ -93,5 +94,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 return _instance;
             }
         }
+
+        public bool ShouldUseLotATCPosition()
+        {
+            if (!IsLotATCConnected)
+            {
+                return false;
+            }
+
+            if (IsGameExportConnected)
+            {
+                if (DcsPlayerRadioInfo.isFlying)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void ClearPositionsIfExpired()
+        {
+            //not game or Lotatc - clear it!
+            if (!IsLotATCConnected && !IsGameExportConnected)
+            {
+                DcsPlayerRadioInfo.pos = new DcsPosition();
+                PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
+            }
+        }
+
+        public void UpdatePlayerPosition(DcsPosition dcsPosition, DCSLatLngPosition latLngPosition)
+        {
+            if (ShouldUseLotATCPosition())
+            {
+                PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
+                PlayerCoaltionLocationMetadata.Position = new DcsPosition(); //clear DCS position
+
+                DcsPlayerRadioInfo.pos = new DcsPosition();
+                DcsPlayerRadioInfo.latLng = latLngPosition;
+            }
+            else
+            {
+                PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
+                PlayerCoaltionLocationMetadata.Position = dcsPosition;
+
+                DcsPlayerRadioInfo.pos = dcsPosition;
+                DcsPlayerRadioInfo.latLng = latLngPosition;
+            }
+        }
+
+
     }
 }

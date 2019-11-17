@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Newtonsoft.Json;
 using NLog;
 
@@ -56,18 +57,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                             _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
                             var bytes = _dcsGameGuiUdpListener.Receive(ref groupEp);
 
-                            var playerInfo =
+                            var updatedPlayerInfo =
                                 JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
-                            if (playerInfo != null)
+                            if (updatedPlayerInfo != null)
                             {
-                                var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-                                //update position
-                                playerInfo.Position = radioInfo.pos;
-                                playerInfo.LngLngPosition = radioInfo.latLng;
-                                _clientStateSingleton.DcsPlayerSideInfo = playerInfo;
-                                _clientSideUpdate();
+                               var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
+
+                               //copy the bits we need  - leave position
+                               currentInfo.name = updatedPlayerInfo.name;
+                               currentInfo.side = updatedPlayerInfo.side;
+
+                                //this will clear any stale positions if nothing is currently connected
+                                _clientStateSingleton.ClearPositionsIfExpired();
+
+                               _clientSideUpdate();
                                 //     count = 0;
 
                                 _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
