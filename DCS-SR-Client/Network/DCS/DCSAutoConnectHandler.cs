@@ -26,8 +26,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _receivedAutoConnect = receivedAutoConnect;
 
             StartDcsBroadcastListener();
-        }
 
+            var args = Environment.GetCommandLineArgs();
+
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-host="))
+                {
+                    string host = arg.Replace("-host=", "").Trim();
+                    HandleMessage(host);
+                    Logger.Info("Auto Connect Launch for host: " + host);
+                }
+            }
+        }
 
         private void StartDcsBroadcastListener()
         {

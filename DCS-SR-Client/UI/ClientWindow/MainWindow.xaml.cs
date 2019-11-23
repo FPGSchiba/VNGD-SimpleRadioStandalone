@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -1330,7 +1331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
+        private async void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
         {
             // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
             bool showPrompt = _settings.GetClientSetting(SettingsKeys.AutoConnectMismatchPrompt).BoolValue;
@@ -1355,6 +1356,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (switchServer)
             {
                 Stop();
+
+                StartStop.IsEnabled = false;
+                StartStop.Content = "Connecting...";
+                await Task.Delay(2000);
+                StartStop.IsEnabled = true;
                 ServerIp.Text = advertisedConnection;
                 Connect();
             }
