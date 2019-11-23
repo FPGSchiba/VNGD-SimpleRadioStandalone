@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -395,24 +396,36 @@ namespace Installer
             {
                 var contents = File.ReadAllText(path + "\\Export.lua");
 
-                if (contents.Contains("SimpleRadioStandalone.lua"))
-                {
-//                    contents =
-//                        contents.Replace(
-//                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])",
-//                            "local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])");
-//                    contents = contents.Trim();
-//
-//                    File.WriteAllText(path + "\\Export.lua", contents);
+                contents.Split('\n');
 
-                    // do nothing
+                if (contents.Contains("SimpleRadioStandalone.lua") &&!contents.Contains("Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua"))
+                {
+                    var lines = contents.Split('\n');
+
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("SimpleRadioStandalone.lua") )
+                        {
+                            sb.Append(
+                                "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
+                        }
+                        else
+                        {
+                            sb.Append(line);
+                            sb.Append("\n");
+                        }
+                        
+                    }
+                    File.WriteAllText(path + "\\Export.lua", contents);
                 }
                 else
                 {
                     var writer = File.AppendText(path + "\\Export.lua");
 
                     writer.WriteLine(
-                        "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                        "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
                     writer.Close();
                 }
             }
@@ -421,7 +434,7 @@ namespace Installer
                 var writer = File.CreateText(path + "\\Export.lua");
 
                 writer.WriteLine(
-                    "\n  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\\DCS-SimpleRadioStandalone.lua]])\n");
+                    "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
                 writer.Close();
             }
 

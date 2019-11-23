@@ -1,7 +1,8 @@
--- Version 1.7.0.4
+-- Version 1.7.0.3
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.7.0.3")
 local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
@@ -19,8 +20,10 @@ end
 
 package.path  = package.path..";.\\LuaSocket\\?.lua;"
 package.cpath = package.cpath..";.\\LuaSocket\\?.dll;"
+package.cpath = package.cpath..";"..lfs.writedir().."Mods\\tech\\DCS-SRS\\bin\\?.dll;"
 
 local socket = require("socket")
+local srs = require("srs")
 
 local JSON = loadfile("Scripts\\JSON.lua")()
 SRS.JSON = JSON
@@ -110,9 +113,6 @@ SRS.sendConnect = function(_message)
 end
 
 SRS.onChatMessage = function(msg, from)
-    --	if DCS.isServer() then
-    --        return
-    --    end
 
     -- Only accept auto connect message coming from host.
     if SRS.CLIENT_ACCEPT_AUTO_CONNECT
@@ -120,6 +120,17 @@ SRS.onChatMessage = function(msg, from)
             and  SRS.isAutoConnectMessage(msg) then
         local host = SRS.getHostFromMessage(msg)
         SRS.log(string.format("Got SRS Auto Connect message: %s", host))
+
+        local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
+        if srs then
+            local path = srs.get_srs_path()
+            if path ~= "" then
+
+                net.log("Trying to Launch SRS @ "..path)
+                srs.start_srs(host)
+            end
+
+        end
         SRS.sendConnect(host)
     end
 end
@@ -127,4 +138,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob -1.7.0.4")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.7.0.3")

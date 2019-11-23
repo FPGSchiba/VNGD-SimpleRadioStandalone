@@ -1,4 +1,4 @@
--- Version 1.7.0.4
+-- Version 1.7.0.3
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -99,7 +99,6 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "",
                     selected = 1,
                     unitId = 0,
-                    inAircraft = true,
                     ptt = false,
                     radios = {
                         -- Radio 1 is always Intercom
@@ -114,16 +113,12 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.name = _data.UnitName
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
-
-                local _point = SR.exportPlayerLocation(_data)
-                _update.pos = _point
-
-                local latLng  = LoLoCoordinatesToGeoCoordinates(_point.x,_point.z)
-                _update.latLng = {lat = latLng.latitude , lng=latLng.longitude, alt =_point.y}
+                _update.pos = SR.exportPlayerLocation(_data)
 
                 SR.lastKnownPos = _update.pos
 
                 --SR.log(_update.unit.."\n\n")
+
 
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
@@ -233,6 +228,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _lastUnitId = _update.unitId
             else
 
+
                 -- save last pos
                 SR.lastKnownPos = { x = 0, y = 0, z = 0 }
 
@@ -243,8 +239,6 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     pos = { x = 0, y = 0, z = 0 },
-                    latLng = {lat = 0,lng=0, alt =0},
-                    inAircraft = false,
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
                         --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
@@ -2234,4 +2228,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.0.4")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.0.3")
