@@ -98,7 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
-            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to Auto update? This will close SRS",
+            var result = MessageBox.Show($"New {branch} version {version} available!\n\nDo you want to Auto update? This will close SRS\n\nYes - Auto Update\nNo - Manual Update\nCancel - Ignore",
                 "Update available", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
 
             if (result == MessageBoxResult.Yes)
