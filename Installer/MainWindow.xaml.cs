@@ -25,10 +25,14 @@ namespace Installer
     public partial class MainWindow
     {
         private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
-        private const string CLIENT_REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE";
         private readonly string currentDirectory;
 
         //   private readonly string currentPath;
+
+        //TODO - Support new Mods/Tech/DCS-SRS method
+        //Clear up old files and replace with new structure
+        //Add button to set the SRS path in the registry
+        //Merge pull request for enable / disable AGC
 
         public MainWindow()
         {
