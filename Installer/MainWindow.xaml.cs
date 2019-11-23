@@ -25,6 +25,7 @@ namespace Installer
     public partial class MainWindow
     {
         private const string REG_PATH = "HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone";
+        private const string EXPORT_SRS_LUA = "pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);";
         private readonly string currentDirectory;
 
         //   private readonly string currentPath;
@@ -37,6 +38,16 @@ namespace Installer
         public MainWindow()
         {
             InitializeComponent();
+
+            if (IsDCSRunning())
+            {
+                MessageBox.Show(
+                    "DCS must now be closed before continuing the installation!\n\nClose DCS and please try again.",
+                    "Please Close DCS",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+                return;
+            }
 
             var assembly = Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -86,6 +97,158 @@ namespace Installer
         }
 
 
+        private void Install_Release(object sender, RoutedEventArgs e)
+        {
+            QuitSimpleRadio();
+
+            var paths = FindValidDCSFolders(dcsScriptsPath.Text);
+
+            if (paths.Count == 0)
+            {
+                MessageBox.Show(
+                    "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
+                    "SR Standalone Installer",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+
+
+                return;
+            }
+
+            InstallButton.IsEnabled = false;
+            RemoveButton.IsEnabled = false;
+
+            InstallButton.Content = "Installing...";
+
+            ClearVersionPreModsTechDCS(srPath.Text, dcsScriptsPath.Text);
+            ClearVersionPostModsTechDCS(srPath.Text, dcsScriptsPath.Text);
+
+            foreach (var path in paths)
+            {
+                InstallScripts(path);
+            }
+
+            //install program
+            InstallProgram(srPath.Text);
+
+            WritePath(srPath.Text, "SRPathStandalone");
+            WritePath(dcsScriptsPath.Text, "ScriptsPath");
+
+            if (CreateStartMenuShortcut.IsChecked ?? true)
+            {
+                InstallShortcuts(srPath.Text);
+            }
+
+            string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
+
+            foreach (var path in paths)
+            {
+                message += ("\n" + path);
+            }
+
+            MessageBox.Show(message, "SR Standalone Installer",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            //open to installation location
+            Process.Start("explorer.exe", srPath.Text);
+
+            Environment.Exit(0);
+        }
+
+        private void ClearVersionPreModsTechDCS(string programPath, string dcsPath)
+        {
+            var paths = FindValidDCSFolders(dcsPath);
+
+            foreach (var path in paths)
+            {
+                RemoveScriptsPreModsTechDCS(path + "\\Scripts");
+            }
+
+            if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
+            {
+                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(srPath.Text + "\\opus.dll");
+                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
+                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
+                DeleteFileIfExists(srPath.Text + "\\SRS-AutoUpdater.exe");
+                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRSGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-AutoConnectGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-OverlayGameGUI.lua");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
+                DeleteFileIfExists(srPath.Text + "\\serverlog.txt");
+                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
+                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-RX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-TX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-RX-1600.wav");
+                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-TX-1600.wav");
+            }
+            
+
+        }
+
+        private void ClearVersionPostModsTechDCS(string programPath, string dcsPath)
+        {
+            var paths = FindValidDCSFolders(dcsPath);
+
+            foreach (var path in paths)
+            {
+                RemoveScriptsPostModsTechDCS(path);
+            }
+
+            if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
+            {
+                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(srPath.Text + "\\opus.dll");
+                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
+                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
+                DeleteFileIfExists(srPath.Text + "\\SRS-AutoUpdater.exe");
+                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
+                DeleteFileIfExists(srPath.Text + "\\serverlog.txt");
+                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
+
+                DeleteDirectory(srPath.Text+"\\AudioEffects");
+                DeleteDirectory(srPath.Text + "\\Scripts");
+            }
+        }
+
+        private void RemoveScriptsPostModsTechDCS(string path)
+        {
+            //SCRIPTS folder
+            if (File.Exists(path + "\\Scripts\\Export.lua"))
+            {
+                var contents = File.ReadAllText(path + "\\Scripts\\Export.lua");
+
+                if (contents.Contains("SimpleRadioStandalone.lua"))
+                {
+                    var lines = contents.Split('\n');
+
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (var line in lines)
+                    {
+                        if (!line.Contains("SimpleRadioStandalone.lua") && line.Trim().Length > 0)
+                        {
+                            sb.Append(line);
+                            sb.Append("\n");
+                        }
+                    }
+                    File.WriteAllText(path + "\\Scripts\\Export.lua", sb.ToString());
+                }
+            }
+            //Hooks Folder
+            DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-Hook.lua");
+
+            //MODs folder
+            if (Directory.Exists(path+"\\Mods\\Tech\\DCS-SRS"))
+            {
+                Directory.Delete(path+"\\Mods\\Tech\\DCS-SRS",true);
+            }
+
+            
+        }
+
         private static string ReadPath(string key)
         {
             var srPath = (string) Registry.GetValue(REG_PATH,
@@ -131,20 +294,32 @@ namespace Installer
             }
         }
 
-
-        //
-        private static bool Is_SimpleRadio_running()
+        private void QuitSimpleRadio()
         {
 #if DEBUG
-            return false;
+            return;
 #endif
             foreach (var clsProcess in Process.GetProcesses())
             {
                 if (clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-server") || clsProcess.ProcessName.ToLower().Trim().StartsWith("sr-client"))
                 {
+                    clsProcess.Kill();
+                    clsProcess.WaitForExit(5000);
+                    clsProcess.Dispose();
+                }
+            }
+        }
+
+        private bool IsDCSRunning()
+        {
+            foreach (var clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.ProcessName.ToLower().Trim().Equals("dcs"))
+                {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -191,68 +366,6 @@ namespace Installer
             }
         }
 
-        private void Install_Release(object sender, RoutedEventArgs e)
-        {
-            if (Is_SimpleRadio_running())
-            {
-                MessageBox.Show("Please close SimpleRadio Overlay before updating!", "SR Standalone Installer",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                Environment.Exit(0);
-
-                return;
-            }
-
-
-            // string savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Saved Games\\";
-            var paths = FindValidDCSFolders(dcsScriptsPath.Text);
-
-            if (paths.Count == 0)
-            {
-                MessageBox.Show(
-                    "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
-                    "SR Standalone Installer",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-
-
-                return;
-            }
-
-            InstallButton.IsEnabled = false;
-            RemoveButton.IsEnabled = false;
-
-            InstallButton.Content = "Installing...";
-
-            foreach (var path in paths)
-            {
-                InstallScripts(path + "\\Scripts");
-            }
-
-            //install program
-            InstallProgram(srPath.Text);
-
-            WritePath(srPath.Text, "SRPathStandalone");
-            WritePath(dcsScriptsPath.Text, "ScriptsPath");
-
-            if (CreateStartMenuShortcut.IsChecked ?? true)
-            {
-                InstallShortcuts(srPath.Text);
-            }
-
-            string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
-
-            foreach (var path in paths)
-            {
-                message += ("\n" + path);
-            }
-
-            MessageBox.Show(message, "SR Standalone Installer",
-                MessageBoxButton.OK, MessageBoxImage.Information);
-
-            //open to installation location
-            Process.Start("explorer.exe", srPath.Text);
-
-            Environment.Exit(0);
-        }
 
         private static List<string> FindValidDCSFolders(string path)
         {
@@ -289,63 +402,27 @@ namespace Installer
 
         private void InstallProgram(string path)
         {
-            if (Directory.Exists(path) && File.Exists(path + "\\SR-ClientRadio.exe"))
-            {
-                DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(path + "\\opus.dll");
-                DeleteFileIfExists(path + "\\speexdsp.dll");
-                DeleteFileIfExists(path + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(path + "\\SR-Server.exe");
-                DeleteFileIfExists(path + "\\SRS-AutoUpdater.exe");
-                DeleteFileIfExists(path + "\\DCS-SimpleRadioStandalone.lua");
-                DeleteFileIfExists(path + "\\DCS-SRSGameGUI.lua");
-                DeleteFileIfExists(path + "\\DCS-SRS-AutoConnectGameGUI.lua");
-                DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
-                DeleteFileIfExists(path + "\\DCS-SRS-Overlay.dlg");
-                DeleteFileIfExists(path + "\\DCS-SRS-hook.lua");
-            }
             //sleep! WTF directory is lagging behind state here...
             Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
             CreateDirectory(path);
             CreateDirectory(path + "\\AudioEffects");
+            CreateDirectory(path + "\\Scripts");
 
             //sleep! WTF directory is lagging behind state here...
             Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
             File.Copy(currentDirectory + "\\speexdsp.dll", path + "\\speexdsp.dll", true);
-            if (!File.Exists(path + "\\awacs-radios.json"))
-            {
-                File.Copy(currentDirectory + "\\awacs-radios.json", path + "\\awacs-radios.json", true);
-            }
+            File.Copy(currentDirectory + "\\awacs-radios.json", path + "\\awacs-radios.json", true);
+            
             File.Copy(currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
             File.Copy(currentDirectory + "\\SRS-AutoUpdater.exe", path + "\\SRS-AutoUpdater.exe", true);
 
-            File.Copy(currentDirectory + "\\beep-connected.wav", path + "\\AudioEffects\\beep-connected.wav", true);
-            File.Copy(currentDirectory + "\\beep-disconnected.wav", path + "\\AudioEffects\\beep-disconnected.wav", true);
-            File.Copy(currentDirectory + "\\KY-58-TX-1600.wav", path + "\\AudioEffects\\KY-58-TX-1600.wav", true);
-            File.Copy(currentDirectory + "\\KY-58-RX-1600.wav", path + "\\AudioEffects\\KY-58-RX-1600.wav", true);
-            File.Copy(currentDirectory + "\\Radio-TX-1600.wav", path + "\\AudioEffects\\Radio-TX-1600.wav", true);
-            File.Copy(currentDirectory + "\\Radio-RX-1600.wav", path + "\\AudioEffects\\Radio-RX-1600.wav", true);
-            
-            //File.Copy(currentDirectory + "\\Installer.exe", path + "\\Installer.exe", true);
-            
-            File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua", path + "\\DCS-SimpleRadioStandalone.lua",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua", path + "\\DCS-SRSGameGUI.lua",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRS-AutoConnectGameGUI.lua", path + "\\DCS-SRS-AutoConnectGameGUI.lua",
-                true);
+            DirectoryCopy(currentDirectory+"\\AudioEffects", path+"\\AudioEffects");
+            DirectoryCopy(currentDirectory + "\\Scripts", path + "\\Scripts");
 
-            File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
-                true);
-
-            File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
-                true);
-            File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\DCS-SRS-hook.lua",
-                true);
         }
 
         private void InstallShortcuts(string path)
@@ -362,43 +439,23 @@ namespace Installer
             shortcut.Save();
         }
 
-        private void CreateDirectory(string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-
-                // Create the rules
-                var writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
-
-                var dir = Directory.CreateDirectory(path);
-
-                dir.Refresh();
-                //sleep! WTF directory is lagging behind state here...
-                Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
-
-                var dSecurity = dir.GetAccessControl();
-                dSecurity.AddAccessRule(new FileSystemAccessRule(
-                    new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl,
-                    InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
-                    PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
-                dir.SetAccessControl(dSecurity);
-                dir.Refresh();
-            }
-        }
-
         private void InstallScripts(string path)
         {
-            //if scripts folder doesnt exist, create it
-            Directory.CreateDirectory(path);
-            Directory.CreateDirectory(path + "\\Hooks");
+            //Scripts Path
+            CreateDirectory(path+"\\Scripts");
+            CreateDirectory(path+"\\Scripts\\Hooks");
+            
+            //Make Tech Path
+            CreateDirectory(path+"\\Mods"); 
+            CreateDirectory(path+"\\Mods\\Tech");
+            CreateDirectory(path+"\\Mods\\Tech\\DCS-SRS");
+
             Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
 
-            var write = true;
             //does it contain an export.lua?
-            if (File.Exists(path + "\\Export.lua"))
+            if (File.Exists(path + "\\Scripts\\Export.lua"))
             {
-                var contents = File.ReadAllText(path + "\\Export.lua");
+                var contents = File.ReadAllText(path + "\\Scripts\\Export.lua");
 
                 contents.Split('\n');
 
@@ -412,52 +469,42 @@ namespace Installer
                     {
                         if (line.Contains("SimpleRadioStandalone.lua") )
                         {
-                            sb.Append(
-                                "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
+                            sb.Append("\n");
+                            sb.Append(EXPORT_SRS_LUA);
+                            sb.Append("\n");
                         }
-                        else
+                        else if(line.Trim().Length>0)
                         {
                             sb.Append(line);
                             sb.Append("\n");
                         }
                         
                     }
-                    File.WriteAllText(path + "\\Export.lua", contents);
+                    File.WriteAllText(path + "\\Scripts\\Export.lua", sb.ToString());
                 }
                 else
                 {
-                    var writer = File.AppendText(path + "\\Export.lua");
+                    var writer = File.AppendText(path + "\\Scripts\\Export.lua");
 
-                    writer.WriteLine(
-                        "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
+                    writer.WriteLine("\n" + EXPORT_SRS_LUA + "\n");
                     writer.Close();
                 }
             }
             else
             {
-                var writer = File.CreateText(path + "\\Export.lua");
+                var writer = File.CreateText(path + "\\Scripts\\Export.lua");
 
-                writer.WriteLine(
-                    "\n  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil); \n");
+                writer.WriteLine("\n"+EXPORT_SRS_LUA+"\n");
                 writer.Close();
             }
 
+
+            //Now sort out Scripts//Hooks folder contents
             try
             {
-                File.Copy(currentDirectory + "\\DCS-SimpleRadioStandalone.lua",
-                    path + "\\DCS-SimpleRadioStandalone.lua", true);
-
-                File.Copy(currentDirectory + "\\DCS-SRSGameGUI.lua",
-                    path + "\\DCS-SRSGameGUI.lua", true);
-
-                File.Copy(currentDirectory + "\\DCS-SRS-OverlayGameGUI.lua", path + "\\DCS-SRS-OverlayGameGUI.lua",
+                File.Copy(currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-hook.lua", path + "\\Scripts\\Hooks\\DCS-SRS-hook.lua",
                     true);
-
-                File.Copy(currentDirectory + "\\DCS-SRS-Overlay.dlg", path + "\\DCS-SRS-Overlay.dlg",
-                    true);
-
-                File.Copy(currentDirectory + "\\DCS-SRS-hook.lua", path + "\\Hooks\\DCS-SRS-hook.lua",
-                    true);
+                DirectoryCopy(currentDirectory + "\\Scripts\\DCS-SRS",path+"\\Mods\\Tech\\DCS-SRS");
             }
             catch (FileNotFoundException ex)
             {
@@ -468,81 +515,68 @@ namespace Installer
             }
         }
 
-        //http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
-        //Recursive Directory Delete
         public static void DeleteDirectory(string target_dir)
         {
-            var files = Directory.GetFiles(target_dir);
-            var dirs = Directory.GetDirectories(target_dir);
-
-            foreach (var file in files)
+            if (Directory.Exists(target_dir))
             {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
+                Directory.Delete(target_dir, true);
             }
-
-            foreach (var dir in dirs)
-            {
-                DeleteDirectory(dir);
-            }
-
-            Directory.Delete(target_dir, false);
         }
 
+        private static void DirectoryCopy(string sourceDirName, string destDirName)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            foreach (DirectoryInfo subdir in dirs)
+            {
+                string temppath = Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, temppath);
+            }
+            
+        }
 
         private void UninstallSR()
         {
-            if (Is_SimpleRadio_running())
-            {
-                MessageBox.Show("Please close SimpleRadio Standalone Overlay before removing!",
-                    "SR Standalone Installer", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                Environment.Exit(0);
-
-                return;
-            }
+            QuitSimpleRadio();
 
             InstallButton.IsEnabled = false;
             RemoveButton.IsEnabled = false;
 
             InstallButton.Content = "Removing...";
 
-            var savedGamesPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-                                 "\\Saved Games\\";
-
-            var dcsPath = savedGamesPath + "DCS";
-
-            RemoveScripts(dcsPath + ".openalpha\\Scripts");
-            RemoveScripts(dcsPath + ".openbeta\\Scripts");
-            RemoveScripts(dcsPath + "\\Scripts");
-
-            if (Directory.Exists(srPath.Text) && File.Exists(srPath.Text + "\\SR-ClientRadio.exe"))
-            {
-                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(srPath.Text + "\\opus.dll");
-                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
-                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
-                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRSGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-AutoConnectGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-OverlayGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
-                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-RX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-TX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-RX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-TX-1600.wav");
-            }
+            ClearVersionPreModsTechDCS(srPath.Text, dcsScriptsPath.Text);
+            ClearVersionPostModsTechDCS(srPath.Text, dcsScriptsPath.Text);
 
             DeleteRegKeys();
 
             RemoveShortcuts();
 
             MessageBox.Show(
-                "SR Standalone Removed Successfully!\n\nContaining folder left just incase you want favourites or frequencies",
+                "SR Standalone Removed Successfully!\n\nContaining folder left just in case you want favourites or frequencies",
                 "SR Standalone Installer",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -556,7 +590,7 @@ namespace Installer
             DeleteFileIfExists(shortcutPath);
         }
 
-        private void RemoveScripts(string path)
+        private void RemoveScriptsPreModsTechDCS(string path)
         {
             //does it contain an export.lua?
             if (File.Exists(path + "\\Export.lua"))
@@ -584,6 +618,32 @@ namespace Installer
             DeleteFileIfExists(path + "\\DCS-SRS-OverlayGameGUI.lua");
             DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-Hook.lua");
         }
+
+        private void CreateDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+
+                // Create the rules
+                var writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
+
+                var dir = Directory.CreateDirectory(path);
+
+                dir.Refresh();
+                //sleep! WTF directory is lagging behind state here...
+                Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
+
+                var dSecurity = dir.GetAccessControl();
+                dSecurity.AddAccessRule(new FileSystemAccessRule(
+                    new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl,
+                    InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                    PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                dir.SetAccessControl(dSecurity);
+                dir.Refresh();
+            }
+        }
+
 
         private void Remove_Plugin(object sender, RoutedEventArgs e)
         {
