@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -29,6 +30,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NAudio.Dmo;
 using NAudio.Wave;
@@ -1634,6 +1636,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MessageBox.Show(this,
                 "Input Devices Rescanned",
                 "New input devices can now be used.",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void SetSRSPath_Click(object sender, RoutedEventArgs e)
+        {
+            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone","SRPathStandalone",Directory.GetCurrentDirectory());
+
+            MessageBox.Show(this,
+                "SRS Path set to: " + Directory.GetCurrentDirectory(),
+                "SRS Client Path",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }

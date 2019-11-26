@@ -833,7 +833,9 @@ namespace Installer
                     MessageBoxButton.OK, MessageBoxImage.Error);
 
                 Process.Start("https://discord.gg/vqxAw7H");
-               
+
+                Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+
             }
             Environment.Exit(0);
         }
