@@ -287,7 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility
                 _format = new WaveFormat(1, sampleRate);
 
                 Reset();
-                RefreshSettings();
+                RefreshSettings(true);
             }
 
             /// <summary>
@@ -300,7 +300,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility
                 if (frame.Count != _frameSize)
                     throw new ArgumentException(string.Format("Incorrect frame size, expected {0} but given {1}", _frameSize, frame.Count), "frame");
 
-                RefreshSettings();
+                RefreshSettings(false);
 
                 using (var handle = frame.Pin())
                     SpeexDspNativeMethods.speex_preprocess_run(_preprocessor, handle.Ptr);
@@ -317,28 +317,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility
                 _preprocessor = SpeexDspNativeMethods.speex_preprocess_state_init(_frameSize, _format.SampleRate);
             }
 
-            private void RefreshSettings()
+            //every 40ms so 500
+            private int count = 0;
+            private void RefreshSettings(bool force)
             {
-                var settingsStore = SettingsStore.Instance;
+                //only check every 5 seconds - 5000/40ms is 125 frames
+                if (count > 125 || force)
+                {
+                    //only check settings store every 5 seconds
+                    var settingsStore = SettingsStore.Instance;
 
-                var agc = settingsStore.GetClientSetting(SettingsKeys.AGC).BoolValue;
-                var agcTarget = settingsStore.GetClientSetting(SettingsKeys.AGCTarget).IntValue;
-                var agcDecrement = settingsStore.GetClientSetting(SettingsKeys.AGCDecrement).IntValue;
-                var agcLevelMax = settingsStore.GetClientSetting(SettingsKeys.AGCLevelMax).IntValue;
+                    var agc = settingsStore.GetClientSetting(SettingsKeys.AGC).BoolValue;
+                    var agcTarget = settingsStore.GetClientSetting(SettingsKeys.AGCTarget).IntValue;
+                    var agcDecrement = settingsStore.GetClientSetting(SettingsKeys.AGCDecrement).IntValue;
+                    var agcLevelMax = settingsStore.GetClientSetting(SettingsKeys.AGCLevelMax).IntValue;
 
-                var denoise = settingsStore.GetClientSetting(SettingsKeys.Denoise).BoolValue;
-                var denoiseAttenuation = settingsStore.GetClientSetting(SettingsKeys.DenoiseAttenuation).IntValue;
+                    var denoise = settingsStore.GetClientSetting(SettingsKeys.Denoise).BoolValue;
+                    var denoiseAttenuation = settingsStore.GetClientSetting(SettingsKeys.DenoiseAttenuation).IntValue;
 
-                //From https://github.com/mumble-voip/mumble/blob/a189969521081565b8bda93d253670370778d471/src/mumble/Settings.cpp
-                //and  https://github.com/mumble-voip/mumble/blob/3ffd9ad3ed18176774d8e1c64a96dffe0de69655/src/mumble/AudioInput.cpp#L605
+                    //From https://github.com/mumble-voip/mumble/blob/a189969521081565b8bda93d253670370778d471/src/mumble/Settings.cpp
+                    //and  https://github.com/mumble-voip/mumble/blob/3ffd9ad3ed18176774d8e1c64a96dffe0de69655/src/mumble/AudioInput.cpp#L605
 
-                if (agc != AutomaticGainControl) { AutomaticGainControl = agc; }
-                if (agcTarget != AutomaticGainControlTarget) { AutomaticGainControlTarget = agcTarget; }
-                if (agcDecrement != AutomaticGainControlDecrement) { AutomaticGainControlDecrement = agcDecrement; }
-                if (agcLevelMax != AutomaticGainControlLevelMax) { AutomaticGainControlLevelMax = agcLevelMax; }
+                    if (agc != AutomaticGainControl) { AutomaticGainControl = agc; }
+                    if (agcTarget != AutomaticGainControlTarget) { AutomaticGainControlTarget = agcTarget; }
+                    if (agcDecrement != AutomaticGainControlDecrement) { AutomaticGainControlDecrement = agcDecrement; }
+                    if (agcLevelMax != AutomaticGainControlLevelMax) { AutomaticGainControlLevelMax = agcLevelMax; }
 
-                if (denoise != Denoise) { Denoise = denoise; }
-                if (denoiseAttenuation != DenoiseAttenuation) { DenoiseAttenuation = denoiseAttenuation; }
+                    if (denoise != Denoise) { Denoise = denoise; }
+                    if (denoiseAttenuation != DenoiseAttenuation) { DenoiseAttenuation = denoiseAttenuation; }
+
+                    count = 0;
+                }
+
+                count++;
+
             }
 
             #region CTL

@@ -111,7 +111,7 @@ namespace NAudio.Wave
             {
                 if (dmoResamplerNeeded)
                 {
-                    if (windowsN)
+                    if (!windowsN)
                     {
                         resamplerDmoStream = new ResamplerDmoStream(sourceProvider, outputFormat);
                         playbackProvider = resamplerDmoStream;

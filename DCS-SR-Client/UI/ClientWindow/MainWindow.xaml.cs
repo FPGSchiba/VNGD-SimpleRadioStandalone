@@ -150,7 +150,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ExternalAWACSModeName.Text = _settings.GetClientSetting(SettingsKeys.LastSeenName).StringValue;
 
-            _audioManager = new AudioManager(_clients);
+            _audioManager = new AudioManager(_clients, windowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
 
@@ -619,23 +619,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     //first time round the loop, select first item
                     if (i == 0)
-                {
-                    MicOutput.SelectedIndex = 0;
+                    {
+                        MicOutput.SelectedIndex = 0;
+                    }
+
+                    if (device.ID == _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue)
+                    {
+                        MicOutput.SelectedIndex = i; //this one
+                    }
+
+                    i++;
+
                 }
-
-                if (device.ID == _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue)
+                catch (Exception e)
                 {
-                    MicOutput.SelectedIndex = i; //this one
+                    Logger.Error(e, "Audio Output - Error processing device - device skipped");
                 }
-
-                i++;
-
             }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Audio Output - Error processing device - device skipped");
-            }
-        }
         }
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
@@ -1090,7 +1090,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-                    _audioPreview.StartPreview(inputId, output);
+                    _audioPreview.StartPreview(inputId, output,windowsN);
 
                     Preview.Content = "Stop Preview";
                 }
