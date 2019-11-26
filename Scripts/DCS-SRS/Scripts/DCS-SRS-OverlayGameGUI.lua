@@ -1,7 +1,9 @@
--- Version 1.7.0.4
+-- Version 1.7.0.3
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
+
+net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.7.0.3 ")
 
 local base = _G
 
@@ -245,14 +247,15 @@ function srsOverlay.paintRadio()
 end
 
 function srsOverlay.createWindow()
-    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Scripts\\DCS-SRS-Overlay.dlg', cdata)
+    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Tech\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
 
     box         = window.Box
     pNoVisible  = window.pNoVisible --PlaceHolder - Not Visible
    -- pDown       = box.pDown
 
     window:addHotKeyCallback(srsOverlay.config.hotkey, srsOverlay.onHotkey)
-
+    
+    window:setVisible(true) -- if you make the window invisible, its destroyed
     
     skinModeFull = pNoVisible.windowModeFull:getSkin()
     skinMinimum = pNoVisible.windowModeMin:getSkin()
@@ -263,7 +266,6 @@ function srsOverlay.createWindow()
         receive       = pNoVisible.eWhiteText:getSkin(),
         guard         = pNoVisible.eRedText:getSkin(),
     }
-
     
     _listStatics = {}
     
@@ -277,8 +279,22 @@ function srsOverlay.createWindow()
             
     srsOverlay.resize(w, h)
     
-    srsOverlay.setMode(srsOverlay.config.mode)    
-    
+    local enabled = base.OptionsData.getPlugin("DCS-SRS","srsOverlayEnabled")
+
+    if enabled then
+
+        if _modes.hidden == srsOverlay.config.mode then
+            -- set to minimum
+            srsOverlay.setMode(_modes.minimum)
+        else
+            srsOverlay.setMode(srsOverlay.config.mode) 
+        end
+
+    else
+        srsOverlay.setMode(_modes.hidden)
+    end
+
+   
     window:addPositionCallback(srsOverlay.positionCallback)     
     srsOverlay.positionCallback()
 
@@ -292,9 +308,6 @@ function srsOverlay.createWindow()
   --  srsOverlay.addMessage("10.00", "INTERCOM", typesMessage.msg)
 end
 
-function srsOverlay.setVisible(b)
-    window:setVisible(b)
-end
 
 function srsOverlay.setMode(mode)
     srsOverlay.log("setMode called "..mode)
@@ -303,8 +316,6 @@ function srsOverlay.setMode(mode)
     if window == nil then
         return
     end
-
-    srsOverlay.setVisible(true) -- if you make the window invisible, its destroyed
     
     if srsOverlay.config.mode == _modes.hidden then
 
@@ -345,6 +356,8 @@ function srsOverlay.setMode(mode)
         end    
     end
 
+    window:setVisible(true) -- if you make the window invisible, its destroyed
+
 
     srsOverlay.paintRadio()
     srsOverlay.saveConfiguration()
@@ -384,17 +397,7 @@ function srsOverlay.positionCallback()
     srsOverlay.saveConfiguration()
 end
 
-function srsOverlay.show(b)
-    if _isWindowCreated == false then
-        srsOverlay.createWindow()
-    end
-    
-    if b == false then
-        srsOverlay.saveConfiguration()
-    end
-    
-    srsOverlay.setVisible(b)
-end
+
 
 function srsOverlay.initListener()
 
@@ -438,24 +441,20 @@ end
 
 
 function srsOverlay.onSimulationFrame()
+
+    if not base.OptionsData then
+        --srsOverlay.log("NO Options Data")
+        return
+    end
+
     if srsOverlay.config == nil then
         srsOverlay.loadConfiguration()
     end
 
     if not window then
-        srsOverlay.show(true)
 
-        if srsOverlay.config and srsOverlay.config.restoreAfterRestart then
-            if srsOverlay.config.mode then
-                srsOverlay.log("Restoring SRS window in " .. srsOverlay.config.mode .. " mode...")
-                srsOverlay.setMode(srsOverlay.config.mode)
-            else
-                srsOverlay.log("Restoring SRS window in fallback full mode...")
-                srsOverlay.setMode(_modes.full)
-            end
-        else
-            srsOverlay.log("Creating SRS window hidden...")
-            srsOverlay.setMode(_modes.hidden)
+        if _isWindowCreated == false then
+            srsOverlay.createWindow()
         end
 
         -- init connection
@@ -479,4 +478,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob - 1.7.0.4 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.7.0.3 ")

@@ -74,9 +74,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private Preprocessor _speex;
+        private bool windowsN = false;
 
-        public AudioManager(ConcurrentDictionary<string, SRClient> clientsList)
+        public AudioManager(ConcurrentDictionary<string, SRClient> clientsList, bool windowsN)
         {
+            this.windowsN = windowsN;
             _clientsList = clientsList;
 
             _cachedAudioEffects =
@@ -119,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40,windowsN);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,
@@ -178,7 +180,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 try
                 {
-                    _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40);
+                    _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40,windowsN);
 
                     _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
                     _micWaveOutBuffer.ReadFully = true;
