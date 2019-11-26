@@ -80,7 +80,7 @@
                 Margin="10,280,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Click="Install_Release"
+                Click="InstallReleaseButton"
                 Content="Install / Update DCS-SRS" />
         <GridSplitter x:Name="gridSplitter"
                       Width="5"

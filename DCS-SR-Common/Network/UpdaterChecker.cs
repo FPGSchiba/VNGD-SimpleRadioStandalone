@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.7.0.0";
 
-        public static readonly string VERSION = "1.7.0.4";
+        public static readonly string VERSION = "1.7.0.3";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -68,11 +68,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 // Compare latest versions with currently running version depending on user branch choice
                 if (checkForBetaUpdates && latestBetaVersion > currentVersion)
                 {
-                    ShowUpdateAvailableDialog("beta", latestBetaVersion, latestBetaRelease.HtmlUrl);
+                    ShowUpdateAvailableDialog("beta", latestBetaVersion, latestBetaRelease.HtmlUrl, true);
                 }
                 else if (latestStableVersion > currentVersion)
                 {
-                    ShowUpdateAvailableDialog("stable", latestStableVersion, latestStableRelease.HtmlUrl);
+                    ShowUpdateAvailableDialog("stable", latestStableVersion, latestStableRelease.HtmlUrl, false);
                 }
                 else if (checkForBetaUpdates && latestBetaVersion == currentVersion)
                 {
@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 #endif
         }
 
-        public static void ShowUpdateAvailableDialog(string branch, Version version, string url)
+        public static void ShowUpdateAvailableDialog(string branch, Version version, string url, bool beta)
         {
             _logger.Warn($"New {branch} version available on GitHub: {version}");
 
@@ -105,7 +105,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 try
                 {
-                    Process.Start("SRS-AutoUpdater.exe");
+                    if (beta)
+                    {
+                        Process.Start("SRS-AutoUpdater.exe","-beta");
+                    }
+                    else
+                    {
+                        Process.Start("SRS-AutoUpdater.exe");
+                    }
                 }
                 catch (Exception ex)
                 {

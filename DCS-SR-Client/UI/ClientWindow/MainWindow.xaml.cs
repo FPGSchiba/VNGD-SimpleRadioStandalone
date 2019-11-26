@@ -30,6 +30,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
 using NAudio.CoreAudioApi;
+using NAudio.Dmo;
 using NAudio.Wave;
 using NLog;
 using WPFCustomMessageBox;
@@ -77,6 +78,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+        private bool windowsN;
 
         public MainWindow()
         {
@@ -571,7 +573,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     Logger.Error(e,"Audio Output - Error processing device - device skipped");
                 }
+            }
 
+
+            windowsN = false;
+            try
+            {
+                var dmoResampler = new DmoResampler();
+                dmoResampler.Dispose();
+            }
+            catch (Exception)
+            {
+                Logger.Warn("Windows N Detected - using inbuilt resampler");
+                windowsN = true;
             }
         }
 

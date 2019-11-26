@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using IWshRuntimeLibrary;
+using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using NLog;
 using NLog.Config;
@@ -103,10 +104,9 @@ namespace Installer
                 if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
                 {
                     Logger.Info("Silent Installer Running");
-                    Install_Release(null, null);
+                    InstallReleaseButton(null, null);
                 }
             }
-
         }
 
 
@@ -157,32 +157,76 @@ namespace Installer
 
         }
 
-        private void Install_Release(object sender, RoutedEventArgs e)
+        private async void  InstallReleaseButton(object sender, RoutedEventArgs e)
+        {
+            InstallButton.IsEnabled = false;
+            RemoveButton.IsEnabled = false;
+
+
+            InstallButton.Content = "Installing...";
+
+            var srsPath = srPath.Text;
+            var dcScriptsPath = dcsScriptsPath.Text;
+            var shortcut = CreateStartMenuShortcut.IsChecked ?? true;
+
+            new Action(async () =>
+            {
+                int result = await Task.Run<int>(() => InstallRelease(srsPath,dcScriptsPath, shortcut));
+                if (result == 0)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            InstallButton.IsEnabled = true;
+                            RemoveButton.IsEnabled = true;
+                            InstallButton.Content = "Install";
+                        }
+                    ); //end-invoke
+                  
+                }
+                else if (result == 1)
+                {
+                    Logger.Info($"Installed SRS Successfully!");
+                
+                    //open to installation location
+                    Process.Start("explorer.exe", srPath.Text);
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Error with installation - please post your installer-log.txt on the SRS Discord for Support",
+                        "Installation Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                    Process.Start("https://discord.gg/vqxAw7H");
+                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                    Environment.Exit(0);
+                }
+            }).Invoke();
+
+        }
+
+        private int InstallRelease(string srPath, string dcsScriptsPath, bool shortcut)
         {
             try
             {
                 QuitSimpleRadio();
 
-                var paths = FindValidDCSFolders(dcsScriptsPath.Text);
+                var paths = FindValidDCSFolders(dcsScriptsPath);
 
                 if (paths.Count == 0)
                 {
+
                     MessageBox.Show(
                         "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
                         "SR Standalone Installer",
                         MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    return;
+                    return 0;
                 }
 
-                InstallButton.IsEnabled = false;
-                RemoveButton.IsEnabled = false;
-
-                InstallButton.Content = "Installing...";
-
-                Logger.Info($"Installing - Paths: \nProgram:{srPath.Text} \nDCS:{dcsScriptsPath.Text} ");
-                ClearVersionPreModsTechDCS(srPath.Text, dcsScriptsPath.Text);
-                ClearVersionPostModsTechDCS(srPath.Text, dcsScriptsPath.Text);
+                Logger.Info($"Installing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
+                ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
+                ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
 
                 foreach (var path in paths)
                 {
@@ -190,14 +234,14 @@ namespace Installer
                 }
 
                 //install program
-                InstallProgram(srPath.Text);
+                InstallProgram(srPath);
 
-                WritePath(srPath.Text, "SRPathStandalone");
-                WritePath(dcsScriptsPath.Text, "ScriptsPath");
+                WritePath(srPath, "SRPathStandalone");
+                WritePath(dcsScriptsPath, "ScriptsPath");
 
-                if (CreateStartMenuShortcut.IsChecked ?? true)
+                if (shortcut)
                 {
-                    InstallShortcuts(srPath.Text);
+                    InstallShortcuts(srPath);
                 }
 
                 string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
@@ -210,27 +254,18 @@ namespace Installer
                 MessageBox.Show(message, "SR Standalone Installer",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
-                Logger.Info($"Installed SRS Successfully!");
-
-                //open to installation location
-                Process.Start("explorer.exe", srPath.Text);
+                return 1;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Logger.Error(ex,"Error Running Installer");
+                Logger.Error(ex, "Error Running Installer");
 
-                MessageBox.Show(
-                    "Error with installation - please post your installer-log.txt on the SRS Discord for Support\n\nError: " + ex.Message,
-                    "Installation Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-
-                Process.Start("https://discord.gg/vqxAw7H");
-            }
-
-            Environment.Exit(0);
             
+                return -1;
+            }
         }
+
 
         private void ClearVersionPreModsTechDCS(string programPath, string dcsPath)
         {
@@ -245,24 +280,24 @@ namespace Installer
             Logger.Info($"Removed SRS program files at {programPath}");
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
-                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(srPath.Text + "\\opus.dll");
-                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
-                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
-                DeleteFileIfExists(srPath.Text + "\\SRS-AutoUpdater.exe");
-                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SimpleRadioStandalone.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRSGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-AutoConnectGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-OverlayGameGUI.lua");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-Overlay.dlg");
-                DeleteFileIfExists(srPath.Text + "\\serverlog.txt");
-                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
-                DeleteFileIfExists(srPath.Text + "\\DCS-SRS-hook.lua");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-RX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\KY-58-TX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-RX-1600.wav");
-                DeleteFileIfExists(srPath.Text + "\\AudioEffects\\Radio-TX-1600.wav");
+                DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(programPath + "\\opus.dll");
+                DeleteFileIfExists(programPath + "\\speexdsp.dll");
+                DeleteFileIfExists(programPath + "\\awacs-radios.json");
+                DeleteFileIfExists(programPath + "\\SRS-AutoUpdater.exe");
+                DeleteFileIfExists(programPath + "\\SR-Server.exe");
+                DeleteFileIfExists(programPath + "\\DCS-SimpleRadioStandalone.lua");
+                DeleteFileIfExists(programPath + "\\DCS-SRSGameGUI.lua");
+                DeleteFileIfExists(programPath + "\\DCS-SRS-AutoConnectGameGUI.lua");
+                DeleteFileIfExists(programPath + "\\DCS-SRS-OverlayGameGUI.lua");
+                DeleteFileIfExists(programPath + "\\DCS-SRS-Overlay.dlg");
+                DeleteFileIfExists(programPath + "\\serverlog.txt");
+                DeleteFileIfExists(programPath + "\\clientlog.txt");
+                DeleteFileIfExists(programPath + "\\DCS-SRS-hook.lua");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\KY-58-RX-1600.wav");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\KY-58-TX-1600.wav");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-RX-1600.wav");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-TX-1600.wav");
             }
             Logger.Info($"Finished clearing scripts and program Pre Mods ");
 
@@ -281,17 +316,17 @@ namespace Installer
             Logger.Info($"Removed SRS program files at {programPath}");
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
-                DeleteFileIfExists(srPath.Text + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(srPath.Text + "\\opus.dll");
-                DeleteFileIfExists(srPath.Text + "\\speexdsp.dll");
-                DeleteFileIfExists(srPath.Text + "\\awacs-radios.json");
-                DeleteFileIfExists(srPath.Text + "\\SRS-AutoUpdater.exe");
-                DeleteFileIfExists(srPath.Text + "\\SR-Server.exe");
-                DeleteFileIfExists(srPath.Text + "\\serverlog.txt");
-                DeleteFileIfExists(srPath.Text + "\\clientlog.txt");
+                DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(programPath + "\\opus.dll");
+                DeleteFileIfExists(programPath + "\\speexdsp.dll");
+                DeleteFileIfExists(programPath + "\\awacs-radios.json");
+                DeleteFileIfExists(programPath + "\\SRS-AutoUpdater.exe");
+                DeleteFileIfExists(programPath + "\\SR-Server.exe");
+                DeleteFileIfExists(programPath + "\\serverlog.txt");
+                DeleteFileIfExists(programPath + "\\clientlog.txt");
 
-                DeleteDirectory(srPath.Text+"\\AudioEffects");
-                DeleteDirectory(srPath.Text + "\\Scripts");
+                DeleteDirectory(programPath + "\\AudioEffects");
+                DeleteDirectory(programPath + "\\Scripts");
             }
             Logger.Info($"Finished clearing scripts and program Post Mods ");
         }
@@ -674,29 +709,40 @@ namespace Installer
             
         }
 
-        private void UninstallSR()
+        private async Task<bool> UninstallSR(string srPath, string dcsScriptsPath)
         {
-            QuitSimpleRadio();
+            try
+            {
+                QuitSimpleRadio();
+                Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        InstallButton.IsEnabled = false;
+                        RemoveButton.IsEnabled = false;
 
-            InstallButton.IsEnabled = false;
-            RemoveButton.IsEnabled = false;
+                        RemoveButton.Content = "Removing...";
+                    }
+                ); //end-invoke
 
-            InstallButton.Content = "Removing...";
+          
 
-            Logger.Info($"Removing - Paths: \nProgram:{srPath.Text} \nDCS:{dcsScriptsPath.Text} ");
-            ClearVersionPreModsTechDCS(srPath.Text, dcsScriptsPath.Text);
-            ClearVersionPostModsTechDCS(srPath.Text, dcsScriptsPath.Text);
+                Logger.Info($"Removing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
+                ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
+                ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
 
-            DeleteRegKeys();
+                DeleteRegKeys();
 
-            RemoveShortcuts();
+                RemoveShortcuts();
 
-            MessageBox.Show(
-                "SR Standalone Removed Successfully!\n\nContaining folder left just in case you want favourites or frequencies",
-                "SR Standalone Installer",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+                return true;
 
-            Environment.Exit(0);
+            }
+            catch (Exception ex) 
+            {
+                Logger.Error(ex, "Error Running Uninstaller");
+            }
+
+            return false;
+
         }
 
         private void RemoveShortcuts()
@@ -766,26 +812,30 @@ namespace Installer
         }
 
 
-        private void Remove_Plugin(object sender, RoutedEventArgs e)
+        private async void Remove_Plugin(object sender, RoutedEventArgs e)
         {
-            try
+            var result = await UninstallSR(srPath.Text,dcsScriptsPath.Text);
+            if (result)
             {
-                UninstallSR();
                 Logger.Info($"Removed SRS Successfully!");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error Running Uninstaller");
 
                 MessageBox.Show(
-                    "Error with uninstaller - please post your installer-log.txt on the SRS Discord for Support\n\nError: "+ex.Message,
+                    "SR Standalone Removed Successfully!\n\nContaining folder left just in case you want favourites or frequencies",
+                    "SR Standalone Installer",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+
+                MessageBox.Show(
+                    "Error with uninstaller - please post your installer-log.txt on the SRS Discord for Support",
                     "Installation Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
 
                 Process.Start("https://discord.gg/vqxAw7H");
+               
             }
             Environment.Exit(0);
-
         }
     }
 }
