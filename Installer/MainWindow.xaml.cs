@@ -33,6 +33,7 @@ namespace Installer
         private const string EXPORT_SRS_LUA = "pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);";
         private readonly string currentDirectory;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private ProgressBarDialog progressBarDialog = null;
 
 
         //   private readonly string currentPath;
@@ -162,8 +163,11 @@ namespace Installer
             InstallButton.IsEnabled = false;
             RemoveButton.IsEnabled = false;
 
-
             InstallButton.Content = "Installing...";
+
+            progressBarDialog = new ProgressBarDialog();
+            progressBarDialog.Owner = this;
+            progressBarDialog.Show();
 
             var srsPath = srPath.Text;
             var dcScriptsPath = dcsScriptsPath.Text;
@@ -181,10 +185,13 @@ namespace Installer
                             InstallButton.Content = "Install";
                         }
                     ); //end-invoke
-                  
+                    progressBarDialog.UpdateProgress(true, "Error");
+
                 }
                 else if (result == 1)
                 {
+                    progressBarDialog.UpdateProgress(true, "Installed SRS Successfully!");
+
                     Logger.Info($"Installed SRS Successfully!");
                 
                     //open to installation location
@@ -193,6 +200,8 @@ namespace Installer
                 }
                 else
                 {
+                    progressBarDialog.UpdateProgress(true, "Error with Installation");
+
                     MessageBox.Show(
                         "Error with installation - please post your installer-log.txt on the SRS Discord for Support",
                         "Installation Error",
@@ -225,6 +234,7 @@ namespace Installer
                 }
 
                 Logger.Info($"Installing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
+
                 ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
                 ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
 
@@ -244,7 +254,9 @@ namespace Installer
                     InstallShortcuts(srPath);
                 }
 
-                string message = "Installation / Update Completed Succesfully!\nInstalled DCS Scripts to: \n";
+                InstallVCRedist();
+
+                string message = "Installation / Update Completed Successfully!\nInstalled DCS Scripts to: \n";
 
                 foreach (var path in paths)
                 {
@@ -266,18 +278,29 @@ namespace Installer
             }
         }
 
+        private void InstallVCRedist()
+        {
+            progressBarDialog.UpdateProgress(false, $"Installing VC Redist x64");
+            Process.Start(Directory.GetCurrentDirectory() + "\\VC_redist.x64.exe", "/install /quiet /log \"vc_redist_2017_x64.log\"");
+            progressBarDialog.UpdateProgress(false, $"Finished installing VC Redist x64");
+
+        }
+
 
         private void ClearVersionPreModsTechDCS(string programPath, string dcsPath)
         {
             Logger.Info($"Removed previous SRS Version at {programPath} and {dcsPath}");
+           
             var paths = FindValidDCSFolders(dcsPath);
 
             foreach (var path in paths)
             {
+                progressBarDialog.UpdateProgress(false, $"Clearing Previous SRS at  {path}");
                 RemoveScriptsPreModsTechDCS(path + "\\Scripts");
             }
 
             Logger.Info($"Removed SRS program files at {programPath}");
+            progressBarDialog.UpdateProgress(false, $"Clearing Previous SRS at  {programPath}");
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
@@ -306,14 +329,17 @@ namespace Installer
         private void ClearVersionPostModsTechDCS(string programPath, string dcsPath)
         {
             Logger.Info($"Removed SRS Version Post Mods at {programPath} and {dcsPath}");
+            
             var paths = FindValidDCSFolders(dcsPath);
 
             foreach (var path in paths)
             {
+                progressBarDialog.UpdateProgress(false, $"Removing SRS at {path}");
                 RemoveScriptsPostModsTechDCS(path);
             }
 
             Logger.Info($"Removed SRS program files at {programPath}");
+            progressBarDialog.UpdateProgress(false, $"Removing SRS at {programPath}");
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
@@ -539,8 +565,11 @@ namespace Installer
         private void InstallProgram(string path)
         {
             Logger.Info($"Installing SRS Program to {path}");
+            progressBarDialog.UpdateProgress(false, $"Installing SRS at {path}");
             //sleep! WTF directory is lagging behind state here...
             Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
+
+            progressBarDialog.UpdateProgress(false, $"Creating Directories at {path}");
 
             Logger.Info($"Creating Directories");
             CreateDirectory(path);
@@ -549,6 +578,7 @@ namespace Installer
 
             //sleep! WTF directory is lagging behind state here...
             Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
+            progressBarDialog.UpdateProgress(false, $"Copying Program Files at {path}");
 
             Logger.Info($"Copying binaries");
             File.Copy(currentDirectory + "\\opus.dll", path + "\\opus.dll", true);
@@ -585,6 +615,7 @@ namespace Installer
         private void InstallScripts(string path)
         {
             Logger.Info($"Installing Scripts to {path}");
+            progressBarDialog.UpdateProgress(false, $"Creating Script folders @ {path}");
             //Scripts Path
             CreateDirectory(path+"\\Scripts");
             CreateDirectory(path+"\\Scripts\\Hooks");
@@ -596,6 +627,7 @@ namespace Installer
 
             Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
 
+            progressBarDialog.UpdateProgress(false, $"Updating / Creating Export.lua @ {path}");
             Logger.Info($"Handling Export.lua");
             //does it contain an export.lua?
             if (File.Exists(path + "\\Scripts\\Export.lua"))
@@ -649,6 +681,7 @@ namespace Installer
 
             //Now sort out Scripts//Hooks folder contents
             Logger.Info($"Creating / installing Hooks & Mods");
+            progressBarDialog.UpdateProgress(false, $"Creating / installing Hooks & Mods @ {path}");
             try
             {
                 File.Copy(currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-hook.lua", path + "\\Scripts\\Hooks\\DCS-SRS-hook.lua",
@@ -663,6 +696,8 @@ namespace Installer
                 Environment.Exit(0);
             }
             Logger.Info($"Scripts installed to {path}");
+
+            progressBarDialog.UpdateProgress(false, $"Installed Hooks & Mods @ {path}");
         }
 
         public static void DeleteDirectory(string target_dir)
@@ -723,8 +758,7 @@ namespace Installer
                     }
                 ); //end-invoke
 
-          
-
+                progressBarDialog.UpdateProgress(false, $"Removing SRS");
                 Logger.Info($"Removing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
                 ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
                 ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
@@ -814,9 +848,15 @@ namespace Installer
 
         private async void Remove_Plugin(object sender, RoutedEventArgs e)
         {
+            progressBarDialog = new ProgressBarDialog();
+            progressBarDialog.Owner = this;
+            progressBarDialog.Show();
+            progressBarDialog.UpdateProgress(false, "Uninstalling SRS");
+
             var result = await UninstallSR(srPath.Text,dcsScriptsPath.Text);
             if (result)
             {
+                progressBarDialog.UpdateProgress(true, "Removed SRS Successfully!");
                 Logger.Info($"Removed SRS Successfully!");
 
                 MessageBox.Show(
@@ -826,7 +866,7 @@ namespace Installer
             }
             else
             {
-
+                progressBarDialog.UpdateProgress(true, "Error with Uninstaller");
                 MessageBox.Show(
                     "Error with uninstaller - please post your installer-log.txt on the SRS Discord for Support",
                     "Installation Error",

@@ -1,8 +1,8 @@
--- Version 1.7.0.3
+-- Version 1.7.0.4
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
-net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.7.0.3")
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.7.0.4")
 local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
@@ -23,7 +23,18 @@ package.cpath = package.cpath..";.\\LuaSocket\\?.dll;"
 package.cpath = package.cpath..";"..lfs.writedir().."Mods\\tech\\DCS-SRS\\bin\\?.dll;"
 
 local socket = require("socket")
-local srs = require("srs")
+
+local srs = nil
+
+pcall(function()
+	srs = require("srs")
+
+	SRS.log("Loaded SRS.dll")
+end)
+
+if not srs then
+	SRS.log("Couldnt load SRS.dll")
+end
 
 local JSON = loadfile("Scripts\\JSON.lua")()
 SRS.JSON = JSON
@@ -138,4 +149,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.7.0.3")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.7.0.4")
