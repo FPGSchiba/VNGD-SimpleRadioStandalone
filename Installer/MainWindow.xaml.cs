@@ -100,14 +100,25 @@ namespace Installer
                 currentDirectory = currentDirectory.Replace("file:\\", "");
             }
 
-            if (((App)Application.Current).Arguments.Length > 0)
+            new Action(async () =>
             {
-                if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
+                await Task.Delay(1).ConfigureAwait(false);
+
+                if (((App)Application.Current).Arguments.Length > 0)
                 {
-                    Logger.Info("Silent Installer Running");
-                    InstallReleaseButton(null, null);
+                    if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
+                    {
+                        Application.Current.Dispatcher?.Invoke(() =>
+                            {
+                                Logger.Info("Silent Installer Running");
+                                InstallReleaseButton(null, null);
+                            }
+                        ); //end-invoke
+                    }
                 }
-            }
+
+            }).Invoke();
+
         }
 
 
