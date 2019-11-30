@@ -102,10 +102,12 @@ namespace AutoUpdater
 
             var releases = await githubClient.Repository.Release.GetAll(GITHUB_USERNAME, GITHUB_REPOSITORY);
 
+            bool allowBeta = AllowBeta();
+
             // Retrieve last stable and beta branch release as tagged on GitHub
             foreach (Release release in releases)
             {
-                if (!release.Prerelease)
+                if ((release.Prerelease && allowBeta) || !release.Prerelease)
                 {
                     var releaseAsset = release.Assets.First();
 
@@ -123,6 +125,21 @@ namespace AutoUpdater
             }
 
             return null;
+        }
+
+        private bool AllowBeta()
+        {
+            foreach (var arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.Trim().Equals("-beta"))
+                {
+                    return true;
+                }
+                
+            }
+
+            return false;
+
         }
 
         public void ShowError()

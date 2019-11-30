@@ -1,4 +1,11 @@
   --Hook to load SRS GameGUI for getting current user coalition and multiplayer name
-  local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SRSGameGUI.lua]])
-
-  pcall(function() local dcsSrOverlay=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SRS-OverlayGameGUI.lua]]); end,nil)  
+ local status, result = pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\Tech\DCS-SRS\Scripts\DCS-SRSGameGUI.lua]]); end,nil) 
+ 
+ if not status then
+ 	net.log(result)
+ end
+ 
+status, result =  pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\Tech\DCS-SRS\Scripts\DCS-SRS-OverlayGameGUI.lua]]); end,nil) 
+ if not status then
+ 	net.log(result)
+ end

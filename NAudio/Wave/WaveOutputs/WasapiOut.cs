@@ -2,6 +2,8 @@
 using NAudio.CoreAudioApi;
 using System.Threading;
 using System.Runtime.InteropServices;
+using NAudio.Dsp;
+using NAudio.Wave.SampleProviders;
 
 // ReSharper disable once CheckNamespace
 namespace NAudio.Wave
@@ -26,6 +28,7 @@ namespace NAudio.Wave
         private Thread playThread;
         private WaveFormat outputFormat;
         private bool dmoResamplerNeeded;
+        private bool windowsN = false;
         private readonly SynchronizationContext syncContext;
         
         /// <summary>
@@ -83,6 +86,11 @@ namespace NAudio.Wave
             outputFormat = audioClient.MixFormat; // allow the user to query the default format for shared mode streams
         }
 
+        public WasapiOut(MMDevice device, AudioClientShareMode shareMode, bool useEventSync, int latency, bool windowsN) : this(device, shareMode, useEventSync, latency)
+        {
+            this.windowsN = windowsN;
+        }
+
         static MMDevice GetDefaultAudioEndpoint()
         {
             if (Environment.OSVersion.Version.Major < 6)
@@ -98,12 +106,21 @@ namespace NAudio.Wave
             ResamplerDmoStream resamplerDmoStream = null;
             IWaveProvider playbackProvider = sourceProvider;
             Exception exception = null;
+            WdlResamplingSampleProvider resamplerWdlStream = null;
             try
             {
                 if (dmoResamplerNeeded)
                 {
-                    resamplerDmoStream = new ResamplerDmoStream(sourceProvider, outputFormat);
-                    playbackProvider = resamplerDmoStream;
+                    if (!windowsN)
+                    {
+                        resamplerDmoStream = new ResamplerDmoStream(sourceProvider, outputFormat);
+                        playbackProvider = resamplerDmoStream;
+                    }
+                    else
+                    {
+                        resamplerWdlStream = new WdlResamplingSampleProvider(sourceProvider.ToSampleProvider(), outputFormat.SampleRate);
+                        playbackProvider = resamplerWdlStream.ToWaveProvider();
+                    }
                 }
 
                 // fill a whole buffer
@@ -350,22 +367,35 @@ namespace NAudio.Wave
                     outputFormat = closestSampleRateFormat;
                 }
 
-                try
-                {
-                    // just check that we can make it.
-                    using (new ResamplerDmoStream(waveProvider, outputFormat))
+                if (!windowsN)
+                { 
+                    try
                     {
+                        // just check that we can make it.
+                        using (new ResamplerDmoStream(waveProvider, outputFormat))
+                        {
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // On Windows 10 some poorly coded drivers return a bad format in to closestSampleRateFormat
+                        // In that case, try and fallback as if it provided no closest (e.g. force trying the mix format)
+                        outputFormat = GetFallbackFormat();
+                        try
+                        {
+                            using (new ResamplerDmoStream(waveProvider, outputFormat))
+                            {
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            //still something wrong - assume windows N and DMO is broken in some way
+                            windowsN = true;
+                        }
+                        
                     }
                 }
-                catch (Exception)
-                {
-                    // On Windows 10 some poorly coded drivers return a bad format in to closestSampleRateFormat
-                    // In that case, try and fallback as if it provided no closest (e.g. force trying the mix format)
-                    outputFormat = GetFallbackFormat();
-                    using (new ResamplerDmoStream(waveProvider, outputFormat))
-                    {
-                    }
-                }
+
                 dmoResamplerNeeded = true;
             }
             else

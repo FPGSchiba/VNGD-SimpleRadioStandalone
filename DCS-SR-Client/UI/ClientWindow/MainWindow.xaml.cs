@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -16,6 +18,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -27,7 +30,9 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
 using NAudio.CoreAudioApi;
+using NAudio.Dmo;
 using NAudio.Wave;
 using NLog;
 using WPFCustomMessageBox;
@@ -51,8 +56,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
-        private ClientSync _client;
-        private DCSAutoConnectListener _dcsAutoConnectListener;
+        private SRSClientSyncHandler _client;
+        private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
         private Overlay.RadioOverlayWindow _radioOverlayWindow;
@@ -75,6 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly SettingsStore _settings = SettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+        private bool windowsN;
 
         public MainWindow()
         {
@@ -146,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ExternalAWACSModeName.Text = _settings.GetClientSetting(SettingsKeys.LastSeenName).StringValue;
 
-            _audioManager = new AudioManager(_clients);
+            _audioManager = new AudioManager(_clients, windowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
 
@@ -159,7 +165,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitFlowDocument();
 
-            _dcsAutoConnectListener = new DCSAutoConnectListener(AutoConnect);
+            _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
             _updateTimer.Tick += UpdateClientCount_VUMeters;
@@ -569,7 +575,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     Logger.Error(e,"Audio Output - Error processing device - device skipped");
                 }
+            }
 
+
+            windowsN = false;
+            try
+            {
+                var dmoResampler = new DmoResampler();
+                dmoResampler.Dispose();
+            }
+            catch (Exception)
+            {
+                Logger.Warn("Windows N Detected - using inbuilt resampler");
+                windowsN = true;
             }
         }
 
@@ -603,23 +621,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     //first time round the loop, select first item
                     if (i == 0)
-                {
-                    MicOutput.SelectedIndex = 0;
+                    {
+                        MicOutput.SelectedIndex = 0;
+                    }
+
+                    if (device.ID == _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue)
+                    {
+                        MicOutput.SelectedIndex = i; //this one
+                    }
+
+                    i++;
+
                 }
-
-                if (device.ID == _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue)
+                catch (Exception e)
                 {
-                    MicOutput.SelectedIndex = i; //this one
+                    Logger.Error(e, "Audio Output - Error processing device - device skipped");
                 }
-
-                i++;
-
             }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Audio Output - Error processing device - device skipped");
-            }
-        }
         }
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
@@ -693,6 +711,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 GameConnectionStatus.Source = Images.IconDisconnected;
             }
+
+            if (_clientStateSingleton.IsLotATCConnected)
+            {
+                LotATCConnectionStatus.Source = Images.IconConnected;
+            }
+            else
+            {
+                LotATCConnectionStatus.Source = Images.IconDisconnected;
+            }
         }
 
 
@@ -716,6 +743,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             MinimiseToTray.IsChecked = _settings.GetClientSetting(SettingsKeys.MinimiseToTray).BoolValue;
             StartMinimised.IsChecked = _settings.GetClientSetting(SettingsKeys.StartMinimised).BoolValue;
+
+            MicAGC.IsChecked = _settings.GetClientSetting(SettingsKeys.AGC).BoolValue;
+            MicDenoise.IsChecked = _settings.GetClientSetting(SettingsKeys.Denoise).BoolValue;
 
             RadioSoundEffects.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue;
             RadioSoundEffectsClipping.IsChecked = _settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue;
@@ -749,7 +779,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new ClientSync(_clients, _guid, UpdateUICallback);
+                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback);
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
@@ -870,7 +900,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             _clientStateSingleton.DcsPlayerRadioInfo.Reset();
-            _clientStateSingleton.DcsPlayerSideInfo.Reset();
+            _clientStateSingleton.PlayerCoaltionLocationMetadata.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1062,7 +1092,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-                    _audioPreview.StartPreview(inputId, output);
+                    _audioPreview.StartPreview(inputId, output,windowsN);
 
                     Preview.Content = "Stop Preview";
                 }
@@ -1320,7 +1350,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
+        private async void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
         {
             // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
             bool showPrompt = _settings.GetClientSetting(SettingsKeys.AutoConnectMismatchPrompt).BoolValue;
@@ -1345,6 +1375,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (switchServer)
             {
                 Stop();
+
+                StartStop.IsEnabled = false;
+                StartStop.Content = "Connecting...";
+                await Task.Delay(2000);
+                StartStop.IsEnabled = true;
                 ServerIp.Text = advertisedConnection;
                 Connect();
             }
@@ -1434,6 +1469,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
         {
             TabControl.SelectedItem = FavouritesSeversTab;
+        }
+
+        private void MicAGC_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.AGC).BoolValue =
+                (bool)MicAGC.IsChecked;
+            _settings.Save();
+        }
+
+        private void MicDenoise_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.Denoise).BoolValue =
+                (bool)MicDenoise.IsChecked;
+            _settings.Save();
         }
 
         private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
@@ -1558,8 +1607,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (result)
             {
                 _clientStateSingleton.InExternalAWACSMode = true;
-                _clientStateSingleton.DcsPlayerSideInfo.side = coalition;
-                _clientStateSingleton.DcsPlayerSideInfo.name = _clientStateSingleton.LastSeenName;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = coalition;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = _clientStateSingleton.LastSeenName;
                 _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
@@ -1569,8 +1618,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 _clientStateSingleton.InExternalAWACSMode = false;
-                _clientStateSingleton.DcsPlayerSideInfo.side = 0;
-                _clientStateSingleton.DcsPlayerSideInfo.name = "";
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = 0;
+                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.name = "";
                 _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
                 _clientStateSingleton.LastSent = 0;
@@ -1587,6 +1636,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MessageBox.Show(this,
                 "Input Devices Rescanned",
                 "New input devices can now be used.",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void SetSRSPath_Click(object sender, RoutedEventArgs e)
+        {
+            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone","SRPathStandalone",Directory.GetCurrentDirectory());
+
+            MessageBox.Show(this,
+                "SRS Path set to: " + Directory.GetCurrentDirectory(),
+                "SRS Client Path",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }

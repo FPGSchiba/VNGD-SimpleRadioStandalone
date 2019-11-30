@@ -10,6 +10,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
+using NAudio.Dmo;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
@@ -55,12 +56,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         public float MicMax { get; set; } = -100;
         public float SpeakerMax { get; set; } = -100;
 
-        public void StartPreview(int mic, MMDevice speakers)
+        public void StartPreview(int mic, MMDevice speakers, bool windowsN)
         {
             try
             {
                 _settings = SettingsStore.Instance;
-                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40);
+
+                _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40, windowsN);
 
                 _buffBufferedWaveProvider =
                     new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));

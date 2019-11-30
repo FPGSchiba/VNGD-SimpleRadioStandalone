@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
@@ -15,6 +16,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public string name = "";
         public DcsPosition pos = new DcsPosition();
+        public DCSLatLngPosition latLng = new DCSLatLngPosition();
+        public bool inAircraft = false;
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom
@@ -43,6 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         {
             name = "";
             pos = new DcsPosition();
+            latLng = new DCSLatLngPosition();
             ptt = false;
             selected = 0;
             unit = "";

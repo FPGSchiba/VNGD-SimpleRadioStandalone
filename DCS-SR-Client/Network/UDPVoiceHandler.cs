@@ -520,18 +520,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.DcsPlayerRadioInfo.pos;
+                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
 
                 var clientPos = transmittingClient.Position;
 
                 if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
                 {
-                    //no real position therefore no line of Sight!
-                    return true;
+                    var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                    var clientLatLng = transmittingClient.LatLngPosition;
+                    //No DCS Position - do we have LotATC Position?
+                    if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))
+                    {
+                        return true;
+                    }
                 }
-
+              
                 losLoss = transmittingClient.LineOfSightLoss;
                 return transmittingClient.LineOfSightLoss < 1.0f; // 1.0 or greater  is TOTAL loss
+                
             }
 
             losLoss = 0;
@@ -549,17 +555,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.DcsPlayerRadioInfo.pos;
+                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
 
                 var clientPos = transmittingClient.Position;
 
+                double dist = 0;
                 if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
                 {
-                    //no real position
-                    return true;
+                    var myLatLng = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                    var clientLatLng = transmittingClient.LatLngPosition;
+                    //No DCS Position - do we have LotATC Position?
+                    if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //Calculate with Haversine (distance over ground) + Pythagoras (crow flies distance)
+                        dist = RadioCalculator.CalculateDistanceHaversine(myLatLng, clientLatLng);
+                    }
                 }
-
-                var dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
+                else
+                {
+                    //calculate with DCS Points
+                    dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
+                }
 
                 var max = RadioCalculator.FriisMaximumTransmissionRange(frequency);
                 // % loss of signal

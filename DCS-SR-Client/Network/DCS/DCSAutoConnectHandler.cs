@@ -10,9 +10,9 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
-    public class DCSAutoConnectListener
+    public class DCSAutoConnectHandler
     {
         private readonly MainWindow.ReceivedAutoConnect _receivedAutoConnect;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -21,13 +21,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stop;
 
 
-        public DCSAutoConnectListener(MainWindow.ReceivedAutoConnect receivedAutoConnect)
+        public DCSAutoConnectHandler(MainWindow.ReceivedAutoConnect receivedAutoConnect)
         {
             _receivedAutoConnect = receivedAutoConnect;
 
             StartDcsBroadcastListener();
-        }
 
+            var args = Environment.GetCommandLineArgs();
+
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-host="))
+                {
+                    string host = arg.Replace("-host=", "").Trim();
+                    HandleMessage(host);
+                    Logger.Info("Auto Connect Launch for host: " + host);
+                }
+            }
+        }
 
         private void StartDcsBroadcastListener()
         {

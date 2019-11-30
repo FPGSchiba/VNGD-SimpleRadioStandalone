@@ -6,18 +6,15 @@ Dedicated servers DO NOT need the installer run.
 
 *** To Install Manually for Clients ***
 
-Copy DCS-SimpleRadioStandalone.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
-Copy DCS-SRSGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
-Copy DCS-SRS-OverlayGameGUI.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
-Copy DCS-SRS-Overlay.dlg to C:\Users\USERNAME\Saved Games\DCS\Scripts
+Copy Scripts\DCS-SRS folder to C:\Users\USERNAME\Saved Games\DCS\Mods\Tech\ 
 
-Copy DCS-SRS-Hook.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts\Hooks -- NOTE: Sub-folder in Scripts folder
+Copy Scripts\Hooks\DCS-SRS-Hook.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts\Hooks -- NOTE: Sub-folder in Scripts folder
 
 Create the folders if they dont exist
 
 Add:
 
-local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SimpleRadioStandalone.lua]])
+pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);
 
 To the END of the Export.lua file in C:\Users\USERNAME\Saved Games\DCS\Scripts
 
@@ -27,13 +24,10 @@ Copy the rest of the zip archive where ever you like and then run, don't forget 
 
 Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
 
-Create a folder called AudioEffects where ever your SR-ClientRadio.exe is - Drag all 4 sound files into that folder or you wont have sound effects
-Copy awacs-radios.json to where ever your SR-ClientRadio.exe is
-
 
 *** To Install AutoConnect System for SERVERS only ***
 To enable SRS clients to be prompted automatically to connect just add the DCS-SRS-AutoConnectGameGUI.lua file 
-to the appropriate DCS Saved Games folder e.g. DCS.openbeta/Scripts, DCS.openalpha/Scripts or just DCS/Scripts
+to the appropriate DCS Saved Games  folder e.g. DCS.openbeta/Scripts/Hooks, DCS.openalpha/Scripts/Hooks or just DCS/Scripts/Hooks
 
 Edit the line below to your server address where SRS server is running. Port is optional. DCS must be restarted on the server for this file and any changes to take effect.
 
@@ -58,5 +52,5 @@ A: Run SR-Server.exe (no need to run installer or add scripts!) and make sure TC
    It does NOT need to be on a PC running DCS and you do NOT need to port forward if you're just using the client.
 
 Q: I've installed everything manually and its not working
-A: Delete your Export.lua file in the DCS\Scripts, DCS.openbeta\Scripts and DCS.openalpha\Scripts and run the installer again
+A: Delete your entire Scripts folder -  DCS\Scripts, DCS.openbeta\Scripts and DCS.openalpha\Scripts and run the installer again
 
