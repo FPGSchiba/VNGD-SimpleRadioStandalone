@@ -166,6 +166,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioEagleII(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
+				elseif string.find(_update.unit, "JF") and string.find(_update.unit,"17")  then
+                    _update = SR.exportRadioJF17(_update)
                 elseif _update.unit == "AV8BNA" then
                     _update = SR.exportRadioAV8BNA(_update)
                 elseif _update.unit == "AJS37" then
@@ -1971,6 +1973,26 @@ function SR.exportRadioM2000C(_data)
 
     _previousEncState = SR.getButtonPosition(432)
 
+    _data.control = 0; -- partial radio, allows hotkeys
+
+    return _data
+end
+
+function SR.exportRadioJF17(_data)
+
+	_data.radios[2].name = "COMM1 VHF Radio"
+    _data.radios[2].freq = SR.getRadioFrequency(29)
+    _data.radios[2].modulation = SR.getRadioModulation(29)
+    _data.radios[2].volume = 100
+	_data.radios[2].volMode = 1
+
+    _data.radios[3].name = "COMM2 UHF Radio"
+    _data.radios[3].freq = SR.getRadioFrequency(30)
+    _data.radios[3].modulation = SR.getRadioModulation(30)
+    _data.radios[3].volume = 100
+	_data.radios[3].volMode = 1
+
+    _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
 
     return _data
