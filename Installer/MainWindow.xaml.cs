@@ -90,7 +90,7 @@ namespace Installer
             }
 
             //To get the location the assembly normally resides on disk or the install directory
-            var currentPath = Assembly.GetExecutingAssembly().CodeBase;
+            var currentPath = GetWorkingDirectory();
 
             //once you have the path you get the directory with:
             currentDirectory = Path.GetDirectoryName(currentPath);
@@ -219,7 +219,7 @@ namespace Installer
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 
                     Process.Start("https://discord.gg/vqxAw7H");
-                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                    Process.Start("explorer.exe", GetWorkingDirectory());
                     Environment.Exit(0);
                 }
             }).Invoke();
@@ -289,10 +289,15 @@ namespace Installer
             }
         }
 
+        private string GetWorkingDirectory()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
         private void InstallVCRedist()
         {
             progressBarDialog.UpdateProgress(false, $"Installing VC Redist x64");
-            Process.Start(Directory.GetCurrentDirectory() + "\\VC_redist.x64.exe", "/install /quiet /log \"vc_redist_2017_x64.log\"");
+            Process.Start(GetWorkingDirectory() + "VC_redist.x64.exe", "/install /quiet /log \"vc_redist_2017_x64.log\"");
             progressBarDialog.UpdateProgress(false, $"Finished installing VC Redist x64");
 
         }
@@ -719,7 +724,7 @@ namespace Installer
             }
         }
 
-        private static void DirectoryCopy(string sourceDirName, string destDirName)
+        private void DirectoryCopy(string sourceDirName, string destDirName)
         {
             // Get the subdirectories for the specified directory.
             DirectoryInfo dir = new DirectoryInfo(sourceDirName);
@@ -735,7 +740,7 @@ namespace Installer
             // If the destination directory doesn't exist, create it.
             if (!Directory.Exists(destDirName))
             {
-                Directory.CreateDirectory(destDirName);
+                CreateDirectory(destDirName);
             }
 
             // Get the files in the directory and copy them to the new location.
@@ -854,6 +859,13 @@ namespace Installer
                 dir.SetAccessControl(dSecurity);
                 dir.Refresh();
             }
+
+            //sometimes it says directory created and its not!
+            do 
+            { 
+                Task.Delay(TimeSpan.FromMilliseconds(50)).Wait();
+            } while(!Directory.Exists(path));
+            Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
         }
 
 
@@ -885,7 +897,7 @@ namespace Installer
 
                 Process.Start("https://discord.gg/vqxAw7H");
 
-                Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                Process.Start("explorer.exe", GetWorkingDirectory());
 
             }
             Environment.Exit(0);

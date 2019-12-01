@@ -3,25 +3,22 @@
 
 SRS::SRSExtension::SRSExtension()
 {
-	
+
 }
 
 bool SRS::SRSExtension::Launch(const char* host)
 {
-	if(!IsSRSRunning())
+	if (!IsSRSRunning())
 	{
-		std::string path = ReadSRSPath();
+		std::string directory = ReadSRSPath();
+		std::string path = directory;
+		path = path.append("\\SR-ClientRadio.exe");
 
-		if(path != "")
+		if (!directory.empty())
 		{
-			std::wstring stemp = std::wstring(path.begin(), path.end());
-			LPCWSTR sw = stemp.c_str();
+			std::string hostStr = std::string(host).insert(0, "-host=");
 
-			std::string hostStr = std::string(host).insert(0,"-host=");
-			
-			LPCWSTR args = SRS::SRSExtension::s2ws(hostStr).c_str();
-		
-			ShellExecute(NULL, L"open", sw, args, NULL, SW_SHOWDEFAULT);
+			ShellExecute(NULL, L"open", s2ws(path).c_str(), s2ws(hostStr).c_str(), s2ws(directory).c_str(), SW_SHOWDEFAULT);
 			return true;
 		}
 
@@ -52,8 +49,6 @@ std::string SRS::SRSExtension::ReadSRSPath()
 			//convert to normal string
 			std::string str(ws.begin(), ws.end());
 
-			str = str.append("\\SR-ClientRadio.exe");
-
 			RegCloseKey(hKey);
 
 			delete[] regBuffer;
@@ -67,25 +62,25 @@ std::string SRS::SRSExtension::ReadSRSPath()
 
 	return "";
 
-	
+
 }
 
 bool SRS::SRSExtension::IsSRSRunning()
 {
-		bool exists = false;
-		PROCESSENTRY32 entry;
-		entry.dwSize = sizeof(PROCESSENTRY32);
+	bool exists = false;
+	PROCESSENTRY32 entry;
+	entry.dwSize = sizeof(PROCESSENTRY32);
 
-		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
-		if (Process32First(snapshot, &entry))
-			while (Process32Next(snapshot, &entry))
-				if (!_wcsicmp(entry.szExeFile, L"SR-ClientRadio.exe"))
-					exists = true;
+	if (Process32First(snapshot, &entry))
+		while (Process32Next(snapshot, &entry))
+			if (!_wcsicmp(entry.szExeFile, L"SR-ClientRadio.exe"))
+				exists = true;
 
-		CloseHandle(snapshot);
-		return exists;
-	
+	CloseHandle(snapshot);
+	return exists;
+
 }
 
 //https://stackoverflow.com/questions/8468597/prepend-stdstring
