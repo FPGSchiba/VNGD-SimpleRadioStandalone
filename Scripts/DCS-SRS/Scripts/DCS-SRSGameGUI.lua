@@ -1,8 +1,8 @@
--- Version 1.7.1.0
+-- Version 1.7.1.1
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
-net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.7.1.0")
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.7.1.1")
 local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
@@ -149,4 +149,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.7.1.0")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.7.1.1")

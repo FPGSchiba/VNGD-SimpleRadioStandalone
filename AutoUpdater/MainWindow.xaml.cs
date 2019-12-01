@@ -199,9 +199,14 @@ namespace AutoUpdater
         {
             if (!_cancel)
             {
-                ZipFile.ExtractToDirectory(_file, _directory + "\\extract");
+                ZipFile.ExtractToDirectory(_file, Path.Combine(_directory, "extract"));
 
-                Process.Start(_directory + "\\extract\\installer.exe", "-autoupdate");
+                ProcessStartInfo procInfo = new ProcessStartInfo();
+                procInfo.WorkingDirectory = Path.Combine(_directory, "extract"); 
+                procInfo.Arguments = "-autoupdate";
+                procInfo.FileName = Path.Combine(Path.Combine(_directory, "extract"), "installer.exe");
+                procInfo.UseShellExecute = false;
+                Process.Start(procInfo);
             }
             
             Close();
