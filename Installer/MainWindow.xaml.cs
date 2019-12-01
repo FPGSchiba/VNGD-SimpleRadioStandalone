@@ -297,7 +297,7 @@ namespace Installer
         private void InstallVCRedist()
         {
             progressBarDialog.UpdateProgress(false, $"Installing VC Redist x64");
-            Process.Start(GetWorkingDirectory() + "VC_redist.x64.exe", "/install /quiet /log \"vc_redist_2017_x64.log\"");
+            Process.Start(GetWorkingDirectory() + "VC_redist.x64.exe", "/install /norestart /quiet /log \"vc_redist_2017_x64.log\"");
             progressBarDialog.UpdateProgress(false, $"Finished installing VC Redist x64");
 
         }
