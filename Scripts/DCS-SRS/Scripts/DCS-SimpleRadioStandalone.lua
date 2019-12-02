@@ -2004,6 +2004,8 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[2].freq = SR.getRadioFrequency(2)
     _data.radios[2].modulation = SR.getRadioModulation(2)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
+	_data.radios[2].guardFreqMode = 1
+    _data.radios[2].secFreq = 243.0 * 1000000
 
     -- get channel selector
     --  local _selector  = SR.getSelectorPosition(448,0.50)
@@ -2016,6 +2018,8 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = SR.getRadioModulation(3)
     _data.radios[3].volume = SR.getRadioVolume(0, 299, { 0.0, 1.0 }, false)
+	_data.radios[3].guardFreqMode = 1
+    _data.radios[3].secFreq = 243.0 * 1000000
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
