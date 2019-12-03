@@ -133,7 +133,7 @@ SRS.onChatMessage = function(msg, from)
         SRS.log(string.format("Got SRS Auto Connect message: %s", host))
 
         local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
-        if srs then
+        if srs and enabled then
             local path = srs.get_srs_path()
             if path ~= "" then
 
