@@ -1,4 +1,4 @@
--- Version 1.7.1.1
+-- Version 1.7.1.2
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -166,7 +166,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioEagleII(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
-				elseif string.find(_update.unit, "JF") and string.find(_update.unit,"17")  then
+				elseif _update.unit == "JF-17"  then
                     _update = SR.exportRadioJF17(_update)
                 elseif _update.unit == "AV8BNA" then
                     _update = SR.exportRadioAV8BNA(_update)
@@ -1983,14 +1983,16 @@ function SR.exportRadioJF17(_data)
 	_data.radios[2].name = "COMM1 VHF Radio"
     _data.radios[2].freq = SR.getRadioFrequency(29)
     _data.radios[2].modulation = SR.getRadioModulation(29)
-    _data.radios[2].volume = 100
-	_data.radios[2].volMode = 1
+    _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 940, { 0.0, 1.0 }, false)
+    _data.radios[2].guardFreqMode = 1
+    _data.radios[2].secFreq = 121.5 * 1000000
 
     _data.radios[3].name = "COMM2 UHF Radio"
     _data.radios[3].freq = SR.getRadioFrequency(30)
     _data.radios[3].modulation = SR.getRadioModulation(30)
-    _data.radios[3].volume = 100
-	_data.radios[3].volMode = 1
+    _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 940, { 0.0, 1.0 }, false)
+    _data.radios[3].guardFreqMode = 1
+    _data.radios[3].secFreq = 243.0 * 1000000
 
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
@@ -2004,6 +2006,8 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[2].freq = SR.getRadioFrequency(2)
     _data.radios[2].modulation = SR.getRadioModulation(2)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
+    _data.radios[2].guardFreqMode = 1
+    _data.radios[2].secFreq = 243.0 * 1000000
 
     -- get channel selector
     --  local _selector  = SR.getSelectorPosition(448,0.50)
@@ -2016,6 +2020,8 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = SR.getRadioModulation(3)
     _data.radios[3].volume = SR.getRadioVolume(0, 299, { 0.0, 1.0 }, false)
+    _data.radios[3].guardFreqMode = 1
+    _data.radios[3].secFreq = 243.0 * 1000000
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
@@ -2250,4 +2256,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.1.1")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.1.2")
