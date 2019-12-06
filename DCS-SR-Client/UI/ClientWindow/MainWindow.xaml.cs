@@ -756,6 +756,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             CheckForBetaUpdates.IsChecked = _settings.GetClientSetting(SettingsKeys.CheckForBetaUpdates).BoolValue;
             PlayConnectionSounds.IsChecked = _settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue;
+
+            RequireAdminToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue;
         }
 
         private void Connect()
@@ -1649,6 +1651,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 "SRS Client Path",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        private void RequireAdminToggle_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue =
+                (bool)RequireAdminToggle.IsChecked;
+            _settings.Save();
+
+            MessageBox.Show(this,
+                "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds you can disable SRS Admin Privileges. \n\nFor this setting to take effect SRS must be restarted",
+                "SRS Admin Privileges", MessageBoxButton.OK, MessageBoxImage.Warning);
+
         }
     }
 }
