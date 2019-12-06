@@ -97,9 +97,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         DisableWindowVisibilityCheck = 82,
         PlayConnectionSounds = 83,
 
+        RequireAdmin = 84,
+
         //LotATC
         LotATCIncomingUDP = 90, //10710
         LotATCOutgoingUDP = 91 //10711
+
     }
 
     public enum InputBinding
@@ -372,6 +375,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"},
             {SettingsKeys.PlayConnectionSounds.ToString(), "true"},
+
+            {SettingsKeys.RequireAdmin.ToString(),"true" },
 
             {SettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
             {SettingsKeys.LotATCOutgoingUDP.ToString(), "10711"}

@@ -2,10 +2,15 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Principal;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using MahApps.Metro.Controls;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -52,12 +57,29 @@ namespace DCS_SR_Client
 
             SetupLogging();
 
+            RequireAdmin();
+
+            
 #if !DEBUG
             if (IsClientRunning())
             {
                 Logger logger = LogManager.GetCurrentClassLogger();
 
-                if (_settings.GetClientSetting(SettingsKeys.AllowMultipleInstances).BoolValue)
+                //check environment flag
+
+                var args = Environment.GetCommandLineArgs();
+                var allowMultiple = false;
+
+                foreach (var arg in args)
+                {
+                    if (arg.Contains("-allowMultiple"))
+                    {
+                        //restart flag to promote to admin
+                        allowMultiple = true;
+                    }
+                }
+
+                if (_settings.GetClientSetting(SettingsKeys.AllowMultipleInstances).BoolValue || allowMultiple)
                 {
                     logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
                 }
@@ -81,8 +103,68 @@ namespace DCS_SR_Client
             InitNotificationIcon();
         }
 
+        private void RequireAdmin()
+        {
+            if (!_settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
+            {
+                return;
+            }
+            
+            WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            bool hasAdministrativeRight = principal.IsInRole(WindowsBuiltInRole.Administrator);
+
+            if (!hasAdministrativeRight && _settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    var location = AppDomain.CurrentDomain.BaseDirectory;
+
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        UseShellExecute = true,
+                        WorkingDirectory = location,
+                        FileName = location + "SR-ClientRadio.exe",
+                        Verb = "runas",
+                        Arguments = GetArgsString() + " -allowMultiple"
+                    };
+                    try
+                    {
+                        Process p = Process.Start(startInfo);
+
+                        //shutdown this process as another has started
+                        Dispatcher?.BeginInvoke(new Action(() => Application.Current.Shutdown(0)));
+                    }
+                    catch (System.ComponentModel.Win32Exception ex)
+                    {
+                        MessageBox.Show(
+                                "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",
+                                "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                });
+            }
+           
+        }
+
+        private string GetArgsString()
+        {
+            StringBuilder builder = new StringBuilder();
+            var args = Environment.GetCommandLineArgs();
+            foreach (var s in args)
+            {
+                if (builder.Length > 0)
+                {
+                    builder.Append(" ");
+                }
+                builder.Append(s);
+               
+            }
+
+            return builder.ToString();
+        }
+
         private bool IsClientRunning()
         {
+
             Process currentProcess = Process.GetCurrentProcess();
             string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
 
