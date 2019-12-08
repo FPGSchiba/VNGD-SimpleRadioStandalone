@@ -24,6 +24,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
@@ -309,16 +310,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ServerAddress = FavouriteServersViewModel.DefaultServerAddress;
         }
 
+        private void InitInputProfiles()
+        {
+            ControlsProfile.Items.Clear();
+            foreach (var profile in _settings.InputSettingsStore.InputProfiles.Keys)
+            {
+                ControlsProfile.Items.Add(profile);
+            }
+            ControlsProfile.SelectedIndex = 0;
+        }
+
         private void InitInput()
         {
             InputManager = new InputDeviceManager(this, ToggleOverlay);
 
-            foreach (var profile in _settings.GetProfiles())
-            {
-                ControlsProfile.Items.Add(profile);
-            }
+            InitInputProfiles();
 
-            ControlsProfile.SelectedIndex = 0;
             ControlsProfile.DropDownClosed += (sender, args) =>
             {
                 //switch profiles
@@ -328,7 +335,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //redraw UI
                 ReloadInputBindings();
             };
-
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -1721,13 +1727,80 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void CreateProfile(object sender, RoutedEventArgs e)
         {
-            
-
+            var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+                {
+                    if (name.Trim().Length > 0)
+                    {
+                        _settings.InputSettingsStore.AddNewProfile(name);
+                        InitInputProfiles();
+                        ReloadInputBindings();
+                    }
+                });
+            inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            inputProfileWindow.Owner = this;
+            inputProfileWindow.ShowDialog();
         }
 
         private void DeleteProfile(object sender, RoutedEventArgs e)
         {
-            
+            var current = ControlsProfile.SelectedValue as string;
+
+            if (current.Equals("default"))
+            {
+                MessageBox.Show(this,
+                    "Cannot delete the default input!",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                var result = MessageBox.Show(this,
+                    $"Are you sure you want to delete {current} ?",
+                    "Confirmation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ControlsProfile.SelectedIndex = 0;
+                    _settings.InputSettingsStore.RemoveProfile(current);
+                    InitInputProfiles();
+                    ReloadInputBindings();
+                }
+
+            }
+
+        }
+
+        private void RenameProfile(object sender, RoutedEventArgs e)
+        {
+
+            var current = ControlsProfile.SelectedValue as string;
+            if (current.Equals("default"))
+            {
+                MessageBox.Show(this,
+                    "Cannot rename the default input!",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                var oldName = current;
+                var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+                {
+                    if (name.Trim().Length > 0)
+                    {
+                        _settings.InputSettingsStore.RenameProfile(oldName,name);
+                        InitInputProfiles();
+                        ReloadInputBindings();
+                    }
+                }, true,oldName);
+                inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                inputProfileWindow.Owner = this;
+                inputProfileWindow.ShowDialog();
+            }
 
         }
     }

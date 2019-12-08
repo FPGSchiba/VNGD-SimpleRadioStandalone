@@ -64,10 +64,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     ModifierText.Text = "None";
                     ModifierDevice.Text = "None";
-
                 }
             }
-           
         }
 
         private void Device_Click(object sender, RoutedEventArgs e)

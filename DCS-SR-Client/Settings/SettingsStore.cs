@@ -226,7 +226,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private  InputSettingsStore _inputSettingsStore;
         public InputSettingsStore InputSettingsStore => _inputSettingsStore;
 
-        public List<string> InputProfiles = new List<string>();
 
         private SettingsStore()
         {
@@ -283,8 +282,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 Save();
             }
 
-            InputProfiles = GetProfiles();
-            
             _inputSettingsStore = new InputSettingsStore(this);
         }
 
@@ -303,20 +300,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
 
-        public List<string> GetProfiles()
-        {
-            var profiles = GetClientSetting(SettingsKeys.InputProfiles).StringValueArray;
-
-            if (profiles == null || profiles.Length == 0 || !profiles.Contains("default"))
-            {
-                profiles = new[] {"default"};
-                SetClientSetting(SettingsKeys.InputProfiles, profiles);
-            }
-
-            return new List<string>(profiles);
-        }
-
-        private void SetClientSetting(SettingsKeys key, string[] strArray)
+        public void SetClientSetting(SettingsKeys key, string[] strArray)
         {
             SetSetting("Client Settings", key.ToString(), strArray);
 
@@ -525,5 +509,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
             }
         }
+
     }
 }

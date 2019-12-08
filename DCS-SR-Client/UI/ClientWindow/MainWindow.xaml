@@ -280,11 +280,13 @@
 
                      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                             <ComboBox x:Name="ControlsProfile"
-                               Width="150"
+                               Width="170"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Top" Margin="5"  Padding="5" />
                             <Button Margin="5" Padding="5" Content="Create Profile" Click="CreateProfile" />
+                            <Button  Margin="5"  Padding="5" Content="Rename Profile" Click="RenameProfile" />
                             <Button  Margin="5"  Padding="5" Content="Delete Profile" Click="DeleteProfile" />
+                            
                         </StackPanel>
                         <Button Width="150px" Content="Rescan Input Devices" Click="RescanInputDevices" />
                         <Grid>
