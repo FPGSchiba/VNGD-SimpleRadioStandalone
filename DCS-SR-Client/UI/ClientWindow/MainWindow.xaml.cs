@@ -313,6 +313,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             InputManager = new InputDeviceManager(this, ToggleOverlay);
 
+            foreach (var profile in _settings.GetProfiles())
+            {
+                ControlsProfile.Items.Add(profile);
+            }
+
+            ControlsProfile.SelectedIndex = 0;
+            ControlsProfile.DropDownClosed += (sender, args) =>
+            {
+                //switch profiles
+                Logger.Info(ControlsProfile.SelectedValue as string+ " - Profile now in use");
+                _settings.InputSettingsStore.CurrentProfileName = ControlsProfile.SelectedValue as string;
+
+                //redraw UI
+                ReloadInputBindings();
+            };
+
+
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
@@ -445,6 +462,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputName = "Radio Channel Down";
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
+        }
+
+        private void ReloadInputBindings()
+        {
+            Radio1.LoadInputSettings();
+            Radio2.LoadInputSettings();
+            Radio3.LoadInputSettings();
+            PTT.LoadInputSettings();
+            Intercom.LoadInputSettings();
+            RadioOverlay.LoadInputSettings();
+            Radio4.LoadInputSettings();
+            Radio5.LoadInputSettings();
+            Radio6.LoadInputSettings();
+            Radio7.LoadInputSettings();
+            Radio8.LoadInputSettings();
+            Radio9.LoadInputSettings();
+            Radio10.LoadInputSettings();
+            Up100.LoadInputSettings();
+            Up10.LoadInputSettings();
+            Up1.LoadInputSettings();
+            Up01.LoadInputSettings();
+            Up001.LoadInputSettings();
+            Up0001.LoadInputSettings();
+            Down100.LoadInputSettings();
+            Down10.LoadInputSettings();
+            Down1.LoadInputSettings();
+            Down01.LoadInputSettings();
+            Down001.LoadInputSettings();
+            Down0001.LoadInputSettings();
+            ToggleGuard.LoadInputSettings();
+            NextRadio.LoadInputSettings();
+            PreviousRadio.LoadInputSettings();
+            ToggleEncryption.LoadInputSettings();
+            EncryptionKeyIncrease.LoadInputSettings();
+            EncryptionKeyDecrease.LoadInputSettings();
+            RadioChannelUp.LoadInputSettings();
+            RadioChannelDown.LoadInputSettings();
         }
 
         private void InitToolTips()
@@ -1662,6 +1716,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MessageBox.Show(this,
                 "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds you can disable SRS Admin Privileges. \n\nFor this setting to take effect SRS must be restarted",
                 "SRS Admin Privileges", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+        }
+
+        private void CreateProfile(object sender, RoutedEventArgs e)
+        {
+            
+
+        }
+
+        private void DeleteProfile(object sender, RoutedEventArgs e)
+        {
+            
 
         }
     }
