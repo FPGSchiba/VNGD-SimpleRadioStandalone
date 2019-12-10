@@ -1983,14 +1983,14 @@ function SR.exportRadioJF17(_data)
 	_data.radios[2].name = "COMM1 VHF Radio"
     _data.radios[2].freq = SR.getRadioFrequency(29)
     _data.radios[2].modulation = SR.getRadioModulation(29)
-    _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 940, { 0.0, 1.0 }, false)
+    _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
     _data.radios[2].guardFreqMode = 1
     _data.radios[2].secFreq = 121.5 * 1000000
 
     _data.radios[3].name = "COMM2 UHF Radio"
     _data.radios[3].freq = SR.getRadioFrequency(30)
     _data.radios[3].modulation = SR.getRadioModulation(30)
-    _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 940, { 0.0, 1.0 }, false)
+    _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
     _data.radios[3].guardFreqMode = 1
     _data.radios[3].secFreq = 243.0 * 1000000
 

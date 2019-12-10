@@ -732,14 +732,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public List<InputBindState> GenerateBindStateList()
         {
             var bindStates = new List<InputBindState>();
+            var currentInputProfile = _settings.InputSettingsStore.GetCurrentInputProfile();
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
             for (int i = (int) InputBinding.Intercom; i <= (int) InputBinding.RadioChannelDown; i++)
             {
-                if (_settings.InputDevices.ContainsKey((InputBinding) i))
+                if (currentInputProfile.ContainsKey((InputBinding) i))
                 {
-                    var input = _settings.InputDevices[(InputBinding) i];
+                    var input = currentInputProfile[(InputBinding) i];
                     //construct InputBindState
 
                     var bindState = new InputBindState()
@@ -751,9 +752,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         ModifierState = false
                     };
 
-                    if (_settings.InputDevices.ContainsKey((InputBinding) i + 100))
+                    if (currentInputProfile.ContainsKey((InputBinding) i + 100))
                     {
-                        bindState.ModifierDevice = _settings.InputDevices[(InputBinding) i + 100];
+                        bindState.ModifierDevice = currentInputProfile[(InputBinding) i + 100];
                     }
 
                     bindStates.Add(bindState);

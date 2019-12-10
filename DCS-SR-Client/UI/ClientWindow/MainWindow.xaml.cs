@@ -24,6 +24,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
@@ -309,9 +310,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ServerAddress = FavouriteServersViewModel.DefaultServerAddress;
         }
 
+        private void InitInputProfiles()
+        {
+            ControlsProfile.Items.Clear();
+            foreach (var profile in _settings.InputSettingsStore.InputProfiles.Keys)
+            {
+                ControlsProfile.Items.Add(profile);
+            }
+            ControlsProfile.SelectedIndex = 0;
+        }
+
         private void InitInput()
         {
             InputManager = new InputDeviceManager(this, ToggleOverlay);
+
+            InitInputProfiles();
+
+            ControlsProfile.DropDownClosed += (sender, args) =>
+            {
+                //switch profiles
+                Logger.Info(ControlsProfile.SelectedValue as string+ " - Profile now in use");
+                _settings.InputSettingsStore.CurrentProfileName = ControlsProfile.SelectedValue as string;
+
+                //redraw UI
+                ReloadInputBindings();
+            };
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -445,6 +468,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputName = "Radio Channel Down";
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
+        }
+
+        private void ReloadInputBindings()
+        {
+            Radio1.LoadInputSettings();
+            Radio2.LoadInputSettings();
+            Radio3.LoadInputSettings();
+            PTT.LoadInputSettings();
+            Intercom.LoadInputSettings();
+            RadioOverlay.LoadInputSettings();
+            Radio4.LoadInputSettings();
+            Radio5.LoadInputSettings();
+            Radio6.LoadInputSettings();
+            Radio7.LoadInputSettings();
+            Radio8.LoadInputSettings();
+            Radio9.LoadInputSettings();
+            Radio10.LoadInputSettings();
+            Up100.LoadInputSettings();
+            Up10.LoadInputSettings();
+            Up1.LoadInputSettings();
+            Up01.LoadInputSettings();
+            Up001.LoadInputSettings();
+            Up0001.LoadInputSettings();
+            Down100.LoadInputSettings();
+            Down10.LoadInputSettings();
+            Down1.LoadInputSettings();
+            Down01.LoadInputSettings();
+            Down001.LoadInputSettings();
+            Down0001.LoadInputSettings();
+            ToggleGuard.LoadInputSettings();
+            NextRadio.LoadInputSettings();
+            PreviousRadio.LoadInputSettings();
+            ToggleEncryption.LoadInputSettings();
+            EncryptionKeyIncrease.LoadInputSettings();
+            EncryptionKeyDecrease.LoadInputSettings();
+            RadioChannelUp.LoadInputSettings();
+            RadioChannelDown.LoadInputSettings();
         }
 
         private void InitToolTips()
@@ -1662,6 +1722,85 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             MessageBox.Show(this,
                 "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds you can disable SRS Admin Privileges. \n\nFor this setting to take effect SRS must be restarted",
                 "SRS Admin Privileges", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+        }
+
+        private void CreateProfile(object sender, RoutedEventArgs e)
+        {
+            var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+                {
+                    if (name.Trim().Length > 0)
+                    {
+                        _settings.InputSettingsStore.AddNewProfile(name);
+                        InitInputProfiles();
+                        ReloadInputBindings();
+                    }
+                });
+            inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            inputProfileWindow.Owner = this;
+            inputProfileWindow.ShowDialog();
+        }
+
+        private void DeleteProfile(object sender, RoutedEventArgs e)
+        {
+            var current = ControlsProfile.SelectedValue as string;
+
+            if (current.Equals("default"))
+            {
+                MessageBox.Show(this,
+                    "Cannot delete the default input!",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                var result = MessageBox.Show(this,
+                    $"Are you sure you want to delete {current} ?",
+                    "Confirmation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ControlsProfile.SelectedIndex = 0;
+                    _settings.InputSettingsStore.RemoveProfile(current);
+                    InitInputProfiles();
+                    ReloadInputBindings();
+                }
+
+            }
+
+        }
+
+        private void RenameProfile(object sender, RoutedEventArgs e)
+        {
+
+            var current = ControlsProfile.SelectedValue as string;
+            if (current.Equals("default"))
+            {
+                MessageBox.Show(this,
+                    "Cannot rename the default input!",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                var oldName = current;
+                var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+                {
+                    if (name.Trim().Length > 0)
+                    {
+                        _settings.InputSettingsStore.RenameProfile(oldName,name);
+                        InitInputProfiles();
+                        ReloadInputBindings();
+                    }
+                }, true,oldName);
+                inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                inputProfileWindow.Owner = this;
+                inputProfileWindow.ShowDialog();
+            }
 
         }
     }
