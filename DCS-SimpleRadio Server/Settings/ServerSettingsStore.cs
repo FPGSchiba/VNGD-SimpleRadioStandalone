@@ -103,6 +103,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             SetSetting("General Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public void SetGeneralSetting(ServerSettingsKeys key, string value)
+        {
+            SetSetting("General Settings", key.ToString(), value.Trim());
+        }
+
         public Setting GetServerSetting(ServerSettingsKeys key)
         {
             return GetSetting("Server Settings", key.ToString());

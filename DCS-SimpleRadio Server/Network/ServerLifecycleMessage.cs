@@ -53,4 +53,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     public class ServerSettingsChangedMessage
     {
     }
+
+    public class ServerTestFrequenciesChanged
+    {
+        public string TestFrequencies { get; set; }
+
+    }
 }

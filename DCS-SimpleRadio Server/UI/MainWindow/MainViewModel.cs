@@ -135,6 +135,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             }
         }
 
+        private string _testFrequencies =
+            ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES).StringValue;
+
+        private DispatcherTimer _testFrequenciesDebounceTimer;
+
+        public string TestFrequencies
+        {
+            get { return _testFrequencies; }
+            set
+            {
+                _testFrequencies = value.Trim();
+                if (_testFrequenciesDebounceTimer != null)
+                {
+                    _testFrequenciesDebounceTimer.Stop();
+                    _testFrequenciesDebounceTimer.Tick -= TestFrequenciesDebounceTimerTick;
+                    _testFrequenciesDebounceTimer = null;
+                }
+
+                _testFrequenciesDebounceTimer = new DispatcherTimer();
+                _testFrequenciesDebounceTimer.Tick += TestFrequenciesDebounceTimerTick;
+                _testFrequenciesDebounceTimer.Interval = TimeSpan.FromMilliseconds(500);
+                _testFrequenciesDebounceTimer.Start();
+
+                NotifyOfPropertyChange(() => TestFrequencies);
+            }
+        }
+
+
         public string ListeningPort
             => ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.SERVER_PORT).StringValue;
 
@@ -279,6 +307,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             _passwordDebounceTimer.Stop();
             _passwordDebounceTimer.Tick -= PasswordDebounceTimerTick;
             _passwordDebounceTimer = null;
+        }
+
+
+        private void TestFrequenciesDebounceTimerTick(object sender, EventArgs e)
+        {
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES, _testFrequencies);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerTestFrequenciesChanged()
+            {
+                TestFrequencies = _testFrequencies
+            });
+
+            _testFrequenciesDebounceTimer.Stop();
+            _testFrequenciesDebounceTimer.Tick -= PasswordDebounceTimerTick;
+            _testFrequenciesDebounceTimer = null;
         }
     }
 }

@@ -17,7 +17,7 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    internal class UDPVoiceRouter
+    internal class UDPVoiceRouter: IHandle<ServerTestFrequenciesChanged>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
@@ -37,12 +37,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private volatile bool _stop;
 
         private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
+        private List<double> _testFrequencies = new List<double>();
 
         public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {
             _clientsList = clientsList;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
+
+            var freqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES).StringValue;
+            UpdateTestFrequencies(freqString);
+        }
+
+
+        private void UpdateTestFrequencies(string freqString)
+        {
+            
+            var freqStringList = freqString.Split(',');
+
+            var newList = new List<double>();
+            foreach (var freq in freqStringList)
+            {
+                if (double.TryParse(freq.Trim(), out var freqDouble))
+                {
+                    freqDouble *= 1e+6; //convert to Hz from MHz
+                    newList.Add(freqDouble);
+                    Logger.Info("Adding Test Frequency: " + freqDouble);
+                }
+            }
+
+            _testFrequencies = newList;
         }
 
         public void Listen()
@@ -289,8 +313,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                     if (ip != null)
                     {
-                        //DEBUG send back to sending client
-                      //   outgoingList.Add(ip);
+                        foreach (var frequency in udpVoice.Frequencies)
+                        {
+                            if (_testFrequencies.Contains(frequency))
+                            {
+                                //DEBUG send back to sending client as its a test frequency
+                                outgoingList.Add(ip);
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -307,6 +338,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 return null;
             }
+        }
+
+        public void Handle(ServerTestFrequenciesChanged message)
+        {
+            UpdateTestFrequencies(message.TestFrequencies);
         }
     }
 }
