@@ -74,7 +74,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private readonly DispatcherTimer _redrawUITimer;
-        private MMDeviceCollection outputDeviceList;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
@@ -541,14 +540,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Audio Input - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue);
 
+            if (WaveIn.DeviceCount > 0)
+            {
+                Mic.Items.Add(new AudioDeviceListItem()
+                {
+                    Text = "Default Microphone",
+                    Value = null
+                });
+            }
+
+            Mic.SelectedIndex = 0;
+
             for (var i = 0; i < WaveIn.DeviceCount; i++)
             {
-                //first time round
-                if (i == 0)
-                {
-                    Mic.SelectedIndex = 0;
-                }
-
+               
                 var item = WaveIn.GetCapabilities(i);
                 Mic.Items.Add(new AudioDeviceListItem()
                 {
@@ -561,7 +566,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 if (item.ProductName.Trim().StartsWith(_settings.GetClientSetting(SettingsKeys.AudioInputDeviceId).StringValue.Trim()))
                 {
-                    Mic.SelectedIndex = i;
+                    Mic.SelectedIndex = i+1;
                     Logger.Info("Audio Input - Found Saved ");
                 }
             }
@@ -601,8 +606,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _settings.GetClientSetting(SettingsKeys.AudioOutputDeviceId).RawValue);
 
             var enumerator = new MMDeviceEnumerator();
-            outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            var i = 0;
+            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            var i = 1;
+
+            Speakers.Items.Add(new AudioDeviceListItem()
+            {
+                Text = "Default Speakers",
+                Value = null
+            });
+
+            Speakers.SelectedIndex = 0;
+
             foreach (var device in outputDeviceList)
             {
 
@@ -618,12 +632,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Value = device
                     });
 
-                    //first time round the loop, select first item
-                    if (i == 0)
-                    {
-                        Speakers.SelectedIndex = 0;
-                    }
-
                     if (device.ID == _settings.GetClientSetting(SettingsKeys.AudioOutputDeviceId).RawValue)
                     {
                         Speakers.SelectedIndex = i; //this one
@@ -637,8 +645,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
 
-
             windowsN = false;
+
             try
             {
                 var dmoResampler = new DmoResampler();
@@ -656,13 +664,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Mic Audio Output - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue);
 
-            var i = 0;
+            var i = 1;
 
             MicOutput.Items.Add(new AudioDeviceListItem()
             {
                 Text = "NO MIC OUTPUT / PASSTHROUGH",
                 Value = null
             });
+
+            var enumerator = new MMDeviceEnumerator();
+            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             foreach (var device in outputDeviceList)
             {
                 try
@@ -967,23 +978,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SaveSelectedInputAndOutput()
         {
-
-            var output = outputDeviceList[Speakers.SelectedIndex];
-
-
             //save app settings
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
             if (_clientStateSingleton.MicrophoneAvailable)
             {
-                _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+                if (Mic.SelectedIndex == 0)
+                {
+                    _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, "default");
+                }
+                else
+                {
+                    _settings.SetClientSetting(SettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+                }
+                
             }
 
-            _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
+            if (Speakers.SelectedIndex == 0)
+            {
+                _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, "default");
+            }
+            else
+            {
+                var output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value;
+
+                _settings.SetClientSetting(SettingsKeys.AudioOutputDeviceId, output.ID);
+            }
+          
 
             //check if we have optional output
             if (MicOutput.SelectedIndex - 1 >= 0)
             {
-                var micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
+                var micOutput = (MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
                 //save settings
                 _settings.SetClientSetting(SettingsKeys.MicAudioOutputDeviceId, micOutput.ID);
             }
@@ -1009,14 +1034,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     try
                     {
 
-                        var inputId = Mic.SelectedIndex;
-                        var output = outputDeviceList[Speakers.SelectedIndex];
+                        var inputId = Mic.SelectedIndex-1;
+
+                        MMDevice output;
+                        if (Speakers.SelectedIndex == 0)
+                        {
+                            output = WasapiOut.GetDefaultAudioEndpoint();
+                        }
+                        else
+                        {
+                            output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value; ;
+                        }
 
                         //check if we have optional output
                         MMDevice micOutput = null;
                         if (MicOutput.SelectedIndex - 1 >= 0)
                         {
-                            micOutput = outputDeviceList[MicOutput.SelectedIndex - 1];
+                            micOutput = (MMDevice)(MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
                         }
 
                         StartStop.Content = "Disconnect";
@@ -1146,11 +1180,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //get device
                 try
                 {
-                    var inputId = Mic.SelectedIndex;
-                    var output = outputDeviceList[Speakers.SelectedIndex];
+                    var inputId = Mic.SelectedIndex-1;
+
+                    MMDevice output;
+                    if (Speakers.SelectedIndex == 0)
+                    {
+                        output = WasapiOut.GetDefaultAudioEndpoint();
+                    }
+                    else
+                    {
+                        output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value;
+                    }
 
                     SaveSelectedInputAndOutput();
-
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);

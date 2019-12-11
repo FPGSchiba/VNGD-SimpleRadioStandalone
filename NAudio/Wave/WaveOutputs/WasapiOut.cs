@@ -91,7 +91,7 @@ namespace NAudio.Wave
             this.windowsN = windowsN;
         }
 
-        static MMDevice GetDefaultAudioEndpoint()
+        public static MMDevice GetDefaultAudioEndpoint()
         {
             if (Environment.OSVersion.Version.Major < 6)
             {
