@@ -35,11 +35,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private volatile bool _stop;
 
+        public delegate void NewAircraft(string name);
+
+        private readonly NewAircraft _newAircraftCallback;
+
         public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate,
-            ConcurrentDictionary<string, SRClient> clients)
+            ConcurrentDictionary<string, SRClient> clients, NewAircraft _newAircraft)
         {
             _radioUpdate = radioUpdate;
             _clients = clients;
+            _newAircraftCallback = _newAircraft;
         }
 
         public void Start()
@@ -238,6 +243,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 overrideFreqAndVol = playerRadioInfo.unitId != message.unitId;
                 playerRadioInfo.unitId = message.unitId;
+            }
+
+            if (newAircraft)
+            {
+                if (_settings.GetClientSetting(SettingsKeys.AutoSelectInputProfile).BoolValue)
+                {
+                    _newAircraftCallback(message.unit);
+                }
             }
 
 

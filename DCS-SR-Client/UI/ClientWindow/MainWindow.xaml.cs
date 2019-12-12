@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -319,21 +321,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ControlsProfile.SelectedIndex = 0;
         }
 
+        void OnControlsProfileOnDropDownClosed(object sender, EventArgs args)
+        {
+            //switch profiles
+            Logger.Info(ControlsProfile.SelectedValue as string + " - Profile now in use");
+            _settings.InputSettingsStore.CurrentProfileName = ControlsProfile.SelectedValue as string;
+
+            //redraw UI
+            ReloadInputBindings();
+        }
+
         private void InitInput()
         {
             InputManager = new InputDeviceManager(this, ToggleOverlay);
 
             InitInputProfiles();
 
-            ControlsProfile.DropDownClosed += (sender, args) =>
-            {
-                //switch profiles
-                Logger.Info(ControlsProfile.SelectedValue as string+ " - Profile now in use");
-                _settings.InputSettingsStore.CurrentProfileName = ControlsProfile.SelectedValue as string;
-
-                //redraw UI
-                ReloadInputBindings();
-            };
+            ControlsProfile.DropDownClosed += OnControlsProfileOnDropDownClosed;
 
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
@@ -829,6 +833,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PlayConnectionSounds.IsChecked = _settings.GetClientSetting(SettingsKeys.PlayConnectionSounds).BoolValue;
 
             RequireAdminToggle.IsChecked = _settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue;
+
+            AutoSelectInputProfile.IsChecked = _settings.GetClientSetting(SettingsKeys.AutoSelectInputProfile).BoolValue;
         }
 
         private void Connect()
@@ -852,7 +858,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback);
+                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback, delegate(string name)
+                        {
+                            try
+                            {
+                                //on MAIN thread
+                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                    new ThreadStart(() =>
+                                    {
+                                        name = Regex.Replace(name.Trim().ToLower(), "[^a-zA-Z0-9]", "");
+
+                                        foreach (var profileName in _settings.InputSettingsStore.ProfileNames)
+                                        {
+                                            if (name.StartsWith(Regex.Replace(profileName.Trim().ToLower(), "[^a-zA-Z0-9]",
+                                                "")))
+                                            {
+                                                ControlsProfile.SelectedItem = profileName;
+                                                OnControlsProfileOnDropDownClosed(null,null);
+                                                return;
+                                            }
+                                        }
+
+                                        ControlsProfile.SelectedIndex = 0;
+                                        OnControlsProfileOnDropDownClosed(null, null);
+
+                                    }));
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+
+                        });
                         _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
 
                         StartStop.Content = "Connecting...";
@@ -1844,6 +1880,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 inputProfileWindow.ShowDialog();
             }
 
+        }
+
+        private void AutoSelectInputProfile_OnClick(object sender, RoutedEventArgs e)
+        {
+            _settings.GetClientSetting(SettingsKeys.AutoSelectInputProfile).BoolValue =
+                (bool)AutoSelectInputProfile.IsChecked;
+            _settings.Save();
         }
     }
 }

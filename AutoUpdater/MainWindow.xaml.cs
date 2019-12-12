@@ -41,6 +41,8 @@ namespace AutoUpdater
         private DispatcherTimer _progressCheckTimer;
         private double _lastValue = -1;
 
+        private string changelogURL = "";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -116,6 +118,7 @@ namespace AutoUpdater
                         if (asset.Name.ToLower().StartsWith("dcs-simpleradiostandalone") &&
                             asset.Name.ToLower().Contains(".zip"))
                         {
+                            changelogURL = release.HtmlUrl;
                             Status.Content = "Downloading Version "+release.TagName;
                             return new System.Uri(releaseAsset.BrowserDownloadUrl);
                         }
@@ -207,6 +210,9 @@ namespace AutoUpdater
                 procInfo.FileName = Path.Combine(Path.Combine(_directory, "extract"), "installer.exe");
                 procInfo.UseShellExecute = false;
                 Process.Start(procInfo);
+
+
+                Process.Start(changelogURL);
             }
             
             Close();
