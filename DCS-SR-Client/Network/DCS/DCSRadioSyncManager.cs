@@ -38,14 +38,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         public bool IsListening { get; private set; }
 
         public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
-            ConcurrentDictionary<string, SRClient> clients, string guid)
+            ConcurrentDictionary<string, SRClient> clients, string guid, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
         {
             this._clients = clients;
             IsListening = false;
             _lineOfSightHandler = new DCSLineOfSightHandler(clients,guid);
             _udpCommandHandler = new UDPCommandHandler();
             _dcsGameGuiHandler = new DCSGameGuiHandler(clientSideUpdate);
-            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _clients);
+            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _clients, _newAircraftCallback);
         }
 
         public void Start()

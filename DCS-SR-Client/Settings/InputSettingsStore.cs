@@ -17,6 +17,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public string CurrentProfileName { get; set; } = "default";
 
+
+        public List<string> ProfileNames
+        {
+            get
+            {
+                return new List<string>(InputProfiles.Keys);
+            }
+            
+        }
+
         public Dictionary<InputBinding, InputDevice> GetCurrentInputProfile()
         {
             return InputProfiles[GetControlProfileName(CurrentProfileName)];
@@ -29,6 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public Dictionary<string, Dictionary<InputBinding, InputDevice>> InputProfiles { get; set; } = new Dictionary<string, Dictionary<InputBinding, InputDevice>>();
 
         private Dictionary<string, Configuration> InputConfigs = new Dictionary<string, Configuration>();
+
         private readonly SettingsStore _settings;
 
         public InputSettingsStore(SettingsStore settingsStore)

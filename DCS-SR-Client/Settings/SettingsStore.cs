@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using SharpConfig;
@@ -103,10 +100,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         InputProfiles = 85,
 
+        AutoSelectInputProfile = 86,
+
         //LotATC
         LotATCIncomingUDP = 90, //10710
         LotATCOutgoingUDP = 91 //10711
 
+      
     }
 
     public enum InputBinding
@@ -384,6 +384,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.PlayConnectionSounds.ToString(), "true"},
 
             {SettingsKeys.RequireAdmin.ToString(),"true" },
+
+            {SettingsKeys.AutoSelectInputProfile.ToString(),"false" },
 
             {SettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
             {SettingsKeys.LotATCOutgoingUDP.ToString(), "10711"}
