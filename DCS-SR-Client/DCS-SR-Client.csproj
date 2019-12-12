@@ -63,9 +63,7 @@
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
   </PropertyGroup>
@@ -89,6 +87,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
@@ -189,6 +190,7 @@
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
+    <Compile Include="Settings\InputSettingsStore.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
     <Compile Include="Network\DCS\DCSGameGuiHandler.cs" />
@@ -223,6 +225,9 @@
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\Images.cs" />
+    <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
+      <DependentUpon>InputProfileWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml.cs">
       <DependentUpon>PresetChannelsView.xaml</DependentUpon>
     </Compile>
@@ -284,6 +289,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\InputProfileWindow\InputProfileWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

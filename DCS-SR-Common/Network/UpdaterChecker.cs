@@ -2,10 +2,12 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using NLog;
 using Octokit;
+using Application = System.Windows.Application;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -19,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.7.0.0";
 
-        public static readonly string VERSION = "1.7.1.2";
+        public static readonly string VERSION = "1.7.1.3";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -105,14 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 try
                 {
-                    if (beta)
-                    {
-                        Process.Start("SRS-AutoUpdater.exe","-beta");
-                    }
-                    else
-                    {
-                        Process.Start("SRS-AutoUpdater.exe");
-                    }
+                    LaunchUpdater(beta);
                 }
                 catch (Exception ex)
                 {
@@ -126,6 +121,53 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             else if (result == MessageBoxResult.No)
             {
                 Process.Start(url);
+            }
+        }
+
+        private static void LaunchUpdater(bool beta)
+        {
+            WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            bool hasAdministrativeRight = principal.IsInRole(WindowsBuiltInRole.Administrator);
+
+            if (!hasAdministrativeRight)
+            {
+               
+                    var location = AppDomain.CurrentDomain.BaseDirectory;
+
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        UseShellExecute = true,
+                        WorkingDirectory = location,
+                        FileName = location + "SRS-AutoUpdater.exe",
+                        Verb = "runas"
+                    };
+
+                    if (beta)
+                    {
+                        startInfo.Arguments = "-beta";
+                    }
+                  
+                    try
+                    {
+                        Process p = Process.Start(startInfo);
+                    }
+                    catch (System.ComponentModel.Win32Exception ex)
+                    {
+                        MessageBox.Show(
+                            "SRS Auto Update Requires Admin Rights",
+                            "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+            }
+            else
+            {
+                if (beta)
+                {
+                    Process.Start("SRS-AutoUpdater.exe", "-beta");
+                }
+                else
+                {
+                    Process.Start("SRS-AutoUpdater.exe");
+                }
             }
         }
     }

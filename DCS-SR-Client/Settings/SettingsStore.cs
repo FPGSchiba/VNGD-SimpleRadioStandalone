@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using SharpConfig;
@@ -97,9 +96,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         DisableWindowVisibilityCheck = 82,
         PlayConnectionSounds = 83,
 
+        RequireAdmin = 84,
+
+        InputProfiles = 85,
+
+        AutoSelectInputProfile = 86,
+
         //LotATC
         LotATCIncomingUDP = 90, //10710
         LotATCOutgoingUDP = 91 //10711
+
+      
     }
 
     public enum InputBinding
@@ -214,7 +221,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Configuration _configuration;
 
-        private string cfgFile = CFG_FILE_NAME;
+        public string ConfigFileName { get; } = CFG_FILE_NAME;
+
+        private  InputSettingsStore _inputSettingsStore;
+        public InputSettingsStore InputSettingsStore => _inputSettingsStore;
+
 
         private SettingsStore()
         {
@@ -225,27 +236,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 if (arg.StartsWith("-cfg="))
                 {
-                    cfgFile = arg.Replace("-cfg=", "").Trim();
+                    ConfigFileName = arg.Replace("-cfg=", "").Trim();
                 }
             }
 
             try
             {
-                _configuration = Configuration.LoadFromFile(cfgFile);
-
-                foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
-                {
-                    var device = GetControlSetting(bind);
-
-                    if (device != null)
-                    {
-                        InputDevices[bind] = device;
-                    }
-                }
+                _configuration = Configuration.LoadFromFile(ConfigFileName);
             }
             catch (FileNotFoundException ex)
             {
-                Logger.Info($"Did not find client config file at path ${cfgFile}, initialising with default config");
+                Logger.Info($"Did not find client config file at path ${ConfigFileName}, initialising with default config");
 
                 _configuration = new Configuration();
                 _configuration.Add(new Section("Position Settings"));
@@ -266,7 +267,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    File.Copy(cfgFile, cfgFile+".bak", true);
+                    File.Copy(ConfigFileName, ConfigFileName+".bak", true);
                 }
                 catch (Exception e)
                 {
@@ -280,9 +281,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 Save();
             }
-        }
 
-        public Dictionary<InputBinding, InputDevice> InputDevices = new Dictionary<InputBinding, InputDevice>();
+            _inputSettingsStore = new InputSettingsStore(this);
+        }
 
         public static SettingsStore Instance
         {
@@ -291,9 +292,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 if (_instance == null)
                 {
                     _instance = new SettingsStore();
+
+                    //stops cyclic init
+                    
                 }
                 return _instance;
             }
+        }
+
+        public void SetClientSetting(SettingsKeys key, string[] strArray)
+        {
+            SetSetting("Client Settings", key.ToString(), strArray);
+
         }
 
         private readonly Dictionary<string, string> defaultSettings = new Dictionary<string, string>()
@@ -373,71 +383,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {SettingsKeys.DisableWindowVisibilityCheck.ToString(), "false"},
             {SettingsKeys.PlayConnectionSounds.ToString(), "true"},
 
+            {SettingsKeys.RequireAdmin.ToString(),"true" },
+
+            {SettingsKeys.AutoSelectInputProfile.ToString(),"false" },
+
             {SettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
             {SettingsKeys.LotATCOutgoingUDP.ToString(), "10711"}
         };
 
-        public InputDevice GetControlSetting(InputBinding key)
+        private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
         {
-            var sectionString = "Control settings";
-
-            if (!_configuration.Contains(key.ToString()))
-            {
-                return null;
-            }
-
-            try
-            {
-                var device = new InputDevice();
-                device.DeviceName = _configuration[key.ToString()]["name"].StringValue;
-
-                device.Button = _configuration[key.ToString()]["button"].IntValue;
-                device.InstanceGuid =
-                    Guid.Parse(_configuration[key.ToString()]["guid"].RawValue);
-                device.InputBind = key;
-
-                device.ButtonValue = _configuration[key.ToString()]["value"].IntValue;
-
-                return device;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Error reading input device saved settings ");
-            }
+            {SettingsKeys.InputProfiles.ToString(), new string[]{"input-default.cfg"} }
+        };
 
 
-            return null;
-        }
-
-        public void SetControlSetting(InputDevice device)
-        {
-            RemoveControlSetting(device.InputBind);
-
-            _configuration.Add(new Section(device.InputBind.ToString()));
-
-            //create the sections
-            var section = _configuration[device.InputBind.ToString()];
-
-            section.Add(new Setting("name", device.DeviceName.Replace("\0", "")));
-            section.Add(new Setting("button", device.Button));
-            section.Add(new Setting("value", device.ButtonValue));
-            section.Add(new Setting("guid", device.InstanceGuid.ToString()));
-
-            InputDevices[device.InputBind] = device;
-
-            Save();
-        }
-
-        public void RemoveControlSetting(InputBinding binding
-        )
-        {
-            if (_configuration.Contains(binding.ToString()))
-            {
-                _configuration.Remove(binding.ToString());
-            }
-
-            InputDevices.Remove(binding);
-        }
 
         public Setting GetPositionSetting(SettingsKeys key)
         {
@@ -486,6 +445,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     Save();
                 }
+                else if(defaultArraySettings.ContainsKey(setting))
+                {
+                    //save
+                    _configuration[section]
+                        .Add(new Setting(setting, defaultArraySettings[setting]));
+
+                    Save();
+                }
                 else
                 {
                     _configuration[section]
@@ -497,7 +464,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return _configuration[section][setting];
         }
 
-        private void SetSetting(string section, string key, string setting)
+        private void SetSetting(string section, string key, object setting)
         {
             if (setting == null)
             {
@@ -514,7 +481,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             else
             {
-                _configuration[section][key].StringValue = setting;
+                if (setting.GetType() == typeof(string))
+                {
+                    _configuration[section][key].StringValue = setting as string;
+                }
+                else
+                {
+                    _configuration[section][key].StringValueArray = setting as string[];
+                }
+                
             }
 
             Save();
@@ -528,7 +503,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 try
                 {
-                    _configuration.SaveToFile(cfgFile);
+                    _configuration.SaveToFile(ConfigFileName);
                 }
                 catch (Exception ex)
                 {
@@ -536,5 +511,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
             }
         }
+
     }
 }

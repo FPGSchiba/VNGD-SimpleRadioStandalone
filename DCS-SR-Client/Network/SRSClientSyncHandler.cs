@@ -37,6 +37,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private ConnectCallback _callback;
         private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
         private UpdateUICallback _updateUICallback;
+        private readonly DCSRadioSyncHandler.NewAircraft _newAircraft;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
 
@@ -49,11 +50,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private static readonly int MAX_DECODE_ERRORS = 5;
 
 
-        public SRSClientSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback)
+        public SRSClientSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
             _clients = clients;
             _guid = guid;
             _updateUICallback = uiCallback;
+            this._newAircraft = _newAircraft;
         }
 
 
@@ -135,7 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid,_newAircraft);
             _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate,_clients, _guid);
             using (_tcpClient = new TcpClient())
             {
