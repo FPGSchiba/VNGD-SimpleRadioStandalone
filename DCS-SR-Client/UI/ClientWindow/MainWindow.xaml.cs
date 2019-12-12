@@ -668,7 +668,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Logger.Info("Mic Audio Output - Saved ID " +
                         _settings.GetClientSetting(SettingsKeys.MicAudioOutputDeviceId).RawValue);
 
-            var i = 1;
+            var i = 0;
 
             MicOutput.Items.Add(new AudioDeviceListItem()
             {
