@@ -25,7 +25,7 @@ namespace DCS_SR_Client
     {
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool loggingReady = false;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private static Logger Logger;
 
         public App()
         {
@@ -57,14 +57,14 @@ namespace DCS_SR_Client
 
             SetupLogging();
 
+            ListArgs();
+
             RequireAdmin();
 
             
 #if !DEBUG
             if (IsClientRunning())
             {
-                Logger logger = LogManager.GetCurrentClassLogger();
-
                 //check environment flag
 
                 var args = Environment.GetCommandLineArgs();
@@ -79,13 +79,13 @@ namespace DCS_SR_Client
                     }
                 }
 
-                if (_settings.GetClientSetting(SettingsKeys.AllowMultipleInstances).BoolValue || allowMultiple)
+                if (SettingsStore.Instance.GetClientSetting(SettingsKeys.AllowMultipleInstances).BoolValue || allowMultiple)
                 {
-                    logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
+                    Logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
                 }
                 else
                 {
-                    logger.Warn("Another SRS instance is already running, preventing second instance startup");
+                    Logger.Warn("Another SRS instance is already running, preventing second instance startup");
 
                     MessageBoxResult result = MessageBox.Show(
                     "Another instance of the SimpleRadio client is already running!\n\nThis one will now quit. Check your system tray for the SRS Icon",
@@ -100,20 +100,31 @@ namespace DCS_SR_Client
             }
 #endif
 
-            InitNotificationIcon();
+           
+        }
+
+        private void ListArgs()
+        {
+            Logger.Info("Arguments:");
+            var args = Environment.GetCommandLineArgs();
+            foreach (var s in args)
+            {
+                Logger.Info(s);
+            }
         }
 
         private void RequireAdmin()
         {
-            if (!_settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
+            if (!SettingsStore.Instance.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
             {
+                InitNotificationIcon();
                 return;
             }
             
             WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
             bool hasAdministrativeRight = principal.IsInRole(WindowsBuiltInRole.Administrator);
 
-            if (!hasAdministrativeRight && _settings.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
+            if (!hasAdministrativeRight && SettingsStore.Instance.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
             {
                 Task.Factory.StartNew(() =>
                 {
@@ -122,8 +133,8 @@ namespace DCS_SR_Client
                     ProcessStartInfo startInfo = new ProcessStartInfo
                     {
                         UseShellExecute = true,
-                        WorkingDirectory = location,
-                        FileName = location + "SR-ClientRadio.exe",
+                        WorkingDirectory = "\"" + location + "\"",
+                        FileName = "SR-ClientRadio.exe",
                         Verb = "runas",
                         Arguments = GetArgsString() + " -allowMultiple"
                     };
@@ -132,15 +143,24 @@ namespace DCS_SR_Client
                         Process p = Process.Start(startInfo);
 
                         //shutdown this process as another has started
-                        Dispatcher?.BeginInvoke(new Action(() => Application.Current.Shutdown(0)));
+                        Dispatcher?.BeginInvoke(new Action(() =>
+                        {
+                            Environment.Exit(0);
+                        }));
                     }
                     catch (System.ComponentModel.Win32Exception ex)
                     {
                         MessageBox.Show(
                                 "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",
                                 "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                        InitNotificationIcon();
                     }
                 });
+            }
+            else
+            {
+                InitNotificationIcon();
             }
            
         }
@@ -155,8 +175,22 @@ namespace DCS_SR_Client
                 {
                     builder.Append(" ");
                 }
-                builder.Append(s);
-               
+
+                if (s.Contains("-cfg="))
+                {
+                    var str = s.Replace("-cfg=", "-cfg=\"");
+
+                    builder.Append(str);
+                    builder.Append("\"");
+                }
+                else if (s.Contains("SR-ClientRadio.exe"))
+                {
+                    ///ignore
+                }
+                else
+                {
+                    builder.Append(s);
+                }
             }
 
             return builder.ToString();
@@ -226,11 +260,17 @@ namespace DCS_SR_Client
             LogManager.Configuration = config;
 
             loggingReady = true;
+
+            Logger = LogManager.GetCurrentClassLogger();
         }
 
 
         private void InitNotificationIcon()
         {
+            if(_notifyIcon != null)
+            {
+                return;
+            }
             System.Windows.Forms.MenuItem notifyIconContextMenuShow = new System.Windows.Forms.MenuItem
             {
                 Index = 0,
@@ -272,7 +312,8 @@ namespace DCS_SR_Client
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _notifyIcon.Visible = false;
+            if(_notifyIcon !=null)
+                _notifyIcon.Visible = false;
             base.OnExit(e);
         }
 
