@@ -10,15 +10,19 @@ bool SRS::SRSExtension::Launch(const char* host)
 {
 	if (!IsSRSRunning())
 	{
-		std::string directory = ReadSRSPath();
-		std::string path = directory;
-		path = path.append("\\SR-ClientRadio.exe");
+		std::wstring directory = ReadSRSPath();
+		std::wstring path = directory;
+		path = path.append(L"\\SR-ClientRadio.exe");
 
 		if (!directory.empty())
 		{
 			std::string hostStr = std::string(host).insert(0, "-host=");
 
-			ShellExecute(NULL, L"open", s2ws(path).c_str(), s2ws(hostStr).c_str(), s2ws(directory).c_str(), SW_SHOWDEFAULT);
+			//path = ("\"" + path.append("\""));
+			//directory = ("\"" + directory.append("\""));
+			
+
+			ShellExecute(NULL, L"open", path.c_str(), s2ws(hostStr).c_str(), directory.c_str(), SW_SHOWDEFAULT);
 			return true;
 		}
 
@@ -27,13 +31,14 @@ bool SRS::SRSExtension::Launch(const char* host)
 }
 
 
-std::string SRS::SRSExtension::ReadSRSPath()
+std::wstring SRS::SRSExtension::ReadSRSPath()
 {
 	//SRPathStandalone
 	HKEY hKey = 0;
 	DWORD bufferSize = 512;
 	LPVOID regBuffer = new char[bufferSize];
 	DWORD dwType = 0;
+	
 	if (RegOpenKey(HKEY_CURRENT_USER, L"SOFTWARE\\DCS-SR-Standalone", &hKey) == ERROR_SUCCESS)
 	{
 		dwType = REG_SZ;
@@ -47,12 +52,12 @@ std::string SRS::SRSExtension::ReadSRSPath()
 										 //convert to widestring
 			std::wstring ws(locationStr);
 			//convert to normal string
-			std::string str(ws.begin(), ws.end());
+			//std::string str(ws.begin(), ws.end());
 
 			RegCloseKey(hKey);
 
 			delete[] regBuffer;
-			return str;
+			return ws;
 		}
 
 		RegCloseKey(hKey);
@@ -60,7 +65,7 @@ std::string SRS::SRSExtension::ReadSRSPath()
 
 	delete[] regBuffer;
 
-	return "";
+	return L"";
 
 
 }
@@ -77,6 +82,16 @@ bool SRS::SRSExtension::IsSRSRunning()
 		while (Process32Next(snapshot, &entry))
 			if (!_wcsicmp(entry.szExeFile, L"SR-ClientRadio.exe"))
 				exists = true;
+
+
+	// while (Process32Next(snapshot, &entry))
+	// {
+	// 	//todo fix this
+	// 	_wcslwr_s(entry.szExeFile, wcslen(entry.szExeFile) + 1);
+	//
+	// 	if (wcscmp(entry.szExeFile, L"sr-clientradio") == 0)
+	// 		exists = true;
+	// }
 
 	CloseHandle(snapshot);
 	return exists;

@@ -234,9 +234,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             foreach (var arg in args)
             {
-                if (arg.StartsWith("-cfg="))
+                if (arg.Trim().StartsWith("-cfg="))
                 {
-                    ConfigFileName = arg.Replace("-cfg=", "").Trim();
+                    ConfigFileName = arg.Trim().Replace("-cfg=", "").Trim();
+                    Logger.Info($"Found -cfg loading: {ConfigFileName}");
                 }
             }
 

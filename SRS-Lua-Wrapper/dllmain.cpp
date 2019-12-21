@@ -18,7 +18,9 @@ static int start_srs(lua_State* L) {
 }
 
 static int get_srs_path(lua_State* L) {
-	lua_pushstring(L, SRS::SRSExtension::ReadSRSPath().c_str());
+	std::wstring wstr = SRS::SRSExtension::ReadSRSPath();
+	std::string str(wstr.begin(), wstr.end());
+	lua_pushlstring(L, str.c_str(), str.size());
 	return 1;
 }
 

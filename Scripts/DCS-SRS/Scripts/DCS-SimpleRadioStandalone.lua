@@ -1,4 +1,4 @@
--- Version 1.7.1.3
+-- Version 1.7.1.4
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1981,15 +1981,15 @@ end
 function SR.exportRadioJF17(_data)
 
 	_data.radios[2].name = "COMM1 VHF Radio"
-    _data.radios[2].freq = SR.getRadioFrequency(29)
-    _data.radios[2].modulation = SR.getRadioModulation(29)
+    _data.radios[2].freq = SR.getRadioFrequency(25)
+    _data.radios[2].modulation = SR.getRadioModulation(25)
     _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
     _data.radios[2].guardFreqMode = 1
     _data.radios[2].secFreq = 121.5 * 1000000
 
     _data.radios[3].name = "COMM2 UHF Radio"
-    _data.radios[3].freq = SR.getRadioFrequency(30)
-    _data.radios[3].modulation = SR.getRadioModulation(30)
+    _data.radios[3].freq = SR.getRadioFrequency(26)
+    _data.radios[3].modulation = SR.getRadioModulation(26)
     _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
     _data.radios[3].guardFreqMode = 1
     _data.radios[3].secFreq = 243.0 * 1000000
@@ -2256,4 +2256,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.1.3")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.1.4")

@@ -17,7 +17,7 @@ namespace SRS
 		~SRSExtension();
 
 		static bool Launch(const char*);
-		static std::string ReadSRSPath();
+		static std::wstring ReadSRSPath();
 		static bool IsSRSRunning();
 	private:
 		static std::wstring s2ws(const std::string& str);
