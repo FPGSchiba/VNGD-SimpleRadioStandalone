@@ -21,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public static readonly string MINIMUM_PROTOCOL_VERSION = "1.7.0.0";
 
-        public static readonly string VERSION = "1.7.1.3";
+        public static readonly string VERSION = "1.7.1.4";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

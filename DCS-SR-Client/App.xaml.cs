@@ -99,8 +99,8 @@ namespace DCS_SR_Client
                 }
             }
 #endif
+            InitNotificationIcon();
 
-           
         }
 
         private void ListArgs()
@@ -117,7 +117,6 @@ namespace DCS_SR_Client
         {
             if (!SettingsStore.Instance.GetClientSetting(SettingsKeys.RequireAdmin).BoolValue)
             {
-                InitNotificationIcon();
                 return;
             }
             
@@ -145,6 +144,9 @@ namespace DCS_SR_Client
                         //shutdown this process as another has started
                         Dispatcher?.BeginInvoke(new Action(() =>
                         {
+                            if (_notifyIcon != null)
+                                _notifyIcon.Visible = false;
+
                             Environment.Exit(0);
                         }));
                     }
@@ -154,13 +156,12 @@ namespace DCS_SR_Client
                                 "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",
                                 "UAC Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-                        InitNotificationIcon();
                     }
                 });
             }
             else
             {
-                InitNotificationIcon();
+                
             }
            
         }
