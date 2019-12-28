@@ -26,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly long UPDATE_SYNC_RATE = 5*1000 * 10000; //There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update every 5 seconds
         private UdpClient _lotATCPositionListener;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private volatile bool _stop = false;
         private readonly ClientStateSingleton _clientStateSingleton;
@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             _lotATCPositionListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
             var localEp = new IPEndPoint(IPAddress.Any,
-                _settings.GetNetworkSetting(SettingsKeys.LotATCIncomingUDP));
+                _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
             _lotATCPositionListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -64,7 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.LotATCIncomingUDP));
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
                             var bytes = _lotATCPositionListener.Receive(ref groupEp);
 
                             var lotAtcPositionWrapper =
@@ -145,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
         private void StartLotATCLOSSender()
         {
             var _udpSocket = new UdpClient();
-            var _host = new IPEndPoint(IPAddress.Loopback, _settings.GetNetworkSetting(SettingsKeys.LotATCOutgoingUDP));
+            var _host = new IPEndPoint(IPAddress.Loopback, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCOutgoingUDP));
 
 
             Task.Factory.StartNew(() =>

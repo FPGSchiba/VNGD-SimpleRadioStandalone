@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 {
     public class InputBindState
     {

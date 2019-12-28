@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             InExternalAWACSMode = false;
 
-            LastSeenName = Settings.SettingsStore.Instance.GetClientSetting(Settings.SettingsKeys.LastSeenName).StringValue;
+            LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).StringValue;
         }
 
         public static ClientStateSingleton Instance

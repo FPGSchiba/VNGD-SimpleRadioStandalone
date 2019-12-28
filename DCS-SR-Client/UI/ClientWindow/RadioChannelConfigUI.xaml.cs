@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
@@ -13,28 +14,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             InitializeComponent();
 
-            //I do this because at this point SettingConfig hasn't been set
+            //I do this because at this point ProfileSettingKey hasn't been set
             //but it has when this is called
             ChannelSelector.Loaded += InitComboBox;
         }
 
-        public SettingsKeys SettingConfig { get; set; }
+        public ProfileSettingsKeys ProfileSettingKey { get; set; }
 
         private void InitComboBox(object sender, RoutedEventArgs e)
         {
+            ChannelSelector.IsEnabled = false;
             //cannot be inlined or it causes an issue
-            var value = SettingsStore.Instance.GetClientSetting(SettingConfig).StringValue;
+            var value = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
 
-            ChannelSelector.SelectedValue = value;
-
+            if (value == null || value == "")
+            {
+                ChannelSelector.SelectedValue = "Both";
+            }
+            else
+            {
+                ChannelSelector.SelectedValue = value;
+            }
+            
             ChannelSelector.SelectionChanged += ChannelSelector_SelectionChanged;
+
+            ChannelSelector.IsEnabled = true;
         }
 
-        private void ChannelSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void Reload()
         {
-            var selected = (string) ChannelSelector.SelectedValue;
+            ChannelSelector.IsEnabled = false;
+            var setting = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
+            if (setting == null || setting == "")
+            {
+                ChannelSelector.SelectedValue = "Both";
+            }
+            else
+            {
+                ChannelSelector.SelectedValue = setting;
+            }
+            ChannelSelector.IsEnabled = true;
+        }
 
-            SettingsStore.Instance.SetClientSetting(SettingConfig, selected);
+        private void ChannelSelector_SelectionChanged(object sender, EventArgs eventArgs)
+        {
+            //the selected value changes when 
+            if (ChannelSelector.IsEnabled)
+            {
+                var selected = (string)ChannelSelector.SelectedValue;
+
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingKey, selected);
+            }
         }
     }
 }

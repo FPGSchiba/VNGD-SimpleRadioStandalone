@@ -18,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly DCSRadioSyncManager.ClientSideUpdate _clientSideUpdate;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private volatile bool _stop = false;
         private UdpClient _dcsGameGuiUdpListener;
 
@@ -40,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //   _dcsGameGuiUdpListener.JoinMulticastGroup(multicastaddress);
 
             var localEp = new IPEndPoint(IPAddress.Any,
-                _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+                _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
             _dcsGameGuiUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingGameGUIUDP));
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
                             var bytes = _dcsGameGuiUdpListener.Receive(ref groupEp);
 
                             var updatedPlayerInfo =

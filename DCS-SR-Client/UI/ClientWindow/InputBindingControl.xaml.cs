@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
@@ -37,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ModifierLabel.Content = InputName + " Modifier";
             ModifierBinding = (InputBinding) ((int) ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
-            var currentInputProfile = SettingsStore.Instance.InputSettingsStore.GetCurrentInputProfile();
+            var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
 
             if (currentInputProfile != null)
             {
@@ -85,14 +84,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 device.InputBind = ControlInputBinding;
 
-                SettingsStore.Instance.InputSettingsStore.SetControlSetting(device);
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });
         }
 
 
         private void DeviceClear_Click(object sender, RoutedEventArgs e)
         {
-            SettingsStore.Instance.InputSettingsStore.RemoveControlSetting(ControlInputBinding);
+            GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ControlInputBinding);
 
             Device.Text = "None";
             DeviceText.Text = "None";
@@ -114,14 +113,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 device.InputBind = ModifierBinding;
 
-                SettingsStore.Instance.InputSettingsStore.SetControlSetting(device);
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });
         }
 
 
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
-            SettingsStore.Instance.InputSettingsStore.RemoveControlSetting(ModifierBinding);
+            GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ModifierBinding);
             ModifierDevice.Text = "None";
             ModifierText.Text = "None";
         }

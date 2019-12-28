@@ -15,7 +15,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 {
     public class InputDeviceManager : IDisposable
     {
@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom
             ; //intercom used to represent null as we cant
 
-        private Settings.SettingsStore _settings = Settings.SettingsStore.Instance;
+        private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public void InitDevices()
         {
             Logger.Info("Starting Device Search. Expand Search: " +
-            (_settings.GetClientSetting(SettingsKeys.ExpandControls).BoolValue));
+            (_globalSettings.GetClientSetting(GlobalSettingsKeys.ExpandControls).BoolValue));
 
             var deviceInstances = _directInput.GetDevices();
 
@@ -149,7 +149,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
                         }
-                        else if (SettingsStore.Instance.GetClientSetting(SettingsKeys.ExpandControls).BoolValue)
+                        else if (GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.ExpandControls).BoolValue)
                         {
                             Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
                                         deviceInstance.ProductName.Trim().Replace("\0", ""));
@@ -732,7 +732,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         public List<InputBindState> GenerateBindStateList()
         {
             var bindStates = new List<InputBindState>();
-            var currentInputProfile = _settings.InputSettingsStore.GetCurrentInputProfile();
+            var currentInputProfile = _globalSettings.ProfileSettingsStore.GetCurrentInputProfile();
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers

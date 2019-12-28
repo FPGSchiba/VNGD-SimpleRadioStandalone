@@ -31,7 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
 
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private volatile bool _stop;
 
@@ -56,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //   var multicastaddress = IPAddress.Parse("239.255.50.10");
             //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
 
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
+            var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
             _dcsUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
 
@@ -72,7 +72,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSIncomingUDP));
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
                             var bytes = _dcsUdpListener.Receive(ref groupEp);
 
                             var str = Encoding.UTF8.GetString(
@@ -188,10 +188,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                 _dcsRadioUpdateSender.Send(byteData, byteData.Length,
                     new IPEndPoint(IPAddress.Parse("127.0.0.1"),
-                        _settings.GetNetworkSetting(SettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
+                        _globalSettings.GetNetworkSetting(GlobalSettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
                 _dcsRadioUpdateSender.Send(byteData, byteData.Length,
                     new IPEndPoint(IPAddress.Parse("127.0.0.1"),
-                        _settings.GetNetworkSetting(SettingsKeys
+                        _globalSettings.GetNetworkSetting(GlobalSettingsKeys
                             .OutgoingDCSUDPOther))); // send to Flight Control Panels
             }
             catch (Exception e)
@@ -212,7 +212,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
 
-            if (_settings.GetClientSetting(SettingsKeys.AlwaysAllowHotasControls).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AlwaysAllowHotasControls).BoolValue)
             {
                 message.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
                 playerRadioInfo.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
@@ -247,7 +247,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             if (newAircraft)
             {
-                if (_settings.GetClientSetting(SettingsKeys.AutoSelectInputProfile).BoolValue)
+                if (_globalSettings.GetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile).BoolValue)
                 {
                     _newAircraftCallback(message.unit);
                 }
@@ -446,7 +446,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                             channelModel.Reload();
                             clientRadio.channel = -1; //reset channel
 
-                            if (_settings.GetClientSetting(SettingsKeys.AutoSelectPresetChannel).BoolValue)
+                            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AutoSelectPresetChannel).BoolValue)
                             {
                                 RadioHelper.RadioChannelUp(i);
                             }
@@ -461,7 +461,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             }
 
             //change PTT last
-            if (!_settings.GetClientSetting(SettingsKeys.AllowDCSPTT).BoolValue)
+            if (!_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AllowDCSPTT).BoolValue)
             {
                 playerRadioInfo.ptt = false;
             }
