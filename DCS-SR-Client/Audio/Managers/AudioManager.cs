@@ -347,11 +347,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume)
         {
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioRxEffects_Start).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-                if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioEncryptionEffects).BoolValue))
+                if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
                 {
                     _effectsBuffer.VolumeSampleProvider.Volume = volume;
                     _effectsBuffer.AddAudioSamples(
@@ -370,12 +370,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume)
         {
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioTxEffects_Start).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start)) ;
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 
 
-                if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioEncryptionEffects).BoolValue))
+                if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
                 {
                     _effectBuffer.VolumeSampleProvider.Volume = volume;
                     _effectBuffer.AddAudioSamples(
@@ -395,7 +395,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume)
         {
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioRxEffects_End).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End))
             {
                 var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
 
@@ -408,7 +408,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume)
         {
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioTxEffects_End).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End))
             {
                 var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 

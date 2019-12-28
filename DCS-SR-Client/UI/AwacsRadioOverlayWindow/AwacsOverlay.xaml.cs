@@ -152,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             // Minimising a window without a taskbar icon leads to the window's menu bar still showing up in the bottom of screen
             // Since controls are unusable, but a very small portion of the always-on-top window still showing, we're closing it instead, similar to toggling the overlay
-            if (_globalSettings.GetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide).BoolValue)
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide))
             {
                 Close();
             }

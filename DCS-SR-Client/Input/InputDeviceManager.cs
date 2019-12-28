@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public void InitDevices()
         {
             Logger.Info("Starting Device Search. Expand Search: " +
-            (_globalSettings.GetClientSetting(GlobalSettingsKeys.ExpandControls).BoolValue));
+            (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls)));
 
             var deviceInstances = _directInput.GetDevices();
 
@@ -149,7 +149,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                             _inputDevices.Add(deviceInstance.InstanceGuid, device);
                         }
-                        else if (GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.ExpandControls).BoolValue)
+                        else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.ExpandControls))
                         {
                             Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
                                         deviceInstance.ProductName.Trim().Replace("\0", ""));

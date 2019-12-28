@@ -212,7 +212,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
 
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AlwaysAllowHotasControls).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
             {
                 message.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
                 playerRadioInfo.control = DCSPlayerRadioInfo.RadioSwitchControls.HOTAS;
@@ -247,7 +247,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             if (newAircraft)
             {
-                if (_globalSettings.GetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile).BoolValue)
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoSelectSettingsProfile))
                 {
                     _newAircraftCallback(message.unit);
                 }
@@ -446,7 +446,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                             channelModel.Reload();
                             clientRadio.channel = -1; //reset channel
 
-                            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AutoSelectPresetChannel).BoolValue)
+                            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel))
                             {
                                 RadioHelper.RadioChannelUp(i);
                             }
@@ -461,7 +461,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             }
 
             //change PTT last
-            if (!_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.AllowDCSPTT).BoolValue)
+            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))
             {
                 playerRadioInfo.ptt = false;
             }

@@ -383,6 +383,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public bool GetClientSettingBool(GlobalSettingsKeys key)
+        {
+            var setting = GetSetting("Client Settings", key.ToString());
+            if (setting.RawValue.Length == 0)
+            {
+                return false;
+            }
+
+            return setting.BoolValue;
+        }
+
         public Setting GetClientSetting(GlobalSettingsKeys key)
         {
             return GetSetting("Client Settings", key.ToString());
@@ -461,13 +472,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             else
             {
-                if (setting.GetType() == typeof(string))
+                
+                if (setting is bool)
+                {
+                    _configuration[section][key].BoolValue = (bool) setting ;
+                }
+                else if (setting.GetType() == typeof(string))
                 {
                     _configuration[section][key].StringValue = setting as string;
                 }
-                else
+                else if(setting is string[])
                 {
                     _configuration[section][key].StringValueArray = setting as string[];
+                }
+                else
+                {
+                    Logger.Error("Unknown Setting Type - Not Saved ");
                 }
                 
             }

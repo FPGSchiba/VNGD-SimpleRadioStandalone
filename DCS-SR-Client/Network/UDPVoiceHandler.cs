@@ -154,7 +154,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
-                var radioSwitchPtt = _globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioSwitchIsPTT).BoolValue;
+                var radioSwitchPtt = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT);
 
                 var ptt = false;
                 foreach (var inputBindState in pressed)

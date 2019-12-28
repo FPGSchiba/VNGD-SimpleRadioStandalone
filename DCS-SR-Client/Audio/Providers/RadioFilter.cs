@@ -51,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         public int Read(float[] buffer, int offset, int sampleCount)
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
-            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioEffects).BoolValue)
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
             {
                 if (samplesRead > 0)
                 {
@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
                         if (audio != 0)
                             // because we have silence in one channel (if a user picks radio left or right ear) we don't want to transform it or it'll play in both
                         {
-                            if (_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.RadioEffectsClipping).BoolValue)
+                            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
                             {
                                 if (audio > CLIPPING_MAX)
                                 {

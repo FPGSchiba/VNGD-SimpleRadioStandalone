@@ -327,12 +327,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility
                     //only check settings store every 5 seconds
                     var settingsStore = GlobalSettingsStore.Instance;
 
-                    var agc = settingsStore.GetClientSetting(GlobalSettingsKeys.AGC).BoolValue;
+                    var agc = settingsStore.GetClientSettingBool(GlobalSettingsKeys.AGC);
                     var agcTarget = settingsStore.GetClientSetting(GlobalSettingsKeys.AGCTarget).IntValue;
                     var agcDecrement = settingsStore.GetClientSetting(GlobalSettingsKeys.AGCDecrement).IntValue;
                     var agcLevelMax = settingsStore.GetClientSetting(GlobalSettingsKeys.AGCLevelMax).IntValue;
 
-                    var denoise = settingsStore.GetClientSetting(GlobalSettingsKeys.Denoise).BoolValue;
+                    var denoise = settingsStore.GetClientSettingBool(GlobalSettingsKeys.Denoise);
                     var denoiseAttenuation = settingsStore.GetClientSetting(GlobalSettingsKeys.DenoiseAttenuation).IntValue;
 
                     //From https://github.com/mumble-voip/mumble/blob/a189969521081565b8bda93d253670370778d471/src/mumble/Settings.cpp
