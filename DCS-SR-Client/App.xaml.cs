@@ -62,7 +62,7 @@ namespace DCS_SR_Client
             RequireAdmin();
 
             
-//#if !DEBUG
+#if !DEBUG
             if (IsClientRunning())
             {
                 //check environment flag
@@ -98,7 +98,7 @@ namespace DCS_SR_Client
                     return;
                 }
             }
-//#endif
+#endif
             InitNotificationIcon();
 
         }

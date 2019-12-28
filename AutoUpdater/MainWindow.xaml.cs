@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -203,6 +204,8 @@ namespace AutoUpdater
             if (!_cancel)
             {
                 ZipFile.ExtractToDirectory(_file, Path.Combine(_directory, "extract"));
+
+                Thread.Sleep(400);
 
                 ProcessStartInfo procInfo = new ProcessStartInfo();
                 procInfo.WorkingDirectory = Path.Combine(_directory, "extract"); 

@@ -134,12 +134,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitSettingsScreen();
 
-            ReloadProfileSettings();
+            InitSettingsProfiles();
+            ReloadProfile();
 
             InitInput();
 
             InitAudioInput();
-
             InitAudioOutput();
             InitMicAudioOutput();
 
@@ -147,7 +147,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
-
 
             SpeakerBoost.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue;
 
@@ -308,7 +307,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ServerAddress = FavouriteServersViewModel.DefaultServerAddress;
         }
 
-        private void InitInputProfiles()
+        private void InitSettingsProfiles()
         {
             ControlsProfile.IsEnabled = false;
             ControlsProfile.Items.Clear();
@@ -318,7 +317,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             } 
             ControlsProfile.IsEnabled = true;
             ControlsProfile.SelectedIndex = 0;
-           
+
+            CurrentProfile.Content = _globalSettings.ProfileSettingsStore.CurrentProfileName;
+
         }
 
         void ReloadProfile()
@@ -331,13 +332,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ReloadInputBindings();
             ReloadProfileSettings();
             ReloadRadioAudioChannelSettings();
+
+            CurrentProfile.Content = _globalSettings.ProfileSettingsStore.CurrentProfileName;
         }
 
         private void InitInput()
         {
             InputManager = new InputDeviceManager(this, ToggleOverlay);
 
-            InitInputProfiles();
+            InitSettingsProfiles();
 
             ControlsProfile.SelectionChanged += OnProfileDropDownChanged;
 
@@ -1789,7 +1792,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     if (name.Trim().Length > 0)
                     {
                         _globalSettings.ProfileSettingsStore.AddNewProfile(name);
-                        InitInputProfiles();
+                        InitSettingsProfiles();
                      
                     }
                 });
@@ -1822,7 +1825,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     ControlsProfile.SelectedIndex = 0;
                     _globalSettings.ProfileSettingsStore.RemoveProfile(current);
-                    InitInputProfiles();
+                    InitSettingsProfiles();
                 }
 
             }
@@ -1849,7 +1852,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     if (name.Trim().Length > 0)
                     {
                         _globalSettings.ProfileSettingsStore.RenameProfile(oldName,name);
-                        InitInputProfiles();
+                        InitSettingsProfiles();
                     }
                 }, true,oldName);
                 inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -1872,7 +1875,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (name.Trim().Length > 0)
                 {
                     _globalSettings.ProfileSettingsStore.CopyProfile(current,name);
-                    InitInputProfiles();
+                    InitSettingsProfiles();
                 }
             });
             inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;

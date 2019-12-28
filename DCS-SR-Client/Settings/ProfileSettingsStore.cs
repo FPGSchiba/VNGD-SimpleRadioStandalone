@@ -475,7 +475,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void CopyProfile(string profileToCopy, string profileName)
         {
-           
             var config = Configuration.LoadFromFile(GetProfileCfgFileName(profileToCopy));
             InputConfigs[GetProfileCfgFileName(profileName)] = config;
 

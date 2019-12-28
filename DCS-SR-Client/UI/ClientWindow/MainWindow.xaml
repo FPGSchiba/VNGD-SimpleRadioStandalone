@@ -11,7 +11,7 @@
                       xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="660"
+                      Height="690"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
@@ -239,7 +239,10 @@
                                HorizontalAlignment="Center"
                                Content="0" />
                     </StackPanel>
-
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,5">
+                        <Label Content="Current Profile:"></Label>
+                        <Label Name="CurrentProfile" Content="None"></Label>
+                    </StackPanel>
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
