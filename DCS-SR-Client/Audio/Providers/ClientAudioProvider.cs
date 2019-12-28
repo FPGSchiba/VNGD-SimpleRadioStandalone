@@ -102,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //adjust for LOS + Distance + Volume
                     AdjustVolume(audio);
 
-                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+                    if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
                         if (audio.ReceivedRadio == 0)
                         {
@@ -119,7 +119,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     AddEncryptionFailureEffect(audio);
 
-                    if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+                    if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
                         AddRadioEffect(audio);
                     }
@@ -220,7 +220,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 var audio = (double) mixedAudio[i] / 32768f;
 
-                if (_settings.GetClientSetting(SettingsKeys.RadioEffectsClipping).BoolValue)
+                if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
                 {
                     if (audio > RadioFilter.CLIPPING_MAX)
                     {

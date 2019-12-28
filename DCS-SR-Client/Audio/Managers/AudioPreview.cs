@@ -38,7 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private readonly Queue<byte> _micInputQueue = new Queue<byte>(AudioManager.SEGMENT_FRAMES * 3);
         private WaveFileWriter _waveFile;
-        private SettingsStore _settings;
+        private GlobalSettingsStore _globalSettings;
 
         public float SpeakerBoost
         {
@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             try
             {
-                _settings = SettingsStore.Instance;
+                _globalSettings = GlobalSettingsStore.Instance;
 
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40, windowsN);
 
@@ -240,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 //                    for (var i = 0; i < pcmShort.Length; i++)
 //                    {
 //                        //clipping tests thanks to Coug4r
-//                        if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+//                        if (_globalSettings.GetClientSetting(GlobalSettingsKeys.RadioEffects).BoolValue)
 //                        {
 //                            if (pcmShort[i] > 4000)
 //                            {

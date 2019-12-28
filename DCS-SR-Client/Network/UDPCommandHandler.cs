@@ -17,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private UdpClient _udpCommandListener;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private volatile bool _stop  = false;
 
         public void Start()
@@ -31,7 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _udpCommandListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpCommandListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
+            var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.CommandListenerUDP));
             _udpCommandListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.CommandListenerUDP));
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.CommandListenerUDP));
                             var bytes = _udpCommandListener.Receive(ref groupEp);
 
                             //Logger.Info("Recevied Message from UDP COMMAND INTERFACE: "+ Encoding.UTF8.GetString(

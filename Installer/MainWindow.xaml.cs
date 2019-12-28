@@ -101,7 +101,7 @@ namespace Installer
 
             _currentDirectory = currentPath;
 
-            Logger.Info("Listing Files / Directories");
+            Logger.Info("Listing Files / Directories for: "+_currentDirectory);
             ListFiles(_currentDirectory);
             Logger.Info("Finished Listing Files / Directories");
 
