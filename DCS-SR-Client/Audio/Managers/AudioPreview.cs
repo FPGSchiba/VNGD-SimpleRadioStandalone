@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -71,10 +72,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
+                CachedLoopingAudioProvider natoEffect =
+                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(),new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
+
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter,
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(natoEffect.ToSampleProvider(),
                     (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
+
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
                 {

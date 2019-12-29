@@ -186,6 +186,7 @@
     <Compile Include="Audio\Managers\AudioManager.cs" />
     <Compile Include="Audio\Managers\AudioPreview.cs" />
     <Compile Include="Audio\Models\ClientAudio.cs" />
+    <Compile Include="Audio\Providers\CachedLoopingAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
@@ -429,6 +430,7 @@
     <Content Include="AudioEffects\beep-connected.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\nato-tone-16k.wav" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

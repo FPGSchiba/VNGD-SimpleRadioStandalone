@@ -7,11 +7,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
     public abstract class AudioProvider
     {
-        protected readonly Settings.GlobalSettingsStore globalSettings;
+        protected readonly Settings.ProfileSettingsStore globalSettings;
 
         public AudioProvider()
         {
-            globalSettings = Settings.GlobalSettingsStore.Instance;
+            globalSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
         }
 
 
@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 return CreateStereoMix(pcmAudio);
             }
 
-            var setting = globalSettings.ProfileSettingsStore.GetClientSetting(settingType);
+            var setting = globalSettings.GetClientSetting(settingType);
 
             if (setting.StringValue == "Left")
             {

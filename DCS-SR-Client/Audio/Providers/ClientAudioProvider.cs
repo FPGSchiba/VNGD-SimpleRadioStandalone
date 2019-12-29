@@ -31,6 +31,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        private short[] natoTone = null;
+        private int natoPosition = 0;
+
         public ClientAudioProvider()
         {
             _filters = new OnlineFilter[2];
@@ -50,7 +53,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
 
+            var effect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.NATO_TONE);
+            
+            if (effect.AudioEffectBytes.Length > 0)
+            {
+                natoTone = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
 
+                var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.NATOToneVolume)
+                    .FloatValue;
+
+                for (int i = 0; i < natoTone.Length; i++)
+                {
+                    natoTone[i] = (short)(natoTone[i] * vol);
+                }
+            }
         }
 
         public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
@@ -102,7 +118,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //adjust for LOS + Distance + Volume
                     AdjustVolume(audio);
 
-                    if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                    if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
                         if (audio.ReceivedRadio == 0)
                         {
@@ -119,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 {
                     AddEncryptionFailureEffect(audio);
 
-                    if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                    if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
                         AddRadioEffect(audio);
                     }
@@ -220,7 +236,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 var audio = (double) mixedAudio[i] / 32768f;
 
-                if (globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
+                if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
                 {
                     if (audio > RadioFilter.CLIPPING_MAX)
                     {
@@ -250,7 +266,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     }
                 }
 
-                mixedAudio[i] = (short) (audio * 32767);
+                var shortAudio = (short)(audio * 32767);
+
+
+                if (natoTone !=null && globalSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
+                {
+                    shortAudio += natoTone[natoPosition];
+                    natoPosition++;
+
+                    if (natoPosition == natoTone.Length)
+                    {
+                        natoPosition = 0;
+                    }
+                }
+
+                mixedAudio[i] = shortAudio;
             }
         }
 

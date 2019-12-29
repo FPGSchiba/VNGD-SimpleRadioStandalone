@@ -15,12 +15,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             RADIO_TX = 0,
             RADIO_RX = 1,
             KY_58_TX = 2,
-            KY_58_RX = 3
+            KY_58_RX = 3,
+            NATO_TONE=4,
         }
 
         //order must match ENUM above
         private static readonly string[] FileNameLookup = new[] { "Radio-TX-1600.wav","Radio-RX-1600.wav",
-            "KY-58-TX-1600.wav","KY-58-RX-1600.wav"};
+            "KY-58-TX-1600.wav","KY-58-RX-1600.wav","nato-tone-16k.wav"};
 
         public CachedAudioEffect(AudioEffectTypes audioEffect)
         {

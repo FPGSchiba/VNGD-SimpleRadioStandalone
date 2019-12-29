@@ -75,6 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         SettingsProfiles,
         AutoSelectSettingsProfile,
+
+        NATOToneVolume,
     }
 
     public enum InputBinding
@@ -363,15 +365,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AutoSelectSettingsProfile.ToString(),"false" },
 
             {GlobalSettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
-            {GlobalSettingsKeys.LotATCOutgoingUDP.ToString(), "10711"}
+            {GlobalSettingsKeys.LotATCOutgoingUDP.ToString(), "10711"},
+
+            {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"}
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
         {
             {GlobalSettingsKeys.SettingsProfiles.ToString(), new string[]{"default.cfg"} }
         };
-
-
 
         public Setting GetPositionSetting(GlobalSettingsKeys key)
         {
