@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Wave;
 
@@ -22,9 +23,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             var effect = new CachedAudioEffect(effectType);
             _audioEffectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
 
+            var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.NATOToneVolume)
+                .FloatValue;
             for (int i = 0; i < _audioEffectShort.Length; i++)
             {
-                _audioEffectShort[i] = (short) (_audioEffectShort[i] * 0.3);
+                _audioEffectShort[i] = (short) (_audioEffectShort[i] * vol);
             }
 
             this.source = source;
@@ -35,23 +38,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         {
             int read = source.Read(buffer, offset, count);
 
-            var effectBytes = GetEffect(read/2);
-
-            //mix together
-            for (int i = 0; i < read/2; i++)
+            if (Settings.GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys
+                .NATOTone))
             {
-                short audio = ConversionHelpers.ToShort(buffer[(offset+i) * 2], buffer[((i+offset) * 2) + 1]);
+                var effectBytes = GetEffect(read / 2);
 
-                audio = (short) (audio + _audioEffectShort[i]);
+                //mix together
+                for (int i = 0; i < read / 2; i++)
+                {
+                    short audio = ConversionHelpers.ToShort(buffer[(offset + i) * 2], buffer[((i + offset) * 2) + 1]);
 
-                //buffer[i + offset] = effectBytes[i]+buffer[i + offset];
+                    audio = (short)(audio + _audioEffectShort[i]);
 
-                byte byte1;
-                byte byte2;
-                ConversionHelpers.FromShort(audio, out byte1, out byte2);
+                    //buffer[i + offset] = effectBytes[i]+buffer[i + offset];
 
-                buffer[(offset + i) * 2] = byte1;
-                buffer[((i + offset) * 2) + 1] = byte2;
+                    byte byte1;
+                    byte byte2;
+                    ConversionHelpers.FromShort(audio, out byte1, out byte2);
+
+                    buffer[(offset + i) * 2] = byte1;
+                    buffer[((i + offset) * 2) + 1] = byte2;
+                }
             }
 
             return read;
