@@ -28,6 +28,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioEffects,
         RadioEncryptionEffects, //Radio Encryption effects
         RadioEffectsClipping,
+        NATOTone,
 
         RadioRxEffects_Start, // Recieving Radio Effects
         RadioRxEffects_End,
@@ -39,6 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AlwaysAllowHotasControls,
         AllowDCSPTT,
         RadioSwitchIsPTT,
+
+     
     }
 
     public class ProfileSettingsStore
@@ -52,6 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "true"},
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
+            {ProfileSettingsKeys.NATOTone.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},

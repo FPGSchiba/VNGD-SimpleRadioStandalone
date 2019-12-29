@@ -851,6 +851,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             RadioEncryptionEffectsToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects);
             RadioSwitchIsPTT.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT);
+
             RadioTxStartToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start);
             RadioTxEndToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End);
 
@@ -859,6 +860,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             RadioSoundEffects.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
             RadioSoundEffectsClipping.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
+            NATORadioToneToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
+
             AutoSelectChannel.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel);
 
             AlwaysAllowHotas.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls);
@@ -1332,6 +1335,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioEncryptionEffects,
                 (string) RadioEncryptionEffectsToggle.Content);
+        }
+
+        private void NATORadioTone_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.NATOTone,
+                (string)NATORadioToneToggle.Content);
         }
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)

@@ -251,16 +251,12 @@ copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\SR-ClientRadio.exe" "$(Sol
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\opus.dll" "$(SolutionDir)\install-build\opus.dll"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\speexdsp.dll" "$(SolutionDir)\install-build\speexdsp.dll"
 copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\awacs-radios.json" "$(SolutionDir)\install-build\awacs-radios.json"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\beep-connected.wav" "$(SolutionDir)\install-build\AudioEffects\beep-connected.wav"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\beep-disconnected.wav" "$(SolutionDir)\install-build\AudioEffects\beep-disconnected.wav"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\KY-58-TX-1600.wav" "$(SolutionDir)\install-build\AudioEffects\KY-58-TX-1600.wav"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\KY-58-RX-1600.wav" "$(SolutionDir)\install-build\AudioEffects\KY-58-RX-1600.wav"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\Radio-RX-1600.wav" "$(SolutionDir)\install-build\AudioEffects\Radio-TX-1600.wav"
-copy /Y "$(SolutionDir)\DCS-SR-Client\bin\x64\Release\AudioEffects\Radio-RX-1600.wav" "$(SolutionDir)\install-build\AudioEffects\Radio-RX-1600.wav"
+xcopy /Y /e "$(SolutionDir)\DCS-SR-Client\AudioEffects" "$(SolutionDir)install-build\AudioEffects"
 copy /Y "$(SolutionDir)\Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)\install-build\Installer.exe"
 copy /Y "$(SolutionDir)\AutoUpdater\bin\Release\SRS-AutoUpdater.exe" "$(SolutionDir)\install-build\SRS-AutoUpdater.exe" 
 xcopy /Y /e "$(SolutionDir)Scripts" "$(SolutionDir)install-build\Scripts"
-copy /Y "$(SolutionDir)x64\Release\srs.dll" "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\srs.dll"</PostBuildEvent>
+copy /Y "$(SolutionDir)x64\Release\srs.dll" "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\srs.dll"
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
