@@ -1265,7 +1265,7 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
-                                   Content="Enable Radio Tone (Requires Radio effects on!)" />
+                                   Content="Enable FM Radio Tone (Requires Radio effects on!)" />
 
                             <ToggleButton Name="NATORadioToneToggle"
                                           Grid.Row="6"

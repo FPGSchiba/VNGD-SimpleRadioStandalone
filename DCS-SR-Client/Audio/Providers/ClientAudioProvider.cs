@@ -33,6 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private short[] natoTone = null;
         private int natoPosition = 0;
+        //used for comparison
+        public static readonly short FM = Convert.ToInt16((int)RadioInformation.Modulation.FM);
 
         public ClientAudioProvider()
         {
@@ -269,7 +271,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 var shortAudio = (short)(audio * 32767);
 
 
-                if (natoTone !=null && globalSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
+                if (clientAudio.Modulation == FM
+                    && natoTone !=null && globalSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
                 {
                     shortAudio += natoTone[natoPosition];
                     natoPosition++;
