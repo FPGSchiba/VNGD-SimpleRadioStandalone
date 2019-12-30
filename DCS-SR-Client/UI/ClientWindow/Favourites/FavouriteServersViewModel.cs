@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
     {
         private readonly ObservableCollection<ServerAddress> _addresses = new ObservableCollection<ServerAddress>();
         private readonly IFavouriteServerStore _favouriteServerStore;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public FavouriteServersViewModel(IFavouriteServerStore favouriteServerStore)
         {
@@ -80,10 +80,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
 
             _addresses.Remove(SelectedItem);
 
-            if (_addresses.Count == 0 && !string.IsNullOrEmpty(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue))
+            if (_addresses.Count == 0 && !string.IsNullOrEmpty(_globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).StringValue))
             {
-                var oldAddress = new ServerAddress(_settings.GetClientSetting(SettingsKeys.LastServer).StringValue,
-                    _settings.GetClientSetting(SettingsKeys.LastServer).StringValue, null, true);
+                var oldAddress = new ServerAddress(_globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).StringValue,
+                    _globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).StringValue, null, true);
                 _addresses.Add(oldAddress);
             }
 

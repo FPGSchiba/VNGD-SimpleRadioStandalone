@@ -101,7 +101,7 @@ namespace Installer
 
             _currentDirectory = currentPath;
 
-            Logger.Info("Listing Files / Directories");
+            Logger.Info("Listing Files / Directories for: "+_currentDirectory);
             ListFiles(_currentDirectory);
             Logger.Info("Finished Listing Files / Directories");
 
@@ -361,6 +361,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\AudioEffects\\KY-58-TX-1600.wav");
                 DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-RX-1600.wav");
                 DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-TX-1600.wav");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\nato-tone-16k.wav");
             }
             Logger.Info($"Finished clearing scripts and program Pre Mods ");
 

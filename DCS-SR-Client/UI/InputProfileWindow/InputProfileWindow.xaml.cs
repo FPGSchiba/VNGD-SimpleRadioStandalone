@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow
         {
             string regexSearch = new string(System.IO.Path.GetInvalidFileNameChars()) + new string(System.IO.Path.GetInvalidPathChars());
             Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
-            str = r.Replace(str, "").Replace(".cfg","").Replace("input-","");
+            str = r.Replace(str, "").Replace(".cfg", "");
 
             if (str.Equals("default"))
             {

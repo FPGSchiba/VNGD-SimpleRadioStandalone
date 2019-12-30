@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private volatile bool _stop = false;
         private UdpClient _dcsLOSListener;
@@ -48,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 true);
             _dcsLOSListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
+            var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
             _dcsLOSListener.Client.Bind(localEp);
 
             Task.Factory.StartNew(() =>
@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         try
                         {
                             var groupEp = new IPEndPoint(IPAddress.Any,
-                            _settings.GetNetworkSetting(SettingsKeys.DCSLOSIncomingUDP));
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
                             var bytes = _dcsLOSListener.Receive(ref groupEp);
 
                             /*   Logger.Debug(Encoding.UTF8.GetString(
@@ -111,7 +111,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private void StartDCSLOSSender()
         {
             var _udpSocket = new UdpClient();
-            var _host = new IPEndPoint(IPAddress.Loopback, _settings.GetNetworkSetting(SettingsKeys.DCSLOSOutgoingUDP));
+            var _host = new IPEndPoint(IPAddress.Loopback, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSOutgoingUDP));
 
 
             Task.Factory.StartNew(() =>

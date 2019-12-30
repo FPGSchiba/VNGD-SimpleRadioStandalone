@@ -186,12 +186,13 @@
     <Compile Include="Audio\Managers\AudioManager.cs" />
     <Compile Include="Audio\Managers\AudioPreview.cs" />
     <Compile Include="Audio\Models\ClientAudio.cs" />
+    <Compile Include="Audio\Providers\CachedLoopingAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
-    <Compile Include="Settings\InputSettingsStore.cs" />
+    <Compile Include="Settings\ProfileSettingsStore.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
     <Compile Include="Network\DCS\DCSGameGuiHandler.cs" />
@@ -266,7 +267,7 @@
     <Compile Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\SettingsStore.cs" />
+    <Compile Include="Settings\GlobalSettingsStore.cs" />
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
@@ -429,6 +430,7 @@
     <Content Include="AudioEffects\beep-connected.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\nato-tone-16k.wav" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

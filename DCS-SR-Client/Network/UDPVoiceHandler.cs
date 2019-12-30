@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
@@ -45,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly int _port;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
-        private readonly SettingsStore _settings = SettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
@@ -150,12 +149,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var decoderThread = new Thread(UdpAudioDecode);
             decoderThread.Start();
 
-            var settings = SettingsStore.Instance;
+            var settings = GlobalSettingsStore.Instance;
             _inputManager.StartDetectPtt(pressed =>
             {
                 var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
-                var radioSwitchPtt = _settings.GetClientSetting(SettingsKeys.RadioSwitchIsPTT).BoolValue;
+                var radioSwitchPtt = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT);
 
                 var ptt = false;
                 foreach (var inputBindState in pressed)

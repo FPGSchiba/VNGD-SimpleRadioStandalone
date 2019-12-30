@@ -7,68 +7,68 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
     public abstract class AudioProvider
     {
-        protected readonly Settings.SettingsStore _settings;
+        protected readonly Settings.ProfileSettingsStore globalSettings;
 
         public AudioProvider()
         {
-            _settings = Settings.SettingsStore.Instance;
+            globalSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
         }
 
 
         public byte[] SeperateAudio(byte[] pcmAudio, int radioId)
         {
-            var settingType = SettingsKeys.Radio1Channel;
+            var settingType = ProfileSettingsKeys.Radio1Channel;
 
             if (radioId == 0)
             {
-                settingType = SettingsKeys.IntercomChannel;
+                settingType = ProfileSettingsKeys.IntercomChannel;
             }
             else if (radioId == 1)
             {
-                settingType = SettingsKeys.Radio1Channel;
+                settingType = ProfileSettingsKeys.Radio1Channel;
             }
             else if (radioId == 2)
             {
-                settingType = SettingsKeys.Radio2Channel;
+                settingType = ProfileSettingsKeys.Radio2Channel;
             }
             else if (radioId == 3)
             {
-                settingType = SettingsKeys.Radio3Channel;
+                settingType = ProfileSettingsKeys.Radio3Channel;
             }
             else if (radioId == 4)
             {
-                settingType = SettingsKeys.Radio4Channel;
+                settingType = ProfileSettingsKeys.Radio4Channel;
             }
             else if (radioId == 5)
             {
-                settingType = SettingsKeys.Radio5Channel;
+                settingType = ProfileSettingsKeys.Radio5Channel;
             }
             else if (radioId == 6)
             {
-                settingType = SettingsKeys.Radio6Channel;
+                settingType = ProfileSettingsKeys.Radio6Channel;
             }
             else if (radioId == 7)
             {
-                settingType = SettingsKeys.Radio7Channel;
+                settingType = ProfileSettingsKeys.Radio7Channel;
             }
             else if (radioId == 8)
             {
-                settingType = SettingsKeys.Radio8Channel;
+                settingType = ProfileSettingsKeys.Radio8Channel;
             }
             else if (radioId == 9)
             {
-                settingType = SettingsKeys.Radio9Channel;
+                settingType = ProfileSettingsKeys.Radio9Channel;
             }
             else if (radioId == 10)
             {
-                settingType = SettingsKeys.Radio10Channel;
+                settingType = ProfileSettingsKeys.Radio10Channel;
             }
             else
             {
                 return CreateStereoMix(pcmAudio);
             }
 
-            var setting = _settings.GetClientSetting(settingType);
+            var setting = globalSettings.GetClientSetting(settingType);
 
             if (setting.StringValue == "Left")
             {

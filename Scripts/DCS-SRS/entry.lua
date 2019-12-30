@@ -5,7 +5,7 @@ declare_plugin("DCS-SRS", {
    "srs.dll"
   },
 
-  version       = "1.7.1.4",
+  version       = "1.7.1.6",
   state         = "installed",
   developerName = "github.com/ciribob/DCS-SimpleRadioStandalone",
   info          = _("DCS-SimpleRadio Standalone\n\nBrings realistic VoIP comms to DCS with a cockpit integration with every aircraft\n\nCheck Special Settings for SRS integration settings\n\nSRS Discord for Support: https://discord.gg/baw7g3t"),

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -38,7 +39,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private readonly Queue<byte> _micInputQueue = new Queue<byte>(AudioManager.SEGMENT_FRAMES * 3);
         private WaveFileWriter _waveFile;
-        private SettingsStore _settings;
+        private GlobalSettingsStore _globalSettings;
 
         public float SpeakerBoost
         {
@@ -60,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             try
             {
-                _settings = SettingsStore.Instance;
+                _globalSettings = GlobalSettingsStore.Instance;
 
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40, windowsN);
 
@@ -71,10 +72,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
+                CachedLoopingAudioProvider natoEffect =
+                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(),new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
+
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter,
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(natoEffect.ToSampleProvider(),
                     (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
+
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
                 {
@@ -240,7 +245,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 //                    for (var i = 0; i < pcmShort.Length; i++)
 //                    {
 //                        //clipping tests thanks to Coug4r
-//                        if (_settings.GetClientSetting(SettingsKeys.RadioEffects).BoolValue)
+//                        if (_globalSettings.GetClientSetting(GlobalSettingsKeys.RadioEffects).BoolValue)
 //                        {
 //                            if (pcmShort[i] > 4000)
 //                            {
