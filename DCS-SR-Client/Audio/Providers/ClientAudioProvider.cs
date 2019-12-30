@@ -270,7 +270,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 var shortAudio = (short)(audio * 32767);
 
-
                 if (clientAudio.Modulation == FM
                     && natoTone !=null && globalSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
                 {
