@@ -150,6 +150,18 @@ function srsOverlay.updateRadio()
 					 if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
 						fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
 					end
+
+					local tuned = _radioState.TunedClients
+
+					if tuned then
+						local tunedRadio = tuned[_i]
+
+						if tunedRadio > 0 then
+							fullMessage  = fullMessage.." +"..tunedRadio
+						end
+
+					end
+
 			end
 
 			local _selected = _i == (_radioInfo.selected+1)

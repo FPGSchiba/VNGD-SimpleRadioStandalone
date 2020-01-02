@@ -308,6 +308,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.Position = updatedSrClient.Position;
                                                 srClient.LatLngPosition = updatedSrClient.LatLngPosition;
 
+                                                if (updatedSrClient.RadioInfo != null)
+                                                {
+                                                    srClient.RadioInfo = updatedSrClient.RadioInfo;
+                                                    srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
+                                                }
+
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
 //                                                            srClient.Name + " Coalition: " +
 //                                                            srClient.Coalition + " Pos: " + srClient.Position);

@@ -8,7 +8,7 @@
              xmlns:presetChannels1="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="RadioControlContainer"
-             Width="155"
+             Width="170"
              Height="75">
 
     <TabControl x:Name="TabControl"
@@ -111,7 +111,7 @@
                         ToolTip="+0.001MHz" />
 
                 <TextBlock x:Name="RadioFrequency"
-                           Width="130"
+                           Width="145"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Top"
                            Background="Black"

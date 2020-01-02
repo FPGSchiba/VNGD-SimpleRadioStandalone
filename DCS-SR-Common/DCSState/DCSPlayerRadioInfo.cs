@@ -113,6 +113,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return LastUpdate > DateTime.Now.Ticks - 100000000;
         }
 
+        //comparing doubles is risky - check that we're close enough to hear (within 100hz)
+        public static bool FreqCloseEnough(double freq1, double freq2)
+        {
+            var diff = Math.Abs(freq1 - freq2);
+
+            return diff < 500;
+        }
+
         public RadioInformation CanHearTransmission(double frequency,
             RadioInformation.Modulation modulation,
             byte encryptionKey,
@@ -165,7 +173,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         continue;
                     }
 
-                    if ((receivingRadio.freq == frequency)
+                    //within 1khz
+                    if ((FreqCloseEnough(receivingRadio.freq,frequency))
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {

@@ -132,8 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             try
             {
-                
-
                 //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
                 // logger.Info("Recevied: " + message.MsgType);
 
@@ -143,11 +141,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         // Do nothing for now
                         break;
                     case NetworkMessage.MessageType.UPDATE:
-                        HandleClientMetaDataUpdate(state,message);
+                        HandleClientMetaDataUpdate(state,message,true);
                         break;
                     case NetworkMessage.MessageType.RADIO_UPDATE:
-                        HandleClientMetaDataUpdate(state,message);
-                        HandleClientRadioUpdate(state,message);
+                        bool showTuned = _serverSettings.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT)
+                            .BoolValue;
+                        HandleClientMetaDataUpdate(state,message,!showTuned);
+                        HandleClientRadioUpdate(state,message,showTuned);
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
@@ -235,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             session.Send(replyMessage.Encode());
         }
 
-        private void HandleClientMetaDataUpdate(SRSClientSession session,NetworkMessage message)
+        private void HandleClientMetaDataUpdate(SRSClientSession session,NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -269,7 +269,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         }
                     };
 
-                    Multicast(replyMessage.Encode());
+                    if(send) 
+                        Multicast(replyMessage.Encode());
                     
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
@@ -292,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             MulticastAllExeceptOne(message.Encode(),srsSession.Id);
         }
 
-        private void HandleClientRadioUpdate(SRSClientSession session,NetworkMessage message)
+        private void HandleClientRadioUpdate(SRSClientSession session,NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -310,7 +311,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Position = message.Client.Position;
                     client.LatLngPosition = message.Client.LatLngPosition;
 
-                    //    _logger.Info("Received Radio Update");
+                    //send update to everyone
+                    //Remove Client Radio Info
+                    if (send)
+                    {
+                        var replyMessage = new NetworkMessage
+                        {
+                            MsgType = NetworkMessage.MessageType.UPDATE,
+                            ServerSettings = _serverSettings.ToDictionary(),
+                            Client = new SRClient
+                            {
+                                ClientGuid = client.ClientGuid,
+                                Coalition = client.Coalition,
+                                Name = client.Name,
+                                LastUpdate = client.LastUpdate,
+                                Position = client.Position,
+                                LatLngPosition = client.LatLngPosition,
+                                RadioInfo = client.RadioInfo
+                            }
+                        };
+                        MulticastAllExeceptOne(replyMessage.Encode(), session.Id);
+                    }
                 }
             }
         }
