@@ -57,48 +57,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         // override object.Equals
         public override bool Equals(object compare)
         {
-            if ((compare == null) || (GetType() != compare.GetType()))
+            try
             {
-                return false;
-            }
-
-            var compareRadio = compare as DCSPlayerRadioInfo;
-
-            if (control != compareRadio.control)
-            {
-                return false;
-            }
-            //if (side != compareRadio.side)
-            //{
-            //    return false;
-            //}
-            if (!name.Equals(compareRadio.name))
-            {
-                return false;
-            }
-            if (!unit.Equals(compareRadio.unit))
-            {
-                return false;
-            }
-
-            if (unitId != compareRadio.unitId)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < radios.Length; i++)
-            {
-                var radio1 = radios[i];
-                var radio2 = compareRadio.radios[i];
-
-                if ((radio1 != null) && (radio2 != null))
+                if ((compare == null) || (GetType() != compare.GetType()))
                 {
-                    if (!radio1.Equals(radio2))
+                    return false;
+                }
+
+                var compareRadio = compare as DCSPlayerRadioInfo;
+
+                if (control != compareRadio.control)
+                {
+                    return false;
+                }
+                //if (side != compareRadio.side)
+                //{
+                //    return false;
+                //}
+                if (!name.Equals(compareRadio.name))
+                {
+                    return false;
+                }
+                if (!unit.Equals(compareRadio.unit))
+                {
+                    return false;
+                }
+
+                if (unitId != compareRadio.unitId)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < radios.Length; i++)
+                {
+                    var radio1 = radios[i];
+                    var radio2 = compareRadio.radios[i];
+
+                    if ((radio1 != null) && (radio2 != null))
                     {
-                        return false;
+                        if (!radio1.Equals(radio2))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
+            catch
+            {
+                return false;
+            }
+          
 
             return true;
         }

@@ -49,6 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private static readonly object _lock = new object();
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public string CurrentProfileName { get; set; } = "default";
+        public string Path { get; }
 
         private readonly Dictionary<string, string> defaultSettingsProfileSettings = new Dictionary<string, string>()
         {
@@ -97,6 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public ProfileSettingsStore(GlobalSettingsStore globalSettingsStore)
         {
             this._globalSettings = globalSettingsStore;
+            this.Path = _globalSettings.Path;
 
             MigrateOldSettings();
 
@@ -106,7 +108,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 Configuration _configuration = null;
                 try
                 {
-                     _configuration = Configuration.LoadFromFile(GetProfileCfgFileName(profile));
+                     _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
                     InputConfigs[GetProfileCfgFileName(profile)] = _configuration;
 
                     var inputProfile = new Dictionary<InputBinding, InputDevice>();
@@ -122,7 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         }
                     }
 
-                    _configuration.SaveToFile(GetProfileCfgFileName(profile), Encoding.UTF8);
+                    _configuration.SaveToFile(Path+GetProfileCfgFileName(profile), Encoding.UTF8);
                 
                 }
                 catch (FileNotFoundException ex)
@@ -142,7 +144,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     var inputProfile = new Dictionary<InputBinding, InputDevice>();
                     InputProfiles[GetProfileName(profile)] = inputProfile;
                     InputConfigs[GetProfileCfgFileName(profile)] = new Configuration();
-                    _configuration.SaveToFile(GetProfileCfgFileName(profile), Encoding.UTF8);
+                    _configuration.SaveToFile(Path+GetProfileCfgFileName(profile), Encoding.UTF8);
 
                 }
             }
@@ -164,14 +166,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             try
             {
                 //combine global.cfg and input-default.cfg
-                if (File.Exists("input-default.cfg") && File.Exists("global.cfg") && !File.Exists("default.cfg"))
+                if (File.Exists(Path+"input-default.cfg") && File.Exists(Path + "global.cfg") && !File.Exists("default.cfg"))
                 {
                     //Copy the current GLOBAL settings - not all relevant but will be ignored
-                    File.Copy("global.cfg", "default.cfg");
+                    File.Copy(Path + "global.cfg", Path + "default.cfg");
 
-                    var inputText = File.ReadAllText("input-default.cfg", Encoding.UTF8);
+                    var inputText = File.ReadAllText(Path + "input-default.cfg", Encoding.UTF8);
 
-                    File.AppendAllText("default.cfg", inputText, Encoding.UTF8);
+                    File.AppendAllText(Path + "default.cfg", inputText, Encoding.UTF8);
 
                     Logger.Info(
                         $"Migrated the previous input-default.cfg and global settings to the new profile");
@@ -188,25 +190,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
           
         }
-
-        private static void CombineMultipleFilesIntoSingleFile(string inputDirectoryPath, string inputFileNamePattern, string outputFilePath)
-        {
-            string[] inputFilePaths = Directory.GetFiles(inputDirectoryPath, inputFileNamePattern);
-            Console.WriteLine("Number of files: {0}.", inputFilePaths.Length);
-            using (var outputStream = File.Create(outputFilePath))
-            {
-                foreach (var inputFilePath in inputFilePaths)
-                {
-                    using (var inputStream = File.OpenRead(inputFilePath))
-                    {
-                        // Buffer size can be passed as the second argument.
-                        inputStream.CopyTo(outputStream);
-                    }
-                    Console.WriteLine("The file {0} has been processed.", inputFilePath);
-                }
-            }
-        }
-
 
         public List<string> GetProfiles()
         {
@@ -232,7 +215,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             var inputProfile = new Dictionary<InputBinding, InputDevice>();
             InputProfiles[GetProfileName(profileName)] = inputProfile;
-
         }
 
         private string GetProfileCfgFileName(string prof)
@@ -427,7 +409,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 try
                 {
                     var configuration = GetCurrentProfile();
-                    configuration.SaveToFile(GetProfileCfgFileName(CurrentProfileName));
+                    configuration.SaveToFile(Path+GetProfileCfgFileName(CurrentProfileName));
                 }
                 catch (Exception ex)
                 {
@@ -446,7 +428,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             try
             {
-                File.Delete(GetProfileCfgFileName(profile));
+                File.Delete(Path+GetProfileCfgFileName(profile));
             }
             catch
             { }
@@ -471,7 +453,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             try
             {
-                File.Delete(GetProfileCfgFileName(oldName));
+                File.Delete(Path+GetProfileCfgFileName(oldName));
             }
             catch
             { }
@@ -479,7 +461,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void CopyProfile(string profileToCopy, string profileName)
         {
-            var config = Configuration.LoadFromFile(GetProfileCfgFileName(profileToCopy));
+            var config = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profileToCopy));
             InputConfigs[GetProfileCfgFileName(profileName)] = config;
 
             var inputProfile = new Dictionary<InputBinding, InputDevice>();
@@ -500,7 +482,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             CurrentProfileName = "default";
 
-            InputConfigs[GetProfileCfgFileName(profileName)].SaveToFile(GetProfileCfgFileName(profileName));
+            InputConfigs[GetProfileCfgFileName(profileName)].SaveToFile(Path+GetProfileCfgFileName(profileName));
 
         }
 

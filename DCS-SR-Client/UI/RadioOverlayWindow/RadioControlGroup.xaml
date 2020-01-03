@@ -113,7 +113,7 @@
                 <TextBlock x:Name="RadioFrequency"
                            Width="145"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Top"
+                           VerticalAlignment="Center"
                            Background="Black"
                            Foreground="#00FF00"
                            MouseDown="RadioFrequencyText_Click"
@@ -185,7 +185,7 @@
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.001MHz" />
                 <Slider x:Name="RadioVolume"
-                        Width="115"
+                        Width="105"
                         Height="15"
                         Margin="20,1,0,0"
                         IsEnabled="False"
@@ -194,6 +194,15 @@
                         Thumb.DragCompleted="RadioVolume_DragCompleted"
                         Thumb.DragStarted="RadioVolume_DragStarted" />
 
+                <TextBlock x:Name="TunedClients"
+                           Width="35"
+                           Height="15"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="White"
+                           Text="👤 30"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
 
             </WrapPanel>
         </TabItem>

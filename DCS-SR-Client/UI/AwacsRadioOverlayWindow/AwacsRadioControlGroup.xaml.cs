@@ -383,7 +383,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     if (count > 0)
                     {
-                        RadioMetaData.Text += " +" + count;
+                        RadioMetaData.Text += " 👤" + count;
                     }
                 }
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;

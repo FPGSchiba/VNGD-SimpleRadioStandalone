@@ -292,6 +292,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     case NetworkMessage.MessageType.PING:
                                         // Do nothing for now
                                         break;
+                                    case NetworkMessage.MessageType.RADIO_UPDATE:
                                     case NetworkMessage.MessageType.UPDATE:
 
                                         _serverSettings.Decode(serverMessage.ServerSettings);
@@ -312,6 +313,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 {
                                                     srClient.RadioInfo = updatedSrClient.RadioInfo;
                                                     srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
+                                                }
+                                                else
+                                                {
+                                                    //radio update but null RadioInfo means no change
+                                                    if (serverMessage.MsgType ==
+                                                        NetworkMessage.MessageType.RADIO_UPDATE)
+                                                    {
+                                                        srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
+                                                    }
                                                 }
 
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +

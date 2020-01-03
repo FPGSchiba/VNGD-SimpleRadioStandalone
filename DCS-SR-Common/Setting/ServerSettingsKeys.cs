@@ -49,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" },
             { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "true" },
             { ServerSettingsKeys.TEST_FREQUENCIES.ToString(), "247.2,120.3" },
-            { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "true" },
+            { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "false" },
         };
     }
 }

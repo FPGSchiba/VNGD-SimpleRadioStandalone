@@ -304,6 +304,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     //update to local ticks
                     message.Client.RadioInfo.LastUpdate = DateTime.Now.Ticks;
 
+                    var changed = false;
+
+                    if (client.RadioInfo == null)
+                    {
+                        client.RadioInfo = message.Client.RadioInfo;
+                        changed = true;
+                    }
+                    else
+                    {
+                       changed = !client.RadioInfo.Equals(message.Client.RadioInfo);
+                    }
+
                     client.LastUpdate = DateTime.Now.Ticks;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
@@ -311,25 +323,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Position = message.Client.Position;
                     client.LatLngPosition = message.Client.LatLngPosition;
 
+                    TimeSpan lastSent = new TimeSpan(DateTime.Now.Ticks - client.LastRadioUpdateSent);
+
                     //send update to everyone
                     //Remove Client Radio Info
                     if (send)
                     {
-                        var replyMessage = new NetworkMessage
+                        NetworkMessage replyMessage;
+                        if ((changed || lastSent.TotalSeconds > 60))
                         {
-                            MsgType = NetworkMessage.MessageType.UPDATE,
-                            ServerSettings = _serverSettings.ToDictionary(),
-                            Client = new SRClient
+                            client.LastRadioUpdateSent = DateTime.Now.Ticks;
+                            replyMessage = new NetworkMessage
                             {
-                                ClientGuid = client.ClientGuid,
-                                Coalition = client.Coalition,
-                                Name = client.Name,
-                                LastUpdate = client.LastUpdate,
-                                Position = client.Position,
-                                LatLngPosition = client.LatLngPosition,
-                                RadioInfo = client.RadioInfo
-                            }
-                        };
+                                MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
+                                ServerSettings = _serverSettings.ToDictionary(),
+                                Client = new SRClient
+                                {
+                                    ClientGuid = client.ClientGuid,
+                                    Coalition = client.Coalition,
+                                    Name = client.Name,
+                                    LastUpdate = client.LastUpdate,
+                                    Position = client.Position,
+                                    LatLngPosition = client.LatLngPosition,
+                                    RadioInfo = client.RadioInfo //send radio info
+                                }
+                            };
+                           
+                        }
+                        else
+                        {
+                            replyMessage = new NetworkMessage
+                            {
+                                MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
+                                ServerSettings = _serverSettings.ToDictionary(),
+                                Client = new SRClient
+                                {
+                                    ClientGuid = client.ClientGuid,
+                                    Coalition = client.Coalition,
+                                    Name = client.Name,
+                                    LastUpdate = client.LastUpdate,
+                                    Position = client.Position,
+                                    LatLngPosition = client.LatLngPosition,
+                                    RadioInfo = null //send radio update will null indicating no change
+                                }
+                            };
+                        }
+
                         MulticastAllExeceptOne(replyMessage.Encode(), session.Id);
                     }
                 }

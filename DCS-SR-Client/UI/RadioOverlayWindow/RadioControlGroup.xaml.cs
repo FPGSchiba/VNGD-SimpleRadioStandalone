@@ -204,6 +204,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 RadioFrequency.Text = "Unknown";
 
                 RadioVolume.IsEnabled = false;
+                RadioVolume.Width = 115;
+
+                TunedClients.Visibility = Visibility.Hidden;
 
                 ToggleButtons(false);
 
@@ -272,7 +275,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     
                     if (count > 0)
                     {
-                        RadioFrequency.Text += " +" + count;
+                        TunedClients.Text = "👤" + count;
+                        RadioVolume.Width = 105;
+                        TunedClients.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        TunedClients.Visibility = Visibility.Hidden;
+                        RadioVolume.Width = 115;
                     }
                     
                 }
