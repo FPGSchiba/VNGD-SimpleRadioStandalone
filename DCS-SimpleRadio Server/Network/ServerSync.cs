@@ -301,6 +301,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 if (client != null)
                 {
+                    //shouldnt be the case but just incase...
+                    if (message.Client.RadioInfo == null)
+                    {
+                        message.Client.RadioInfo = new DCSPlayerRadioInfo();
+                    }
                     //update to local ticks
                     message.Client.RadioInfo.LastUpdate = DateTime.Now.Ticks;
 

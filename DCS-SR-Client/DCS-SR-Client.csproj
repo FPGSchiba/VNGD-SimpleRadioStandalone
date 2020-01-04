@@ -192,6 +192,8 @@
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
+    <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
+    <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
     <Compile Include="Settings\ProfileSettingsStore.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />

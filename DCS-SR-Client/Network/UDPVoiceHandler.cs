@@ -639,12 +639,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
+        private bool PTTPressed()
+        {
+            if (_clientStateSingleton.InhibitTX.InhibitTX)
+            {
+                TimeSpan time = new TimeSpan(DateTime.Now.Ticks - _clientStateSingleton.InhibitTX.LastReceivedAt);
+
+                //inhibit for up to 5 seconds since the last message from VAICOM
+                if (time.TotalSeconds < 5)
+                {
+                    return false;
+                }
+            }
+
+            return _ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt;
+        }
+
         public bool Send(byte[] bytes, int len)
         {
             //if either PTT is true, a microphone is available && socket connected etc
             if (_ready
                 && _listener != null
-                && (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+                && PTTPressed()
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
                 && _clientStateSingleton.MicrophoneAvailable
                 && (bytes != null))

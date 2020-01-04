@@ -296,7 +296,7 @@ namespace Installer
 
         private string GetWorkingDirectory()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            return Environment.CurrentDirectory;
         }
 
         private void InstallVCRedist()
