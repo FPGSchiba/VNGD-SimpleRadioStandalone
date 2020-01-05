@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             var currentClientPos = ClientStateSingleton.Instance.PlayerCoaltionLocationMetadata;
             var currentUnitId = ClientStateSingleton.Instance.DcsPlayerRadioInfo.unitId;
             var coalitionSecurity = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY);
-
+            var globalFrequencies = _serverSettings.GlobalFrequencies;
             int count = 0;
 
             foreach (var client in _clients)
@@ -82,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                                 currentUnitId,
                                 new List<int>(),
                                 out radioReceivingState,
-                                out decryptable);
+                                out decryptable, globalFrequencies.Contains(freq));
 
                             //only send if we can hear!
                             if (receivingRadio != null)

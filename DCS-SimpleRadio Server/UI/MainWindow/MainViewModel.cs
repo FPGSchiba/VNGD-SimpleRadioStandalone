@@ -162,6 +162,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             }
         }
 
+        private string _globalLobbyFrequencies =
+            ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES).StringValue;
+
+        private DispatcherTimer _globalLobbyFrequenciesDebounceTimer;
+
+        public string GlobalLobbyFrequencies
+        {
+            get { return _globalLobbyFrequencies; }
+            set
+            {
+                _globalLobbyFrequencies = value.Trim();
+                if (_globalLobbyFrequenciesDebounceTimer != null)
+                {
+                    _globalLobbyFrequenciesDebounceTimer.Stop();
+                    _globalLobbyFrequenciesDebounceTimer.Tick -= GlobalLobbyFrequenciesDebounceTimerTick;
+                    _globalLobbyFrequenciesDebounceTimer = null;
+                }
+
+                _globalLobbyFrequenciesDebounceTimer = new DispatcherTimer();
+                _globalLobbyFrequenciesDebounceTimer.Tick += GlobalLobbyFrequenciesDebounceTimerTick;
+                _globalLobbyFrequenciesDebounceTimer.Interval = TimeSpan.FromMilliseconds(500);
+                _globalLobbyFrequenciesDebounceTimer.Start();
+
+                NotifyOfPropertyChange(() => GlobalLobbyFrequencies);
+            }
+        }
+
         public string TunedCountText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT).BoolValue ? "ON" : "OFF";
         public string ListeningPort
@@ -315,14 +342,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         {
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES, _testFrequencies);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerTestFrequenciesChanged()
+            _eventAggregator.PublishOnBackgroundThread(new ServerFrequenciesChanged()
             {
                 TestFrequencies = _testFrequencies
             });
 
             _testFrequenciesDebounceTimer.Stop();
-            _testFrequenciesDebounceTimer.Tick -= PasswordDebounceTimerTick;
+            _testFrequenciesDebounceTimer.Tick -= TestFrequenciesDebounceTimerTick;
             _testFrequenciesDebounceTimer = null;
+        }
+
+        private void GlobalLobbyFrequenciesDebounceTimerTick(object sender, EventArgs e)
+        {
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES, _globalLobbyFrequencies);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerFrequenciesChanged()
+            {
+                GlobalLobbyFrequencies = _globalLobbyFrequencies
+            });
+
+            _globalLobbyFrequenciesDebounceTimer.Stop();
+            _globalLobbyFrequenciesDebounceTimer.Tick -= GlobalLobbyFrequenciesDebounceTimerTick;
+            _globalLobbyFrequenciesDebounceTimer = null;
         }
 
         public void TunedCountToggle()

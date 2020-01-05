@@ -17,7 +17,7 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    internal class UDPVoiceRouter: IHandle<ServerTestFrequenciesChanged>
+    internal class UDPVoiceRouter: IHandle<ServerFrequenciesChanged>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
@@ -38,6 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
         private List<double> _testFrequencies = new List<double>();
+        private List<double> _globalFrequencies = new List<double>();
 
         public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {
@@ -47,6 +48,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             var freqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES).StringValue;
             UpdateTestFrequencies(freqString);
+
+            var globalFreqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES).StringValue;
+            UpdateGlobalLobbyFrequencies(globalFreqString);
         }
 
 
@@ -67,6 +71,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
 
             _testFrequencies = newList;
+        }
+
+        private void UpdateGlobalLobbyFrequencies(string freqString)
+        {
+
+            var freqStringList = freqString.Split(',');
+
+            var newList = new List<double>();
+            foreach (var freq in freqStringList)
+            {
+                if (double.TryParse(freq.Trim(), out var freqDouble))
+                {
+                    freqDouble *= 1e+6; //convert to Hz from MHz
+                    newList.Add(freqDouble);
+                    Logger.Info("Adding Global Frequency: " + freqDouble);
+                }
+            }
+
+            _globalFrequencies = newList;
         }
 
         public void Listen()
@@ -285,25 +308,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                             {
-
-                                RadioReceivingState radioReceivingState = null;
-                                bool decryptable;
-                                var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
-                                    (RadioInformation.Modulation)udpVoice.Modulations[i],
-                                    udpVoice.Encryptions[i],
-                                    udpVoice.UnitId,
-                                    _emptyBlockedRadios,
-                                    out radioReceivingState,
-                                    out decryptable);
-
-                                //only send if we can hear!
-                                if (receivingRadio != null)
+                                //ignore everything as its global frequency
+                                if (_globalFrequencies.Contains(udpVoice.Frequencies[i]))
                                 {
                                     outgoingList.Add(ip);
                                 }
+                                else
+                                {
+                                    RadioReceivingState radioReceivingState = null;
+                                    bool decryptable;
+                                    var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
+                                        (RadioInformation.Modulation)udpVoice.Modulations[i],
+                                        udpVoice.Encryptions[i],
+                                        udpVoice.UnitId,
+                                        _emptyBlockedRadios,
+                                        out radioReceivingState,
+                                        out decryptable);
+
+                                    //only send if we can hear!
+                                    if (receivingRadio != null)
+                                    {
+                                        outgoingList.Add(ip);
+                                    }
+                                }
+
+                                
                             }
-
-
                         }
                     }
                 }
@@ -317,7 +347,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             if (_testFrequencies.Contains(frequency))
                             {
-                                //DEBUG send back to sending client as its a test frequency
+                                //send back to sending client as its a test frequency
                                 outgoingList.Add(ip);
                                 break;
                             }
@@ -340,9 +370,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        public void Handle(ServerTestFrequenciesChanged message)
+        public void Handle(ServerFrequenciesChanged message)
         {
-            UpdateTestFrequencies(message.TestFrequencies);
+            if (message.TestFrequencies != null)
+            {
+                UpdateTestFrequencies(message.TestFrequencies);
+            }
+            else
+            {
+                UpdateGlobalLobbyFrequencies(message.GlobalLobbyFrequencies);
+            }
         }
+
     }
 }

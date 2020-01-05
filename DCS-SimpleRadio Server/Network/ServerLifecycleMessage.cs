@@ -54,9 +54,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     {
     }
 
-    public class ServerTestFrequenciesChanged
+    public class ServerFrequenciesChanged
     {
         public string TestFrequencies { get; set; }
+        public string GlobalLobbyFrequencies { get; set; }
 
     }
 }

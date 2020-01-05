@@ -26,6 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         ALLOW_RADIO_ENCRYPTION = 15,
         TEST_FREQUENCIES = 16,
         SHOW_TUNED_COUNT = 17,
+        GLOBAL_LOBBY_FREQUENCIES = 18,
+        SHOW_TRANSMITTER_NAME = 19,
     }
 
     public class DefaultServerSettings
@@ -50,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "true" },
             { ServerSettingsKeys.TEST_FREQUENCIES.ToString(), "247.2,120.3" },
             { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "false" },
+            { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.2,123.3" },
+            { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
         };
     }
 }
