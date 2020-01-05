@@ -157,7 +157,7 @@ function srsOverlay.updateRadio()
 						local tunedRadio = tuned[_i]
 
 						if tunedRadio > 0 then
-							fullMessage  = fullMessage.." +"..tunedRadio
+							fullMessage  = fullMessage.." ⚡"..tunedRadio
 						end
 
 					end
