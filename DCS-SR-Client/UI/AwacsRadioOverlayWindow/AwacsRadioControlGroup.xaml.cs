@@ -23,6 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private const int MaxSimultaneousTransmissions = 3;
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
@@ -376,6 +377,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (currentRadio.enc && (currentRadio.encKey > 0))
                     {
                         RadioMetaData.Text += " E" + currentRadio.encKey; // ENCRYPTED
+                    }
+
+                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+
+                    if (count > 0)
+                    {
+                        RadioMetaData.Text += " 👤" + count;
                     }
                 }
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;

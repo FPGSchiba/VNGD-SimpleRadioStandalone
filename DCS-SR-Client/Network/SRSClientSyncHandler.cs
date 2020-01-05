@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -48,6 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private LotATCSyncHandler _lotATCSync;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
+        private VAICOMSyncHandler _vaicomSync;
 
 
         public SRSClientSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
@@ -134,11 +136,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _lotATCSync.Stop();
                 _lotATCSync = null;
             }
+            if (_vaicomSync != null)
+            {
+                _vaicomSync.Stop();
+                _vaicomSync = null;
+            }
 
             bool connectionError = false;
 
             _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid,_newAircraft);
             _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate,_clients, _guid);
+            _vaicomSync = new VAICOMSyncHandler();
+
             using (_tcpClient = new TcpClient())
             {
                 try
@@ -176,6 +185,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _radioDCSSync.Stop();
             _lotATCSync.Stop();
+            _vaicomSync.Stop();
 
             //disconnect callback
             CallOnMain(false, connectionError);
@@ -292,6 +302,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     case NetworkMessage.MessageType.PING:
                                         // Do nothing for now
                                         break;
+                                    case NetworkMessage.MessageType.RADIO_UPDATE:
                                     case NetworkMessage.MessageType.UPDATE:
 
                                         _serverSettings.Decode(serverMessage.ServerSettings);
@@ -307,6 +318,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.Coalition = updatedSrClient.Coalition;
                                                 srClient.Position = updatedSrClient.Position;
                                                 srClient.LatLngPosition = updatedSrClient.LatLngPosition;
+
+                                                if (updatedSrClient.RadioInfo != null)
+                                                {
+                                                    srClient.RadioInfo = updatedSrClient.RadioInfo;
+                                                    srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
+                                                }
+                                                else
+                                                {
+                                                    //radio update but null RadioInfo means no change
+                                                    if (serverMessage.MsgType ==
+                                                        NetworkMessage.MessageType.RADIO_UPDATE)
+                                                    {
+                                                        srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
+                                                    }
+                                                }
 
 //                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
 //                                                            srClient.Name + " Coalition: " +

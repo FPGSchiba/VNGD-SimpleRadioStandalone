@@ -91,9 +91,6 @@ namespace Installer
             //To get the location the assembly normally resides on disk or the install directory
             var currentPath = GetWorkingDirectory();
 
-            //once you have the path you get the directory with:
-            currentPath = Path.GetDirectoryName(currentPath);
-
             if (currentPath.StartsWith("file:\\"))
             {
                 currentPath = currentPath.Replace("file:\\", "");
@@ -296,13 +293,13 @@ namespace Installer
 
         private string GetWorkingDirectory()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            return new FileInfo(Assembly.GetEntryAssembly().Location).Directory.ToString();
         }
 
         private void InstallVCRedist()
         {
             _progressBarDialog.UpdateProgress(false, $"Installing VC Redist x64");
-            Process.Start(GetWorkingDirectory() + "VC_redist.x64.exe", "/install /norestart /quiet /log \"vc_redist_2017_x64.log\"");
+            Process.Start(GetWorkingDirectory() + "\\VC_redist.x64.exe", "/install /norestart /quiet /log \"vc_redist_2017_x64.log\"");
             _progressBarDialog.UpdateProgress(false, $"Finished installing VC Redist x64");
 
         }

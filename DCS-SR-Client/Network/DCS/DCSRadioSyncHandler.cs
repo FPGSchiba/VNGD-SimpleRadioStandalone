@@ -166,6 +166,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             try
             {
+                var connectedClientsSingleton = ConnectedClientsSingleton.Instance;
+                int[] tunedClients = new int[11];
+
+                if (_clientStateSingleton.IsConnected
+                    && _clientStateSingleton.DcsPlayerRadioInfo !=null
+                    && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
+                {
+
+                    for (int i = 0; i < tunedClients.Length; i++)
+                    {
+                        var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
+                        
+                        if (clientRadio.modulation == RadioInformation.Modulation.FM ||
+                            clientRadio.modulation == RadioInformation.Modulation.AM)
+                        {
+                            tunedClients[i] = connectedClientsSingleton.ClientsOnFreq(clientRadio.freq, clientRadio.modulation);
+                        }
+                    }
+                }
+                
                 //get currently transmitting or receiving
                 var combinedState = new CombinedRadioState()
                 {
@@ -173,7 +193,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     RadioSendingState = UdpVoiceHandler.RadioSendingState,
                     RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
                     ClientCountConnected = _clients.Count,
-                    ClientCountIngame = clientCountIngame
+                    ClientCountIngame = clientCountIngame,
+                    TunedClients = tunedClients,
                 };
 
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings

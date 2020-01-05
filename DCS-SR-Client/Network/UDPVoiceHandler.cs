@@ -324,7 +324,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                 if (udpVoicePacket != null && udpVoicePacket.Modulations[0] != 4)
                                 {
-
+                                    var globalFrequencies = _serverSettings.GlobalFrequencies;
 
                                     var frequencyCount = udpVoicePacket.Frequencies.Length;
 
@@ -337,6 +337,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     {
                                         RadioReceivingState state = null;
                                         bool decryptable;
+
+                                        //Check if Global
+                                        bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequencies[i]);
+
+                                        if (globalFrequency)
+                                        {
+                                            //remove encryption for global
+                                            udpVoicePacket.Encryptions[i] = 0;
+                                        }
+
                                         var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(
                                             udpVoicePacket.Frequencies[i],
                                             (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
@@ -353,6 +363,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             if (
                                                 radio.modulation == RadioInformation.Modulation.INTERCOM
+                                                || globalFrequency
                                                 || (
                                                     HasLineOfSight(udpVoicePacket, out losLoss)
                                                     && InRange(udpVoicePacket.Guid, udpVoicePacket.Frequencies[i],
@@ -424,10 +435,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 (radioState == null || radioState.PlayedEndOfTransmission ||
                                                  !radioState.IsReceiving))
                                             {
-                                                var decrytable = audio.Decryptable || (audio.Encryption == 0);
+                                                var audioDecryptable = audio.Decryptable || (audio.Encryption == 0);
 
                                                 //mark that we have decrpyted encrypted audio for sound effects
-                                                if (decrytable && (audio.Encryption > 0))
+                                                if (audioDecryptable && (audio.Encryption > 0))
                                                 {
                                                     _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
                                                         true,
@@ -639,12 +650,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
+        private bool PTTPressed()
+        {
+            if (_clientStateSingleton.InhibitTX.InhibitTX)
+            {
+                TimeSpan time = new TimeSpan(DateTime.Now.Ticks - _clientStateSingleton.InhibitTX.LastReceivedAt);
+
+                //inhibit for up to 5 seconds since the last message from VAICOM
+                if (time.TotalSeconds < 5)
+                {
+                    return false;
+                }
+            }
+
+            return _ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt;
+        }
+
         public bool Send(byte[] bytes, int len)
         {
             //if either PTT is true, a microphone is available && socket connected etc
             if (_ready
                 && _listener != null
-                && (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+                && PTTPressed()
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
                 && _clientStateSingleton.MicrophoneAvailable
                 && (bytes != null))

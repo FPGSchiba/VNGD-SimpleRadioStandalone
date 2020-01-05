@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly AudioManager _audioManager;
 
-        private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
+        private readonly ConcurrentDictionary<string, SRClient> _clients = ConnectedClientsSingleton.Instance.Clients;
 
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();

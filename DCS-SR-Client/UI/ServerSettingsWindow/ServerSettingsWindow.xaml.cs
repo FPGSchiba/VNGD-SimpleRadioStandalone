@@ -60,6 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 AllowRadioEncryption.Content = settings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION) ? "ON" : "OFF";
 
+                TunedClientCount.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TUNED_COUNT) ? "ON" : "OFF";
+
                 ServerVersion.Content = SRSClientSyncHandler.ServerVersion;
             }
             catch (IndexOutOfRangeException ex)

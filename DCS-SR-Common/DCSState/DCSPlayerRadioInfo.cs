@@ -57,48 +57,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         // override object.Equals
         public override bool Equals(object compare)
         {
-            if ((compare == null) || (GetType() != compare.GetType()))
+            try
             {
-                return false;
-            }
-
-            var compareRadio = compare as DCSPlayerRadioInfo;
-
-            if (control != compareRadio.control)
-            {
-                return false;
-            }
-            //if (side != compareRadio.side)
-            //{
-            //    return false;
-            //}
-            if (!name.Equals(compareRadio.name))
-            {
-                return false;
-            }
-            if (!unit.Equals(compareRadio.unit))
-            {
-                return false;
-            }
-
-            if (unitId != compareRadio.unitId)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < radios.Length; i++)
-            {
-                var radio1 = radios[i];
-                var radio2 = compareRadio.radios[i];
-
-                if ((radio1 != null) && (radio2 != null))
+                if ((compare == null) || (GetType() != compare.GetType()))
                 {
-                    if (!radio1.Equals(radio2))
+                    return false;
+                }
+
+                var compareRadio = compare as DCSPlayerRadioInfo;
+
+                if (control != compareRadio.control)
+                {
+                    return false;
+                }
+                //if (side != compareRadio.side)
+                //{
+                //    return false;
+                //}
+                if (!name.Equals(compareRadio.name))
+                {
+                    return false;
+                }
+                if (!unit.Equals(compareRadio.unit))
+                {
+                    return false;
+                }
+
+                if (unitId != compareRadio.unitId)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < radios.Length; i++)
+                {
+                    var radio1 = radios[i];
+                    var radio2 = compareRadio.radios[i];
+
+                    if ((radio1 != null) && (radio2 != null))
                     {
-                        return false;
+                        if (!radio1.Equals(radio2))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
+            catch
+            {
+                return false;
+            }
+          
 
             return true;
         }
@@ -111,6 +119,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public bool IsCurrent()
         {
             return LastUpdate > DateTime.Now.Ticks - 100000000;
+        }
+
+        //comparing doubles is risky - check that we're close enough to hear (within 100hz)
+        public static bool FreqCloseEnough(double freq1, double freq2)
+        {
+            var diff = Math.Abs(freq1 - freq2);
+
+            return diff < 500;
         }
 
         public RadioInformation CanHearTransmission(double frequency,
@@ -143,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         (modulation == RadioInformation.Modulation.INTERCOM))
                     {
                         if ((unitId > 0) && (sendingUnitId > 0)
-                            && (unitId == sendingUnitId))
+                            && (unitId == sendingUnitId) )
                         {
                             receivingState = new RadioReceivingState
                             {
@@ -165,7 +181,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         continue;
                     }
 
-                    if ((receivingRadio.freq == frequency)
+                    //within 1khz
+                    if ((FreqCloseEnough(receivingRadio.freq,frequency))
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {

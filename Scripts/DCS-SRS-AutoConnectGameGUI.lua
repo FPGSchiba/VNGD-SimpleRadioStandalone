@@ -1,4 +1,4 @@
--- Version 1.7.1.6
+-- Version 1.7.2.0
 -- ONLY COPY THIS WHOLE FILE IS YOU ARE GOING TO HOST A SERVER!
 -- The file must be in Saved Games\DCS\Scripts\Hooks or Saved Games\DCS.openalpha\Scripts\Hooks
 -- Make sure you enter the correct address into SERVER_SRS_HOST below.
@@ -95,12 +95,12 @@ SRSAuto.onChatMessage = function(message, playerID)
 
         local _freq = ""
 
-        if _player.coa == 0 then
-            _freq = SRSAuto.SRS_FREQUENCIES.neutral
-        elseif _player.coa == 1 then
+        if _player.side == 2 then
+            _freq = SRSAuto.SRS_FREQUENCIES.blue
+        elseif _player.side == 1 then
             _freq = SRSAuto.SRS_FREQUENCIES.red
         else
-            _freq = SRSAuto.SRS_FREQUENCIES.blue
+            _freq = SRSAuto.SRS_FREQUENCIES.neutral
         end
 
         local _chatMessage = string.format("*** SRS: %s ***",_freq)
@@ -211,4 +211,4 @@ SRSAuto.sendMessage = function(msg, showTime, gid)
 end
 
 DCS.setUserCallbacks(SRSAuto)
-net.log("Loaded - DCS-SRS-AutoConnect 1.7.1.6")
+net.log("Loaded - DCS-SRS-AutoConnect 1.7.2.0")

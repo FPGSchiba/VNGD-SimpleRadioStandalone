@@ -74,7 +74,7 @@
             {
                 return false;
             }
-            if (freq != compare.freq)
+            if (!DCSPlayerRadioInfo.FreqCloseEnough(freq , compare.freq))
             {
                 return false;
             }
@@ -90,7 +90,7 @@
             {
                 return false;
             }
-            if (secFreq != compare.secFreq)
+            if (!DCSPlayerRadioInfo.FreqCloseEnough(secFreq, compare.secFreq))
             {
                 return false;
             }
