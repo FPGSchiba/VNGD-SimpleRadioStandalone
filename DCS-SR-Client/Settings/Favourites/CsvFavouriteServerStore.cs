@@ -17,12 +17,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 
         public CsvFavouriteServerStore()
         {
-            var path = GlobalSettingsStore.Instance.Path;
-
-            if (path.Length == 0)
-            {
-                path = Environment.CurrentDirectory;
-            }
+            // var path = GlobalSettingsStore.Instance.Path;
+            //
+            // if (path.Length == 0)
+            // {
+            var path = Environment.CurrentDirectory;
+            // }
 
             _fileNameAndPath = Path.Combine(path, "FavouriteServers.csv");
         }
