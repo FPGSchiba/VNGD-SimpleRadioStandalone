@@ -57,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 
                 if (kvp.Key.Equals(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString()))
                 {
-                    var freqStringList = kvp.Key.Split(',');
+                    var freqStringList = kvp.Value.Split(',');
 
                     var newList = new List<double>();
                     foreach (var freq in freqStringList)
@@ -66,9 +66,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         {
                             freqDouble *= 1e+6; //convert to Hz from MHz
                             newList.Add(freqDouble);
-                            Logger.Info("Adding Server Global Frequency: " + freqDouble);
+                            Logger.Debug("Adding Server Global Frequency: " + freqDouble);
                         }
                     }
+
+                    GlobalFrequencies = newList;
                 }
             }
         }

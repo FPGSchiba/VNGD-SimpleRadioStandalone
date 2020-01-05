@@ -297,23 +297,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (!client.Key.Equals(guid))
                 {
                     var ip = client.Value.VoipPort;
-
-                    // check that either coalition radio security is disabled OR the coalitions match
-                    if ((ip != null) && (!coalitionSecurity || (client.Value.Coalition == fromClient.Coalition)))
+                    bool global = false;
+                    if (ip != null)
                     {
 
-                        var radioInfo = client.Value.RadioInfo;
-
-                        if (radioInfo != null)
+                        for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                         {
-                            for (int i = 0; i < udpVoice.Frequencies.Length; i++)
+                            //ignore everything as its global frequency
+                            if (_globalFrequencies.Contains(udpVoice.Frequencies[i]))
                             {
-                                //ignore everything as its global frequency
-                                if (_globalFrequencies.Contains(udpVoice.Frequencies[i]))
-                                {
-                                    outgoingList.Add(ip);
-                                }
-                                else
+                                global = true;
+                                break;
+                            }
+                        }
+
+                        if (global)
+                        {
+                            outgoingList.Add(ip);
+                        }
+                        // check that either coalition radio security is disabled OR the coalitions match
+                        else if ((!coalitionSecurity || (client.Value.Coalition == fromClient.Coalition)))
+                        {
+
+                            var radioInfo = client.Value.RadioInfo;
+
+                            if (radioInfo != null)
+                            {
+                                for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                                 {
                                     RadioReceivingState radioReceivingState = null;
                                     bool decryptable;
@@ -331,8 +341,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                         outgoingList.Add(ip);
                                     }
                                 }
-
-                                
                             }
                         }
                     }

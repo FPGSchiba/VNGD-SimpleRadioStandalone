@@ -354,7 +354,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             udpVoicePacket.UnitId,
                                             blockedRadios,
                                             out state,
-                                            out decryptable, globalFrequency);
+                                            out decryptable);
 
                                         float losLoss = 0.0f;
                                         double receivPowerLossPercent = 0.0;

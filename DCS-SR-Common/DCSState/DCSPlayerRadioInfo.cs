@@ -135,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             uint sendingUnitId,
             List<int> blockedRadios,
             out RadioReceivingState receivingState,
-            out bool decryptable, bool global = false)
+            out bool decryptable)
         {
             if (!IsCurrent())
             {
@@ -155,13 +155,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (receivingRadio != null)
                 {
                     //handle INTERCOM Modulation is 2
-                    if (((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) &&
-                        (modulation == RadioInformation.Modulation.INTERCOM)) 
-                        || global)
+                    if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) &&
+                        (modulation == RadioInformation.Modulation.INTERCOM))
                     {
-                        if (((unitId > 0) && (sendingUnitId > 0)
+                        if ((unitId > 0) && (sendingUnitId > 0)
                             && (unitId == sendingUnitId) )
-                            || global)
                         {
                             receivingState = new RadioReceivingState
                             {
