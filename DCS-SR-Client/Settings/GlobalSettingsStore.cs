@@ -77,6 +77,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AutoSelectSettingsProfile,
 
         NATOToneVolume,
+
+        VAICOMIncomingUDP, //33501 
     }
 
     public enum InputBinding
@@ -198,22 +200,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private  ProfileSettingsStore _profileSettingsStore;
         public ProfileSettingsStore ProfileSettingsStore => _profileSettingsStore;
 
+        public string Path { get; } = "";
+
         private GlobalSettingsStore()
         {
-//            //check commandline
-//            var args = Environment.GetCommandLineArgs();
-//
-//            foreach (var arg in args)
-//            {
-//                if (arg.Trim().StartsWith("-cfg="))
-//                {
-//                    ConfigFileName = arg.Trim().Replace("-cfg=", "").Trim();
-//                    Logger.Info($"Found -cfg loading: {ConfigFileName}");
-//                }
-//            }
+
             //Try migrating
             MigrateSettings();
-          
+
+            //check commandline
+            var args = Environment.GetCommandLineArgs();
+            
+            foreach (var arg in args)
+            {
+                if (arg.Trim().StartsWith("-cfg="))
+                {
+                    Path = arg.Trim().Replace("-cfg=", "").Trim();
+                    if (!Path.EndsWith("\\"))
+                    {
+                        Path = Path + "\\";
+                    }
+                    Logger.Info($"Found -cfg loading: {Path +ConfigFileName}");
+                }
+            }
 
             try
             {
@@ -221,7 +230,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             catch (FileNotFoundException ex)
             {
-                Logger.Info($"Did not find client config file at path ${ConfigFileName}, initialising with default config");
+                Logger.Info($"Did not find client config file at path ${Path}/${ConfigFileName}, initialising with default config");
 
                 _configuration = new Configuration();
                 _configuration.Add(new Section("Position Settings"));
@@ -242,7 +251,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    File.Copy(ConfigFileName, ConfigFileName+".bak", true);
+                    File.Copy(Path+ConfigFileName, Path + ConfigFileName +".bak", true);
                 }
                 catch (Exception e)
                 {
@@ -264,11 +273,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         {
             try 
             { 
-                if (File.Exists(PREVIOUS_CFG_FILE_NAME) && !File.Exists(CFG_FILE_NAME))
+                if (File.Exists(Path + PREVIOUS_CFG_FILE_NAME) && !File.Exists(Path + CFG_FILE_NAME))
                 {
-                    Logger.Info($"Migrating {PREVIOUS_CFG_FILE_NAME} to {CFG_FILE_NAME}");
-                    File.Copy(PREVIOUS_CFG_FILE_NAME, CFG_FILE_NAME, true);
-                    Logger.Info($"Migrated {PREVIOUS_CFG_FILE_NAME} to {CFG_FILE_NAME}");
+                    Logger.Info($"Migrating {Path + PREVIOUS_CFG_FILE_NAME} to {Path + CFG_FILE_NAME}");
+                    File.Copy(Path + PREVIOUS_CFG_FILE_NAME, Path + CFG_FILE_NAME, true);
+                    Logger.Info($"Migrated {Path + PREVIOUS_CFG_FILE_NAME} to {Path + CFG_FILE_NAME}");
                 }
             }
             catch (Exception ex)
@@ -367,7 +376,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
             {GlobalSettingsKeys.LotATCOutgoingUDP.ToString(), "10711"},
 
-            {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"}
+            {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
+
+            {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"}
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
@@ -505,7 +516,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 try
                 {
-                    _configuration.SaveToFile(ConfigFileName);
+                    _configuration.SaveToFile(Path + ConfigFileName);
                 }
                 catch (Exception ex)
                 {

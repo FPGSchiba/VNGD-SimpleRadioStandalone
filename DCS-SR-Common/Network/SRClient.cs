@@ -39,6 +39,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         [JsonIgnore]
         public long LastUpdate { get; set; }
 
+        [JsonIgnore]
+        public long LastRadioUpdateSent { get; set; }
+
         public DCSPlayerRadioInfo RadioInfo { get; set; }
         public DcsPosition Position { get; set; }
 

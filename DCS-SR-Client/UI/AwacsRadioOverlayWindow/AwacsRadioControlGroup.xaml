@@ -111,6 +111,7 @@
 
                 <TextBox x:Name="RadioFrequency"
                          Width="60"
+                         Height="15"
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"
                          Background="Black"
@@ -124,8 +125,9 @@
                          TextWrapping="Wrap" />
                 <TextBlock x:Name="RadioMetaData"
                            Width="80"
+                           Height="15"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Top"
+                           VerticalAlignment="Center"
                            Background="Black"
                            Foreground="#00FF00"
                            MouseDown="RadioFrequencyText_Click"

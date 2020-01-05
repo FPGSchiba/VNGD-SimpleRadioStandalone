@@ -5,9 +5,9 @@
         xmlns:radioOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow"
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="155"
+        Width="170"
         Height="315"
-        MinWidth="155"
+        MinWidth="170"
         MinHeight="315"
         AllowsTransparency="True"
         Background="#444"
@@ -33,7 +33,7 @@
         </WrapPanel.LayoutTransform>
 
         <TextBlock Name="ControlText"
-                   Width="115"
+                   Width="130"
                    Height="12"
                    Margin="5,0,0,0"
                    VerticalAlignment="Top"

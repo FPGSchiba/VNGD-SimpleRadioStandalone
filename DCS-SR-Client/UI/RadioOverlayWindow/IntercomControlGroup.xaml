@@ -5,12 +5,12 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Name="RadioControlContainer"
-             Width="155"
+             Width="170"
              Height="35">
     <WrapPanel>
 
         <TextBlock x:Name="RadioLabel"
-                   Width="120"
+                   Width="135"
                    Margin="13,0,0,0"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Top"

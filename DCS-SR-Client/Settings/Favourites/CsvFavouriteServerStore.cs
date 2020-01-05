@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 
@@ -16,7 +17,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
 
         public CsvFavouriteServerStore()
         {
-            _fileNameAndPath = Path.Combine(Environment.CurrentDirectory, "FavouriteServers.csv");
+            // var path = GlobalSettingsStore.Instance.Path;
+            //
+            // if (path.Length == 0)
+            // {
+            var path = Environment.CurrentDirectory;
+            // }
+
+            _fileNameAndPath = Path.Combine(path, "FavouriteServers.csv");
         }
 
         public IEnumerable<ServerAddress> LoadFromStore()
