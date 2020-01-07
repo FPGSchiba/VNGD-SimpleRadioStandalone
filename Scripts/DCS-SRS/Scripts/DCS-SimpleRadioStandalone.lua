@@ -2110,6 +2110,17 @@ function SR.exportRadioF14(_data)
         _data.ptt = false
     end
 
+    -- handle simultaneous transmission
+    if _data.selected ~= 0 and _data.ptt then
+        local xmtrSelector = SR.getButtonPosition(381)
+
+        if xmtrSelector == 0 then
+            _data.radios[2].simul =true
+            _data.radios[3].simul =true
+        end
+
+    end
+
     _data.control = 1 -- full radio
 
     return _data
