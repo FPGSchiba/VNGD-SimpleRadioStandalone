@@ -721,7 +721,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume = 1.0
     _data.radios[1].volMode = 1
-     _data.radios[1].simul = true
+    _data.radios[1].simul = true
 
     _data.radios[2].name = "TRAP 138A"
     _data.radios[2].freq = SR.getRadioFrequency(5)
@@ -758,7 +758,6 @@ function SR.exportRadioSA342(_data)
         _data.radios[3].enc = true
     end
 
-
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383, 0.167)
     if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
@@ -775,16 +774,14 @@ function SR.exportRadioSA342(_data)
 
     if SR.getButtonPosition(452) > 0.5 then
         _data.selected = 1
-        _data.radios[2].simul = true
     elseif SR.getButtonPosition(454) > 0.5 then
         _data.selected = 2
-        _data.radios[3].simul = true
     elseif SR.getButtonPosition(453) > 0.5 then
         _data.selected = 3
-        _data.radios[4].simul = true
     end
 
-    _data.control = 1; -- HOTAS Controls
+    _data.control = 1; -- COCKPIT Controls
+    _data.intercomHotMic = true
 
     return _data
 
