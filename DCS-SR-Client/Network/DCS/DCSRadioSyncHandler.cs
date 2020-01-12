@@ -232,6 +232,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //update common parts
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
+            playerRadioInfo.intercomHotMic = message.intercomHotMic;
 
             if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
             {
