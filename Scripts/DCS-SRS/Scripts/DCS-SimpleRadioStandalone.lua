@@ -2003,6 +2003,20 @@ function SR.exportRadioJF17(_data)
     _data.radios[3].guardFreqMode = 1
     _data.radios[3].secFreq = 243.0 * 1000000
 
+       -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "VHF/UHF Expansion"
+    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0 * 1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 115 * 1000000
+    _data.radios[4].freqMax = 399.975 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
 
@@ -2121,7 +2135,7 @@ function SR.exportRadioF14(_data)
 
     -- handle simultaneous transmission
     if _data.selected ~= 0 and _data.ptt then
-        local xmtrSelector = SR.getButtonPosition(381)
+        local xmtrSelector = SR.getButtonPosition(381) --402
 
         if xmtrSelector == 0 then
             _data.radios[2].simul =true
@@ -2130,6 +2144,8 @@ function SR.exportRadioF14(_data)
 
     end
 
+
+    -- _data.intercomHotMic = true  --402 for the hotmic switch
     _data.control = 1 -- full radio
 
     return _data
