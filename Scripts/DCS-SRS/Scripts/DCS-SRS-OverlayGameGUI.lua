@@ -174,7 +174,12 @@ function srsOverlay.updateRadio()
                         and _radioState.RadioSendingState.IsSending then
 
                     fullMessage = fullMessage.." +TR"
-                end
+				end
+             elseif _radioState.RadioSendingState 
+                and  _radioState.RadioSendingState.IsSending 
+                and  _radio.simul 
+                then 
+                fullMessage = fullMessage.." +TR"
             end
 
        --     srsOverlay.log(fullMessage)

@@ -25,6 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public short selected = 0;
         public string unit = "";
         public uint unitId;
+        public bool intercomHotMic = false; //if true switch to intercom and transmit
 
         public readonly static uint UnitIdOffset = 100000001
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
