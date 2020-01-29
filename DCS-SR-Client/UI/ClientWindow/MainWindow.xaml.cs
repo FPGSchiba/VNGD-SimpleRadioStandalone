@@ -845,6 +845,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RequireAdminToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RequireAdmin);
 
             AutoSelectInputProfile.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoSelectSettingsProfile);
+
+            VAICOMTXInhibitEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled);
         }
 
         private void ReloadProfileSettings()
@@ -1890,6 +1892,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             inputProfileWindow.Owner = this;
             inputProfileWindow.ShowDialog();
+        }
+
+        private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
+        {VAICOMTXInhibitEnabled
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
         }
     }
 }

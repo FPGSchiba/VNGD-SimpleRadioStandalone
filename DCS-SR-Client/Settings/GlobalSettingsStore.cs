@@ -79,6 +79,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         NATOToneVolume,
 
         VAICOMIncomingUDP, //33501 
+        VAICOMTXInhibitEnabled,
     }
 
     public enum InputBinding
@@ -378,7 +379,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
 
-            {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"}
+            {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
+            {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
+            
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()

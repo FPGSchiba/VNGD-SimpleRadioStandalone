@@ -114,6 +114,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
+                --_update.iff = {mode=3,key="123",control=0}
 
                 SR.lastKnownPos = _update.pos
 
