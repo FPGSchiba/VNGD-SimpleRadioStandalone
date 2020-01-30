@@ -120,16 +120,15 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                 --SR.log(_update.unit.."\n\n")
 
-
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
-                elseif string.find(_update.unit, "SA342") then
+                elseif string.find(_update.unit, "SA342",1,true) then
                     _update = SR.exportRadioSA342(_update)
                 elseif _update.unit == "Ka-50" then
                     _update = SR.exportRadioKA50(_update)
                 elseif _update.unit == "Mi-8MT" then
                     _update = SR.exportRadioMI8(_update)
-                elseif string.find(_update.unit, "L-39") then
+                elseif string.find(_update.unit, "L-39",1,true)  then
                     _update = SR.exportRadioL39(_update)
                 elseif _update.unit == "Yak-52" then
                     _update = SR.exportRadioYak52(_update)
@@ -137,7 +136,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioA10C(_update)
                 elseif _update.unit == "FA-18C_hornet" then
                     _update = SR.exportRadioFA18C(_update)
-                elseif string.find(_update.unit, "F-14") then
+                elseif string.find(_update.unit, "F-14",1,true)  then
                     _update = SR.exportRadioF14(_update)
                 elseif _update.unit == "F-86F Sabre" then
                     _update = SR.exportRadioF86Sabre(_update)
@@ -155,7 +154,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
-                elseif string.find(_update.unit, "SpitfireLFMkIX") then
+                elseif string.find(_update.unit, "SpitfireLFMkIX",1,true)  then
                     _update = SR.exportRadioSpitfireLFMkIX(_update)
                 elseif _update.unit == "C-101EB" then
                     _update = SR.exportRadioC101EB(_update)

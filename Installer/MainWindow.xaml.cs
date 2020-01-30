@@ -35,14 +35,6 @@ namespace Installer
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private ProgressBarDialog _progressBarDialog = null;
 
-
-        //   private readonly string currentPath;
-
-        //TODO - Support new Mods/Tech/DCS-SRS method
-        //Clear up old files and replace with new structure
-        //Add button to set the SRS path in the registry
-        //Merge pull request for enable / disable AGC
-
         public MainWindow()
         {
             SetupLogging();
@@ -121,6 +113,42 @@ namespace Installer
 
             }).Invoke();
 
+            if (IsDCSRunning())
+            {
+                MessageBox.Show(
+                    "DCS must now be closed before continuing the installation!\n\nClose DCS and please try again.",
+                    "Please Close DCS",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+
+                Logger.Warn("DCS is Running - Installer quit");
+
+                Environment.Exit(0);
+
+                return;
+            }
+
+            if (!CheckExtracted())
+            {
+
+                MessageBox.Show(
+                    "Please extract the entire installation zip into a folder and then run the installer from the extracted folder.\n\nDo not run the installer from the zip as it wont work!",
+                    "Please Extract Installation zip",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+
+                Logger.Warn("DCS is Running - Installer quit");
+
+                Environment.Exit(0);
+
+                return;
+            }
+
+        }
+
+        private bool CheckExtracted()
+        {
+            return File.Exists(_currentDirectory + "\\opus.dll") 
+                   && File.Exists(_currentDirectory + "\\awacs-radios.json")
+                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe");
         }
 
 
@@ -570,11 +598,10 @@ namespace Installer
 
             foreach (var directory in Directory.EnumerateDirectories(path))
             {
-                var dirs = directory.Split('\\');
-
-                var end = dirs[dirs.Length - 1];
-
-                if (end.ToUpper().StartsWith("DCS.") || end.ToUpper().Equals("DCS"))
+                //check for config/network.vault and options.lua
+                var network = directory + "\\config\\network.vault";
+                var config = directory + "\\config\\options.lua";
+                if (File.Exists(network) && File.Exists(config))
                 {
                     Logger.Info($"Found DCS Saved Games Path {directory}");
                     paths.Add(directory);

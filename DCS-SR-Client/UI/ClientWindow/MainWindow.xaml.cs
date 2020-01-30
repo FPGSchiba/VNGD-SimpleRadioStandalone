@@ -1895,7 +1895,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         }
 
         private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
-        {VAICOMTXInhibitEnabled
+        {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
         }
     }
