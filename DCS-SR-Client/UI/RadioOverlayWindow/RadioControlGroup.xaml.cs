@@ -215,9 +215,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
             else
             {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+                var transmitting = UdpVoiceHandler.RadioSendingState;
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
-                    var transmitting = UdpVoiceHandler.RadioSendingState;
 
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
@@ -230,10 +231,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else
                 {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    if (currentRadio.simul && dcsPlayerRadioInfo.simultaneousTransmission)
+                    {
+                        // if (transmitting.IsSending)
+                        // {
+                        //     RadioActive.Fill = new SolidColorBrush(Colors.LightBlue);
+                        // }
+                        // else
+                        // {
+                            RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
+                        // }
+                       
+                    }
+                    else
+                    {
+                        RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    }
+                    
                 }
-
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
                 if (currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
@@ -246,6 +261,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     ToggleButtons(false);
                     return;
                 }
+
+               
+
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
                     RadioFrequency.Text = "INTERCOM";

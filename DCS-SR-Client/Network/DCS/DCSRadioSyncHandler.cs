@@ -232,6 +232,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //update common parts
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
+            playerRadioInfo.intercomHotMic = message.intercomHotMic;
 
             if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
             {
@@ -286,6 +287,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 playerRadioInfo.selected = message.selected;
             }
 
+            bool simul = false;
+
 
             //copy over radio names, min + max
             for (var i = 0; i < playerRadioInfo.radios.Length; i++)
@@ -338,6 +341,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     //update common parts
                     clientRadio.freqMin = updateRadio.freqMin;
                     clientRadio.freqMax = updateRadio.freqMax;
+
+                    if (updateRadio.simul)
+                    {
+                        simul = true;
+                    }
+                    clientRadio.simul = updateRadio.simul;
 
                     clientRadio.name = updateRadio.name;
 
@@ -480,6 +489,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     }
                 }
             }
+
+            playerRadioInfo.simultaneousTransmission = simul;
 
             //change PTT last
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))

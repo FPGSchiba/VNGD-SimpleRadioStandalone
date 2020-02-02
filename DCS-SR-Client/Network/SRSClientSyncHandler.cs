@@ -162,6 +162,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         _radioDCSSync.Start();
                         _lotATCSync.Start();
+                        _vaicomSync.Start();
 
                         _tcpClient.NoDelay = true;
 

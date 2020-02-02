@@ -1,4 +1,4 @@
--- Version 1.7.2.0
+-- Version 1.7.3.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -114,21 +114,21 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
+                --_update.iff = {mode=3,key="123",control=0}
 
                 SR.lastKnownPos = _update.pos
 
                 --SR.log(_update.unit.."\n\n")
 
-
                 if _update.unit == "UH-1H" then
                     _update = SR.exportRadioUH1H(_update)
-                elseif string.find(_update.unit, "SA342") then
+                elseif string.find(_update.unit, "SA342",1,true) then
                     _update = SR.exportRadioSA342(_update)
                 elseif _update.unit == "Ka-50" then
                     _update = SR.exportRadioKA50(_update)
                 elseif _update.unit == "Mi-8MT" then
                     _update = SR.exportRadioMI8(_update)
-                elseif string.find(_update.unit, "L-39") then
+                elseif string.find(_update.unit, "L-39",1,true)  then
                     _update = SR.exportRadioL39(_update)
                 elseif _update.unit == "Yak-52" then
                     _update = SR.exportRadioYak52(_update)
@@ -136,7 +136,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioA10C(_update)
                 elseif _update.unit == "FA-18C_hornet" then
                     _update = SR.exportRadioFA18C(_update)
-                elseif string.find(_update.unit, "F-14") then
+                elseif string.find(_update.unit, "F-14",1,true)  then
                     _update = SR.exportRadioF14(_update)
                 elseif _update.unit == "F-86F Sabre" then
                     _update = SR.exportRadioF86Sabre(_update)
@@ -154,7 +154,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
                     _update = SR.exportRadioBF109(_update)
-                elseif string.find(_update.unit, "SpitfireLFMkIX") then
+                elseif string.find(_update.unit, "SpitfireLFMkIX",1,true)  then
                     _update = SR.exportRadioSpitfireLFMkIX(_update)
                 elseif _update.unit == "C-101EB" then
                     _update = SR.exportRadioC101EB(_update)
@@ -575,15 +575,59 @@ end
 
 function SR.exportRadioA4E(_data)
 
-    _data.radios[2].name = "AN/ARC-27A"
-    _data.radios[2].freq = 251.0 * 1000000 --225 to 399.975MHZ
-    _data.radios[2].modulation = 0
-    _data.radios[2].secFreq = 243.0 * 1000000
-    _data.radios[2].volume = 1.0
-    _data.radios[2].freqMin = 225 * 1000000
-    _data.radios[2].freqMax = 399.975 * 1000000
-    _data.radios[2].volMode = 1
-    _data.radios[2].freqMode = 1
+    local mainFreq = 0
+    local guardFreq = 0
+    local channel = nil
+
+    -- Oil pressure gauge is the most reliable way to get power status
+    local hasPower = SR.getButtonPosition(152) > 0.05
+    -- "Function Select Switch" near the right edge controls radio power
+    local functionSelect = SR.getButtonPosition(372)
+
+    if hasPower and functionSelect > 0.05 then
+        -- Left edge Mode Selector Switch controls local oscillator source
+        -- -1 OFF, 0 MAN, 1 PRESET
+        local modeSelector = SR.getButtonPosition(366)
+        if modeSelector > -0.5 then
+            if modeSelector > 0.5 then
+                -- PRESET mode, currently hardcoded support for Hoggit's usual defaults
+                -- TODO Find a way to copy presets from the .miz file
+                channel = SR.getSelectorPosition(361, 0.05) + 1
+                mainFreq = 246.000e6 + 3.500e6 * channel
+            else
+                -- MAN mode, frequency from the three middle dials
+                -- Moving the coeffients below inside the getSelectorPosition
+                -- function call would cause relatively large rounding errors.
+                local left = 10.000e6 * SR.getSelectorPosition(367, 1 / 20)
+                local middle = 1.000e6 * SR.getSelectorPosition(368, 1 / 10)
+                local right = 0.050e6 * SR.getSelectorPosition(369, 1 / 20)
+                mainFreq = 220e6 + left + middle + right
+            end
+            -- Additionally, enable guard monitor if Function knob is in position T/R+G
+            if 0.15 < functionSelect and functionSelect < 0.25 then
+                guardFreq = 243.000e6
+            end
+        else
+            -- GD XMIT (Guard Transmit) mode
+            mainFreq = 243.000e6
+        end
+    end
+
+    local arc51 = _data.radios[2]
+    arc51.name = "AN/ARC-51BX"
+    arc51.freq = mainFreq
+    arc51.secFreq = guardFreq
+    arc51.channel = channel
+    arc51.modulation = 0  -- AM only
+    arc51.freqMin = 220.000e6
+    arc51.freqMax = 399.950e6
+
+    -- TODO Check if there are other volume knobs in series
+    arc51.volume = SR.getRadioVolume(0, 365, {0.2, 0.8}, false)
+    if arc51.volume < 0.0 then
+        -- The knob position at startup is 0.0, not 0.2, and it gets scaled to -33.33
+        arc51.volume = 0.0
+    end
 
     -- Expansion Radio - Server Side Controlled
     _data.radios[3].name = "AN/ARC-186(V)"
@@ -721,6 +765,7 @@ function SR.exportRadioSA342(_data)
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume = 1.0
     _data.radios[1].volMode = 1
+    _data.radios[1].simul = true
 
     _data.radios[2].name = "TRAP 138A"
     _data.radios[2].freq = SR.getRadioFrequency(5)
@@ -757,7 +802,6 @@ function SR.exportRadioSA342(_data)
         _data.radios[3].enc = true
     end
 
-
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(383, 0.167)
     if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
@@ -772,7 +816,16 @@ function SR.exportRadioSA342(_data)
         _data.radios[4].enc = true
     end
 
-    _data.control = 0; -- HOTAS Controls
+    if SR.getButtonPosition(452) > 0.5 then
+        _data.selected = 1
+    elseif SR.getButtonPosition(454) > 0.5 then
+        _data.selected = 2
+    elseif SR.getButtonPosition(453) > 0.5 then
+        _data.selected = 3
+    end
+
+    _data.control = 1; -- COCKPIT Controls
+    _data.intercomHotMic = true
 
     return _data
 
@@ -1994,6 +2047,20 @@ function SR.exportRadioJF17(_data)
     _data.radios[3].guardFreqMode = 1
     _data.radios[3].secFreq = 243.0 * 1000000
 
+       -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "VHF/UHF Expansion"
+    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0 * 1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 115 * 1000000
+    _data.radios[4].freqMax = 399.975 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
 
@@ -2110,6 +2177,19 @@ function SR.exportRadioF14(_data)
         _data.ptt = false
     end
 
+    -- handle simultaneous transmission
+    if _data.selected ~= 0 and _data.ptt then
+        local xmtrSelector = SR.getButtonPosition(381) --402
+
+        if xmtrSelector == 0 then
+            _data.radios[2].simul =true
+            _data.radios[3].simul =true
+        end
+
+    end
+
+
+    -- _data.intercomHotMic = true  --402 for the hotmic switch
     _data.control = 1 -- full radio
 
     return _data
@@ -2256,4 +2336,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.2.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.3.0")

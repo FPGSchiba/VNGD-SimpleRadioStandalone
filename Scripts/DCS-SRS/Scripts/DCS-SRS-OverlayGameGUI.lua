@@ -1,9 +1,9 @@
--- Version 1.7.2.0
+-- Version 1.7.3.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
 
-net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.7.2.0 ")
+net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.7.3.0 ")
 
 local base = _G
 
@@ -174,7 +174,12 @@ function srsOverlay.updateRadio()
                         and _radioState.RadioSendingState.IsSending then
 
                     fullMessage = fullMessage.." +TR"
-                end
+				end
+             elseif _radioState.RadioSendingState 
+                and  _radioState.RadioSendingState.IsSending 
+                and  _radio.simul 
+                then 
+                fullMessage = fullMessage.." +TR"
             end
 
        --     srsOverlay.log(fullMessage)
@@ -490,4 +495,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.7.2.0 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.7.3.0 ")

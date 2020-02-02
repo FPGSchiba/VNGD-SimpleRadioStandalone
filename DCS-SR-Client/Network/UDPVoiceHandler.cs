@@ -650,8 +650,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
-        private bool PTTPressed()
+        private List<RadioInformation> PTTPressed(out int sendingOn)
         {
+            sendingOn = -1;
             if (_clientStateSingleton.InhibitTX.InhibitTX)
             {
                 TimeSpan time = new TimeSpan(DateTime.Now.Ticks - _clientStateSingleton.InhibitTX.LastReceivedAt);
@@ -659,61 +660,91 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //inhibit for up to 5 seconds since the last message from VAICOM
                 if (time.TotalSeconds < 5)
                 {
-                    return false;
+                    return new List<RadioInformation>();
                 }
             }
 
-            return _ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt;
+            var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+            //If its a hot intercom and thats not the currently selected radio
+            //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
+            //so we have to figure out what you're transmitting on in SRS
+            if (radioInfo.intercomHotMic 
+                && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT
+                && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
+            {
+                if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
+                {
+                    var intercom = new List<RadioInformation>();
+                    intercom.Add(radioInfo.radios[0]);
+                    sendingOn = 0;
+                    return intercom;
+                }
+            }
+
+            var transmittingRadios = new List<RadioInformation>();
+            if (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
+            {
+                // Always add currently selected radio (if valid)
+                var currentSelected = _clientStateSingleton.DcsPlayerRadioInfo.selected;
+                RadioInformation currentlySelectedRadio = null;
+                if (currentSelected >= 0
+                    && currentSelected < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length)
+                {
+                    currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
+
+                    if (currentlySelectedRadio != null && currentlySelectedRadio.modulation !=
+                                                       RadioInformation.Modulation.DISABLED
+                                                       && (currentlySelectedRadio.freq > 100 ||
+                                                           currentlySelectedRadio.modulation ==
+                                                           RadioInformation.Modulation.INTERCOM))
+                    {
+                        sendingOn = currentSelected;
+                        transmittingRadios.Add(currentlySelectedRadio);
+                    }
+                }
+
+                // Add all radios toggled for simultaneous transmission if the global flag has been set
+                if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
+                {
+                    var i = 0;
+                    foreach (var radio in _clientStateSingleton.DcsPlayerRadioInfo.radios)
+                    {
+                        if (radio != null && radio.simul && radio.modulation != RadioInformation.Modulation.DISABLED
+                            && (radio.freq > 100 || radio.modulation == RadioInformation.Modulation.INTERCOM)
+                            && !transmittingRadios.Contains(radio)
+                        ) // Make sure we don't add the selected radio twice
+                        {
+                            if (sendingOn == -1)
+                            {
+                                sendingOn = i;
+                            }
+                            transmittingRadios.Add(radio);
+                        }
+
+                        i++;
+                    }
+                }
+            }
+
+            return transmittingRadios;
         }
 
         public bool Send(byte[] bytes, int len)
         {
+            // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
+            List<RadioInformation> transmittingRadios;
             //if either PTT is true, a microphone is available && socket connected etc
+            var sendingOn = -1;
             if (_ready
                 && _listener != null
-                && PTTPressed()
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
                 && _clientStateSingleton.MicrophoneAvailable
-                && (bytes != null))
+                && (bytes != null)
+                && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
                 //can only send if DCS is connected
             {
                 try
                 {
-                    // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
-                    List<RadioInformation> transmittingRadios = new List<RadioInformation>();
-
-                    // Always add currently selected radio (if valid)
-                    var currentSelected = _clientStateSingleton.DcsPlayerRadioInfo.selected;
-                    RadioInformation currentlySelectedRadio = null;
-                    if (currentSelected >= 0
-                        && currentSelected < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length)
-                    {
-                        currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
-
-                        if (currentlySelectedRadio != null && currentlySelectedRadio.modulation !=
-                                                           RadioInformation.Modulation.DISABLED
-                                                           && (currentlySelectedRadio.freq > 100 ||
-                                                               currentlySelectedRadio.modulation ==
-                                                               RadioInformation.Modulation.INTERCOM))
-                        {
-                            transmittingRadios.Add(currentlySelectedRadio);
-                        }
-                    }
-
-                    // Add all radios toggled for simultaneous transmission if the global flag has been set
-                    if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
-                    {
-                        foreach (var radio in _clientStateSingleton.DcsPlayerRadioInfo.radios)
-                        {
-                            if (radio != null && radio.simul && radio.modulation != RadioInformation.Modulation.DISABLED
-                                && (radio.freq > 100 || radio.modulation == RadioInformation.Modulation.INTERCOM)
-                                && !transmittingRadios.Contains(radio)
-                            ) // Make sure we don't add the selected radio twice
-                            {
-                                transmittingRadios.Add(radio);
-                            }
-                        }
-                    }
 
                     if (transmittingRadios.Count > 0)
                     {
@@ -765,11 +796,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
 
+                        var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
+
                         //not sending or really quickly switched sending
                         if (currentlySelectedRadio != null &&
-                            (!RadioSendingState.IsSending || RadioSendingState.SendingOn != currentSelected))
+                            (!RadioSendingState.IsSending || RadioSendingState.SendingOn != sendingOn))
                         {
-                            _audioManager.PlaySoundEffectStartTransmit(currentSelected,
+                            _audioManager.PlaySoundEffectStartTransmit(sendingOn,
                                 currentlySelectedRadio.enc && (currentlySelectedRadio.encKey > 0),
                                 currentlySelectedRadio.volume);
                         }
@@ -779,7 +812,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             IsSending = true,
                             LastSentAt = DateTime.Now.Ticks,
-                            SendingOn = currentSelected
+                            SendingOn = sendingOn
                         };
                         return true;
                     }
