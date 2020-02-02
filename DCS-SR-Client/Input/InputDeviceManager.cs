@@ -120,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                 CooperativeLevel.Background | CooperativeLevel.NonExclusive);
                             device.Acquire();
 
-                            _inputDevices.Add(deviceInstance.InstanceGuid,device);
+                            _inputDevices.Add(deviceInstance.InstanceGuid, device);
                         }
                         else if (deviceInstance.Type == DeviceType.Mouse)
                         {
@@ -324,7 +324,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 while (!found)
                 {
-                    Thread.Sleep(1);
+                    Thread.Sleep(100);
 
                     for (var i = 0; i < _inputDevices.Count; i++)
                     {
@@ -481,15 +481,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     var bindStates = GenerateBindStateList();
 
-                    GetBindStates(ref bindStates);
 
                     for (var i = 0; i < bindStates.Count; i++)
                     {
                         //contains main binding and optional modifier binding + states of each
                         var bindState = bindStates[i];
 
+                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
+
                         if (bindState.ModifierDevice != null)
                         {
+                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+
                             bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
                         }
                         else
@@ -552,8 +555,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                 () => { _toggleOverlayCallback(false); });
                             break;
                         }
-                        else if ((int) bindState.MainDevice.InputBind >= (int) InputBinding.Up100 &&
-                                 (int) bindState.MainDevice.InputBind <= (int) InputBinding.RadioChannelDown)
+                        else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
+                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.RadioChannelDown)
                         {
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
@@ -646,7 +649,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         }
                     }
 
-                    Thread.Sleep(1);
+                    Thread.Sleep(40);
                 }
             });
             pttInputThread.Start();
@@ -658,103 +661,51 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             _detectPtt = false;
         }
 
-        private bool GetBindStates(ref List<InputBindState> bindStates)
+        private bool GetButtonState(InputDevice inputDeviceBinding)
         {
-            var _usedInputDevices=new Dictionary<Guid, Device>(_inputDevices);
-
-            for(var i=0;i<_usedInputDevices.Count; i++)
-            {
-                var found = false;
-                for (var j = 0; j < bindStates.Count; j++)
-                {
-                    if (bindStates[j].MainDevice.InstanceGuid == _usedInputDevices.Keys.ElementAt(i))
-                    {
-                        found = true;
-                    }
-                }
-                if (!found)
-                {
-                    _usedInputDevices.Remove(_usedInputDevices.Keys.ElementAt(i));
-                    i--;
-                }
-            }
-
-            foreach (var kpDevice in _usedInputDevices)
+            foreach (var kpDevice in _inputDevices)
             {
                 var device = kpDevice.Value;
                 if (device != null &&
-                    !device.IsDisposed)
+                    !device.IsDisposed &&
+                    device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
                 {
+
                     try
                     {
-                        device.Poll();
                         if (device is Joystick)
                         {
+                            device.Poll();
                             var state = (device as Joystick).GetCurrentState();
-                            foreach (var bindState in bindStates) { 
-                                if (device.Information.InstanceGuid.Equals(bindState.MainDevice.InstanceGuid))
-                                {
-                                    if (bindState.MainDevice.Button > 128)//its a POV!
-                                    {
-                                        var pov = state.PointOfViewControllers;
-                                        //-128 to get POV index
-                                        bindState.MainDeviceState = pov[bindState.MainDevice.Button - 128] == bindState.MainDevice.ButtonValue;
-                                    }
-                                    else
-                                    {
-                                        bindState.MainDeviceState = state.Buttons[bindState.MainDevice.Button];
-                                    }
-                                }
-                                if (bindState.ModifierDevice != null && device.Information.InstanceGuid.Equals(bindState.ModifierDevice.InstanceGuid))
-                                {
-                                    if (bindState.ModifierDevice.Button > 128)//its a POV!
-                                    {
-                                        var pov = state.PointOfViewControllers;
-                                        //-128 to get POV index
-                                        bindState.ModifierState = pov[bindState.ModifierDevice.Button - 128] == bindState.ModifierDevice.ButtonValue;
-                                    }
-                                    else
-                                    {
-                                        bindState.ModifierState = state.Buttons[bindState.ModifierDevice.Button];
-                                    }
-                                }
+
+                            if (inputDeviceBinding.Button >= 128) //its a POV!
+                            {
+                                var pov = state.PointOfViewControllers;
+                                //-128 to get POV index
+                                return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
+                            }
+                            else
+                            {
+                                return state.Buttons[inputDeviceBinding.Button];
                             }
                         }
                         else if (device is Keyboard)
                         {
-                            var state = (device as Keyboard).GetCurrentState();
-                            foreach (var bindState in bindStates)
-                            {
-                                if (device.Information.InstanceGuid.Equals(bindState.MainDevice.InstanceGuid))
-                                {
-                                    bindState.MainDeviceState=state.IsPressed(state.AllKeys[bindState.MainDevice.Button]);
-                                }
-                                if (device.Information.InstanceGuid.Equals(bindState.ModifierDevice.InstanceGuid))
-                                {
-                                    bindState.ModifierState = state.IsPressed(state.AllKeys[bindState.ModifierDevice.Button]);
-                                }
-                            }
+                            var keyboard = device as Keyboard;
+                            keyboard.Poll();
+                            var state = keyboard.GetCurrentState();
+                            return
+                                state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
                         }
                         else if (device is Mouse)
                         {
+                            device.Poll();
                             var state = (device as Mouse).GetCurrentState();
-                            foreach (var bindState in bindStates)
+
+                            //just incase mouse changes number of buttons, like logitech can?
+                            if (inputDeviceBinding.Button < state.Buttons.Length)
                             {
-                                //just incase mouse changes number of buttons, like logitech can?
-                                if (device.Information.InstanceGuid.Equals(bindState.ModifierDevice.InstanceGuid))
-                                {
-                                    if (bindState.MainDevice.Button < state.Buttons.Length)
-                                    {
-                                        bindState.MainDeviceState = state.Buttons[bindState.MainDevice.Button];
-                                    }
-                                }
-                                if (device.Information.InstanceGuid.Equals(bindState.ModifierDevice.InstanceGuid))
-                                {
-                                    if (bindState.ModifierDevice.Button < state.Buttons.Length)
-                                    {
-                                        bindState.ModifierState = state.Buttons[bindState.ModifierDevice.Button];
-                                    }
-                                }
+                                return state.Buttons[inputDeviceBinding.Button];
                             }
                         }
                     }
@@ -775,7 +726,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     }
                 }
             }
-            return true;
+            return false;
         }
 
         public List<InputBindState> GenerateBindStateList()
@@ -785,11 +736,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int) InputBinding.Intercom; i <= (int) InputBinding.RadioChannelDown; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioChannelDown; i++)
             {
-                if (currentInputProfile.ContainsKey((InputBinding) i))
+                if (currentInputProfile.ContainsKey((InputBinding)i))
                 {
-                    var input = currentInputProfile[(InputBinding) i];
+                    var input = currentInputProfile[(InputBinding)i];
                     //construct InputBindState
 
                     var bindState = new InputBindState()
@@ -801,9 +752,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         ModifierState = false
                     };
 
-                    if (currentInputProfile.ContainsKey((InputBinding) i + 100))
+                    if (currentInputProfile.ContainsKey((InputBinding)i + 100))
                     {
-                        bindState.ModifierDevice = currentInputProfile[(InputBinding) i + 100];
+                        bindState.ModifierDevice = currentInputProfile[(InputBinding)i + 100];
                     }
 
                     bindStates.Add(bindState);
