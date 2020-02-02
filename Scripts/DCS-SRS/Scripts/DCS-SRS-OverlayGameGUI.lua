@@ -31,13 +31,13 @@ local U                 = require('me_utilities')
 local Skin              = require('Skin')
 local Gui               = require('dxgui')
 local DialogLoader      = require('DialogLoader')
-local Static 			= require('Static')
+local Static            = require('Static')
 local Tools             = require('tools')
 
 local _modes = {     
     hidden = "hidden",
     minimum = "minimum",
-	minimum_vol =  "minimum_vol",
+    minimum_vol =  "minimum_vol",
     full = "full",
 }
 
@@ -48,7 +48,7 @@ local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
 local WIDTH = 350
-local HEIGHT = 140
+local HEIGHT = 160
 
 local _lastReceived = 0
 
@@ -95,86 +95,144 @@ function srsOverlay.log(str)
     end
 end
 
+
 function srsOverlay.updateRadio()    
 
-	_listMessages = {}
+    _listMessages = {}
 
-	if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
+    if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
 
-		if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected and _radioState.ClientCountIngame then
-			local clientCountMsg = string.format("Connected clients: %i (%i ingame)", _radioState.ClientCountConnected, _radioState.ClientCountIngame)
+        if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected and _radioState.ClientCountIngame then
+            local clientCountMsg = string.format("Connected clients: %i (%i ingame)", _radioState.ClientCountConnected, _radioState.ClientCountIngame)
 
-			local countMsg = {message = clientCountMsg, skin = typesMessage.normal, height = 20 }
+            local countMsg = {message = clientCountMsg, skin = typesMessage.normal, height = 20 }
 
-			table.insert(_listMessages, countMsg)
-		end
+            table.insert(_listMessages, countMsg)
+        end
 
+        
         local _radioInfo  =_radioState.RadioInfo
 
-		for _i,_radio in pairs(_radioInfo.radios) do
+        -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) , 3 DISABLED
+        -- M1:-1 = OFF, any other number on 
+        -- M3: -1 = OFF, any other number on 
+        -- M4: 1 = ON or 0 = OFF
+        -- EXPANSION: only enabled if IFF Expansion is enabled
+        -- CONTROL: 0 - COCKPIT / Realistic, 1 - OVERLAY / SRS, 
+        --IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
 
-			local fullMessage
+        -- Handle IFF
+        if _radioInfo.iff then
 
-			if _radio.modulation == 3 then
-					 fullMessage = ""
-					
-			elseif _radio.modulation == 2 then 
+            if _radioInfo.iff.status == 1 or _radioInfo.iff.status == 2 then
 
-					 fullMessage = "INTERCOM "
-				
-			else
-					 fullMessage = _radio.name.." - "
+                local _iff = "IFF:"
 
-					 fullMessage = fullMessage..string.format("%.3f", _radio.freq/1000000.0)
+                if _radioInfo.iff.status == 2 then
+                    _iff = _iff .. " IDENT"
+                end
+                
+                if _radioInfo.iff.mode1 == -1 then
+                     _iff = _iff .. " M1:OFF"
+                else
+                     _iff = _iff .. string.format(" M1:%02d",_radioInfo.iff.mode1)
+                end
+
+                if _radioInfo.iff.mode3 == -1 then
+                     _iff = _iff .. " M3:OFF"
+                else
+                     _iff = _iff .. string.format(" M3:%04d",_radioInfo.iff.mode3)
+                end
+
+                if _radioInfo.iff.mode4 then
+                    _iff = _iff.." M4:ON"
+                else
+                    _iff = _iff.." M4:OFF"
+                end
+
+                 local _iffMsg = {message = _iff, skin = typesMessage.normal, height = 20 }
+
+                table.insert(_listMessages, _iffMsg)
+
+                   srsOverlay.log("Added IFF Message")
+--
+            else
+
+                if _radioInfo.iff.status == 0 then
+                    local _iffMsg = {message = "IFF: OFF", skin = typesMessage.normal, height = 20 }
+                    table.insert(_listMessages, _iffMsg)
+                       srsOverlay.log("Added IFF Message OFF")
+                else
+                       srsOverlay.log("IGNORED IFF Message")
+                end
+                --ELSE DISABLED so dont show
+            end         
+        end
+
+        for _i,_radio in pairs(_radioInfo.radios) do
+
+            local fullMessage
+
+            if _radio.modulation == 3 then
+                     fullMessage = ""
+                    
+            elseif _radio.modulation == 2 then 
+
+                     fullMessage = "INTERCOM "
+                
+            else
+                     fullMessage = _radio.name.." - "
+
+                     fullMessage = fullMessage..string.format("%.3f", _radio.freq/1000000.0)
 
          --            srsOverlay.log( _radio.freq)
 
-					 if _radio.modulation == 0 then
-						fullMessage = fullMessage.." AM"
-					 else
-						fullMessage = fullMessage.." FM"
-					 end
-
-					 if _radio.secFreq > 100 then
-						fullMessage = fullMessage.." G"
-					 end
-
-					 if _radio.channel >= 0 then
-					 	fullMessage = fullMessage.." C".._radio.channel
-					 end
-
-					 if _radio.enc and _radio.encKey > 0 then
-						fullMessage = fullMessage.." E".._radio.encKey
+                     if _radio.modulation == 0 then
+                        fullMessage = fullMessage.." AM"
+                     else
+                        fullMessage = fullMessage.." FM"
                      end
 
-					 if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
-						fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
-					end
+                     if _radio.secFreq > 100 then
+                        fullMessage = fullMessage.." G"
+                     end
 
-					local tuned = _radioState.TunedClients
+                     if _radio.channel >= 0 then
+                        fullMessage = fullMessage.." C".._radio.channel
+                     end
 
-					if tuned then
-						local tunedRadio = tuned[_i]
+                     if _radio.enc and _radio.encKey > 0 then
+                        fullMessage = fullMessage.." E".._radio.encKey
+                     end
 
-						if tunedRadio > 0 then
-							fullMessage  = fullMessage.." ⚡"..tunedRadio
-						end
+                     if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+                        fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+                    end
 
-					end
+                    local tuned = _radioState.TunedClients
 
-			end
+                    if tuned then
+                        local tunedRadio = tuned[_i]
 
-			local _selected = _i == (_radioInfo.selected+1)
+                        if tunedRadio > 0 then
+                            fullMessage  = fullMessage.." ⚡"..tunedRadio
+                        end
 
-			if _selected then
-				fullMessage = fullMessage.." *"
+                    end
+
+            end
+
+            local _selected = _i == (_radioInfo.selected+1)
+
+            if _selected then
+                fullMessage = fullMessage.." *"
 
                 if _radioState.RadioSendingState
                         and _radioState.RadioSendingState.SendingOn == _i -1
                         and _radioState.RadioSendingState.IsSending then
 
                     fullMessage = fullMessage.." +TR"
-				end
+                end
              elseif _radioState.RadioSendingState 
                 and  _radioState.RadioSendingState.IsSending 
                 and  _radio.simul 
@@ -195,12 +253,14 @@ function srsOverlay.updateRadio()
             end
 
 
-			local msg = {message = fullMessage, skin =_skin, height = 20 }
+            local msg = {message = fullMessage, skin =_skin, height = 20 }
 
 
-			table.insert(_listMessages, msg)
-		end
-	end
+            table.insert(_listMessages, msg)
+        end
+
+        
+    end
 
     srsOverlay.paintRadio()
 end
@@ -286,7 +346,7 @@ function srsOverlay.createWindow()
     
     _listStatics = {}
     
-    for i = 1, 5 do
+    for i = 1, 6 do
         local staticNew = Static.new()
         table.insert(_listStatics, staticNew)
         box:insertWidget(staticNew)
@@ -390,7 +450,7 @@ function srsOverlay.onHotkey()
         srsOverlay.setMode(_modes.minimum)
     elseif (srsOverlay.getMode() == _modes.minimum) then
         srsOverlay.setMode(_modes.minimum_vol)
-	elseif (srsOverlay.getMode() == _modes.minimum_vol) then
+    elseif (srsOverlay.getMode() == _modes.minimum_vol) then
         srsOverlay.setMode(_modes.hidden)
     else
         srsOverlay.setMode(_modes.full)
@@ -434,23 +494,23 @@ function srsOverlay.listen()
 
     if _received then
 
-	--KNOWN BUG - Hitting Left Control + Windows Key + L causes lag
-	-- Fix by disabling overlay or hitting L CNTRL + L SHIFT + L
-		if srsOverlay.getMode() ~= _modes.hidden then
-			local _decoded = JSON:decode(_received)
+    --KNOWN BUG - Hitting Left Control + Windows Key + L causes lag
+    -- Fix by disabling overlay or hitting L CNTRL + L SHIFT + L
+        if srsOverlay.getMode() ~= _modes.hidden then
+            local _decoded = JSON:decode(_received)
 
-		  --srsOverlay.log(_received)
+          --srsOverlay.log(_received)
 
-			if _decoded then
+            if _decoded then
 
-				_lastReceived  = os.clock()
+                _lastReceived  = os.clock()
 
-				_radioState = _decoded
+                _radioState = _decoded
 
-				return true
-			end
+                return true
+            end
 
-		end
+        end
     end
 
     return false

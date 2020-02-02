@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
@@ -273,8 +274,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 {
                     _newAircraftCallback(message.unit);
                 }
+
+                playerRadioInfo.iff = message.iff;
             }
 
+            //TODO tidy up the IFF handling and this giant function in general as its silly big :(
+            if (message.iff.control == IFF.IFFControlMode.COCKPIT)
+            {
+                playerRadioInfo.iff = message.iff;
+            }
 
             if (overrideFreqAndVol)
             {

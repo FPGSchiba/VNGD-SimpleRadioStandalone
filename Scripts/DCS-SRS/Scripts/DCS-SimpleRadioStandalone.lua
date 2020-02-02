@@ -114,7 +114,16 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
-                --_update.iff = {mode=3,key="123",control=0}
+
+-- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
+-- M1:-1 = OFF, any other number on 
+-- M3: -1 = OFF, any other number on 
+-- M4: 1 = ON or 0 = OFF
+-- EXPANSION: only enabled if IFF Expansion is enabled
+-- CONTROL: 0 - COCKPIT / Realistic, 1 - OVERLAY / SRS, 
+--IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
+
+                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=true}
 
                 SR.lastKnownPos = _update.pos
 
@@ -166,7 +175,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioEagleII(_update)
                 elseif _update.unit == "M-2000C" then
                     _update = SR.exportRadioM2000C(_update)
-				elseif _update.unit == "JF-17"  then
+                elseif _update.unit == "JF-17"  then
                     _update = SR.exportRadioJF17(_update)
                 elseif _update.unit == "AV8BNA" then
                     _update = SR.exportRadioAV8BNA(_update)
@@ -225,6 +234,7 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                     _update.control = 0;
                     _update.selected = 1
+                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
                 end
 
                 _lastUnitId = _update.unitId
@@ -256,7 +266,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                         { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false },
                         { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false },
                     },
-                    radioType = 3
+                    radioType = 3,
+                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
                 }
 
                 _lastUnitId = ""
@@ -1247,6 +1258,52 @@ function SR.exportRadioA10C(_data)
 
     _data.control = 0 -- HOTAS Controls - set to 1 for DCS PTT & Select controls
 
+    -- Handle iff
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(200,0.1)
+    SR.log(iffPower.." iffPower\n\n") -- 0 is
+
+    local iffIdent =  SR.getButtonPosition(207) -- -1 is off 0 or more is on
+
+    --SR.log(iffIdent.." iffIdent\n\n") -- 0 is
+    if iffPower >= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+    end
+    
+    local mode1On =  SR.getButtonPosition(202)
+    -- SR.log(mode1On.." mode1On\n\n") -- -1 is off 0 or more is on
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
+    
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(204)
+    -- SR.log(mode3On.." mode3On\n\n") -- -1 is off 0 or more is on
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
+    
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(208)
+
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
+
+    SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
     return _data
 end
 
@@ -2033,7 +2090,7 @@ end
 
 function SR.exportRadioJF17(_data)
 
-	_data.radios[2].name = "COMM1 VHF Radio"
+    _data.radios[2].name = "COMM1 VHF Radio"
     _data.radios[2].freq = SR.getRadioFrequency(25)
     _data.radios[2].modulation = SR.getRadioModulation(25)
     _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
@@ -2073,7 +2130,7 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[2].freq = SR.getRadioFrequency(2)
     _data.radios[2].modulation = SR.getRadioModulation(2)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
-	_data.radios[2].guardFreqMode = 1
+    _data.radios[2].guardFreqMode = 1
     _data.radios[2].secFreq = 243.0 * 1000000
 
     -- get channel selector
