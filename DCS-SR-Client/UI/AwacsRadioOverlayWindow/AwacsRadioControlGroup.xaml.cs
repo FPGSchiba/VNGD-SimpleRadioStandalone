@@ -221,56 +221,68 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 PresetChannelsView.IsEnabled = true;
 
-                if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
+                if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl ==
+                    DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
                 {
-                    int simulTransmission = 0;
-                    for (int i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
+                    if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission 
+                        && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
                     {
-                        if (_clientStateSingleton.DcsPlayerRadioInfo.radios[i].simul)
+                        int simulTransmission = 0;
+                        for (int i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
                         {
-                            if (i != RadioId)
+                            if (_clientStateSingleton.DcsPlayerRadioInfo.radios[i].simul)
                             {
-                                simulTransmission++;
+                                if (i != RadioId)
+                                {
+                                    simulTransmission++;
+                                }
                             }
                         }
-                    }
 
-                    if (simulTransmission < MaxSimultaneousTransmissions)
-                    {
-                        ToggleSimultaneousTransmissionButton.IsEnabled = true;
+                        if (simulTransmission < MaxSimultaneousTransmissions)
+                        {
+                            ToggleSimultaneousTransmissionButton.IsEnabled = true;
+                        }
+                        else
+                        {
+                            ToggleSimultaneousTransmissionButton.IsEnabled = false;
+                            ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
+                        }
+
                     }
                     else
                     {
                         ToggleSimultaneousTransmissionButton.IsEnabled = false;
                         ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
                     }
-
                 }
                 else
                 {
+                    Up10.Visibility = Visibility.Hidden;
+                    Up1.Visibility = Visibility.Hidden;
+                    Up01.Visibility = Visibility.Hidden;
+                    Up001.Visibility = Visibility.Hidden;
+                    Up0001.Visibility = Visibility.Hidden;
+
+                    Down10.Visibility = Visibility.Hidden;
+                    Down1.Visibility = Visibility.Hidden;
+                    Down01.Visibility = Visibility.Hidden;
+                    Down001.Visibility = Visibility.Hidden;
+                    Down0001.Visibility = Visibility.Hidden;
+
+                    PresetChannelsView.IsEnabled = false;
+
                     ToggleSimultaneousTransmissionButton.IsEnabled = false;
                     ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
                 }
             }
             else
             {
-                Up10.Visibility = Visibility.Hidden;
-                Up1.Visibility = Visibility.Hidden;
-                Up01.Visibility = Visibility.Hidden;
-                Up001.Visibility = Visibility.Hidden;
-                Up0001.Visibility = Visibility.Hidden;
-
-                Down10.Visibility = Visibility.Hidden;
-                Down1.Visibility = Visibility.Hidden;
-                Down01.Visibility = Visibility.Hidden;
-                Down001.Visibility = Visibility.Hidden;
-                Down0001.Visibility = Visibility.Hidden;
-
-                PresetChannelsView.IsEnabled = false;
-
                 ToggleSimultaneousTransmissionButton.IsEnabled = false;
                 ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
             }
+
+                
         }
 
         internal void RepaintRadioStatus()

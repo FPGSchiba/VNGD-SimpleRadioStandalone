@@ -103,7 +103,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if (dcsPlayerRadioInfo != null)
             {
-                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent())
+                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent() 
+                                                      && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
                 {
                     ToggleGlobalSimultaneousTransmissionButton.IsEnabled = true;
 
@@ -121,13 +122,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     ToggleGlobalSimultaneousTransmissionButton.IsEnabled = false;
                     ToggleGlobalSimultaneousTransmissionButton.Content = "Simul. Transmission OFF";
-
-                    dcsPlayerRadioInfo.simultaneousTransmission = false;
-
-                    foreach (var radio in dcsPlayerRadioInfo.radios)
-                    {
-                        radio.simul = false;
-                    }
                 }
             }
         }

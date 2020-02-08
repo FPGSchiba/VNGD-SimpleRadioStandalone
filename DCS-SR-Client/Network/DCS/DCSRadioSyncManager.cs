@@ -106,6 +106,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         selected = 1,
                         latLng = new DCSLatLngPosition(),
                         simultaneousTransmission = false,
+                        simultaneousTransmissionControl = DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS,
                         unit = "External AWACS",
                         unitId = 100000001,
                         inAircraft = false

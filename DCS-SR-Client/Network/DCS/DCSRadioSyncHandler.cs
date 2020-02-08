@@ -245,6 +245,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 playerRadioInfo.control = message.control;
             }
 
+            playerRadioInfo.simultaneousTransmissionControl = message.simultaneousTransmissionControl;
+
             playerRadioInfo.unit = message.unit;
 
 
@@ -350,11 +352,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = updateRadio.freqMin;
                     clientRadio.freqMax = updateRadio.freqMax;
 
+                    if (playerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL)
+                    { 
+                        clientRadio.simul = updateRadio.simul;
+                    }
+
                     if (updateRadio.simul)
                     {
                         simul = true;
                     }
-                    clientRadio.simul = updateRadio.simul;
 
                     clientRadio.name = updateRadio.name;
 
@@ -498,7 +504,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 }
             }
 
-            playerRadioInfo.simultaneousTransmission = simul;
+
+            if (playerRadioInfo.simultaneousTransmissionControl ==
+                DCSPlayerRadioInfo.SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL)
+            {
+                playerRadioInfo.simultaneousTransmission = simul;
+            }
 
             //change PTT last
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))

@@ -34,6 +34,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         public bool simultaneousTransmission = false; // Global toggle enabling simultaneous transmission on multiple radios, activated via the AWACS panel
 
+        public SimultaneousTransmissionControl simultaneousTransmissionControl =
+            SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
+
+        public enum SimultaneousTransmissionControl
+        {
+            ENABLED_INTERNAL_SRS_CONTROLS = 1,
+            EXTERNAL_DCS_CONTROL = 0,
+        }
+
         public DCSPlayerRadioInfo()
         {
             for (var i = 0; i < 11; i++)
@@ -54,6 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             selected = 0;
             unit = "";
             simultaneousTransmission = false;
+            simultaneousTransmissionControl = SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
             LastUpdate = 0;
         }
 

@@ -98,6 +98,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     name = "",
                     unit = "",
                     selected = 1,
+					simultaneousTransmissionControl = 0,
                     unitId = 0,
                     ptt = false,
                     radios = {
@@ -250,6 +251,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "CA",
                     selected = 1,
                     ptt = false,
+					simultaneousTransmissionControl = 1,
                     pos = { x = 0, y = 0, z = 0 },
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
