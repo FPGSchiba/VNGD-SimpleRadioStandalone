@@ -87,6 +87,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Intercom.RepaintRadioStatus();
 
+            TransponderPanel.RepaintTransponderStatus();
+
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {

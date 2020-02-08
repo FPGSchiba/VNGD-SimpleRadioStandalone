@@ -14,7 +14,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
             -- M3: -1 = OFF, any other number on 
             -- M4: 1 = ON or 0 = OFF
             -- EXPANSION: only enabled if IFF Expansion is enabled
-            -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, DISABLED / NOT FITTED AT ALL
+            -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
             -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
          */
 

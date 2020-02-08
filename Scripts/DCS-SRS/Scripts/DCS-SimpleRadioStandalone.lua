@@ -116,15 +116,15 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
 
--- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
--- M1:-1 = OFF, any other number on 
--- M3: -1 = OFF, any other number on 
--- M4: 1 = ON or 0 = OFF
--- EXPANSION: only enabled if IFF Expansion is enabled
--- CONTROL: 0 - COCKPIT / Realistic, 1 - OVERLAY / SRS, 
---IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
+			-- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
+            -- M1:-1 = off, any other number on 
+            -- M3: -1 = OFF, any other number on 
+            -- M4: 1 = ON or 0 = OFF
+            -- EXPANSION: only enabled if IFF Expansion is enabled
+            -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
+            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
 
-                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=true}
+                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false}
 
                 SR.lastKnownPos = _update.pos
 
@@ -1260,7 +1260,7 @@ function SR.exportRadioA10C(_data)
 
     _data.control = 0 -- HOTAS Controls - set to 1 for DCS PTT & Select controls
 
-    -- Handle iff
+    -- Handle transponder
     
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
