@@ -41,5 +41,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
         public bool mode4 = false;
 
         public IFFStatus status = IFFStatus.OFF;
+
+        public override bool Equals(object obj)
+        {
+            if ((obj == null) || (GetType() != obj.GetType()))
+                return false;
+
+            var compare = (IFF)obj;
+
+
+            if (mode1 != compare.mode1)
+            {
+                return false;
+            }
+
+            if (mode3 != compare.mode3)
+            {
+                return false;
+            }
+
+            if (mode4 != compare.mode4)
+            {
+                return false;
+            }
+
+            if (status != compare.status)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

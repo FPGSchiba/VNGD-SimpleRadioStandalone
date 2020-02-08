@@ -601,7 +601,7 @@ namespace Installer
                 //check for config/network.vault and options.lua
                 var network = directory + "\\config\\network.vault";
                 var config = directory + "\\config\\options.lua";
-                if (File.Exists(network) && File.Exists(config))
+                if (File.Exists(network) && File.Exists(config) && directory.ToUpper().StartsWith("DCS"))
                 {
                     Logger.Info($"Found DCS Saved Games Path {directory}");
                     paths.Add(directory);

@@ -101,6 +101,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                     return false;
                 }
 
+                if (((iff == null) || (compareRadio.iff == null)))
+                {
+                    return false;
+                }
+                else
+                {
+                    //check iff
+                    if (!iff.Equals(compareRadio.iff))
+                    {
+                        return false;
+                    }
+                }
+
                 for (var i = 0; i < radios.Length; i++)
                 {
                     var radio1 = radios[i];

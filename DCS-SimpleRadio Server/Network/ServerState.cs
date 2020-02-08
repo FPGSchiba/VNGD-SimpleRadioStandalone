@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -119,8 +121,79 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             Logger.Error(e);
                         }
+
                     }
                     Thread.Sleep(5000);
+                }
+            });
+
+            var udpSocket = new UdpClient();
+           
+
+            Task.Factory.StartNew(() =>
+            {
+                using (udpSocket)
+                {
+                    while (!_stop)
+                    {
+                        try
+                        {
+                            if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_ENABLED)
+                                .BoolValue)
+                            {
+                                var host = new IPEndPoint(IPAddress.Loopback,
+                                    ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_PORT).IntValue);
+
+                                ClientListExport data = new ClientListExport { ServerVersion = UpdaterChecker.VERSION, Clients = new List<SRClient>()};
+
+                                foreach (var srClient in _connectedClients.Values)
+                                {
+
+                                    if (srClient.isCurrent())
+                                    {
+                                        data.Clients.Add(new SRClient()
+                                        {
+                                            ClientGuid = srClient.ClientGuid,
+                                            RadioInfo = new DCSPlayerRadioInfo()
+                                            {
+                                                radios = null,
+                                                unitId = srClient.RadioInfo.unitId,
+                                                iff = srClient.RadioInfo.iff,
+                                                unit = srClient.RadioInfo.unit,
+                                                latLng = null,
+                                            },
+                                            Coalition = srClient.Coalition,
+                                            Name = srClient.Name,
+                                            Position = srClient.Position,
+                                            LatLngPosition = srClient.LatLngPosition
+                                        });
+                                    }
+                                }
+                                
+
+                                var byteData =
+                                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\n");
+
+                                udpSocket.Send(byteData, byteData.Length, host);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, "Exception Sending LotATC Client Info");
+                        }
+
+                        //every 2s
+                        Thread.Sleep(2000);
+                    }
+
+                    try
+                    {
+                        udpSocket.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Exception stoping LotATC Client Info");
+                    }
                 }
             });
         }
