@@ -126,7 +126,7 @@ function srsOverlay.updateRadio()
 
             if _radioInfo.iff.status == 1 or _radioInfo.iff.status == 2 then
 
-                local _iff = "IFF:"
+                local _iff = "TRANS:"
 
                 if _radioInfo.iff.status == 2 then
                     _iff = _iff .. " IDENT"
@@ -159,8 +159,8 @@ function srsOverlay.updateRadio()
             else
 
                 if _radioInfo.iff.status == 0 then
-                    local _iffMsg = {message = "IFF: OFF", skin = typesMessage.normal, height = 20 }
-                    table.insert(_listMessages, _iffMsg)
+                   -- local _iffMsg = {message = "TRANS: OFF", skin = typesMessage.normal, height = 20 }
+                  --  table.insert(_listMessages, _iffMsg)
                       -- srsOverlay.log("Added IFF Message OFF")
                 else
                    --    srsOverlay.log("IGNORED IFF Message")
