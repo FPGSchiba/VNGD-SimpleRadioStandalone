@@ -5,29 +5,25 @@
         xmlns:local="clr-namespace:Installer"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="DCS-SRS Installer"
-        Width="450"
-        Height="340"
+        Width="477.346"
+        Height="408.114"
         ResizeMode="NoResize"
         mc:Ignorable="d">
-    <Grid Name="containerPanel">
+    <Grid Name="containerPanel" Margin="0,0,4,0">
         <Label x:Name="intro"
-               Width="422"
-               Margin="10,3,0,0"
-               HorizontalAlignment="Left"
+               Margin="10,3,10,0"
                VerticalAlignment="Top"
                Content="SimpleRadio Standalone Installer -"
                FontSize="20" />
 
         <Label x:Name="step2"
-               Width="422"
-               Margin="10,45,0,0"
-               HorizontalAlignment="Left"
+               Margin="10,45,10,0"
                VerticalAlignment="Top"
                Content="Step 1: Pick Install Location"
                FontSize="20" />
 
         <TextBox x:Name="srPath"
-                 Width="290"
+                 Width="330"
                  Height="23"
                  Margin="10,87,0,0"
                  HorizontalAlignment="Left"
@@ -36,32 +32,30 @@
                  TextWrapping="Wrap" />
         <Button x:Name="srPathButton"
                 Width="75"
-                Margin="337,87,0,0"
+                Margin="365,87,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="Set_Install_Path"
                 Content="Locate" />
 
         <Label x:Name="step3"
-               Width="422"
-               Margin="10,120,0,0"
-               HorizontalAlignment="Left"
+               Margin="10,120,10,0"
                VerticalAlignment="Top"
                Content="Step 2: Locate Saved Games Folder - Not DCS"
                FontSize="20" />
 
 
         <TextBox x:Name="dcsScriptsPath"
-                 Width="290"
+                 Width="330"
                  Height="23"
-                 Margin="10,160,0,0"
+                 Margin="10,197,0,0"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
                  Text="Saved Games"
                  TextWrapping="Wrap" />
         <Button x:Name="dcsPathButton"
                 Width="75"
-                Margin="337,161,0,0"
+                Margin="365,198,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="Set_Scripts_Path"
@@ -72,12 +66,12 @@
                   HorizontalAlignment="Center"
                   Width="165"
                   Height="20"
-                  Margin="137,254,137,37"
+                  Margin="146,322,133,37"
                   IsChecked="True" />
 
         <Button x:Name="InstallButton"
                 Width="197"
-                Margin="10,280,0,0"
+                Margin="17,347,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="InstallReleaseButton"
@@ -85,23 +79,39 @@
         <GridSplitter x:Name="gridSplitter"
                       Width="5"
                       Height="20"
-                      Margin="212,280,0,0"
+                      Margin="232,347,0,0"
                       HorizontalAlignment="Left"
                       VerticalAlignment="Top" />
         <Button x:Name="RemoveButton"
                 Width="206"
-                Margin="222,280,0,0"
+                Margin="251,347,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Click="Remove_Plugin"
                 Content="Remove DCS-SRS" />
-        <Label Width="422"
-               Height="69"
-               Margin="10,189,0,0"
+        <Label Width="447"
+               Height="40"
+               Margin="10,223,0,0"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
-               Content="Step 3: Install Or Remove DCS-SRS&#xD;&#xA;No Need to install on Dedicated Servers."
+               Content="Step 3: Install Or Remove DCS-SRS"
                FontSize="20" />
+        <CheckBox x:Name="InstallScriptsCheckbox"
+            Content="Install DCS Client Scripts - Only required for SRS Client NOT Server Only Installs"
+            Height="20"
+            Margin="17,162,10,197"
+            IsChecked="True"
+            Checked="InstallScriptsCheckbox_OnChecked"
+            Unchecked="InstallScriptsCheckbox_OnUnchecked"/>
+        <TextBlock Width="438"
+                   IsEnabled="False"
+            Height="60"
+            Margin="10,257,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontSize="12"
+            TextWrapping="Wrap"
+            ><Run Text="Please Note: Server installs will need to manually install the DCS-SRS-AutoConnectGameGUI.lua - found in the SRS Install Location in the Scripts folder. Installation instructions are "/><Run Text="in"/><Run Text=" the file."/></TextBlock>
 
     </Grid>
 </Window>

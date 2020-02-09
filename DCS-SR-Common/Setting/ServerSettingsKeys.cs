@@ -28,6 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         SHOW_TUNED_COUNT = 17,
         GLOBAL_LOBBY_FREQUENCIES = 18,
         SHOW_TRANSMITTER_NAME = 19,
+        LOTATC_EXPORT_ENABLED = 20,
+        LOTATC_EXPORT_PORT = 21,
     }
 
     public class DefaultServerSettings
@@ -51,9 +53,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" },
             { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "true" },
             { ServerSettingsKeys.TEST_FREQUENCIES.ToString(), "247.2,120.3" },
-            { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "false" },
+            { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "true" },
             { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.22" },
-            { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
+            { ServerSettingsKeys.LOTATC_EXPORT_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.LOTATC_EXPORT_PORT.ToString(), "10712" },
         };
     }
 }

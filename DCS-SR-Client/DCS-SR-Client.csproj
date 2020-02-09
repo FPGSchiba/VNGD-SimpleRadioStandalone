@@ -221,6 +221,9 @@
     <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
+    <Compile Include="UI\RadioOverlayWindow\TransponderPanel.xaml.cs">
+      <DependentUpon>TransponderPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
@@ -277,6 +280,10 @@
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\RadioOverlayWindow\TransponderPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ClientWindow\InputBindingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

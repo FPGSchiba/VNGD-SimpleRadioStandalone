@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
@@ -244,6 +245,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 playerRadioInfo.control = message.control;
             }
 
+            playerRadioInfo.simultaneousTransmissionControl = message.simultaneousTransmissionControl;
+
             playerRadioInfo.unit = message.unit;
 
 
@@ -273,8 +276,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 {
                     _newAircraftCallback(message.unit);
                 }
+
+                playerRadioInfo.iff = message.iff;
             }
 
+            //TODO tidy up the IFF handling and this giant function in general as its silly big :(
+            if (message.iff.control == IFF.IFFControlMode.COCKPIT)
+            {
+                playerRadioInfo.iff = message.iff;
+            }
 
             if (overrideFreqAndVol)
             {
@@ -342,11 +352,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = updateRadio.freqMin;
                     clientRadio.freqMax = updateRadio.freqMax;
 
+                    if (playerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL)
+                    { 
+                        clientRadio.simul = updateRadio.simul;
+                    }
+
                     if (updateRadio.simul)
                     {
                         simul = true;
                     }
-                    clientRadio.simul = updateRadio.simul;
 
                     clientRadio.name = updateRadio.name;
 
@@ -490,7 +504,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 }
             }
 
-            playerRadioInfo.simultaneousTransmission = simul;
+
+            if (playerRadioInfo.simultaneousTransmissionControl ==
+                DCSPlayerRadioInfo.SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL)
+            {
+                playerRadioInfo.simultaneousTransmission = simul;
+            }
 
             //change PTT last
             if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))

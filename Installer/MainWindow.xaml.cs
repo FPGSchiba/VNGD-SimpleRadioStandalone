@@ -21,6 +21,7 @@ using NLog.Targets.Wrappers;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using File = System.IO.File;
+using ThreadState = System.Diagnostics.ThreadState;
 
 namespace Installer
 {
@@ -105,6 +106,20 @@ namespace Installer
                         Application.Current.Dispatcher?.Invoke(() =>
                             {
                                 Logger.Info("Silent Installer Running");
+                                var result = MessageBox.Show(
+                                    "Do you want to install the SRS Scripts required for the SRS Client to DCS?\n\nThis scripts are NOT required if you plan to just host a Server on this machine or use SRS without DCS. \n\nEAM mode can be used to use SRS with any game",
+                                    "Install Scripts?",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                                if (result == MessageBoxResult.Yes)
+                                {
+                                    InstallScriptsCheckbox.IsChecked = true;
+                                }
+                                else
+                                {
+                                    InstallScriptsCheckbox.IsChecked = false;
+                                }
+
                                 InstallReleaseButton(null, null);
                             }
                         ); //end-invoke
@@ -214,6 +229,12 @@ namespace Installer
             var dcScriptsPath = dcsScriptsPath.Text;
             var shortcut = CreateStartMenuShortcut.IsChecked ?? true;
 
+            if ((bool) !InstallScriptsCheckbox.IsChecked)
+            {
+                dcScriptsPath = null;
+            }
+
+
             new Action(async () =>
             {
                 int result = await Task.Run<int>(() => InstallRelease(srsPath,dcScriptsPath, shortcut));
@@ -262,33 +283,43 @@ namespace Installer
             {
                 QuitSimpleRadio();
 
-                var paths = FindValidDCSFolders(dcsScriptsPath);
-
-                if (paths.Count == 0)
+                var paths = new List<string>();
+                if (dcsScriptsPath != null)
                 {
+                    paths = FindValidDCSFolders(dcsScriptsPath);
 
-                    MessageBox.Show(
-                        "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
-                        "SR Standalone Installer",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                    return 0;
+                    if (paths.Count == 0)
+                    {
+
+                        MessageBox.Show(
+                            "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
+                            "SR Standalone Installer",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        return 0;
+                    }
+
+                    Logger.Info($"Installing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
+
+                    ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
+                    ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
+
+                    foreach (var path in paths)
+                    {
+                        InstallScripts(path);
+                    }
                 }
-
-                Logger.Info($"Installing - Paths: \nProgram:{srPath} \nDCS:{dcsScriptsPath} ");
-
-                ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
-                ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
-
-                foreach (var path in paths)
+                else
                 {
-                    InstallScripts(path);
+                    Logger.Info($"Installing - Paths: \nProgram:{srPath} DCS: NO PATH - NO SCRIPTS");
                 }
 
                 //install program
                 InstallProgram(srPath);
 
                 WritePath(srPath, "SRPathStandalone");
-                WritePath(dcsScriptsPath, "ScriptsPath");
+
+                if(dcsScriptsPath!=null)
+                    WritePath(dcsScriptsPath, "ScriptsPath");
 
                 if (shortcut)
                 {
@@ -297,15 +328,26 @@ namespace Installer
 
                 InstallVCRedist();
 
-                string message = "Installation / Update Completed Successfully!\nInstalled DCS Scripts to: \n";
-
-                foreach (var path in paths)
+                if (dcsScriptsPath != null)
                 {
-                    message += ("\n" + path);
-                }
+                    string message = "Installation / Update Completed Successfully!\nInstalled DCS Scripts to: \n";
 
-                MessageBox.Show(message, "SR Standalone Installer",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                    foreach (var path in paths)
+                    {
+                        message += ("\n" + path);
+                    }
+
+                    MessageBox.Show(message, "SR Standalone Installer",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    string message = "Installation / Update Completed Successfully!";
+
+                    MessageBox.Show(message, "SR Standalone Installer",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                    
 
                 return 1;
 
@@ -539,8 +581,23 @@ namespace Installer
             {
                 if (clsProcess.ProcessName.ToLower().Trim().Equals("dcs"))
                 {
-                    Logger.Info($"DCS is running");
-                    return true;
+                    bool suspended = true;
+                    foreach (var thread in clsProcess.Threads)
+                    {
+                        var t = (System.Diagnostics.ProcessThread)thread;
+
+                        if (t.ThreadState == ThreadState.Wait && t.WaitReason == ThreadWaitReason.Suspended)
+                        {
+                            Logger.Info($"DCS thread is suspended");
+                        }
+                        else
+                        {
+                            Logger.Info($"DCS thread is not suspended");
+                            suspended = false;
+                        }
+                    }
+
+                    return !suspended;
                 }
             }
 
@@ -598,14 +655,18 @@ namespace Installer
 
             foreach (var directory in Directory.EnumerateDirectories(path))
             {
-                //check for config/network.vault and options.lua
-                var network = directory + "\\config\\network.vault";
-                var config = directory + "\\config\\options.lua";
-                if (File.Exists(network) || File.Exists(config))
+                if (directory.ToUpper().Contains("DCS.") || directory.ToUpper().EndsWith("DCS"))
                 {
-                    Logger.Info($"Found DCS Saved Games Path {directory}");
-                    paths.Add(directory);
+                    //check for config/network.vault and options.lua
+                    var network = directory + "\\config\\network.vault";
+                    var config = directory + "\\config\\options.lua";
+                    if (File.Exists(network) && File.Exists(config))
+                    {
+                        Logger.Info($"Found DCS Saved Games Path {directory}");
+                        paths.Add(directory);
+                    }
                 }
+               
             }
 
             Logger.Info($"Finished Finding DCS Saved Games Path");
@@ -950,6 +1011,18 @@ namespace Installer
 
             }
             Environment.Exit(0);
+        }
+
+        private void InstallScriptsCheckbox_OnChecked(object sender, RoutedEventArgs e)
+        {
+            dcsScriptsPath.IsEnabled = true;
+
+        }
+
+        private void InstallScriptsCheckbox_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            dcsScriptsPath.IsEnabled = false;
+
         }
     }
 }

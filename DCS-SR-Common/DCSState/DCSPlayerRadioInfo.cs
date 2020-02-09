@@ -27,10 +27,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public uint unitId;
         public bool intercomHotMic = false; //if true switch to intercom and transmit
 
+        public IFF iff = new IFF();
+
         public readonly static uint UnitIdOffset = 100000001
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
         public bool simultaneousTransmission = false; // Global toggle enabling simultaneous transmission on multiple radios, activated via the AWACS panel
+
+        public SimultaneousTransmissionControl simultaneousTransmissionControl =
+            SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
+
+        public enum SimultaneousTransmissionControl
+        {
+            ENABLED_INTERNAL_SRS_CONTROLS = 1,
+            EXTERNAL_DCS_CONTROL = 0,
+        }
 
         public DCSPlayerRadioInfo()
         {
@@ -52,6 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             selected = 0;
             unit = "";
             simultaneousTransmission = false;
+            simultaneousTransmissionControl = SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
             LastUpdate = 0;
         }
 
@@ -87,6 +99,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 if (unitId != compareRadio.unitId)
                 {
                     return false;
+                }
+
+                if (((iff == null) || (compareRadio.iff == null)))
+                {
+                    return false;
+                }
+                else
+                {
+                    //check iff
+                    if (!iff.Equals(compareRadio.iff))
+                    {
+                        return false;
+                    }
                 }
 
                 for (var i = 0; i < radios.Length; i++)
