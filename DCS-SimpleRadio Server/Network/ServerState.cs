@@ -161,11 +161,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 iff = srClient.RadioInfo.iff,
                                                 unit = srClient.RadioInfo.unit,
                                                 latLng = null,
+                                                inAircraft = srClient.RadioInfo.inAircraft,
                                             },
                                             Coalition = srClient.Coalition,
                                             Name = srClient.Name,
                                             Position = srClient.Position,
-                                            LatLngPosition = srClient.LatLngPosition
+                                            LatLngPosition = srClient.LatLngPosition,
                                         });
                                     }
                                 }

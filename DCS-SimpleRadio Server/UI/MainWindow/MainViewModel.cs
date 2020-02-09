@@ -191,6 +191,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 
         public string TunedCountText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT).BoolValue ? "ON" : "OFF";
+
+        public string LotATCExportText
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_ENABLED).BoolValue ? "ON" : "OFF";
         public string ListeningPort
             => ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.SERVER_PORT).StringValue;
 
@@ -371,6 +374,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             var newSetting = TunedCountText != "ON";
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT, newSetting);
             NotifyOfPropertyChange(() => TunedCountText);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void LotATCExportToggle()
+        {
+            var newSetting = LotATCExportText != "ON";
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_ENABLED, newSetting);
+            NotifyOfPropertyChange(() => LotATCExportText);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
