@@ -154,16 +154,16 @@ function srsOverlay.updateRadio()
 
                 table.insert(_listMessages, _iffMsg)
 
-                   srsOverlay.log("Added IFF Message")
+               --    srsOverlay.log("Added IFF Message")
 --
             else
 
                 if _radioInfo.iff.status == 0 then
                     local _iffMsg = {message = "IFF: OFF", skin = typesMessage.normal, height = 20 }
                     table.insert(_listMessages, _iffMsg)
-                       srsOverlay.log("Added IFF Message OFF")
+                      -- srsOverlay.log("Added IFF Message OFF")
                 else
-                       srsOverlay.log("IGNORED IFF Message")
+                   --    srsOverlay.log("IGNORED IFF Message")
                 end
                 --ELSE DISABLED so dont show
             end         
