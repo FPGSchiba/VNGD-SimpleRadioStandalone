@@ -98,7 +98,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     name = "",
                     unit = "",
                     selected = 1,
-					simultaneousTransmissionControl = 0,
+                    simultaneousTransmissionControl = 0,
                     unitId = 0,
                     ptt = false,
                     radios = {
@@ -116,15 +116,16 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
 
-			-- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
+            -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
             -- M1:-1 = off, any other number on 
             -- M3: -1 = OFF, any other number on 
             -- M4: 1 = ON or 0 = OFF
             -- EXPANSION: only enabled if IFF Expansion is enabled
             -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
-            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
+            -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
+            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
-                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false}
+                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
 
                 SR.lastKnownPos = _update.pos
 
@@ -235,7 +236,7 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                     _update.control = 0;
                     _update.selected = 1
-                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
+                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 end
 
                 _lastUnitId = _update.unitId
@@ -251,7 +252,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "CA",
                     selected = 1,
                     ptt = false,
-					simultaneousTransmissionControl = 1,
+                    simultaneousTransmissionControl = 1,
                     pos = { x = 0, y = 0, z = 0 },
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
@@ -269,7 +270,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                         { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false },
                     },
                     radioType = 3,
-                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
+                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 }
 
                 _lastUnitId = ""
@@ -781,6 +782,17 @@ function SR.exportRadioUH1H(_data)
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
+
+        -- MODE set to MIC
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                _data.iff.status = 2 -- IDENT due to MIC switch
+            end
+        end
+
     end
     
     local mode1On =  SR.getButtonPosition(61)
@@ -1316,6 +1328,18 @@ function SR.exportRadioA10C(_data)
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
     end
     
     local mode1On =  SR.getButtonPosition(202)
@@ -1345,7 +1369,7 @@ function SR.exportRadioA10C(_data)
          _data.iff.mode4 = false
     end
 
-    --SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
     return _data
 end
 

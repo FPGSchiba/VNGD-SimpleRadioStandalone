@@ -40,6 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
         public int mode3 = -1;
         public bool mode4 = false;
 
+        public int mic = -1;
+
         public IFFStatus status = IFFStatus.OFF;
 
         public override bool Equals(object obj)
