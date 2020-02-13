@@ -515,8 +515,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 playerRadioInfo.ptt = message.ptt;
             }
 
-            //HANDLE IFF UPDATE
-            //TODO tidy up the IFF handling and this giant function in general as its silly big :(
+            //HANDLE IFF/TRANSPONDER UPDATE
+            //TODO tidy up the IFF/Transponder handling and this giant function in general as its silly big :(
             if (message.iff.control == IFF.IFFControlMode.COCKPIT)
             {
                 playerRadioInfo.iff = message.iff;
