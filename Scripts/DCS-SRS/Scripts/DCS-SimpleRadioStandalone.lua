@@ -2317,6 +2317,47 @@ function SR.exportRadioM2000C(_data)
 
     _data.control = 0; -- partial radio, allows hotkeys
 
+    -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+
+    local iffIdent =  SR.getButtonPosition(383) -- -1 is off 0 or more is on
+
+    -- No power switch - always on
+    _data.iff.status = 1 -- NORMAL
+
+    if iffIdent == 1 then
+        _data.iff.status = 2 -- IDENT (BLINKY THING)
+    end
+    
+    local mode1On =  SR.getButtonPosition(384)
+
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(377), 0.1)*100+SR.round(SR.getButtonPosition(378), 0.1)*10
+    
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(386)
+    
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(379), 0.1) * 10000 + SR.round(SR.getButtonPosition(380), 0.1) * 1000 + SR.round(SR.getButtonPosition(381), 0.1)* 100 + SR.round(SR.getButtonPosition(382), 0.1) * 10
+    
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10
+
+    if mode4On == 2 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
+
     return _data
 end
 

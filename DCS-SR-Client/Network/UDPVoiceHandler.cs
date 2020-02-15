@@ -142,8 +142,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _udpLastReceived = 0;
             _ready = false;
             _listener = new UdpClient();
-            _listener.AllowNatTraversal(true);
-           // _listener.Connect(_serverEndpoint);
+            try
+            {
+                _listener.AllowNatTraversal(true);
+            }
+            catch { }
+            // _listener.Connect(_serverEndpoint);
 
             //start 2 audio processing threads
             var decoderThread = new Thread(UdpAudioDecode);
