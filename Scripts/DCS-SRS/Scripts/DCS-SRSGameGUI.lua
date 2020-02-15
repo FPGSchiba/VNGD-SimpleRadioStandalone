@@ -123,7 +123,99 @@ SRS.sendConnect = function(_message)
     end
 end
 
+SRS.sendCommand = function(_message)
+
+    if SRS.unicast then
+        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.0.0.1", 9040))
+    else
+        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.255.255.255", 9040))
+    end
+end
+
+SRS.findCommandValue = function(key, list)
+
+	for index,str in pairs(list) do
+			
+		if str == key then
+			
+			return list[index+1]
+		end
+	end
+	return nil
+end
+
+SRS.handleTransponder = function(msg)
+
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
+
+	local commands = {}
+
+	--search for keys
+	for _,key in pairs(keys) do
+
+		local val = SRS.findCommandValue(key, split)
+
+		if val then
+			if key == "POWER" or key == "PWR" then
+				if val == "ON" then
+					table.insert(commands, {Command = 6, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 6, Enabled = false})
+				end
+			elseif key == "M1" then
+
+				if val == "OFF" then
+					table.insert(commands, {Command = 7, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 7, Code = code})
+					end
+				end
+			
+			elseif key == "M3" then
+				 if val == "OFF" then
+					table.insert(commands, {Command = 8, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 8, Code = code})
+					end
+				end
+
+			elseif key == "M4" then
+				if val == "ON" then
+					table.insert(commands, {Command = 9, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 9, Enabled = false})
+				end
+			elseif key == "IDENT" then
+				if val == "ON" then
+					table.insert(commands, {Command = 10, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 10, Enabled = false})
+				end
+			end
+		end
+	end
+
+	return commands
+
+end
+
 SRS.onChatMessage = function(msg, from)
+
 
     -- Only accept auto connect message coming from host.
     if SRS.CLIENT_ACCEPT_AUTO_CONNECT
@@ -142,8 +234,23 @@ SRS.onChatMessage = function(msg, from)
             end
 
         end
-        SRS.sendConnect(host)
+        SRS.sendConnect(host) 
     end
+
+    -- MESSAGE FROM MYSELF
+    if from == net.get_my_player_id() then
+		
+		msg = msg:upper()
+
+		if string.find(msg,"SRSTRANS",1,true) then
+			local commands = SRS.handleTransponder(msg) 
+
+			for _,command in pairs(commands) do
+				SRS.sendCommand(command)
+			end
+		end
+	end
+
 end
 
 

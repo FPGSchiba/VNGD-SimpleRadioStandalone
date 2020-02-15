@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() || dcsPlayerRadioInfo.iff == null || dcsPlayerRadioInfo.iff.control == IFF.IFFControlMode.DISABLED)
+            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() || dcsPlayerRadioInfo.iff == null || dcsPlayerRadioInfo.iff.control == Common.DCSState.Transponder.IFFControlMode.DISABLED)
             {
                 Mode1.IsEnabled = false;
                 Mode1.Text = "--";
@@ -74,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 var iff = dcsPlayerRadioInfo.iff;
 
-                if (iff.control != IFF.IFFControlMode.OVERLAY)
+                if (iff.control != Common.DCSState.Transponder.IFFControlMode.OVERLAY)
                 {
                     Mode1.IsEnabled = false;
                     Mode3.IsEnabled = false;
@@ -89,7 +89,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     Ident.IsEnabled = true;
                 }
 
-                if (iff.status == IFF.IFFStatus.OFF)
+                if (iff.status == Common.DCSState.Transponder.IFFStatus.OFF)
                 {
                     Mode1.Text = "--";
                     Mode3.Text = "--";
@@ -145,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                         Mode4Button.Foreground = new SolidColorBrush(Colors.Black);
                     }
 
-                    if (iff.status == IFF.IFFStatus.IDENT)
+                    if (iff.status == Common.DCSState.Transponder.IFFStatus.IDENT)
                     {
                         Ident.Foreground = _buttonOn;
                     }
@@ -165,21 +165,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 return;
             }
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (dcsPlayerRadioInfo.iff.status == IFF.IFFStatus.OFF)
+            if (TransponderHelper.TogglePower())
             {
-                dcsPlayerRadioInfo.iff.status = IFF.IFFStatus.NORMAL;
+                RepaintTransponderStatus();
             }
-            else
-            {
-                dcsPlayerRadioInfo.iff.status = IFF.IFFStatus.OFF;
-            }
-            
-            RepaintTransponderStatus();
-         
         }
-
 
         private void ModeOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
@@ -220,27 +210,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 return;
             }
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
+      
             int mode3 = 0;
             if (int.TryParse(Mode3.Text.Replace(',', '.').Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out mode3))
             {
-                var numberStr = Math.Abs(mode3).ToString().ToCharArray();
-
-                for (int i = 0; i < numberStr.Length; i++)
-                {
-                    if (int.Parse(numberStr[i].ToString()) > 7)
-                    {
-                        numberStr[i] = '7';
-                    }
-                }
-
-                dcsPlayerRadioInfo.iff.mode3 = int.Parse(new string(numberStr));
+                TransponderHelper.SetMode3(mode3);
             }
             else
             {
                 Mode1.Text = "--";
-                dcsPlayerRadioInfo.iff.mode3 = -1;
+                TransponderHelper.SetMode3(-1);
             }
 
         }
@@ -251,81 +230,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             {
                 return;
             }
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             int mode1 = 0;
             if (int.TryParse(Mode1.Text.Replace(',', '.').Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out mode1))
             {
-                //first digit 0-7 inc
-                //second 0-3 inc
-
-                int first = mode1 / 10;
-
-                if (first > 7)
-                {
-                    first = 7;
-                }
-
-                if (first < 0)
-                {
-                    first = 0;
-                }
-
-                int second = mode1 % 10;
-
-                if (second > 3)
-                {
-                    second = 3;
-                }
-
-                dcsPlayerRadioInfo.iff.mode1 = first * 10 + second;
+                TransponderHelper.SetMode1(mode1);
             }
             else
             {
                 Mode1.Text = "--";
-                dcsPlayerRadioInfo.iff.mode1 = -1;
+                TransponderHelper.SetMode1(-1);
             }
         }
 
         private void Mode4ButtonOnClick(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (!CanInteract() || dcsPlayerRadioInfo.iff.status == IFF.IFFStatus.OFF)
+            if (TransponderHelper.Mode4Toggle())
             {
-                return;
+                RepaintTransponderStatus();
             }
-
-            //flip
-            dcsPlayerRadioInfo.iff.mode4 = !dcsPlayerRadioInfo.iff.mode4;
-            RepaintTransponderStatus();
         }
 
         private void IdentButtonOnClick(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (!CanInteract() || dcsPlayerRadioInfo.iff.status == IFF.IFFStatus.OFF)
+            if (TransponderHelper.ToggleIdent())
             {
-                return;
+                RepaintTransponderStatus();
             }
-
-            if (dcsPlayerRadioInfo.iff.status == IFF.IFFStatus.NORMAL)
-            {
-                dcsPlayerRadioInfo.iff.status = IFF.IFFStatus.IDENT;
-            }
-            else
-            {
-                dcsPlayerRadioInfo.iff.status = IFF.IFFStatus.NORMAL;
-            }
-            RepaintTransponderStatus();
         }
 
         private bool CanInteract()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() || dcsPlayerRadioInfo.iff == null || dcsPlayerRadioInfo.iff.control != IFF.IFFControlMode.OVERLAY)
+            var trans = TransponderHelper.GetTransponder();
+           
+            if ((trans == null) || trans.control != Common.DCSState.Transponder.IFFControlMode.OVERLAY)
             {
                 return false;
             }

@@ -76,6 +76,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             {
                                 RadioHelper.SetRadioVolume(message.Volume, message.RadioId);
                             }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TRANSPONDER_POWER)
+                            {
+                                TransponderHelper.SetPower(message.Enabled);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TRANSPONDER_M1_CODE)
+                            {
+                                TransponderHelper.SetMode1(message.Code);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TRANSPONDER_M3_CODE)
+                            {
+                                TransponderHelper.SetMode3(message.Code);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TRANSPONDER_M4)
+                            {
+                                TransponderHelper.SetMode4(message.Enabled);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TRANSPONDER_IDENT)
+                            {
+                                TransponderHelper.SetIdent(message.Enabled);
+                            }
                             else
                             {
                                 Logger.Error("Unknown UDP Command!");

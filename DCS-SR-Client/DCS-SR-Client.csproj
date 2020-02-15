@@ -279,6 +279,7 @@
     <Compile Include="UI\ToolTips.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
+    <Compile Include="Utils\TransponderHelper.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
     <Page Include="UI\RadioOverlayWindow\TransponderPanel.xaml">
       <SubType>Designer</SubType>

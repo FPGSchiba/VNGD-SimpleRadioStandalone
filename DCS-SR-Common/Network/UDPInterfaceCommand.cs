@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
@@ -16,11 +17,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             CHANNEL_UP = 3,
             CHANNEL_DOWN = 4,
             SET_VOLUME = 5,
+            TRANSPONDER_POWER = 6,
+            TRANSPONDER_M1_CODE = 7,
+            TRANSPONDER_M3_CODE = 8,
+            TRANSPONDER_M4 = 9,
+            TRANSPONDER_IDENT = 10
         }
 
         public int RadioId { get; set; }
         public double Frequency { get; set; }
         public UDPCommandType Command { get; set; }
         public float Volume { get; set; }
+
+        public bool Enabled { get; set; }
+
+        public int Code { get; set; }
     }
 }
