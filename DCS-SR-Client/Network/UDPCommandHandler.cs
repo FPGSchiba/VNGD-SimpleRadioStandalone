@@ -52,9 +52,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 JsonConvert.DeserializeObject<UDPInterfaceCommand>(Encoding.UTF8.GetString(
                                     bytes, 0, bytes.Length));
 
-                            if (message?.Command == UDPInterfaceCommand.UDPCommandType.FREQUENCY)
+                            if (message?.Command == UDPInterfaceCommand.UDPCommandType.FREQUENCY_DELTA)
                             {
                                 RadioHelper.UpdateRadioFrequency(message.Frequency, message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.FREQUENCY_SET)
+                            {
+                                RadioHelper.UpdateRadioFrequency(message.Frequency, message.RadioId,false,true);
                             }
                             else if (message?.Command == UDPInterfaceCommand.UDPCommandType.ACTIVE_RADIO)
                             {
@@ -63,6 +67,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             else if (message?.Command == UDPInterfaceCommand.UDPCommandType.TOGGLE_GUARD)
                             {
                                 RadioHelper.ToggleGuard(message.RadioId);
+                            }
+                            else if (message?.Command == UDPInterfaceCommand.UDPCommandType.GUARD)
+                            {
+                                RadioHelper.SetGuard(message.RadioId, message.Enabled);
                             }
                             else if (message?.Command == UDPInterfaceCommand.UDPCommandType.CHANNEL_UP)
                             {

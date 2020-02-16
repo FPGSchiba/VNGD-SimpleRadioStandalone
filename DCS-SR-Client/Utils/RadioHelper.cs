@@ -35,6 +35,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             }
         }
 
+        public static void SetGuard(int radioId, bool enabled)
+        {
+            var radio = GetRadio(radioId);
+
+            if (radio != null)
+            {
+                if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                {
+                    if (!enabled)
+                    {
+                        radio.secFreq = 0; // 0 indicates we want it overridden + disabled
+                    }
+                    else
+                    {
+                        radio.secFreq = 1; //indicates we want it back
+                    }
+
+                    //make radio data stale to force resysnc
+                    ClientStateSingleton.Instance.LastSent = 0;
+                }
+            }
+        }
+
         public static bool UpdateRadioFrequency(double frequency, int radioId, bool delta = true, bool inMHz = true)
         {
             bool inLimit = true;

@@ -134,7 +134,7 @@ end
 
 SRS.findCommandValue = function(key, list)
 
-	for index,str in pairs(list) do
+	for index,str in ipairs(list) do
 			
 		if str == key then
 			
@@ -160,7 +160,7 @@ SRS.handleTransponder = function(msg)
 	local commands = {}
 
 	--search for keys
-	for _,key in pairs(keys) do
+	for _,key in ipairs(keys) do
 
 		local val = SRS.findCommandValue(key, split)
 
@@ -214,6 +214,94 @@ SRS.handleTransponder = function(msg)
 
 end
 
+
+SRS.handleRadio = function(msg)
+
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"SELECT",
+					"RADIO","FREQ","GUARD",
+					"FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
+
+	local commands = {}
+
+	local radioId = -1
+
+	--search for keys
+	for _,key in ipairs(keys) do
+
+		local val = SRS.findCommandValue(key, split)
+
+		if val then
+			if key == "SELECT" or key == "RADIO" then
+
+				local code = tonumber(val)
+				if code ~= nil then
+					radioId  = code
+					if key == "SELECT" then
+						table.insert(commands, {Command = 1, RadioId = radioId})
+					end
+				end
+
+			elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
+
+				if radioId > 0 then
+					local frq = tonumber(val)
+
+					if frq ~= nil then
+						table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
+					end
+				end
+			elseif key == "VOL" or key == "VOLUME" then
+
+				if radioId > 0 then
+					local vol = tonumber(val)
+
+					if vol ~= nil then
+
+						if vol > 1.0 then
+							vol = 1.0
+						elseif vol < 0 then
+							vol = 0
+						end
+
+						table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
+					end
+				end
+			elseif key == "CHN" or key == "CHANNEL" then
+
+				if radioId > 0 then
+					if val == "UP" or val == "+" then
+						table.insert(commands, {Command = 3,  RadioId = radioId})
+					elseif val == "DOWN" or val == "-" then
+						table.insert(commands, {Command = 4,  RadioId = radioId})
+					end
+				end
+			elseif key == "GUARD" or key == "GRD" then
+				if val == "ON" then
+					table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
+				end
+			end
+		end
+	end
+
+	if radioId > 0 then
+		return commands
+	end
+
+	return {}
+
+end
+
 SRS.onChatMessage = function(msg, from)
 
 
@@ -244,6 +332,12 @@ SRS.onChatMessage = function(msg, from)
 
 		if string.find(msg,"SRSTRANS",1,true) then
 			local commands = SRS.handleTransponder(msg) 
+
+			for _,command in pairs(commands) do
+				SRS.sendCommand(command)
+			end
+		elseif string.find(msg,"SRSRADIO",1,true) then
+			local commands = SRS.handleRadio(msg) 
 
 			for _,command in pairs(commands) do
 				SRS.sendCommand(command)

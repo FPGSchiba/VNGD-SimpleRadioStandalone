@@ -11,7 +11,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
     {
         public enum UDPCommandType
         {
-            FREQUENCY = 0,
+            FREQUENCY_DELTA = 0,
             ACTIVE_RADIO = 1,
             TOGGLE_GUARD = 2,
             CHANNEL_UP = 3,
@@ -21,7 +21,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             TRANSPONDER_M1_CODE = 7,
             TRANSPONDER_M3_CODE = 8,
             TRANSPONDER_M4 = 9,
-            TRANSPONDER_IDENT = 10
+            TRANSPONDER_IDENT = 10,
+            GUARD = 11, // SET guard
+            FREQUENCY_SET = 12,
         }
 
         public int RadioId { get; set; }
