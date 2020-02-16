@@ -1,4 +1,4 @@
--- Version 1.7.4.0
+-- Version 1.7.5.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -98,7 +98,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     name = "",
                     unit = "",
                     selected = 1,
-					simultaneousTransmissionControl = 0,
+                    simultaneousTransmissionControl = 0,
                     unitId = 0,
                     ptt = false,
                     radios = {
@@ -116,15 +116,16 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.unitId = LoGetPlayerPlaneId()
                 _update.pos = SR.exportPlayerLocation(_data)
 
-			-- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
+            -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
             -- M1:-1 = off, any other number on 
             -- M3: -1 = OFF, any other number on 
             -- M4: 1 = ON or 0 = OFF
             -- EXPANSION: only enabled if IFF Expansion is enabled
             -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
-            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
+            -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
+            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
-                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false}
+                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
 
                 SR.lastKnownPos = _update.pos
 
@@ -235,7 +236,7 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                     _update.control = 0;
                     _update.selected = 1
-                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
+                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 end
 
                 _lastUnitId = _update.unitId
@@ -251,7 +252,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "CA",
                     selected = 1,
                     ptt = false,
-					simultaneousTransmissionControl = 1,
+                    simultaneousTransmissionControl = 1,
                     pos = { x = 0, y = 0, z = 0 },
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
@@ -269,7 +270,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                         { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false },
                     },
                     radioType = 3,
-                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false}
+                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 }
 
                 _lastUnitId = ""
@@ -781,6 +782,17 @@ function SR.exportRadioUH1H(_data)
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
+
+        -- MODE set to MIC
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                _data.iff.status = 2 -- IDENT due to MIC switch
+            end
+        end
+
     end
     
     local mode1On =  SR.getButtonPosition(61)
@@ -1316,6 +1328,18 @@ function SR.exportRadioA10C(_data)
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
     end
     
     local mode1On =  SR.getButtonPosition(202)
@@ -1345,7 +1369,7 @@ function SR.exportRadioA10C(_data)
          _data.iff.mode4 = false
     end
 
-    --SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
     return _data
 end
 
@@ -1730,6 +1754,59 @@ function SR.exportRadioF5E(_data)
 
     _data.control = 0; -- hotas radio
 
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(200,0.1)
+
+    local iffIdent =  SR.getButtonPosition(207) -- -1 is off 0 or more is on
+
+    if iffPower >= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
+    end
+    
+    local mode1On =  SR.getButtonPosition(202)
+
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
+    
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(204)
+    
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
+    
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(208)
+
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
+
     return _data;
 end
 
@@ -1943,6 +2020,62 @@ function SR.exportRadioC101EB(_data)
 
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
+    -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(347,0.25)
+
+    SR.log("IFF iffPower"..iffPower.."\n\n")
+
+    local iffIdent =  SR.getButtonPosition(361) -- -1 is off 0 or more is on
+
+    if iffPower <= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 1
+
+            if _data.ptt and _data.selected == 2 then
+                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
+    end
+    
+    local mode1On =  SR.getButtonPosition(349)
+
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
+    
+    if mode1On == 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(351)
+    
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
+    
+    if mode3On == 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 0 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(354)
+
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
     _data.control = 1; -- full radio
 
     return _data;
@@ -2004,6 +2137,63 @@ function SR.exportRadioC101CC(_data)
     end
 
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
+
+     -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(347,0.25)
+
+    SR.log("IFF iffPower"..iffPower.."\n\n")
+
+    local iffIdent =  SR.getButtonPosition(361) -- -1 is off 0 or more is on
+
+    if iffPower <= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 1
+
+            if _data.ptt and _data.selected == 2 then
+                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
+    end
+    
+    local mode1On =  SR.getButtonPosition(349)
+
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
+    
+    if mode1On == 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(351)
+    
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
+    
+    if mode3On == 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 0 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(354)
+
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
 
     _data.control = 1;
 
@@ -2126,6 +2316,47 @@ function SR.exportRadioM2000C(_data)
     _previousEncState = SR.getButtonPosition(432)
 
     _data.control = 0; -- partial radio, allows hotkeys
+
+    -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+
+    local iffIdent =  SR.getButtonPosition(383) -- -1 is off 0 or more is on
+
+    -- No power switch - always on
+    _data.iff.status = 1 -- NORMAL
+
+    if iffIdent == 1 then
+        _data.iff.status = 2 -- IDENT (BLINKY THING)
+    end
+    
+    local mode1On =  SR.getButtonPosition(384)
+
+     _data.iff.mode1 = SR.round(SR.getButtonPosition(377), 0.1)*100+SR.round(SR.getButtonPosition(378), 0.1)*10
+    
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(386)
+    
+     _data.iff.mode3 = SR.round(SR.getButtonPosition(379), 0.1) * 10000 + SR.round(SR.getButtonPosition(380), 0.1) * 1000 + SR.round(SR.getButtonPosition(381), 0.1)* 100 + SR.round(SR.getButtonPosition(382), 0.1) * 10
+    
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10
+
+    if mode4On == 2 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
 
     return _data
 end
@@ -2435,4 +2666,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.4.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.5.0")

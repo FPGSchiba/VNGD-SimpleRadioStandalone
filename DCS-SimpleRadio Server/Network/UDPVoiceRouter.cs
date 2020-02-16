@@ -102,7 +102,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             var port = _serverSettings.GetServerPort();
             _listener = new UdpClient();
-            _listener.AllowNatTraversal(true);
+            try
+            {
+                _listener.AllowNatTraversal(true);
+            }
+            catch { }
+            
             _listener.ExclusiveAddressUse = true;
             _listener.DontFragment = true;
             _listener.Client.DontFragment = true;

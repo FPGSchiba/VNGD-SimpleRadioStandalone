@@ -128,20 +128,6 @@ namespace Installer
 
             }).Invoke();
 
-            if (IsDCSRunning())
-            {
-                MessageBox.Show(
-                    "DCS must now be closed before continuing the installation!\n\nClose DCS and please try again.",
-                    "Please Close DCS",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-
-                Logger.Warn("DCS is Running - Installer quit");
-
-                Environment.Exit(0);
-
-                return;
-            }
-
             if (!CheckExtracted())
             {
 
@@ -163,7 +149,7 @@ namespace Installer
         {
             return File.Exists(_currentDirectory + "\\opus.dll") 
                    && File.Exists(_currentDirectory + "\\awacs-radios.json")
-                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe");
+                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")&& File.Exists(_currentDirectory + "\\Scripts\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua");
         }
 
 
@@ -295,6 +281,18 @@ namespace Installer
                             "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
                             "SR Standalone Installer",
                             MessageBoxButton.OK, MessageBoxImage.Error);
+                        return 0;
+                    }
+
+                    if (IsDCSRunning())
+                    {
+                        MessageBox.Show(
+                            "DCS must now be closed before continuing the installation!\n\nClose DCS and please try again.",
+                            "Please Close DCS",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        Logger.Warn("DCS is Running - Installer stopped");
+
                         return 0;
                     }
 
@@ -581,23 +579,24 @@ namespace Installer
             {
                 if (clsProcess.ProcessName.ToLower().Trim().Equals("dcs"))
                 {
-                    bool suspended = true;
-                    foreach (var thread in clsProcess.Threads)
-                    {
-                        var t = (System.Diagnostics.ProcessThread)thread;
-
-                        if (t.ThreadState == ThreadState.Wait && t.WaitReason == ThreadWaitReason.Suspended)
-                        {
-                            Logger.Info($"DCS thread is suspended");
-                        }
-                        else
-                        {
-                            Logger.Info($"DCS thread is not suspended");
-                            suspended = false;
-                        }
-                    }
-
-                    return !suspended;
+                    return true;
+                    // bool suspended = true;
+                    // foreach (var thread in clsProcess.Threads)
+                    // {
+                    //     var t = (System.Diagnostics.ProcessThread)thread;
+                    //
+                    //     if (t.ThreadState == ThreadState.Wait && t.WaitReason == ThreadWaitReason.Suspended)
+                    //     {
+                    //         Logger.Info($"DCS thread is suspended");
+                    //     }
+                    //     else
+                    //     {
+                    //         Logger.Info($"DCS thread is not suspended");
+                    //         suspended = false;
+                    //     }
+                    // }
+                    //
+                    // return !suspended;
                 }
             }
 

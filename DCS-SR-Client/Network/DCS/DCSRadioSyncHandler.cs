@@ -280,12 +280,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 playerRadioInfo.iff = message.iff;
             }
 
-            //TODO tidy up the IFF handling and this giant function in general as its silly big :(
-            if (message.iff.control == IFF.IFFControlMode.COCKPIT)
-            {
-                playerRadioInfo.iff = message.iff;
-            }
-
             if (overrideFreqAndVol)
             {
                 playerRadioInfo.selected = message.selected;
@@ -520,6 +514,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 playerRadioInfo.ptt = message.ptt;
             }
+
+            //HANDLE IFF/TRANSPONDER UPDATE
+            //TODO tidy up the IFF/Transponder handling and this giant function in general as its silly big :(
+            if (message.iff.control == Transponder.IFFControlMode.COCKPIT)
+            {
+                playerRadioInfo.iff = message.iff;
+            }
+
+            //HANDLE MIC IDENT
+            if (!playerRadioInfo.ptt && playerRadioInfo.iff.mic >0 && UdpVoiceHandler.RadioSendingState.IsSending)
+            {
+                if (UdpVoiceHandler.RadioSendingState.SendingOn == playerRadioInfo.iff.mic)
+                {
+                    playerRadioInfo.iff.status = Transponder.IFFStatus.IDENT;
+                }
+            }
+            
 
             //                }
             //            }

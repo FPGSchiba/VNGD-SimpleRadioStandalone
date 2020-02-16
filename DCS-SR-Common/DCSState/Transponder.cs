@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 {
-    public class IFF
+    public class Transponder
     {
         /**
          *  -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
@@ -40,6 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
         public int mode3 = -1;
         public bool mode4 = false;
 
+        public int mic = -1;
+
         public IFFStatus status = IFFStatus.OFF;
 
         public override bool Equals(object obj)
@@ -47,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
             if ((obj == null) || (GetType() != obj.GetType()))
                 return false;
 
-            var compare = (IFF)obj;
+            var compare = (Transponder)obj;
 
 
             if (mode1 != compare.mode1)
