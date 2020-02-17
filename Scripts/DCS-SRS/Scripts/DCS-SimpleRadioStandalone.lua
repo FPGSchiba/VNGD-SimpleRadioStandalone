@@ -1496,6 +1496,60 @@ function SR.exportRadioF16C(_data)
 
     _data.control = 0; -- SRS Hotas Controls
 
+     -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(540,0.1)
+
+    local iffIdent =  SR.getButtonPosition(125) -- -1 is off 0 or more is on
+
+    if iffPower >= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+    end
+    
+    local modeSelector =  SR.getButtonPosition(553)
+
+    if modeSelector == -1 then
+
+        --shares a dial with the mode 3, limit number to max 3
+        local _secondDigit = SR.round(SR.getButtonPosition(548), 0.1)*10
+
+        if _secondDigit > 3 then
+            _secondDigit = 3
+        end
+
+        _data.iff.mode1 = SR.round(SR.getButtonPosition(546), 0.1)*100 + _secondDigit
+    else
+        _data.iff.mode1 = -1
+    end
+
+    if modeSelector ~= 0 then
+        _data.iff.mode3 = SR.round(SR.getButtonPosition(546), 0.1) * 10000 + SR.round(SR.getButtonPosition(548), 0.1) * 1000 + SR.round(SR.getButtonPosition(550), 0.1)* 100 + SR.round(SR.getButtonPosition(552), 0.1) * 10
+    else
+        _data.iff.mode3 = -1
+    end
+
+    if iffPower == 4 and modeSelector ~= 0 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(541)
+
+    if mode4On == 0 then
+        _data.iff.mode4 = true
+    else
+        _data.iff.mode4 = false
+    end
+
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
+
     return _data
 end
 
