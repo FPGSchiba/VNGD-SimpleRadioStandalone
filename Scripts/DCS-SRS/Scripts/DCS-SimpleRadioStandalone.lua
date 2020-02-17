@@ -2614,9 +2614,9 @@ function SR.exportRadioF14(_data)
     local mode4On =  SR.getButtonPosition(181)
 
     if mode4On == 0 then
-        _data.iff.mode4 = true
-    else
         _data.iff.mode4 = false
+    else
+        _data.iff.mode4 = true
     end
 
     -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
