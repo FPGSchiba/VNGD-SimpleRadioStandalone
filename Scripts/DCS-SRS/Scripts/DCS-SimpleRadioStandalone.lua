@@ -1542,7 +1542,9 @@ function SR.exportRadioF16C(_data)
 
     local mode4On =  SR.getButtonPosition(541)
 
-    if mode4On == 0 then
+    local mode4Code = SR.getButtonPosition(543)
+
+    if mode4On == 0 and mode4Code ~= -1 then
         _data.iff.mode4 = true
     else
         _data.iff.mode4 = false
