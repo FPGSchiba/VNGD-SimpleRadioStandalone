@@ -40,6 +40,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private readonly NewAircraft _newAircraftCallback;
 
+        private long _identStart = 0;
+        private bool _ident;
+
         public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate,
             ConcurrentDictionary<string, SRClient> clients, NewAircraft _newAircraft)
         {
@@ -517,10 +520,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             //HANDLE IFF/TRANSPONDER UPDATE
             //TODO tidy up the IFF/Transponder handling and this giant function in general as its silly big :(
+
+
+            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys
+                .AlwaysAllowTransponderOverlay))
+            {
+                if (message.iff.control != Transponder.IFFControlMode.DISABLED)
+                {
+                    playerRadioInfo.iff.control = Transponder.IFFControlMode.OVERLAY;
+                    message.iff.control = Transponder.IFFControlMode.OVERLAY;
+                }
+            }
+
             if (message.iff.control == Transponder.IFFControlMode.COCKPIT)
             {
                 playerRadioInfo.iff = message.iff;
             }
+
 
             //HANDLE MIC IDENT
             if (!playerRadioInfo.ptt && playerRadioInfo.iff.mic >0 && UdpVoiceHandler.RadioSendingState.IsSending)
@@ -530,7 +546,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     playerRadioInfo.iff.status = Transponder.IFFStatus.IDENT;
                 }
             }
-            
+
+            //Handle IDENT only lasting for 40 seconds at most - need to toggle it
+            if (playerRadioInfo.iff.status == Transponder.IFFStatus.IDENT)
+            {
+                if (_identStart == 0)
+                {
+                    _identStart = DateTime.Now.Ticks;
+                }
+
+                if (TimeSpan.FromTicks(DateTime.Now.Ticks -_identStart).TotalSeconds > 40)
+                {
+                    playerRadioInfo.iff.status = Transponder.IFFStatus.NORMAL;
+                }
+
+            }
+            else
+            {
+                _identStart = 0;
+            }
 
             //                }
             //            }

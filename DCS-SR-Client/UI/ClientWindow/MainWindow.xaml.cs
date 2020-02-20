@@ -868,6 +868,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             AlwaysAllowHotas.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls);
             AllowDCSPTT.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT);
+            AlwaysAllowTransponderOverlay.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay);
         }
 
         private void Connect()
@@ -1897,6 +1898,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
+        }
+
+        private void AlwaysAllowTransponderOverlay_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.AlwaysAllowTransponderOverlay, (bool)AlwaysAllowTransponderOverlay.IsChecked);
         }
     }
 }

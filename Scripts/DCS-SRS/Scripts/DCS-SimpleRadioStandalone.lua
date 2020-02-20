@@ -732,15 +732,20 @@ end
 
 function SR.exportRadioUH1H(_data)
 
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+
     _data.radios[2].name = "AN/ARC-131"
     _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 1
-    _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true)
 
     _data.radios[3].name = "AN/ARC-51BX - UHF"
     _data.radios[3].freq = SR.getRadioFrequency(22)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 21, { 0.0, 1.0 }, true) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[3].volume = SR.getRadioVolume(0, 21, { 0.0, 1.0 }, true)
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(15, 0.1)
@@ -752,7 +757,7 @@ function SR.exportRadioUH1H(_data)
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
-    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false) 
 
     --_device:get_argument_value(_arg)
     --guard mode for UHF Radio
@@ -765,7 +770,9 @@ function SR.exportRadioUH1H(_data)
 
     local switch = _panel:get_argument_value(30)
 
-    if SR.nearlyEqual(switch, 0.2, 0.03) then
+    if SR.nearlyEqual(switch, 0.1, 0.03) then
+        _data.selected = 0
+    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
         _data.selected = 1
     elseif SR.nearlyEqual(switch, 0.3, 0.03) then
         _data.selected = 2
@@ -775,7 +782,14 @@ function SR.exportRadioUH1H(_data)
         _data.selected = -1
     end
 
-    if SR.getButtonPosition(194) >= 0.1 then
+    local _pilotPTT = SR.getButtonPosition(194)
+    if _pilotPTT >= 0.1 then
+
+        if _pilotPTT == 0.5 then
+            -- intercom
+            _data.selected = 0
+        end
+
         _data.ptt = true
     end
 
