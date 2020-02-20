@@ -252,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             if (!_clientStateSingleton.ShouldUseLotATCPosition())
             {
-                _clientStateSingleton.UpdatePlayerPosition(message.pos, message.latLng);
+                _clientStateSingleton.UpdatePlayerPosition(message.latLng);
             }
             
             var overrideFreqAndVol = false;

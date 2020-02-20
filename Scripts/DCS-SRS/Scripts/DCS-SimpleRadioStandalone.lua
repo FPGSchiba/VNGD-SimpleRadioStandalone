@@ -1,4 +1,4 @@
--- Version 1.7.5.0
+-- Version 1.7.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -114,7 +114,11 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.name = _data.UnitName
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
-                _update.pos = SR.exportPlayerLocation(_data)
+
+                local _latLng,_point = SR.exportPlayerLocation(_data)
+
+                _update.latLng = _latLng
+                SR.lastKnownPos = _point
 
             -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
             -- M1:-1 = off, any other number on 
@@ -126,8 +130,6 @@ LuaExportActivityNextEvent = function(tCurrent)
             -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
                 _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
-
-                SR.lastKnownPos = _update.pos
 
                 --SR.log(_update.unit.."\n\n")
 
@@ -253,7 +255,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     simultaneousTransmissionControl = 1,
-                    pos = { x = 0, y = 0, z = 0 },
+                    latLng = { lat = 0, lng = 0, alt = 0 },
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
                         --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
@@ -366,13 +368,17 @@ end
 function SR.checkLOS(_clientsList)
 
     local _result = {}
+
     for _, _client in pairs(_clientsList) do
         -- add 10 meter tolerance
-
+        --Coordinates convertion :
+        --{x,y,z}                 = LoGeoCoordinatesToLoCoordinates(longitude_degrees,latitude_degrees)
+        local _point = LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
+        -- Encoded Point: {"x":3758906.25,"y":0,"z":-1845112.125}
 
         local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
 
-        local _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+        local _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
         if _hasLos then
             table.insert(_result, { id = _client.id, los = 0.0 })
@@ -380,7 +386,7 @@ function SR.checkLOS(_clientsList)
             --check from 10 - 60 in incremenents of 10 if there is Line of sight
 
             -- check Max
-            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
             if _hasLos then
                 table.insert(_result, { id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
@@ -390,7 +396,7 @@ function SR.checkLOS(_clientsList)
 
             for _losOffset = SR.LOS_HEIGHT_OFFSET + SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_MAX - SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
 
-                _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+                _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
                 if _hasLos then
                     table.insert(_result, { id = _client.id, los = (_losOffset / 100.0) })
@@ -407,12 +413,19 @@ function SR.checkLOS(_clientsList)
     return _result
 end
 
+--Coordinates convertion :
+--{latitude,longitude}  = LoLoCoordinatesToGeoCoordinates(x,z);
+
 function SR.exportPlayerLocation(_data)
 
     if _data ~= nil and _data.Position ~= nil then
-        return _data.Position
+
+        local latLng  = LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
+        --LatLng: {"latitude":25.594814853729,"longitude":55.938746498011}
+
+        return { lat = latLng.latitude, lng = latLng.longitude, alt = _data.Position.y },_data.Position
     else
-        return { x = 0, y = 0, z = 0 }
+        return { lat = 0, lng = 0, alt = 0 },{ x = 0, y = 0, z = 0 }
     end
 end
 
@@ -2722,4 +2735,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.5.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.6.0")

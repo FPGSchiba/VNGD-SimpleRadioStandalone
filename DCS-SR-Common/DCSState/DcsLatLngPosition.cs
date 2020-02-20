@@ -8,20 +8,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 {
     public class DCSLatLngPosition
     {
-        public DCSLatLngPosition()
-        {
+        public double lat;
+        public double lng;
+        public double alt;
 
+        public bool isValid()
+        {
+            return lat != 0 && lng != 0;
         }
 
-        public DCSLatLngPosition(double lat, double lng,double alt)
+        public override string ToString()
         {
-            this.lat = lat;
-            this.lng = lng;
-            this.alt = alt;
+            return $"Pos:[{lat},{lng},{alt}]";
         }
-
-        public double lat = 0;
-        public double lng = 0;
-        public double alt = 0;
     }
 }

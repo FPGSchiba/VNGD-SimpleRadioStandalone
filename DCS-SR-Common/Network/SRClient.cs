@@ -43,7 +43,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public long LastRadioUpdateSent { get; set; }
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
-        public DcsPosition Position { get; set; }
+
+        public DcsPosition Position { get; set; } = new DcsPosition();
 
         public DCSLatLngPosition LatLngPosition { get; set; }
 
@@ -56,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 {
                     return 0;
                 }
-                if ((Position.x == 0) && (Position.z == 0))
+                if ((LatLngPosition.lat == 0) && (LatLngPosition.lng == 0))
                 {
                     return 0;
                 }
@@ -130,7 +131,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             {
                 side = "Spectator";
             }
-            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss " + _lineOfSightLoss + " Pos" + Position;
+            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss " + _lineOfSightLoss + " Pos" + LatLngPosition;
         }
     }
 }

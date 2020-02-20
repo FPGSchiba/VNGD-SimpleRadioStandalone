@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
@@ -160,18 +161,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 unitId = srClient.RadioInfo.unitId,
                                                 iff = srClient.RadioInfo.iff,
                                                 unit = srClient.RadioInfo.unit,
-                                                latLng = null,
+                                                latLng = srClient.LatLngPosition,
                                                 inAircraft = srClient.RadioInfo.inAircraft,
                                             },
                                             Coalition = srClient.Coalition,
                                             Name = srClient.Name,
-                                            Position = srClient.Position,
                                             LatLngPosition = srClient.LatLngPosition,
+                                            Position = new DcsPosition()
                                         });
                                     }
                                 }
                                 
-
                                 var byteData =
                                     Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\n");
 

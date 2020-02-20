@@ -80,6 +80,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         VAICOMIncomingUDP, //33501 
         VAICOMTXInhibitEnabled,
+
+        LotATCHeightOffset,
     }
 
     public enum InputBinding
@@ -376,6 +378,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.LotATCIncomingUDP.ToString(), "10710"},
             {GlobalSettingsKeys.LotATCOutgoingUDP.ToString(), "10711"},
+            {GlobalSettingsKeys.LotATCHeightOffset.ToString(), "70"},
 
             {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
 

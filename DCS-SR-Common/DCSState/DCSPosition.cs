@@ -6,6 +6,11 @@
         public double y;
         public double z;
 
+        public bool isValid()
+        {
+            return x != 0 && z != 0;
+        }
+
         public override string ToString()
         {
             return $"Pos:[{x},{y},{z}]";

@@ -35,6 +35,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
         private readonly string _guid;
         private long _lastSent = 0;
 
+        private double _heightOffset;
+
         public LotATCSyncHandler(DCSRadioSyncManager.ClientSideUpdate clientSideUpdate, ConcurrentDictionary<string, SRClient> clients,
             string guid)
         {
@@ -42,6 +44,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             _clients = clients;
             _guid = guid;
             _clientStateSingleton = ClientStateSingleton.Instance;
+
+            _heightOffset = _globalSettings.GetClientSetting(GlobalSettingsKeys.LotATCHeightOffset).DoubleValue;
         }
 
         public void Start()
@@ -118,7 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             //TODO only update position if player isnt in aircraft
             if (_clientStateSingleton.ShouldUseLotATCPosition())
             {
-                _clientStateSingleton.UpdatePlayerPosition(new DcsPosition(), new DCSLatLngPosition(controller.latitude,controller.longitude,controller.altitude));
+                _clientStateSingleton.UpdatePlayerPosition(new DCSLatLngPosition(){ lat=controller.latitude, lng=controller.longitude, alt=controller.altitude });
                 long diff = DateTime.Now.Ticks - _lastSent;
 
                 if (diff > UPDATE_SYNC_RATE) // There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update ever 5 seconds
@@ -204,18 +208,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             var requests = new List<LotATCLineOfSightRequest>();
 
             if (_clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition != null
-                && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lng != 0
-                && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.lat != 0 
+                && _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition.isValid()
                 && _clientStateSingleton.ShouldUseLotATCPosition() 
                 && _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
             {
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if ((client.LatLngPosition != null 
-                         && client.LatLngPosition.lat != 0) 
-                        && (client.LatLngPosition.lng != 0) 
-                        && (client.ClientGuid != _guid))
+                    if ((client.LatLngPosition != null
+                         && client.LatLngPosition.isValid()) 
+                        && (client.ClientGuid != _guid)
+                        )
                     {
                         requests.Add(new LotATCLineOfSightRequest()
                         {
