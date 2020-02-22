@@ -121,17 +121,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             //not game or Lotatc - clear it!
             if (!IsLotATCConnected && !IsGameExportConnected)
             {
-                PlayerCoaltionLocationMetadata.Position = new DcsPosition();
                 PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
             }
         }
 
-        public void UpdatePlayerPosition(DcsPosition dcsPosition, DCSLatLngPosition latLngPosition)
+        public void UpdatePlayerPosition( DCSLatLngPosition latLngPosition)
         {
             PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-            PlayerCoaltionLocationMetadata.Position = dcsPosition;
-
-            DcsPlayerRadioInfo.pos = dcsPosition;
             DcsPlayerRadioInfo.latLng = latLngPosition;
             
         }

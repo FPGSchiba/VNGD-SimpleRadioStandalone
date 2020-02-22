@@ -3,8 +3,8 @@
     public struct DCSLosCheckRequest
     {
         public string id;
-        public double x;
-        public double y;
-        public double z;
+        public double lat;
+        public double lng;
+        public double alt;
     }
 }

@@ -87,7 +87,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
-                    Position = sideInfo.Position,
                     LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
@@ -111,8 +110,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         Coalition = 0,
                         Name = "",
-                        Position = new DcsPosition { x = 0, y = 0, z = 0 },
-                        LatLngPosition = new DCSLatLngPosition(),
+                        LatLngPosition = new DCSLatLngPosition(){lat=0,lng=0,alt=0},
                         ClientGuid = _guid
                     },
                     MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT
@@ -204,7 +202,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Name = sideInfo.name,
                     ClientGuid = _guid,
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    Position = sideInfo.Position,
                     LatLngPosition = sideInfo.LngLngPosition
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
@@ -220,7 +217,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
-                    Position = sideInfo.Position,
                     LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
@@ -283,7 +279,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             Coalition = sideInfo.side,
                             Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
-                            Position = sideInfo.Position,
+                            LatLngPosition = sideInfo.LngLngPosition,
                             ClientGuid = _guid
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
@@ -317,7 +313,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.LastUpdate = DateTime.Now.Ticks;
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
-                                                srClient.Position = updatedSrClient.Position;
+
                                                 srClient.LatLngPosition = updatedSrClient.LatLngPosition;
 
                                                 if (updatedSrClient.RadioInfo != null)

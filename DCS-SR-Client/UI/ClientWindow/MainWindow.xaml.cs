@@ -778,6 +778,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Mic_VU.Value = -100;
                 Speaker_VU.Value = -100;
             }
+
+            try
+            {
+                var pos = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
+            }
+            catch { }
+            
         }
 
         private void RedrawUITick(object sender, EventArgs e)
@@ -868,6 +876,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             AlwaysAllowHotas.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls);
             AllowDCSPTT.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT);
+            AlwaysAllowTransponderOverlay.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay);
         }
 
         private void Connect()
@@ -1897,6 +1906,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
+        }
+
+        private void AlwaysAllowTransponderOverlay_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.AlwaysAllowTransponderOverlay, (bool)AlwaysAllowTransponderOverlay.IsChecked);
+        }
+
+        private void CurrentPosition_OnClick(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                var pos = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+
+                Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
+            }
+            catch { }
+           
         }
     }
 }

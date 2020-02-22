@@ -1,4 +1,4 @@
--- Version 1.7.5.0
+-- Version 1.7.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -114,7 +114,11 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.name = _data.UnitName
                 _update.unit = _data.Name
                 _update.unitId = LoGetPlayerPlaneId()
-                _update.pos = SR.exportPlayerLocation(_data)
+
+                local _latLng,_point = SR.exportPlayerLocation(_data)
+
+                _update.latLng = _latLng
+                SR.lastKnownPos = _point
 
             -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
             -- M1:-1 = off, any other number on 
@@ -126,8 +130,6 @@ LuaExportActivityNextEvent = function(tCurrent)
             -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
                 _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
-
-                SR.lastKnownPos = _update.pos
 
                 --SR.log(_update.unit.."\n\n")
 
@@ -241,11 +243,6 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                 _lastUnitId = _update.unitId
             else
-
-
-                -- save last pos
-                SR.lastKnownPos = { x = 0, y = 0, z = 0 }
-
                 --Ground Commander or spectator
                 _update = {
                     name = "Unknown",
@@ -253,7 +250,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     selected = 1,
                     ptt = false,
                     simultaneousTransmissionControl = 1,
-                    pos = { x = 0, y = 0, z = 0 },
+                    latLng = { lat = 0, lng = 0, alt = 0 },
                     unitId = 100000001, -- pass through starting unit id here
                     radios = {
                         --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
@@ -272,6 +269,11 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radioType = 3,
                     iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 }
+
+                local _latLng,_point = SR.exportCameraLocation()
+
+                _update.latLng = _latLng
+                SR.lastKnownPos = _point
 
                 _lastUnitId = ""
             end
@@ -366,13 +368,17 @@ end
 function SR.checkLOS(_clientsList)
 
     local _result = {}
+
     for _, _client in pairs(_clientsList) do
         -- add 10 meter tolerance
-
+        --Coordinates convertion :
+        --{x,y,z}                 = LoGeoCoordinatesToLoCoordinates(longitude_degrees,latitude_degrees)
+        local _point = LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
+        -- Encoded Point: {"x":3758906.25,"y":0,"z":-1845112.125}
 
         local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
 
-        local _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+        local _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
         if _hasLos then
             table.insert(_result, { id = _client.id, los = 0.0 })
@@ -380,7 +386,7 @@ function SR.checkLOS(_clientsList)
             --check from 10 - 60 in incremenents of 10 if there is Line of sight
 
             -- check Max
-            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
             if _hasLos then
                 table.insert(_result, { id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
@@ -390,7 +396,7 @@ function SR.checkLOS(_clientsList)
 
             for _losOffset = SR.LOS_HEIGHT_OFFSET + SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_MAX - SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
 
-                _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _client.x, _client.y + SR.LOS_HEIGHT_OFFSET, _client.z)
+                _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
                 if _hasLos then
                     table.insert(_result, { id = _client.id, los = (_losOffset / 100.0) })
@@ -407,13 +413,33 @@ function SR.checkLOS(_clientsList)
     return _result
 end
 
+--Coordinates convertion :
+--{latitude,longitude}  = LoLoCoordinatesToGeoCoordinates(x,z);
+
 function SR.exportPlayerLocation(_data)
 
     if _data ~= nil and _data.Position ~= nil then
-        return _data.Position
+
+        local latLng  = LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
+        --LatLng: {"latitude":25.594814853729,"longitude":55.938746498011}
+
+        return { lat = latLng.latitude, lng = latLng.longitude, alt = _data.Position.y },_data.Position
     else
-        return { x = 0, y = 0, z = 0 }
+        return { lat = 0, lng = 0, alt = 0 },{ x = 0, y = 0, z = 0 }
     end
+end
+
+function SR.exportCameraLocation()
+    local _cameraPosition = LoGetCameraPosition()
+
+    if _cameraPosition ~= nil and _cameraPosition.p ~= nil then
+
+        local latLng = LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
+
+        return { lat = latLng.latitude, lng = latLng.longitude, alt = _cameraPosition.p.y },_cameraPosition.p
+    end
+
+    return { lat = 0, lng = 0, alt = 0 },{ x = 0, y = 0, z = 0 }
 end
 
 function SR.exportRadioA10A(_data)
@@ -719,15 +745,20 @@ end
 
 function SR.exportRadioUH1H(_data)
 
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+
     _data.radios[2].name = "AN/ARC-131"
     _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 1
-    _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true)
 
     _data.radios[3].name = "AN/ARC-51BX - UHF"
     _data.radios[3].freq = SR.getRadioFrequency(22)
     _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 21, { 0.0, 1.0 }, true) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[3].volume = SR.getRadioVolume(0, 21, { 0.0, 1.0 }, true)
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(15, 0.1)
@@ -739,7 +770,7 @@ function SR.exportRadioUH1H(_data)
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
-    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false) * SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
+    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false) 
 
     --_device:get_argument_value(_arg)
     --guard mode for UHF Radio
@@ -752,7 +783,9 @@ function SR.exportRadioUH1H(_data)
 
     local switch = _panel:get_argument_value(30)
 
-    if SR.nearlyEqual(switch, 0.2, 0.03) then
+    if SR.nearlyEqual(switch, 0.1, 0.03) then
+        _data.selected = 0
+    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
         _data.selected = 1
     elseif SR.nearlyEqual(switch, 0.3, 0.03) then
         _data.selected = 2
@@ -762,7 +795,14 @@ function SR.exportRadioUH1H(_data)
         _data.selected = -1
     end
 
-    if SR.getButtonPosition(194) >= 0.1 then
+    local _pilotPTT = SR.getButtonPosition(194)
+    if _pilotPTT >= 0.1 then
+
+        if _pilotPTT == 0.5 then
+            -- intercom
+            _data.selected = 0
+        end
+
         _data.ptt = true
     end
 
@@ -2578,6 +2618,51 @@ function SR.exportRadioF14(_data)
     -- _data.intercomHotMic = true  --402 for the hotmic switch
     _data.control = 1 -- full radio
 
+     -- Handle transponder
+    
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(184,0.25)
+
+    local iffIdent =  SR.getButtonPosition(167)
+
+    if iffPower >= 2 then
+        _data.iff.status = 1 -- NORMAL
+   
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+    end
+    
+    local mode1On =  SR.getButtonPosition(162)
+     _data.iff.mode1 = SR.round(SR.getSelectorPosition(201,0.11111), 0.1)*10+SR.round(SR.getSelectorPosition(200,0.11111), 0.1)
+    
+
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(164)
+     _data.iff.mode3 = SR.round(SR.getSelectorPosition(199,0.11111), 0.1) * 1000 + SR.round(SR.getSelectorPosition(198,0.11111), 0.1) * 100 + SR.round(SR.getSelectorPosition(2261,0.11111), 0.1)* 10 + SR.round(SR.getSelectorPosition(2262,0.11111), 0.1)
+    
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(181)
+
+    if mode4On == 0 then
+        _data.iff.mode4 = false
+    else
+        _data.iff.mode4 = true
+    end
+
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
+
     return _data
 end
 
@@ -2722,4 +2807,4 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.5.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.6.0")

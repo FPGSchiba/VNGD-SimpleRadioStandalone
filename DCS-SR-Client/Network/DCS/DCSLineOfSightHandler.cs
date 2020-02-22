@@ -167,19 +167,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             var requests = new List<DCSLosCheckRequest>();
 
-            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
+            var playerLocation = ClientStateSingleton.Instance.PlayerCoaltionLocationMetadata;
+
+            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED) 
+                && playerLocation != null
+                && playerLocation.LngLngPosition  !=null
+                && playerLocation.LngLngPosition.isValid())
             {
                 foreach (var client in clients)
                 {
                     //only check if its worth it
-                    if ((client.Position.x != 0) && (client.Position.z != 0) && (client.ClientGuid != _guid))
+                    if (client.LatLngPosition !=null 
+                        && client.LatLngPosition.isValid()
+                        && client.ClientGuid != _guid
+                        )
                     {
+                        var latLng = client.LatLngPosition;
+
                         requests.Add(new DCSLosCheckRequest
                         {
                             id = client.ClientGuid,
-                            x = client.Position.x,
-                            y = client.Position.y,
-                            z = client.Position.z
+                           lat = latLng.lat,
+                           lng = latLng.lng,
+                           alt = latLng.alt
                         });
                     }
                 }

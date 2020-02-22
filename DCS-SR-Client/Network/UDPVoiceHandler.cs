@@ -159,6 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
                 var radioSwitchPtt = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT);
+                var radioSwitchPttWhenValid = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid);
 
                 var ptt = false;
                 foreach (var inputBindState in pressed)
@@ -180,13 +181,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                                 {
                                     radios.selected = (short) radioId;
+                                    
+                                    //turn on PTT
+                                    if (radioSwitchPttWhenValid || radioSwitchPtt)
+                                    {
+                                        ptt = true;
+                                    }
+                                }
+                                else
+                                {
+                                    //turn on PTT even if not valid radio switch
+                                    if (radioSwitchPtt)
+                                    {
+                                        ptt = true;
+                                    }
                                 }
 
-                                //turn on PTT
-                                if (radioSwitchPtt)
-                                {
-                                    ptt = true;
-                                }
                             }
                         }
                         else if (inputBindState.MainDevice.InputBind == InputBinding.Ptt)
@@ -534,21 +544,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
-
-                var clientPos = transmittingClient.Position;
-
-                if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
+                var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                var clientLatLng = transmittingClient.LatLngPosition;
+                if (myLatLng == null || clientLatLng == null || !myLatLng.isValid() || !clientLatLng.isValid())
                 {
-                    var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
-                    var clientLatLng = transmittingClient.LatLngPosition;
-                    //No DCS Position - do we have LotATC Position?
-                    if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-              
+                
                 losLoss = transmittingClient.LineOfSightLoss;
                 return transmittingClient.LineOfSightLoss < 1.0f; // 1.0 or greater  is TOTAL loss
                 
@@ -569,30 +571,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             SRClient transmittingClient;
             if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
-                var myPosition = _clientStateSingleton.PlayerCoaltionLocationMetadata.Position;
-
-                var clientPos = transmittingClient.Position;
-
                 double dist = 0;
-                if (((myPosition.x == 0) && (myPosition.z == 0)) || ((clientPos.x == 0) && (clientPos.z == 0)))
+               
+                var myLatLng = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                var clientLatLng = transmittingClient.LatLngPosition;
+                //No DCS Position - do we have LotATC Position?
+                if (myLatLng == null || clientLatLng == null || !myLatLng.isValid() || !clientLatLng.isValid())
                 {
-                    var myLatLng = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
-                    var clientLatLng = transmittingClient.LatLngPosition;
-                    //No DCS Position - do we have LotATC Position?
-                    if (((myLatLng.lat == 0) && (myLatLng.lng == 0)) || ((clientLatLng.lat == 0) && (clientLatLng.lng == 0)))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        //Calculate with Haversine (distance over ground) + Pythagoras (crow flies distance)
-                        dist = RadioCalculator.CalculateDistanceHaversine(myLatLng, clientLatLng);
-                    }
+                    return true;
                 }
                 else
                 {
-                    //calculate with DCS Points
-                    dist = RadioCalculator.CalculateDistance(myPosition, clientPos);
+                    //Calculate with Haversine (distance over ground) + Pythagoras (crow flies distance)
+                    dist = RadioCalculator.CalculateDistanceHaversine(myLatLng, clientLatLng);
                 }
 
                 var max = RadioCalculator.FriisMaximumTransmissionRange(frequency);
