@@ -42,7 +42,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioSwitchIsPTT,
 
 
-        AlwaysAllowTransponderOverlay
+        AlwaysAllowTransponderOverlay,
+        RadioSwitchIsPTTOnlyWhenValid
     }
 
     public class ProfileSettingsStore
@@ -69,6 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
             {ProfileSettingsKeys.AllowDCSPTT.ToString(),"true" },
             {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "false"},
+            {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), "false"},
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
         };
 

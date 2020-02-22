@@ -230,7 +230,10 @@
                                 IsEnabled="False"
                                 Style="{DynamicResource SquareButtonStyle}" />
                     </StackPanel>
-
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,5">
+                        <Label Content="Current Profile:"></Label>
+                        <Label Name="CurrentProfile" Content="None"></Label>
+                    </StackPanel>
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
@@ -238,11 +241,12 @@
                         <Label x:Name="ClientCount"
                                HorizontalAlignment="Center"
                                Content="0" />
+                        <Label Content="Current Position:"></Label>
+                        <Label >
+                            <TextBlock Name="CurrentPosition" Text="0,0 - Alt:0" MouseLeftButtonUp="CurrentPosition_OnClick" />
+                        </Label>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,5">
-                        <Label Content="Current Profile:"></Label>
-                        <Label Name="CurrentProfile" Content="None"></Label>
-                    </StackPanel>
+                   
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">

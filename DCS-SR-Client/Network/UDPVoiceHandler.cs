@@ -159,6 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var radios = _clientStateSingleton.DcsPlayerRadioInfo;
 
                 var radioSwitchPtt = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT);
+                var radioSwitchPttWhenValid = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid);
 
                 var ptt = false;
                 foreach (var inputBindState in pressed)
@@ -180,13 +181,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                     radios.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                                 {
                                     radios.selected = (short) radioId;
+                                    
+                                    //turn on PTT
+                                    if (radioSwitchPttWhenValid || radioSwitchPtt)
+                                    {
+                                        ptt = true;
+                                    }
+                                }
+                                else
+                                {
+                                    //turn on PTT even if not valid radio switch
+                                    if (radioSwitchPtt)
+                                    {
+                                        ptt = true;
+                                    }
                                 }
 
-                                //turn on PTT
-                                if (radioSwitchPtt)
-                                {
-                                    ptt = true;
-                                }
                             }
                         }
                         else if (inputBindState.MainDevice.InputBind == InputBinding.Ptt)

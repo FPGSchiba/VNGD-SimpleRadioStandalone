@@ -243,11 +243,6 @@ LuaExportActivityNextEvent = function(tCurrent)
 
                 _lastUnitId = _update.unitId
             else
-
-
-                -- save last pos
-                SR.lastKnownPos = { x = 0, y = 0, z = 0 }
-
                 --Ground Commander or spectator
                 _update = {
                     name = "Unknown",
@@ -274,6 +269,11 @@ LuaExportActivityNextEvent = function(tCurrent)
                     radioType = 3,
                     iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
                 }
+
+                local _latLng,_point = SR.exportCameraLocation()
+
+                _update.latLng = _latLng
+                SR.lastKnownPos = _point
 
                 _lastUnitId = ""
             end
@@ -427,6 +427,19 @@ function SR.exportPlayerLocation(_data)
     else
         return { lat = 0, lng = 0, alt = 0 },{ x = 0, y = 0, z = 0 }
     end
+end
+
+function SR.exportCameraLocation()
+    local _cameraPosition = LoGetCameraPosition()
+
+    if _cameraPosition ~= nil and _cameraPosition.p ~= nil then
+
+        local latLng = LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
+
+        return { lat = latLng.latitude, lng = latLng.longitude, alt = _cameraPosition.p.y },_cameraPosition.p
+    end
+
+    return { lat = 0, lng = 0, alt = 0 },{ x = 0, y = 0, z = 0 }
 end
 
 function SR.exportRadioA10A(_data)
