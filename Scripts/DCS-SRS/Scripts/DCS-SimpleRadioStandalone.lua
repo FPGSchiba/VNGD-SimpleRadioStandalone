@@ -2428,31 +2428,63 @@ function SR.exportRadioM2000C(_data)
     end
     
     local mode1On =  SR.getButtonPosition(384)
+	
+	local mode1Digit1 = SR.round(SR.getButtonPosition(377), 0.1)*100
+	local mode1Digit2 = SR.round(SR.getButtonPosition(378), 0.1)*10
+	
+	if mode1Digit1 > 70 then
+		mode1Digit1 = 70
+	end
+	
+	if mode1Digit2 > 3 then
+		mode1Digit2 = 3
+	end
 
-     _data.iff.mode1 = SR.round(SR.getButtonPosition(377), 0.1)*100+SR.round(SR.getButtonPosition(378), 0.1)*10
+     _data.iff.mode1 = mode1Digit1+mode1Digit2
     
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(386)
+	
+	local mode3Digit1 = SR.round(SR.getButtonPosition(379), 0.1)*10000
+	local mode3Digit2 = SR.round(SR.getButtonPosition(380), 0.1)*1000
+	local mode3Digit3 = SR.round(SR.getButtonPosition(381), 0.1)*100
+	local mode3Digit4 = SR.round(SR.getButtonPosition(382), 0.1)*10
+	
+	if mode3Digit1 > 7000 then
+		mode3Digit1 = 7000
+	end
+	
+	if mode3Digit2 > 700 then
+		mode3Digit2 = 700
+	end
+	
+	if mode3Digit3 > 70 then
+		mode3Digit3 = 70
+	end
+	
+	if mode3Digit4 > 7 then
+		mode3Digit4 = 7
+	end
     
-     _data.iff.mode3 = SR.round(SR.getButtonPosition(379), 0.1) * 10000 + SR.round(SR.getButtonPosition(380), 0.1) * 1000 + SR.round(SR.getButtonPosition(381), 0.1)* 100 + SR.round(SR.getButtonPosition(382), 0.1) * 10
+     _data.iff.mode3 = mode3Digit1+mode3Digit2+mode3Digit3+mode3Digit4
     
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
-    elseif iffPower == 4 then
+    --elseif iffPower == 4 then
         -- EMERG SETTING 7770
-        _data.iff.mode3 = 7700
+        --_data.iff.mode3 = 7700
     end
 
-    local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10
+    --local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10 -- This control is for interrogation of other a/c; it does not control the M4 response to IFF interrogation from other sources.
 
-    if mode4On == 2 then
-        _data.iff.mode4 = true
-    else
-         _data.iff.mode4 = false
-    end
+    --if mode4On == 2 then
+        _data.iff.mode4 = true  -- M4 selector in cockpit is non-functional as of 2.5.5.41962 ; defaulting to on due to partial control of IFF settings in cockpit
+    --else
+         --_data.iff.mode4 = false
+    --end
 
     return _data
 end
