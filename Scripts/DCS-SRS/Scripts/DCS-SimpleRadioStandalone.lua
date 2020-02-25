@@ -2473,18 +2473,18 @@ function SR.exportRadioM2000C(_data)
     
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
-    --elseif iffPower == 4 then
+    elseif iffPower == 4 then
         -- EMERG SETTING 7770
-        --_data.iff.mode3 = 7700
+        _data.iff.mode3 = 7700
     end
 
-    --local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10 -- This control is for interrogation of other a/c; it does not control the M4 response to IFF interrogation from other sources.
+    local mode4On =  SR.round(SR.getButtonPosition(598),0.1)*10
 
-    --if mode4On == 2 then
-        _data.iff.mode4 = true  -- M4 selector in cockpit is non-functional as of 2.5.5.41962 ; defaulting to on due to partial control of IFF settings in cockpit
-    --else
-         --_data.iff.mode4 = false
-    --end
+    if mode4On == 2 then
+        _data.iff.mode4 = true
+    else
+         _data.iff.mode4 = false
+    end
 
     return _data
 end
