@@ -255,6 +255,7 @@ xcopy /Y /e "$(SolutionDir)DCS-SR-Client\AudioEffects" "$(SolutionDir)install-bu
 copy /Y "$(SolutionDir)Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)install-build\Installer.exe"
 copy /Y "$(SolutionDir)AutoUpdater\bin\Release\SRS-AutoUpdater.exe" "$(SolutionDir)install-build\SRS-AutoUpdater.exe" 
 xcopy /Y /e "$(SolutionDir)Scripts" "$(SolutionDir)install-build\Scripts"
+if not exist "$(SolutionDir)install-build\Scripts\bin" mkdir "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\"
 copy /Y "$(SolutionDir)x64\Release\srs.dll" "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\srs.dll"
 </PostBuildEvent>
   </PropertyGroup>
