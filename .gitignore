@@ -249,7 +249,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
-<<<<<<< HEAD
 
 # JetBrains Rider
 .idea/
