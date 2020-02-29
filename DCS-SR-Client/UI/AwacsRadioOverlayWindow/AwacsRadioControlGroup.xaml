@@ -216,13 +216,13 @@
                         Style="{x:Null}" />
             </WrapPanel>
         </TabItem>
-        <TabItem>
+        <TabItem Name="EncryptionTab">
             <TabItem.Header>
                 <TextBlock Margin="3,0,3,0"
                            FontSize="10"
                            Foreground="#E7E7E7"
                            Padding="0"
-                           Text="Set" />
+                           Text="Enc" />
             </TabItem.Header>
 
             <WrapPanel HorizontalAlignment="Center"
@@ -255,7 +255,7 @@
 
         </TabItem>
 
-        <TabItem>
+        <TabItem Name="ChannelTab">
             <TabItem.Header>
                 <TextBlock Margin="3,0,3,0"
                            FontSize="10"

@@ -45,7 +45,7 @@
             </Style>
         </TabControl.Resources>
 
-        <TabItem>
+        <TabItem Name="RadioTab">
             <TabItem.Header>
                 <TextBlock x:Name="RadioLabel"
                            Margin="3,0,3,0"
@@ -206,7 +206,7 @@
 
             </WrapPanel>
         </TabItem>
-        <TabItem>
+        <TabItem Name="EncryptionTab">
             <TabItem.Header>
                 <TextBlock Margin="3,0,3,0"
                            FontSize="10"
@@ -245,7 +245,7 @@
 
         </TabItem>
 
-        <TabItem>
+        <TabItem Name="ChannelTab">
             <TabItem.Header>
                 <TextBlock Margin="3,0,3,0"
                            FontSize="10"
