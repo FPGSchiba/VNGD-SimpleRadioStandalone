@@ -172,6 +172,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 //LoadFromFileButton.IsEnabled = true;
 
                 PresetChannelsView.IsEnabled = true;
+
+                ChannelTab.Visibility = Visibility.Visible;
             }
             else
             {
@@ -188,6 +190,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 Down0001.Visibility = Visibility.Hidden;
 
                 PresetChannelsView.IsEnabled = false;
+
+                ChannelTab.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -259,6 +263,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioVolume.IsEnabled = false;
 
                     ToggleButtons(false);
+
+                    ChannelTab.Visibility = Visibility.Collapsed;
                     return;
                 }
 
@@ -329,13 +335,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
+
+            TabItem item = TabControl.SelectedItem as TabItem;
+
+            if (item?.Visibility != Visibility.Visible)
+            {
+                TabControl.SelectedIndex = 0;
+            }
         }
 
         private void SetupEncryption()
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) || dcsPlayerRadioInfo.IsCurrent())
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
@@ -350,6 +363,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     EncryptionKeySpinner.IsEnabled = false;
                     EncryptionButton.IsEnabled = false;
                     EncryptionButton.Content = "Enable";
+
+                    EncryptionTab.Visibility = Visibility.Collapsed;
                 }
                 else if (currentRadio.encMode ==
                          RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
@@ -360,6 +375,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     //disallow encryption toggle
                     EncryptionButton.IsEnabled = false;
                     EncryptionButton.Content = "Enable";
+                    EncryptionTab.Visibility = Visibility.Visible;
                 }
                 else if (currentRadio.encMode ==
                          RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
@@ -375,6 +391,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     {
                         EncryptionButton.Content = "Enable";
                     }
+                    EncryptionTab.Visibility = Visibility.Visible;
                 }
             }
             else
@@ -383,6 +400,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 EncryptionKeySpinner.IsEnabled = false;
                 EncryptionButton.IsEnabled = false;
                 EncryptionButton.Content = "Enable";
+                EncryptionTab.Visibility = Visibility.Collapsed;
             }
         }
 
