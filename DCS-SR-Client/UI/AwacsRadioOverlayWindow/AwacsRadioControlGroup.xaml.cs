@@ -458,58 +458,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
-                if (currentRadio != null)
-                {
-                    EncryptionKeySpinner.Value = currentRadio.encKey;
+                EncryptionKeySpinner.Value = currentRadio.encKey;
 
-                    //update stuff
-                    if ((currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
-                        || (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL)
-                        || (currentRadio.modulation == RadioInformation.Modulation.INTERCOM))
-                    {
-                        //Disable everything
-                        EncryptionKeySpinner.IsEnabled = false;
-                        EncryptionButton.IsEnabled = false;
-                        EncryptionButton.Content = "Enable";
-
-                        EncryptionTab.Visibility = Visibility.Collapsed;
-                    }
-                    else if (currentRadio.encMode ==
-                             RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
-                    {
-                        //allow spinner
-                        EncryptionKeySpinner.IsEnabled = true;
-
-                        //disallow encryption toggle
-                        EncryptionButton.IsEnabled = false;
-                        EncryptionButton.Content = "Enable";
-                        EncryptionTab.Visibility = Visibility.Visible;
-                    }
-                    else if (currentRadio.encMode ==
-                             RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-                    {
-                        EncryptionKeySpinner.IsEnabled = true;
-                        EncryptionButton.IsEnabled = true;
-
-                        if (currentRadio.enc)
-                        {
-                            EncryptionButton.Content = "Disable";
-                        }
-                        else
-                        {
-                            EncryptionButton.Content = "Enable";
-                        }
-
-                        EncryptionTab.Visibility = Visibility.Visible;
-                    }
-                }
-                else
+                //update stuff
+                if ((currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
+                    || (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL)
+                    || (currentRadio.modulation == RadioInformation.Modulation.INTERCOM))
                 {
                     //Disable everything
                     EncryptionKeySpinner.IsEnabled = false;
                     EncryptionButton.IsEnabled = false;
+                    EncryptionButton.Visibility = Visibility.Hidden;
                     EncryptionButton.Content = "Enable";
+
                     EncryptionTab.Visibility = Visibility.Collapsed;
+                }
+                else if (currentRadio.encMode ==
+                         RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
+                {
+                    //allow spinner
+                    EncryptionKeySpinner.IsEnabled = true;
+
+                    //disallow encryption toggle
+                    EncryptionButton.IsEnabled = false;
+                    EncryptionButton.Content = "Enable";
+                    EncryptionButton.Visibility = Visibility.Visible;
+                    EncryptionTab.Visibility = Visibility.Visible;
+                }
+                else if (currentRadio.encMode ==
+                         RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
+                {
+                    EncryptionKeySpinner.IsEnabled = true;
+                    EncryptionButton.IsEnabled = true;
+                    EncryptionButton.Visibility = Visibility.Visible;
+
+                    if (currentRadio.enc)
+                    {
+                        EncryptionButton.Content = "Disable";
+                    }
+                    else
+                    {
+                        EncryptionButton.Content = "Enable";
+                    }
+                    EncryptionTab.Visibility = Visibility.Visible;
                 }
             }
             else
@@ -517,6 +508,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 //Disable everything
                 EncryptionKeySpinner.IsEnabled = false;
                 EncryptionButton.IsEnabled = false;
+                EncryptionButton.Visibility = Visibility.Hidden;
                 EncryptionButton.Content = "Enable";
                 EncryptionTab.Visibility = Visibility.Collapsed;
             }

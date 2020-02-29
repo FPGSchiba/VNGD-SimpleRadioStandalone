@@ -362,6 +362,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     //Disable everything
                     EncryptionKeySpinner.IsEnabled = false;
                     EncryptionButton.IsEnabled = false;
+                    EncryptionButton.Visibility = Visibility.Hidden;
                     EncryptionButton.Content = "Enable";
 
                     EncryptionTab.Visibility = Visibility.Collapsed;
@@ -375,6 +376,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     //disallow encryption toggle
                     EncryptionButton.IsEnabled = false;
                     EncryptionButton.Content = "Enable";
+                    EncryptionButton.Visibility = Visibility.Visible;
                     EncryptionTab.Visibility = Visibility.Visible;
                 }
                 else if (currentRadio.encMode ==
@@ -382,6 +384,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     EncryptionKeySpinner.IsEnabled = true;
                     EncryptionButton.IsEnabled = true;
+                    EncryptionButton.Visibility = Visibility.Visible;
 
                     if (currentRadio.enc)
                     {
@@ -399,6 +402,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 //Disable everything
                 EncryptionKeySpinner.IsEnabled = false;
                 EncryptionButton.IsEnabled = false;
+                EncryptionButton.Visibility = Visibility.Hidden;
                 EncryptionButton.Content = "Enable";
                 EncryptionTab.Visibility = Visibility.Collapsed;
             }
