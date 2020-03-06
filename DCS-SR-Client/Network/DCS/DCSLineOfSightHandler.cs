@@ -21,16 +21,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
     public class DCSLineOfSightHandler
     {
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private readonly string _guid;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private volatile bool _stop = false;
         private UdpClient _dcsLOSListener;
 
-        public DCSLineOfSightHandler(ConcurrentDictionary<string, SRClient> clients, string guid)
+        public DCSLineOfSightHandler(string guid)
         {
-            _clients = clients;
             _guid = guid;
         }
 

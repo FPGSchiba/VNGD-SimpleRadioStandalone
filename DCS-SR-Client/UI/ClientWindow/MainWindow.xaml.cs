@@ -54,8 +54,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly AudioManager _audioManager;
 
-        private readonly ConcurrentDictionary<string, SRClient> _clients = ConnectedClientsSingleton.Instance.Clients;
-
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
@@ -81,9 +79,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private bool windowsN;
-
+        
         public MainWindow()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
@@ -155,7 +155,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue;
 
-            _audioManager = new AudioManager(_clients, windowsN);
+            _audioManager = new AudioManager(windowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
 
@@ -743,17 +743,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void UpdateClientCount_VUMeters(object sender, EventArgs e)
         {
-            int clientCountIngame = 0;
-
-            foreach (KeyValuePair<string, SRClient> kvp in _clients)
-            {
-                if (kvp.Value.IsIngame())
-                {
-                    clientCountIngame++;
-                }
-            }
-
-            ClientCount.Content = $"{_clients.Count} ({clientCountIngame} ingame)";
+            ClientCount.Content = $"{_clients.Total} ({_clients.InGame} ingame)";
 
             if (_audioPreview != null)
             {
@@ -900,7 +890,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback, delegate(string name)
+                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate(string name)
                         {
                             try
                             {

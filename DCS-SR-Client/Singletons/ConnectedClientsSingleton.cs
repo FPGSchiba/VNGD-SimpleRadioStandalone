@@ -2,10 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -13,7 +9,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
-    public class ConnectedClientsSingleton
+    public sealed class ConnectedClientsSingleton
     {
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
@@ -21,12 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private readonly string guid = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
-        public ConcurrentDictionary<string, SRClient> Clients {
-            get
-            {
-                return _clients;
-            }
-        }
+        private ConnectedClientsSingleton() { }
 
         public static ConnectedClientsSingleton Instance
         {
@@ -45,9 +36,68 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        private ConnectedClientsSingleton()
+        public SRClient this[string key]
         {
+            get
+            {
+                return _clients[key];
+            }
+            set
+            {
+                _clients[key] = value;
+            }
+        }
 
+        public ICollection<SRClient> Values
+        {
+            get
+            {
+                return _clients.Values;
+            }
+        }
+
+        public int Total
+        {
+            get
+            {
+                return _clients.Count();
+            }
+        }
+
+        public int InGame
+        {
+            get
+            {
+                int clientCountIngame = 0;
+                foreach (SRClient client in _clients.Values)
+                {
+                    if (client.IsIngame())
+                    {
+                        clientCountIngame++;
+                    }
+                }
+                return clientCountIngame;
+            }
+        }
+
+        public bool TryRemove(string key, out SRClient value)
+        {
+            return _clients.TryRemove(key, out value);
+        }
+
+        public void Clear()
+        {
+            _clients.Clear();
+        }
+
+        public bool TryGetValue(string key, out SRClient value)
+        {
+            return _clients.TryGetValue(key, out value);
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return _clients.ContainsKey(key);
         }
 
         public int ClientsOnFreq(double freq, RadioInformation.Modulation modulation)
