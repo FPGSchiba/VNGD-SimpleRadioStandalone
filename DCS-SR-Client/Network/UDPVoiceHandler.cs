@@ -74,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private DispatcherTimer _updateTimer;
 
         public UdpVoiceHandler(string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager,
-            InputDeviceManager inputManager, AudioManager.VOIPConnectCallback voipConnectCallback)
+            InputDeviceManager inputManager)
         {
             // _decoder = decoder;
             _audioManager = audioManager;
@@ -88,8 +88,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _inputManager = inputManager;
 
-            _voipConnectCallback = voipConnectCallback;
-
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
             _updateTimer.Tick += UpdateVOIPStatus;
             _updateTimer.Start();
@@ -102,14 +100,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //ping every 15 so after 35 seconds VoIP UDP issue
             if (diff.Seconds > 35)
             {
-                CallOnMainVOIPConnect(false);
+                _clientStateSingleton.IsVoipConnected = false;
             }
             else
             {
-                CallOnMainVOIPConnect(true);
+                _clientStateSingleton.IsVoipConnected = true;
             }
-
-
         }
 
         private void AudioEffectCheckTick()
@@ -249,7 +245,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //stop UI Refreshing
             _updateTimer.Stop();
 
-            CallOnMainVOIPConnect(false);
+            _clientStateSingleton.IsVoipConnected = false;
         }
 
         public void StartTimer()
@@ -874,21 +870,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
             });
             thread.Start();
-        }
-
-        private void CallOnMainVOIPConnect(bool result, bool connectionError = false)
-        {
-            try
-            {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate
-                    {
-                        _voipConnectCallback(result, connectionError, $"{_address.ToString()}:{_port}");
-                    }));
-            }
-            catch (Exception ex)
-            {
-            }
         }
     }
 }
