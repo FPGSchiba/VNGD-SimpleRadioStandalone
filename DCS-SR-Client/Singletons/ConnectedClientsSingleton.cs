@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -9,13 +10,15 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
-    public sealed class ConnectedClientsSingleton
+    public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
         private readonly string guid = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private ConnectedClientsSingleton() { }
 
@@ -36,6 +39,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
+        private void NotifyPropertyChanged(string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public SRClient this[string key]
         {
             get
@@ -45,6 +53,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             set
             {
                 _clients[key] = value;
+                NotifyPropertyChanged("Total");
+                NotifyPropertyChanged("InGame");
             }
         }
 
@@ -82,12 +92,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public bool TryRemove(string key, out SRClient value)
         {
-            return _clients.TryRemove(key, out value);
+            bool result = _clients.TryRemove(key, out value);
+            if (result)
+            {
+                NotifyPropertyChanged("Total");
+                NotifyPropertyChanged("InGame");
+            }
+            return result;
         }
 
         public void Clear()
         {
             _clients.Clear();
+            NotifyPropertyChanged("Total");
+            NotifyPropertyChanged("InGame");
         }
 
         public bool TryGetValue(string key, out SRClient value)

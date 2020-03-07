@@ -79,11 +79,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
-        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+        
+        /// <remarks>Used in the XAML for DataBinding the connected client count</remarks>
+        public ConnectedClientsSingleton Clients { get; } = ConnectedClientsSingleton.Instance;
 
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private bool windowsN;
-        
+
         public MainWindow()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
@@ -171,7 +173,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
-            _updateTimer.Tick += UpdateClientCount_VUMeters;
+            _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
 
             _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -741,10 +743,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void UpdateClientCount_VUMeters(object sender, EventArgs e)
+        private void UpdatePlayerLocationAndVUMeters(object sender, EventArgs e)
         {
-            ClientCount.Content = $"{_clients.Total} ({_clients.InGame} ingame)";
-
             if (_audioPreview != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
