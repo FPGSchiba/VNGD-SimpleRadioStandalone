@@ -102,77 +102,75 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var decoded = _decoder.Decode(audio.EncodedAudio,
                 audio.EncodedAudio.Length, out decodedLength, newTransmission);
 
-            if (decodedLength > 0)
+            if (decodedLength <= 0)
             {
+                Logger.Info("Failed to decode audio from Packet for client");
+                return;
+            }
 
-                // for some reason if this is removed then it lags?!
-                //guess it makes a giant buffer and only uses a little?
-                //Answer: makes a buffer of 4000 bytes - so throw away most of it
-                var tmp = new byte[decodedLength];
-                Buffer.BlockCopy(decoded, 0, tmp, 0, decodedLength);
+            // for some reason if this is removed then it lags?!
+            //guess it makes a giant buffer and only uses a little?
+            //Answer: makes a buffer of 4000 bytes - so throw away most of it
+            var tmp = new byte[decodedLength];
+            Buffer.BlockCopy(decoded, 0, tmp, 0, decodedLength);
 
-                audio.PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp);
+            audio.PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp);
 
-                var decrytable = audio.Decryptable || (audio.Encryption == 0);
+            var decrytable = audio.Decryptable || (audio.Encryption == 0);
 
-                if (decrytable)
+            if (decrytable)
+            {
+                //adjust for LOS + Distance + Volume
+                AdjustVolume(audio);
+
+                if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                 {
-                    //adjust for LOS + Distance + Volume
-                    AdjustVolume(audio);
-
-                    if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                    if (audio.ReceivedRadio == 0)
                     {
-                        if (audio.ReceivedRadio == 0)
-                        {
-                            AddRadioEffectIntercom(audio);
-                        }
-                        else
-                        {
-                            AddRadioEffect(audio);
-                        }
+                        AddRadioEffectIntercom(audio);
                     }
-
-                }
-                else
-                {
-                    AddEncryptionFailureEffect(audio);
-
-                    if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                    else
                     {
                         AddRadioEffect(audio);
                     }
                 }
 
-                if (newTransmission)
-                {
-                    // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
-                    //append ms of silence - this functions as our jitter buffer??
-                    var silencePad = (AudioManager.INPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
-
-                    var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
-
-                    Buffer.BlockCopy(audio.PcmAudioShort, 0, newAudio, silencePad, audio.PcmAudioShort.Length);
-
-                    audio.PcmAudioShort = newAudio;
-                }
-
-                _lastReceivedOn = audio.ReceivedRadio;
-                LastUpdate = DateTime.Now.Ticks;
-
-                JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
-                {
-                    Audio =
-                        SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
-                            audio.ReceivedRadio),
-                    PacketNumber = audio.PacketNumber
-                });
-
-                //timer.Stop();
             }
             else
             {
-                Logger.Info("Failed to decode audio from Packet for client");
+                AddEncryptionFailureEffect(audio);
+
+                if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                {
+                    AddRadioEffect(audio);
+                }
             }
+
+            if (newTransmission)
+            {
+                // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
+                //append ms of silence - this functions as our jitter buffer??
+                var silencePad = (AudioManager.INPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
+
+                var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
+
+                Buffer.BlockCopy(audio.PcmAudioShort, 0, newAudio, silencePad, audio.PcmAudioShort.Length);
+
+                audio.PcmAudioShort = newAudio;
+            }
+
+            _lastReceivedOn = audio.ReceivedRadio;
+            LastUpdate = DateTime.Now.Ticks;
+
+            JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
+            {
+                Audio =
+                    SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
+                        audio.ReceivedRadio),
+                PacketNumber = audio.PacketNumber
+            });
+
+            //timer.Stop();
         }
 
         private void AddRadioEffectIntercom(ClientAudio clientAudio)

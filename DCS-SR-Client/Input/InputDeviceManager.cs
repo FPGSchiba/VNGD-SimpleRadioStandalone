@@ -92,86 +92,84 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             foreach (var deviceInstance in deviceInstances)
             {
                 //Workaround for Bad Devices that pretend to be joysticks
-                if (!IsBlackListed(deviceInstance.ProductGuid))
-                {
-                    Logger.Info("Found Device ID:" + deviceInstance.ProductGuid +
-                                " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
-                                deviceInstance.UsagePage + " Type: " +
-                                deviceInstance.Type);
-                    if (_inputDevices.ContainsKey(deviceInstance.InstanceGuid))
-                    {
-                        Logger.Info("Already have device:" + deviceInstance.ProductGuid +
-                                    " " +
-                                    deviceInstance.ProductName.Trim().Replace("\0", ""));
-                    }
-                    else
-                    {
-
-                        if (deviceInstance.Type == DeviceType.Keyboard)
-                        {
-
-                            Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid +
-                                        " " +
-                                        deviceInstance.ProductName.Trim().Replace("\0", ""));
-                            var device = new Keyboard(_directInput);
-
-                            device.SetCooperativeLevel(WindowHelper.Handle,
-                                CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                            device.Acquire();
-
-                            _inputDevices.Add(deviceInstance.InstanceGuid, device);
-                        }
-                        else if (deviceInstance.Type == DeviceType.Mouse)
-                        {
-                            Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid + " " +
-                                        deviceInstance.ProductName.Trim().Replace("\0", ""));
-                            var device = new Mouse(_directInput);
-
-                            device.SetCooperativeLevel(WindowHelper.Handle,
-                                CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                            device.Acquire();
-
-                            _inputDevices.Add(deviceInstance.InstanceGuid, device);
-                        }
-                        else if (((deviceInstance.Type >= DeviceType.Joystick) &&
-                                  (deviceInstance.Type <= DeviceType.FirstPerson)) ||
-                                 IsWhiteListed(deviceInstance.ProductGuid))
-                        {
-                            var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
-
-                            Logger.Info("Adding ID:" + deviceInstance.ProductGuid + " " +
-                                        deviceInstance.ProductName.Trim().Replace("\0", ""));
-
-                            device.SetCooperativeLevel(WindowHelper.Handle,
-                                CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                            device.Acquire();
-
-                            _inputDevices.Add(deviceInstance.InstanceGuid, device);
-                        }
-                        else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.ExpandControls))
-                        {
-                            Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
-                                        deviceInstance.ProductName.Trim().Replace("\0", ""));
-
-                            var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
-
-                            device.SetCooperativeLevel(WindowHelper.Handle,
-                                CooperativeLevel.Background | CooperativeLevel.NonExclusive);
-                            device.Acquire();
-
-                            _inputDevices.Add(deviceInstance.InstanceGuid, device);
-
-                            Logger.Info("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
-                                        deviceInstance.ProductName.Trim().Replace("\0", ""));
-                        }
-                    }
-                }
-                else
+                if (IsBlackListed(deviceInstance.ProductGuid))
                 {
                     Logger.Info("Found but ignoring blacklist device  " + deviceInstance.ProductGuid + " Instance: " +
-                                deviceInstance.InstanceGuid + " " +
-                                deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: " + deviceInstance.Type);
+                        deviceInstance.InstanceGuid + " " +
+                        deviceInstance.ProductName.Trim().Replace("\0", "") + " Type: " + deviceInstance.Type);
+                    continue;
+                }
+
+                Logger.Info("Found Device ID:" + deviceInstance.ProductGuid +
+                            " " +
+                            deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
+                            deviceInstance.UsagePage + " Type: " +
+                            deviceInstance.Type);
+                if (_inputDevices.ContainsKey(deviceInstance.InstanceGuid))
+                {
+                    Logger.Info("Already have device:" + deviceInstance.ProductGuid +
+                                " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                    continue;
+                }
+
+
+                if (deviceInstance.Type == DeviceType.Keyboard)
+                {
+
+                    Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid +
+                                " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                    var device = new Keyboard(_directInput);
+
+                    device.SetCooperativeLevel(WindowHelper.Handle,
+                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    device.Acquire();
+
+                    _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                }
+                else if (deviceInstance.Type == DeviceType.Mouse)
+                {
+                    Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+                    var device = new Mouse(_directInput);
+
+                    device.SetCooperativeLevel(WindowHelper.Handle,
+                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    device.Acquire();
+
+                    _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                }
+                else if (((deviceInstance.Type >= DeviceType.Joystick) &&
+                            (deviceInstance.Type <= DeviceType.FirstPerson)) ||
+                            IsWhiteListed(deviceInstance.ProductGuid))
+                {
+                    var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
+
+                    Logger.Info("Adding ID:" + deviceInstance.ProductGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+
+                    device.SetCooperativeLevel(WindowHelper.Handle,
+                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    device.Acquire();
+
+                    _inputDevices.Add(deviceInstance.InstanceGuid, device);
+                }
+                else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.ExpandControls))
+                {
+                    Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
+
+                    var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
+
+                    device.SetCooperativeLevel(WindowHelper.Handle,
+                        CooperativeLevel.Background | CooperativeLevel.NonExclusive);
+                    device.Acquire();
+
+                    _inputDevices.Add(deviceInstance.InstanceGuid, device);
+
+                    Logger.Info("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
+                                deviceInstance.ProductName.Trim().Replace("\0", ""));
                 }
             }
         }
@@ -194,31 +192,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private void LoadGuidFromPath(string path, HashSet<Guid> _hashSet)
         {
-            if (File.Exists(path))
-            {
-                string[] lines = File.ReadAllLines(path);
-                if (lines?.Length > 0)
-                {
-                    foreach (var line in lines)
-                    {
-                        var trimmed = line.Trim();
-                        if (trimmed.Length > 0)
-                        {
-                            try
-                            {
-                                _hashSet.Add(new Guid(trimmed));
-                                Logger.Info("Added " + trimmed);
-                            }
-                            catch (Exception ex)
-                            {
-                            }
-                        }
-                    }
-                }
-            }
-            else
+            if (!File.Exists(path))
             {
                 Logger.Info("File doesnt exist: " + path);
+                return;
+            }
+
+            string[] lines = File.ReadAllLines(path);
+            if (lines?.Length <= 0)
+            {
+                return;
+
+            }
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+                if (trimmed.Length > 0)
+                {
+                    try
+                    {
+                        _hashSet.Add(new Guid(trimmed));
+                        Logger.Info("Added " + trimmed);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
             }
         }
 
@@ -259,60 +259,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 for (var i = 0; i < deviceList.Count; i++)
                 {
-                    if (deviceList[i] != null && !deviceList[i].IsDisposed)
+                    if (deviceList[i] == null || deviceList[i].IsDisposed)
                     {
-                        try
+                        continue;
+                    }
+
+                    try
+                    {
+                        if (deviceList[i] is Joystick)
                         {
-                            if (deviceList[i] is Joystick)
+                            deviceList[i].Poll();
+
+                            var state = (deviceList[i] as Joystick).GetCurrentState();
+
+                            for (var j = 0; j < state.Buttons.Length; j++)
                             {
-                                deviceList[i].Poll();
-
-                                var state = (deviceList[i] as Joystick).GetCurrentState();
-
-                                for (var j = 0; j < state.Buttons.Length; j++)
-                                {
-                                    initial[i, j] = state.Buttons[j] ? 1 : 0;
-                                }
-                                var pov = state.PointOfViewControllers;
-
-                                for (var j = 0; j < pov.Length; j++)
-                                {
-                                    initial[i, j + 128] = pov[j];
-                                }
+                                initial[i, j] = state.Buttons[j] ? 1 : 0;
                             }
-                            else if (deviceList[i] is Keyboard)
+                            var pov = state.PointOfViewControllers;
+
+                            for (var j = 0; j < pov.Length; j++)
                             {
-                                var keyboard = deviceList[i] as Keyboard;
-                                keyboard.Poll();
-                                var state = keyboard.GetCurrentState();
-
-                                for (var j = 0; j < 128; j++)
-                                {
-                                    initial[i, j] = state.IsPressed(state.AllKeys[j]) ? 1 : 0;
-                                }
-                            }
-                            else if (deviceList[i] is Mouse)
-                            {
-                                var mouse = deviceList[i] as Mouse;
-                                mouse.Poll();
-
-                                var state = mouse.GetCurrentState();
-
-                                for (var j = 0; j < state.Buttons.Length; j++)
-                                {
-                                    initial[i, j] = state.Buttons[j] ? 1 : 0;
-                                }
+                                initial[i, j + 128] = pov[j];
                             }
                         }
-                        catch (Exception e)
+                        else if (deviceList[i] is Keyboard)
                         {
-                            Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
-                                $"(ID: {deviceList[i].Information.ProductGuid}) while assigning button, ignoring until next restart/rediscovery");
+                            var keyboard = deviceList[i] as Keyboard;
+                            keyboard.Poll();
+                            var state = keyboard.GetCurrentState();
 
-                            deviceList[i].Unacquire();
-                            deviceList[i].Dispose();
-                            deviceList[i] = null;
+                            for (var j = 0; j < 128; j++)
+                            {
+                                initial[i, j] = state.IsPressed(state.AllKeys[j]) ? 1 : 0;
+                            }
                         }
+                        else if (deviceList[i] is Mouse)
+                        {
+                            var mouse = deviceList[i] as Mouse;
+                            mouse.Poll();
+
+                            var state = mouse.GetCurrentState();
+
+                            for (var j = 0; j < state.Buttons.Length; j++)
+                            {
+                                initial[i, j] = state.Buttons[j] ? 1 : 0;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
+                            $"(ID: {deviceList[i].Information.ProductGuid}) while assigning button, ignoring until next restart/rediscovery");
+
+                        deviceList[i].Unacquire();
+                        deviceList[i].Dispose();
+                        deviceList[i] = null;
                     }
                 }
 
@@ -328,75 +330,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     for (var i = 0; i < _inputDevices.Count; i++)
                     {
-                        if (deviceList[i] != null && !deviceList[i].IsDisposed)
+                        if (deviceList[i] == null || deviceList[i].IsDisposed)
                         {
-                            try
+                            continue;
+                        }
+
+                        try
+                        {
+                            if (deviceList[i] is Joystick)
                             {
-                                if (deviceList[i] is Joystick)
+                                deviceList[i].Poll();
+
+                                var state = (deviceList[i] as Joystick).GetCurrentState();
+
+                                for (var j = 0; j < 128 + 4; j++)
                                 {
-                                    deviceList[i].Poll();
-
-                                    var state = (deviceList[i] as Joystick).GetCurrentState();
-
-                                    for (var j = 0; j < 128 + 4; j++)
+                                    if (j >= 128)
                                     {
-                                        if (j >= 128)
-                                        {
-                                            //handle POV
-                                            var pov = state.PointOfViewControllers;
+                                        //handle POV
+                                        var pov = state.PointOfViewControllers;
 
-                                            if (pov[j - 128] != initial[i, j])
-                                            {
-                                                found = true;
-
-                                                var inputDevice = new InputDevice
-                                                {
-                                                    DeviceName =
-                                                        deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
-                                                    Button = j,
-                                                    InstanceGuid = deviceList[i].Information.InstanceGuid,
-                                                    ButtonValue = pov[j - 128]
-                                                };
-                                                Application.Current.Dispatcher.Invoke(
-                                                    () => { callback(inputDevice); });
-                                                return;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var buttonState = state.Buttons[j] ? 1 : 0;
-
-                                            if (buttonState != initial[i, j])
-                                            {
-                                                found = true;
-
-                                                var inputDevice = new InputDevice
-                                                {
-                                                    DeviceName =
-                                                        deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
-                                                    Button = j,
-                                                    InstanceGuid = deviceList[i].Information.InstanceGuid,
-                                                    ButtonValue = buttonState
-                                                };
-
-                                                Application.Current.Dispatcher.Invoke(
-                                                    () => { callback(inputDevice); });
-
-
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                                else if (deviceList[i] is Keyboard)
-                                {
-                                    var keyboard = deviceList[i] as Keyboard;
-                                    keyboard.Poll();
-                                    var state = keyboard.GetCurrentState();
-
-                                    for (var j = 0; j < 128; j++)
-                                    {
-                                        if (initial[i, j] != (state.IsPressed(state.AllKeys[j]) ? 1 : 0))
+                                        if (pov[j - 128] != initial[i, j])
                                         {
                                             found = true;
 
@@ -406,34 +360,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                                     deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
                                                 Button = j,
                                                 InstanceGuid = deviceList[i].Information.InstanceGuid,
-                                                ButtonValue = 1
+                                                ButtonValue = pov[j - 128]
                                             };
-
                                             Application.Current.Dispatcher.Invoke(
                                                 () => { callback(inputDevice); });
-
-
                                             return;
                                         }
-
-                                        //                                if (initial[i, j] == 1)
-                                        //                                {
-                                        //                                    Console.WriteLine("Pressed: "+j);
-                                        //                                    MessageBox.Show("Keyboard!");
-                                        //                                }
                                     }
-                                }
-                                else if (deviceList[i] is Mouse)
-                                {
-                                    deviceList[i].Poll();
-
-                                    var state = (deviceList[i] as Mouse).GetCurrentState();
-
-                                    //skip left mouse button - start at 1 with j 0 is left, 1 is right, 2 is middle
-                                    for (var j = 1; j < state.Buttons.Length; j++)
+                                    else
                                     {
                                         var buttonState = state.Buttons[j] ? 1 : 0;
-
 
                                         if (buttonState != initial[i, j])
                                         {
@@ -450,20 +386,87 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                                             Application.Current.Dispatcher.Invoke(
                                                 () => { callback(inputDevice); });
+
+
                                             return;
                                         }
                                     }
                                 }
                             }
-                            catch (Exception e)
+                            else if (deviceList[i] is Keyboard)
                             {
-                                Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
-                                    $"(ID: {deviceList[i].Information.ProductGuid}) while discovering button press while assigning, ignoring until next restart/rediscovery");
+                                var keyboard = deviceList[i] as Keyboard;
+                                keyboard.Poll();
+                                var state = keyboard.GetCurrentState();
 
-                                deviceList[i].Unacquire();
-                                deviceList[i].Dispose();
-                                deviceList[i] = null;
+                                for (var j = 0; j < 128; j++)
+                                {
+                                    if (initial[i, j] != (state.IsPressed(state.AllKeys[j]) ? 1 : 0))
+                                    {
+                                        found = true;
+
+                                        var inputDevice = new InputDevice
+                                        {
+                                            DeviceName =
+                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
+                                            Button = j,
+                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
+                                            ButtonValue = 1
+                                        };
+
+                                        Application.Current.Dispatcher.Invoke(
+                                            () => { callback(inputDevice); });
+
+
+                                        return;
+                                    }
+
+                                    //                                if (initial[i, j] == 1)
+                                    //                                {
+                                    //                                    Console.WriteLine("Pressed: "+j);
+                                    //                                    MessageBox.Show("Keyboard!");
+                                    //                                }
+                                }
                             }
+                            else if (deviceList[i] is Mouse)
+                            {
+                                deviceList[i].Poll();
+
+                                var state = (deviceList[i] as Mouse).GetCurrentState();
+
+                                //skip left mouse button - start at 1 with j 0 is left, 1 is right, 2 is middle
+                                for (var j = 1; j < state.Buttons.Length; j++)
+                                {
+                                    var buttonState = state.Buttons[j] ? 1 : 0;
+
+                                    if (buttonState != initial[i, j])
+                                    {
+                                        found = true;
+
+                                        var inputDevice = new InputDevice
+                                        {
+                                            DeviceName =
+                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
+                                            Button = j,
+                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
+                                            ButtonValue = buttonState
+                                        };
+
+                                        Application.Current.Dispatcher.Invoke(
+                                            () => { callback(inputDevice); });
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
+                                $"(ID: {deviceList[i].Information.ProductGuid}) while discovering button press while assigning, ignoring until next restart/rediscovery");
+
+                            deviceList[i].Unacquire();
+                            deviceList[i].Dispose();
+                            deviceList[i] = null;
                         }
                     }
                 }
@@ -480,7 +483,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 while (_detectPtt)
                 {
                     var bindStates = GenerateBindStateList();
-
 
                     for (var i = 0; i < bindStates.Count; i++)
                     {
@@ -509,34 +511,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                 //check previous bindings
                                 var previousBind = bindStates[j];
 
-                                if (previousBind.IsActive)
+                                if (!previousBind.IsActive)
                                 {
-                                    if (previousBind.ModifierDevice == null && bindState.ModifierDevice != null)
+                                    continue;
+                                }
+
+                                if (previousBind.ModifierDevice == null && bindState.ModifierDevice != null)
+                                {
+                                    //set previous bind to off if previous bind Main == main or modifier of bindstate
+                                    if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
                                     {
-                                        //set previous bind to off if previous bind Main == main or modifier of bindstate
-                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
-                                        {
-                                            previousBind.IsActive = false;
-                                            break;
-                                        }
-                                        if (previousBind.MainDevice.IsSameBind(bindState.ModifierDevice))
-                                        {
-                                            previousBind.IsActive = false;
-                                            break;
-                                        }
+                                        previousBind.IsActive = false;
+                                        break;
                                     }
-                                    else if (previousBind.ModifierDevice != null && bindState.ModifierDevice == null)
+                                    if (previousBind.MainDevice.IsSameBind(bindState.ModifierDevice))
                                     {
-                                        if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
-                                        {
-                                            bindState.IsActive = false;
-                                            break;
-                                        }
-                                        if (previousBind.ModifierDevice.IsSameBind(bindState.MainDevice))
-                                        {
-                                            bindState.IsActive = false;
-                                            break;
-                                        }
+                                        previousBind.IsActive = false;
+                                        break;
+                                    }
+                                }
+                                else if (previousBind.ModifierDevice != null && bindState.ModifierDevice == null)
+                                {
+                                    if (previousBind.MainDevice.IsSameBind(bindState.MainDevice))
+                                    {
+                                        bindState.IsActive = false;
+                                        break;
+                                    }
+                                    if (previousBind.ModifierDevice.IsSameBind(bindState.MainDevice))
+                                    {
+                                        bindState.IsActive = false;
+                                        break;
                                     }
                                 }
                             }
@@ -666,65 +670,67 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             foreach (var kpDevice in _inputDevices)
             {
                 var device = kpDevice.Value;
-                if (device != null &&
-                    !device.IsDisposed &&
-                    device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
+                if (device == null ||
+                    device.IsDisposed ||
+                    !device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
                 {
+                    continue;
+                }
 
-                    try
+                try
+                {
+                    if (device is Joystick)
                     {
-                        if (device is Joystick)
-                        {
-                            device.Poll();
-                            var state = (device as Joystick).GetCurrentState();
+                        device.Poll();
+                        var state = (device as Joystick).GetCurrentState();
 
-                            if (inputDeviceBinding.Button >= 128) //its a POV!
-                            {
-                                var pov = state.PointOfViewControllers;
-                                //-128 to get POV index
-                                return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
-                            }
-                            else
-                            {
-                                return state.Buttons[inputDeviceBinding.Button];
-                            }
-                        }
-                        else if (device is Keyboard)
+                        if (inputDeviceBinding.Button >= 128) //its a POV!
                         {
-                            var keyboard = device as Keyboard;
-                            keyboard.Poll();
-                            var state = keyboard.GetCurrentState();
-                            return
-                                state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                            var pov = state.PointOfViewControllers;
+                            //-128 to get POV index
+                            return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
                         }
-                        else if (device is Mouse)
+                        else
                         {
-                            device.Poll();
-                            var state = (device as Mouse).GetCurrentState();
-
-                            //just incase mouse changes number of buttons, like logitech can?
-                            if (inputDeviceBinding.Button < state.Buttons.Length)
-                            {
-                                return state.Buttons[inputDeviceBinding.Button];
-                            }
+                            return state.Buttons[inputDeviceBinding.Button];
                         }
                     }
-                    catch (Exception e)
+                    else if (device is Keyboard)
                     {
-                        Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
-                            $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
+                        var keyboard = device as Keyboard;
+                        keyboard.Poll();
+                        var state = keyboard.GetCurrentState();
+                        return
+                            state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                    }
+                    else if (device is Mouse)
+                    {
+                        device.Poll();
+                        var state = (device as Mouse).GetCurrentState();
 
-                        MessageBox.Show(
-                            $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
-                            $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
-                            "Input device error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-
-                        device.Unacquire();
-                        device.Dispose();
+                        //just incase mouse changes number of buttons, like logitech can?
+                        if (inputDeviceBinding.Button < state.Buttons.Length)
+                        {
+                            return state.Buttons[inputDeviceBinding.Button];
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
+                        $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
+
+                    MessageBox.Show(
+                        $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
+                        $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
+                        "Input device error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    device.Unacquire();
+                    device.Dispose();
+                }
+
             }
             return false;
         }
@@ -738,27 +744,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             //MIN + MAX bind numbers
             for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioChannelDown; i++)
             {
-                if (currentInputProfile.ContainsKey((InputBinding)i))
+                if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {
-                    var input = currentInputProfile[(InputBinding)i];
-                    //construct InputBindState
-
-                    var bindState = new InputBindState()
-                    {
-                        IsActive = false,
-                        MainDevice = input,
-                        MainDeviceState = false,
-                        ModifierDevice = null,
-                        ModifierState = false
-                    };
-
-                    if (currentInputProfile.ContainsKey((InputBinding)i + 100))
-                    {
-                        bindState.ModifierDevice = currentInputProfile[(InputBinding)i + 100];
-                    }
-
-                    bindStates.Add(bindState);
+                    continue;
                 }
+
+                var input = currentInputProfile[(InputBinding)i];
+                //construct InputBindState
+
+                var bindState = new InputBindState()
+                {
+                    IsActive = false,
+                    MainDevice = input,
+                    MainDeviceState = false,
+                    ModifierDevice = null,
+                    ModifierState = false
+                };
+
+                if (currentInputProfile.ContainsKey((InputBinding)i + 100))
+                {
+                    bindState.ModifierDevice = currentInputProfile[(InputBinding)i + 100];
+                }
+
+                bindStates.Add(bindState);
             }
 
             return bindStates;
