@@ -325,7 +325,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 {
                                                     //radio update but null RadioInfo means no change
                                                     if (serverMessage.MsgType ==
-                                                        NetworkMessage.MessageType.RADIO_UPDATE)
+                                                        NetworkMessage.MessageType.RADIO_UPDATE &&
+                                                        srClient.RadioInfo != null)
                                                     {
                                                         srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
                                                     }
