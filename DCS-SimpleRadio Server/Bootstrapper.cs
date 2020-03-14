@@ -38,49 +38,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         private void SetupLogging()
         {
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string logFilePath = Path.Combine(baseDirectory, "serverlog.txt");
-            string oldLogFilePath = Path.Combine(baseDirectory, "serverlog.old.txt");
-
-            FileInfo logFileInfo = new FileInfo(logFilePath);
-            // Cleanup logfile if > 100MB, keep one old file copy
-            if (logFileInfo.Exists && logFileInfo.Length >= 104857600)
+            // If there is a configuration file then this will already be set
+            if (LogManager.Configuration != null)
             {
-                if (File.Exists(oldLogFilePath))
-                {
-                    try
-                    {
-                        File.Delete(oldLogFilePath);
-                    }
-                    catch (Exception) { }
-                }
-
-                try
-                {
-                    File.Move(logFilePath, oldLogFilePath);
-                }
-                catch (Exception) { }
+                loggingReady = true;
+                return;
             }
 
             var config = new LoggingConfiguration();
-
-            var fileTarget = new FileTarget();
-
-            fileTarget.FileName = "${basedir}/serverlog.txt";
-            fileTarget.Layout =
-                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}";
+            var fileTarget = new FileTarget
+            {
+                FileName = "serverlog.txt",
+                ArchiveFileName = "serverlog.old.txt",
+                MaxArchiveFiles = 1,
+                ArchiveAboveSize = 104857600,
+                Layout =
+                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+            };
 
             var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
-            config.AddTarget("file", wrapper);
-
-#if DEBUG
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Debug, fileTarget));
-#else
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileTarget));
-#endif
+            config.AddTarget("asyncFileTarget", wrapper);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, wrapper));
 
             LogManager.Configuration = config;
-
             loggingReady = true;
         }
 
