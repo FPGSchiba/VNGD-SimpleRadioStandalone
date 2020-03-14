@@ -33,19 +33,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private volatile bool _stopExternalAWACSMode;
 
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
 
         public bool IsListening { get; private set; }
 
         public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
-            ConcurrentDictionary<string, SRClient> clients, string guid, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
+           string guid, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
         {
-            this._clients = clients;
             IsListening = false;
-            _lineOfSightHandler = new DCSLineOfSightHandler(clients,guid);
+            _lineOfSightHandler = new DCSLineOfSightHandler(guid);
             _udpCommandHandler = new UDPCommandHandler();
             _dcsGameGuiHandler = new DCSGameGuiHandler(clientSideUpdate);
-            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _clients, _newAircraftCallback);
+            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _newAircraftCallback);
         }
 
         public void Start()

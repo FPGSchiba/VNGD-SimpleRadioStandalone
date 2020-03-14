@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
             new ConcurrentDictionary<string, ClientAudioProvider>();
 
-        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private MixingSampleProvider _clientAudioMixer;
 
         private OpusDecoder _decoder;
@@ -75,10 +75,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private Preprocessor _speex;
         private bool windowsN = false;
 
-        public AudioManager(ConcurrentDictionary<string, SRClient> clientsList, bool windowsN)
+        public AudioManager(bool windowsN)
         {
             this.windowsN = windowsN;
-            _clientsList = clientsList;
 
             _cachedAudioEffects =
                 new CachedAudioEffect[Enum.GetNames(typeof(CachedAudioEffect.AudioEffectTypes)).Length];
@@ -241,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
                     _udpVoiceHandler =
-                        new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                        new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
                     var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
@@ -264,7 +263,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 //no mic....
                 _udpVoiceHandler =
-                    new UdpVoiceHandler(_clientsList, guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                    new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
                 MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();

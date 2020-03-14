@@ -239,8 +239,18 @@
                                 Orientation="Horizontal">
                         <Label HorizontalAlignment="Center" Content="Connected Clients:" />
                         <Label x:Name="ClientCount"
-                               HorizontalAlignment="Center"
-                               Content="0" />
+                               HorizontalAlignment="Center">
+                            <Label.Content>
+                                <TextBlock> <!-- https://stackoverflow.com/questions/4399178/stringformat-and-multibinding-with-label -->
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat=" {0} ({1} ingame)">
+                                            <Binding Path="Clients.Total" />
+                                            <Binding Path="Clients.InGame" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Label.Content>
+                        </Label>
                         <Label Content="Current Position:"></Label>
                         <Label >
                             <TextBlock Name="CurrentPosition" Text="0,0 - Alt:0" MouseLeftButtonUp="CurrentPosition_OnClick" />

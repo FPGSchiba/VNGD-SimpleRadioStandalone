@@ -33,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;
-        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
 
 
         private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
@@ -73,14 +73,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _udpLastReceived = 0;
         private DispatcherTimer _updateTimer;
 
-        public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
-            int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager,
-            AudioManager.VOIPConnectCallback voipConnectCallback)
+        public UdpVoiceHandler(string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager,
+            InputDeviceManager inputManager, AudioManager.VOIPConnectCallback voipConnectCallback)
         {
             // _decoder = decoder;
             _audioManager = audioManager;
-
-            _clientsList = clientsList;
             _guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
 
             _guid = guid;
@@ -295,9 +292,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private SRClient IsClientMetaDataValid(string clientGuid)
         {
-            if (_clientsList.ContainsKey(clientGuid))
+            if (_clients.ContainsKey(clientGuid))
             {
-                var client = _clientsList[_guid];
+                var client = _clients[_guid];
 
                 if ((client != null) && client.isCurrent())
                 {
@@ -542,7 +539,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SRClient transmittingClient;
-            if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
+            if (_clients.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
                 var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
                 var clientLatLng = transmittingClient.LatLngPosition;
@@ -569,7 +566,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SRClient transmittingClient;
-            if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
+            if (_clients.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
                 double dist = 0;
                

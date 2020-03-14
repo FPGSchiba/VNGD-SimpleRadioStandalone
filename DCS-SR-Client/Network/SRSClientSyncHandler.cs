@@ -33,7 +33,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stop = false;
 
         public static string ServerVersion = "Unknown";
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
         private readonly string _guid;
         private ConnectCallback _callback;
         private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
@@ -44,6 +43,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+
 
         private DCSRadioSyncManager _radioDCSSync = null;
         private LotATCSyncHandler _lotATCSync;
@@ -52,9 +53,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private VAICOMSyncHandler _vaicomSync;
 
 
-        public SRSClientSyncHandler(ConcurrentDictionary<string, SRClient> clients, string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
+        public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
-            _clients = clients;
             _guid = guid;
             _updateUICallback = uiCallback;
             this._newAircraft = _newAircraft;
@@ -142,8 +142,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _clients, _guid,_newAircraft);
-            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate,_clients, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _guid,_newAircraft);
+            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate, _guid);
             _vaicomSync = new VAICOMSyncHandler();
 
             using (_tcpClient = new TcpClient())
