@@ -1186,7 +1186,7 @@ function SR.exportRadioYak52(_data)
     _data.radios[1].volMode = 1
 
     _data.radios[2].name = "Baklan 5"
-    _data.radios[2].freq = SR.getRadioFrequency(24)
+    _data.radios[2].freq = SR.getRadioFrequency(27)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 90, { 0.0, 1.0 }, false)
 
