@@ -60,6 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             _eventAggregator.Subscribe(this);
             _serverSettings = ServerSettingsStore.Instance;
 
+            OptionKeepAlive = true;
+
         }
 
         public void Handle(ServerSettingsChangedMessage message)

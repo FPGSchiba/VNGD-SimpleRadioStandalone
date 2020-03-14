@@ -95,12 +95,45 @@ namespace NetCoreServer
             get => Socket.SendBufferSize;
             set => Socket.SendBufferSize = value;
         }
+        /// <summary>
+        /// Option: receive timeout in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// The default value is 0, which indicates an infinite time-out period. Specifying -1 also indicates an infinite time-out period.
+        /// </remarks>
+        public int OptionReceiveTimeout
+        {
+            get => Socket.ReceiveTimeout;
+            set => Socket.ReceiveTimeout = value;
+        }
+        /// <summary>
+        /// Option: send timeout in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// The default value is 0, which indicates an infinite time-out period. Specifying -1 also indicates an infinite time-out period.
+        /// </remarks>
+        public int OptionSendTimeout
+        {
+            get => Socket.SendTimeout;
+            set => Socket.SendTimeout = value;
+        }
+        /// <summary>
+        /// Option: linger state
+        /// </summary>
+        public LingerOption OptionLingerState
+        {
+            get => Socket.LingerState;
+            set => Socket.LingerState = value;
+        }
 
         #region Connect/Disconnect client
 
-        private bool _connecting;
         private SocketAsyncEventArgs _connectEventArg;
 
+        /// <summary>
+        /// Is the client connecting?
+        /// </summary>
+        public bool IsConnecting { get; private set; }
         /// <summary>
         /// Is the client connected?
         /// </summary>
@@ -109,10 +142,14 @@ namespace NetCoreServer
         /// <summary>
         /// Connect the client (synchronous)
         /// </summary>
+        /// <remarks>
+        /// Please note that synchronous connect will not receive data automatically!
+        /// You should use Receive() or ReceiveAsync() method manually after successful connection.
+        /// </remarks>
         /// <returns>'true' if the client was successfully connected, 'false' if the client failed to connect</returns>
         public virtual bool Connect()
         {
-            if (IsConnected || _connecting)
+            if (IsConnected || IsConnecting)
                 return false;
 
             // Setup buffers
@@ -182,11 +219,11 @@ namespace NetCoreServer
         /// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
         public virtual bool Disconnect()
         {
-            if (!IsConnected && !_connecting)
+            if (!IsConnected && !IsConnecting)
                 return false;
 
             // Cancel connecting operation
-            if (_connecting)
+            if (IsConnecting)
                 Socket.CancelConnectAsync(_connectEventArg);
 
             // Reset event args
@@ -245,7 +282,7 @@ namespace NetCoreServer
         /// <returns>'true' if the client was successfully connected, 'false' if the client failed to connect</returns>
         public virtual bool ConnectAsync()
         {
-            if (IsConnected || _connecting)
+            if (IsConnected || IsConnecting)
                 return false;
 
             // Setup buffers
@@ -266,7 +303,7 @@ namespace NetCoreServer
             Socket = new Socket(Endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             // Async connect to the server
-            _connecting = true;
+            IsConnecting = true;
             if (!Socket.ConnectAsync(_connectEventArg))
                 ProcessConnect(_connectEventArg);
 
@@ -302,6 +339,7 @@ namespace NetCoreServer
         private bool _receiving;
         private Buffer _receiveBuffer;
         private SocketAsyncEventArgs _receiveEventArg;
+        private int _receiveThreadId;
         // Send buffer
         private readonly object _sendLock = new object();
         private bool _sending;
@@ -309,6 +347,7 @@ namespace NetCoreServer
         private Buffer _sendBufferFlush;
         private SocketAsyncEventArgs _sendEventArg;
         private long _sendBufferFlushOffset;
+        private int _sendThreadId;
 
         /// <summary>
         /// Send data to the server (synchronous)
@@ -399,7 +438,10 @@ namespace NetCoreServer
             }
 
             // Try to send the main buffer
-            TrySend();
+            if (Thread.CurrentThread.ManagedThreadId == _sendThreadId)
+                ThreadPool.QueueUserWorkItem(_ => TrySend());
+            else
+                TrySend();
 
             return true;
         }
@@ -469,7 +511,14 @@ namespace NetCoreServer
         /// <summary>
         /// Receive data from the server (asynchronous)
         /// </summary>
-        public virtual void ReceiveAsync() { TryReceive(); }
+        public virtual void ReceiveAsync()
+        {
+            // Try to receive datagram
+            if (Thread.CurrentThread.ManagedThreadId == _receiveThreadId)
+                ThreadPool.QueueUserWorkItem(_ => TryReceive());
+            else
+                TryReceive();
+        }
 
         /// <summary>
         /// Try to receive new data
@@ -487,6 +536,7 @@ namespace NetCoreServer
                 // Async receive with the receive handler
                 _receiving = true;
                 _receiveEventArg.SetBuffer(_receiveBuffer.Data, 0, (int)_receiveBuffer.Capacity);
+                _receiveThreadId = Thread.CurrentThread.ManagedThreadId;
                 if (!Socket.ReceiveAsync(_receiveEventArg))
                     ProcessReceive(_receiveEventArg);
             }
@@ -534,6 +584,7 @@ namespace NetCoreServer
                 // Async write with the write handler
                 _sending = true;
                 _sendEventArg.SetBuffer(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset));
+                _sendThreadId = Thread.CurrentThread.ManagedThreadId;
                 if (!Socket.SendAsync(_sendEventArg))
                     ProcessSend(_sendEventArg);
             }
@@ -590,7 +641,7 @@ namespace NetCoreServer
         /// </summary>
         private void ProcessConnect(SocketAsyncEventArgs e)
         {
-            _connecting = false;
+            IsConnecting = false;
 
             if (e.SocketError == SocketError.Success)
             {
@@ -643,6 +694,7 @@ namespace NetCoreServer
             if (!IsConnected)
                 return;
 
+            bool recursive = (Thread.CurrentThread.ManagedThreadId == _receiveThreadId);
             long size = e.BytesTransferred;
 
             // Received some data from the server
@@ -654,6 +706,9 @@ namespace NetCoreServer
                 // Call the buffer received handler
                 OnReceived(_receiveBuffer.Data, 0, size);
 
+                // Reset the receive thread Id
+                _receiveThreadId = 0;
+
                 // If the receive buffer is full increase its size
                 if (_receiveBuffer.Capacity == size)
                     _receiveBuffer.Reserve(2 * size);
@@ -664,7 +719,12 @@ namespace NetCoreServer
             {
                 // If zero is returned from a read operation, the remote end has closed the connection
                 if (size > 0)
-                    TryReceive();
+                {
+                    if (recursive)
+                        ThreadPool.QueueUserWorkItem(_ => TryReceive());
+                    else
+                        TryReceive();
+                }
                 else
                     DisconnectAsync();
             }
@@ -685,6 +745,7 @@ namespace NetCoreServer
             if (!IsConnected)
                 return;
 
+            bool recursive = (Thread.CurrentThread.ManagedThreadId == _sendThreadId);
             long size = e.BytesTransferred;
 
             // Send some data to the server
@@ -707,11 +768,19 @@ namespace NetCoreServer
 
                 // Call the buffer sent handler
                 OnSent(size, BytesPending + BytesSending);
+
+                // Reset the send thread Id
+                _sendThreadId = 0;
             }
 
             // Try to send again if the client is valid
             if (e.SocketError == SocketError.Success)
-                TrySend();
+            {
+                if (recursive)
+                    ThreadPool.QueueUserWorkItem(_ => TrySend());
+                else
+                    TrySend();
+            }
             else
             {
                 SendError(e.SocketError);

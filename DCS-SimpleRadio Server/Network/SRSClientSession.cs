@@ -99,10 +99,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             Logger.Error( $"Socket Error: {error}");
         }
 
-        protected override void OnException(Exception error)
-        {
-            Logger.Error(error,$"Socket Exception: {error}");
-            Disconnect();
-        }
+        // protected override void OnException(Exception error)
+        // {
+        //     Logger.Error(error,$"Socket Exception: {error}");
+        //     Disconnect();
+        // }
     }
 }
