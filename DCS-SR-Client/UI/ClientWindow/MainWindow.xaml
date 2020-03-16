@@ -18,6 +18,9 @@
                       mc:Ignorable="d">
 
     <TabControl x:Name="TabControl">
+        <TabControl.Resources>
+            <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter"/>
+        </TabControl.Resources>
         <TabItem Header="General">
             <GroupBox x:Name="GroupBox"
                       Margin="5"
@@ -29,7 +32,10 @@
                     <ComboBox x:Name="Mic"
                               Width="250"
                               HorizontalAlignment="Center"
-                              VerticalAlignment="Top" />
+                              VerticalAlignment="Top"
+                              ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
+                              SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
+                              ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
@@ -39,7 +45,8 @@
                                      Margin="10,10,0,0"
                                      Value="-100"
                                      Maximum="18"
-                                     Minimum="-100"  />
+                                     Minimum="-100"
+                                     ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
                     </StackPanel>
 
                     <StackPanel Margin="0"
@@ -53,8 +60,9 @@
                             Click="PreviewAudio"
                             Content="Audio Preview"
                             Style="{DynamicResource SquareButtonStyle}"
-                            ToolTipService.ShowOnDisabled="True" />
-
+                            ToolTipService.ShowOnDisabled="True"
+                            IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
+                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
 
                     <Label x:Name="SpeakerLabel"
                            HorizontalAlignment="Center"
@@ -151,7 +159,8 @@
                                 HorizontalAlignment="Center"
                                 Command="{Binding Path=ConnectCommand}"
                                 Content="Connect"
-                                Style="{DynamicResource SquareButtonStyle}" />
+                                Style="{DynamicResource SquareButtonStyle}"
+                                ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
                         <Button x:Name="ToggleServerSettings"
                                 Width="125"
                                 Margin="0,10,0,0"

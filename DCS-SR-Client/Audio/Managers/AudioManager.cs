@@ -68,6 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public float SpeakerMax { get; set; } = -100;
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
 
@@ -223,7 +224,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 }
             }
 
-            if (_clientStateSingleton.MicrophoneAvailable)
+            if (_audioInputSingleton.MicrophoneAvailable)
             {
                 try
                 {

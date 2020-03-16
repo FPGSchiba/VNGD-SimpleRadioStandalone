@@ -85,6 +85,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         /// <remarks>Used in the XAML for DataBinding the connected client count</remarks>
         public ConnectedClientsSingleton Clients { get; } = ConnectedClientsSingleton.Instance;
 
+        /// <remarks>Used in the XAML for DataBinding input audio related UI elements</remarks>
+        public AudioInputSingleton AudioInput { get; } = AudioInputSingleton.Instance;
+
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private bool windowsN;
 
@@ -143,7 +146,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitInput();
 
-            InitAudioInput();
             InitAudioOutput();
             InitMicAudioOutput();
 
@@ -569,71 +571,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public ICommand ConnectCommand => _connectCommand;
 
-        private void InitAudioInput()
-        {
-            Logger.Info("Audio Input - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue);
-
-            if (WaveIn.DeviceCount > 0)
-            {
-                Mic.Items.Add(new AudioDeviceListItem()
-                {
-                    Text = "Default Microphone",
-                    Value = null
-                });
-            }
-
-            Mic.SelectedIndex = 0;
-
-            for (var i = 0; i < WaveIn.DeviceCount; i++)
-            {
-               
-                var item = WaveIn.GetCapabilities(i);
-                Mic.Items.Add(new AudioDeviceListItem()
-                {
-                    Text = item.ProductName,
-                    Value = item
-                });
-
-                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
-                            item.NameGuid + " - CHN:" + item.Channels);
-
-                if (item.ProductName.Trim().StartsWith(_globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue.Trim()))
-                {
-                    Mic.SelectedIndex = i+1;
-                    Logger.Info("Audio Input - Found Saved ");
-                }
-            }
-
-            // No microphone is available - users can still connect/listen, but audio input controls are disabled and sending is prevented
-            if (WaveIn.DeviceCount == 0 || Mic.SelectedIndex < 0)
-            {
-                Logger.Info("Audio Input - No audio input devices available, disabling mic preview");
-
-                ClientState.MicrophoneAvailable = false;
-
-                Preview.IsEnabled = false;
-
-                Preview.ToolTip = ToolTips.NoMicAvailable;
-                StartStop.ToolTip = ToolTips.NoMicAvailable;
-                Mic.ToolTip = ToolTips.NoMicAvailable;
-                Mic_VU.ToolTip = ToolTips.NoMicAvailable;
-            }
-            else
-            {
-                Logger.Info("Audio Input - " + WaveIn.DeviceCount + " audio input devices available, configuring as usual");
-
-                ClientState.MicrophoneAvailable = true;
-
-                Preview.IsEnabled = true;
-
-                Preview.ToolTip = null;
-                StartStop.ToolTip = null;
-                Mic.ToolTip = null;
-                Mic_VU.ToolTip = null;
-            }
-        }
-
         private void InitAudioOutput()
         {
             Logger.Info("Audio Output - Saved ID " +
@@ -750,7 +687,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (_audioPreview != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
-                if (ClientState.MicrophoneAvailable)
+                if (AudioInput.MicrophoneAvailable)
                 {
                     Mic_VU.Value = _audioPreview.MicMax;
                 }
@@ -759,7 +696,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else if (_audioManager != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
-                if (ClientState.MicrophoneAvailable)
+                if (AudioInput.MicrophoneAvailable)
                 {
                     Mic_VU.Value = _audioManager.MicMax;
                 }
@@ -1023,7 +960,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             //save app settings
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
-            if (ClientState.MicrophoneAvailable)
+            if (AudioInput.MicrophoneAvailable)
             {
                 if (Mic.SelectedIndex == 0)
                 {
@@ -1201,7 +1138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview == null)
             {
-                if (!ClientState.MicrophoneAvailable)
+                if (!AudioInput.MicrophoneAvailable)
                 {
                     Logger.Info("Unable to preview audio, no valid audio input device available or selected");
                     return;

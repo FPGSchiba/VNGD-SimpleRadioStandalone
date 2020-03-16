@@ -14,7 +14,6 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
@@ -34,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
-
+        private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
 
         private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
         private readonly string _guid;
@@ -726,7 +725,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if (_ready
                 && _listener != null
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
-                && _clientStateSingleton.MicrophoneAvailable
+                && _audioInputSingleton.MicrophoneAvailable
                 && (bytes != null)
                 && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
                 //can only send if DCS is connected
