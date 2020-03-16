@@ -103,7 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         }
 
         public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port, MMDevice micOutput, VOIPConnectCallback voipConnectCallback)
+            IPAddress ipAddress, int port, MMDevice micOutput)
         {
             _stop = false;
 
@@ -238,7 +238,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
                     _udpVoiceHandler =
-                        new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                        new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager);
                     var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
@@ -261,7 +261,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 //no mic....
                 _udpVoiceHandler =
-                    new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager, voipConnectCallback);
+                    new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager);
                 MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();
