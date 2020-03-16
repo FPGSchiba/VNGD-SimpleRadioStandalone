@@ -38,26 +38,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         {
             int read = source.Read(buffer, offset, count);
 
-            if (Settings.GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
+            if (!GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
             {
-                var effectBytes = GetEffect(read / 2);
+                return read;
+            }
 
-                //mix together
-                for (int i = 0; i < read / 2; i++)
-                {
-                    short audio = ConversionHelpers.ToShort(buffer[(offset + i) * 2], buffer[((i + offset) * 2) + 1]);
+            var effectBytes = GetEffect(read / 2);
 
-                    audio = (short)(audio + _audioEffectShort[i]);
+            //mix together
+            for (int i = 0; i < read / 2; i++)
+            {
+                short audio = ConversionHelpers.ToShort(buffer[(offset + i) * 2], buffer[((i + offset) * 2) + 1]);
 
-                    //buffer[i + offset] = effectBytes[i]+buffer[i + offset];
+                audio = (short)(audio + _audioEffectShort[i]);
 
-                    byte byte1;
-                    byte byte2;
-                    ConversionHelpers.FromShort(audio, out byte1, out byte2);
+                //buffer[i + offset] = effectBytes[i]+buffer[i + offset];
 
-                    buffer[(offset + i) * 2] = byte1;
-                    buffer[((i + offset) * 2) + 1] = byte2;
-                }
+                byte byte1;
+                byte byte2;
+                ConversionHelpers.FromShort(audio, out byte1, out byte2);
+
+                buffer[(offset + i) * 2] = byte1;
+                buffer[((i + offset) * 2) + 1] = byte2;
             }
 
             return read;

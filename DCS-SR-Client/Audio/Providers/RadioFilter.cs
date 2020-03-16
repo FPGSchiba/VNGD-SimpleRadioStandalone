@@ -51,44 +51,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         public int Read(float[] buffer, int offset, int sampleCount)
         {
             var samplesRead = _source.Read(buffer, offset, sampleCount);
-            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects) || samplesRead <= 0)
             {
-                if (samplesRead > 0)
-                {
-                    for (var n = 0; n < sampleCount; n++)
-                    {
-                        var audio = (double) buffer[offset + n];
-                        if (audio != 0)
-                            // because we have silence in one channel (if a user picks radio left or right ear) we don't want to transform it or it'll play in both
-                        {
-                            if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
-                            {
-                                if (audio > CLIPPING_MAX)
-                                {
-                                    audio = CLIPPING_MAX;
-                                }
-                                else if (audio < CLIPPING_MIN)
-                                {
-                                    audio = CLIPPING_MIN;
-                                }
-                            }
-
-                            for (int i = 0; i < _filters.Length; i++)
-                            {
-                                var filter = _filters[i];
-                                audio = filter.ProcessSample(audio);
-
-                                if (double.IsNaN(audio))
-                                    audio = buffer[offset + n];
-                            }
-
-
-                            buffer[offset + n] = (float) audio;
-                        }
-                    }
-                }
+                return samplesRead;
             }
 
+            for (var n = 0; n < sampleCount; n++)
+            {
+                var audio = (double) buffer[offset + n];
+                if (audio == 0)
+                {
+                    continue;
+                }
+                // because we have silence in one channel (if a user picks radio left or right ear) we don't want to transform it or it'll play in both
+
+                if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
+                {
+                    if (audio > CLIPPING_MAX)
+                    {
+                        audio = CLIPPING_MAX;
+                    }
+                    else if (audio < CLIPPING_MIN)
+                    {
+                        audio = CLIPPING_MIN;
+                    }
+                }
+
+                for (int i = 0; i < _filters.Length; i++)
+                {
+                    var filter = _filters[i];
+                    audio = filter.ProcessSample(audio);
+
+                    if (double.IsNaN(audio))
+                        audio = buffer[offset + n];
+                }
+                buffer[offset + n] = (float) audio;
+            }
 
             //   Console.WriteLine("Read:"+samplesRead+" Time - " + _stopwatch.ElapsedMilliseconds);
             //     _stopwatch.Restart();
