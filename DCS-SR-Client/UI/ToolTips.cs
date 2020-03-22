@@ -8,7 +8,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public static ToolTip ExternalAWACSMode;
         public static ToolTip ExternalAWACSModeName;
         public static ToolTip ExternalAWACSModePassword;
-        public static ToolTip NoMicAvailable;
 
         public static void Init()
         {
@@ -66,26 +65,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
 
             ExternalAWACSModePassword.Content = externalAWACSModePasswordContent;
-
-
-            NoMicAvailable = new ToolTip();
-            StackPanel noMicAvailableContent = new StackPanel();
-
-            noMicAvailableContent.Children.Add(new TextBlock
-            {
-                Text = "No microphone available",
-                FontWeight = FontWeights.Bold
-            });
-            noMicAvailableContent.Children.Add(new TextBlock
-            {
-                Text = "No valid microphone is available - others will not be able to hear you."
-            });
-            noMicAvailableContent.Children.Add(new TextBlock
-            {
-                Text = "You can still use SRS to listen to radio calls, but will not be able to transmit anything yourself."
-            });
-
-            NoMicAvailable.Content = noMicAvailableContent;
         }
     }
 }

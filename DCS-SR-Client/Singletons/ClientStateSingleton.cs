@@ -36,9 +36,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
 
-        // Indicates whether a valid microphone is available - deactivating audio input controls and transmissions otherwise
-        public bool MicrophoneAvailable { get; set; }
-
         public long LastSent { get; set; }
 
         private static readonly DispatcherTimer _timer = new DispatcherTimer();
@@ -120,8 +117,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             {
                 FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
-
-            MicrophoneAvailable = true;
 
             LastSent = 0;
 

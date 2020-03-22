@@ -221,6 +221,7 @@
     <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
+    <Compile Include="Singletons\AudioInputSingleton.cs" />
     <Compile Include="UI\RadioOverlayWindow\TransponderPanel.xaml.cs">
       <DependentUpon>TransponderPanel.xaml</DependentUpon>
     </Compile>
@@ -281,6 +282,7 @@
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\TransponderHelper.cs" />
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
+    <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
     <Page Include="UI\RadioOverlayWindow\TransponderPanel.xaml">
       <SubType>Designer</SubType>
