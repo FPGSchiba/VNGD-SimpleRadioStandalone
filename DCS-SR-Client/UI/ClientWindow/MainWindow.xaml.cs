@@ -88,8 +88,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         /// <remarks>Used in the XAML for DataBinding input audio related UI elements</remarks>
         public AudioInputSingleton AudioInput { get; } = AudioInputSingleton.Instance;
 
+        /// <remarks>Used in the XAML for DataBinding output audio related UI elements</remarks>
+        public AudioOutputSingleton AudioOutput { get; } = AudioOutputSingleton.Instance;
+
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
-        private bool windowsN;
 
         public MainWindow()
         {
@@ -146,9 +148,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitInput();
 
-            InitAudioOutput();
-            InitMicAudioOutput();
-
             _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
@@ -161,7 +160,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue;
 
-            _audioManager = new AudioManager(windowsN);
+            _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
 
@@ -570,117 +569,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         }
 
         public ICommand ConnectCommand => _connectCommand;
-
-        private void InitAudioOutput()
-        {
-            Logger.Info("Audio Output - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue);
-
-            var enumerator = new MMDeviceEnumerator();
-            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            var i = 1;
-
-            Speakers.Items.Add(new AudioDeviceListItem()
-            {
-                Text = "Default Speakers",
-                Value = null
-            });
-
-            Speakers.SelectedIndex = 0;
-
-            foreach (var device in outputDeviceList)
-            {
-
-                try
-                {
-                    Logger.Info("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
-                                device.AudioClient.MixFormat.Channels + " Rate:" +
-                                device.AudioClient.MixFormat.SampleRate.ToString());
-
-                    Speakers.Items.Add(new AudioDeviceListItem()
-                    {
-                        Text = device.FriendlyName,
-                        Value = device
-                    });
-
-                    if (device.ID == _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue)
-                    {
-                        Speakers.SelectedIndex = i; //this one
-                    }
-
-                    i++;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e,"Audio Output - Error processing device - device skipped");
-                }
-            }
-
-            windowsN = false;
-
-            try
-            {
-                var dmoResampler = new DmoResampler();
-                dmoResampler.Dispose();
-            }
-            catch (Exception)
-            {
-                Logger.Warn("Windows N Detected - using inbuilt resampler");
-                windowsN = true;
-            }
-        }
-
-        private void InitMicAudioOutput()
-        {
-            Logger.Info("Mic Audio Output - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue);
-
-            var i = 0;
-
-            MicOutput.Items.Add(new AudioDeviceListItem()
-            {
-                Text = "NO MIC OUTPUT / PASSTHROUGH",
-                Value = null
-            });
-
-            var enumerator = new MMDeviceEnumerator();
-            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            foreach (var device in outputDeviceList)
-            {
-                try
-                {
-
-                    Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
-                            device.AudioClient.MixFormat.Channels + " Rate:" +
-                            device.AudioClient.MixFormat.SampleRate.ToString());
-
-                    MicOutput.Items.Add(new AudioDeviceListItem()
-                    {
-                        Text = device.FriendlyName,
-                        Value = device
-                    });
-
-
-                    //first time round the loop, select first item
-                    if (i == 0)
-                    {
-                        MicOutput.SelectedIndex = 0;
-                    }
-
-                    if (device.ID == _globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue)
-                    {
-                        MicOutput.SelectedIndex = i+1; //this one
-                    }
-
-                    i++;
-
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Audio Output - Error processing device - device skipped");
-                }
-            }
-        }
 
         private void UpdatePlayerLocationAndVUMeters(object sender, EventArgs e)
         {
@@ -1163,7 +1051,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-                    _audioPreview.StartPreview(inputId, output,windowsN);
+                    _audioPreview.StartPreview(inputId, output, AudioOutput.WindowsN);
 
                     Preview.Content = "Stop Preview";
                 }

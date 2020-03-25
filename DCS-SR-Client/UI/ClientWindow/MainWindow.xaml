@@ -73,11 +73,15 @@
                         <ComboBox x:Name="Speakers"
                                   Width="200"
                                   HorizontalAlignment="Center"
-                                  VerticalAlignment="Top" Margin="0,0,5,0" />
+                                  VerticalAlignment="Top" Margin="0,0,5,0"
+                                  ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
+                                  SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}" />
                         <ComboBox x:Name="MicOutput"
                                   Width="200"
                                   HorizontalAlignment="Center"
-                                  VerticalAlignment="Top" Margin="5,0,0,0" />
+                                  VerticalAlignment="Top" Margin="5,0,0,0"
+                                  ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
+                                  SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}" />
                     </StackPanel>
 
 
