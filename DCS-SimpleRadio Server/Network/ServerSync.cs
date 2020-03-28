@@ -10,7 +10,6 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
-using NetCoreServer;
 using Newtonsoft.Json;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -35,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public Socket workSocket;
     }
 
-    public class ServerSync : TcpServer, IHandle<ServerSettingsChangedMessage>
+    internal class ServerSync : IHandle<ServerSettingsChangedMessage>
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -52,63 +51,105 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private Socket listener;
 
         public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps,
-            IEventAggregator eventAggregator) : base(IPAddress.Any, ServerSettingsStore.Instance.GetServerPort())
+            IEventAggregator eventAggregator)
         {
             _clients = connectedClients;
             this._bannedIps = _bannedIps;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
             _serverSettings = ServerSettingsStore.Instance;
-
-            OptionKeepAlive = true;
-
         }
 
         public void Handle(ServerSettingsChangedMessage message)
         {
-            foreach (var clientToSent in _clients)
-            {
-                try
+                //send server settings
+                var replyMessage = new NetworkMessage
                 {
-                    HandleServerSettingsMessage();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Exception Sending Server Settings ");
-                }
-            }
-        }
+                    MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
+                    ServerSettings = _serverSettings.ToDictionary()
+                };
 
-        protected override TcpSession CreateSession() { return new SRSClientSession(this,_clients,_bannedIps); }
-
-        protected override void OnError(SocketError error)
-        {
-            _logger.Error($"TCP SERVER ERROR: {error} ");
+                Multicast(replyMessage);
         }
 
         public void StartListening()
         {
-            OptionKeepAlive = true;
-            Start();
+            var ipAddress = new IPAddress(0);
+            var port = _serverSettings.GetServerPort();
+            var localEndPoint = new IPEndPoint(ipAddress, port);
+
+            // Create a TCP/IP socket.
+            listener = new Socket(AddressFamily.InterNetwork,
+                SocketType.Stream, ProtocolType.Tcp);
+            listener.NoDelay = true;
+
+            // Bind the socket to the local endpoint and listen for incoming connections.
+            try
+            {
+                listener.Bind(localEndPoint);
+                listener.Listen(100);
+                listener.NoDelay = true;
+                while (true)
+                {
+                    // Set the event to nonsignaled state.
+                    _allDone.Reset();
+
+                    // Start an asynchronous socket to listen for connections.
+                    _logger.Info($"Waiting for a connection on {port}...");
+                    listener.BeginAccept(
+                        AcceptCallback,
+                        listener);
+
+                    // Wait until a connection is made before continuing.
+                    _allDone.WaitOne();
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Server Listen error: " + e.Message);
+            }
         }
 
-        public void HandleDisconnect(SRSClientSession state)
+        public void AcceptCallback(IAsyncResult ar)
+        {
+            // Signal the main thread to continue.
+            _allDone.Set();
+
+            try
+            {
+                // Get the socket that handles the client request.
+                var listener = (Socket) ar.AsyncState;
+                var handler = listener.EndAccept(ar);
+                handler.NoDelay = true;
+
+                // Create the state object.
+                var state = new StateObject();
+                state.workSocket = handler;
+                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    ReadCallback, state);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error accepting socket");
+            }
+        }
+
+        public void HandleDisconnect(StateObject state)
         {
             _logger.Info("Disconnecting Client");
 
-            if ((state != null) && (state.SRSGuid != null))
+            if ((state != null) && (state.guid != null))
             {
                 
                 //removed
                 SRClient client;
-                _clients.TryRemove(state.SRSGuid, out client);
+                _clients.TryRemove(state.guid, out client);
 
                 if (client != null)
                 {
-                    _logger.Info("Removed Disconnected Client " + state.SRSGuid);
+                    HandleClientDisconnect(client);
 
-                    //Dont tell others for now as a test
-                    HandleClientDisconnect(state,client);
+                    _logger.Info("Removed Client " + state.guid);
                 }
 
                 try
@@ -121,19 +162,114 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     _logger.Info(ex, "Exception Publishing Client Update After Disconnect");
                 }
             }
-            else
-            {
-                _logger.Info("Removed Disconnected Unknown Client");
-            }
 
+            try
+            {
+                state.workSocket.Shutdown(SocketShutdown.Both);
+                state.workSocket.Close();
+            }
+            catch (Exception ex)
+            {
+                _logger.Info(ex, "Exception closing socket after disconnect");
+            }
         }
 
+        public void ReadCallback(IAsyncResult ar)
+        {
+            // Retrieve the state object and the handler socket
+            // from the asynchronous state object.
+            var state = (StateObject) ar.AsyncState;
+            var handler = state.workSocket;
 
+            try
+            {
+                // Read data from the client socket.
+                var bytesRead = handler.EndReceive(ar);
+
+                if (bytesRead > 0)
+                {
+                    // There  might be more data, so store the data received so far.
+                    state.sb.Append(Encoding.UTF8.GetString(
+                        state.buffer, 0, bytesRead));
+
+                    List<string> messages = GetNetworkMessage(state.sb);
+
+                    if (messages.Count > 0)
+                    {
+                        foreach (var content in messages)
+                        {
+                            //Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
+                            //   content.Length, content);
+
+                            try
+                            {
+                                var message = JsonConvert.DeserializeObject<NetworkMessage>(content);
+
+                                HandleMessage(state, message);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "Server - Client Exception reading");
+                            }
+                        }
+                    }
+
+                    //continue receiving more
+                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                        ReadCallback, state);
+                }
+                else
+                {
+                    _logger.Error("Received 0 bytes - Disconnecting Client");
+                    HandleDisconnect(state);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error reading from socket. Disconnecting ");
+
+                HandleDisconnect(state);
+            }
+        }
+
+        private List<string> GetNetworkMessage(StringBuilder buf)
+        {
+            List<string> messages = new List<string>();
+            //search for a \n, extract up to that \n and then remove from buffer
+            var content = buf.ToString();
+            while (content.Length > 2 && content.Contains("\n"))
+            {
+                //extract message
+                var message = content.Substring(0, content.IndexOf("\n") + 1);
+
+                //now clear from buffer
+                buf.Remove(0, message.Length);
+
+                //trim the received part
+                messages.Add(message.Trim());
       
-        public void HandleMessage(SRSClientSession state, NetworkMessage message)
+                //load in next part
+                content = buf.ToString();
+            }
+
+            return messages;
+        }
+
+        public void HandleMessage(StateObject state, NetworkMessage message)
         {
             try
             {
+                var clientIp = (IPEndPoint) state.workSocket.RemoteEndPoint;
+
+                if (_bannedIps.Contains(clientIp.Address))
+                { 
+                    state.workSocket.Shutdown(SocketShutdown.Both);
+                    state.workSocket.Disconnect(true);
+
+                    _logger.Warn("Disconnecting Banned Client -  " + clientIp.Address + " " + clientIp.Port);
+                    return;
+                }
+
                 //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
                 // logger.Info("Recevied: " + message.MsgType);
 
@@ -143,25 +279,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         // Do nothing for now
                         break;
                     case NetworkMessage.MessageType.UPDATE:
-                        HandleClientMetaDataUpdate(state,message,true);
+                        HandleClientMetaDataUpdate(message,true);
                         break;
                     case NetworkMessage.MessageType.RADIO_UPDATE:
                         bool showTuned = _serverSettings.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT)
                             .BoolValue;
-                        HandleClientMetaDataUpdate(state,message,!showTuned);
-                        HandleClientRadioUpdate(state,message,showTuned);
+                        HandleClientMetaDataUpdate(message,!showTuned);
+                        HandleClientRadioUpdate(message,showTuned);
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
                         var srClient = message.Client;
                         if (!_clients.ContainsKey(srClient.ClientGuid))
                         {
-                            var clientIp = (IPEndPoint) state.Socket.RemoteEndPoint;
                             if (message.Version == null)
                             {
                                 _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
                                              clientIp.Port);
-                                state.Disconnect();
+                                state.workSocket.Shutdown(SocketShutdown.Both);
+                                state.workSocket.Disconnect(true);
                                 return;
                             }
 
@@ -172,36 +308,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             {
                                 _logger.Warn(
                                     $"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
-                                HandleVersionMismatch(state);
+                                HandleVersionMismatch(state.workSocket);
 
+                                state.workSocket.Shutdown(SocketShutdown.Both);
                                 //close socket after
-                                state.Disconnect();
+                                state.workSocket.Disconnect(true);
 
                                 return;
                             }
 
-                            srClient.ClientSession =state;
+                            srClient.ClientSocket = state.workSocket;
 
                             //add to proper list
                             _clients[srClient.ClientGuid] = srClient;
 
-                            state.SRSGuid = srClient.ClientGuid;
+                            state.guid = srClient.ClientGuid;
 
                             _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
                                 new List<SRClient>(_clients.Values)));
                         }
 
-                        HandleRadioClientsSync(state, message,srClient);
+                        HandleRadioClientsSync(clientIp, state.workSocket, message);
 
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
-                        HandleServerSettingsMessage();
+                        //HandleServerSettingsMessage(state.workSocket);
                         break;
                     case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
-                        HandleExternalAWACSModePassword(state, message.ExternalAWACSModePassword, message.Client);
+                        HandleExternalAWACSModePassword(state.workSocket, message.ExternalAWACSModePassword, message.Client);
                         break;
                     case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT:
-                        HandleExternalAWACSModeDisconnect(state,message.Client);
+                        HandleExternalAWACSModeDisconnect(message.Client);
                         break;
                     default:
                         _logger.Warn("Recevied unknown message type");
@@ -214,30 +351,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleServerSettingsMessage()
-        {
-            //send server settings
-            var replyMessage = new NetworkMessage
-            {
-                MsgType = NetworkMessage.MessageType.SERVER_SETTINGS,
-                ServerSettings = _serverSettings.ToDictionary()
-            };
-
-            Multicast(replyMessage.Encode());
-            
-        }
-
-        private void HandleVersionMismatch(SRSClientSession session)
+        private void HandleVersionMismatch(Socket socket)
         {
             //send server settings
             var replyMessage = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.VERSION_MISMATCH,
             };
-            session.Send(replyMessage.Encode());
+            Send(socket, replyMessage);
         }
 
-        private void HandleClientMetaDataUpdate(SRSClientSession session,NetworkMessage message, bool send)
+        private void HandleClientMetaDataUpdate(NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -269,8 +393,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         }
                     };
 
-                    if(send) 
-                        Multicast(replyMessage.Encode());
+                    foreach (var clientToSent in _clients)
+                    {
+                        Send(clientToSent.Value.ClientSocket, replyMessage);
+                    }
                     
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
@@ -282,7 +408,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleClientDisconnect(SRSClientSession srsSession,SRClient client)
+        private void HandleClientDisconnect(SRClient client)
         {
             var message = new NetworkMessage()
             {
@@ -290,10 +416,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
             };
 
-            MulticastAllExeceptOne(message.Encode(),srsSession.Id);
+            Multicast(message,client.ClientGuid);
         }
 
-        private void HandleClientRadioUpdate(SRSClientSession session,NetworkMessage message, bool send)
+        private void HandleClientRadioUpdate(NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -371,13 +497,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             };
                         }
 
-                        MulticastAllExeceptOne(replyMessage.Encode(), session.Id);
+                        Multicast(replyMessage, message.Client.ClientGuid);
                     }
                 }
             }
         }
 
-        private void HandleRadioClientsSync(SRSClientSession session,NetworkMessage message, SRClient client)
+        private void HandleRadioClientsSync(IPEndPoint clientIp, Socket clientSocket, NetworkMessage message)
         {
             //store new client
             var replyMessage = new NetworkMessage
@@ -388,9 +514,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 Version = UpdaterChecker.VERSION
             };
 
-            session.Send(replyMessage.Encode());
-
-            //send update to everyone
+            Send(clientSocket,replyMessage);
+        
+            //send update to everyone bar who just synced
             //Remove Client Radio Info
             var update = new NetworkMessage
             {
@@ -398,15 +524,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 ServerSettings = _serverSettings.ToDictionary(),
                 Client = new SRClient
                 {
-                    ClientGuid = client.ClientGuid,
+                    ClientGuid = message.Client.ClientGuid,
                 }
             };
 
-            Multicast(update.Encode());
+            Multicast(update, message.Client.ClientGuid);
 
         }
 
-        private void HandleExternalAWACSModePassword(SRSClientSession session, string password, SRClient client)
+        private void HandleExternalAWACSModePassword(Socket clientSocket, string password, SRClient client)
         {
             // Response of clientCoalition = 0 indicates authentication success (or external AWACS mode disabled)
             int clientCoalition = 0;
@@ -440,8 +566,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 },
                 MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD,
             };
-
-            session.Send(replyMessage.Encode());
+            Send(clientSocket, replyMessage);
 
             var message = new NetworkMessage
             {
@@ -457,10 +582,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 }
             };
 
-            Multicast(message.Encode());
+            Multicast(message);
+          
         }
 
-        private void HandleExternalAWACSModeDisconnect(SRSClientSession session,SRClient client)
+        private void HandleExternalAWACSModeDisconnect(SRClient client)
         {
             if (_clients.ContainsKey(client.ClientGuid))
             {
@@ -484,21 +610,82 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                 };
 
-                Multicast(message.Encode());
+                Multicast(message);
+            }
+        }
+
+
+        private void Multicast(NetworkMessage message, String guid = "")
+        {
+            foreach (var clientToSent in _clients)
+            {
+                if (!guid.Equals(clientToSent.Key))
+                {
+                    Send(clientToSent.Value.ClientSocket, message);
+                }
+            }
+        }
+
+        private static void Send(Socket handler, NetworkMessage message)
+        {
+            try
+            {
+                message.Version = UpdaterChecker.VERSION;
+
+                // Convert the string data to byte data using UTF8 encoding.
+                var byteData = Encoding.UTF8.GetBytes(message.Encode());
+
+                // Begin sending the data to the remote device.
+                handler.BeginSend(byteData, 0, byteData.Length, 0,
+                    SendCallback, handler);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Exception Sending Message " + ex.Message);
+            }
+        }
+
+        private static void SendCallback(IAsyncResult ar)
+        {
+            try
+            {
+                // Retrieve the socket from the state object.
+                var handler = (Socket) ar.AsyncState;
+
+                // Complete sending the data to the remote device.
+                var bytesSent = handler.EndSend(ar);
+                //  Console.WriteLine("Sent {0} bytes to client.", bytesSent);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Exception SendCallback ");
             }
         }
 
         public void RequestStop()
         {
-           
             try
             {
-                DisconnectAll();
-                Stop();
+                foreach (var client in _clients)
+                {
+                    try
+                    { 
+                        client.Value.ClientSocket.Shutdown(SocketShutdown.Both);
+                        client.Value.ClientSocket.Close();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+                listener.Shutdown(SocketShutdown.Both);
+                listener.Close();
+
                 _clients.Clear();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
         }
     }
