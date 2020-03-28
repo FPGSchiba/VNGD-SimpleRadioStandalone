@@ -281,8 +281,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 try
                 {
-                    client.ClientSocket.Shutdown(SocketShutdown.Both);
-                    client.ClientSocket.Close();
+                    ((SRSClientSession)client.ClientSession).Disconnect();
                 }
                 catch (Exception e)
                 {
@@ -295,7 +294,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             try
             {
-                var remoteIpEndPoint = client.ClientSocket.RemoteEndPoint as IPEndPoint;
+                var remoteIpEndPoint = ((SRSClientSession)client.ClientSession).Socket.RemoteEndPoint as IPEndPoint;
 
                 _bannedIps.Add(remoteIpEndPoint.Address);
 
