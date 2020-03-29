@@ -850,39 +850,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
             if (AudioInput.MicrophoneAvailable)
             {
-                if (Mic.SelectedIndex == 0)
+                if(AudioInput.SelectedAudioInput.Value == null)
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, "default");
+
                 }
                 else
                 {
-                    _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+                    var input = ((WaveInCapabilities)AudioInput.SelectedAudioInput.Value).ProductName;
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, input);
                 }
-                
             }
 
-            if (Speakers.SelectedIndex == 0)
+            if (AudioOutput.SelectedAudioOutput.Value == null)
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId, "default");
             }
             else
             {
-                var output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value;
-
+                var output = (MMDevice)AudioOutput.SelectedAudioOutput.Value;
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId, output.ID);
             }
-          
 
             //check if we have optional output
-            if (MicOutput.SelectedIndex - 1 >= 0)
+            if (AudioOutput.SelectedMicAudioOutput.Value != null)
             {
-                var micOutput = (MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
-                //save settings
+                var micOutput = (MMDevice)AudioOutput.SelectedMicAudioOutput.Value;
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, micOutput.ID);
             }
             else
             {
-                //save settings as none
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, "");
             }
         }
@@ -901,26 +898,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     try
                     {
-
-                        var inputId = Mic.SelectedIndex-1;
-
-                        MMDevice output;
-                        if (Speakers.SelectedIndex == 0)
-                        {
-                            output = WasapiOut.GetDefaultAudioEndpoint();
-                        }
-                        else
-                        {
-                            output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value; ;
-                        }
-
-                        //check if we have optional output
-                        MMDevice micOutput = null;
-                        if (MicOutput.SelectedIndex - 1 >= 0)
-                        {
-                            micOutput = (MMDevice)(MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
-                        }
-
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
@@ -941,8 +918,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
 
-                        _audioManager.StartEncoding(inputId, output, _guid, InputManager,
-                            _resolvedIp, _port, micOutput);
+                        _audioManager.StartEncoding(_guid, InputManager,
+                            _resolvedIp, _port);
                     }
                     catch (Exception ex)
                     {
