@@ -197,6 +197,9 @@
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <converters:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
+                        </StackPanel.Resources>
                         <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Vertical">
@@ -205,13 +208,13 @@
                                 HorizontalContentAlignment="Center"
                                 Margin="0,10,10,0"
                                 Content="EAM coalition password"
-                                IsEnabled="False" />
+                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <PasswordBox x:Name="ExternalAWACSModePassword"
-                                 Width="200"
-                                 Height="23"
-                                 Margin="0,0,10,0"
-                                 HorizontalAlignment="Center"
-                                 IsEnabled="False" />
+                                Width="200"
+                                Height="23"
+                                Margin="0,0,10,0"
+                                HorizontalAlignment="Center"
+                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                         </StackPanel>
                         <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
@@ -221,7 +224,7 @@
                                 HorizontalContentAlignment="Center"
                                 Margin="0,10,0,0"
                                 Content="EAM name"
-                                IsEnabled="False" />
+                                 IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <TextBox x:Name="ExternalAWACSModeName"
                                  Width="200"
                                  Height="23"
@@ -229,7 +232,7 @@
                                  MaxLines="1"
                                  TextWrapping="Wrap"
                                  HorizontalAlignment="Center"
-                                 IsEnabled="False" />
+                                 IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Margin="0"
