@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -82,14 +83,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
+        // Indicates the user's desire to be in External Awacs Mode or not
+        public bool ExternalAWACSModelSelected { get; set; }
+
+        // Indicates whether we are *actually* connected in External Awacs Mode
+        // Used by the Name and Password related UI elements to determine if they are editable or not
+        public bool ExternalAWACSModeConnected
+        {
+            get
+            { 
+                bool EamEnabled = SyncedServerSettings.Instance.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+                return IsConnected && EamEnabled && ExternalAWACSModelSelected && !IsGameExportConnected;
+            }
+        }
+
         public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 50000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
         // Indicates an active game connection has been detected (1 tick = 100ns, 100000000 ticks = 10s stale timer), not updated by EAM
         public bool IsGameConnected { get { return IsGameGuiConnected && IsGameExportConnected; } }
-
-        public bool InExternalAWACSMode { get; set; }
 
         public string LastSeenName { get; set; }
 
@@ -100,7 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 
-            // The following two members are not updated due to events. Therefore we need to setup a polling action so that they are
+            // The following members are not updated due to events. Therefore we need to setup a polling action so that they are
             // periodically checked.
             DcsGameGuiLastReceived = 0;
             DcsExportLastReceived = 0;
@@ -108,6 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             _timer.Tick += (s, e) => {
                 NotifyPropertyChanged("IsGameConnected");
                 NotifyPropertyChanged("IsLotATCConnected");
+                NotifyPropertyChanged("ExternalAWACSModeConnected");
             };
             _timer.Start();
 
@@ -121,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             LastSent = 0;
 
             IsConnected = false;
-            InExternalAWACSMode = false;
+            ExternalAWACSModelSelected = false;
 
             LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).StringValue;
         }
@@ -181,7 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsPlayerRadioInfo.latLng = latLngPosition;
             
         }
-
 
     }
 }

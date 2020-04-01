@@ -69,6 +69,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
+        private AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
+
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
 
@@ -103,10 +105,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void StartEncoding(int mic, MMDevice speakers, string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port, MMDevice micOutput)
+        public void StartEncoding(string guid, InputDeviceManager inputManager,
+            IPAddress ipAddress, int port)
         {
             _stop = false;
+
+            MMDevice speakers = null;
+            if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
+            {
+                speakers = WasapiOut.GetDefaultAudioEndpoint();
+            }
+            else 
+            {
+                speakers = (MMDevice)_audioOutputSingleton.SelectedAudioOutput.Value;
+            }
+
+            MMDevice micOutput = null;
+            if (_audioOutputSingleton.SelectedMicAudioOutput.Value != null)
+            {
+                micOutput = (MMDevice)_audioOutputSingleton.SelectedMicAudioOutput.Value;
+            }
 
             try
             {
@@ -231,7 +249,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
                     {
                         BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
-                        DeviceNumber = mic,
+                        DeviceNumber = _audioInputSingleton.SelectedAudioInputDeviceNumber()
                     };
 
                     _waveIn.NumberOfBuffers = 2;

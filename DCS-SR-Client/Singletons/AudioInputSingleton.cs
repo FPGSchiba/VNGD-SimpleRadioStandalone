@@ -97,6 +97,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         {
             return (WaveIn.DeviceCount > 0);
         }
+
+        public int SelectedAudioInputDeviceNumber()
+        {
+            // Special case for the default
+            if (SelectedAudioInput.Value == null) {
+                return 0;
+            }
+
+            for (var i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                var device = WaveIn.GetCapabilities(i);
+                var selectedAudioInput = (WaveInCapabilities)SelectedAudioInput.Value;
+                if ((device.ProductName == selectedAudioInput.ProductName) &&
+                    (device.ProductGuid == selectedAudioInput.ProductGuid))
+                {
+                    return i;
+                }
+            }
+            throw new IndexOutOfRangeException("No device number matches selected");
+        }
         #endregion
     }
 }
