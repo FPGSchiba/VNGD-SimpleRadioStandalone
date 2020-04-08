@@ -1487,7 +1487,7 @@ function SR.exportRadioFA18C(_data)
     _data.radios[2].name = "AN/ARC-210 - 1"
     _data.radios[2].freq = SR.getRadioFrequency(38)
     _data.radios[2].modulation = SR.getRadioModulation(38)
-    _data.radios[2].volume = SR.getRadioVolume(0, 108, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
+    _data.radios[2].volume = SR.getRadioVolume(0, 108, { 0.0, 1.0 }, false)
     -- _data.radios[2].encMode = 2 -- Mode 2 is set by aircraft
     --_data.radios[2].secFreq = 243.0 * 1000000
 
@@ -1502,7 +1502,7 @@ function SR.exportRadioFA18C(_data)
     _data.radios[3].name = "AN/ARC-210 - 2"
     _data.radios[3].freq = SR.getRadioFrequency(39)
     _data.radios[3].modulation = SR.getRadioModulation(39)
-    _data.radios[3].volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
+    _data.radios[3].volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false)
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
 
