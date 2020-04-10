@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -655,16 +656,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         {
                             try
                             {
-                                int sent = outgoingEndPoint.Send(byteData, byteData.Length, 0);
+                                if (!outgoingEndPoint.Connected) continue;
+                                
+                                int sent = outgoingEndPoint.Send(byteData, 0);
 
                                 if (sent != byteData.Length)
                                 {
                                     _logger.Error($"Packet not fully sent : Sent {sent} out of {byteData.Length} ");
                                 }
+
                             }
                             catch (Exception ex)
                             {
-                                _logger.Error("Error Sending packet : " + ex.Message);
+                                _logger.Error("Error Sending packet - closing : " + ex.Message);
+                                outgoingEndPoint.Close();
+                                   
                             }
                         }
                         
