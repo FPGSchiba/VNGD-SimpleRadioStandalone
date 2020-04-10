@@ -109,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             try
             {
                 //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
-                // logger.Info("Recevied: " + message.MsgType);
+                // logger.Info("Received: " + message.MsgType);
 
                 switch (message.MsgType)
                 {
