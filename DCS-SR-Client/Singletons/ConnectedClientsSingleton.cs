@@ -15,7 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
-        private readonly string guid = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
+        private readonly string _guid = ClientStateSingleton.Instance.ShortGUID;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -133,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             foreach (var client in _clients)
             {
-                if (!client.Key.Equals(guid))
+                if (!client.Key.Equals(_guid))
                 {
                     // check that either coalition radio security is disabled OR the coalitions match
                     if (global|| (!coalitionSecurity || (client.Value.Coalition == currentClientPos.side)))

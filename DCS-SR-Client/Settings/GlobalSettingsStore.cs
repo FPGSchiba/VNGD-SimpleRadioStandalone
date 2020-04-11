@@ -38,7 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AwacsY,
         MicAudioOutputDeviceId,
 
-        CliendIdShort,
+        CliendIdShort, // not used anymore
         ClientIdLong,
         DCSLOSOutgoingUDP, //9086
         DCSIncomingUDP, //9084
@@ -344,7 +344,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AwacsX.ToString(), "300"},
             {GlobalSettingsKeys.AwacsY.ToString(), "300"},
 
-            {GlobalSettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
+        //    {GlobalSettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
             {GlobalSettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString()},
 
             {GlobalSettingsKeys.DCSLOSOutgoingUDP.ToString(), "9086"},

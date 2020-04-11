@@ -8,6 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
@@ -70,6 +71,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         }
 
         private bool isConnectionErrored;
+        public string ShortGUID { get; }
+
         public bool IsConnectionErrored
         {
             get
@@ -110,6 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private ClientStateSingleton()
         {
+            ShortGUID = ShortGuid.NewGuid();
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 
