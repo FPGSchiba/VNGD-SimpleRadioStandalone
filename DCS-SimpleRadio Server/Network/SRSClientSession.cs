@@ -13,7 +13,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    public class SRSClientSession: TcpSession
+    public class SRSClientSession : TcpSession
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -44,6 +44,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
+        protected override void OnSent(long sent, long pending)
+        {
+            // Disconnect slow client with 3MB send buffer
+            if (pending > 3e+6)
+                Disconnect();
+        }
+
         protected override void OnDisconnected()
         {
             _receiveBuffer.Clear();
@@ -72,7 +79,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex,$"Unable to process JSON: \n {message}");
+                    Logger.Error(ex, $"Unable to process JSON: \n {message}");
                 }
 
 
@@ -85,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         protected override void OnReceived(byte[] buffer, long offset, long size)
         {
-            _receiveBuffer.Append(Encoding.UTF8.GetString(buffer, (int) offset, (int) size));
+            _receiveBuffer.Append(Encoding.UTF8.GetString(buffer, (int)offset, (int)size));
 
             foreach (var s in GetNetworkMessage())
             {
@@ -96,13 +103,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         protected override void OnError(SocketError error)
         {
-            Logger.Error( $"Socket Error: {error}");
+            Logger.Error($"Socket Error: {error}");
         }
 
-        protected override void OnException(Exception error)
-        {
-            Logger.Error(error,$"Socket Exception: {error}");
-            Disconnect();
-        }
     }
 }

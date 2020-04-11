@@ -31,17 +31,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
         private volatile bool _stop = false;
         private readonly ClientStateSingleton _clientStateSingleton;
         private readonly DCSRadioSyncManager.ClientSideUpdate _clientSideUpdate;
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private readonly string _guid;
         private long _lastSent = 0;
 
         private double _heightOffset;
 
-        public LotATCSyncHandler(DCSRadioSyncManager.ClientSideUpdate clientSideUpdate, ConcurrentDictionary<string, SRClient> clients,
-            string guid)
+        public LotATCSyncHandler(DCSRadioSyncManager.ClientSideUpdate clientSideUpdate, string guid)
         {
             _clientSideUpdate = clientSideUpdate;
-            _clients = clients;
             _guid = guid;
             _clientStateSingleton = ClientStateSingleton.Instance;
 

@@ -17,30 +17,9 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    // State object for reading client data asynchronously
-    public class StateObject
-    {
-        // Size of receive buffer.
-        public const int BufferSize = 1024;
-
-        // Receive buffer.
-        public byte[] buffer = new byte[BufferSize];
-
-        public string guid;
-
-        // Received data string.
-        public StringBuilder sb = new StringBuilder();
-
-        // Client  socket.
-        public Socket workSocket;
-    }
-
     public class ServerSync : TcpServer, IHandle<ServerSettingsChangedMessage>
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        // Thread signal.
-        public static ManualResetEvent _allDone = new ManualResetEvent(false);
 
         private readonly HashSet<IPAddress> _bannedIps;
 
@@ -48,8 +27,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private readonly IEventAggregator _eventAggregator;
 
         private readonly ServerSettingsStore _serverSettings;
-
-        private Socket listener;
 
         public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps,
             IEventAggregator eventAggregator) : base(IPAddress.Any, ServerSettingsStore.Instance.GetServerPort())
@@ -60,24 +37,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             _eventAggregator.Subscribe(this);
             _serverSettings = ServerSettingsStore.Instance;
 
+            OptionKeepAlive = true;
+
         }
 
         public void Handle(ServerSettingsChangedMessage message)
         {
-            foreach (var clientToSent in _clients)
+            try
             {
-                try
-                {
-                    HandleServerSettingsMessage();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Exception Sending Server Settings ");
-                }
+                HandleServerSettingsMessage();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Exception Sending Server Settings ");
             }
         }
 
-        protected override TcpSession CreateSession() { return new SRSClientSession(this,_clients,_bannedIps); }
+        protected override TcpSession CreateSession() { return new SRSClientSession(this, _clients, _bannedIps); }
 
         protected override void OnError(SocketError error)
         {
@@ -96,7 +72,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             if ((state != null) && (state.SRSGuid != null))
             {
-                
+
                 //removed
                 SRClient client;
                 _clients.TryRemove(state.SRSGuid, out client);
@@ -104,9 +80,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (client != null)
                 {
                     _logger.Info("Removed Disconnected Client " + state.SRSGuid);
+                    client.ClientSession = null;
 
-                    //Dont tell others for now as a test
-                    HandleClientDisconnect(state,client);
+                   
+                    HandleClientDisconnect(state, client);
                 }
 
                 try
@@ -127,7 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         }
 
 
-      
+
         public void HandleMessage(SRSClientSession state, NetworkMessage message)
         {
             try
@@ -141,20 +118,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         // Do nothing for now
                         break;
                     case NetworkMessage.MessageType.UPDATE:
-                        HandleClientMetaDataUpdate(state,message,true);
+                        HandleClientMetaDataUpdate(state, message, true);
                         break;
                     case NetworkMessage.MessageType.RADIO_UPDATE:
                         bool showTuned = _serverSettings.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT)
                             .BoolValue;
-                        HandleClientMetaDataUpdate(state,message,!showTuned);
-                        HandleClientRadioUpdate(state,message,showTuned);
+                        HandleClientMetaDataUpdate(state, message, !showTuned);
+                        HandleClientRadioUpdate(state, message, showTuned);
                         break;
                     case NetworkMessage.MessageType.SYNC:
 
                         var srClient = message.Client;
                         if (!_clients.ContainsKey(srClient.ClientGuid))
                         {
-                            var clientIp = (IPEndPoint) state.Socket.RemoteEndPoint;
+                            var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
                             if (message.Version == null)
                             {
                                 _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
@@ -178,7 +155,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 return;
                             }
 
-                            srClient.ClientSession =state;
+                            srClient.ClientSession = state;
 
                             //add to proper list
                             _clients[srClient.ClientGuid] = srClient;
@@ -189,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 new List<SRClient>(_clients.Values)));
                         }
 
-                        HandleRadioClientsSync(state, message,srClient);
+                        HandleRadioClientsSync(state, message, srClient);
 
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
@@ -199,7 +176,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         HandleExternalAWACSModePassword(state, message.ExternalAWACSModePassword, message.Client);
                         break;
                     case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT:
-                        HandleExternalAWACSModeDisconnect(state,message.Client);
+                        HandleExternalAWACSModeDisconnect(state, message.Client);
                         break;
                     default:
                         _logger.Warn("Recevied unknown message type");
@@ -222,7 +199,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             };
 
             Multicast(replyMessage.Encode());
-            
+
         }
 
         private void HandleVersionMismatch(SRSClientSession session)
@@ -235,7 +212,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             session.Send(replyMessage.Encode());
         }
 
-        private void HandleClientMetaDataUpdate(SRSClientSession session,NetworkMessage message, bool send)
+        private void HandleClientMetaDataUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -267,9 +244,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         }
                     };
 
-                    if(send) 
+                    if (send)
                         Multicast(replyMessage.Encode());
-                    
+
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
                     {
@@ -280,7 +257,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleClientDisconnect(SRSClientSession srsSession,SRClient client)
+        private void HandleClientDisconnect(SRSClientSession srsSession, SRClient client)
         {
             var message = new NetworkMessage()
             {
@@ -288,10 +265,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
             };
 
-            MulticastAllExeceptOne(message.Encode(),srsSession.Id);
+            MulticastAllExeceptOne(message.Encode(), srsSession.Id);
+            try
+            {
+                srsSession.Dispose();
+            }
+            catch (Exception) { }
+          
         }
 
-        private void HandleClientRadioUpdate(SRSClientSession session,NetworkMessage message, bool send)
+        private void HandleClientRadioUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
             if (_clients.ContainsKey(message.Client.ClientGuid))
             {
@@ -316,7 +299,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                     else
                     {
-                       changed = !client.RadioInfo.Equals(message.Client.RadioInfo);
+                        changed = !client.RadioInfo.Equals(message.Client.RadioInfo);
                     }
 
                     client.LastUpdate = DateTime.Now.Ticks;
@@ -349,7 +332,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     RadioInfo = client.RadioInfo //send radio info
                                 }
                             };
-                           
+
                         }
                         else
                         {
@@ -375,7 +358,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleRadioClientsSync(SRSClientSession session,NetworkMessage message, SRClient client)
+        private void HandleRadioClientsSync(SRSClientSession session, NetworkMessage message, SRClient client)
         {
             //store new client
             var replyMessage = new NetworkMessage
@@ -458,7 +441,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             Multicast(message.Encode());
         }
 
-        private void HandleExternalAWACSModeDisconnect(SRSClientSession session,SRClient client)
+        private void HandleExternalAWACSModeDisconnect(SRSClientSession session, SRClient client)
         {
             if (_clients.ContainsKey(client.ClientGuid))
             {
@@ -488,7 +471,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void RequestStop()
         {
-           
+
             try
             {
                 DisconnectAll();

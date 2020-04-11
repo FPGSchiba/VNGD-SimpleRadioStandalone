@@ -87,7 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         // Used by server client list to remove last frequency client transmitted on after threshold
         [JsonIgnore]
         public DateTime LastTransmissionReceived { get; set; }
-
+        
         //is an SRSClientSession but dont want to include the dependancy for now
         [JsonIgnore]
         public object ClientSession { get; set; }

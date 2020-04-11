@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -13,20 +10,17 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 {
-    public class ConnectedClientsSingleton
+    public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
         private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
-        private readonly string guid = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
+        private readonly string _guid = ClientStateSingleton.Instance.ShortGUID;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
-        public ConcurrentDictionary<string, SRClient> Clients {
-            get
-            {
-                return _clients;
-            }
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private ConnectedClientsSingleton() { }
 
         public static ConnectedClientsSingleton Instance
         {
@@ -45,9 +39,83 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        private ConnectedClientsSingleton()
+        private void NotifyPropertyChanged(string propertyName = "")
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
+        public SRClient this[string key]
+        {
+            get
+            {
+                return _clients[key];
+            }
+            set
+            {
+                _clients[key] = value;
+                NotifyPropertyChanged("Total");
+                NotifyPropertyChanged("InGame");
+            }
+        }
+
+        public ICollection<SRClient> Values
+        {
+            get
+            {
+                return _clients.Values;
+            }
+        }
+
+        public int Total
+        {
+            get
+            {
+                return _clients.Count();
+            }
+        }
+
+        public int InGame
+        {
+            get
+            {
+                int clientCountIngame = 0;
+                foreach (SRClient client in _clients.Values)
+                {
+                    if (client.IsIngame())
+                    {
+                        clientCountIngame++;
+                    }
+                }
+                return clientCountIngame;
+            }
+        }
+
+        public bool TryRemove(string key, out SRClient value)
+        {
+            bool result = _clients.TryRemove(key, out value);
+            if (result)
+            {
+                NotifyPropertyChanged("Total");
+                NotifyPropertyChanged("InGame");
+            }
+            return result;
+        }
+
+        public void Clear()
+        {
+            _clients.Clear();
+            NotifyPropertyChanged("Total");
+            NotifyPropertyChanged("InGame");
+        }
+
+        public bool TryGetValue(string key, out SRClient value)
+        {
+            return _clients.TryGetValue(key, out value);
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return _clients.ContainsKey(key);
         }
 
         public int ClientsOnFreq(double freq, RadioInformation.Modulation modulation)
@@ -65,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             foreach (var client in _clients)
             {
-                if (!client.Key.Equals(guid))
+                if (!client.Key.Equals(_guid))
                 {
                     // check that either coalition radio security is disabled OR the coalitions match
                     if (global|| (!coalitionSecurity || (client.Value.Coalition == currentClientPos.side)))

@@ -23,11 +23,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
     public class DCSRadioSyncHandler
     {
         private readonly DCSRadioSyncManager.SendRadioUpdate _radioUpdate;
-        private readonly ConcurrentDictionary<string, SRClient> _clients;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+
 
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
@@ -43,11 +44,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private long _identStart = 0;
         private bool _ident;
 
-        public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate,
-            ConcurrentDictionary<string, SRClient> clients, NewAircraft _newAircraft)
+        public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate, NewAircraft _newAircraft)
         {
             _radioUpdate = radioUpdate;
-            _clients = clients;
             _newAircraftCallback = _newAircraft;
         }
 
@@ -158,16 +157,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 _dcsRadioUpdateSender.ExclusiveAddressUse = false;
             }
 
-            int clientCountIngame = 0;
-
-            foreach (KeyValuePair<string, SRClient> kvp in _clients)
-            {
-                if (kvp.Value.IsIngame())
-                {
-                    clientCountIngame++;
-                }
-            }
-
             try
             {
                 var connectedClientsSingleton = ConnectedClientsSingleton.Instance;
@@ -196,8 +185,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
                     RadioSendingState = UdpVoiceHandler.RadioSendingState,
                     RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
-                    ClientCountConnected = _clients.Count,
-                    ClientCountIngame = clientCountIngame,
+                    ClientCountConnected = _clients.Total,
+                    ClientCountIngame = _clients.InGame,
                     TunedClients = tunedClients,
                 };
 

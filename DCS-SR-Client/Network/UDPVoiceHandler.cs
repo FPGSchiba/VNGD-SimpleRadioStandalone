@@ -14,7 +14,6 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
@@ -33,8 +32,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;
-        private readonly ConcurrentDictionary<string, SRClient> _clientsList;
-
+        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+        private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
 
         private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
         private readonly string _guid;
@@ -73,14 +72,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _udpLastReceived = 0;
         private DispatcherTimer _updateTimer;
 
-        public UdpVoiceHandler(ConcurrentDictionary<string, SRClient> clientsList, string guid, IPAddress address,
-            int port, OpusDecoder decoder, AudioManager audioManager, InputDeviceManager inputManager,
-            AudioManager.VOIPConnectCallback voipConnectCallback)
+        public UdpVoiceHandler(string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager,
+            InputDeviceManager inputManager)
         {
             // _decoder = decoder;
             _audioManager = audioManager;
-
-            _clientsList = clientsList;
             _guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
 
             _guid = guid;
@@ -90,8 +86,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _serverEndpoint = new IPEndPoint(_address, _port);
 
             _inputManager = inputManager;
-
-            _voipConnectCallback = voipConnectCallback;
 
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
             _updateTimer.Tick += UpdateVOIPStatus;
@@ -105,14 +99,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //ping every 15 so after 35 seconds VoIP UDP issue
             if (diff.Seconds > 35)
             {
-                CallOnMainVOIPConnect(false);
+                _clientStateSingleton.IsVoipConnected = false;
             }
             else
             {
-                CallOnMainVOIPConnect(true);
+                _clientStateSingleton.IsVoipConnected = true;
             }
-
-
         }
 
         private void AudioEffectCheckTick()
@@ -252,7 +244,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //stop UI Refreshing
             _updateTimer.Stop();
 
-            CallOnMainVOIPConnect(false);
+            _clientStateSingleton.IsVoipConnected = false;
         }
 
         public void StartTimer()
@@ -295,9 +287,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private SRClient IsClientMetaDataValid(string clientGuid)
         {
-            if (_clientsList.ContainsKey(clientGuid))
+            if (_clients.ContainsKey(clientGuid))
             {
-                var client = _clientsList[_guid];
+                var client = _clients[_guid];
 
                 if ((client != null) && client.isCurrent())
                 {
@@ -542,7 +534,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SRClient transmittingClient;
-            if (_clientsList.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
+            if (_clients.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
                 var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
                 var clientLatLng = transmittingClient.LatLngPosition;
@@ -569,7 +561,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SRClient transmittingClient;
-            if (_clientsList.TryGetValue(transmissingClientGuid, out transmittingClient))
+            if (_clients.TryGetValue(transmissingClientGuid, out transmittingClient))
             {
                 double dist = 0;
                
@@ -733,7 +725,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if (_ready
                 && _listener != null
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
-                && _clientStateSingleton.MicrophoneAvailable
+                && _audioInputSingleton.MicrophoneAvailable
                 && (bytes != null)
                 && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
                 //can only send if DCS is connected
@@ -877,21 +869,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
             });
             thread.Start();
-        }
-
-        private void CallOnMainVOIPConnect(bool result, bool connectionError = false)
-        {
-            try
-            {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate
-                    {
-                        _voipConnectCallback(result, connectionError, $"{_address.ToString()}:{_port}");
-                    }));
-            }
-            catch (Exception ex)
-            {
-            }
         }
     }
 }

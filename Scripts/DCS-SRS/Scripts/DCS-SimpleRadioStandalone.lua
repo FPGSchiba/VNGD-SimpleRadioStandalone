@@ -1,4 +1,4 @@
--- Version 1.7.7.0
+-- Version 1.7.8.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1186,7 +1186,7 @@ function SR.exportRadioYak52(_data)
     _data.radios[1].volMode = 1
 
     _data.radios[2].name = "Baklan 5"
-    _data.radios[2].freq = SR.getRadioFrequency(24)
+    _data.radios[2].freq = SR.getRadioFrequency(27)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 90, { 0.0, 1.0 }, false)
 
@@ -1413,29 +1413,103 @@ function SR.exportRadioA10C(_data)
     return _data
 end
 
+local _fa18 = {}
+_fa18.radio1 = {}
+_fa18.radio2 = {}
+_fa18.radio1.guard = 0
+_fa18.radio2.guard = 0
+
 function SR.exportRadioFA18C(_data)
+
+
+    local _ufc = SR.getListIndicatorValue(6)
+
+--{
+--   "UFC_Comm1Display": " 1",
+--   "UFC_Comm2Display": " 8",
+--   "UFC_MainDummy": "",
+--   "UFC_OptionCueing1": ":",
+--   "UFC_OptionCueing2": ":",
+--   "UFC_OptionCueing3": "",
+--   "UFC_OptionCueing4": ":",
+--   "UFC_OptionCueing5": "",
+--   "UFC_OptionDisplay1": "GRCV",
+--   "UFC_OptionDisplay2": "SQCH",
+--   "UFC_OptionDisplay3": "CPHR",
+--   "UFC_OptionDisplay4": "AM  ",
+--   "UFC_OptionDisplay5": "MENU",
+--   "UFC_ScratchPadNumberDisplay": "257.000",
+--   "UFC_ScratchPadString1Display": " 8",
+--   "UFC_ScratchPadString2Display": "_",
+--   "UFC_mask": ""
+-- }
+    --_data.radios[3].secFreq = 243.0 * 1000000
+    -- reset state on aircraft switch
+    if _lastUnitId ~= _data.unitId then
+        _fa18.radio1.guard = 0
+        _fa18.radio2.guard = 0
+    end
+
+        local getGuardFreq = function (freq,currentGuard)
+
+
+        if freq > 1000000 then
+
+        -- check if UFC is currently displaying the GRCV for this radio 
+        --and change state if so
+
+        if _ufc.UFC_OptionDisplay1 == "GRCV" then
+
+            if _ufc.UFC_ScratchPadNumberDisplay then
+                 local _ufcFreq = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
+
+                if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
+                    if _ufc.UFC_OptionCueing1 == ":" then
+                        return 243.0 * 1000000
+                    else
+                        return 0
+                    end
+                end
+            end
+        end
+
+        return currentGuard
+
+    else
+        -- reset state
+           return 0
+    end
+
+    end
 
     -- VHF AM
     -- Set radio data
     _data.radios[2].name = "AN/ARC-210 - 1"
     _data.radios[2].freq = SR.getRadioFrequency(38)
     _data.radios[2].modulation = SR.getRadioModulation(38)
-    _data.radios[2].volume = SR.getRadioVolume(0, 108, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
+    _data.radios[2].volume = SR.getRadioVolume(0, 108, { 0.0, 1.0 }, false)
     -- _data.radios[2].encMode = 2 -- Mode 2 is set by aircraft
-    _data.radios[2].guardFreqMode = 1
-    _data.radios[2].secFreq = 243.0 * 1000000
+    --_data.radios[2].secFreq = 243.0 * 1000000
+
+
+    local radio1Guard = getGuardFreq(_data.radios[2].freq, _fa18.radio1.guard)
+    
+     _fa18.radio1.guard = radio1Guard
+     _data.radios[2].secFreq = _fa18.radio1.guard
 
     -- UHF
     -- Set radio data
     _data.radios[3].name = "AN/ARC-210 - 2"
     _data.radios[3].freq = SR.getRadioFrequency(39)
     _data.radios[3].modulation = SR.getRadioModulation(39)
-    _data.radios[3].volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
+    _data.radios[3].volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false)
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
-    _data.radios[3].guardFreqMode = 1
-    _data.radios[3].secFreq = 243.0 * 1000000
 
 
+    local radio2Guard = getGuardFreq(_data.radios[3].freq, _fa18.radio2.guard)
+    
+     _fa18.radio2.guard = radio2Guard
+     _data.radios[3].secFreq = _fa18.radio2.guard
 
     -- KY-58 Radio Encryption
     local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
@@ -2428,17 +2502,17 @@ function SR.exportRadioM2000C(_data)
     end
     
     local mode1On =  SR.getButtonPosition(384)
-	
-	local mode1Digit1 = SR.round(SR.getButtonPosition(377), 0.1)*100
-	local mode1Digit2 = SR.round(SR.getButtonPosition(378), 0.1)*10
-	
-	if mode1Digit1 > 70 then
-		mode1Digit1 = 70
-	end
-	
-	if mode1Digit2 > 3 then
-		mode1Digit2 = 3
-	end
+    
+    local mode1Digit1 = SR.round(SR.getButtonPosition(377), 0.1)*100
+    local mode1Digit2 = SR.round(SR.getButtonPosition(378), 0.1)*10
+    
+    if mode1Digit1 > 70 then
+        mode1Digit1 = 70
+    end
+    
+    if mode1Digit2 > 3 then
+        mode1Digit2 = 3
+    end
 
      _data.iff.mode1 = mode1Digit1+mode1Digit2
     
@@ -2447,27 +2521,27 @@ function SR.exportRadioM2000C(_data)
     end
 
     local mode3On =  SR.getButtonPosition(386)
-	
-	local mode3Digit1 = SR.round(SR.getButtonPosition(379), 0.1)*10000
-	local mode3Digit2 = SR.round(SR.getButtonPosition(380), 0.1)*1000
-	local mode3Digit3 = SR.round(SR.getButtonPosition(381), 0.1)*100
-	local mode3Digit4 = SR.round(SR.getButtonPosition(382), 0.1)*10
-	
-	if mode3Digit1 > 7000 then
-		mode3Digit1 = 7000
-	end
-	
-	if mode3Digit2 > 700 then
-		mode3Digit2 = 700
-	end
-	
-	if mode3Digit3 > 70 then
-		mode3Digit3 = 70
-	end
-	
-	if mode3Digit4 > 7 then
-		mode3Digit4 = 7
-	end
+    
+    local mode3Digit1 = SR.round(SR.getButtonPosition(379), 0.1)*10000
+    local mode3Digit2 = SR.round(SR.getButtonPosition(380), 0.1)*1000
+    local mode3Digit3 = SR.round(SR.getButtonPosition(381), 0.1)*100
+    local mode3Digit4 = SR.round(SR.getButtonPosition(382), 0.1)*10
+    
+    if mode3Digit1 > 7000 then
+        mode3Digit1 = 7000
+    end
+    
+    if mode3Digit2 > 700 then
+        mode3Digit2 = 700
+    end
+    
+    if mode3Digit3 > 70 then
+        mode3Digit3 = 70
+    end
+    
+    if mode3Digit4 > 7 then
+        mode3Digit4 = 7
+    end
     
      _data.iff.mode3 = mode3Digit1+mode3Digit2+mode3Digit3+mode3Digit4
     
@@ -2525,14 +2599,83 @@ function SR.exportRadioJF17(_data)
     return _data
 end
 
+local _av8 = {}
+_av8.radio1 = {}
+_av8.radio2 = {}
+_av8.radio1.guard = 0
+_av8.radio2.guard = 0
+
 function SR.exportRadioAV8BNA(_data)
+
+    local _ufc = SR.getListIndicatorValue(6)
+
+    --{
+    --    "ODU_DISPLAY":"",
+    --    "ODU_Option_1_Text":TR-G",
+    --    "ODU_Option_2_Text":" ",
+    --    "ODU_Option_3_Slc":":",
+    --    "ODU_Option_3_Text":"SQL",
+    --    "ODU_Option_4_Text":"PLN",
+    --    "ODU_Option_5_Text":"CD 0"
+    -- }
+
+    --SR.log("UFC:\n"..SR.JSON:encode(_ufc).."\n\n")
+    local _ufcScratch = SR.getListIndicatorValue(5)
+
+    --{
+    --    "UFC_DISPLAY":"",
+    --    "ufc_chnl_1_m":"M",
+    --    "ufc_chnl_2_m":"M",
+    --    "ufc_right_position":"127.500"
+    -- }
+
+    --SR.log("UFC Scratch:\n"..SR.JSON:encode(SR.getListIndicatorValue(5)).."\n\n")
+
+    if _lastUnitId ~= _data.unitId then
+        _av8.radio1.guard = 0
+        _av8.radio2.guard = 0
+    end
+
+        local getGuardFreq = function (freq,currentGuard)
+
+
+        if freq > 1000000 then
+
+        -- check if LEFT UFC is currently displaying the TR-G for this radio 
+        --and change state if so
+
+        if _ufcScratch.ufc_right_position then
+             local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
+
+            if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
+                if _ufc.ODU_Option_1_Text == "TR-G" then
+                    return 243.0 * 1000000
+                else
+                    return 0
+                end
+            end
+        end
+
+
+        return currentGuard
+
+    else
+        -- reset state
+           return 0
+    end
+
+    end
+
 
     _data.radios[2].name = "ARC-210 COM 1"
     _data.radios[2].freq = SR.getRadioFrequency(2)
     _data.radios[2].modulation = SR.getRadioModulation(2)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
-    _data.radios[2].guardFreqMode = 1
-    _data.radios[2].secFreq = 243.0 * 1000000
+
+    local radio1Guard = getGuardFreq(_data.radios[2].freq, _av8.radio1.guard)
+    
+     _av8.radio1.guard = radio1Guard
+     _data.radios[2].secFreq = _av8.radio1.guard
 
     -- get channel selector
     --  local _selector  = SR.getSelectorPosition(448,0.50)
@@ -2545,8 +2688,11 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = SR.getRadioModulation(3)
     _data.radios[3].volume = SR.getRadioVolume(0, 299, { 0.0, 1.0 }, false)
-    _data.radios[3].guardFreqMode = 1
-    _data.radios[3].secFreq = 243.0 * 1000000
+   
+    local radio2Guard = getGuardFreq(_data.radios[3].freq, _av8.radio2.guard)
+    
+     _av8.radio2.guard = radio2Guard
+     _data.radios[3].secFreq = _av8.radio2.guard
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
@@ -2839,4 +2985,27 @@ function SR.nearlyEqual(a, b, diff)
     return math.abs(a - b) < diff
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.7.0")
+-- SOURCE: DCS-BIOS! Thank you! https://dcs-bios.readthedocs.io/
+-- The function return a table with values of given indicator
+-- The value is retrievable via a named index. e.g. TmpReturn.txt_digits
+function SR.getListIndicatorValue(IndicatorID)
+    local ListIindicator = list_indication(IndicatorID)
+    local TmpReturn = {}
+    
+    if ListIindicator == "" then
+        return nil
+    end
+
+    local ListindicatorMatch = ListIindicator:gmatch("-----------------------------------------\n([^\n]+)\n([^\n]*)\n")
+    while true do
+        local Key, Value = ListindicatorMatch()
+        if not Key then
+            break
+        end
+        TmpReturn[Key] = Value
+    end
+
+    return TmpReturn
+end
+
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.0")

@@ -54,8 +54,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly AudioManager _audioManager;
 
-        private readonly ConcurrentDictionary<string, SRClient> _clients = ConnectedClientsSingleton.Instance.Clients;
-
         private readonly string _guid;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
@@ -80,9 +78,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DelegateCommand _connectCommand;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+
+        /// <remarks>Used in the XAML for DataBinding many things</remarks>
+        public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
+        
+        /// <remarks>Used in the XAML for DataBinding the connected client count</remarks>
+        public ConnectedClientsSingleton Clients { get; } = ConnectedClientsSingleton.Instance;
+
+        /// <remarks>Used in the XAML for DataBinding input audio related UI elements</remarks>
+        public AudioInputSingleton AudioInput { get; } = AudioInputSingleton.Instance;
+
+        /// <remarks>Used in the XAML for DataBinding output audio related UI elements</remarks>
+        public AudioOutputSingleton AudioOutput { get; } = AudioOutputSingleton.Instance;
+
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
-        private bool windowsN;
 
         public MainWindow()
         {
@@ -128,8 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
             }
 
-            _guid = _globalSettings.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
-
+            _guid = ClientStateSingleton.Instance.ShortGUID;
             Analytics.Log("Client", "Startup", _globalSettings.GetClientSetting(GlobalSettingsKeys.ClientIdLong).RawValue);
 
             InitSettingsScreen();
@@ -138,10 +146,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ReloadProfile();
 
             InitInput();
-
-            InitAudioInput();
-            InitAudioOutput();
-            InitMicAudioOutput();
 
             _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
@@ -155,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue;
 
-            _audioManager = new AudioManager(_clients, windowsN);
+            _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
 
@@ -171,12 +175,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
-            _updateTimer.Tick += UpdateClientCount_VUMeters;
+            _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
 
-            _redrawUITimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _redrawUITimer.Tick += RedrawUITick;
-            _redrawUITimer.Start();
         }
 
         private void CheckWindowVisibility()
@@ -565,200 +566,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public ICommand ConnectCommand => _connectCommand;
 
-        private void InitAudioInput()
+        private void UpdatePlayerLocationAndVUMeters(object sender, EventArgs e)
         {
-            Logger.Info("Audio Input - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue);
-
-            if (WaveIn.DeviceCount > 0)
-            {
-                Mic.Items.Add(new AudioDeviceListItem()
-                {
-                    Text = "Default Microphone",
-                    Value = null
-                });
-            }
-
-            Mic.SelectedIndex = 0;
-
-            for (var i = 0; i < WaveIn.DeviceCount; i++)
-            {
-               
-                var item = WaveIn.GetCapabilities(i);
-                Mic.Items.Add(new AudioDeviceListItem()
-                {
-                    Text = item.ProductName,
-                    Value = item
-                });
-
-                Logger.Info("Audio Input - " + item.ProductName + " " + item.ProductGuid.ToString() + " - Name GUID" +
-                            item.NameGuid + " - CHN:" + item.Channels);
-
-                if (item.ProductName.Trim().StartsWith(_globalSettings.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue.Trim()))
-                {
-                    Mic.SelectedIndex = i+1;
-                    Logger.Info("Audio Input - Found Saved ");
-                }
-            }
-
-            // No microphone is available - users can still connect/listen, but audio input controls are disabled and sending is prevented
-            if (WaveIn.DeviceCount == 0 || Mic.SelectedIndex < 0)
-            {
-                Logger.Info("Audio Input - No audio input devices available, disabling mic preview");
-
-                _clientStateSingleton.MicrophoneAvailable = false;
-
-                Preview.IsEnabled = false;
-
-                Preview.ToolTip = ToolTips.NoMicAvailable;
-                StartStop.ToolTip = ToolTips.NoMicAvailable;
-                Mic.ToolTip = ToolTips.NoMicAvailable;
-                Mic_VU.ToolTip = ToolTips.NoMicAvailable;
-            }
-            else
-            {
-                Logger.Info("Audio Input - " + WaveIn.DeviceCount + " audio input devices available, configuring as usual");
-
-                _clientStateSingleton.MicrophoneAvailable = true;
-
-                Preview.IsEnabled = true;
-
-                Preview.ToolTip = null;
-                StartStop.ToolTip = null;
-                Mic.ToolTip = null;
-                Mic_VU.ToolTip = null;
-            }
-        }
-
-        private void InitAudioOutput()
-        {
-            Logger.Info("Audio Output - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue);
-
-            var enumerator = new MMDeviceEnumerator();
-            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            var i = 1;
-
-            Speakers.Items.Add(new AudioDeviceListItem()
-            {
-                Text = "Default Speakers",
-                Value = null
-            });
-
-            Speakers.SelectedIndex = 0;
-
-            foreach (var device in outputDeviceList)
-            {
-
-                try
-                {
-                    Logger.Info("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
-                                device.AudioClient.MixFormat.Channels + " Rate:" +
-                                device.AudioClient.MixFormat.SampleRate.ToString());
-
-                    Speakers.Items.Add(new AudioDeviceListItem()
-                    {
-                        Text = device.FriendlyName,
-                        Value = device
-                    });
-
-                    if (device.ID == _globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue)
-                    {
-                        Speakers.SelectedIndex = i; //this one
-                    }
-
-                    i++;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e,"Audio Output - Error processing device - device skipped");
-                }
-            }
-
-            windowsN = false;
-
-            try
-            {
-                var dmoResampler = new DmoResampler();
-                dmoResampler.Dispose();
-            }
-            catch (Exception)
-            {
-                Logger.Warn("Windows N Detected - using inbuilt resampler");
-                windowsN = true;
-            }
-        }
-
-        private void InitMicAudioOutput()
-        {
-            Logger.Info("Mic Audio Output - Saved ID " +
-                        _globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue);
-
-            var i = 0;
-
-            MicOutput.Items.Add(new AudioDeviceListItem()
-            {
-                Text = "NO MIC OUTPUT / PASSTHROUGH",
-                Value = null
-            });
-
-            var enumerator = new MMDeviceEnumerator();
-            var outputDeviceList = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            foreach (var device in outputDeviceList)
-            {
-                try
-                {
-
-                    Logger.Info("Mic Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
-                            device.AudioClient.MixFormat.Channels + " Rate:" +
-                            device.AudioClient.MixFormat.SampleRate.ToString());
-
-                    MicOutput.Items.Add(new AudioDeviceListItem()
-                    {
-                        Text = device.FriendlyName,
-                        Value = device
-                    });
-
-
-                    //first time round the loop, select first item
-                    if (i == 0)
-                    {
-                        MicOutput.SelectedIndex = 0;
-                    }
-
-                    if (device.ID == _globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue)
-                    {
-                        MicOutput.SelectedIndex = i+1; //this one
-                    }
-
-                    i++;
-
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Audio Output - Error processing device - device skipped");
-                }
-            }
-        }
-
-        private void UpdateClientCount_VUMeters(object sender, EventArgs e)
-        {
-            int clientCountIngame = 0;
-
-            foreach (KeyValuePair<string, SRClient> kvp in _clients)
-            {
-                if (kvp.Value.IsIngame())
-                {
-                    clientCountIngame++;
-                }
-            }
-
-            ClientCount.Content = $"{_clients.Count} ({clientCountIngame} ingame)";
-
             if (_audioPreview != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
-                if (_clientStateSingleton.MicrophoneAvailable)
+                if (AudioInput.MicrophoneAvailable)
                 {
                     Mic_VU.Value = _audioPreview.MicMax;
                 }
@@ -767,7 +580,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else if (_audioManager != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
-                if (_clientStateSingleton.MicrophoneAvailable)
+                if (AudioInput.MicrophoneAvailable)
                 {
                     Mic_VU.Value = _audioManager.MicMax;
                 }
@@ -781,56 +594,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             try
             {
-                var pos = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
                 CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
             }
             catch { }
             
         }
-
-        private void RedrawUITick(object sender, EventArgs e)
-        {
-            bool isGameGuiConnected = _clientStateSingleton.IsGameGuiConnected;
-            bool isGameExportConnected = _clientStateSingleton.IsGameExportConnected;
-
-            // Redraw UI state (currently once per second), toggling controls as required
-            // Some other callbacks/UI state changes could also probably be moved to this...
-            if (_clientStateSingleton.IsConnected)
-            {
-                bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-
-                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !isGameExportConnected;
-                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !isGameExportConnected;
-            }
-            else
-            {
-                ExternalAWACSModePassword.IsEnabled = false;
-                ExternalAWACSModeName.IsEnabled = false;
-            }
-
-            if (isGameGuiConnected && isGameExportConnected)
-            {
-                GameConnectionStatus.Source = Images.IconConnected;
-            }
-            else if (isGameGuiConnected || isGameGuiConnected)
-            {
-                GameConnectionStatus.Source = Images.IconDisconnectedGame;
-            }
-            else
-            {
-                GameConnectionStatus.Source = Images.IconDisconnected;
-            }
-
-            if (_clientStateSingleton.IsLotATCConnected)
-            {
-                LotATCConnectionStatus.Source = Images.IconConnected;
-            }
-            else
-            {
-                LotATCConnectionStatus.Source = Images.IconDisconnected;
-            }
-        }
-
 
         private void InitSettingsScreen()
         {
@@ -881,7 +650,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Connect()
         {
-            if (_clientStateSingleton.IsConnected)
+            if (ClientState.IsConnected)
             {
                 Stop();
             }
@@ -900,7 +669,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new SRSClientSyncHandler(_clients, _guid, UpdateUICallback, delegate(string name)
+                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate(string name)
                         {
                             try
                             {
@@ -952,7 +721,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
 
-                        _clientStateSingleton.IsConnected = false;
+                        ClientState.IsConnected = false;
                         ToggleServerSettings.IsEnabled = false;
                     }
                 }
@@ -961,7 +730,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
 
-                    _clientStateSingleton.IsConnected = false;
+                    ClientState.IsConnected = false;
                     ToggleServerSettings.IsEnabled = false;
                 }
             }
@@ -998,7 +767,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void Stop(bool connectionError = false)
         {
-            if (_clientStateSingleton.IsConnected && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+            if (ClientState.IsConnected && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
             {
                 try
                 {
@@ -1010,29 +779,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
 
+            ClientState.IsConnectionErrored = connectionError;
+
             StartStop.Content = "Connect";
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
             MicOutput.IsEnabled = true;
             Preview.IsEnabled = true;
-            _clientStateSingleton.IsConnected = false;
+            ClientState.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
 
-            ServerConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
-            VOIPConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
-
-            ExternalAWACSModePassword.IsEnabled = false;
-            ExternalAWACSModePasswordLabel.IsEnabled = false;
-            ExternalAWACSModeName.IsEnabled = false;
-            ExternalAWACSModeNameLabel.IsEnabled = false;
             ConnectExternalAWACSMode.IsEnabled = false;
             ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
 
-            if (!string.IsNullOrWhiteSpace(_clientStateSingleton.LastSeenName) &&
-                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != _clientStateSingleton.LastSeenName)
+            if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
             {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, _clientStateSingleton.LastSeenName);
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientState.LastSeenName);
             }
 
             try
@@ -1049,49 +813,46 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _client = null;
             }
 
-            _clientStateSingleton.DcsPlayerRadioInfo.Reset();
-            _clientStateSingleton.PlayerCoaltionLocationMetadata.Reset();
+            ClientState.DcsPlayerRadioInfo.Reset();
+            ClientState.PlayerCoaltionLocationMetadata.Reset();
         }
 
         private void SaveSelectedInputAndOutput()
         {
             //save app settings
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
-            if (_clientStateSingleton.MicrophoneAvailable)
+            if (AudioInput.MicrophoneAvailable)
             {
-                if (Mic.SelectedIndex == 0)
+                if(AudioInput.SelectedAudioInput.Value == null)
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, "default");
+
                 }
                 else
                 {
-                    _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, ((WaveInCapabilities)((AudioDeviceListItem)Mic.SelectedItem).Value).ProductName);
+                    var input = ((WaveInCapabilities)AudioInput.SelectedAudioInput.Value).ProductName;
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, input);
                 }
-                
             }
 
-            if (Speakers.SelectedIndex == 0)
+            if (AudioOutput.SelectedAudioOutput.Value == null)
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId, "default");
             }
             else
             {
-                var output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value;
-
+                var output = (MMDevice)AudioOutput.SelectedAudioOutput.Value;
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId, output.ID);
             }
-          
 
             //check if we have optional output
-            if (MicOutput.SelectedIndex - 1 >= 0)
+            if (AudioOutput.SelectedMicAudioOutput.Value != null)
             {
-                var micOutput = (MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
-                //save settings
+                var micOutput = (MMDevice)AudioOutput.SelectedMicAudioOutput.Value;
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, micOutput.ID);
             }
             else
             {
-                //save settings as none
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, "");
             }
         }
@@ -1106,36 +867,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             if (result)
             {
-                if (!_clientStateSingleton.IsConnected)
+                if (!ClientState.IsConnected)
                 {
                     try
                     {
-
-                        var inputId = Mic.SelectedIndex-1;
-
-                        MMDevice output;
-                        if (Speakers.SelectedIndex == 0)
-                        {
-                            output = WasapiOut.GetDefaultAudioEndpoint();
-                        }
-                        else
-                        {
-                            output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value; ;
-                        }
-
-                        //check if we have optional output
-                        MMDevice micOutput = null;
-                        if (MicOutput.SelectedIndex - 1 >= 0)
-                        {
-                            micOutput = (MMDevice)(MMDevice)((AudioDeviceListItem)MicOutput.SelectedItem).Value;
-                        }
-
                         StartStop.Content = "Disconnect";
                         StartStop.IsEnabled = true;
 
-                        _clientStateSingleton.IsConnected = true;
-                        ServerConnectionStatus.Source = Images.IconConnected;
-                        VOIPConnectionStatus.Source = Images.IconDisconnected;
+                        ClientState.IsConnected = true;
+                        ClientState.IsVoipConnected = false;
 
                         if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
                         {
@@ -1151,8 +891,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
 
-                        _audioManager.StartEncoding(inputId, output, _guid, InputManager,
-                            _resolvedIp, _port, micOutput, VOIPConnectCallback);
+                        _audioManager.StartEncoding(_guid, InputManager,
+                            _resolvedIp, _port);
                     }
                     catch (Exception ex)
                     {
@@ -1180,22 +920,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                if (!_clientStateSingleton.IsConnected)
+                if (!ClientState.IsConnected)
                 {
                     Stop(connectionError);
                 }
-            }
-        }
-
-        private void VOIPConnectCallback(bool result, bool connectionError, string connection)
-        {
-            if (result)
-            {
-                VOIPConnectionStatus.Source = Images.IconConnected;
-            }
-            else
-            {
-                VOIPConnectionStatus.Source = connectionError ? Images.IconDisconnectedError : Images.IconDisconnected;
             }
         }
 
@@ -1204,10 +932,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, Top);
 
-            if (!string.IsNullOrWhiteSpace(_clientStateSingleton.LastSeenName) &&
-                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != _clientStateSingleton.LastSeenName)
+            if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
             {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, _clientStateSingleton.LastSeenName);
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientState.LastSeenName);
             }
 
             //save window position
@@ -1248,7 +976,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_audioPreview == null)
             {
-                if (!_clientStateSingleton.MicrophoneAvailable)
+                if (!AudioInput.MicrophoneAvailable)
                 {
                     Logger.Info("Unable to preview audio, no valid audio input device available or selected");
                     return;
@@ -1273,7 +1001,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-                    _audioPreview.StartPreview(inputId, output,windowsN);
+                    _audioPreview.StartPreview(inputId, output, AudioOutput.WindowsN);
 
                     Preview.Content = "Stop Preview";
                 }
@@ -1294,26 +1022,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void UpdateUICallback()
         {
-            if (_clientStateSingleton.IsConnected)
+            if (ClientState.IsConnected)
             {
                 ToggleServerSettings.IsEnabled = true;
 
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
-                ExternalAWACSModePassword.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
-                ExternalAWACSModePasswordLabel.IsEnabled = eamEnabled;
-                ExternalAWACSModeName.IsEnabled = eamEnabled && !_clientStateSingleton.InExternalAWACSMode && !_clientStateSingleton.IsGameConnected;
-                ExternalAWACSModeNameLabel.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
-                ConnectExternalAWACSMode.Content = _clientStateSingleton.InExternalAWACSMode ? "Disconnect External AWACS MODE (EAM)" : "Connect External AWACS MODE (EAM)";
+                ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect External AWACS MODE (EAM)" : "Connect External AWACS MODE (EAM)";
             }
             else
             {
                 ToggleServerSettings.IsEnabled = false;
-                ExternalAWACSModePassword.IsEnabled = false;
-                ExternalAWACSModePasswordLabel.IsEnabled = false;
-                ExternalAWACSModeName.IsEnabled = false;
-                ExternalAWACSModeNameLabel.IsEnabled = false;
                 ConnectExternalAWACSMode.IsEnabled = false;
                 ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
             }
@@ -1423,7 +1143,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
 
-            if (_clientStateSingleton.IsConnected)
+            if (ClientState.IsConnected)
             {
                 // Always show prompt about active/advertised SRS connection mismatch if client is already connected
                 string[] currentConnectionParts = ServerIp.Text.Trim().Split(':');
@@ -1726,18 +1446,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
         {
             if (_client == null ||
-                !_clientStateSingleton.IsConnected ||
+                !ClientState.IsConnected ||
                 !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
-                (!_clientStateSingleton.InExternalAWACSMode &&
+                (!ClientState.ExternalAWACSModelSelected &&
                 string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Password)))
             {
                 return;
             }
 
-            _clientStateSingleton.LastSeenName = ExternalAWACSModeName.Text;
+            ClientState.LastSeenName = ExternalAWACSModeName.Text;
 
             // Already connected, disconnect
-            if (_clientStateSingleton.InExternalAWACSMode)
+            if (ClientState.ExternalAWACSModelSelected)
             {
                 _client.DisconnectExternalAWACSMode();
             }
@@ -1751,23 +1471,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (result)
             {
-                _clientStateSingleton.InExternalAWACSMode = true;
-                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = coalition;
-                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = _clientStateSingleton.LastSeenName;
-                _clientStateSingleton.DcsPlayerRadioInfo.name = _clientStateSingleton.LastSeenName;
+                ClientState.ExternalAWACSModelSelected = true;
+                ClientState.PlayerCoaltionLocationMetadata.side = coalition;
+                ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
+                ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
-                ExternalAWACSModePassword.IsEnabled = false;
-                ExternalAWACSModeName.IsEnabled = false;
             }
             else
             {
-                _clientStateSingleton.InExternalAWACSMode = false;
-                _clientStateSingleton.PlayerCoaltionLocationMetadata.side = 0;
-                _clientStateSingleton.PlayerCoaltionLocationMetadata.name = "";
-                _clientStateSingleton.DcsPlayerRadioInfo.name = "";
-                _clientStateSingleton.DcsPlayerRadioInfo.LastUpdate = 0;
-                _clientStateSingleton.LastSent = 0;
+                ClientState.ExternalAWACSModelSelected = false;
+                ClientState.PlayerCoaltionLocationMetadata.side = 0;
+                ClientState.PlayerCoaltionLocationMetadata.name = "";
+                ClientState.DcsPlayerRadioInfo.name = "";
+                ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
+                ClientState.LastSent = 0;
 
                 ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
@@ -1918,7 +1636,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             try
             {
-                var pos = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
+                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
 
                 Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
             }

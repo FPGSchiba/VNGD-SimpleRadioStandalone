@@ -224,18 +224,20 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Network\Models\OutgoingTCPMessage.cs" />
+    <Compile Include="Network\Models\OutgoingVoice.cs" />
+    <Compile Include="Network\Models\PendingPacket.cs" />
+    <Compile Include="Network\Models\ConnectionStateObject.cs" />
     <Compile Include="Network\NetCoreServer\Buffer.cs" />
-    <Compile Include="Network\OutgoingVoice.cs" />
-    <Compile Include="Network\PendingPacket.cs" />
-    <Compile Include="Network\SRSClientSession.cs" />
     <Compile Include="Network\NetCoreServer\TcpClient.cs" />
     <Compile Include="Network\NetCoreServer\TcpServer.cs" />
     <Compile Include="Network\NetCoreServer\TcpSession.cs" />
+    <Compile Include="Network\SRSClientSession.cs" />
     <Compile Include="Network\UDPVoiceRouter.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
     <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />
     <Compile Include="UI\MainWindow\MainViewModel.cs" />
-    <Compile Include="Network\ServerLifecycleMessage.cs" />
+    <Compile Include="Network\Models\ServerLifecycleMessage.cs" />
     <Compile Include="Settings\ServerSettingsStore.cs" />
     <Compile Include="Network\ServerState.cs" />
     <Compile Include="Network\ServerSync.cs" />
@@ -271,6 +273,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.manifest" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
