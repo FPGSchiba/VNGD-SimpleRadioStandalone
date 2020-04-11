@@ -504,6 +504,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             //clear the clients list
             _clients.Clear();
+
+            Disconnect();
         }
 
         private void ShowVersionMistmatchWarning(string serverVersion)
@@ -566,6 +568,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             Logger.Error("Disconnecting from server");
+            ClientStateSingleton.Instance.IsConnected = false;
 
             //CallOnMain(false);
         }

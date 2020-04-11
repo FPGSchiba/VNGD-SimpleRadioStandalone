@@ -80,6 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (client != null)
                 {
                     _logger.Info("Removed Disconnected Client " + state.SRSGuid);
+                    client.ClientSession = null;
 
                    
                     HandleClientDisconnect(state, client);
@@ -265,6 +266,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             };
 
             MulticastAllExeceptOne(message.Encode(), srsSession.Id);
+            try
+            {
+                srsSession.Dispose();
+            }
+            catch (Exception) { }
+          
         }
 
         private void HandleClientRadioUpdate(SRSClientSession session, NetworkMessage message, bool send)
