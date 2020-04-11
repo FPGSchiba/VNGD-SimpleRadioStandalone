@@ -37,8 +37,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         private int _radioId;
 
         public int RadioId
-        {
-            private get { return _radioId; }
+        { 
+            get { return _radioId; }
             set
             {
                 _radioId = value;

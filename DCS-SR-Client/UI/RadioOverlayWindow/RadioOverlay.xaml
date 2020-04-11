@@ -6,7 +6,7 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="170"
-        Height="315"
+        Height="355"
         MinWidth="170"
         MinHeight="355"
         AllowsTransparency="True"
@@ -77,6 +77,8 @@
         <radioOverlayWindow:RadioControlGroup x:Name="Radio2" RadioId="2" />
 
         <radioOverlayWindow:RadioControlGroup x:Name="Radio3" RadioId="3" />
+
+        <radioOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" Visibility="Collapsed" />
 
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
         <Separator Width="170" Margin="0 2" />

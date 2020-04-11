@@ -25,13 +25,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup =
-            new Client.UI.RadioOverlayWindow.RadioControlGroup[3];
+            new Client.UI.RadioOverlayWindow.RadioControlGroup[4];
 
         private readonly DispatcherTimer _updateTimer;
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+
+        private readonly double _originalMinHeight;
 
         public RadioOverlayWindow()
         {
@@ -43,6 +45,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             _aspectRatio = MinWidth / MinHeight;
 
+            _originalMinHeight = MinHeight;
+
             AllowsTransparency = true;
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
@@ -50,6 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             radioControlGroup[0] = Radio1;
             radioControlGroup[1] = Radio2;
             radioControlGroup[2] = Radio3;
+            radioControlGroup[3] = Radio4;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -79,17 +84,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            bool first = true;
+            
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioReceive();
                 radio.RepaintRadioStatus();
+
+                //TODO show and hide radio 4 if its visible
             }
 
             Intercom.RepaintRadioStatus();
 
             TransponderPanel.RepaintTransponderStatus();
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+         
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
                 var avalilableRadios = 0;
