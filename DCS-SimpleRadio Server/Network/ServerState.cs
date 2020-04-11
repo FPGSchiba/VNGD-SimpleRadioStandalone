@@ -142,7 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_ENABLED)
                                 .BoolValue)
                             {
-                                var host = new IPEndPoint(IPAddress.Loopback,
+                                var host = new IPEndPoint(IPAddress.Parse(ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_IP).StringValue),
                                     ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_PORT).IntValue);
 
                                 ClientListExport data = new ClientListExport { ServerVersion = UpdaterChecker.VERSION, Clients = new List<SRClient>()};

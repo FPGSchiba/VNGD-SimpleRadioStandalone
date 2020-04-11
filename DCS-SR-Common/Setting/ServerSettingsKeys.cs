@@ -30,6 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         SHOW_TRANSMITTER_NAME = 19,
         LOTATC_EXPORT_ENABLED = 20,
         LOTATC_EXPORT_PORT = 21,
+        LOTATC_EXPORT_IP = 22,
     }
 
     public class DefaultServerSettings
@@ -57,6 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.22" },
             { ServerSettingsKeys.LOTATC_EXPORT_ENABLED.ToString(), "false" },
             { ServerSettingsKeys.LOTATC_EXPORT_PORT.ToString(), "10712" },
+            { ServerSettingsKeys.LOTATC_EXPORT_IP.ToString(), "127.0.0.1" },
         };
     }
 }
