@@ -1,4 +1,4 @@
--- Version 1.7.8.0
+-- Version 1.7.8.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -3008,4 +3008,4 @@ function SR.getListIndicatorValue(IndicatorID)
     return TmpReturn
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.1")
