@@ -1,4 +1,4 @@
--- Version 1.7.8.0
+-- Version 1.7.8.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -1419,6 +1419,21 @@ _fa18.radio2 = {}
 _fa18.radio1.guard = 0
 _fa18.radio2.guard = 0
 
+--[[
+From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
+
+ARC-210(RT-1556 and DCS)
+
+Frequency Band(MHz) Modulation 	Guard Channel (MHz)
+	30 to 87.995 		FM
+	*108 to 135.995 	AM 			121.5
+	136 to 155.995 		AM/FM
+	156 to 173.995 		FM
+	225 to 399.975 		AM/FM 		243.0 (AM)
+
+*Cannot transmit on 108 thru 117.995 MHz
+]]--
+
 function SR.exportRadioFA18C(_data)
 
 
@@ -1450,7 +1465,7 @@ function SR.exportRadioFA18C(_data)
         _fa18.radio2.guard = 0
     end
 
-        local getGuardFreq = function (freq,currentGuard)
+    local getGuardFreq = function (freq,currentGuard,modulation)
 
 
         if freq > 1000000 then
@@ -1463,14 +1478,44 @@ function SR.exportRadioFA18C(_data)
             if _ufc.UFC_ScratchPadNumberDisplay then
                  local _ufcFreq = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
 
+                 -- if its the correct radio
                 if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
                     if _ufc.UFC_OptionCueing1 == ":" then
-                        return 243.0 * 1000000
+
+                    	-- GUARD changes based on the tuned frequency
+                    	if freq > 108*1000000 
+                    		and freq < 135.995*1000000 
+                    		and modulation == 0 then
+                    		return 121.5 * 1000000
+                    	end 
+                    	if freq > 108*1000000 
+                    		and freq < 399.975*1000000 
+                    		and modulation == 0 then
+                    		return 243 * 1000000
+                    	end
+
+                        return 0
                     else
                         return 0
                     end
                 end
             end
+        end
+
+        if currentGuard > 1000 then
+
+	        if freq > 108*1000000 
+	    		and freq < 135.995*1000000 
+	    		and modulation == 0 then
+
+	    			return 121.5 * 1000000
+	    	end 
+	    	if freq > 108*1000000 
+	    		and freq < 399.975*1000000 
+	    		and modulation == 0 then
+
+	    		return 243 * 1000000
+	    	end
         end
 
         return currentGuard
@@ -1492,9 +1537,13 @@ function SR.exportRadioFA18C(_data)
     --_data.radios[2].secFreq = 243.0 * 1000000
 
 
-    local radio1Guard = getGuardFreq(_data.radios[2].freq, _fa18.radio1.guard)
+    local radio1Guard = getGuardFreq(_data.radios[2].freq, _fa18.radio1.guard, _data.radios[2].modulation)
     
+
+
      _fa18.radio1.guard = radio1Guard
+
+
      _data.radios[2].secFreq = _fa18.radio1.guard
 
     -- UHF
@@ -1506,7 +1555,7 @@ function SR.exportRadioFA18C(_data)
     _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
 
 
-    local radio2Guard = getGuardFreq(_data.radios[3].freq, _fa18.radio2.guard)
+    local radio2Guard = getGuardFreq(_data.radios[3].freq, _fa18.radio2.guard,_data.radios[3].modulation)
     
      _fa18.radio2.guard = radio2Guard
      _data.radios[3].secFreq = _fa18.radio2.guard
@@ -3008,4 +3057,4 @@ function SR.getListIndicatorValue(IndicatorID)
     return TmpReturn
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.1")

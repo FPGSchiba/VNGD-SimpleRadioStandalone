@@ -137,8 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
             }
 
-            _guid = _globalSettings.GetClientSetting(GlobalSettingsKeys.CliendIdShort).StringValue;
-
+            _guid = ClientStateSingleton.Instance.ShortGUID;
             Analytics.Log("Client", "Startup", _globalSettings.GetClientSetting(GlobalSettingsKeys.ClientIdLong).RawValue);
 
             InitSettingsScreen();
