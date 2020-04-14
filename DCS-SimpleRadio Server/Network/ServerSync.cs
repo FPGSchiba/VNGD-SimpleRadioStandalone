@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using NetCoreServer;
 using Newtonsoft.Json;
 using NLog;
+using Open.Nat;
 using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
@@ -27,6 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private readonly IEventAggregator _eventAggregator;
 
         private readonly ServerSettingsStore _serverSettings;
+        private NatHandler _natHandler;
+
 
         public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps,
             IEventAggregator eventAggregator) : base(IPAddress.Any, ServerSettingsStore.Instance.GetServerPort())
@@ -39,6 +42,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             OptionKeepAlive = true;
 
+            if (_serverSettings.GetServerSetting(ServerSettingsKeys.UPNP_ENABLED).BoolValue)
+            {
+                _natHandler = new NatHandler(_serverSettings.GetServerPort());
+                _natHandler.OpenNAT();
+            }
+            
         }
 
         public void Handle(ServerSettingsChangedMessage message)
@@ -471,6 +480,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void RequestStop()
         {
+            try
+            {
+                _natHandler?.CloseNAT();
+            }
+            catch
+            {
+            }
 
             try
             {
