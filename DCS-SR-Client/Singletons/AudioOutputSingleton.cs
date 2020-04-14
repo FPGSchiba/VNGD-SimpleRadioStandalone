@@ -86,11 +86,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 }
             };
 
+            string savedDeviceId;
             if (micOutput)
             {
+                savedDeviceId = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue;
                 SelectedMicAudioOutput = outputs[0];
             } else
             {
+                savedDeviceId = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue;
                 SelectedAudioOutput = outputs[0];
             }
 
@@ -112,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                         Value = device
                     });
 
-                    if (device.ID == GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue)
+                    if (device.ID == savedDeviceId)
                     {
                         if (micOutput)
                         {
