@@ -2618,15 +2618,13 @@ function SR.exportRadioJF17(_data)
     _data.radios[2].freq = SR.getRadioFrequency(25)
     _data.radios[2].modulation = SR.getRadioModulation(25)
     _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
-    _data.radios[2].guardFreqMode = 1
-    _data.radios[2].secFreq = 121.5 * 1000000
+    _data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
 
     _data.radios[3].name = "COMM2 UHF Radio"
     _data.radios[3].freq = SR.getRadioFrequency(26)
     _data.radios[3].modulation = SR.getRadioModulation(26)
     _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-    _data.radios[3].guardFreqMode = 1
-    _data.radios[3].secFreq = 243.0 * 1000000
+    _data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
 
        -- Expansion Radio - Server Side Controlled
     _data.radios[4].name = "VHF/UHF Expansion"
@@ -2644,6 +2642,30 @@ function SR.exportRadioJF17(_data)
 
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
+
+    -- SR.log(SR.tableShow(_G).."\n\n")
+
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local _iff = GetDevice(15)
+
+    if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
+        _data.iff.status = 1
+    end
+
+    if _iff:is_m1_trs_on() then
+        _data.iff.mode1 = _iff:get_m1_trs_code()
+    else
+        _data.iff.mode1 = -1
+    end
+
+    if _iff:is_m3_trs_on() then
+        _data.iff.mode3 = _iff:get_m3_trs_code()
+    else
+        _data.iff.mode3 = -1
+    end
+
+    _data.iff.mode4 =  _iff:is_m6_trs_on()
 
     return _data
 end
@@ -3057,4 +3079,90 @@ function SR.getListIndicatorValue(IndicatorID)
     return TmpReturn
 end
 
+
+function SR.basicSerialize(var)
+    if var == nil then
+        return "\"\""
+    else
+        if ((type(var) == 'number') or
+                (type(var) == 'boolean') or
+                (type(var) == 'function') or
+                (type(var) == 'table') or
+                (type(var) == 'userdata') ) then
+            return tostring(var)
+        elseif type(var) == 'string' then
+            var = string.format('%q', var)
+            return var
+        end
+    end
+end
+
+
+    function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slmod, this is a _G serialization
+        tableshow_tbls = tableshow_tbls or {} --create table of tables
+        loc = loc or ""
+        indent = indent or ""
+        if type(tbl) == 'table' then --function only works for tables!
+            tableshow_tbls[tbl] = loc
+
+            local tbl_str = {}
+
+            tbl_str[#tbl_str + 1] = indent .. '{\n'
+
+            for ind,val in pairs(tbl) do -- serialize its fields
+                if type(ind) == "number" then
+                    tbl_str[#tbl_str + 1] = indent
+                    tbl_str[#tbl_str + 1] = loc .. '['
+                    tbl_str[#tbl_str + 1] = tostring(ind)
+                    tbl_str[#tbl_str + 1] = '] = '
+                else
+                    tbl_str[#tbl_str + 1] = indent
+                    tbl_str[#tbl_str + 1] = loc .. '['
+                    tbl_str[#tbl_str + 1] = SR.basicSerialize(ind)
+                    tbl_str[#tbl_str + 1] = '] = '
+                end
+
+                if ((type(val) == 'number') or (type(val) == 'boolean')) then
+                    tbl_str[#tbl_str + 1] = tostring(val)
+                    tbl_str[#tbl_str + 1] = ',\n'
+                elseif type(val) == 'string' then
+                    tbl_str[#tbl_str + 1] = SR.basicSerialize(val)
+                    tbl_str[#tbl_str + 1] = ',\n'
+                elseif type(val) == 'nil' then -- won't ever happen, right?
+                    tbl_str[#tbl_str + 1] = 'nil,\n'
+                elseif type(val) == 'table' then
+                    if tableshow_tbls[val] then
+                        tbl_str[#tbl_str + 1] = tostring(val) .. ' already defined: ' .. tableshow_tbls[val] .. ',\n'
+                    else
+                        tableshow_tbls[val] = loc ..    '[' .. SR.basicSerialize(ind) .. ']'
+                        tbl_str[#tbl_str + 1] = tostring(val) .. ' '
+                        tbl_str[#tbl_str + 1] = SR.tableShow(val,  loc .. '[' .. SR.basicSerialize(ind).. ']', indent .. '        ', tableshow_tbls)
+                        tbl_str[#tbl_str + 1] = ',\n'
+                    end
+                elseif type(val) == 'function' then
+                    if debug and debug.getinfo then
+                        local fcnname = tostring(val)
+                        local info = debug.getinfo(val, "S")
+                        if info.what == "C" then
+                            tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', C function') .. ',\n'
+                        else
+                            if (string.sub(info.source, 1, 2) == [[./]]) then
+                                tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')' .. info.source) ..',\n'
+                            else
+                                tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')') ..',\n'
+                            end
+                        end
+
+                    else
+                        tbl_str[#tbl_str + 1] = 'a function,\n'
+                    end
+                else
+                    tbl_str[#tbl_str + 1] = 'unable to serialize value type ' .. SR.basicSerialize(type(val)) .. ' at index ' .. tostring(ind)
+                end
+            end
+
+            tbl_str[#tbl_str + 1] = indent .. '}'
+            return table.concat(tbl_str)
+        end
+    end
 SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.1")
