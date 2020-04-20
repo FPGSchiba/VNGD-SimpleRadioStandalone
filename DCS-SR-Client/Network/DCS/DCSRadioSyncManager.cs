@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
@@ -19,6 +21,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
     public class DCSRadioSyncManager
     {
+        private readonly SendRadioUpdate _clientRadioUpdate;
+        private readonly ClientSideUpdate _clientSideUpdate;
         public static readonly string AWACS_RADIOS_FILE = "awacs-radios.json";
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -34,17 +38,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private volatile bool _stopExternalAWACSMode;
 
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
+        private DispatcherTimer _clearRadio;
 
         public bool IsListening { get; private set; }
 
         public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
            string guid, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
         {
+            _clientRadioUpdate = clientRadioUpdate;
+            _clientSideUpdate = clientSideUpdate;
             IsListening = false;
             _lineOfSightHandler = new DCSLineOfSightHandler(guid);
             _udpCommandHandler = new UDPCommandHandler();
             _dcsGameGuiHandler = new DCSGameGuiHandler(clientSideUpdate);
             _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _newAircraftCallback);
+
+            _clearRadio = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
+            _clearRadio.Tick += CheckIfRadioIsStale;
+           
+        }
+
+        private void CheckIfRadioIsStale(object sender, EventArgs e)
+        {
+            if (!_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
+            {
+                //check if we've had an update
+                if (_clientStateSingleton.DcsPlayerRadioInfo.LastUpdate > 0)
+                {
+                    _clientStateSingleton.PlayerCoaltionLocationMetadata.Reset();
+                    _clientStateSingleton.DcsPlayerRadioInfo.Reset();
+
+                    _clientRadioUpdate();
+                    _clientSideUpdate();
+                    Logger.Info("Reset Radio state - no longer connected");
+                }
+            }
         }
 
         public void Start()
@@ -110,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         inAircraft = false
                     });
 
-                    Thread.Sleep(200);
+                    Thread.Sleep(1000);
                 }
 
                 Logger.Debug("Stopping external AWACS mode loop");
@@ -128,6 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _dcsGameGuiHandler.Start();
             _lineOfSightHandler.Start();
             _udpCommandHandler.Start();
+             _clearRadio.Start();
         }
 
         public void Stop()
@@ -135,10 +164,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _stopExternalAWACSMode = true;
             IsListening = false;
 
+            _clearRadio.Stop();
             _dcsRadioSyncHandler.Stop();
             _dcsGameGuiHandler.Stop();
             _lineOfSightHandler.Stop();
             _udpCommandHandler.Stop();
+            
         }
     }
 }

@@ -149,8 +149,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                                 foreach (var srClient in _connectedClients.Values)
                                 {
-
-                                    if (srClient.isCurrent() && srClient.RadioInfo?.iff != null)
+                                    if (srClient.RadioInfo?.iff != null)
                                     {
                                         data.Clients.Add(new SRClient()
                                         {
@@ -161,13 +160,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 unitId = srClient.RadioInfo.unitId,
                                                 iff = srClient.RadioInfo.iff,
                                                 unit = srClient.RadioInfo?.unit,
-                                                latLng = srClient?.LatLngPosition,
-                                                inAircraft = srClient.RadioInfo.inAircraft,
                                             },
                                             Coalition = srClient.Coalition,
                                             Name = srClient?.Name,
-                                            LatLngPosition = srClient?.LatLngPosition,
-                                            Position = new DcsPosition()
+                                            LatLngPosition = srClient?.LatLngPosition
                                         });
                                     }
                                 }

@@ -291,7 +291,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var client = _clients[_guid];
 
-                if ((client != null) && client.isCurrent())
+                if (client != null)
                 {
                     return client;
                 }

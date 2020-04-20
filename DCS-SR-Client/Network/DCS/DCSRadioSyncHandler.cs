@@ -134,9 +134,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             Logger.Debug("Update sent to DCS");
 
-            if (update || IsRadioInfoStale(message))
+            if (update)
             {
-                Logger.Debug("Sending Radio Info To Server - Stale");
+                Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
                 _radioUpdate();
             }
@@ -369,10 +369,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                     if ((updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT) || overrideFreqAndVol)
                     {
-                        if (clientRadio.freq != updateRadio.freq)
+                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.freq, updateRadio.freq))
                             changed = true;
 
-                        if (clientRadio.secFreq != updateRadio.secFreq)
+                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.secFreq, updateRadio.secFreq))
                             changed = true;
 
                         clientRadio.freq = updateRadio.freq;
@@ -564,7 +564,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             return changed;
         }
 
-        private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
+   /*     private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
         {
             //send update if our metadata is nearly stale (1 tick = 100ns, 50000000 ticks = 5s stale timer)
             if (DateTime.Now.Ticks - _clientStateSingleton.LastSent < 50000000)
@@ -574,7 +574,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             }
             Logger.Debug($"Stale Radio - Tick: {DateTime.Now.Ticks} Last sent: {_clientStateSingleton.LastSent} ");
             return true;
-        }
+        }*/
 
         public void Stop()
         {

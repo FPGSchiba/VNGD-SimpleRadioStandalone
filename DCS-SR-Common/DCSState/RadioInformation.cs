@@ -1,4 +1,6 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿using Newtonsoft.Json;
+
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class RadioInformation
     {
@@ -37,20 +39,32 @@
 
         public bool enc = false; // encrytion enabled
         public byte encKey = 0;
+
+        [JsonIgnore]
         public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
 
+        [JsonIgnore]
         public double freqMax = 1;
+        [JsonIgnore]
         public double freqMin = 1;
+
         public double freq = 1;
+        
         public Modulation modulation = Modulation.DISABLED;
+        
         public string name = "";
+        
         public double secFreq = 1;
+
         public float volume = 1.0f;
 
+        [JsonIgnore]
         public FreqMode freqMode = FreqMode.COCKPIT;
+        [JsonIgnore]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
+        [JsonIgnore]
         public VolumeMode volMode = VolumeMode.COCKPIT;
-
+        [JsonIgnore]
         public bool expansion = false;
 
         public int channel = -1;

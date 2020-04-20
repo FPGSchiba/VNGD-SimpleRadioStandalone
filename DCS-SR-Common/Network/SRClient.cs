@@ -9,16 +9,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
     public class SRClient : INotifyPropertyChanged
     {
-        //  public DcsPosition Position { get; set; }
-
         private int _coalition;
 
-        [JsonIgnore] private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
+        [JsonIgnore] 
+        private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
         public string ClientGuid { get; set; }
 
         public string Name { get; set; }
-
 
         public int Coalition
         {
@@ -43,9 +41,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public long LastRadioUpdateSent { get; set; }
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
-
-        public DcsPosition Position { get; set; } = new DcsPosition();
-
         public DCSLatLngPosition LatLngPosition { get; set; }
 
         [JsonIgnore]
@@ -65,8 +60,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
             set { _lineOfSightLoss = value; }
         }
-
-        public string ClientChannelId { get; set; }
 
         // Used by server client list to display last frequency client transmitted on
         private string _transmittingFrequency;
@@ -92,22 +85,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         [JsonIgnore]
         public object ClientSession { get; set; }
 
+
         public event PropertyChangedEventHandler PropertyChanged;
-
-
-        public bool isCurrent()
-        {
-            return true;
-//             if(LastUpdate > DateTime.Now.Ticks - 100000000)//last in game 10 seconds ago
-//             {
-//                Console.WriteLine("NOT CURRENT!");
-//                 return true;
-//             }
-//            else
-//            {
-//                return true;
-//            }
-        }
 
         public bool IsIngame()
         {

@@ -115,6 +115,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     },
                     MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT
                 });
+                //reset radio
+                _clientStateSingleton.DcsPlayerRadioInfo.Reset();
             }
 
             _radioDCSSync.StopExternalAWACSModeLoop();
