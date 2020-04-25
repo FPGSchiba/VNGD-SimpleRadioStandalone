@@ -9,6 +9,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Newtonsoft.Json;
 using NLog;
 
@@ -23,6 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private UdpClient _dcsGameGuiUdpListener;
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public DCSGameGuiHandler(DCSRadioSyncManager.ClientSideUpdate clientSideUpdate)
         {
@@ -40,6 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
             _dcsGameGuiUdpListener.Client.Bind(localEp);
             //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
+            _clientStateSingleton.LastPostionCoalitionSent = 0;
 
             Task.Factory.StartNew(() =>
             {
@@ -60,16 +63,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                             if (updatedPlayerInfo != null)
                             {
-                               var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
+                                var shouldUpdate = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
 
-                               //copy the bits we need  - leave position
-                               currentInfo.name = updatedPlayerInfo.name;
-                               currentInfo.side = updatedPlayerInfo.side;
+                                var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
+
+                                bool changed = !updatedPlayerInfo.name.Equals(currentInfo.name) || currentInfo.side!=updatedPlayerInfo.side;
+                                //copy the bits we need  - leave position
+
+                                currentInfo.name = updatedPlayerInfo.name;
+                                currentInfo.side = updatedPlayerInfo.side;
 
                                 //this will clear any stale positions if nothing is currently connected
                                 _clientStateSingleton.ClearPositionsIfExpired();
 
-                                if (_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
+                                //only update if position is changed 
+                                if (_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent() &&  (changed || shouldUpdate))
                                 {
                                     _clientSideUpdate();
                                 }
