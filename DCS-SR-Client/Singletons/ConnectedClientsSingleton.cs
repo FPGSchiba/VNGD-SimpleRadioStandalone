@@ -44,6 +44,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public void NotifyAll()
+        {
+            NotifyPropertyChanged("Total");
+            NotifyPropertyChanged("InGame");
+        }
+
         public SRClient this[string key]
         {
             get
@@ -53,8 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             set
             {
                 _clients[key] = value;
-                NotifyPropertyChanged("Total");
-                NotifyPropertyChanged("InGame");
+               NotifyAll();
             }
         }
 

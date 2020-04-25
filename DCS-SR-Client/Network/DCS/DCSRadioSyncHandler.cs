@@ -193,7 +193,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
                 {
                  //   NullValueHandling = NullValueHandling.Ignore,
-                 //   ContractResolver = new JsonNetworkPropertiesResolver(),
+                    ContractResolver = new JsonNetworkPropertiesResolver(),
                 }) + "\n";
 
                 var byteData =

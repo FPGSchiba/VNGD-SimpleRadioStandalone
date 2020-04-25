@@ -16,20 +16,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         }
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public string name = "";
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public DCSLatLngPosition latLng = new DCSLatLngPosition();
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public bool inAircraft = false;
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public RadioSwitchControls control = RadioSwitchControls.HOTAS;
 
         [JsonNetworkIgnoreSerialization]
@@ -40,6 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public uint unitId;
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public bool intercomHotMic = false; //if true switch to intercom and transmit
 
         public Transponder iff = new Transponder();
@@ -49,6 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public bool simultaneousTransmission = false; // Global toggle enabling simultaneous transmission on multiple radios, activated via the AWACS panel
 
         [JsonNetworkIgnoreSerialization]

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
@@ -41,6 +42,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public long LastRadioUpdateSent { get; set; }
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
+
+        [JsonDCSIgnoreSerialization]
         public DCSLatLngPosition LatLngPosition { get; set; }
 
         [JsonIgnore]

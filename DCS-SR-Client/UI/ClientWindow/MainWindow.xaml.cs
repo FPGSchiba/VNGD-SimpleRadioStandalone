@@ -595,7 +595,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
             }
             catch { }
-            
+
+            ConnectedClientsSingleton.Instance.NotifyAll();
+
         }
 
         private void InitSettingsScreen()

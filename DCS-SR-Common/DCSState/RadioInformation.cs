@@ -44,9 +44,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         [JsonNetworkIgnoreSerialization]
         public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
 
+        [JsonDCSIgnoreSerialization]
         [JsonNetworkIgnoreSerialization]
         public double freqMax = 1;
 
+        [JsonDCSIgnoreSerialization]
         [JsonNetworkIgnoreSerialization]
         public double freqMin = 1;
 
@@ -63,12 +65,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public float volume = 1.0f;
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public FreqMode freqMode = FreqMode.COCKPIT;
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public VolumeMode volMode = VolumeMode.COCKPIT;
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public bool expansion = false;
 
         [JsonNetworkIgnoreSerialization]
