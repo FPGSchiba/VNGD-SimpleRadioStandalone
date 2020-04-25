@@ -252,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     };
 
                     if (send)
-                        Multicast(replyMessage.Encode());
+                        MulticastAllExeceptOne(replyMessage.Encode(),session.Id);
 
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
