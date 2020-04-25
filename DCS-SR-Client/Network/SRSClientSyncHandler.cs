@@ -279,6 +279,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             decodeErrors = 0; //reset counter
                             if (serverMessage != null)
                             {
+                                //Logger.Debug("Received "+serverMessage.MsgType);
                                 switch (serverMessage.MsgType)
                                 {
                                     case NetworkMessage.MessageType.PING:
@@ -317,9 +318,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                     }
                                                 }
 
-//                                                Logger.Info("Recevied Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
-//                                                            srClient.Name + " Coalition: " +
-//                                                            srClient.Coalition + " Pos: " + srClient.Position);
+                                                // Logger.Debug("Received Update Client: " + NetworkMessage.MessageType.UPDATE + " From: " +
+                                                //             srClient.Name + " Coalition: " +
+                                                //             srClient.Coalition + " Pos: " + srClient.LatLngPosition);
                                             }
                                         }
                                         else
@@ -334,10 +335,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
-//                                            Logger.Info("Recevied New Client: " + NetworkMessage.MessageType.UPDATE +
-//                                                        " From: " +
-//                                                        serverMessage.Client.Name + " Coalition: " +
-//                                                        serverMessage.Client.Coalition);
+                                            // Logger.Debug("Received New Client: " + NetworkMessage.MessageType.UPDATE +
+                                            //             " From: " +
+                                            //             serverMessage.Client.Name + " Coalition: " +
+                                            //             serverMessage.Client.Coalition);
                                         }
 
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
@@ -402,7 +403,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                     case NetworkMessage.MessageType.SERVER_SETTINGS:
 
-                                        //  Logger.Info("Recevied: " + NetworkMessage.MessageType.SERVER_SETTINGS);
                                         _serverSettings.Decode(serverMessage.ServerSettings);
                                         ServerVersion = serverMessage.Version;
 
@@ -416,7 +416,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         break;
                                     case NetworkMessage.MessageType.CLIENT_DISCONNECT:
-                                        //   Logger.Info("Recevied: " + NetworkMessage.MessageType.CLIENT_DISCONNECT);
 
                                         SRClient outClient;
                                         _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);

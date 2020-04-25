@@ -1,4 +1,4 @@
--- Version 1.7.8.1
+-- Version 1.8.0.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -3213,4 +3213,4 @@ end
             return table.concat(tbl_str)
         end
     end
-SR.log("Loaded SimpleRadio Standalone Export version: 1.7.8.1")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.0")
