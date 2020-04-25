@@ -35,6 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool ToggleIdent()
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null && trans.status != Transponder.IFFStatus.OFF)
@@ -56,6 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool Mode4Toggle()
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -68,6 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool SetMode3(int mode3)
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -100,6 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool SetMode1(int mode1)
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -144,6 +148,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool TogglePower()
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -165,6 +170,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool SetPower(bool on)
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -186,6 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool SetMode4(bool on)
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null)
@@ -199,6 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
         public static bool SetIdent(bool on)
         {
+            ClientStateSingleton.Instance.LastSent = 0;
             var trans = GetTransponder(true);
 
             if (trans != null && trans.status != Transponder.IFFStatus.OFF)

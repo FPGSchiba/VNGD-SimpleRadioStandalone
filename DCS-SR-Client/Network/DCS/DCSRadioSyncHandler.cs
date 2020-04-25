@@ -127,6 +127,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
+            //copy iff
+
+            Transponder original = null;
+
+            if (_clientStateSingleton.DcsPlayerRadioInfo.iff!=null)
+            {
+                original = _clientStateSingleton.DcsPlayerRadioInfo.iff.Copy();
+            }
+
             var update = UpdateRadio(message);
 
             //send to DCS UI
@@ -134,7 +143,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             Logger.Debug("Update sent to DCS");
 
-            if (update || _clientStateSingleton.LastSent < 1)
+            if (update || _clientStateSingleton.LastSent < 1 || !_clientStateSingleton.DcsPlayerRadioInfo.iff.Equals(original))
             {
                 Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
@@ -193,7 +202,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
                 {
                  //   NullValueHandling = NullValueHandling.Ignore,
-                    ContractResolver = new JsonNetworkPropertiesResolver(),
+                    ContractResolver = new JsonDCSPropertiesResolver(),
                 }) + "\n";
 
                 var byteData =
@@ -564,18 +573,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             return changed;
         }
-
-   /*     private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
-        {
-            //send update if our metadata is nearly stale (1 tick = 100ns, 50000000 ticks = 5s stale timer)
-            if (DateTime.Now.Ticks - _clientStateSingleton.LastSent < 50000000)
-            {
-                Logger.Debug($"Not Stale - Tick: {DateTime.Now.Ticks} Last sent: {_clientStateSingleton.LastSent} ");
-                return false;
-            }
-            Logger.Debug($"Stale Radio - Tick: {DateTime.Now.Ticks} Last sent: {_clientStateSingleton.LastSent} ");
-            return true;
-        }*/
 
         public void Stop()
         {

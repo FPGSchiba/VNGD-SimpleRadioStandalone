@@ -76,5 +76,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 
             return true;
         }
+
+        public Transponder Copy()
+        {
+            return new Transponder(){mode1 = mode1,mode3 = mode3,mode4 = mode4,status = status, mic = mic};
+        }
     }
 }

@@ -220,6 +220,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             else
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio == null)
+                {
+                    return;
+                }
+
                 var transmitting = UdpVoiceHandler.RadioSendingState;
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
@@ -261,6 +267,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioFrequency.Text = "Unknown";
 
                     RadioVolume.IsEnabled = false;
+
+                    TunedClients.Visibility = Visibility.Hidden;
 
                     ToggleButtons(false);
 

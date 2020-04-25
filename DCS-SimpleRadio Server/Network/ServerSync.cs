@@ -338,7 +338,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     RadioInfo = client.RadioInfo //send radio info
                                 }
                             };
-                            MulticastAllExeceptOne(replyMessage.Encode(), session.Id);
+                            Multicast(replyMessage.Encode());
                         }
                     }
                 }

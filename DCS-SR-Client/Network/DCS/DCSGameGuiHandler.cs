@@ -36,9 +36,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 true);
             _dcsGameGuiUdpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            //    var multicastaddress = IPAddress.Parse("239.255.50.10");
-            //   _dcsGameGuiUdpListener.JoinMulticastGroup(multicastaddress);
-
             var localEp = new IPEndPoint(IPAddress.Any,
                 _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
             _dcsGameGuiUdpListener.Client.Bind(localEp);
@@ -72,7 +69,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                                 //this will clear any stale positions if nothing is currently connected
                                 _clientStateSingleton.ClearPositionsIfExpired();
 
-                               _clientSideUpdate();
+                                if (_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
+                                {
+                                    _clientSideUpdate();
+                                }
+                                
                                 //     count = 0;
 
                                 _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
