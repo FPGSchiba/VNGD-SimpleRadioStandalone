@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
@@ -40,35 +41,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public bool enc = false; // encrytion enabled
         public byte encKey = 0;
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public double freqMax = 1;
-        [JsonIgnore]
+
+        [JsonNetworkIgnoreSerialization]
         public double freqMin = 1;
 
         public double freq = 1;
         
         public Modulation modulation = Modulation.DISABLED;
-        
+
+        [JsonNetworkIgnoreSerialization]
         public string name = "";
         
         public double secFreq = 1;
 
+        [JsonNetworkIgnoreSerialization]
         public float volume = 1.0f;
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public FreqMode freqMode = FreqMode.COCKPIT;
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public VolumeMode volMode = VolumeMode.COCKPIT;
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public bool expansion = false;
 
+        [JsonNetworkIgnoreSerialization]
         public int channel = -1;
 
+        [JsonNetworkIgnoreSerialization]
         public bool simul = false;
 
         /**

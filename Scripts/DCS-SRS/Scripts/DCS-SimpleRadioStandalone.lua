@@ -2612,60 +2612,108 @@ function SR.exportRadioM2000C(_data)
     return _data
 end
 
+local newJF17Interface = nil
+
 function SR.exportRadioJF17(_data)
 
-    _data.radios[2].name = "COMM1 VHF Radio"
-    _data.radios[2].freq = SR.getRadioFrequency(25)
-    _data.radios[2].modulation = SR.getRadioModulation(25)
-    _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
-    _data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
+	if newJF17Interface == nil then
+		newJF17Interface = false
+		pcall(function() 
+		
+		GetDevice(25):get_guard_plus_freq()
 
-    _data.radios[3].name = "COMM2 UHF Radio"
-    _data.radios[3].freq = SR.getRadioFrequency(26)
-    _data.radios[3].modulation = SR.getRadioModulation(26)
-    _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-    _data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
+		newJF17Interface = true
+		end)
 
-       -- Expansion Radio - Server Side Controlled
-    _data.radios[4].name = "VHF/UHF Expansion"
-    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
-    _data.radios[4].modulation = 0
-    _data.radios[4].secFreq = 243.0 * 1000000
-    _data.radios[4].volume = 1.0
-    _data.radios[4].freqMin = 115 * 1000000
-    _data.radios[4].freqMax = 399.975 * 1000000
-    _data.radios[4].volMode = 1
-    _data.radios[4].freqMode = 1
-    _data.radios[4].expansion = true
-    _data.radios[4].encKey = 1
-    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+	end
 
-    _data.selected = 1
-    _data.control = 0; -- partial radio, allows hotkeys
+	if newJF17Interface then
 
-    -- SR.log(SR.tableShow(_G).."\n\n")
+		_data.radios[2].name = "COMM1 VHF Radio"
+		_data.radios[2].freq = SR.getRadioFrequency(25)
+		_data.radios[2].modulation = SR.getRadioModulation(25)
+		_data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
+		_data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
 
-    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+		_data.radios[3].name = "COMM2 UHF Radio"
+		_data.radios[3].freq = SR.getRadioFrequency(26)
+		_data.radios[3].modulation = SR.getRadioModulation(26)
+		_data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
+		_data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
 
-    local _iff = GetDevice(15)
+		   -- Expansion Radio - Server Side Controlled
+		_data.radios[4].name = "VHF/UHF Expansion"
+		_data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+		_data.radios[4].modulation = 0
+		_data.radios[4].secFreq = 243.0 * 1000000
+		_data.radios[4].volume = 1.0
+		_data.radios[4].freqMin = 115 * 1000000
+		_data.radios[4].freqMax = 399.975 * 1000000
+		_data.radios[4].volMode = 1
+		_data.radios[4].freqMode = 1
+		_data.radios[4].expansion = true
+		_data.radios[4].encKey = 1
+		_data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-    if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
-        _data.iff.status = 1
-    end
+		_data.selected = 1
+		_data.control = 0; -- partial radio, allows hotkeys
 
-    if _iff:is_m1_trs_on() then
-        _data.iff.mode1 = _iff:get_m1_trs_code()
-    else
-        _data.iff.mode1 = -1
-    end
+		-- SR.log(SR.tableShow(_G).."\n\n")
 
-    if _iff:is_m3_trs_on() then
-        _data.iff.mode3 = _iff:get_m3_trs_code()
-    else
-        _data.iff.mode3 = -1
-    end
+		_data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
-    _data.iff.mode4 =  _iff:is_m6_trs_on()
+		local _iff = GetDevice(15)
+
+		if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
+			_data.iff.status = 1
+		end
+
+		if _iff:is_m1_trs_on() then
+			_data.iff.mode1 = _iff:get_m1_trs_code()
+		else
+			_data.iff.mode1 = -1
+		end
+
+		if _iff:is_m3_trs_on() then
+			_data.iff.mode3 = _iff:get_m3_trs_code()
+		else
+			_data.iff.mode3 = -1
+		end
+
+		_data.iff.mode4 =  _iff:is_m6_trs_on()
+
+	else
+	    _data.radios[2].name = "COMM1 VHF Radio"
+		_data.radios[2].freq = SR.getRadioFrequency(25)
+		_data.radios[2].modulation = SR.getRadioModulation(25)
+		_data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
+		_data.radios[2].guardFreqMode = 1
+		_data.radios[2].secFreq = 121.5 * 1000000
+
+		_data.radios[3].name = "COMM2 UHF Radio"
+		_data.radios[3].freq = SR.getRadioFrequency(26)
+		_data.radios[3].modulation = SR.getRadioModulation(26)
+		_data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
+		_data.radios[3].guardFreqMode = 1
+		_data.radios[3].secFreq = 243.0 * 1000000
+
+		   -- Expansion Radio - Server Side Controlled
+		_data.radios[4].name = "VHF/UHF Expansion"
+		_data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+		_data.radios[4].modulation = 0
+		_data.radios[4].secFreq = 243.0 * 1000000
+		_data.radios[4].volume = 1.0
+		_data.radios[4].freqMin = 115 * 1000000
+		_data.radios[4].freqMax = 399.975 * 1000000
+		_data.radios[4].volMode = 1
+		_data.radios[4].freqMode = 1
+		_data.radios[4].expansion = true
+		_data.radios[4].encKey = 1
+		_data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+		_data.selected = 1
+		_data.control = 0; -- partial radio, allows hotkeys
+	end
 
     return _data
 end

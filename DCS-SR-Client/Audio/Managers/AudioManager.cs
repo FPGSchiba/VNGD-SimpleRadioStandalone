@@ -57,7 +57,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly Queue<short> _micInputQueue = new Queue<short>(SEGMENT_FRAMES * 3);
 
         private float _speakerBoost = 1.0f;
-        private volatile bool _stop = true;
         private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
@@ -108,7 +107,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public void StartEncoding(string guid, InputDeviceManager inputManager,
             IPAddress ipAddress, int port)
         {
-            _stop = false;
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
@@ -595,8 +593,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             _speex?.Dispose();
             _speex = null;
-
-            _stop = true;
 
             SpeakerMax = -100;
             MicMax = -100;

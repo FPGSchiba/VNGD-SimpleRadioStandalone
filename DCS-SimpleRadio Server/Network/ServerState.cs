@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
@@ -113,7 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue)
                     {
                         ClientListExport data = new ClientListExport { Clients = _connectedClients.Values, ServerVersion = UpdaterChecker.VERSION };
-                        var json = JsonConvert.SerializeObject(data) + "\n";
+                        var json = JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new JsonNetworkPropertiesResolver() }) + "\n";
                         try
                         {
                             File.WriteAllText(exportFilePath, json);
@@ -169,7 +170,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 }
                                 
                                 var byteData =
-                                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\n");
+                                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new JsonNetworkPropertiesResolver() }) + "\n");
 
                                 udpSocket.Send(byteData, byteData.Length, host);
                             }

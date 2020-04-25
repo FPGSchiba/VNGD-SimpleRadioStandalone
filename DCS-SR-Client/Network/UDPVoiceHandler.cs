@@ -47,7 +47,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
-        private readonly AudioManager.VOIPConnectCallback _voipConnectCallback;
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
 
@@ -67,7 +66,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stop;
 
         private Timer _timer;
-        private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
         private long _udpLastReceived = 0;
         private DispatcherTimer _updateTimer;
@@ -205,10 +203,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StartTimer();
 
             StartPing();
-
-            //set to false so we sent one packet to open up the radio
-            //automatically rather than the user having to press Send
-            hasSentVoicePacket = false;
 
             _packetNumber = 1; //reset packet number
 

@@ -14,6 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
@@ -42,7 +43,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private readonly NewAircraft _newAircraftCallback;
 
         private long _identStart = 0;
-        private bool _ident;
 
         public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate, NewAircraft _newAircraft)
         {
@@ -134,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             Logger.Debug("Update sent to DCS");
 
-            if (update)
+            if (update || _clientStateSingleton.LastSent < 1)
             {
                 Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
@@ -192,7 +192,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
                 {
-                    NullValueHandling = NullValueHandling.Ignore
+                 //   NullValueHandling = NullValueHandling.Ignore,
+                 //   ContractResolver = new JsonNetworkPropertiesResolver(),
                 }) + "\n";
 
                 var byteData =

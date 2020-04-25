@@ -67,13 +67,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
 
-        private bool _stop = true;
-
         //used to debounce toggle
         private long _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
-        private readonly DispatcherTimer _redrawUITimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
@@ -944,9 +941,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             //stop timer
             _updateTimer?.Stop();
 
-            // Stop UI redraw timer
-            _redrawUITimer?.Stop();
-
             Stop();
 
             _audioPreview?.StopEncoding();
@@ -1453,8 +1447,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 return;
             }
-
-         
 
             // Already connected, disconnect
             if (ClientState.ExternalAWACSModelSelected)

@@ -20,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
     public class ServerSync : TcpServer, IHandle<ServerSettingsChangedMessage>
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly HashSet<IPAddress> _bannedIps;
 
@@ -58,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Exception Sending Server Settings ");
+                Logger.Error(ex, "Exception Sending Server Settings ");
             }
         }
 
@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         protected override void OnError(SocketError error)
         {
-            _logger.Error($"TCP SERVER ERROR: {error} ");
+            Logger.Error($"TCP SERVER ERROR: {error} ");
         }
 
         public void StartListening()
@@ -77,7 +77,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         public void HandleDisconnect(SRSClientSession state)
         {
-            _logger.Info("Disconnecting Client");
+            Logger.Info("Disconnecting Client");
 
             if ((state != null) && (state.SRSGuid != null))
             {
@@ -88,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 if (client != null)
                 {
-                    _logger.Info("Removed Disconnected Client " + state.SRSGuid);
+                    Logger.Info("Removed Disconnected Client " + state.SRSGuid);
                     client.ClientSession = null;
 
                    
@@ -102,12 +102,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 }
                 catch (Exception ex)
                 {
-                    _logger.Info(ex, "Exception Publishing Client Update After Disconnect");
+                    Logger.Info(ex, "Exception Publishing Client Update After Disconnect");
                 }
             }
             else
             {
-                _logger.Info("Removed Disconnected Unknown Client");
+                Logger.Info("Removed Disconnected Unknown Client");
             }
 
         }
@@ -118,8 +118,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             try
             {
-                //  logger.Info("Received From " + clientIp.Address + " " + clientIp.Port);
-                // logger.Info("Received: " + message.MsgType);
+                Logger.Debug($"Received:  Msg - {message.MsgType} from {state.SRSGuid}");
 
                 switch (message.MsgType)
                 {
@@ -143,7 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
                             if (message.Version == null)
                             {
-                                _logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
+                                Logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
                                              clientIp.Port);
                                 state.Disconnect();
                                 return;
@@ -154,7 +153,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                             if (clientVersion < protocolVersion)
                             {
-                                _logger.Warn(
+                                Logger.Warn(
                                     $"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
                                 HandleVersionMismatch(state);
 
@@ -188,13 +187,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         HandleExternalAWACSModeDisconnect(state, message.Client);
                         break;
                     default:
-                        _logger.Warn("Recevied unknown message type");
+                        Logger.Warn("Recevied unknown message type");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Exception Handling Message " + ex.Message);
+                Logger.Error(ex, "Exception Handling Message " + ex.Message);
             }
         }
 

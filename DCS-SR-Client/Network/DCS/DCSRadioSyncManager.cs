@@ -141,6 +141,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     Thread.Sleep(1000);
                 }
 
+                var radio = new DCSPlayerRadioInfo();
+                radio.Reset();
+                _dcsRadioSyncHandler.ProcessRadioInfo(radio);
+
                 Logger.Debug("Stopping external AWACS mode loop");
             });
         }

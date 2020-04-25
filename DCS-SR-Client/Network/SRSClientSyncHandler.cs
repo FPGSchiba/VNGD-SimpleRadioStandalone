@@ -102,23 +102,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return;
             }
 
-            if (_tcpClient != null && _tcpClient.Connected)
-            {
-                SendToServer(new NetworkMessage
-                {
-                    Client = new SRClient
-                    {
-                        Coalition = 0,
-                        Name = "",
-                        LatLngPosition = new DCSLatLngPosition(){lat=0,lng=0,alt=0},
-                        ClientGuid = _guid
-                    },
-                    MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_DISCONNECT
-                });
-                //reset radio
-                _clientStateSingleton.DcsPlayerRadioInfo.Reset();
-            }
-
             _radioDCSSync.StopExternalAWACSModeLoop();
 
             CallExternalAWACSModeOnMain(false, 0);

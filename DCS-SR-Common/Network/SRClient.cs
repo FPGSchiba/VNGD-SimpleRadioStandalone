@@ -32,10 +32,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public bool Muted { get; set; }
 
         [JsonIgnore]
-        public IPEndPoint VoipPort { get; set; }
+        public long LastUpdate { get; set; }
 
         [JsonIgnore]
-        public long LastUpdate { get; set; }
+        public IPEndPoint VoipPort { get; set; }
 
         [JsonIgnore]
         public long LastRadioUpdateSent { get; set; }
@@ -91,7 +91,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public bool IsIngame()
         {
             // Clients are counted as ingame if they have a name and have been updated within the last 10 seconds
-            return !string.IsNullOrEmpty(Name) && DateTime.Now.Ticks - LastUpdate < 100000000;
+            return !string.IsNullOrEmpty(Name) && RadioInfo!=null && RadioInfo.IsValid();
         }
 
         public override string ToString()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
@@ -14,30 +15,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             IN_COCKPIT = 1
         }
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public string name = "";
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public DCSLatLngPosition latLng = new DCSLatLngPosition();
-        
-        [JsonIgnore]
+
+        [JsonNetworkIgnoreSerialization]
         public bool inAircraft = false;
-        
-        [JsonIgnore]
+
+        [JsonNetworkIgnoreSerialization]
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public RadioSwitchControls control = RadioSwitchControls.HOTAS;
-        
+
+        [JsonNetworkIgnoreSerialization]
         public short selected = 0;
 
         public string unit = "";
         
         public uint unitId;
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public bool intercomHotMic = false; //if true switch to intercom and transmit
 
         public Transponder iff = new Transponder();
@@ -46,10 +48,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public readonly static uint UnitIdOffset = 100000001
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public bool simultaneousTransmission = false; // Global toggle enabling simultaneous transmission on multiple radios, activated via the AWACS panel
 
-        [JsonIgnore]
+        [JsonNetworkIgnoreSerialization]
         public SimultaneousTransmissionControl simultaneousTransmissionControl =
             SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
 
@@ -279,6 +281,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             decryptable = bestMatchingDecryptable;
             receivingState = bestMatchingRadioState;
             return bestMatchingRadio;
+        }
+
+        public bool IsValid()
+        {
+            foreach (var radio in radios)
+            {
+                if (radio?.modulation != RadioInformation.Modulation.DISABLED)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

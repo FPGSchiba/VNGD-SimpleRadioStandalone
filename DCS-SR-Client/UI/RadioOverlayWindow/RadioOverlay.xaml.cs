@@ -86,8 +86,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            bool first = true;
-            
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioReceive();
