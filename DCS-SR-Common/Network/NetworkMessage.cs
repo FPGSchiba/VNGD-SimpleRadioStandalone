@@ -9,7 +9,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
-            ContractResolver = new JsonNetworkPropertiesResolver(),
+            ContractResolver = new JsonNetworkPropertiesResolver(),// strip out things not required for the TCP sync
             NullValueHandling = NullValueHandling.Ignore // same some network bandwidth
         };
         public enum MessageType

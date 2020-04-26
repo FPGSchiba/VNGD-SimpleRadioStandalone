@@ -120,6 +120,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 Logger.Debug($"Received:  Msg - {message.MsgType} from {state.SRSGuid}");
 
+                if (!HandleConnectedClient(state, message))
+                {
+                    Logger.Info($"Invalid Client - disconnecting {state.SRSGuid}");
+                }
+
                 switch (message.MsgType)
                 {
                     case NetworkMessage.MessageType.PING:
@@ -135,47 +140,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         HandleClientRadioUpdate(state, message, showTuned);
                         break;
                     case NetworkMessage.MessageType.SYNC:
-
-                        var srClient = message.Client;
-                        if (!_clients.ContainsKey(srClient.ClientGuid))
-                        {
-                            var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
-                            if (message.Version == null)
-                            {
-                                Logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
-                                             clientIp.Port);
-                                state.Disconnect();
-                                return;
-                            }
-
-                            var clientVersion = Version.Parse(message.Version);
-                            var protocolVersion = Version.Parse(UpdaterChecker.MINIMUM_PROTOCOL_VERSION);
-
-                            if (clientVersion < protocolVersion)
-                            {
-                                Logger.Warn(
-                                    $"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
-                                HandleVersionMismatch(state);
-
-                                //close socket after
-                                state.Disconnect();
-
-                                return;
-                            }
-
-                            srClient.ClientSession = state;
-
-                            //add to proper list
-                            _clients[srClient.ClientGuid] = srClient;
-
-                            state.SRSGuid = srClient.ClientGuid;
-
-                            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
-                                new List<SRClient>(_clients.Values)));
-                        }
-
-                        HandleRadioClientsSync(state, message, srClient);
-
+                        HandleRadioClientsSync(state, message);
                         break;
                     case NetworkMessage.MessageType.SERVER_SETTINGS:
                         HandleServerSettingsMessage();
@@ -195,6 +160,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 Logger.Error(ex, "Exception Handling Message " + ex.Message);
             }
+        }
+
+        private bool HandleConnectedClient(SRSClientSession state, NetworkMessage message)
+        {
+            var srClient = message.Client;
+            if (!_clients.ContainsKey(srClient.ClientGuid))
+            {
+                var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
+                if (message.Version == null)
+                {
+                    Logger.Warn("Disconnecting Unversioned Client -  " + clientIp.Address + " " +
+                                clientIp.Port);
+                    state.Disconnect();
+                    return false;
+                }
+
+                var clientVersion = Version.Parse(message.Version);
+                var protocolVersion = Version.Parse(UpdaterChecker.MINIMUM_PROTOCOL_VERSION);
+
+                if (clientVersion < protocolVersion)
+                {
+                    Logger.Warn(
+                        $"Disconnecting Unsupported  Client Version - Version {clientVersion} IP {clientIp.Address} Port {clientIp.Port}");
+                    HandleVersionMismatch(state);
+
+                    //close socket after
+                    state.Disconnect();
+
+                    return false;
+                }
+
+                srClient.ClientSession = state;
+
+                //add to proper list
+                _clients[srClient.ClientGuid] = srClient;
+
+                state.SRSGuid = srClient.ClientGuid;
+
+                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                    new List<SRClient>(_clients.Values)));
+            }
+
+            return true;
         }
 
         private void HandleServerSettingsMessage()
@@ -343,7 +351,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
-        private void HandleRadioClientsSync(SRSClientSession session, NetworkMessage message, SRClient client)
+        private void HandleRadioClientsSync(SRSClientSession session, NetworkMessage message)
         {
             //store new client
             var replyMessage = new NetworkMessage
@@ -363,12 +371,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 MsgType = NetworkMessage.MessageType.UPDATE,
                 Client = new SRClient
                 {
-                    ClientGuid = client.ClientGuid,
+                    ClientGuid = message.Client.ClientGuid,
                 }
             };
 
             Multicast(update.Encode());
-
         }
 
         private void HandleExternalAWACSModePassword(SRSClientSession session, string password, SRClient client)
