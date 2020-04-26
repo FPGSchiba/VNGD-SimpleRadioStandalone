@@ -138,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         inAircraft = false
                     });
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                 }
 
                 var radio = new DCSPlayerRadioInfo();

@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             var newList = new List<double>();
             foreach (var freq in freqStringList)
             {
-                if (double.TryParse(freq.Trim(), out var freqDouble))
+                if (double.TryParse(freq.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var freqDouble))
                 {
                     freqDouble *= 1e+6; //convert to Hz from MHz
                     newList.Add(freqDouble);
@@ -81,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             var newList = new List<double>();
             foreach (var freq in freqStringList)
             {
-                if (double.TryParse(freq.Trim(), out var freqDouble))
+                if (double.TryParse(freq.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var freqDouble))
                 {
                     freqDouble *= 1e+6; //convert to Hz from MHz
                     newList.Add(freqDouble);
@@ -308,11 +308,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                         for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                         {
-                            //ignore everything as its global frequency
-                            if (_globalFrequencies.Contains(udpVoice.Frequencies[i]))
+                            foreach (var testFrequency in _globalFrequencies)
                             {
-                                global = true;
-                                break;
+                                if (DCSPlayerRadioInfo.FreqCloseEnough(testFrequency, udpVoice.Frequencies[i]))
+                                {
+                                    //ignore everything as its global frequency
+                                    global = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -358,11 +361,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     {
                         foreach (var frequency in udpVoice.Frequencies)
                         {
-                            if (_testFrequencies.Contains(frequency))
+                            foreach (var testFrequency in _testFrequencies)
                             {
-                                //send back to sending client as its a test frequency
-                                outgoingList.Add(ip);
-                                break;
+                                if (DCSPlayerRadioInfo.FreqCloseEnough(testFrequency, frequency))
+                                {
+                                    //send back to sending client as its a test frequency
+                                    outgoingList.Add(ip);
+                                    break;
+                                }
                             }
                         }
                     }
