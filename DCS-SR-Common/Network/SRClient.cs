@@ -91,12 +91,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool IsIngame()
-        {
-            // Clients are counted as ingame if they have a name and have been updated within the last 10 seconds
-            return !string.IsNullOrEmpty(Name) && RadioInfo!=null && RadioInfo.IsValid();
-        }
-
         public override string ToString()
         {
             string side;

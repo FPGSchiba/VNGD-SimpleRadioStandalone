@@ -241,7 +241,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     var replyMessage = new NetworkMessage
                     {
                         MsgType = NetworkMessage.MessageType.UPDATE,
-                        ServerSettings = _serverSettings.ToDictionary(),
                         Client = new SRClient
                         {
                             ClientGuid = client.ClientGuid,
@@ -328,7 +327,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             replyMessage = new NetworkMessage
                             {
                                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
-                                ServerSettings = _serverSettings.ToDictionary(),
                                 Client = new SRClient
                                 {
                                     ClientGuid = client.ClientGuid,
@@ -363,7 +361,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             var update = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.UPDATE,
-                ServerSettings = _serverSettings.ToDictionary(),
                 Client = new SRClient
                 {
                     ClientGuid = client.ClientGuid,
@@ -414,7 +411,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             var message = new NetworkMessage
             {
                 MsgType = NetworkMessage.MessageType.UPDATE,
-                ServerSettings = _serverSettings.ToDictionary(),
                 Client = new SRClient
                 {
                     ClientGuid = client.ClientGuid,
@@ -441,7 +437,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 var message = new NetworkMessage
                 {
                     MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
-                    ServerSettings = _serverSettings.ToDictionary(),
                     Client = new SRClient
                     {
                         ClientGuid = client.ClientGuid,

@@ -195,7 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     RadioSendingState = UdpVoiceHandler.RadioSendingState,
                     RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
                     ClientCountConnected = _clients.Total,
-                    ClientCountIngame = _clients.InGame,
                     TunedClients = tunedClients,
                 };
 

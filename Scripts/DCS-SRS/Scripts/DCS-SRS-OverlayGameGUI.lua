@@ -102,8 +102,8 @@ function srsOverlay.updateRadio()
 
     if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
 
-        if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected and _radioState.ClientCountIngame then
-            local clientCountMsg = string.format("Connected clients: %i (%i ingame)", _radioState.ClientCountConnected, _radioState.ClientCountIngame)
+        if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected then
+            local clientCountMsg = string.format("Connected clients: %i", _radioState.ClientCountConnected)
 
             local countMsg = {message = clientCountMsg, skin = typesMessage.normal, height = 20 }
 
