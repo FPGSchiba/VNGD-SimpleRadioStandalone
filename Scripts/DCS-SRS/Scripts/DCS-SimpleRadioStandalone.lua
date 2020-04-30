@@ -1550,8 +1550,6 @@ function SR.exportRadioFA18C(_data)
 
     local radio1Guard = getGuardFreq(_data.radios[2].freq, _fa18.radio1.guard, _data.radios[2].modulation)
 
-
-
     _fa18.radio1.guard = radio1Guard
 
 
@@ -1631,18 +1629,17 @@ function SR.exportRadioFA18C(_data)
 
     _fa18.radio3.channel = midsAChannel
 
+	_data.radios[4].name = "MIDS A"
+    _data.radios[4].modulation = 6
+    _data.radios[4].volume = SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
+    _data.radios[4].encMode = 2 -- Mode 2 is set by aircraft
 
     if midsAChannel < 127 and _fa18.radio3.channel > 0 then
-        _data.radios[4].name = "MIDS A"
         _data.radios[4].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsAChannel)
-        _data.radios[4].modulation = 3
-        _data.radios[4].volume = SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
-        _data.radios[4].encMode = 2 -- Mode 2 is set by aircraft
+		_data.radios[4].channel = midsAChannel
     else
-        _data.radios[4].name = "MIDS A"
         _data.radios[4].freq = 1
-        _data.radios[4].modulation = 3 -- disabled
-        _data.radios[4].volume = 0
+        _data.radios[4].channel = -1
     end
 
 
@@ -1651,18 +1648,18 @@ function SR.exportRadioFA18C(_data)
     -- Set MIDS data
     _fa18.radio4.channel = midsBChannel
 
+	_data.radios[5].name = "MIDS B"
+	_data.radios[5].modulation = 6
+	_data.radios[5].volume = SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
+	_data.radios[5].encMode = 2 -- Mode 2 is set by aircraft
 
     if midsBChannel < 127 and _fa18.radio4.channel > 0 then
-        _data.radios[5].name = "MIDS B"
         _data.radios[5].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsBChannel)
-        _data.radios[5].modulation = 6
-        _data.radios[5].volume = SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
-        _data.radios[5].encMode = 2 -- Mode 2 is set by aircraft
+        _data.radios[5].channel = midsBChannel
+      
     else
-        _data.radios[5].name = "MIDS B"
         _data.radios[5].freq = 1
-        _data.radios[5].modulation = 3 -- disabled
-        _data.radios[5].volume = 0
+        _data.radios[5].channel = -1
     end
 
     return _data

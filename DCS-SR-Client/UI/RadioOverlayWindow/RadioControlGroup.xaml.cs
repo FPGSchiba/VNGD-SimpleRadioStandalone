@@ -282,6 +282,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     RadioFrequency.Text = "INTERCOM";
                 }
+                else if (currentRadio.modulation == RadioInformation.Modulation.MIDS) //MIDS
+                {
+                    RadioFrequency.Text = "MIDS";
+                    if (currentRadio.channel >= 0)
+                    {
+                        RadioFrequency.Text += " CHN " + currentRadio.channel;
+                    }
+                    else
+                    {
+                        RadioFrequency.Text += " OFF";
+                    }
+                }
                 else
                 {
                     RadioFrequency.Text =
@@ -302,21 +314,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     {
                         RadioFrequency.Text += " E" + currentRadio.encKey; // ENCRYPTED
                     }
+                
+                }
 
-                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq,currentRadio.modulation);
-                    
-                    if (count > 0)
-                    {
-                        TunedClients.Text = "👤" + count;
-                        RadioVolume.Width = 105;
-                        TunedClients.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        TunedClients.Visibility = Visibility.Hidden;
-                        RadioVolume.Width = 115;
-                    }
-                    
+
+                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+
+                if (count > 0)
+                {
+                    TunedClients.Text = "👤" + count;
+                    RadioVolume.Width = 105;
+                    TunedClients.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    TunedClients.Visibility = Visibility.Hidden;
+                    RadioVolume.Width = 115;
                 }
 
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
