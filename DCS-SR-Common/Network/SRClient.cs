@@ -19,6 +19,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public string Name { get; set; }
 
+        public int Seat { get; set; }
+
         public int Coalition
         {
             get { return _coalition; }

@@ -148,11 +148,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                                 ClientListExport data = new ClientListExport { ServerVersion = UpdaterChecker.VERSION, Clients = new List<SRClient>()};
 
+                                Dictionary<uint, SRClient> firstSeatDict = new Dictionary<uint, SRClient>();
+                                Dictionary<uint, SRClient> secondSeatDict = new Dictionary<uint, SRClient>();
+                                
                                 foreach (var srClient in _connectedClients.Values)
                                 {
                                     if (srClient.RadioInfo?.iff != null)
                                     {
-                                        data.Clients.Add(new SRClient()
+                                        var newClient = new SRClient()
                                         {
                                             ClientGuid = srClient.ClientGuid,
                                             RadioInfo = new DCSPlayerRadioInfo()
@@ -160,12 +163,46 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 radios = null,
                                                 unitId = srClient.RadioInfo.unitId,
                                                 iff = srClient.RadioInfo.iff,
-                                                unit = srClient.RadioInfo?.unit,
+                                                unit = srClient.RadioInfo.unit,
                                             },
                                             Coalition = srClient.Coalition,
-                                            Name = srClient?.Name,
-                                            LatLngPosition = srClient?.LatLngPosition
-                                        });
+                                            Name = srClient.Name,
+                                            LatLngPosition = srClient?.LatLngPosition,
+                                            Seat = srClient.Seat
+
+                                        };
+
+                                        data.Clients.Add(newClient);
+
+                                        //will need to be expanded as more aircraft have more seats and transponder controls
+                                        if(newClient.Seat == 0)
+                                        {
+                                            firstSeatDict[newClient.RadioInfo.unitId] = newClient;
+                                        } else{
+                                            secondSeatDict[newClient.RadioInfo.unitId] = newClient;
+                                        }
+                                    }
+                                }
+
+                                //now look for other seats and handle the logic
+                                foreach (KeyValuePair<uint, SRClient> secondSeatPair in secondSeatDict)
+                                {
+                                    SRClient firstSeat = null;
+                                    
+                                    firstSeatDict.TryGetValue(secondSeatPair.Key, out firstSeat);
+                                    //copy second seat 
+                                    if (firstSeat!=null)
+                                    {
+                                        //F-14 has RIO IFF Control so use the second seat IFF
+                                        if (firstSeat.RadioInfo.unit.StartsWith("F-14"))
+                                        {
+                                            //copy second to first
+                                            firstSeat.RadioInfo.iff = secondSeatPair.Value.RadioInfo.iff;
+                                        }
+                                        else{
+                                            //copy first to second
+                                            secondSeatPair.Value.RadioInfo.iff = firstSeat.RadioInfo.iff;
+                                        }
                                     }
                                 }
                                 

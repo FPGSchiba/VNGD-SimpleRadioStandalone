@@ -243,6 +243,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
                     client.LatLngPosition = message.Client.LatLngPosition;
+                    client.Seat = message.Client.Seat;
 
                     //send update to everyone
                     //Remove Client Radio Info
@@ -254,7 +255,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             ClientGuid = client.ClientGuid,
                             Coalition = client.Coalition,
                             Name = client.Name,
-                            LatLngPosition = client.LatLngPosition
+                            LatLngPosition = client.LatLngPosition,
+                            Seat = client.Seat
                         }
                     };
 
@@ -319,8 +321,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     client.LastUpdate = DateTime.Now.Ticks;
                     client.Name = message.Client.Name;
                     client.Coalition = message.Client.Coalition;
+                    client.Seat = message.Client.Seat;
                     client.RadioInfo = message.Client.RadioInfo;
                     client.LatLngPosition = message.Client.LatLngPosition;
+                    client.Seat = message.Client.Seat;
 
                     TimeSpan lastSent = new TimeSpan(DateTime.Now.Ticks - client.LastRadioUpdateSent);
 
@@ -341,7 +345,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     Coalition = client.Coalition,
                                     Name = client.Name,
                                     LatLngPosition = client.LatLngPosition,
-                                    RadioInfo = client.RadioInfo //send radio info
+                                    RadioInfo = client.RadioInfo, //send radio info
+                                    Seat = client.Seat
                                 }
                             };
                             Multicast(replyMessage.Encode());
@@ -424,7 +429,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     Coalition = clientCoalition,
                     Name = client.Name,
                     LastUpdate = client.LastUpdate,
-                    LatLngPosition = client.LatLngPosition
+                    LatLngPosition = client.LatLngPosition,
+                    Seat = client.Seat
                 }
             };
 
@@ -451,7 +457,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         Name = client.Name,
                         LastUpdate = client.LastUpdate,
                         RadioInfo = new DCSPlayerRadioInfo(),
-                        LatLngPosition = client.LatLngPosition
+                        LatLngPosition = client.LatLngPosition,
+                        Seat = client.Seat
                     }
                 };
 

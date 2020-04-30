@@ -67,12 +67,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                                 var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
 
-                                bool changed = !updatedPlayerInfo.name.Equals(currentInfo.name) || currentInfo.side!=updatedPlayerInfo.side;
+                                bool changed = !updatedPlayerInfo.Equals(currentInfo);
                                 //copy the bits we need  - leave position
 
                                 currentInfo.name = updatedPlayerInfo.name;
                                 currentInfo.side = updatedPlayerInfo.side;
-
+                                currentInfo.seat = updatedPlayerInfo.seat;
+                             
                                 //this will clear any stale positions if nothing is currently connected
                                 _clientStateSingleton.ClearPositionsIfExpired();
 

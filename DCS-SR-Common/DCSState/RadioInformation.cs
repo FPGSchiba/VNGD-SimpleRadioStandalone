@@ -35,7 +35,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             AM = 0,
             FM = 1,
             INTERCOM = 2,
-            DISABLED = 3
+            DISABLED = 3,
+            HAVEQUICK = 4,
+            SATCOM = 5,
+            MIDS = 6,
         }
 
         public bool enc = false; // encrytion enabled

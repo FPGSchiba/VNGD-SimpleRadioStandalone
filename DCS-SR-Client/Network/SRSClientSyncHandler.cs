@@ -185,6 +185,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
+                    Seat = sideInfo.seat,
                     ClientGuid = _guid,
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
                     LatLngPosition = sideInfo.LngLngPosition
@@ -202,6 +203,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
+                    Seat = sideInfo.seat,
                     LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },

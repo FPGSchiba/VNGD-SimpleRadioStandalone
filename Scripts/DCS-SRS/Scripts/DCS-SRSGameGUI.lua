@@ -73,10 +73,22 @@ SRS.sendUpdate = function(playerID)
     local _update = {
         name = "",
         side = 0,
+        seat = 0,
     }
 
     _update.name = net.get_player_info(playerID, "name" )
 	_update.side = net.get_player_info(playerID,"side")
+
+	local slot =  net.get_player_info(playerID,"slot")
+
+    slot = tostring(slot)
+    
+    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
+    if string.find(tostring(slot), "_", 1, true) then
+        --extract substring - get the seat ID
+        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
+        _update.seat = tonumber(slot) -1 -- -1 as seat starts at 2
+    end
 
     --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 

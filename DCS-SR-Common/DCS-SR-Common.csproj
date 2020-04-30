@@ -113,7 +113,6 @@
     <Compile Include="Helpers\CircularBuffer.cs" />
     <Compile Include="Helpers\ConversionHelpers.cs" />
     <Compile Include="DCSState\DCSPlayerSideInfo.cs" />
-    <Compile Include="DCSState\DCSPosition.cs" />
     <Compile Include="Helpers\JsonDCSIgnoreSerializationAttribute.cs" />
     <Compile Include="Helpers\JsonNetworkIgnoreSerializationAttribute.cs" />
     <Compile Include="Helpers\JsonDCSPropertiesResolver.cs" />
