@@ -22,6 +22,9 @@ SR.unicast = true --DONT CHANGE THIS
 
 SR.lastKnownPos = { x = 0, y = 0, z = 0 }
 
+SR.MIDS_FREQ = 300.0 * 1000000 -- Start at UHF 300
+SR.MIDS_FREQ_SEPARATION = 1.0 * 100000 -- 0.1 MHZ between MIDS channels
+
 SR.logFile = io.open(lfs.writedir() .. [[Logs\DCS-SimpleRadioStandalone.log]], "w")
 function SR.log(str)
     if SR.logFile then
@@ -107,6 +110,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                         { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false }, -- enc means encrypted
                         { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
                         { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
+                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
                     },
                     control = 0, -- HOTAS
                 }
@@ -120,14 +125,14 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update.latLng = _latLng
                 SR.lastKnownPos = _point
 
-            -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) 
-            -- M1:-1 = off, any other number on 
-            -- M3: -1 = OFF, any other number on 
-            -- M4: 1 = ON or 0 = OFF
-            -- EXPANSION: only enabled if IFF Expansion is enabled
-            -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
-            -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
-            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
+                -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC)
+                -- M1:-1 = off, any other number on
+                -- M3: -1 = OFF, any other number on
+                -- M4: 1 = ON or 0 = OFF
+                -- EXPANSION: only enabled if IFF Expansion is enabled
+                -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
+                -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
+                -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
                 _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
 
@@ -764,13 +769,13 @@ function SR.exportRadioUH1H(_data)
     local _selector = SR.getSelectorPosition(15, 0.1)
 
     if _selector < 1 then
-        _data.radios[3].channel = SR.getSelectorPosition(16, 0.05) + 1 --add 1 as channel 0 is channel 1 
+        _data.radios[3].channel = SR.getSelectorPosition(16, 0.05) + 1 --add 1 as channel 0 is channel 1
     end
 
     _data.radios[4].name = "AN/ARC-134"
     _data.radios[4].freq = SR.getRadioFrequency(20)
     _data.radios[4].modulation = 0
-    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false) 
+    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false)
 
     --_device:get_argument_value(_arg)
     --guard mode for UHF Radio
@@ -818,7 +823,7 @@ function SR.exportRadioUH1H(_data)
 
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
@@ -834,18 +839,18 @@ function SR.exportRadioUH1H(_data)
         end
 
     end
-    
+
     local mode1On =  SR.getButtonPosition(61)
-     _data.iff.mode1 = SR.round(SR.getSelectorPosition(68,0.33), 0.1)*10+SR.round(SR.getSelectorPosition(69,0.11), 0.1)
-    
+    _data.iff.mode1 = SR.round(SR.getSelectorPosition(68,0.33), 0.1)*10+SR.round(SR.getSelectorPosition(69,0.11), 0.1)
+
 
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(63)
-     _data.iff.mode3 = SR.round(SR.getSelectorPosition(70,0.11), 0.1) * 1000 + SR.round(SR.getSelectorPosition(71,0.11), 0.1) * 100 + SR.round(SR.getSelectorPosition(72,0.11), 0.1)* 10 + SR.round(SR.getSelectorPosition(73,0.11), 0.1)
-    
+    _data.iff.mode3 = SR.round(SR.getSelectorPosition(70,0.11), 0.1) * 1000 + SR.round(SR.getSelectorPosition(71,0.11), 0.1) * 100 + SR.round(SR.getSelectorPosition(72,0.11), 0.1)* 10 + SR.round(SR.getSelectorPosition(73,0.11), 0.1)
+
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 4 then
@@ -858,7 +863,7 @@ function SR.exportRadioUH1H(_data)
     if mode4On ~= 0 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
 
     return _data
@@ -952,7 +957,7 @@ function SR.exportRadioKA50(_data)
     else
         _data.radios[2].modulation = 0
     end
-    _data.radios[2].volume = SR.getRadioVolume(0, 353, { 0.0, 1.0 }, false) -- using ADF knob for now 
+    _data.radios[2].volume = SR.getRadioVolume(0, 353, { 0.0, 1.0 }, false) -- using ADF knob for now
 
     _data.radios[3].name = "R-828"
     _data.radios[3].freq = SR.getRadioFrequency(49, 50000)
@@ -1010,7 +1015,7 @@ function SR.exportRadioMI8(_data)
     local _selector = GetDevice(0):get_argument_value(132)
 
     if _selector > 0.5 then
-        _data.radios[2].channel = SR.getSelectorPosition(370, 0.05) + 1 --add 1 as channel 0 is channel 1 
+        _data.radios[2].channel = SR.getSelectorPosition(370, 0.05) + 1 --add 1 as channel 0 is channel 1
     end
 
     _data.radios[2].volume = SR.getRadioVolume(0, 156, { 0.0, 1.0 }, false)
@@ -1322,7 +1327,7 @@ function SR.exportRadioA10C(_data)
     end
 
 
-    -- Mic Switch Radio Select and Transmit - by Dyram  
+    -- Mic Switch Radio Select and Transmit - by Dyram
     -- Check Mic Switch position (UP: 751 1.0, DOWN: 751 -1.0, FWD: 752 1.0, AFT: 752 -1.0)
     if SR.getButtonPosition(752) == 1 then
         -- Mic Switch FWD pressed
@@ -1355,7 +1360,7 @@ function SR.exportRadioA10C(_data)
     _data.control = 0 -- HOTAS Controls - set to 1 for DCS PTT & Select controls
 
     -- Handle transponder
-    
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
     local iffPower =  SR.getSelectorPosition(200,0.1)
@@ -1364,7 +1369,7 @@ function SR.exportRadioA10C(_data)
 
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
@@ -1377,23 +1382,23 @@ function SR.exportRadioA10C(_data)
             _data.iff.mic = 2
 
             if _data.ptt and _data.selected == 2 then
-                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
             end
         end
     end
-    
+
     local mode1On =  SR.getButtonPosition(202)
 
-     _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
-    
+    _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
+
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(204)
-    
-     _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
-    
+
+    _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
+
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 4 then
@@ -1406,7 +1411,7 @@ function SR.exportRadioA10C(_data)
     if mode4On ~= 0 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
 
     -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
@@ -1416,8 +1421,12 @@ end
 local _fa18 = {}
 _fa18.radio1 = {}
 _fa18.radio2 = {}
+_fa18.radio3 = {}
+_fa18.radio4 = {}
 _fa18.radio1.guard = 0
 _fa18.radio2.guard = 0
+_fa18.radio3.channel = 127 --127 is disabled for MIDS
+_fa18.radio4.channel = 127
 
 --[[
 From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
@@ -1439,30 +1448,32 @@ function SR.exportRadioFA18C(_data)
 
     local _ufc = SR.getListIndicatorValue(6)
 
---{
---   "UFC_Comm1Display": " 1",
---   "UFC_Comm2Display": " 8",
---   "UFC_MainDummy": "",
---   "UFC_OptionCueing1": ":",
---   "UFC_OptionCueing2": ":",
---   "UFC_OptionCueing3": "",
---   "UFC_OptionCueing4": ":",
---   "UFC_OptionCueing5": "",
---   "UFC_OptionDisplay1": "GRCV",
---   "UFC_OptionDisplay2": "SQCH",
---   "UFC_OptionDisplay3": "CPHR",
---   "UFC_OptionDisplay4": "AM  ",
---   "UFC_OptionDisplay5": "MENU",
---   "UFC_ScratchPadNumberDisplay": "257.000",
---   "UFC_ScratchPadString1Display": " 8",
---   "UFC_ScratchPadString2Display": "_",
---   "UFC_mask": ""
--- }
+    --{
+    --   "UFC_Comm1Display": " 1",
+    --   "UFC_Comm2Display": " 8",
+    --   "UFC_MainDummy": "",
+    --   "UFC_OptionCueing1": ":",
+    --   "UFC_OptionCueing2": ":",
+    --   "UFC_OptionCueing3": "",
+    --   "UFC_OptionCueing4": ":",
+    --   "UFC_OptionCueing5": "",
+    --   "UFC_OptionDisplay1": "GRCV",
+    --   "UFC_OptionDisplay2": "SQCH",
+    --   "UFC_OptionDisplay3": "CPHR",
+    --   "UFC_OptionDisplay4": "AM  ",
+    --   "UFC_OptionDisplay5": "MENU",
+    --   "UFC_ScratchPadNumberDisplay": "257.000",
+    --   "UFC_ScratchPadString1Display": " 8",
+    --   "UFC_ScratchPadString2Display": "_",
+    --   "UFC_mask": ""
+    -- }
     --_data.radios[3].secFreq = 243.0 * 1000000
     -- reset state on aircraft switch
     if _lastUnitId ~= _data.unitId then
         _fa18.radio1.guard = 0
         _fa18.radio2.guard = 0
+        _fa18.radio3.channel = 127 --127 is disabled for MIDS
+        _fa18.radio4.channel = 127
     end
 
     local getGuardFreq = function (freq,currentGuard,modulation)
@@ -1470,60 +1481,60 @@ function SR.exportRadioFA18C(_data)
 
         if freq > 1000000 then
 
-        -- check if UFC is currently displaying the GRCV for this radio 
-        --and change state if so
+            -- check if UFC is currently displaying the GRCV for this radio
+            --and change state if so
 
-        if _ufc.UFC_OptionDisplay1 == "GRCV" then
+            if _ufc.UFC_OptionDisplay1 == "GRCV" then
 
-            if _ufc.UFC_ScratchPadNumberDisplay then
-                 local _ufcFreq = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
+                if _ufc.UFC_ScratchPadNumberDisplay then
+                    local _ufcFreq = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
 
-                 -- if its the correct radio
-                if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
-                    if _ufc.UFC_OptionCueing1 == ":" then
+                    -- if its the correct radio
+                    if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
+                        if _ufc.UFC_OptionCueing1 == ":" then
 
-                    	-- GUARD changes based on the tuned frequency
-                    	if freq > 108*1000000 
-                    		and freq < 135.995*1000000 
-                    		and modulation == 0 then
-                    		return 121.5 * 1000000
-                    	end 
-                    	if freq > 108*1000000 
-                    		and freq < 399.975*1000000 
-                    		and modulation == 0 then
-                    		return 243 * 1000000
-                    	end
+                            -- GUARD changes based on the tuned frequency
+                            if freq > 108*1000000
+                                    and freq < 135.995*1000000
+                                    and modulation == 0 then
+                                return 121.5 * 1000000
+                            end
+                            if freq > 108*1000000
+                                    and freq < 399.975*1000000
+                                    and modulation == 0 then
+                                return 243 * 1000000
+                            end
 
-                        return 0
-                    else
-                        return 0
+                            return 0
+                        else
+                            return 0
+                        end
                     end
                 end
             end
+
+            if currentGuard > 1000 then
+
+                if freq > 108*1000000
+                        and freq < 135.995*1000000
+                        and modulation == 0 then
+
+                    return 121.5 * 1000000
+                end
+                if freq > 108*1000000
+                        and freq < 399.975*1000000
+                        and modulation == 0 then
+
+                    return 243 * 1000000
+                end
+            end
+
+            return currentGuard
+
+        else
+            -- reset state
+            return 0
         end
-
-        if currentGuard > 1000 then
-
-	        if freq > 108*1000000 
-	    		and freq < 135.995*1000000 
-	    		and modulation == 0 then
-
-	    			return 121.5 * 1000000
-	    	end 
-	    	if freq > 108*1000000 
-	    		and freq < 399.975*1000000 
-	    		and modulation == 0 then
-
-	    		return 243 * 1000000
-	    	end
-        end
-
-        return currentGuard
-
-    else
-        -- reset state
-           return 0
-    end
 
     end
 
@@ -1538,13 +1549,13 @@ function SR.exportRadioFA18C(_data)
 
 
     local radio1Guard = getGuardFreq(_data.radios[2].freq, _fa18.radio1.guard, _data.radios[2].modulation)
-    
 
 
-     _fa18.radio1.guard = radio1Guard
+
+    _fa18.radio1.guard = radio1Guard
 
 
-     _data.radios[2].secFreq = _fa18.radio1.guard
+    _data.radios[2].secFreq = _fa18.radio1.guard
 
     -- UHF
     -- Set radio data
@@ -1556,9 +1567,9 @@ function SR.exportRadioFA18C(_data)
 
 
     local radio2Guard = getGuardFreq(_data.radios[3].freq, _fa18.radio2.guard,_data.radios[3].modulation)
-    
-     _fa18.radio2.guard = radio2Guard
-     _data.radios[3].secFreq = _fa18.radio2.guard
+
+    _fa18.radio2.guard = radio2Guard
+    _data.radios[3].secFreq = _fa18.radio2.guard
 
     -- KY-58 Radio Encryption
     local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
@@ -1580,7 +1591,79 @@ function SR.exportRadioFA18C(_data)
 
     end
 
-    _data.control = 0; -- SRS Hotas Controls
+    local getMidsChannel = function (currentChannel, mids)
+
+        --DL page
+        if _ufc.UFC_OptionDisplay4 == "VOCA" then
+
+            if _ufc.UFC_ScratchPadString1Display == "O" and _ufc.UFC_ScratchPadString2Display == "N" then
+
+                if _ufc.UFC_OptionCueing4 ==":" and mids == 1 then
+                        --first mids
+
+                        local chan = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
+
+                        if chan == nil then
+                            return 0
+                        end
+                        return chan
+                end
+                if _ufc.UFC_OptionCueing5 ==":" and mids == 2 then
+                    --first mids
+
+                    local chan = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
+
+                    if chan == nil then
+                        return 0
+                    end
+                    return chan
+                end
+            else
+                return 0
+            end
+        end
+
+        return currentChannel
+    end
+
+
+    local midsAChannel = getMidsChannel(_fa18.radio3.channel,1)
+
+    _fa18.radio3.channel = midsAChannel
+
+
+    if midsAChannel < 127 and _fa18.radio3.channel > 0 then
+        _data.radios[4].name = "MIDS A"
+        _data.radios[4].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsAChannel)
+        _data.radios[4].modulation = 3
+        _data.radios[4].volume = SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
+        _data.radios[4].encMode = 2 -- Mode 2 is set by aircraft
+    else
+        _data.radios[4].name = "MIDS A"
+        _data.radios[4].freq = 1
+        _data.radios[4].modulation = 3 -- disabled
+        _data.radios[4].volume = 0
+    end
+
+
+    local midsBChannel = getMidsChannel(_fa18.radio4.channel,2)
+
+    -- Set MIDS data
+    _fa18.radio4.channel = midsBChannel
+
+
+    if midsBChannel < 127 and _fa18.radio4.channel > 0 then
+        _data.radios[5].name = "MIDS B"
+        _data.radios[5].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsBChannel)
+        _data.radios[5].modulation = 6
+        _data.radios[5].volume = SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
+        _data.radios[5].encMode = 2 -- Mode 2 is set by aircraft
+    else
+        _data.radios[5].name = "MIDS B"
+        _data.radios[5].freq = 1
+        _data.radios[5].modulation = 3 -- disabled
+        _data.radios[5].volume = 0
+    end
 
     return _data
 end
@@ -1649,18 +1732,18 @@ function SR.exportRadioF16C(_data)
         end
     end
 
-   local _cipherOnly =  SR.round(SR.getButtonPosition(443),1) < -0.5 --If HOT MIC CIPHER Switch, HOT MIC / OFF / CIPHER set to CIPHER, allow only cipher
-   if _cipherOnly and _data.radios[3].enc ~=true then
-      _data.radios[3].freq = 0
-   end
-   if _cipherOnly and _data.radios[2].enc ~=true then
-      _data.radios[2].freq = 0
-   end
+    local _cipherOnly =  SR.round(SR.getButtonPosition(443),1) < -0.5 --If HOT MIC CIPHER Switch, HOT MIC / OFF / CIPHER set to CIPHER, allow only cipher
+    if _cipherOnly and _data.radios[3].enc ~=true then
+        _data.radios[3].freq = 0
+    end
+    if _cipherOnly and _data.radios[2].enc ~=true then
+        _data.radios[2].freq = 0
+    end
 
     _data.control = 0; -- SRS Hotas Controls
 
-     -- Handle transponder
-    
+    -- Handle transponder
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
     local iffPower =  SR.getSelectorPosition(540,0.1)
@@ -1669,13 +1752,13 @@ function SR.exportRadioF16C(_data)
 
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
 
     end
-    
+
     local modeSelector =  SR.getButtonPosition(553)
 
     if modeSelector == -1 then
@@ -1925,7 +2008,7 @@ function SR.exportRadioF5E(_data)
     local _selector = SR.getSelectorPosition(307, 0.1)
 
     if _selector == 1 then
-        _data.radios[2].channel = SR.getSelectorPosition(300, 0.05) + 1 --add 1 as channel 0 is channel 1 
+        _data.radios[2].channel = SR.getSelectorPosition(300, 0.05) + 1 --add 1 as channel 0 is channel 1
     end
 
     _data.selected = 1
@@ -1981,7 +2064,7 @@ function SR.exportRadioF5E(_data)
 
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
@@ -1994,23 +2077,23 @@ function SR.exportRadioF5E(_data)
             _data.iff.mic = 2
 
             if _data.ptt and _data.selected == 2 then
-                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
             end
         end
     end
-    
+
     local mode1On =  SR.getButtonPosition(202)
 
-     _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
-    
+    _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
+
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(204)
-    
-     _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
-    
+
+    _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
+
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 4 then
@@ -2023,7 +2106,7 @@ function SR.exportRadioF5E(_data)
     if mode4On ~= 0 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
 
     return _data;
@@ -2240,7 +2323,7 @@ function SR.exportRadioC101EB(_data)
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
     -- Handle transponder
-    
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
     local iffPower =  SR.getSelectorPosition(347,0.25)
@@ -2251,7 +2334,7 @@ function SR.exportRadioC101EB(_data)
 
     if iffPower <= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
@@ -2264,23 +2347,23 @@ function SR.exportRadioC101EB(_data)
             _data.iff.mic = 1
 
             if _data.ptt and _data.selected == 2 then
-                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
             end
         end
     end
-    
+
     local mode1On =  SR.getButtonPosition(349)
 
-     _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
-    
+    _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
+
     if mode1On == 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(351)
-    
-     _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
-    
+
+    _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
+
     if mode3On == 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 0 then
@@ -2293,7 +2376,7 @@ function SR.exportRadioC101EB(_data)
     if mode4On ~= 0 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
     _data.control = 1; -- full radio
 
@@ -2357,8 +2440,8 @@ function SR.exportRadioC101CC(_data)
 
     --TODO figure our which cockpit you're in? So we can have controls working in the rear?
 
-     -- Handle transponder
-    
+    -- Handle transponder
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
     local iffPower =  SR.getSelectorPosition(347,0.25)
@@ -2369,7 +2452,7 @@ function SR.exportRadioC101CC(_data)
 
     if iffPower <= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
@@ -2382,23 +2465,23 @@ function SR.exportRadioC101CC(_data)
             _data.iff.mic = 1
 
             if _data.ptt and _data.selected == 2 then
-                 _data.iff.status = 2 -- IDENT (BLINKY THING)
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
             end
         end
     end
-    
+
     local mode1On =  SR.getButtonPosition(349)
 
-     _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
-    
+    _data.iff.mode1 = SR.round(SR.getButtonPosition(355), 0.1)*100+SR.round(SR.getButtonPosition(356), 0.1)*10
+
     if mode1On == 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(351)
-    
-     _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
-    
+
+    _data.iff.mode3 = SR.round(SR.getButtonPosition(357), 0.1) * 10000 + SR.round(SR.getButtonPosition(358), 0.1) * 1000 + SR.round(SR.getButtonPosition(359), 0.1)* 100 + SR.round(SR.getButtonPosition(360), 0.1) * 10
+
     if mode3On == 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 0 then
@@ -2411,7 +2494,7 @@ function SR.exportRadioC101CC(_data)
     if mode4On ~= 0 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
 
     _data.control = 1;
@@ -2488,7 +2571,7 @@ function SR.exportRadioM2000C(_data)
     local _selector = SR.getSelectorPosition(448, 0.50)
 
     if _selector == 1 then
-        _data.radios[2].channel = SR.getSelectorPosition(445, 0.05)  --add 1 as channel 0 is channel 1 
+        _data.radios[2].channel = SR.getSelectorPosition(445, 0.05)  --add 1 as channel 0 is channel 1
     end
 
     _data.radios[3].name = "TRT ERA 7200 UHF"
@@ -2537,7 +2620,7 @@ function SR.exportRadioM2000C(_data)
     _data.control = 0; -- partial radio, allows hotkeys
 
     -- Handle transponder
-    
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
 
@@ -2549,51 +2632,51 @@ function SR.exportRadioM2000C(_data)
     if iffIdent == 1 then
         _data.iff.status = 2 -- IDENT (BLINKY THING)
     end
-    
+
     local mode1On =  SR.getButtonPosition(384)
-    
+
     local mode1Digit1 = SR.round(SR.getButtonPosition(377), 0.1)*100
     local mode1Digit2 = SR.round(SR.getButtonPosition(378), 0.1)*10
-    
+
     if mode1Digit1 > 70 then
         mode1Digit1 = 70
     end
-    
+
     if mode1Digit2 > 3 then
         mode1Digit2 = 3
     end
 
-     _data.iff.mode1 = mode1Digit1+mode1Digit2
-    
+    _data.iff.mode1 = mode1Digit1+mode1Digit2
+
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(386)
-    
+
     local mode3Digit1 = SR.round(SR.getButtonPosition(379), 0.1)*10000
     local mode3Digit2 = SR.round(SR.getButtonPosition(380), 0.1)*1000
     local mode3Digit3 = SR.round(SR.getButtonPosition(381), 0.1)*100
     local mode3Digit4 = SR.round(SR.getButtonPosition(382), 0.1)*10
-    
+
     if mode3Digit1 > 7000 then
         mode3Digit1 = 7000
     end
-    
+
     if mode3Digit2 > 700 then
         mode3Digit2 = 700
     end
-    
+
     if mode3Digit3 > 70 then
         mode3Digit3 = 70
     end
-    
+
     if mode3Digit4 > 7 then
         mode3Digit4 = 7
     end
-    
-     _data.iff.mode3 = mode3Digit1+mode3Digit2+mode3Digit3+mode3Digit4
-    
+
+    _data.iff.mode3 = mode3Digit1+mode3Digit2+mode3Digit3+mode3Digit4
+
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 4 then
@@ -2606,7 +2689,7 @@ function SR.exportRadioM2000C(_data)
     if mode4On == 2 then
         _data.iff.mode4 = true
     else
-         _data.iff.mode4 = false
+        _data.iff.mode4 = false
     end
 
     return _data
@@ -2616,104 +2699,104 @@ local newJF17Interface = nil
 
 function SR.exportRadioJF17(_data)
 
-	if newJF17Interface == nil then
-		newJF17Interface = false
-		pcall(function() 
-		
-		GetDevice(25):get_guard_plus_freq()
+    if newJF17Interface == nil then
+        newJF17Interface = false
+        pcall(function()
 
-		newJF17Interface = true
-		end)
+            GetDevice(25):get_guard_plus_freq()
 
-	end
+            newJF17Interface = true
+        end)
 
-	if newJF17Interface then
+    end
 
-		_data.radios[2].name = "COMM1 VHF Radio"
-		_data.radios[2].freq = SR.getRadioFrequency(25)
-		_data.radios[2].modulation = SR.getRadioModulation(25)
-		_data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
-		_data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
+    if newJF17Interface then
 
-		_data.radios[3].name = "COMM2 UHF Radio"
-		_data.radios[3].freq = SR.getRadioFrequency(26)
-		_data.radios[3].modulation = SR.getRadioModulation(26)
-		_data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-		_data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
+        _data.radios[2].name = "COMM1 VHF Radio"
+        _data.radios[2].freq = SR.getRadioFrequency(25)
+        _data.radios[2].modulation = SR.getRadioModulation(25)
+        _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false)
+        _data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
 
-		   -- Expansion Radio - Server Side Controlled
-		_data.radios[4].name = "VHF/UHF Expansion"
-		_data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
-		_data.radios[4].modulation = 0
-		_data.radios[4].secFreq = 243.0 * 1000000
-		_data.radios[4].volume = 1.0
-		_data.radios[4].freqMin = 115 * 1000000
-		_data.radios[4].freqMax = 399.975 * 1000000
-		_data.radios[4].volMode = 1
-		_data.radios[4].freqMode = 1
-		_data.radios[4].expansion = true
-		_data.radios[4].encKey = 1
-		_data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+        _data.radios[3].name = "COMM2 UHF Radio"
+        _data.radios[3].freq = SR.getRadioFrequency(26)
+        _data.radios[3].modulation = SR.getRadioModulation(26)
+        _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
+        _data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
 
-		_data.selected = 1
-		_data.control = 0; -- partial radio, allows hotkeys
+        -- Expansion Radio - Server Side Controlled
+        _data.radios[4].name = "VHF/UHF Expansion"
+        _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+        _data.radios[4].modulation = 0
+        _data.radios[4].secFreq = 243.0 * 1000000
+        _data.radios[4].volume = 1.0
+        _data.radios[4].freqMin = 115 * 1000000
+        _data.radios[4].freqMax = 399.975 * 1000000
+        _data.radios[4].volMode = 1
+        _data.radios[4].freqMode = 1
+        _data.radios[4].expansion = true
+        _data.radios[4].encKey = 1
+        _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-		-- SR.log(SR.tableShow(_G).."\n\n")
+        _data.selected = 1
+        _data.control = 0; -- partial radio, allows hotkeys
 
-		_data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+        -- SR.log(SR.tableShow(_G).."\n\n")
 
-		local _iff = GetDevice(15)
+        _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
-		if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
-			_data.iff.status = 1
-		end
+        local _iff = GetDevice(15)
 
-		if _iff:is_m1_trs_on() then
-			_data.iff.mode1 = _iff:get_m1_trs_code()
-		else
-			_data.iff.mode1 = -1
-		end
+        if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
+            _data.iff.status = 1
+        end
 
-		if _iff:is_m3_trs_on() then
-			_data.iff.mode3 = _iff:get_m3_trs_code()
-		else
-			_data.iff.mode3 = -1
-		end
+        if _iff:is_m1_trs_on() then
+            _data.iff.mode1 = _iff:get_m1_trs_code()
+        else
+            _data.iff.mode1 = -1
+        end
 
-		_data.iff.mode4 =  _iff:is_m6_trs_on()
+        if _iff:is_m3_trs_on() then
+            _data.iff.mode3 = _iff:get_m3_trs_code()
+        else
+            _data.iff.mode3 = -1
+        end
 
-	else
-	    _data.radios[2].name = "COMM1 VHF Radio"
-		_data.radios[2].freq = SR.getRadioFrequency(25)
-		_data.radios[2].modulation = SR.getRadioModulation(25)
-		_data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false) 
-		_data.radios[2].guardFreqMode = 1
-		_data.radios[2].secFreq = 121.5 * 1000000
+        _data.iff.mode4 =  _iff:is_m6_trs_on()
 
-		_data.radios[3].name = "COMM2 UHF Radio"
-		_data.radios[3].freq = SR.getRadioFrequency(26)
-		_data.radios[3].modulation = SR.getRadioModulation(26)
-		_data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-		_data.radios[3].guardFreqMode = 1
-		_data.radios[3].secFreq = 243.0 * 1000000
+    else
+        _data.radios[2].name = "COMM1 VHF Radio"
+        _data.radios[2].freq = SR.getRadioFrequency(25)
+        _data.radios[2].modulation = SR.getRadioModulation(25)
+        _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false)
+        _data.radios[2].guardFreqMode = 1
+        _data.radios[2].secFreq = 121.5 * 1000000
 
-		   -- Expansion Radio - Server Side Controlled
-		_data.radios[4].name = "VHF/UHF Expansion"
-		_data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
-		_data.radios[4].modulation = 0
-		_data.radios[4].secFreq = 243.0 * 1000000
-		_data.radios[4].volume = 1.0
-		_data.radios[4].freqMin = 115 * 1000000
-		_data.radios[4].freqMax = 399.975 * 1000000
-		_data.radios[4].volMode = 1
-		_data.radios[4].freqMode = 1
-		_data.radios[4].expansion = true
-		_data.radios[4].encKey = 1
-		_data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+        _data.radios[3].name = "COMM2 UHF Radio"
+        _data.radios[3].freq = SR.getRadioFrequency(26)
+        _data.radios[3].modulation = SR.getRadioModulation(26)
+        _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
+        _data.radios[3].guardFreqMode = 1
+        _data.radios[3].secFreq = 243.0 * 1000000
 
-		_data.selected = 1
-		_data.control = 0; -- partial radio, allows hotkeys
-	end
+        -- Expansion Radio - Server Side Controlled
+        _data.radios[4].name = "VHF/UHF Expansion"
+        _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+        _data.radios[4].modulation = 0
+        _data.radios[4].secFreq = 243.0 * 1000000
+        _data.radios[4].volume = 1.0
+        _data.radios[4].freqMin = 115 * 1000000
+        _data.radios[4].freqMax = 399.975 * 1000000
+        _data.radios[4].volMode = 1
+        _data.radios[4].freqMode = 1
+        _data.radios[4].expansion = true
+        _data.radios[4].encKey = 1
+        _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+        _data.selected = 1
+        _data.control = 0; -- partial radio, allows hotkeys
+    end
 
     return _data
 end
@@ -2755,33 +2838,33 @@ function SR.exportRadioAV8BNA(_data)
         _av8.radio2.guard = 0
     end
 
-        local getGuardFreq = function (freq,currentGuard)
+    local getGuardFreq = function (freq,currentGuard)
 
 
         if freq > 1000000 then
 
-        -- check if LEFT UFC is currently displaying the TR-G for this radio 
-        --and change state if so
+            -- check if LEFT UFC is currently displaying the TR-G for this radio
+            --and change state if so
 
-        if _ufcScratch.ufc_right_position then
-             local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
+            if _ufcScratch.ufc_right_position then
+                local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
 
-            if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
-                if _ufc.ODU_Option_1_Text == "TR-G" then
-                    return 243.0 * 1000000
-                else
-                    return 0
+                if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
+                    if _ufc.ODU_Option_1_Text == "TR-G" then
+                        return 243.0 * 1000000
+                    else
+                        return 0
+                    end
                 end
             end
+
+
+            return currentGuard
+
+        else
+            -- reset state
+            return 0
         end
-
-
-        return currentGuard
-
-    else
-        -- reset state
-           return 0
-    end
 
     end
 
@@ -2792,26 +2875,26 @@ function SR.exportRadioAV8BNA(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
 
     local radio1Guard = getGuardFreq(_data.radios[2].freq, _av8.radio1.guard)
-    
-     _av8.radio1.guard = radio1Guard
-     _data.radios[2].secFreq = _av8.radio1.guard
+
+    _av8.radio1.guard = radio1Guard
+    _data.radios[2].secFreq = _av8.radio1.guard
 
     -- get channel selector
     --  local _selector  = SR.getSelectorPosition(448,0.50)
 
     --if _selector == 1 then
-    --_data.radios[2].channel =  SR.getSelectorPosition(178,0.01)  --add 1 as channel 0 is channel 1 
+    --_data.radios[2].channel =  SR.getSelectorPosition(178,0.01)  --add 1 as channel 0 is channel 1
     --end
 
     _data.radios[3].name = "ARC-210 COM 2"
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = SR.getRadioModulation(3)
     _data.radios[3].volume = SR.getRadioVolume(0, 299, { 0.0, 1.0 }, false)
-   
+
     local radio2Guard = getGuardFreq(_data.radios[3].freq, _av8.radio2.guard)
-    
-     _av8.radio2.guard = radio2Guard
-     _data.radios[3].secFreq = _av8.radio2.guard
+
+    _av8.radio2.guard = radio2Guard
+    _data.radios[3].secFreq = _av8.radio2.guard
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
@@ -2915,8 +2998,8 @@ function SR.exportRadioF14(_data)
     -- _data.intercomHotMic = true  --402 for the hotmic switch
     _data.control = 1 -- full radio
 
-     -- Handle transponder
-    
+    -- Handle transponder
+
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
     local iffPower =  SR.getSelectorPosition(184,0.25)
@@ -2925,24 +3008,24 @@ function SR.exportRadioF14(_data)
 
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
-   
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
 
     end
-    
+
     local mode1On =  SR.getButtonPosition(162)
-     _data.iff.mode1 = SR.round(SR.getSelectorPosition(201,0.11111), 0.1)*10+SR.round(SR.getSelectorPosition(200,0.11111), 0.1)
-    
+    _data.iff.mode1 = SR.round(SR.getSelectorPosition(201,0.11111), 0.1)*10+SR.round(SR.getSelectorPosition(200,0.11111), 0.1)
+
 
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
     end
 
     local mode3On =  SR.getButtonPosition(164)
-     _data.iff.mode3 = SR.round(SR.getSelectorPosition(199,0.11111), 0.1) * 1000 + SR.round(SR.getSelectorPosition(198,0.11111), 0.1) * 100 + SR.round(SR.getSelectorPosition(2261,0.11111), 0.1)* 10 + SR.round(SR.getSelectorPosition(2262,0.11111), 0.1)
-    
+    _data.iff.mode3 = SR.round(SR.getSelectorPosition(199,0.11111), 0.1) * 1000 + SR.round(SR.getSelectorPosition(198,0.11111), 0.1) * 100 + SR.round(SR.getSelectorPosition(2261,0.11111), 0.1)* 10 + SR.round(SR.getSelectorPosition(2262,0.11111), 0.1)
+
     if mode3On ~= 0 then
         _data.iff.mode3 = -1
     elseif iffPower == 4 then
@@ -3110,7 +3193,7 @@ end
 function SR.getListIndicatorValue(IndicatorID)
     local ListIindicator = list_indication(IndicatorID)
     local TmpReturn = {}
-    
+
     if ListIindicator == "" then
         return nil
     end
@@ -3146,71 +3229,72 @@ function SR.basicSerialize(var)
 end
 
 
-    function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slmod, this is a _G serialization
-        tableshow_tbls = tableshow_tbls or {} --create table of tables
-        loc = loc or ""
-        indent = indent or ""
-        if type(tbl) == 'table' then --function only works for tables!
-            tableshow_tbls[tbl] = loc
+function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slmod, this is a _G serialization
+    tableshow_tbls = tableshow_tbls or {} --create table of tables
+    loc = loc or ""
+    indent = indent or ""
+    if type(tbl) == 'table' then --function only works for tables!
+        tableshow_tbls[tbl] = loc
 
-            local tbl_str = {}
+        local tbl_str = {}
 
-            tbl_str[#tbl_str + 1] = indent .. '{\n'
+        tbl_str[#tbl_str + 1] = indent .. '{\n'
 
-            for ind,val in pairs(tbl) do -- serialize its fields
-                if type(ind) == "number" then
-                    tbl_str[#tbl_str + 1] = indent
-                    tbl_str[#tbl_str + 1] = loc .. '['
-                    tbl_str[#tbl_str + 1] = tostring(ind)
-                    tbl_str[#tbl_str + 1] = '] = '
-                else
-                    tbl_str[#tbl_str + 1] = indent
-                    tbl_str[#tbl_str + 1] = loc .. '['
-                    tbl_str[#tbl_str + 1] = SR.basicSerialize(ind)
-                    tbl_str[#tbl_str + 1] = '] = '
-                end
-
-                if ((type(val) == 'number') or (type(val) == 'boolean')) then
-                    tbl_str[#tbl_str + 1] = tostring(val)
-                    tbl_str[#tbl_str + 1] = ',\n'
-                elseif type(val) == 'string' then
-                    tbl_str[#tbl_str + 1] = SR.basicSerialize(val)
-                    tbl_str[#tbl_str + 1] = ',\n'
-                elseif type(val) == 'nil' then -- won't ever happen, right?
-                    tbl_str[#tbl_str + 1] = 'nil,\n'
-                elseif type(val) == 'table' then
-                    if tableshow_tbls[val] then
-                        tbl_str[#tbl_str + 1] = tostring(val) .. ' already defined: ' .. tableshow_tbls[val] .. ',\n'
-                    else
-                        tableshow_tbls[val] = loc ..    '[' .. SR.basicSerialize(ind) .. ']'
-                        tbl_str[#tbl_str + 1] = tostring(val) .. ' '
-                        tbl_str[#tbl_str + 1] = SR.tableShow(val,  loc .. '[' .. SR.basicSerialize(ind).. ']', indent .. '        ', tableshow_tbls)
-                        tbl_str[#tbl_str + 1] = ',\n'
-                    end
-                elseif type(val) == 'function' then
-                    if debug and debug.getinfo then
-                        local fcnname = tostring(val)
-                        local info = debug.getinfo(val, "S")
-                        if info.what == "C" then
-                            tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', C function') .. ',\n'
-                        else
-                            if (string.sub(info.source, 1, 2) == [[./]]) then
-                                tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')' .. info.source) ..',\n'
-                            else
-                                tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')') ..',\n'
-                            end
-                        end
-
-                    else
-                        tbl_str[#tbl_str + 1] = 'a function,\n'
-                    end
-                else
-                    tbl_str[#tbl_str + 1] = 'unable to serialize value type ' .. SR.basicSerialize(type(val)) .. ' at index ' .. tostring(ind)
-                end
+        for ind,val in pairs(tbl) do -- serialize its fields
+            if type(ind) == "number" then
+                tbl_str[#tbl_str + 1] = indent
+                tbl_str[#tbl_str + 1] = loc .. '['
+                tbl_str[#tbl_str + 1] = tostring(ind)
+                tbl_str[#tbl_str + 1] = '] = '
+            else
+                tbl_str[#tbl_str + 1] = indent
+                tbl_str[#tbl_str + 1] = loc .. '['
+                tbl_str[#tbl_str + 1] = SR.basicSerialize(ind)
+                tbl_str[#tbl_str + 1] = '] = '
             end
 
-            tbl_str[#tbl_str + 1] = indent .. '}'
-            return table.concat(tbl_str)
+            if ((type(val) == 'number') or (type(val) == 'boolean')) then
+                tbl_str[#tbl_str + 1] = tostring(val)
+                tbl_str[#tbl_str + 1] = ',\n'
+            elseif type(val) == 'string' then
+                tbl_str[#tbl_str + 1] = SR.basicSerialize(val)
+                tbl_str[#tbl_str + 1] = ',\n'
+            elseif type(val) == 'nil' then -- won't ever happen, right?
+                tbl_str[#tbl_str + 1] = 'nil,\n'
+            elseif type(val) == 'table' then
+                if tableshow_tbls[val] then
+                    tbl_str[#tbl_str + 1] = tostring(val) .. ' already defined: ' .. tableshow_tbls[val] .. ',\n'
+                else
+                    tableshow_tbls[val] = loc ..    '[' .. SR.basicSerialize(ind) .. ']'
+                    tbl_str[#tbl_str + 1] = tostring(val) .. ' '
+                    tbl_str[#tbl_str + 1] = SR.tableShow(val,  loc .. '[' .. SR.basicSerialize(ind).. ']', indent .. '        ', tableshow_tbls)
+                    tbl_str[#tbl_str + 1] = ',\n'
+                end
+            elseif type(val) == 'function' then
+                if debug and debug.getinfo then
+                    local fcnname = tostring(val)
+                    local info = debug.getinfo(val, "S")
+                    if info.what == "C" then
+                        tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', C function') .. ',\n'
+                    else
+                        if (string.sub(info.source, 1, 2) == [[./]]) then
+                            tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')' .. info.source) ..',\n'
+                        else
+                            tbl_str[#tbl_str + 1] = string.format('%q', fcnname .. ', defined in (' .. info.linedefined .. '-' .. info.lastlinedefined .. ')') ..',\n'
+                        end
+                    end
+
+                else
+                    tbl_str[#tbl_str + 1] = 'a function,\n'
+                end
+            else
+                tbl_str[#tbl_str + 1] = 'unable to serialize value type ' .. SR.basicSerialize(type(val)) .. ' at index ' .. tostring(ind)
+            end
         end
+
+        tbl_str[#tbl_str + 1] = indent .. '}'
+        return table.concat(tbl_str)
     end
+end
+
 SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.0")

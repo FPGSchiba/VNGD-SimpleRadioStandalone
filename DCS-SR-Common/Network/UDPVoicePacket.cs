@@ -53,7 +53,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         // FREQUENCY SEGMENT
         public double[] Frequencies { get; set; }
-        public byte[] Modulations { get; set; } // 0 - AM, 1 - FM, 2- Intercom, 3 - disabled
+
+        /*
+        AM = 0,
+        FM = 1,
+        INTERCOM = 2,
+        DISABLED = 3,
+        HAVEQUICK = 4,
+        SATCOM = 5,
+        MIDS = 6,*/
+        public byte[] Modulations { get; set; }
+    
         public byte[] Encryptions { get; set; }
 
         // FIXED SEGMENT

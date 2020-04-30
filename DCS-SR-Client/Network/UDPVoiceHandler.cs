@@ -500,7 +500,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return transmitting;
             }
 
-            transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
+            //Currently transmitting - PTT must be true - figure out if we can hear on those radios
+
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[_clientStateSingleton.DcsPlayerRadioInfo.selected];
+
+            if (currentRadio.modulation == RadioInformation.Modulation.FM || currentRadio.modulation == RadioInformation.Modulation.AM)
+            {
+                //only AM and FM block - MIDS etc dont
+
+                transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
+            }
+ 
 
             if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
             {
@@ -508,7 +518,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 for (int i = 1; i < 11; i++)
                 {
                     var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
-                    if (radio.modulation != RadioInformation.Modulation.DISABLED && radio.simul &&
+                    if ( (radio.modulation == RadioInformation.Modulation.FM || radio.modulation == RadioInformation.Modulation.AM )&& radio.simul &&
                         i != _clientStateSingleton.DcsPlayerRadioInfo.selected)
                     {
                         transmitting.Add(i);

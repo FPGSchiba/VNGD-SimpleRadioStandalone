@@ -173,7 +173,30 @@ function srsOverlay.updateRadio()
 
             local fullMessage
 
-            if _radio.modulation == 3 then
+			if _radio.modulation == 4 || _radio.modulation == 5 || _radio.modulation == 6 then 
+
+                fullMessage = _radio.name.." - "
+
+				if _radio.channel >= 0 then
+					fullMessage = fullMessage.." CHN ".._radio.channel
+                end
+
+				if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+					fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+				end
+
+				local tuned = _radioState.TunedClients
+
+				if tuned then
+					local tunedRadio = tuned[_i]
+
+					if tunedRadio > 0 then
+						fullMessage  = fullMessage.." ⚡"..tunedRadio
+					end
+
+				end
+
+            elseif _radio.modulation == 3 then
                      fullMessage = ""
                     
             elseif _radio.modulation == 2 then 

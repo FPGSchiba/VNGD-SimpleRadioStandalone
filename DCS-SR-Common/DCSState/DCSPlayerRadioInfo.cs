@@ -289,17 +289,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             receivingState = bestMatchingRadioState;
             return bestMatchingRadio;
         }
-
-        public bool IsValid()
-        {
-            foreach (var radio in radios)
-            {
-                if (radio?.modulation != RadioInformation.Modulation.DISABLED)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 }
