@@ -300,12 +300,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 var clientRadio = playerRadioInfo.radios[i];
 
-                //if awacs NOT open -  disable radios over 3
-                if (i >= message.radios.Length
-                    || (RadioOverlayWindow.AwacsActive == false
-                        && (i > 3 || i == 0)
-                        // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
-                        && playerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+                //if we have more radios than the message has
+                if (i >= message.radios.Length)
                 {
                     clientRadio.freq = 1;
                     clientRadio.freqMin = 1;
