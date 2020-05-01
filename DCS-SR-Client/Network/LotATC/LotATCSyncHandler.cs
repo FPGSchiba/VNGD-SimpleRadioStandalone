@@ -117,13 +117,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
         {
             _clientStateSingleton.LotATCLastReceived = DateTime.Now.Ticks;
 
-            //TODO only update position if player isnt in aircraft
+            //only send update if position and line of sight are enabled
+            var shouldUpdate = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
             if (_clientStateSingleton.ShouldUseLotATCPosition())
             {
                 _clientStateSingleton.UpdatePlayerPosition(new DCSLatLngPosition(){ lat=controller.latitude, lng=controller.longitude, alt=controller.altitude+_heightOffset });
                 long diff = DateTime.Now.Ticks - _lastSent;
 
-                if (diff > UPDATE_SYNC_RATE) // There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update ever 5 seconds
+                if (diff > UPDATE_SYNC_RATE && shouldUpdate) // There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update ever 5 seconds
                 {
                     _lastSent = DateTime.Now.Ticks;
                     _clientSideUpdate();

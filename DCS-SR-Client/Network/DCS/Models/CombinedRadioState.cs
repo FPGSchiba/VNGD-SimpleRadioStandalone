@@ -13,8 +13,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models
 
         public int ClientCountConnected;
 
-        public int ClientCountIngame;
-
         public int[] TunedClients;
     }
 }

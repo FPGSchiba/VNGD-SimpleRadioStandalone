@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using NAudio.Utils;
 using NAudio.Wave;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
     public class JitterBufferProviderInterface : IWaveProvider
     {
         private readonly CircularBuffer _circularBuffer;
+
+        public static readonly int MAXIMUM_BUFFER_SIZE_MS = 2500;
 
         private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES * 2]; //*2 for stereo
 
@@ -18,6 +21,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private readonly object _lock = new object();
 
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         //  private const int INITIAL_DELAY_MS = 200;
         //   private long _delayedUntil = -1; //holds audio for a period of time
 
@@ -25,7 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 1); //was 3
+            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 1); //was 3 
 
             Array.Clear(_silence, 0, _silence.Length);
         }
@@ -132,7 +137,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     _bufferedAudio.AddFirst(jitterBufferAudio);
                 }
                 else if (jitterBufferAudio.PacketNumber > _lastRead)
-                {
+                { 
+                    var time = _bufferedAudio.Count * AudioManager.INPUT_AUDIO_LENGTH_MS; // this isnt quite true as there can be padding audio but good enough
+
+                    if (time > MAXIMUM_BUFFER_SIZE_MS)
+                    {
+                        _bufferedAudio.Clear();
+                        Logger.Warn($"Cleared Audio buffer - length was {time} ms");
+                    }
+
                     for (var it = _bufferedAudio.First; it != null;)
                     {
                         //iterate list

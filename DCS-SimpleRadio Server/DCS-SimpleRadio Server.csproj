@@ -114,6 +114,9 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.5.8\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="Open.Nat, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f22a6a4582336c76, processorArchitecture=MSIL">
+      <HintPath>..\packages\Open.NAT.2.1.0.0\lib\net45\Open.Nat.dll</HintPath>
+    </Reference>
     <Reference Include="PropertyChanged, Version=2.1.3.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.2.1.3\lib\netstandard1.0\PropertyChanged.dll</HintPath>
       <Private>False</Private>
@@ -225,14 +228,16 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Network\Models\OutgoingTCPMessage.cs" />
-    <Compile Include="Network\Models\OutgoingVoice.cs" />
+    <Compile Include="Network\Models\OutgoingUDPPackets.cs" />
     <Compile Include="Network\Models\PendingPacket.cs" />
     <Compile Include="Network\Models\ConnectionStateObject.cs" />
+    <Compile Include="Network\NatHandler.cs" />
     <Compile Include="Network\NetCoreServer\Buffer.cs" />
     <Compile Include="Network\NetCoreServer\TcpClient.cs" />
     <Compile Include="Network\NetCoreServer\TcpServer.cs" />
     <Compile Include="Network\NetCoreServer\TcpSession.cs" />
     <Compile Include="Network\SRSClientSession.cs" />
+    <Compile Include="Network\UDPPositionHandler.cs" />
     <Compile Include="Network\UDPVoiceRouter.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
     <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />

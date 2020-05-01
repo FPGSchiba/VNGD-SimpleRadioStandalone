@@ -23,7 +23,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
     public class VAICOMSyncHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private static readonly long UPDATE_SYNC_RATE = 5*1000 * 10000; //There are 10,000 ticks in a millisecond, or 10 million ticks in a second. Update every 5 seconds
         private UdpClient _vaicomUDPListener;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;

@@ -302,14 +302,15 @@ namespace NetCoreServer
         /// <returns>'true' if the data was successfully sent, 'false' if the session is not connected</returns>
         public virtual bool SendAsync(byte[] buffer, long offset, long size)
         {
-            if (!IsConnected)
-                return false;
-
-            if (size == 0)
-                return true;
-
             lock (_sendLock)
             {
+                if (!IsConnected)
+                    return false;
+
+                if (size == 0)
+                    return true;
+
+
                 // Detect multiple send handlers
                 bool sendRequired = _sendBufferMain.IsEmpty || _sendBufferFlush.IsEmpty;
 
@@ -322,11 +323,11 @@ namespace NetCoreServer
                 // Avoid multiple send handlers
                 if (!sendRequired)
                     return true;
+          
+
+                // Try to send the main buffer
+                Task.Factory.StartNew(TrySend);
             }
-
-            // Try to send the main buffer
-            Task.Factory.StartNew(TrySend);
-
             return true;
         }
 
@@ -436,20 +437,24 @@ namespace NetCoreServer
         /// </summary>
         private void TrySend()
         {
-            if (_sending)
-                return;
-
-            if (!IsConnected)
-                return;
-
-            bool process = true;
-
-            while (process)
+            // lock the whole method
+            lock (_sendLock)
             {
-                process = false;
+                if (_sending)
+                    return;
 
-                lock (_sendLock)
+                if (!IsConnected)
+                    return;
+
+                bool process = true;
+
+                while (process)
                 {
+                    process = false;
+
+                    if (!IsConnected)
+                        return;
+
                     if (_sending)
                         return;
 
@@ -468,24 +473,28 @@ namespace NetCoreServer
                     }
                     else
                         return;
-                }
 
-                // Check if the flush buffer is empty
-                if (_sendBufferFlush.IsEmpty)
-                {
-                    // Call the empty send buffer handler
-                    OnEmpty();
-                    return;
-                }
 
-                try
-                {
-                    // Async write with the write handler
-                    _sendEventArg.SetBuffer(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset));
-                    if (!Socket.SendAsync(_sendEventArg))
-                        process = ProcessSend(_sendEventArg);
+                    // Check if the flush buffer is empty
+                    if (_sendBufferFlush.IsEmpty)
+                    {
+                        // Call the empty send buffer handler
+                        OnEmpty();
+                        return;
+                    }
+
+                    try
+                    {
+                        // Async write with the write handler
+                        _sendEventArg.SetBuffer(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset));
+                        if (!Socket.SendAsync(_sendEventArg))
+                            process = ProcessSend(_sendEventArg);
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch(Exception ex) {
+                        OnTrySendException(ex);
+                    }
                 }
-                catch (ObjectDisposedException) {}
             }
         }
 
@@ -693,6 +702,8 @@ namespace NetCoreServer
 
             OnError(error);
         }
+
+        protected virtual void OnTrySendException(Exception ex) { }
 
         #endregion
 
