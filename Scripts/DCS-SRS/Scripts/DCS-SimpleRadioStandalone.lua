@@ -22,7 +22,7 @@ SR.unicast = true --DONT CHANGE THIS
 
 SR.lastKnownPos = { x = 0, y = 0, z = 0 }
 
-SR.MIDS_FREQ = 300.0 * 1000000 -- Start at UHF 300
+SR.MIDS_FREQ = 1030.0 * 1000000 -- Start at UHF 300
 SR.MIDS_FREQ_SEPARATION = 1.0 * 100000 -- 0.1 MHZ between MIDS channels
 
 SR.logFile = io.open(lfs.writedir() .. [[Logs\DCS-SimpleRadioStandalone.log]], "w")
