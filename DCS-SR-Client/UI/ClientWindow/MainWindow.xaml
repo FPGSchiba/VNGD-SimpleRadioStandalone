@@ -260,9 +260,8 @@
                             <Label.Content>
                                 <TextBlock> <!-- https://stackoverflow.com/questions/4399178/stringformat-and-multibinding-with-label -->
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat=" {0} ({1} ingame)">
+                                        <MultiBinding StringFormat=" {0}">
                                             <Binding Path="Clients.Total" />
-                                            <Binding Path="Clients.InGame" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>

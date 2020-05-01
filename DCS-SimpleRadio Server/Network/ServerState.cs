@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
@@ -113,7 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED).BoolValue)
                     {
                         ClientListExport data = new ClientListExport { Clients = _connectedClients.Values, ServerVersion = UpdaterChecker.VERSION };
-                        var json = JsonConvert.SerializeObject(data) + "\n";
+                        var json = JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new JsonNetworkPropertiesResolver() }) + "\n";
                         try
                         {
                             File.WriteAllText(exportFilePath, json);
@@ -147,12 +148,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                                 ClientListExport data = new ClientListExport { ServerVersion = UpdaterChecker.VERSION, Clients = new List<SRClient>()};
 
+                                Dictionary<uint, SRClient> firstSeatDict = new Dictionary<uint, SRClient>();
+                                Dictionary<uint, SRClient> secondSeatDict = new Dictionary<uint, SRClient>();
+                                
                                 foreach (var srClient in _connectedClients.Values)
                                 {
-
-                                    if (srClient.isCurrent() && srClient.RadioInfo?.iff != null)
+                                    if (srClient.RadioInfo?.iff != null)
                                     {
-                                        data.Clients.Add(new SRClient()
+                                        var newClient = new SRClient()
                                         {
                                             ClientGuid = srClient.ClientGuid,
                                             RadioInfo = new DCSPlayerRadioInfo()
@@ -160,20 +163,51 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 radios = null,
                                                 unitId = srClient.RadioInfo.unitId,
                                                 iff = srClient.RadioInfo.iff,
-                                                unit = srClient.RadioInfo?.unit,
-                                                latLng = srClient?.LatLngPosition,
-                                                inAircraft = srClient.RadioInfo.inAircraft,
+                                                unit = srClient.RadioInfo.unit,
                                             },
                                             Coalition = srClient.Coalition,
-                                            Name = srClient?.Name,
+                                            Name = srClient.Name,
                                             LatLngPosition = srClient?.LatLngPosition,
-                                            Position = new DcsPosition()
-                                        });
+                                            Seat = srClient.Seat
+
+                                        };
+
+                                        data.Clients.Add(newClient);
+
+                                        //will need to be expanded as more aircraft have more seats and transponder controls
+                                        if(newClient.Seat == 0)
+                                        {
+                                            firstSeatDict[newClient.RadioInfo.unitId] = newClient;
+                                        } else{
+                                            secondSeatDict[newClient.RadioInfo.unitId] = newClient;
+                                        }
+                                    }
+                                }
+
+                                //now look for other seats and handle the logic
+                                foreach (KeyValuePair<uint, SRClient> secondSeatPair in secondSeatDict)
+                                {
+                                    SRClient firstSeat = null;
+                                    
+                                    firstSeatDict.TryGetValue(secondSeatPair.Key, out firstSeat);
+                                    //copy second seat 
+                                    if (firstSeat!=null)
+                                    {
+                                        //F-14 has RIO IFF Control so use the second seat IFF
+                                        if (firstSeat.RadioInfo.unit.StartsWith("F-14"))
+                                        {
+                                            //copy second to first
+                                            firstSeat.RadioInfo.iff = secondSeatPair.Value.RadioInfo.iff;
+                                        }
+                                        else{
+                                            //copy first to second
+                                            secondSeatPair.Value.RadioInfo.iff = firstSeat.RadioInfo.iff;
+                                        }
                                     }
                                 }
                                 
                                 var byteData =
-                                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data) + "\n");
+                                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data, new JsonSerializerSettings { ContractResolver = new JsonNetworkPropertiesResolver() }) + "\n");
 
                                 udpSocket.Send(byteData, byteData.Length, host);
                             }

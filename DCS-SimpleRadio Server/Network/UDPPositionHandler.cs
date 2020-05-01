@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,11 +17,10 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    internal class UDPVoiceRouter: IHandle<ServerFrequenciesChanged>
+    class UDPPositionHandler
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
-        private readonly IEventAggregator _eventAggregator;
 
         private readonly BlockingCollection<OutgoingUDPPackets> _outGoing = new BlockingCollection<OutgoingUDPPackets>();
         private readonly CancellationTokenSource _outgoingCancellationToken = new CancellationTokenSource();
@@ -36,61 +35,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private volatile bool _stop;
 
-        private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
-        private List<double> _testFrequencies = new List<double>();
-        private List<double> _globalFrequencies = new List<double>();
-
-        public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
+        public UDPPositionHandler(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {
             _clientsList = clientsList;
-            _eventAggregator = eventAggregator;
-            _eventAggregator.Subscribe(this);
-
-            var freqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES).StringValue;
-            UpdateTestFrequencies(freqString);
-
-            var globalFreqString = _serverSettings.GetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES).StringValue;
-            UpdateGlobalLobbyFrequencies(globalFreqString);
         }
 
 
-        private void UpdateTestFrequencies(string freqString)
-        {
-            
-            var freqStringList = freqString.Split(',');
-
-            var newList = new List<double>();
-            foreach (var freq in freqStringList)
-            {
-                if (double.TryParse(freq.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var freqDouble))
-                {
-                    freqDouble *= 1e+6; //convert to Hz from MHz
-                    newList.Add(freqDouble);
-                    Logger.Info("Adding Test Frequency: " + freqDouble);
-                }
-            }
-
-            _testFrequencies = newList;
-        }
-
-        private void UpdateGlobalLobbyFrequencies(string freqString)
-        {
-
-            var freqStringList = freqString.Split(',');
-
-            var newList = new List<double>();
-            foreach (var freq in freqStringList)
-            {
-                if (double.TryParse(freq.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var freqDouble))
-                {
-                    freqDouble *= 1e+6; //convert to Hz from MHz
-                    newList.Add(freqDouble);
-                    Logger.Info("Adding Global Frequency: " + freqDouble);
-                }
-            }
-
-            _globalFrequencies = newList;
-        }
 
         public void Listen()
         {
@@ -100,14 +50,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             //outgoing packets
             new Thread(SendPendingPackets).Start();
 
-            var port = _serverSettings.GetServerPort();
+            var port = _serverSettings.GetServerPort() +1;
             _listener = new UdpClient();
             try
             {
                 _listener.AllowNatTraversal(true);
             }
             catch { }
-            
+
             _listener.ExclusiveAddressUse = true;
             _listener.DontFragment = true;
             _listener.Client.DontFragment = true;
@@ -151,7 +101,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 }
                 catch (Exception e)
                 {
-                      Logger.Error(e,"Error receving audio UDP for client " + e.Message);
+                    Logger.Error(e, "Error receving audio UDP for client " + e.Message);
                 }
 
             try
@@ -212,8 +162,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(udpPacket.RawBytes);
 
                                     if ((udpVoicePacket != null) && (udpVoicePacket.Modulations[0] != 4))
-                                        //magical ping ignore message 4 - its an empty voip packet to intialise VoIP if
-                                        //someone doesnt transmit
+                                    //magical ping ignore message 4 - its an empty voip packet to intialise VoIP if
+                                    //someone doesnt transmit
                                     {
                                         var outgoingVoice = GenerateOutgoingPacket(udpVoicePacket, udpPacket, client);
 
@@ -292,9 +242,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             var outgoingList = new HashSet<IPEndPoint>();
 
-            var coalitionSecurity =
-                _serverSettings.GetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY).BoolValue;
-
             var guid = fromClient.ClientGuid;
 
             foreach (var client in _clientsList)
@@ -302,75 +249,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 if (!client.Key.Equals(guid))
                 {
                     var ip = client.Value.VoipPort;
-                    bool global = false;
                     if (ip != null)
                     {
-
-                        for (int i = 0; i < udpVoice.Frequencies.Length; i++)
-                        {
-                            foreach (var testFrequency in _globalFrequencies)
-                            {
-                                if (DCSPlayerRadioInfo.FreqCloseEnough(testFrequency, udpVoice.Frequencies[i]))
-                                {
-                                    //ignore everything as its global frequency
-                                    global = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (global)
-                        {
-                            outgoingList.Add(ip);
-                        }
-                        // check that either coalition radio security is disabled OR the coalitions match
-                        else if ((!coalitionSecurity || (client.Value.Coalition == fromClient.Coalition)))
-                        {
-
-                            var radioInfo = client.Value.RadioInfo;
-
-                            if (radioInfo != null)
-                            {
-                                for (int i = 0; i < udpVoice.Frequencies.Length; i++)
-                                {
-                                    RadioReceivingState radioReceivingState = null;
-                                    bool decryptable;
-                                    var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
-                                        (RadioInformation.Modulation)udpVoice.Modulations[i],
-                                        udpVoice.Encryptions[i],
-                                        udpVoice.UnitId,
-                                        _emptyBlockedRadios,
-                                        out radioReceivingState,
-                                        out decryptable);
-
-                                    //only send if we can hear!
-                                    if (receivingRadio != null)
-                                    {
-                                        outgoingList.Add(ip);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    var ip = client.Value.VoipPort;
-
-                    if (ip != null)
-                    {
-                        foreach (var frequency in udpVoice.Frequencies)
-                        {
-                            foreach (var testFrequency in _testFrequencies)
-                            {
-                                if (DCSPlayerRadioInfo.FreqCloseEnough(testFrequency, frequency))
-                                {
-                                    //send back to sending client as its a test frequency
-                                    outgoingList.Add(ip);
-                                    break;
-                                }
-                            }
-                        }
+                        outgoingList.Add(ip);
                     }
                 }
             }
@@ -386,18 +267,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             else
             {
                 return null;
-            }
-        }
-
-        public void Handle(ServerFrequenciesChanged message)
-        {
-            if (message.TestFrequencies != null)
-            {
-                UpdateTestFrequencies(message.TestFrequencies);
-            }
-            else
-            {
-                UpdateGlobalLobbyFrequencies(message.GlobalLobbyFrequencies);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 {
@@ -34,6 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
 
         public IFFControlMode control = IFFControlMode.DISABLED;
 
+        [JsonIgnore]
         public bool expansion = false;
 
         public int mode1 = -1;
@@ -73,6 +75,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
             }
 
             return true;
+        }
+
+        public Transponder Copy()
+        {
+            return new Transponder(){mode1 = mode1,mode3 = mode3,mode4 = mode4,status = status, mic = mic};
         }
     }
 }

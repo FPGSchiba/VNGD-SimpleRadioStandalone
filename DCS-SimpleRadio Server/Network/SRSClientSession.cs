@@ -101,9 +101,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
+        protected override void OnTrySendException( Exception ex)
+        {
+            Logger.Error(ex,$"Caught Client Session Exception");
+        }
+
         protected override void OnError(SocketError error)
         {
-            Logger.Error($"Socket Error: {error}");
+            Logger.Error($"Caught Socket Error: {error}");
         }
 
     }

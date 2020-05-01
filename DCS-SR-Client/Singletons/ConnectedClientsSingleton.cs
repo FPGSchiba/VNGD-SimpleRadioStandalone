@@ -44,6 +44,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public void NotifyAll()
+        {
+            NotifyPropertyChanged("Total");
+        }
+
         public SRClient this[string key]
         {
             get
@@ -53,8 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             set
             {
                 _clients[key] = value;
-                NotifyPropertyChanged("Total");
-                NotifyPropertyChanged("InGame");
+               NotifyAll();
             }
         }
 
@@ -74,29 +78,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        public int InGame
-        {
-            get
-            {
-                int clientCountIngame = 0;
-                foreach (SRClient client in _clients.Values)
-                {
-                    if (client.IsIngame())
-                    {
-                        clientCountIngame++;
-                    }
-                }
-                return clientCountIngame;
-            }
-        }
-
         public bool TryRemove(string key, out SRClient value)
         {
             bool result = _clients.TryRemove(key, out value);
             if (result)
             {
                 NotifyPropertyChanged("Total");
-                NotifyPropertyChanged("InGame");
             }
             return result;
         }
@@ -105,7 +92,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         {
             _clients.Clear();
             NotifyPropertyChanged("Total");
-            NotifyPropertyChanged("InGame");
         }
 
         public bool TryGetValue(string key, out SRClient value)

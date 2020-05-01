@@ -228,7 +228,7 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Network\Models\OutgoingTCPMessage.cs" />
-    <Compile Include="Network\Models\OutgoingVoice.cs" />
+    <Compile Include="Network\Models\OutgoingUDPPackets.cs" />
     <Compile Include="Network\Models\PendingPacket.cs" />
     <Compile Include="Network\Models\ConnectionStateObject.cs" />
     <Compile Include="Network\NatHandler.cs" />
@@ -237,6 +237,7 @@
     <Compile Include="Network\NetCoreServer\TcpServer.cs" />
     <Compile Include="Network\NetCoreServer\TcpSession.cs" />
     <Compile Include="Network\SRSClientSession.cs" />
+    <Compile Include="Network\UDPPositionHandler.cs" />
     <Compile Include="Network\UDPVoiceRouter.cs" />
     <Compile Include="UI\ClientAdmin\ClientAdminViewModel.cs" />
     <Compile Include="UI\ClientAdmin\ClientViewModel.cs" />

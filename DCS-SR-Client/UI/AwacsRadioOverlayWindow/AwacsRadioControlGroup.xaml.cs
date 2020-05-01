@@ -382,6 +382,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioFrequency.Text = "INTERCOM";
                     RadioMetaData.Text = "";
                 }
+                else if (currentRadio.modulation == RadioInformation.Modulation.MIDS) //MIDS
+                {
+                    RadioFrequency.Text = "MIDS";
+                    if (currentRadio.channel >= 0)
+                    {
+                        RadioMetaData.Text = " CHN " + currentRadio.channel;
+                    }
+                    else
+                    {
+                        RadioMetaData.Text = " OFF";
+                    }
+  
+                }
                 else
                 {
                     if (!RadioFrequency.IsFocused
@@ -409,14 +422,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         RadioMetaData.Text += " E" + currentRadio.encKey; // ENCRYPTED
                     }
 
-                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-
-                    if (count > 0)
-                    {
-                        RadioMetaData.Text += " 👤" + count;
-                    }
+                 
                 }
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
+
+                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+
+                if (count > 0)
+                {
+                    RadioMetaData.Text += " 👤" + count;
+                }
 
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {

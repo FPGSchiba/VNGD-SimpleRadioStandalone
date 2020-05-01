@@ -14,6 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
@@ -42,7 +43,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private readonly NewAircraft _newAircraftCallback;
 
         private long _identStart = 0;
-        private bool _ident;
 
         public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate, NewAircraft _newAircraft)
         {
@@ -127,6 +127,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
+            //copy iff
+
+            Transponder original = null;
+
+            if (_clientStateSingleton.DcsPlayerRadioInfo.iff!=null)
+            {
+                original = _clientStateSingleton.DcsPlayerRadioInfo.iff.Copy();
+            }
+
             var update = UpdateRadio(message);
 
             //send to DCS UI
@@ -134,9 +143,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             Logger.Debug("Update sent to DCS");
 
-            if (update || IsRadioInfoStale(message))
+            if (update || _clientStateSingleton.LastSent < 1 || !_clientStateSingleton.DcsPlayerRadioInfo.iff.Equals(original))
             {
-                Logger.Debug("Sending Radio Info To Server - Stale");
+                Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
                 _radioUpdate();
             }
@@ -186,13 +195,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     RadioSendingState = UdpVoiceHandler.RadioSendingState,
                     RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
                     ClientCountConnected = _clients.Total,
-                    ClientCountIngame = _clients.InGame,
                     TunedClients = tunedClients,
                 };
 
                 var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
                 {
-                    NullValueHandling = NullValueHandling.Ignore
+                 //   NullValueHandling = NullValueHandling.Ignore,
+                    ContractResolver = new JsonDCSPropertiesResolver(),
                 }) + "\n";
 
                 var byteData =
@@ -291,12 +300,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 var clientRadio = playerRadioInfo.radios[i];
 
-                //if awacs NOT open -  disable radios over 3
-                if (i >= message.radios.Length
-                    || (RadioOverlayWindow.AwacsActive == false
-                        && (i > 3 || i == 0)
-                        // disable intercom and all radios over 3 if awacs panel isnt open and we're a spectator given by the UnitId
-                        && playerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+                //if we have more radios than the message has
+                if (i >= message.radios.Length)
                 {
                     clientRadio.freq = 1;
                     clientRadio.freqMin = 1;
@@ -369,10 +374,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                     if ((updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT) || overrideFreqAndVol)
                     {
-                        if (clientRadio.freq != updateRadio.freq)
+                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.freq, updateRadio.freq))
                             changed = true;
 
-                        if (clientRadio.secFreq != updateRadio.secFreq)
+                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.secFreq, updateRadio.secFreq))
                             changed = true;
 
                         clientRadio.freq = updateRadio.freq;
@@ -562,18 +567,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             playerRadioInfo.LastUpdate = DateTime.Now.Ticks;
 
             return changed;
-        }
-
-        private bool IsRadioInfoStale(DCSPlayerRadioInfo radioUpdate)
-        {
-            //send update if our metadata is nearly stale (1 tick = 100ns, 50000000 ticks = 5s stale timer)
-            if (DateTime.Now.Ticks - _clientStateSingleton.LastSent < 50000000)
-            {
-                Logger.Debug($"Not Stale - Tick: {DateTime.Now.Ticks} Last sent: {_clientStateSingleton.LastSent} ");
-                return false;
-            }
-            Logger.Debug($"Stale Radio - Tick: {DateTime.Now.Ticks} Last sent: {_clientStateSingleton.LastSent} ");
-            return true;
         }
 
         public void Stop()

@@ -1,4 +1,7 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Newtonsoft.Json;
+
+namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 {
     public class RadioInformation
     {
@@ -32,29 +35,55 @@
             AM = 0,
             FM = 1,
             INTERCOM = 2,
-            DISABLED = 3
+            DISABLED = 3,
+            HAVEQUICK = 4,
+            SATCOM = 5,
+            MIDS = 6,
         }
 
         public bool enc = false; // encrytion enabled
         public byte encKey = 0;
+
+        [JsonNetworkIgnoreSerialization]
         public EncryptionMode encMode = EncryptionMode.NO_ENCRYPTION;
 
+        [JsonDCSIgnoreSerialization]
+        [JsonNetworkIgnoreSerialization]
         public double freqMax = 1;
+
+        [JsonDCSIgnoreSerialization]
+        [JsonNetworkIgnoreSerialization]
         public double freqMin = 1;
+
         public double freq = 1;
+        
         public Modulation modulation = Modulation.DISABLED;
+
+        [JsonNetworkIgnoreSerialization]
         public string name = "";
+        
         public double secFreq = 1;
+
+        [JsonNetworkIgnoreSerialization]
         public float volume = 1.0f;
 
+        [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public FreqMode freqMode = FreqMode.COCKPIT;
+        [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
+        [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public VolumeMode volMode = VolumeMode.COCKPIT;
-
+        [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
         public bool expansion = false;
 
+        [JsonNetworkIgnoreSerialization]
         public int channel = -1;
 
+        [JsonNetworkIgnoreSerialization]
         public bool simul = false;
 
         /**

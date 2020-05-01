@@ -220,6 +220,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             else
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio == null)
+                {
+                    return;
+                }
+
                 var transmitting = UdpVoiceHandler.RadioSendingState;
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
@@ -262,6 +268,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
                     RadioVolume.IsEnabled = false;
 
+                    TunedClients.Visibility = Visibility.Hidden;
+
                     ToggleButtons(false);
 
                     ChannelTab.Visibility = Visibility.Collapsed;
@@ -273,6 +281,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
                     RadioFrequency.Text = "INTERCOM";
+                }
+                else if (currentRadio.modulation == RadioInformation.Modulation.MIDS) //MIDS
+                {
+                    RadioFrequency.Text = "MIDS";
+                    if (currentRadio.channel >= 0)
+                    {
+                        RadioFrequency.Text += " CHN " + currentRadio.channel;
+                    }
+                    else
+                    {
+                        RadioFrequency.Text += " OFF";
+                    }
                 }
                 else
                 {
@@ -294,21 +314,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     {
                         RadioFrequency.Text += " E" + currentRadio.encKey; // ENCRYPTED
                     }
+                
+                }
 
-                    int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq,currentRadio.modulation);
-                    
-                    if (count > 0)
-                    {
-                        TunedClients.Text = "👤" + count;
-                        RadioVolume.Width = 105;
-                        TunedClients.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        TunedClients.Visibility = Visibility.Hidden;
-                        RadioVolume.Width = 115;
-                    }
-                    
+
+                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+
+                if (count > 0)
+                {
+                    TunedClients.Text = "👤" + count;
+                    RadioVolume.Width = 105;
+                    TunedClients.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    TunedClients.Visibility = Visibility.Hidden;
+                    RadioVolume.Width = 115;
                 }
 
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;

@@ -67,13 +67,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
 
-        private bool _stop = true;
-
         //used to debounce toggle
         private long _toggleShowHide;
 
         private readonly DispatcherTimer _updateTimer;
-        private readonly DispatcherTimer _redrawUITimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
@@ -598,7 +595,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
             }
             catch { }
-            
+
+            ConnectedClientsSingleton.Instance.NotifyAll();
+
         }
 
         private void InitSettingsScreen()
@@ -943,9 +942,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             //stop timer
             _updateTimer?.Stop();
-
-            // Stop UI redraw timer
-            _redrawUITimer?.Stop();
 
             Stop();
 
@@ -1454,15 +1450,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 return;
             }
 
-            ClientState.LastSeenName = ExternalAWACSModeName.Text;
-
             // Already connected, disconnect
             if (ClientState.ExternalAWACSModelSelected)
             {
                 _client.DisconnectExternalAWACSMode();
             }
-            else
+            else if (!ClientState.IsGameExportConnected) //only if we're not in game
             {
+                ClientState.LastSeenName = ExternalAWACSModeName.Text;
                 _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
             }
         }

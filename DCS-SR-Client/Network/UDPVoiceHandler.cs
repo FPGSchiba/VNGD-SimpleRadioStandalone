@@ -47,7 +47,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
-        private readonly AudioManager.VOIPConnectCallback _voipConnectCallback;
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
 
@@ -67,7 +66,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private volatile bool _stop;
 
         private Timer _timer;
-        private bool hasSentVoicePacket; //used to force sending of first voice packet to establish comms
 
         private long _udpLastReceived = 0;
         private DispatcherTimer _updateTimer;
@@ -206,10 +204,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             StartPing();
 
-            //set to false so we sent one packet to open up the radio
-            //automatically rather than the user having to press Send
-            hasSentVoicePacket = false;
-
             _packetNumber = 1; //reset packet number
 
             while (!_stop)
@@ -291,7 +285,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 var client = _clients[_guid];
 
-                if ((client != null) && client.isCurrent())
+                if (client != null)
                 {
                     return client;
                 }
@@ -506,7 +500,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return transmitting;
             }
 
-            transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
+            //Currently transmitting - PTT must be true - figure out if we can hear on those radios
+
+            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[_clientStateSingleton.DcsPlayerRadioInfo.selected];
+
+            if (currentRadio.modulation == RadioInformation.Modulation.FM || currentRadio.modulation == RadioInformation.Modulation.AM)
+            {
+                //only AM and FM block - MIDS etc dont
+
+                transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
+            }
+ 
 
             if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
             {
@@ -514,7 +518,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 for (int i = 1; i < 11; i++)
                 {
                     var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
-                    if (radio.modulation != RadioInformation.Modulation.DISABLED && radio.simul &&
+                    if ( (radio.modulation == RadioInformation.Modulation.FM || radio.modulation == RadioInformation.Modulation.AM )&& radio.simul &&
                         i != _clientStateSingleton.DcsPlayerRadioInfo.selected)
                     {
                         transmitting.Add(i);
