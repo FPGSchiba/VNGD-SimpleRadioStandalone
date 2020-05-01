@@ -175,8 +175,8 @@ function srsOverlay.updateRadio()
 
 			if _radio.modulation == 4 or _radio.modulation == 5 or _radio.modulation == 6 then 
 
+				fullMessage = _radio.name.." - "
 				if  _radio.channel > 0 then
-					fullMessage = _radio.name.." - "
 
 					if _radio.channel >= 0 then
 						fullMessage = fullMessage.." CHN ".._radio.channel
@@ -197,7 +197,7 @@ function srsOverlay.updateRadio()
 
 					end
 				else
-					fullMessage = " OFF"
+					fullMessage = fullMessage.." OFF"
 				end
             elseif _radio.modulation == 3 then
                      fullMessage = ""
