@@ -261,21 +261,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    Up10.Visibility = Visibility.Hidden;
-                    Up1.Visibility = Visibility.Hidden;
-                    Up01.Visibility = Visibility.Hidden;
-                    Up001.Visibility = Visibility.Hidden;
-                    Up0001.Visibility = Visibility.Hidden;
-
-                    Down10.Visibility = Visibility.Hidden;
-                    Down1.Visibility = Visibility.Hidden;
-                    Down01.Visibility = Visibility.Hidden;
-                    Down001.Visibility = Visibility.Hidden;
-                    Down0001.Visibility = Visibility.Hidden;
-
-                    PresetChannelsView.IsEnabled = false;
-                    ChannelTab.Visibility = Visibility.Collapsed;
-
                     ToggleSimultaneousTransmissionButton.IsEnabled = false;
                     ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
                 }
