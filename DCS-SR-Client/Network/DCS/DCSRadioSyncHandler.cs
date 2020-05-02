@@ -180,8 +180,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     {
                         var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
                         
-                        if (clientRadio.modulation == RadioInformation.Modulation.FM ||
-                            clientRadio.modulation == RadioInformation.Modulation.AM)
+                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
                         {
                             tunedClients[i] = connectedClientsSingleton.ClientsOnFreq(clientRadio.freq, clientRadio.modulation);
                         }
