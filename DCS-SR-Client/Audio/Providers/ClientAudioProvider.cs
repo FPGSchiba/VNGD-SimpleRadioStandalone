@@ -125,7 +125,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                 {
-                    if (audio.ReceivedRadio == 0)
+                    if (audio.ReceivedRadio == 0 
+                        || audio.Modulation == (short)RadioInformation.Modulation.MIDS)
                     {
                         AddRadioEffectIntercom(audio);
                     }

@@ -322,7 +322,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                 //Decode bytes
                                 var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedOpusAudio);
 
-                                if (udpVoicePacket != null && udpVoicePacket.Modulations[0] != 4)
+                                if (udpVoicePacket != null)
                                 {
                                     var globalFrequencies = _serverSettings.GlobalFrequencies;
 

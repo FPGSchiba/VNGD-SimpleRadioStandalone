@@ -1,8 +1,8 @@
--- Version 1.8.0.1
+-- Version 1.8.0.2
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
-net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.8.0.1")
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.8.0.2")
 local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
@@ -81,14 +81,21 @@ SRS.sendUpdate = function(playerID)
 
 	local slot =  net.get_player_info(playerID,"slot")
 
-    slot = tostring(slot)
-    
-    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
-    if string.find(tostring(slot), "_", 1, true) then
-        --extract substring - get the seat ID
-        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
-        _update.seat = tonumber(slot) -1 -- -1 as seat starts at 2
-    end
+	if slot and slot ~= '' then 
+		slot = tostring(slot)
+	    
+	    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
+	    if string.find(tostring(slot), "_", 1, true) then
+	        --extract substring - get the seat ID
+	        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
+
+	        local slotNum = tonumber(slot)
+
+	        if slotNum ~= nil and slotNum >= 1 then
+	        	_update.seat = slotNum -1 -- -1 as seat starts at 2
+	        end
+	    end
+	end
 
     --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
@@ -362,4 +369,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.8.0.1")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.8.0.2")

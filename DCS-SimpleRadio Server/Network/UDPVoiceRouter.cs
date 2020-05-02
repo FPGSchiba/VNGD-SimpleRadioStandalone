@@ -211,7 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     //decode
                                     var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(udpPacket.RawBytes);
 
-                                    if ((udpVoicePacket != null) && (udpVoicePacket.Modulations[0] != 4))
+                                    if (udpVoicePacket != null)
                                         //magical ping ignore message 4 - its an empty voip packet to intialise VoIP if
                                         //someone doesnt transmit
                                     {
@@ -225,7 +225,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                             //mark as transmitting for the UI
                                             double mainFrequency = udpVoicePacket.Frequencies.FirstOrDefault();
                                             // Only trigger transmitting frequency update for "proper" packets (excluding invalid frequencies and magic ping packets with modulation 4)
-                                            if (mainFrequency > 0 && udpVoicePacket.Modulations[0] != 4)
+                                            if (mainFrequency > 0)
                                             {
                                                 RadioInformation.Modulation mainModulation = (RadioInformation.Modulation)udpVoicePacket.Modulations[0];
                                                 if (mainModulation == RadioInformation.Modulation.INTERCOM)
