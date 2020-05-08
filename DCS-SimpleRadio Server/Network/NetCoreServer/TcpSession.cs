@@ -170,51 +170,54 @@ namespace NetCoreServer
         /// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
         public virtual bool Disconnect()
         {
-            if (!IsConnected)
-                return false;
-
-            // Reset event args
-            _receiveEventArg.Completed -= OnAsyncCompleted;
-            _sendEventArg.Completed -= OnAsyncCompleted;
-
-            try
+            lock (_sendLock)
             {
+                if (!IsConnected)
+                    return false;
+
+                // Reset event args
+                _receiveEventArg.Completed -= OnAsyncCompleted;
+                _sendEventArg.Completed -= OnAsyncCompleted;
+
                 try
                 {
-                    // Shutdown the socket associated with the client
-                    Socket.Shutdown(SocketShutdown.Both);
+                    try
+                    {
+                        // Shutdown the socket associated with the client
+                        Socket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch (SocketException) { }
+
+                    // Close the session socket
+                    Socket.Close();
+
+                    // Dispose the session socket
+                    Socket.Dispose();
+
+                    // Update the session socket disposed flag
+                    IsSocketDisposed = true;
                 }
-                catch (SocketException) {}
+                catch (ObjectDisposedException) { }
 
-                // Close the session socket
-                Socket.Close();
+                // Update the connected flag
+                IsConnected = false;
 
-                // Dispose the session socket
-                Socket.Dispose();
+                // Update sending/receiving flags
+                _receiving = false;
+                _sending = false;
 
-                // Update the session socket disposed flag
-                IsSocketDisposed = true;
+                // Clear send/receive buffers
+                ClearBuffers();
+
+                // Call the session disconnected handler
+                OnDisconnected();
+
+                // Call the session disconnected handler in the server
+                Server.OnDisconnectedInternal(this);
+
+                // Unregister session
+                Server.UnregisterSession(Id);
             }
-            catch (ObjectDisposedException) {}
-
-            // Update the connected flag
-            IsConnected = false;
-
-            // Update sending/receiving flags
-            _receiving = false;
-            _sending = false;
-
-            // Clear send/receive buffers
-            ClearBuffers();
-
-            // Call the session disconnected handler
-            OnDisconnected();
-
-            // Call the session disconnected handler in the server
-            Server.OnDisconnectedInternal(this);
-
-            // Unregister session
-            Server.UnregisterSession(Id);
 
             return true;
         }

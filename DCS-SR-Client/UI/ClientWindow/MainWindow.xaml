@@ -1165,7 +1165,8 @@
                                    Grid.Column="1"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Orientation="Horizontal">
+                                   Orientation="Vertical">
+                                <WrapPanel Orientation="Horizontal">
                                 <Label>Start</Label>
 
                                 <ToggleButton Name="RadioTxStartToggle"
@@ -1205,6 +1206,28 @@
                                         </Style>
                                     </ToggleButton.Style>
                                 </ToggleButton>
+                                </WrapPanel>
+                                <WrapPanel>
+                                    <Label>MIDS Start</Label>
+                                    <ToggleButton Name="RadioMIDSToggle"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="RadioMIDS_Click">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="{x:Type ToggleButton}">
+                                                <Setter Property="Content" Value="ON" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Content" Value="ON" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="False">
+                                                        <Setter Property="Content" Value="OFF" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
+                                </WrapPanel>
                             </WrapPanel>
 
                             <Label Grid.Row="2"
