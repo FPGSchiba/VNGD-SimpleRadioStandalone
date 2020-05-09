@@ -1,4 +1,4 @@
--- Version 1.8.0.2
+-- Version 1.8.0.3
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -3429,4 +3429,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.2")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.3")
