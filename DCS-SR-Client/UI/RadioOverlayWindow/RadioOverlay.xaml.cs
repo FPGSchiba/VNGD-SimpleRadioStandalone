@@ -11,8 +11,9 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using NLog;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -187,6 +188,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
 
         private long _lastFocus;
+        private RadioCapabilities _radioCapabilitiesWindow;
 
         private void FocusDCS()
         {
@@ -244,6 +246,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 WindowState = WindowState.Minimized;
             }
+        }
+
+        private void Button_About(object sender, RoutedEventArgs e)
+        {
+            //Show Radio Capabilities
+            if ((_radioCapabilitiesWindow == null) || !_radioCapabilitiesWindow.IsVisible ||
+                (_radioCapabilitiesWindow.WindowState == WindowState.Minimized))
+            {
+                _radioCapabilitiesWindow?.Close();
+
+                _radioCapabilitiesWindow = new RadioCapabilities();
+                _radioCapabilitiesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _radioCapabilitiesWindow.Owner = this;
+                _radioCapabilitiesWindow.ShowDialog();
+            }
+            else
+            {
+                _radioCapabilitiesWindow?.Close();
+                _radioCapabilitiesWindow = null;
+            }
+
         }
 
 

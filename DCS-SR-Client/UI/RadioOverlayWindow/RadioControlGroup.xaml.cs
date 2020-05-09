@@ -298,8 +298,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     RadioFrequency.Text =
                         (currentRadio.freq / MHz).ToString("0.000",
-                            CultureInfo.InvariantCulture) + //make nuber UK / US style with decimals not commas!
-                        (currentRadio.modulation == 0 ? "AM" : "FM");
+                            CultureInfo.InvariantCulture); //make nuber UK / US style with decimals not commas!
+                        
+                    if(currentRadio.modulation == RadioInformation.Modulation.AM)
+                    {
+                        RadioFrequency.Text += "AM";
+                    }
+                    else if(currentRadio.modulation == RadioInformation.Modulation.FM)
+                    {
+                        RadioFrequency.Text += "FM";
+                    }
+                    else if (currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
+                    {
+                        RadioFrequency.Text += "HQ";
+                    }
+                    else
+                    {
+                        RadioFrequency.Text += "";
+                    }
+
                     if (currentRadio.secFreq > 100)
                     {
                         RadioFrequency.Text += " G";

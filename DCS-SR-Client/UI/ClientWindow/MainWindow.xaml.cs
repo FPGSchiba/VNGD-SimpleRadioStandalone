@@ -25,6 +25,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -66,6 +67,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
+
+        private ClientListWindow _clientListWindow;
 
         //used to debounce toggle
         private long _toggleShowHide;
@@ -635,6 +638,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             RadioRxStartToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start);
             RadioRxEndToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End);
+
+            RadioMIDSToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
 
             RadioSoundEffects.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
             RadioSoundEffectsClipping.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
@@ -1313,7 +1318,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = new ServerSettingsWindow();
                 _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _serverSettingsWindow.Owner = this;
-                _serverSettingsWindow.ShowDialog();
+                _serverSettingsWindow.Show();
             }
             else
             {
@@ -1395,6 +1400,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void RadioRxEnd_Click(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioRxEffects_End, (bool) RadioRxEndToggle.IsChecked);
+        }
+
+        private void RadioMIDS_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.MIDSRadioEffect, (bool)RadioMIDSToggle.IsChecked);
         }
 
         private void AudioSelectChannel_OnClick(object sender, RoutedEventArgs e)
@@ -1637,6 +1647,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             catch { }
            
+        }
+
+        private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
+        {
+            if ((_clientListWindow == null) || !_clientListWindow.IsVisible ||
+                (_clientListWindow.WindowState == WindowState.Minimized))
+            {
+                _clientListWindow?.Close();
+
+                _clientListWindow = new ClientListWindow();
+                _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _clientListWindow.Owner = this;
+                _clientListWindow.Show();
+            }
+            else
+            {
+                _clientListWindow?.Close();
+                _clientListWindow = null;
+            }
         }
     }
 }

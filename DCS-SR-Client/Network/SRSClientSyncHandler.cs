@@ -135,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
-                    _tcpClient.SendTimeout = 10000;
+                    _tcpClient.SendTimeout = 90000;
                     _tcpClient.NoDelay = true;
 
                     // Wait for 10 seconds before aborting connection attempt - no SRS server running/port opened in that case

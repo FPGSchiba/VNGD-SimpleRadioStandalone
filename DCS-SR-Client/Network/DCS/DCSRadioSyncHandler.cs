@@ -30,6 +30,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
 
+        private static readonly int RADIO_UPDATE_PING_INTERVAL = 60; //send update regardless of change every X seconds
+
 
         private UdpClient _dcsUdpListener;
         private UdpClient _dcsRadioUpdateSender;
@@ -127,15 +129,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
-            //copy iff
-
-            Transponder original = null;
-
-            if (_clientStateSingleton.DcsPlayerRadioInfo.iff!=null)
-            {
-                original = _clientStateSingleton.DcsPlayerRadioInfo.iff.Copy();
-            }
-
+          
+            // determine if its changed by comparing old to new
             var update = UpdateRadio(message);
 
             //send to DCS UI
@@ -143,7 +138,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             Logger.Debug("Update sent to DCS");
 
-            if (update || _clientStateSingleton.LastSent < 1 || !_clientStateSingleton.DcsPlayerRadioInfo.iff.Equals(original))
+            var diff = new TimeSpan( DateTime.Now.Ticks - _clientStateSingleton.LastSent);
+
+            if (update 
+                || _clientStateSingleton.LastSent < 1 
+                || diff.TotalSeconds > 60)
             {
                 Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
@@ -224,16 +223,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private bool UpdateRadio(DCSPlayerRadioInfo message)
         {
-            var changed = false;
-
             var expansion = _serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EXPANSION);
 
             var playerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            //copy and compare to look for changes
+            var beforeUpdate = playerRadioInfo.DeepClone();
 
             //update common parts
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
             playerRadioInfo.intercomHotMic = message.intercomHotMic;
+            playerRadioInfo.capabilities = message.capabilities;
 
             if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
             {
@@ -283,7 +284,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             if (overrideFreqAndVol)
             {
                 playerRadioInfo.selected = message.selected;
-                changed = true;
             }
 
             if (playerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
@@ -373,12 +373,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                     if ((updateRadio.freqMode == RadioInformation.FreqMode.COCKPIT) || overrideFreqAndVol)
                     {
-                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.freq, updateRadio.freq))
-                            changed = true;
-
-                        if (!DCSPlayerRadioInfo.FreqCloseEnough(clientRadio.secFreq, updateRadio.secFreq))
-                            changed = true;
-
                         clientRadio.freq = updateRadio.freq;
 
                         if (newAircraft && updateRadio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
@@ -565,7 +559,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //update
             playerRadioInfo.LastUpdate = DateTime.Now.Ticks;
 
-            return changed;
+            return !beforeUpdate.Equals(playerRadioInfo);
         }
 
         public void Stop()

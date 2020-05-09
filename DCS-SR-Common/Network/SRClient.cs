@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Newtonsoft.Json;
@@ -16,8 +17,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
         public string ClientGuid { get; set; }
+        private string _name= "";
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                if(value == null || value == "")
+                {
+                    value = "---";
+                }
 
-        public string Name { get; set; }
+                if (_name != value)
+                {
+                    _name = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+                }
+            }
+        }
 
         public int Seat { get; set; }
 
@@ -28,6 +48,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             {
                 _coalition = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
+            }
+        }
+
+        public SolidColorBrush ClientCoalitionColour
+        {
+            get
+            {
+                switch (Coalition)
+                {
+                    case 0:
+                        return new SolidColorBrush(Colors.White);
+                    case 1:
+                        return new SolidColorBrush(Colors.Red);
+                    case 2:
+                        return new SolidColorBrush(Colors.Blue);
+                    default:
+                        return new SolidColorBrush(Colors.White);
+                }
             }
         }
 

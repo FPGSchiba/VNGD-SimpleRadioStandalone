@@ -62,6 +62,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public SimultaneousTransmissionControl simultaneousTransmissionControl =
             SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
 
+        [JsonNetworkIgnoreSerialization]
+        public DCSAircraftCapabilities capabilities = new DCSAircraftCapabilities();
+
         public enum SimultaneousTransmissionControl
         {
             ENABLED_INTERNAL_SRS_CONTROLS = 1,
@@ -89,6 +92,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             simultaneousTransmission = false;
             simultaneousTransmissionControl = SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
             LastUpdate = 0;
+
+            for (var i = 0; i < 11; i++)
+            {
+                radios[i] = new RadioInformation();
+            }
+
         }
 
         // override object.Equals
@@ -121,6 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 }
 
                 if (unitId != compareRadio.unitId)
+                {
+                    return false;
+                }
+
+                if (inAircraft != compareRadio.inAircraft)
                 {
                     return false;
                 }
@@ -288,6 +302,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             decryptable = bestMatchingDecryptable;
             receivingState = bestMatchingRadioState;
             return bestMatchingRadio;
+        }
+
+        public DCSPlayerRadioInfo DeepClone()
+        {
+            var clone = (DCSPlayerRadioInfo) this.MemberwiseClone();
+
+            clone.iff = this.iff.Copy();
+            //ignore position
+            clone.radios = new RadioInformation[11];
+
+            for (var i = 0; i < 11; i++)
+            {
+                clone.radios[i] = this.radios[i].Copy();
+            }
+
+            return clone;
+
         }
     }
 }

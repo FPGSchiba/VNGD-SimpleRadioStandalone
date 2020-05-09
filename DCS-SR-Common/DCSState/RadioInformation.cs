@@ -1,4 +1,5 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+﻿using System;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Newtonsoft.Json;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common
@@ -138,6 +139,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
 
             return true;
+        }
+
+        internal RadioInformation Copy()
+        {
+            //probably can use memberswise clone
+            return new RadioInformation()
+            {
+                channel = this.channel,
+                enc = this.enc,
+                encKey = this.encKey,
+                encMode = this.encMode,
+                expansion = this.expansion,
+                freq = this.freq,
+                freqMax = this.freqMax,
+                freqMin = this.freqMin,
+                freqMode = this.freqMode,
+                guardFreqMode = this.guardFreqMode,
+                modulation = this.modulation,
+                secFreq = this.secFreq,
+                name = this.name,
+                simul = this.simul,
+                volMode = this.volMode,
+                volume = this.volume,
+
+            };
         }
     }
 }

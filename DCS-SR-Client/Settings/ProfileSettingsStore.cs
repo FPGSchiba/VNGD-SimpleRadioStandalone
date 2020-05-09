@@ -43,7 +43,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
 
         AlwaysAllowTransponderOverlay,
-        RadioSwitchIsPTTOnlyWhenValid
+        RadioSwitchIsPTTOnlyWhenValid,
+
+        MIDSRadioEffect //if on and Radio TX effects are on the MIDS tone is used
     }
 
     public class ProfileSettingsStore
@@ -64,6 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
+            {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
 
             {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), "true"},
 

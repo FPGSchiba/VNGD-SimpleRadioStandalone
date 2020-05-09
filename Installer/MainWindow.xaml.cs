@@ -427,6 +427,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-RX-1600.wav");
                 DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-TX-1600.wav");
                 DeleteFileIfExists(programPath + "\\AudioEffects\\nato-tone-16k.wav");
+                DeleteFileIfExists(programPath + "\\AudioEffects\\nato-mids-tone.wav");
             }
             Logger.Info($"Finished clearing scripts and program Pre Mods ");
 

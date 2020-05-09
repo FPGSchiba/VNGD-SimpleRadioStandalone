@@ -19,6 +19,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using FragLabs.Audio.Codecs;
 using NLog;
+using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 using Timer = Cabhishek.Timers.Timer;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
@@ -121,7 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     if (!radioState.IsSimultaneous)
                     {
-                        _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume);
+                        _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume, radioInfo.radios[i].modulation);
                     }
                 }
             }
@@ -442,13 +443,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 {
                                                     _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
                                                         true,
-                                                        audio.Volume);
+                                                        audio.Volume, (Modulation) audio.Modulation);
                                                 }
                                                 else
                                                 {
                                                     _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
                                                         false,
-                                                        audio.Volume);
+                                                        audio.Volume,(Modulation) audio.Modulation);
                                                 }
                                             }
 
@@ -795,7 +796,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             _audioManager.PlaySoundEffectStartTransmit(sendingOn,
                                 currentlySelectedRadio.enc && (currentlySelectedRadio.encKey > 0),
-                                currentlySelectedRadio.volume);
+                                currentlySelectedRadio.volume, currentlySelectedRadio.modulation);
                         }
 
                         //set radio overlay state
@@ -823,7 +824,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioSendingState.SendingOn];
 
-                        _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn, radio.volume);
+                        _audioManager.PlaySoundEffectEndTransmit(RadioSendingState.SendingOn, radio.volume, radio.modulation);
                     }
                 }
             }

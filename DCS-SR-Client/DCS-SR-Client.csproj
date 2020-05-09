@@ -223,6 +223,12 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
+      <DependentUpon>ClientListWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioCapabilities.xaml.cs">
+      <DependentUpon>RadioCapabilities.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\TransponderPanel.xaml.cs">
       <DependentUpon>TransponderPanel.xaml</DependentUpon>
     </Compile>
@@ -272,7 +278,7 @@
     </Compile>
     <Compile Include="Network\Models\RadioSendingState.cs" />
     <Compile Include="Network\DCS\DCSRadioSyncManager.cs" />
-    <Compile Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
+    <Compile Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
       <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\GlobalSettingsStore.cs" />
@@ -286,6 +292,14 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioCapabilities.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\TransponderPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -347,7 +361,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ServerSettingsWindow\ServerSettingsWindow.xaml">
+    <Page Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -373,6 +387,9 @@
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="AudioEffects\nato-mids-tone.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

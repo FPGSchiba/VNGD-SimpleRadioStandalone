@@ -12,6 +12,7 @@ using NAudio.Wave.SampleProviders;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
 using NLog;
+using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -205,6 +206,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void AdjustVolume(ClientAudio clientAudio)
         {
+            if(clientAudio.Modulation == (short) Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
+            {
+                return;
+            }
+
             var audio = clientAudio.PcmAudioShort;
             for (var i = 0; i < audio.Length; i++)
             {
