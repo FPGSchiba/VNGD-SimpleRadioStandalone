@@ -173,7 +173,7 @@ function srsOverlay.updateRadio()
 
             local fullMessage
 
-			if _radio.modulation == 4 or _radio.modulation == 5 or _radio.modulation == 6 then 
+			if  _radio.modulation == 5 or _radio.modulation == 6 then 
 
 				fullMessage = _radio.name.." - "
 				if  _radio.channel > 0 then
@@ -215,9 +215,11 @@ function srsOverlay.updateRadio()
 
                      if _radio.modulation == 0 then
                         fullMessage = fullMessage.." AM"
-                     else
+                     elseif _radio.modulation == 1 then
                         fullMessage = fullMessage.." FM"
-                     end
+                     elseif _radio.modulation == 4 then
+						fullMessage = fullMessage.." HQ"
+					 end
 
                      if _radio.secFreq > 100 then
                         fullMessage = fullMessage.." G"

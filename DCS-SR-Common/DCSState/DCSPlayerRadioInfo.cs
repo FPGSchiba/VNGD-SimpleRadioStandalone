@@ -62,6 +62,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public SimultaneousTransmissionControl simultaneousTransmissionControl =
             SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
 
+        [JsonNetworkIgnoreSerialization]
+        public DCSAircraftCapabilities capabilities = new DCSAircraftCapabilities();
+
         public enum SimultaneousTransmissionControl
         {
             ENABLED_INTERNAL_SRS_CONTROLS = 1,

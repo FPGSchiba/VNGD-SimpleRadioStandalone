@@ -391,7 +391,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                                 CultureInfo.InvariantCulture); //make nuber UK / US style with decimals not commas!
                     }
 
-                    RadioMetaData.Text = (currentRadio.modulation == 0 ? "AM" : "FM");
+                    if (currentRadio.modulation == RadioInformation.Modulation.AM)
+                    {
+                        RadioMetaData.Text = "AM";
+                    }
+                    else if (currentRadio.modulation == RadioInformation.Modulation.FM)
+                    {
+                        RadioMetaData.Text = "FM";
+                    }
+                    else if (currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
+                    {
+                        RadioMetaData.Text = "HQ";
+                    }
+                    else
+                    {
+                        RadioMetaData.Text += "";
+                    }
 
                     if (currentRadio.secFreq > 100)
                     {
