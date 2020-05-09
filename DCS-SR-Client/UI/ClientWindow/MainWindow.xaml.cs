@@ -1318,7 +1318,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow = new ServerSettingsWindow();
                 _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _serverSettingsWindow.Owner = this;
-                _serverSettingsWindow.ShowDialog();
+                _serverSettingsWindow.Show();
             }
             else
             {

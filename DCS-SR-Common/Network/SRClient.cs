@@ -26,9 +26,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
             set
             {
-                if(value == null)
+                if(value == null || value == "")
                 {
-                    value = "";
+                    value = "---";
                 }
 
                 if (_name != value)
