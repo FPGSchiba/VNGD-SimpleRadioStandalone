@@ -37,10 +37,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             if (_bannedIps.Contains(clientIp.Address))
             {
-                Disconnect();
-
                 Logger.Warn("Disconnecting Banned Client -  " + clientIp.Address + " " + clientIp.Port);
-                return;
+
+                Disconnect();
             }
         }
 

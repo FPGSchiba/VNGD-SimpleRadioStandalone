@@ -187,10 +187,17 @@
                                 Style="{DynamicResource SquareButtonStyle}" />
                         <Button x:Name="ShowAwacsOverlay"
                                 Width="125"
-                                Margin="0,15,0,0"
+                                Margin="0,15,20,0"
                                 HorizontalAlignment="Center"
                                 Click="ShowAwacsOverlay_OnClick"
                                 Content="Toggle AWACS Overlay"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                        <Button x:Name="ShowClientList"
+                                Width="125"
+                                Margin="0,15,0,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowClientList_OnClick"
+                                Content="Toggle Client List"
                                 Style="{DynamicResource SquareButtonStyle}" />
                     </StackPanel>
 

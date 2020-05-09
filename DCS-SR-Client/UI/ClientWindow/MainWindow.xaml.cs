@@ -25,6 +25,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -66,6 +67,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
+
+        private ClientListWindow _clientListWindow;
 
         //used to debounce toggle
         private long _toggleShowHide;
@@ -1644,6 +1647,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             catch { }
            
+        }
+
+        private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
+        {
+            if ((_clientListWindow == null) || !_clientListWindow.IsVisible ||
+                (_clientListWindow.WindowState == WindowState.Minimized))
+            {
+                _clientListWindow?.Close();
+
+                _clientListWindow = new ClientListWindow();
+                _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _clientListWindow.Owner = this;
+                _clientListWindow.Show();
+            }
+            else
+            {
+                _clientListWindow?.Close();
+                _clientListWindow = null;
+            }
         }
     }
 }
