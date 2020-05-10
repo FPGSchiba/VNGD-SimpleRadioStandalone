@@ -320,34 +320,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             }
         }
 
+        object lockob = new object();
+
         public void StopEncoding()
         {
-            _waveIn?.Dispose();
-            _waveIn = null;
+            lock(lockob)
+            {
+                _waveIn?.Dispose();
+                _waveIn = null;
 
-            _waveOut?.Dispose();
-            _waveOut = null;
+                _waveOut?.Dispose();
+                _waveOut = null;
 
-            _playBuffer?.ClearBuffer();
-            _playBuffer = null;
+                _playBuffer?.ClearBuffer();
+                _playBuffer = null;
 
-            _encoder?.Dispose();
-            _encoder = null;
+                _encoder?.Dispose();
+                _encoder = null;
 
-            _decoder?.Dispose();
-            _decoder = null;
+                _decoder?.Dispose();
+                _decoder = null;
 
-            _playBuffer?.ClearBuffer();
-            _playBuffer = null;
+                _playBuffer?.ClearBuffer();
+                _playBuffer = null;
 
-            _speex?.Dispose();
-            _speex = null;
+                _speex?.Dispose();
+                _speex = null;
 
-            _waveFile?.Dispose();
-            _waveFile = null;
+                _waveFile?.Dispose();
+                _waveFile = null;
 
-            SpeakerMax = -100;
-            MicMax = -100;
+                SpeakerMax = -100;
+                MicMax = -100;
+            }
+           
         }
     }
 }

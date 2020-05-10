@@ -596,47 +596,51 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+        object lockObj = new object();
         public void StopEncoding()
         {
-            _waveIn?.StopRecording();
-            _waveIn?.Dispose();
-            _waveIn = null;
-
-            _waveOut?.Stop();
-            _waveOut?.Dispose();
-            _waveOut = null;
-
-            _micWaveOut?.Stop();
-            _micWaveOut?.Dispose();
-            _micWaveOut = null;
-
-            _volumeSampleProvider = null;
-            _clientAudioMixer?.RemoveAllMixerInputs();
-            _clientAudioMixer = null;
-
-            _clientsBufferedAudio.Clear();
-
-            _encoder?.Dispose();
-            _encoder = null;
-
-            _decoder?.Dispose();
-            _decoder = null;
-
-            if (_udpVoiceHandler != null)
+            lock(lockObj)
             {
-                _udpVoiceHandler.RequestStop();
-                _udpVoiceHandler = null;
+                _waveIn?.StopRecording();
+                _waveIn?.Dispose();
+                _waveIn = null;
+
+                _waveOut?.Stop();
+                _waveOut?.Dispose();
+                _waveOut = null;
+
+                _micWaveOut?.Stop();
+                _micWaveOut?.Dispose();
+                _micWaveOut = null;
+
+                _volumeSampleProvider = null;
+                _clientAudioMixer?.RemoveAllMixerInputs();
+                _clientAudioMixer = null;
+
+                _clientsBufferedAudio.Clear();
+
+                _encoder?.Dispose();
+                _encoder = null;
+
+                _decoder?.Dispose();
+                _decoder = null;
+
+                if (_udpVoiceHandler != null)
+                {
+                    _udpVoiceHandler.RequestStop();
+                    _udpVoiceHandler = null;
+                }
+
+                _speex?.Dispose();
+                _speex = null;
+
+                SpeakerMax = -100;
+                MicMax = -100;
+
+                _effectsOutputBuffer = null;
+
+                MessageHub.Instance.ClearSubscriptions();
             }
-
-            _speex?.Dispose();
-            _speex = null;
-
-            SpeakerMax = -100;
-            MicMax = -100;
-
-            _effectsOutputBuffer = null;
-
-            MessageHub.Instance.ClearSubscriptions();
         }
 
         public void AddClientAudio(ClientAudio audio)

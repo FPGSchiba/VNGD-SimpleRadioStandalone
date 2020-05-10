@@ -204,29 +204,36 @@ namespace NAudio.Wave
             }
         }
 
+        object lockob = new object();
+
         /// <summary>
         /// Stop recording
         /// </summary>
+        /// 
         public void StopRecording()
         {
-            if (recording)
+            lock(lockob)
             {
-                recording = false;
-                MmException.Try(WaveInterop.waveInStop(waveInHandle), "waveInStop");
-                // report the last buffers, sometimes more than one, so taking care to report them in the right order
-                for (int n = 0; n < buffers.Length; n++)
+                if (recording)
                 {
-                    int index = (n + lastReturnedBufferIndex + 1) % buffers.Length;
-                    var buffer = buffers[index];
-                    if (buffer.Done)
+                    recording = false;
+                    MmException.Try(WaveInterop.waveInStop(waveInHandle), "waveInStop");
+                    // report the last buffers, sometimes more than one, so taking care to report them in the right order
+                    for (int n = 0; n < buffers.Length; n++)
                     {
-                        RaiseDataAvailable(buffer);
+                        int index = (n + lastReturnedBufferIndex + 1) % buffers.Length;
+                        var buffer = buffers[index];
+                        if (buffer.Done)
+                        {
+                            RaiseDataAvailable(buffer);
+                        }
                     }
+                    RaiseRecordingStopped(null);
                 }
-                RaiseRecordingStopped(null);
+                //MmException.Try(WaveInterop.waveInReset(waveInHandle), "waveInReset");      
+                // Don't actually close yet so we get the last buffer
             }
-            //MmException.Try(WaveInterop.waveInReset(waveInHandle), "waveInReset");      
-            // Don't actually close yet so we get the last buffer
+
         }
 
         /// <summary>
