@@ -505,9 +505,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[_clientStateSingleton.DcsPlayerRadioInfo.selected];
 
-            if (currentRadio.modulation == RadioInformation.Modulation.FM || currentRadio.modulation == RadioInformation.Modulation.AM)
+            if (currentRadio.modulation == RadioInformation.Modulation.FM 
+                || currentRadio.modulation == RadioInformation.Modulation.AM 
+                || currentRadio.modulation == RadioInformation.Modulation.MIDS 
+                || currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
             {
-                //only AM and FM block - MIDS etc dont
+                //only AM and FM block - SATCOM etc dont
 
                 transmitting.Add(_clientStateSingleton.DcsPlayerRadioInfo.selected);
             }
