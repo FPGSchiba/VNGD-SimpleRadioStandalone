@@ -754,16 +754,27 @@ function SR.exportRadioUH1H(_data)
 
 	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
+	local intercomOn =  SR.getButtonPosition(27)
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
 
+    if intercomOn < 0.5 then
+    	_data.radios[1].modulation = 3
+    end
+
+    local fmOn =  SR.getButtonPosition(23)
     _data.radios[2].name = "AN/ARC-131"
     _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 1
     _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true)
 
+    if fmOn < 0.5 then
+    	_data.radios[2].freq = 1
+    end
+
+    local uhfOn =  SR.getButtonPosition(24)
     _data.radios[3].name = "AN/ARC-51BX - UHF"
     _data.radios[3].freq = SR.getRadioFrequency(22)
     _data.radios[3].modulation = 0
@@ -776,17 +787,28 @@ function SR.exportRadioUH1H(_data)
         _data.radios[3].channel = SR.getSelectorPosition(16, 0.05) + 1 --add 1 as channel 0 is channel 1
     end
 
-    _data.radios[4].name = "AN/ARC-134"
-    _data.radios[4].freq = SR.getRadioFrequency(20)
-    _data.radios[4].modulation = 0
-    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false)
+    if uhfOn < 0.5 then
+    	_data.radios[3].freq = 1
+    	_data.radios[3].channel = -1
+    end
 
-    --_device:get_argument_value(_arg)
     --guard mode for UHF Radio
     local uhfModeKnob = SR.getSelectorPosition(17, 0.1)
     if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
         _data.radios[3].secFreq = 243.0 * 1000000
     end
+
+    local vhfOn =  SR.getButtonPosition(25)
+    _data.radios[4].name = "AN/ARC-134"
+    _data.radios[4].freq = SR.getRadioFrequency(20)
+    _data.radios[4].modulation = 0
+    _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false)
+
+    if vhfOn < 0.5 then
+    	_data.radios[4].freq = 1
+    end
+
+    --_device:get_argument_value(_arg)
 
     local _panel = GetDevice(0)
 
@@ -1694,6 +1716,10 @@ function SR.exportRadioFA18C(_data)
     return _data
 end
 
+local _f16 = {}
+_f16.radio1 = {}
+_f16.radio1.guard = 0
+
 function SR.exportRadioF16C(_data)
 
 	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
@@ -1723,7 +1749,26 @@ function SR.exportRadioF16C(_data)
             local _channel = SR.getSelectorPosition(410, 0.05) + 1 --add 1 as channel 0 is channel 1
             _data.radios[2].channel = _channel
         end
-    end
+    else
+    	-- Parse the UFC - LOOK FOR BOTH (OR MAIN)
+		local ded = SR.getListIndicatorValue(6)
+		--PANEL 6{"Active Frequency or Channel":"305.00","Asterisks on Scratchpad_lhs":"*","Asterisks on Scratchpad_rhs":"*","Bandwidth":"NB","Bandwidth_placeholder":"","COM 1 Mode":"UHF","Preset Frequency":"305.00","Preset Frequency_placeholder":"","Preset Label":"PRE     a","Preset Number":" 1","Preset Number_placeholder":"","Receiver Mode":"BOTH","Scratchpad":"305.00","Scratchpad_placeholder":"","TOD Label":"TOD"}
+		
+		if ded["Receiver Mode"] ~= nil and  ded["COM 1 Mode"] == "UHF" then
+			if ded["Receiver Mode"] == "BOTH" then
+				_f16.radio1.guard= 243.0 * 1000000
+			else
+				_f16.radio1.guard= 0
+			end
+		else
+			if _data.radios[2].freq < 1000 then
+				_f16.radio1.guard= 0
+			end
+		end
+
+		_data.radios[2].secFreq = _f16.radio1.guard
+    	    
+     end
 
     -- VHF
     _data.radios[3].name = "AN/ARC-222"
@@ -2037,8 +2082,16 @@ function SR.exportRadioF5E(_data)
 
     _data.radios[2].name = "AN/ARC-164"
     _data.radios[2].freq = SR.getRadioFrequency(23)
-    _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 309, { 0.1, 0.9 }, false)
+    _data.radios[2].volume = SR.getRadioVolume(0, 309, { 0.0, 1.0 }, false)
+
+    local modulation = SR.getSelectorPosition(327, 0.1)
+
+	--is HQ selected (A on the Radio)
+	if modulation == 0 then
+		_data.radios[2].modulation = 4
+	else
+		_data.radios[2].modulation = 0
+	end
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(307, 0.1)

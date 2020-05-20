@@ -20,6 +20,8 @@ namespace NetCoreServer
         {
             Id = Guid.NewGuid();
             Server = server;
+            OptionReceiveBufferSize = server.OptionReceiveBufferSize;
+            OptionSendBufferSize = server.OptionSendBufferSize;
         }
 
         /// <summary>
@@ -56,49 +58,11 @@ namespace NetCoreServer
         /// <summary>
         /// Option: receive buffer size
         /// </summary>
-        public int OptionReceiveBufferSize
-        {
-            get => Socket.ReceiveBufferSize;
-            set => Socket.ReceiveBufferSize = value;
-        }
+        public int OptionReceiveBufferSize { get; set; } = 8192;
         /// <summary>
         /// Option: send buffer size
         /// </summary>
-        public int OptionSendBufferSize
-        {
-            get => Socket.SendBufferSize;
-            set => Socket.SendBufferSize = value;
-        }
-        /// <summary>
-        /// Option: receive timeout in milliseconds
-        /// </summary>
-        /// <remarks>
-        /// The default value is 0, which indicates an infinite time-out period. Specifying -1 also indicates an infinite time-out period.
-        /// </remarks>
-        public int OptionReceiveTimeout
-        {
-            get => Socket.ReceiveTimeout;
-            set => Socket.ReceiveTimeout = value;
-        }
-        /// <summary>
-        /// Option: send timeout in milliseconds
-        /// </summary>
-        /// <remarks>
-        /// The default value is 0, which indicates an infinite time-out period. Specifying -1 also indicates an infinite time-out period.
-        /// </remarks>
-        public int OptionSendTimeout
-        {
-            get => Socket.SendTimeout;
-            set => Socket.SendTimeout = value;
-        }
-        /// <summary>
-        /// Option: linger state
-        /// </summary>
-        public LingerOption OptionLingerState
-        {
-            get => Socket.LingerState;
-            set => Socket.LingerState = value;
-        }
+        public int OptionSendBufferSize { get; set; } = 8192;
 
         #region Connect/Disconnect session
 
@@ -170,8 +134,7 @@ namespace NetCoreServer
         /// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
         public virtual bool Disconnect()
         {
-            lock (_sendLock)
-            {
+   
                 if (!IsConnected)
                     return false;
 
@@ -197,7 +160,7 @@ namespace NetCoreServer
                     // Update the session socket disposed flag
                     IsSocketDisposed = true;
                 }
-                catch (ObjectDisposedException) { }
+                catch (Exception) { }
 
                 // Update the connected flag
                 IsConnected = false;
@@ -217,9 +180,9 @@ namespace NetCoreServer
 
                 // Unregister session
                 Server.UnregisterSession(Id);
-            }
+            
 
-            return true;
+                return true;
         }
 
         #endregion
@@ -305,15 +268,14 @@ namespace NetCoreServer
         /// <returns>'true' if the data was successfully sent, 'false' if the session is not connected</returns>
         public virtual bool SendAsync(byte[] buffer, long offset, long size)
         {
-            lock (_sendLock)
-            {
                 if (!IsConnected)
                     return false;
 
                 if (size == 0)
                     return true;
 
-
+            lock (_sendLock)
+            {
                 // Detect multiple send handlers
                 bool sendRequired = _sendBufferMain.IsEmpty || _sendBufferFlush.IsEmpty;
 
@@ -326,11 +288,11 @@ namespace NetCoreServer
                 // Avoid multiple send handlers
                 if (!sendRequired)
                     return true;
-          
+            }
 
                 // Try to send the main buffer
                 Task.Factory.StartNew(TrySend);
-            }
+
             return true;
         }
 
@@ -440,9 +402,6 @@ namespace NetCoreServer
         /// </summary>
         private void TrySend()
         {
-            // lock the whole method
-            lock (_sendLock)
-            {
                 if (_sending)
                     return;
 
@@ -455,9 +414,8 @@ namespace NetCoreServer
                 {
                     process = false;
 
-                    if (!IsConnected)
-                        return;
-
+                lock (_sendLock)
+                {
                     if (_sending)
                         return;
 
@@ -476,7 +434,7 @@ namespace NetCoreServer
                     }
                     else
                         return;
-
+                }
 
                     // Check if the flush buffer is empty
                     if (_sendBufferFlush.IsEmpty)
@@ -498,7 +456,6 @@ namespace NetCoreServer
                         OnTrySendException(ex);
                     }
                 }
-            }
         }
 
         /// <summary>
