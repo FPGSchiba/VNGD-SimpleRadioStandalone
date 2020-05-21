@@ -42,68 +42,77 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         //used for the result
         private void StartDCSLOSBroadcastListener()
         {
-            _dcsLOSListener = new UdpClient();
-            _dcsLOSListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _dcsLOSListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
 
-            var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
-            _dcsLOSListener.Client.Bind(localEp);
+            
 
             Task.Factory.StartNew(() =>
             {
-                using (_dcsLOSListener)
+
+                while (!_stop)
                 {
-                    //    var count = 0;
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
-                            var bytes = _dcsLOSListener.Receive(ref groupEp);
-
-                            /*   Logger.Debug(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));*/
-                            var playerInfo =
-                                JsonConvert.DeserializeObject<DCSLosCheckResult[]>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            foreach (var player in playerInfo)
-                            {
-                                SRClient client;
-
-                                if (_clients.TryGetValue(player.id, out client))
-                                {
-                                    client.LineOfSightLoss = player.los;
-
-                                    //  Logger.Debug(client.ToString());
-                                }
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS Los Result Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS Los Result Message");
-                        }
-                    }
-
+                    var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
                     try
                     {
-                        _dcsLOSListener.Close();
+                        _dcsLOSListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the DCS LOS Listner Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+
+                }
+              
+                //    var count = 0;
+                while (!_stop)
+                {
+                    try
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any,0);
+                        var bytes = _dcsLOSListener.Receive(ref groupEp);
+
+                        /*   Logger.Debug(Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length));*/
+                        var playerInfo =
+                            JsonConvert.DeserializeObject<DCSLosCheckResult[]>(Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length));
+
+                        foreach (var player in playerInfo)
+                        {
+                            SRClient client;
+
+                            if (_clients.TryGetValue(player.id, out client))
+                            {
+                                client.LineOfSightLoss = player.los;
+
+                                //  Logger.Debug(client.ToString());
+                            }
+                        }
+                    }
+                    catch (SocketException e)
+                    {
+                        // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                        if (!_stop)
+                        {
+                            Logger.Error(e, "SocketException Handling DCS Los Result Message");
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Exception stoping DCS LOS Result listener ");
+                        Logger.Error(e, "Exception Handling DCS Los Result Message");
                     }
                 }
+
+                try
+                {
+                    _dcsLOSListener.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception stoping DCS LOS Result listener ");
+                }
+                
             });
         }
 

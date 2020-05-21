@@ -58,14 +58,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
             catch { }
 
-            _listener.ExclusiveAddressUse = true;
             _listener.DontFragment = true;
             _listener.Client.DontFragment = true;
             _listener.Client.Bind(new IPEndPoint(IPAddress.Any, port));
             while (!_stop)
                 try
                 {
-                    var groupEP = new IPEndPoint(IPAddress.Any, port);
+                    var groupEP = new IPEndPoint(IPAddress.Any, 0);
                     var rawBytes = _listener.Receive(ref groupEP);
 
                     if (rawBytes?.Length == 22)

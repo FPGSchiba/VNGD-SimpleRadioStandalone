@@ -18,6 +18,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
+using System.Threading;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 {
@@ -54,75 +55,76 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void Start()
         {
-            _dcsUdpListener = new UdpClient();
-            _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _dcsUdpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            //   var multicastaddress = IPAddress.Parse("239.255.50.10");
-            //      _dcsUdpListener.JoinMulticastGroup(multicastaddress);
-
-            var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
-            _dcsUdpListener.Client.Bind(localEp);
-            //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
-
             //reset last sent
             _clientStateSingleton.LastSent = 0;
 
             Task.Factory.StartNew(() =>
             {
-                using (_dcsUdpListener)
+                while (!_stop)
                 {
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
-                            var bytes = _dcsUdpListener.Receive(ref groupEp);
-
-                            var str = Encoding.UTF8.GetString(
-                                bytes, 0, bytes.Length).Trim();
-
-                            var message =
-                                JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
-
-                            Logger.Debug($"Recevied Message from DCS {str}");
-
-                            if (!string.IsNullOrWhiteSpace(message.name) && message.name != "Unknown" && message.name != _clientStateSingleton.LastSeenName)
-                            {
-                                _clientStateSingleton.LastSeenName = message.name;
-                            }
-
-                            _clientStateSingleton.DcsExportLastReceived = DateTime.Now.Ticks;
-
-                            //sync with others
-                            //Radio info is marked as Stale for FC3 aircraft after every frequency change
-
-                            ProcessRadioInfo(message);
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS Message");
-                        }
-                    }
-
+                    var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
                     try
                     {
-                        _dcsUdpListener.Close();
+                        _dcsUdpListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the DCS Export Listener Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+                }
+
+                while (!_stop)
+                {
+                    try
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any,0);
+                        var bytes = _dcsUdpListener.Receive(ref groupEp);
+
+                        var str = Encoding.UTF8.GetString(
+                            bytes, 0, bytes.Length).Trim();
+
+                        var message =
+                            JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
+
+                        Logger.Debug($"Recevied Message from DCS {str}");
+
+                        if (!string.IsNullOrWhiteSpace(message.name) && message.name != "Unknown" && message.name != _clientStateSingleton.LastSeenName)
+                        {
+                            _clientStateSingleton.LastSeenName = message.name;
+                        }
+
+                        _clientStateSingleton.DcsExportLastReceived = DateTime.Now.Ticks;
+
+                        //sync with others
+                        //Radio info is marked as Stale for FC3 aircraft after every frequency change
+
+                        ProcessRadioInfo(message);
+                    }
+                    catch (SocketException e)
+                    {
+                        // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                        if (!_stop)
+                        {
+                            Logger.Error(e, "SocketException Handling DCS Message");
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Exception stoping DCS listener ");
+                        Logger.Error(e, "Exception Handling DCS Message");
                     }
                 }
+
+                try
+                {
+                    _dcsUdpListener.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception stoping DCS listener ");
+                }
+                
             });
         }
 
@@ -155,14 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         {
             if (_dcsRadioUpdateSender == null)
             {
-                _dcsRadioUpdateSender = new UdpClient
-                {
-                    ExclusiveAddressUse = false,
-                    EnableBroadcast = true
-                };
-                _dcsRadioUpdateSender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                    true);
-                _dcsRadioUpdateSender.ExclusiveAddressUse = false;
+                _dcsRadioUpdateSender = new UdpClient();
             }
 
             try

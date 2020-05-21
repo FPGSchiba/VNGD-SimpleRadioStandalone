@@ -48,66 +48,73 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
 
         public void Start()
         {
-            _lotATCPositionListener = new UdpClient();
-            _lotATCPositionListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _lotATCPositionListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            var localEp = new IPEndPoint(IPAddress.Any,
-                _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
-            _lotATCPositionListener.Client.Bind(localEp);
+  
+            
 
             Task.Factory.StartNew(() =>
             {
-                using (_lotATCPositionListener)
+                while (!_stop)
                 {
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
-                            var bytes = _lotATCPositionListener.Receive(ref groupEp);
-
-                            var lotAtcPositionWrapper =
-                                JsonConvert.DeserializeObject<LotATCMessageWrapper>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            if (lotAtcPositionWrapper != null )
-                            {
-                                
-                                if (lotAtcPositionWrapper.los != null)
-                                {
-                                    HandleLOSResponse(lotAtcPositionWrapper.los);
-                                } 
-                                else if (lotAtcPositionWrapper.controller !=null)
-                                {
-                                    HandleLotATCUpdate(lotAtcPositionWrapper.controller);
-                                }
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling LotATC UDP Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling LotATC UDP Message");
-                        }
-                    }
-
+                    var localEp = new IPEndPoint(IPAddress.Any,
+                   _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
                     try
                     {
-                        _lotATCPositionListener.Close();
+                        _lotATCPositionListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the LotATC Export Listener Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+                }
+                
+                while (!_stop)
+                {
+                    try
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any,0);
+                        var bytes = _lotATCPositionListener.Receive(ref groupEp);
+
+                        var lotAtcPositionWrapper =
+                            JsonConvert.DeserializeObject<LotATCMessageWrapper>(Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length));
+
+                        if (lotAtcPositionWrapper != null )
+                        {
+                                
+                            if (lotAtcPositionWrapper.los != null)
+                            {
+                                HandleLOSResponse(lotAtcPositionWrapper.los);
+                            } 
+                            else if (lotAtcPositionWrapper.controller !=null)
+                            {
+                                HandleLotATCUpdate(lotAtcPositionWrapper.controller);
+                            }
+                        }
+                    }
+                    catch (SocketException e)
+                    {
+                        if (!_stop)
+                        {
+                            Logger.Error(e, "SocketException Handling LotATC UDP Message");
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Exception stoping LotATC UDP listener");
+                        Logger.Error(e, "Exception Handling LotATC UDP Message");
                     }
                 }
+
+                try
+                {
+                    _lotATCPositionListener.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception stoping LotATC UDP listener");
+                }
+                
             });
 
             StartLotATCLOSSender();

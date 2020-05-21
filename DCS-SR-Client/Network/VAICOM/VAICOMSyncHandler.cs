@@ -36,25 +36,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
         public void Start()
         {
-            _vaicomUDPListener = new UdpClient();
-            _vaicomUDPListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _vaicomUDPListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            var localEp = new IPEndPoint(IPAddress.Any,
-                _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
-            _vaicomUDPListener.Client.Bind(localEp);
+            
 
             Task.Factory.StartNew(() =>
             {
-                using (_vaicomUDPListener)
+                while (!_stop)
                 {
-                    while (!_stop)
+                    var localEp = new IPEndPoint(IPAddress.Any,
+                   _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
+                    try
+                    {
+                        _vaicomUDPListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the VAICOM Listener Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+                }
+                while (!_stop)
                     {
                         try
                         {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
+                            var groupEp = new IPEndPoint(IPAddress.Any,0);
                             var bytes = _vaicomUDPListener.Receive(ref groupEp);
 
                             var vaicomMessageWrapper =
@@ -94,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
                     {
                         Logger.Error(e, "Exception stoping VAICOM UDP listener");
                     }
-                }
+                
             });
 
           

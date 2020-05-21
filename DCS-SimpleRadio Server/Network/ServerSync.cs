@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -72,7 +73,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public void StartListening()
         {
             OptionKeepAlive = true;
-            Start();
+            try
+            {
+                Start();
+            }
+            catch(Exception ex)
+            {
+                try
+                {
+                    _natHandler?.CloseNAT();
+                }
+                catch
+                {
+                }
+
+                Logger.Error(ex,$"Unable to start the SRS Server");
+
+                MessageBox.Show($"Unable to start the SRS Server\n\nPort {_serverSettings.GetServerPort()} in use\n\nChange the port by editing the .cfg", "Port in use",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
+            }
         }
 
         public void HandleDisconnect(SRSClientSession state)
