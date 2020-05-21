@@ -82,6 +82,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         VAICOMTXInhibitEnabled,
 
         LotATCHeightOffset,
+
+        DCSAutoConnectUDP // 5069
     }
 
     public enum InputBinding
@@ -354,6 +356,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.OutgoingDCSUDPOther.ToString(), "7082"},
             {GlobalSettingsKeys.DCSIncomingGameGUIUDP.ToString(), "5068"},
             {GlobalSettingsKeys.DCSLOSIncomingUDP.ToString(), "9085"},
+            {GlobalSettingsKeys.DCSAutoConnectUDP.ToString(), "5069"},
+            
 
             {GlobalSettingsKeys.AGC.ToString(), "true"},
             {GlobalSettingsKeys.AGCTarget.ToString(), "30000"},

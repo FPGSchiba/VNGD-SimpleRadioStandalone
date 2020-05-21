@@ -202,6 +202,25 @@ namespace Installer
 
         private async void  InstallReleaseButton(object sender, RoutedEventArgs e)
         {
+            var dcScriptsPath = dcsScriptsPath.Text;
+            if ((bool)!InstallScriptsCheckbox.IsChecked)
+            {
+                dcScriptsPath = null;
+            }
+            else
+            {
+                var paths = FindValidDCSFolders(dcScriptsPath);
+
+                if (paths.Count == 0)
+                {
+                    MessageBox.Show(
+                           "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
+                           "SR Standalone Installer",
+                           MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                return;
+            }
+
             InstallButton.IsEnabled = false;
             RemoveButton.IsEnabled = false;
 
@@ -212,14 +231,8 @@ namespace Installer
             _progressBarDialog.Show();
 
             var srsPath = srPath.Text;
-            var dcScriptsPath = dcsScriptsPath.Text;
+           
             var shortcut = CreateStartMenuShortcut.IsChecked ?? true;
-
-            if ((bool) !InstallScriptsCheckbox.IsChecked)
-            {
-                dcScriptsPath = null;
-            }
-
 
             new Action(async () =>
             {
@@ -653,6 +666,11 @@ namespace Installer
             Logger.Info($"Finding DCS Saved Games Path");
             var paths = new List<string>();
 
+            if(path == null || path.Length == 0)
+            {
+                return paths;
+            }
+
             foreach (var directory in Directory.EnumerateDirectories(path))
             {
                 if (directory.ToUpper().Contains("DCS.") || directory.ToUpper().EndsWith("DCS"))
@@ -981,6 +999,13 @@ namespace Installer
 
         private async void Remove_Plugin(object sender, RoutedEventArgs e)
         {
+
+            if (!Directory.Exists(dcsScriptsPath.Text))
+            {
+                dcsScriptsPath.Text = "";
+                Logger.Info($"SRS Scripts path not valid - ignoring uninstall of scripts: {dcsScriptsPath.Text}");
+            }
+
             _progressBarDialog = new ProgressBarDialog();
             _progressBarDialog.Owner = this;
             _progressBarDialog.Show();

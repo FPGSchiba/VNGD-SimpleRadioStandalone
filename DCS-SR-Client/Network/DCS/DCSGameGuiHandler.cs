@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -33,84 +34,90 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void Start()
         {
-            _dcsGameGuiUdpListener = new UdpClient();
-            _dcsGameGuiUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress,
-                true);
-            _dcsGameGuiUdpListener.ExclusiveAddressUse = false; // only if you want to send/receive on same machine.
-
-            var localEp = new IPEndPoint(IPAddress.Any,
-                _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
-            _dcsGameGuiUdpListener.Client.Bind(localEp);
-            //   activeRadioUdpClient.Client.ReceiveTimeout = 10000;
             _clientStateSingleton.LastPostionCoalitionSent = 0;
 
             Task.Factory.StartNew(() =>
             {
-                using (_dcsGameGuiUdpListener)
+                while (!_stop)
                 {
-                    //    var count = 0;
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any,
-                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
-                            var bytes = _dcsGameGuiUdpListener.Receive(ref groupEp);
-
-                            var updatedPlayerInfo =
-                                JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
-                                    bytes, 0, bytes.Length));
-
-                            if (updatedPlayerInfo != null)
-                            {
-                                var shouldUpdate = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
-
-                                var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-
-                                bool changed = !updatedPlayerInfo.Equals(currentInfo);
-                                //copy the bits we need  - leave position
-
-                                currentInfo.name = updatedPlayerInfo.name;
-                                currentInfo.side = updatedPlayerInfo.side;
-                                currentInfo.seat = updatedPlayerInfo.seat;
-                             
-                                //this will clear any stale positions if nothing is currently connected
-                                _clientStateSingleton.ClearPositionsIfExpired();
-
-                                //only update if position is changed 
-                                if (_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent() &&  (changed || shouldUpdate))
-                                {
-                                    _clientSideUpdate();
-                                }
-                                
-                                //     count = 0;
-
-                                _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
-                            }
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS GameGUI Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS GameGUI Message");
-                        }
-                    }
-
+                    var localEp = new IPEndPoint(IPAddress.Any,
+                  _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
                     try
                     {
-                        _dcsGameGuiUdpListener.Close();
+                        _dcsGameGuiUdpListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the DCS GameGUI Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+
+                }
+
+                //    var count = 0;
+                while (!_stop)
+                {
+                    try
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any,0);
+                        var bytes = _dcsGameGuiUdpListener.Receive(ref groupEp);
+
+                        var updatedPlayerInfo =
+                            JsonConvert.DeserializeObject<DCSPlayerSideInfo>(Encoding.UTF8.GetString(
+                                bytes, 0, bytes.Length));
+
+                        if (updatedPlayerInfo != null)
+                        {
+                            var shouldUpdate = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
+                            var currentInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
+
+                            bool changed = !updatedPlayerInfo.Equals(currentInfo);
+                            //copy the bits we need  - leave position
+
+                            currentInfo.name = updatedPlayerInfo.name;
+                            currentInfo.side = updatedPlayerInfo.side;
+                            currentInfo.seat = updatedPlayerInfo.seat;
+                             
+                            //this will clear any stale positions if nothing is currently connected
+                            _clientStateSingleton.ClearPositionsIfExpired();
+
+                            //only update if position is changed 
+                            if (_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent() &&  (changed || shouldUpdate))
+                            {
+                                _clientSideUpdate();
+                            }
+                                
+                            //     count = 0;
+
+                            _clientStateSingleton.DcsGameGuiLastReceived = DateTime.Now.Ticks;
+                        }
+                    }
+                    catch (SocketException e)
+                    {
+                        // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                        if (!_stop)
+                        {
+                            Logger.Error(e, "SocketException Handling DCS GameGUI Message");
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Exception stoping DCS listener ");
+                        Logger.Error(e, "Exception Handling DCS GameGUI Message");
                     }
                 }
+
+                try
+                {
+                    _dcsGameGuiUdpListener.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception stoping DCS listener ");
+                }
+
+                
             });
         }
 

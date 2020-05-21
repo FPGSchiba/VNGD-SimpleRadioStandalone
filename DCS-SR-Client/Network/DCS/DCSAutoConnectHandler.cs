@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 
@@ -42,52 +43,61 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private void StartDcsBroadcastListener()
         {
-            _dcsUdpListener = new UdpClient();
-            _dcsUdpListener.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _dcsUdpListener.ExclusiveAddressUse = false;
-
-            var localEp = new IPEndPoint(IPAddress.Any, 5069);
-            _dcsUdpListener.Client.Bind(localEp);
-
+            
 
             Task.Factory.StartNew(() =>
             {
-                using (_dcsUdpListener)
+                while(!_stop)
                 {
-                    while (!_stop)
-                    {
-                        try
-                        {
-                            var groupEp = new IPEndPoint(IPAddress.Any, 5069);
-                            var bytes = _dcsUdpListener.Receive(ref groupEp);
-
-                            var message = Encoding.UTF8.GetString(
-                                bytes, 0, bytes.Length);
-
-                            HandleMessage(message);
-                        }
-                        catch (SocketException e)
-                        {
-                            // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                            if (!_stop)
-                            {
-                                Logger.Error(e, "SocketException Handling DCS AutoConnect Message");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, "Exception Handling DCS AutoConnect Message");
-                        }
-                    }
-
+                    var localEp = new IPEndPoint(IPAddress.Any,
+                   GlobalSettingsStore.Instance.GetNetworkSetting(GlobalSettingsKeys.DCSAutoConnectUDP));
                     try
                     {
-                        _dcsUdpListener.Close();
+                        _dcsUdpListener = new UdpClient(localEp);
+                        break;
+                    }
+                    catch(Exception ex)
+                    {
+                        Logger.Warn(ex, $"Unable to bind to the AutoConnect Socket Port: {localEp.Port}");
+                        Thread.Sleep(500);
+                    }
+                    
+                }
+
+                while (!_stop)
+                {
+                    try
+                    {
+                        var groupEp = new IPEndPoint(IPAddress.Any, 0);
+                        var bytes = _dcsUdpListener.Receive(ref groupEp);
+
+                        var message = Encoding.UTF8.GetString(
+                            bytes, 0, bytes.Length);
+
+                        HandleMessage(message);
+                    }
+                    catch (SocketException e)
+                    {
+                        // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
+                        if (!_stop)
+                        {
+                            Logger.Error(e, "SocketException Handling DCS AutoConnect Message");
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, "Exception stoping DCS AutoConnect listener ");
+                        Logger.Error(e, "Exception Handling DCS AutoConnect Message");
                     }
+                }
+                
+
+                try
+                {
+                    _dcsUdpListener.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception stoping DCS AutoConnect listener ");
                 }
             });
         }
@@ -124,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             try
             {
-                _dcsUdpListener.Close();
+                _dcsUdpListener?.Close();
             }
             catch (Exception ex)
             {
