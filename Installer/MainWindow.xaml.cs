@@ -217,8 +217,9 @@ namespace Installer
                            "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
                            "SR Standalone Installer",
                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
-                return;
+                
             }
 
             InstallButton.IsEnabled = false;
