@@ -1740,7 +1740,6 @@ function SR.exportRadioF16C(_data)
         else
             _data.radios[2].secFreq = 0
         end
-        _data.radios[2].volume = SR.getRadioVolume(0, 420, { 0.0, 1.0 }, false)
 
         -- Check UHF frequency mode (0 = MNL, 1 = PRESET, 2 = GRD)
         local _selector = SR.getSelectorPosition(416, 0.1)
