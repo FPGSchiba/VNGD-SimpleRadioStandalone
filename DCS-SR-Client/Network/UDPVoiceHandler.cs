@@ -95,8 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
 
-            //ping every 15 so after 35 seconds VoIP UDP issue
-            if (diff.Seconds > 35)
+            //ping every 10 so after 40 seconds VoIP UDP issue
+            if (diff.TotalSeconds > 41)
             {
                 _clientStateSingleton.IsVoipConnected = false;
             }
@@ -209,28 +209,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             while (!_stop)
             {
-                _ready = true;
-                try
+               if(_ready)
                 {
-                    var groupEp = new IPEndPoint(IPAddress.Any, _port);
-                    //   listener.Client.ReceiveTimeout = 3000;
-
-                    var bytes = _listener.Receive(ref groupEp);
-
-                    if (bytes?.Length == 22)
+                    try
                     {
-                        _udpLastReceived = DateTime.Now.Ticks;
-                        Logger.Info("Received Ping Back from Server");
+                        var groupEp = new IPEndPoint(IPAddress.Any, _port);
+                        //   listener.Client.ReceiveTimeout = 3000;
+
+                        var bytes = _listener.Receive(ref groupEp);
+
+                        if (bytes?.Length == 22)
+                        {
+                            _udpLastReceived = DateTime.Now.Ticks;
+                            Logger.Info("Received Ping Back from Server");
+                        }
+                        else if (bytes?.Length > 22)
+                        {
+                            _udpLastReceived = DateTime.Now.Ticks;
+                            _encodedAudio.Add(bytes);
+                        }
                     }
-                    else if (bytes?.Length > 22)
+                    catch (Exception e)
                     {
-                        _udpLastReceived = DateTime.Now.Ticks;
-                        _encodedAudio.Add(bytes);
+                        //  logger.Error(e, "error listening for UDP Voip");
                     }
-                }
-                catch (Exception e)
-                {
-                    //  logger.Error(e, "error listening for UDP Voip");
                 }
             }
 
@@ -852,12 +854,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     return;
                 }
 
+                _ready = true;
+
                 while (!_stop)
                 {
                     //Logger.Info("Pinging Server");
                     try
                     {
-                        if (!RadioSendingState.IsSending && _listener != null)
+                        if (_listener != null)
                         {
                             _listener.Send(message, message.Length,_serverEndpoint);
                         }
@@ -874,6 +878,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     {
                         return;
                     }
+
+                    TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
+
+                    //reconnect to UDP - port is no good!
+                    if (diff.TotalSeconds > 41)
+                    {
+                        Logger.Error("VoIP Timeout - Recreating VoIP Connection");
+                        _ready = false;
+                        try
+                        {
+                            _listener?.Close();
+                        }catch(Exception ex)
+                        { }
+
+                        _listener = null;
+
+                        _udpLastReceived = 0;
+
+                        _listener = new UdpClient();
+                        try
+                        {
+                            _listener.AllowNatTraversal(true);
+                        }
+                        catch { }
+
+                        try
+                        {
+                            // Force immediate ping once to avoid race condition before starting to listen
+                            _listener.Send(message, message.Length, _serverEndpoint);
+                            _ready = true;
+                            Logger.Error("VoIP Timeout - Success Recreating VoIP Connection");
+                        }
+                        catch (Exception e) {
+                            Logger.Error(e, "Exception Sending Audio Ping! " + e.Message);
+                        }
+                        
+                    }
+                   
                 }
             });
             thread.Start();
