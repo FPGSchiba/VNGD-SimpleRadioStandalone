@@ -48,6 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly CancellationTokenSource _stopFlag = new CancellationTokenSource();
 
+        private readonly int UDP_VOIP_TIMEOUT = 42; // seconds for timeout before redoing VoIP
 
         private readonly int JITTER_BUFFER = 50; //in milliseconds
 
@@ -96,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
 
             //ping every 10 so after 40 seconds VoIP UDP issue
-            if (diff.TotalSeconds > 41)
+            if (diff.TotalSeconds > UDP_VOIP_TIMEOUT)
             {
                 _clientStateSingleton.IsVoipConnected = false;
             }
@@ -882,7 +883,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
 
                     //reconnect to UDP - port is no good!
-                    if (diff.TotalSeconds > 41)
+                    if (diff.TotalSeconds > UDP_VOIP_TIMEOUT)
                     {
                         Logger.Error("VoIP Timeout - Recreating VoIP Connection");
                         _ready = false;
