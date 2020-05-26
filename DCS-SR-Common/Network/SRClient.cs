@@ -51,6 +51,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
         }
 
+        /*
+         * Wierd Memory Leak - Looks like the Colours werent cleaned up? Doing this as a work around
+         */
+        [JsonIgnore]
+        private static readonly SolidColorBrush White = new SolidColorBrush(Colors.White);
+        [JsonIgnore]
+        private static readonly SolidColorBrush Red = new SolidColorBrush(Colors.Red);
+        [JsonIgnore]
+        private static readonly SolidColorBrush Blue = new SolidColorBrush(Colors.Blue);
+
+        [JsonIgnore]
         public SolidColorBrush ClientCoalitionColour
         {
             get
@@ -58,13 +69,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 switch (Coalition)
                 {
                     case 0:
-                        return new SolidColorBrush(Colors.White);
+                        return White;
                     case 1:
-                        return new SolidColorBrush(Colors.Red);
+                        return Red;
                     case 2:
-                        return new SolidColorBrush(Colors.Blue);
+                        return Blue;
                     default:
-                        return new SolidColorBrush(Colors.White);
+                        return White;
                 }
             }
         }
@@ -127,7 +138,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         //is an SRSClientSession but dont want to include the dependancy for now
         [JsonIgnore]
         public object ClientSession { get; set; }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
