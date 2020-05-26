@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -16,43 +17,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             //I do this because at this point ProfileSettingKey hasn't been set
             //but it has when this is called
-            ChannelSelector.Loaded += InitComboBox;
+            ChannelSelector.Loaded += InitBalanceSlider;
         }
 
         public ProfileSettingsKeys ProfileSettingKey { get; set; }
 
-        private void InitComboBox(object sender, RoutedEventArgs e)
+        private void InitBalanceSlider(object sender, RoutedEventArgs e)
         {
             ChannelSelector.IsEnabled = false;
-            //cannot be inlined or it causes an issue
-            var value = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
+            Reload();
 
-            if (value == null || value == "")
-            {
-                ChannelSelector.SelectedValue = "Both";
-            }
-            else
-            {
-                ChannelSelector.SelectedValue = value;
-            }
-            
-            ChannelSelector.SelectionChanged += ChannelSelector_SelectionChanged;
-
-            ChannelSelector.IsEnabled = true;
+            ChannelSelector.ValueChanged += ChannelSelector_SelectionChanged;
         }
 
         public void Reload()
         {
             ChannelSelector.IsEnabled = false;
-            var setting = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
-            if (setting == null || setting == "")
+            var value = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
+
+            float balance = 0f;
+            if (value == null || value == "")
             {
-                ChannelSelector.SelectedValue = "Both";
+                balance = 0f;
             }
             else
             {
-                ChannelSelector.SelectedValue = setting;
+                if (!float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out balance))
+                {
+                    if (value.ToUpper() == "LEFT")
+                    {
+                        balance = -1.0f;
+                    }
+                    else if (value.ToUpper() == "BOTH")
+                    {
+                        balance = 0f;
+                    }
+                    else if (value.ToUpper() == "RIGHT")
+                    {
+                        balance = 1.0f;
+                    }
+                }
             }
+
+            GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingKey, balance.ToString(CultureInfo.InvariantCulture));
+
+            ChannelSelector.Value = balance;
+
             ChannelSelector.IsEnabled = true;
         }
 
@@ -61,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             //the selected value changes when 
             if (ChannelSelector.IsEnabled)
             {
-                var selected = (string)ChannelSelector.SelectedValue;
+                var selected = ChannelSelector.Value.ToString(CultureInfo.InvariantCulture);
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingKey, selected);
             }

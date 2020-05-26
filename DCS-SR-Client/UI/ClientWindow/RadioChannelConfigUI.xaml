@@ -8,16 +8,29 @@
              d:DesignHeight="50"
              d:DesignWidth="200"
              mc:Ignorable="d">
-    <Grid>
-        <ComboBox Name="ChannelSelector"
-                  Grid.Row="1"
-                  Grid.Column="1"
-                  SelectedValuePath="Content">
-            <ComboBoxItem>Left</ComboBoxItem>
-            <ComboBoxItem>Right</ComboBoxItem>
-            <ComboBoxItem>Both</ComboBoxItem>
-        </ComboBox>
+    <StackPanel Margin="3">
+        <Slider Name="ChannelSelector"
+                  Maximum="1.0"
+                  Minimum="-1.0"
+                  Value="0" TickPlacement="BottomRight"
+                  SmallChange="0.1" 
+                  LargeChange="0.3"
+                    IsSnapToTickEnabled="True"
+                    TickFrequency="0.1">
+        </Slider>
 
-
-    </Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" FontSize="10" Content="Left" HorizontalAlignment="Left" ></Label>
+            <Label Grid.Column="1" FontSize="10" Content="Equal" HorizontalAlignment="Center" ></Label>
+            <Label Grid.Column="2" FontSize="10" Content="Right" HorizontalAlignment="Right" ></Label>
+        </Grid>
+    </StackPanel>
 </UserControl>
