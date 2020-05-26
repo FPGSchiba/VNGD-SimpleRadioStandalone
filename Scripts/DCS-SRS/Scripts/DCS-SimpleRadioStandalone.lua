@@ -1535,7 +1535,7 @@ function SR.exportRadioFA18C(_data)
             -- check if UFC is currently displaying the GRCV for this radio
             --and change state if so
 
-            if _ufc.UFC_OptionDisplay1 == "GRCV" then
+            if _ufc and _ufc.UFC_OptionDisplay1 == "GRCV" then
 
                 if _ufc.UFC_ScratchPadNumberDisplay then
                     local _ufcFreq = tonumber(_ufc.UFC_ScratchPadNumberDisplay)
@@ -1753,7 +1753,7 @@ function SR.exportRadioF16C(_data)
 		local ded = SR.getListIndicatorValue(6)
 		--PANEL 6{"Active Frequency or Channel":"305.00","Asterisks on Scratchpad_lhs":"*","Asterisks on Scratchpad_rhs":"*","Bandwidth":"NB","Bandwidth_placeholder":"","COM 1 Mode":"UHF","Preset Frequency":"305.00","Preset Frequency_placeholder":"","Preset Label":"PRE     a","Preset Number":" 1","Preset Number_placeholder":"","Receiver Mode":"BOTH","Scratchpad":"305.00","Scratchpad_placeholder":"","TOD Label":"TOD"}
 		
-		if ded["Receiver Mode"] ~= nil and  ded["COM 1 Mode"] == "UHF" then
+		if ded and ded["Receiver Mode"] ~= nil and  ded["COM 1 Mode"] == "UHF" then
 			if ded["Receiver Mode"] == "BOTH" then
 				_f16.radio1.guard= 243.0 * 1000000
 			else
@@ -2910,7 +2910,7 @@ function SR.exportRadioAV8BNA(_data)
             -- check if LEFT UFC is currently displaying the TR-G for this radio
             --and change state if so
 
-            if _ufcScratch.ufc_right_position then
+            if _ufcScratch and _ufc and _ufcScratch.ufc_right_position then
                 local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
 
                 if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
@@ -2938,7 +2938,7 @@ function SR.exportRadioAV8BNA(_data)
             -- check if LEFT UFC is currently displaying the encryption for this radio
  
 
-            if _ufcScratch.ufc_right_position then
+            if _ufcScratch and_ufcScratch and _ufcScratch.ufc_right_position then
                 local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
 
                 if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
