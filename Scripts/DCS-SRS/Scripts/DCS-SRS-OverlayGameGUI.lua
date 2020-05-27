@@ -47,7 +47,7 @@ local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
-local WIDTH = 350
+local WIDTH = 400
 local HEIGHT = 160
 
 local _lastReceived = 0
@@ -272,12 +272,14 @@ function srsOverlay.updateRadio()
 
             local _skin = typesMessage.normal
 
-            local _isReceiving = srsOverlay.isReceiving(_i)
+            local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
 
             if _isReceiving == 1 then
                 _skin = typesMessage.receive
+				fullMessage = fullMessage .." ".._sentBy
             elseif  _isReceiving == 2 then
                 _skin = typesMessage.guard
+				fullMessage = fullMessage .." ".._sentBy
             end
 
 
@@ -303,16 +305,16 @@ function srsOverlay.isReceiving(_radioPos )
             if _rxState ~= nil and _rxState.ReceivedOn+1 == _radioPos and _rxState.IsReceiving then
 
                 if _rxState.IsSecondary then
-                    return 2
+                    return 2,_rxState.SentBy
                 end
 
-                return 1
+                return 1,_rxState.SentBy
             end
         end
 
     end
 
-    return 0
+    return 0,""
 
 end
 

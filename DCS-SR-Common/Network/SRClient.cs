@@ -61,24 +61,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         [JsonIgnore]
         private static readonly SolidColorBrush Blue = new SolidColorBrush(Colors.Blue);
 
-        [JsonIgnore]
-        public SolidColorBrush ClientCoalitionColour
-        {
-            get
-            {
-                switch (Coalition)
-                {
-                    case 0:
-                        return White;
-                    case 1:
-                        return Red;
-                    case 2:
-                        return Blue;
-                    default:
-                        return White;
-                }
-            }
-        }
+        // [JsonIgnore]
+        // public SolidColorBrush ClientCoalitionColour
+        // {
+        //     get
+        //     {
+        //         switch (Coalition)
+        //         {
+        //             case 0:
+        //                 return White;
+        //             case 1:
+        //                 return Red;
+        //             case 2:
+        //                 return Blue;
+        //             default:
+        //                 return White;
+        //         }
+        //     }
+        // }
 
         [JsonIgnore]
         public bool Muted { get; set; }

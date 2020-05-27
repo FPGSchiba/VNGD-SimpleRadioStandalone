@@ -316,7 +316,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             else
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-                var transmitting = UdpVoiceHandler.RadioSendingState;
+                var transmitting = _clientStateSingleton.RadioSendingState;
 
                 if (transmitting.IsSending)
                 {
@@ -540,7 +540,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
             else
             {
-                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
+                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
                 //check if current
 
                 if ((receiveState == null) || !receiveState.IsReceiving)

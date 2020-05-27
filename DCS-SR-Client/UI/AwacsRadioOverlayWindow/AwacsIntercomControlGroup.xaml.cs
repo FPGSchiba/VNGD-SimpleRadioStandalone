@@ -78,8 +78,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
             else
             {
-                var transmitting = UdpVoiceHandler.RadioSendingState;
-                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
+                var transmitting = _clientStateSingleton.RadioSendingState;
+                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
 
                 if ((receiveState != null) && receiveState.IsReceiving)
                 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
@@ -43,6 +44,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         public long LastPostionCoalitionSent { get; set; }
 
         private static readonly DispatcherTimer _timer = new DispatcherTimer();
+
+        public RadioSendingState RadioSendingState { get; set; }
+        public  RadioReceivingState[] RadioReceivingState { get; }
 
         private bool isConnected;
         public bool IsConnected
@@ -115,6 +119,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private ClientStateSingleton()
         {
+            RadioSendingState = new RadioSendingState();
+            RadioReceivingState = new RadioReceivingState[11];
+
             ShortGUID = ShortGuid.NewGuid();
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
