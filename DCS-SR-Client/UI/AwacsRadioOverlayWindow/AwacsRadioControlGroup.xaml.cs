@@ -532,11 +532,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         internal void RepaintRadioReceive()
         {
+            TransmitterName.Visibility = Visibility.Collapsed;
+            RadioFrequency.Visibility = Visibility.Visible;
+            RadioMetaData.Visibility = Visibility.Visible;
+
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if (dcsPlayerRadioInfo == null)
             {
                 RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
                 RadioMetaData.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                
             }
             else
             {
@@ -551,13 +556,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
+                    if (receiveState.SentBy.Length > 0)
+                    {
+                        TransmitterName.Text = receiveState.SentBy;
+
+                        TransmitterName.Visibility = Visibility.Visible;
+                        RadioFrequency.Visibility = Visibility.Collapsed;
+                        RadioMetaData.Visibility = Visibility.Collapsed;
+
+                    }
                     if (receiveState.IsSecondary)
                     {
+                        TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
                         RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
                         RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
                     }
                     else
                     {
+                        TransmitterName.Foreground = new SolidColorBrush(Colors.White);
                         RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
                         RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
                     }

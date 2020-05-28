@@ -91,8 +91,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             foreach (var radio in radioControlGroup)
             {
-                radio.RepaintRadioReceive();
                 radio.RepaintRadioStatus();
+                radio.RepaintRadioReceive();
             }
 
             Intercom.RepaintRadioStatus();

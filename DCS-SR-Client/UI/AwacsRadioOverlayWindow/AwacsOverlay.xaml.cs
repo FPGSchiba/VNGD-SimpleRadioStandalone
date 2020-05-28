@@ -94,8 +94,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             foreach (var radio in radioControlGroup)
             {
-                radio.RepaintRadioReceive();
                 radio.RepaintRadioStatus();
+                radio.RepaintRadioReceive();
             }
 
             intercom.RepaintRadioStatus();

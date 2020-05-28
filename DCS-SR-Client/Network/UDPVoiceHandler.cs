@@ -461,10 +461,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 }
                                             }
 
-                                            SRClient transmittingClient;
-                                            if (_clients.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
-                                            {
+                                            var transmitterName = "";
+                                            if (//_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) &&
+                                                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)
+                                                && _clients.TryGetValue(udpVoicePacket.Guid, out var transmittingClient))
 
+                                            {
+                                                transmitterName = transmittingClient.Name;
                                             }
 
                                             var newRadioReceivingState =  new RadioReceivingState
@@ -474,12 +477,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 LastReceviedAt = DateTime.Now.Ticks,
                                                 PlayedEndOfTransmission = false,
                                                 ReceivedOn = destinationRadio.ReceivingState.ReceivedOn,
+                                                SentBy = transmitterName
                                             };
-
-                                            if (transmittingClient != null)
-                                            {
-                                                newRadioReceivingState.SentBy = transmittingClient.Name;
-                                            }
 
                                             _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
 

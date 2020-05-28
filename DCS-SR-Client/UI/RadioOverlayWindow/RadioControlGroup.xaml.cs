@@ -466,6 +466,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
+                    if (receiveState.SentBy.Length > 0)
+                    {
+                        RadioFrequency.Text = receiveState.SentBy;
+                    }
+
                     if (receiveState.IsSecondary)
                     {
                         RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);

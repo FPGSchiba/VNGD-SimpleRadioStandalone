@@ -51,34 +51,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
         }
 
-        /*
-         * Wierd Memory Leak - Looks like the Colours werent cleaned up? Doing this as a work around
-         */
         [JsonIgnore]
-        private static readonly SolidColorBrush White = new SolidColorBrush(Colors.White);
-        [JsonIgnore]
-        private static readonly SolidColorBrush Red = new SolidColorBrush(Colors.Red);
-        [JsonIgnore]
-        private static readonly SolidColorBrush Blue = new SolidColorBrush(Colors.Blue);
-
-        // [JsonIgnore]
-        // public SolidColorBrush ClientCoalitionColour
-        // {
-        //     get
-        //     {
-        //         switch (Coalition)
-        //         {
-        //             case 0:
-        //                 return White;
-        //             case 1:
-        //                 return Red;
-        //             case 2:
-        //                 return Blue;
-        //             default:
-        //                 return White;
-        //         }
-        //     }
-        // }
+        public SolidColorBrush ClientCoalitionColour
+        {
+            get
+            {
+                switch (Coalition)
+                {
+                    case 0:
+                        return new SolidColorBrush(Colors.White);
+                    case 1:
+                        return new SolidColorBrush(Colors.Red);
+                    case 2:
+                        return new SolidColorBrush(Colors.Blue);
+                    default:
+                        return new SolidColorBrush(Colors.White);
+                }
+            }
+        }
 
         [JsonIgnore]
         public bool Muted { get; set; }

@@ -47,7 +47,7 @@ local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
-local WIDTH = 400
+local WIDTH = 420
 local HEIGHT = 160
 
 local _lastReceived = 0

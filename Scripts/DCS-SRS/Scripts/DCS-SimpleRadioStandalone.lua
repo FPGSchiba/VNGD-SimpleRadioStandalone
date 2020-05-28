@@ -2938,7 +2938,7 @@ function SR.exportRadioAV8BNA(_data)
             -- check if LEFT UFC is currently displaying the encryption for this radio
  
 
-            if _ufcScratch and_ufcScratch and _ufcScratch.ufc_right_position then
+            if _ufcScratch and _ufcScratch and _ufcScratch.ufc_right_position then
                 local _ufcFreq = tonumber(_ufcScratch.ufc_right_position)
 
                 if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
