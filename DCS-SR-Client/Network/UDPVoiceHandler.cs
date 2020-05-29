@@ -462,8 +462,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             }
 
                                             var transmitterName = "";
-                                            if (//_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) &&
-                                                 _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)
+                                            if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
+                                                && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)
                                                 && _clients.TryGetValue(udpVoicePacket.Guid, out var transmittingClient))
 
                                             {
