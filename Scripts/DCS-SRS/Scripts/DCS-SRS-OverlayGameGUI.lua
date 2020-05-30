@@ -183,7 +183,7 @@ function srsOverlay.updateRadio()
 				fullMessage = _radio.name.." - "
 				if  _radio.channel > 0 then
 
-                    if _compactMode and (_isReceiving == 1 or _isReceiving == 2) then
+                    if _compactMode and (_isReceiving == 1 or _isReceiving == 2) and _sentBy ~= "" then
                         fullMessage = fullMessage .._sentBy
                     else
                        
@@ -218,7 +218,7 @@ function srsOverlay.updateRadio()
             else
                  fullMessage = _radio.name.." - "
 
-                 if _compactMode and (_isReceiving == 1 or _isReceiving == 2) then
+                 if _compactMode and (_isReceiving == 1 or _isReceiving == 2) and _sentBy ~= "" then
                     fullMessage = fullMessage .._sentBy
                  else
                      fullMessage = fullMessage..string.format("%.3f", _radio.freq/1000000.0)
