@@ -83,7 +83,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         LotATCHeightOffset,
 
-        DCSAutoConnectUDP // 5069
+        DCSAutoConnectUDP, // 5069
+        ShowTransmitterName
     }
 
     public enum InputBinding
@@ -388,7 +389,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
-            
+            {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
+
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()

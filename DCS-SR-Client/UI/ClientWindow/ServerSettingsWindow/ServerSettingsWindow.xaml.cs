@@ -62,6 +62,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 TunedClientCount.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TUNED_COUNT) ? "ON" : "OFF";
 
+                ShowTransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? "ON" : "OFF";
+
                 ServerVersion.Content = SRSClientSyncHandler.ServerVersion;
             }
             catch (IndexOutOfRangeException ex)

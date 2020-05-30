@@ -206,30 +206,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void AdjustVolume(ClientAudio clientAudio)
         {
-            if(clientAudio.Modulation == (short) Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
-            {
-                return;
-            }
 
             var audio = clientAudio.PcmAudioShort;
             for (var i = 0; i < audio.Length; i++)
             {
                 var speaker1Short = (short) (audio[i] * clientAudio.Volume);
 
-                //add in radio loss
-                //if less than loss reduce volume
-                if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
+                if (clientAudio.Modulation == (short)Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
                 {
-                    //gives linear signal loss from 15% down to 0%
-                    speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.RecevingPower));
+                   //nothing
                 }
-
-                //0 is no loss so if more than 0 reduce volume
-                if (clientAudio.LineOfSightLoss > 0)
+                else
                 {
-                    speaker1Short = (short) (speaker1Short * (1.0f - clientAudio.LineOfSightLoss));
-                }
+                    //add in radio loss
+                    //if less than loss reduce volume
+                    if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
+                    {
+                        //gives linear signal loss from 15% down to 0%
+                        speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.RecevingPower));
+                    }
 
+                    //0 is no loss so if more than 0 reduce volume
+                    if (clientAudio.LineOfSightLoss > 0)
+                    {
+                        speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.LineOfSightLoss));
+                    }
+                }
+          
                 audio[i] = speaker1Short;
             }
         }

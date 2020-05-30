@@ -51,6 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
         }
 
+        [JsonIgnore]
         public SolidColorBrush ClientCoalitionColour
         {
             get
@@ -127,7 +128,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         //is an SRSClientSession but dont want to include the dependancy for now
         [JsonIgnore]
         public object ClientSession { get; set; }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
