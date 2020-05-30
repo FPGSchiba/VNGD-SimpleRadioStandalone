@@ -1,7 +1,7 @@
 --DATIS OPTIONS PAGE
 
 local leftMargin = 56
-local width = 750
+local width = 850
 
 -- Skins
 
@@ -185,6 +185,49 @@ dialog = {
 							},
 							["enabled"] = true,
 							["text"] = "$DCS_SRS_AUTO_LAUNCH_INFO_2",
+							["tooltip"] = "",
+							["visible"] = true,
+							["zindex"] = 0,
+						},
+						["skin"] = HelpSkin,
+						["type"] = "Static",
+					},
+
+					-----------------------------------------------
+
+					-----------------------------------------------
+					-- SRS Compact Mode
+					-----------------------------------------------
+					["srsOverlayCompactModeEnabledCheckbox"] = {
+						["params"] = {
+							["bounds"] = {
+								["x"] = leftMargin,
+								["y"] = 300,
+								["w"] = width,
+								["h"] = 20,
+							},
+							["enabled"] = true,
+							["state"] = false,
+							["text"] = "$DCS_SRS_OVERLAY_COMPACT",
+							["tooltip"] = "",
+							["visible"] = true,
+							["zindex"] = 0,
+							["tabOrder"] = 0,
+						},
+						["skin"] = CheckBoxSkin,
+						["type"] = "CheckBox",
+					},
+
+					["srsCompactModeCheckboxLabel"] = {
+						["params"] = {
+							["bounds"] = {
+								["x"] = leftMargin,
+								["y"] = 320,
+								["w"] = width,
+								["h"] = 90,
+							},
+							["enabled"] = true,
+							["text"] = "$DCS_SRS_OVERLAY_COMPACT_INFO",
 							["tooltip"] = "",
 							["visible"] = true,
 							["zindex"] = 0,

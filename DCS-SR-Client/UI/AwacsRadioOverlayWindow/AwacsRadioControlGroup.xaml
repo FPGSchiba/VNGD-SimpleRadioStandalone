@@ -135,7 +135,19 @@
                            Style="{x:Null}"
                            Text="AM"
                            TextAlignment="Center"
-                           TextWrapping="Wrap" />
+                           TextWrapping="NoWrap" />
+                <TextBlock x:Name="TransmitterName"
+                           Width="140"
+                           Height="15"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Background="Black"
+                           Foreground="#00FF00"
+                           Style="{x:Null}"
+                           Text="USER"
+                           Visibility="Collapsed"
+                           TextAlignment="Center"
+                           TextWrapping="NoWrap" />
 
                 <Ellipse x:Name="RadioActive"
                          Width="10"

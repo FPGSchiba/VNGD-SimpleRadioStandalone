@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-                var transmitting = UdpVoiceHandler.RadioSendingState;
+                var transmitting = _clientStateSingleton.RadioSendingState;
                 if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
                 {
 

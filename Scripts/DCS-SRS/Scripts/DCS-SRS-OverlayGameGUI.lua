@@ -47,7 +47,7 @@ local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
-local WIDTH = 350
+local WIDTH = 420
 local HEIGHT = 160
 
 local _lastReceived = 0
@@ -97,6 +97,9 @@ end
 
 
 function srsOverlay.updateRadio()    
+
+
+    local _compactMode = base.OptionsData.getPlugin("DCS-SRS","srsOverlayCompactModeEnabled")
 
     _listMessages = {}
 
@@ -173,18 +176,24 @@ function srsOverlay.updateRadio()
 
             local fullMessage
 
+            local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
+
 			if  _radio.modulation == 5 or _radio.modulation == 6 then 
 
 				fullMessage = _radio.name.." - "
 				if  _radio.channel > 0 then
 
-					if _radio.channel >= 0 then
-						fullMessage = fullMessage.." CHN ".._radio.channel
-					end
+                    if _compactMode and (_isReceiving == 1 or _isReceiving == 2) then
+                        fullMessage = fullMessage .._sentBy
+                    else
+                       
+                        fullMessage = fullMessage.." CHN ".._radio.channel
+                    
+                        if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+                            fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+                        end
 
-					if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
-						fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
-					end
+                    end
 
 					local tuned = _radioState.TunedClients
 
@@ -207,8 +216,11 @@ function srsOverlay.updateRadio()
                      fullMessage = "INTERCOM "
                 
             else
-                     fullMessage = _radio.name.." - "
+                 fullMessage = _radio.name.." - "
 
+                 if _compactMode and (_isReceiving == 1 or _isReceiving == 2) then
+                    fullMessage = fullMessage .._sentBy
+                 else
                      fullMessage = fullMessage..string.format("%.3f", _radio.freq/1000000.0)
 
          --            srsOverlay.log( _radio.freq)
@@ -236,18 +248,17 @@ function srsOverlay.updateRadio()
                      if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
                         fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
                     end
+                end
 
-                    local tuned = _radioState.TunedClients
+                local tuned = _radioState.TunedClients
 
-                    if tuned then
-                        local tunedRadio = tuned[_i]
+                if tuned then
+                    local tunedRadio = tuned[_i]
 
-                        if tunedRadio > 0 then
-                            fullMessage  = fullMessage.." ⚡"..tunedRadio
-                        end
-
+                    if tunedRadio > 0 then
+                        fullMessage  = fullMessage.." ⚡"..tunedRadio
                     end
-
+                end
             end
 
             local _selected = _i == (_radioInfo.selected+1)
@@ -272,14 +283,19 @@ function srsOverlay.updateRadio()
 
             local _skin = typesMessage.normal
 
-            local _isReceiving = srsOverlay.isReceiving(_i)
-
             if _isReceiving == 1 then
                 _skin = typesMessage.receive
+
+                if not _compactMode then 
+                    fullMessage = fullMessage .." ".._sentBy
+                end
             elseif  _isReceiving == 2 then
                 _skin = typesMessage.guard
-            end
 
+				if not _compactMode then 
+                    fullMessage = fullMessage .." ".._sentBy
+                end
+            end
 
             local msg = {message = fullMessage, skin =_skin, height = 20 }
 
@@ -303,16 +319,16 @@ function srsOverlay.isReceiving(_radioPos )
             if _rxState ~= nil and _rxState.ReceivedOn+1 == _radioPos and _rxState.IsReceiving then
 
                 if _rxState.IsSecondary then
-                    return 2
+                    return 2,_rxState.SentBy
                 end
 
-                return 1
+                return 1,_rxState.SentBy
             end
         end
 
     end
 
-    return 0
+    return 0,""
 
 end
 
@@ -547,10 +563,10 @@ end
 
 function srsOverlay.onSimulationFrame()
 
-    if not base.OptionsData then
-        --srsOverlay.log("NO Options Data")
-        return
-    end
+    -- if not base.OptionsData then
+    --     --srsOverlay.log("NO Options Data")
+    --     return
+    -- end
 
     if srsOverlay.config == nil then
         srsOverlay.loadConfiguration()
@@ -568,7 +584,14 @@ function srsOverlay.onSimulationFrame()
 
     if srsOverlay.listen() then
 
-        srsOverlay.updateRadio()
+        local _status, _result = base.pcall(function() 
+            srsOverlay.updateRadio()
+        end)
+
+        if not _status then
+            srsOverlay.log("Error: ".._result)
+        end
+        
     else
         local _now = os.clock()
 

@@ -121,7 +121,7 @@
                            Style="{x:Null}"
                            Text="000.00AM"
                            TextAlignment="Center"
-                           TextWrapping="Wrap" />
+                           TextWrapping="NoWrap" />
 
                 <Ellipse x:Name="RadioActive"
                          Width="12"

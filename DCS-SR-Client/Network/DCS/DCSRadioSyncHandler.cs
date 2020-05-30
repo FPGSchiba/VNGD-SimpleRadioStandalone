@@ -185,8 +185,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 var combinedState = new CombinedRadioState()
                 {
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    RadioSendingState = UdpVoiceHandler.RadioSendingState,
-                    RadioReceivingState = UdpVoiceHandler.RadioReceivingState,
+                    RadioSendingState = _clientStateSingleton.RadioSendingState,
+                    RadioReceivingState = _clientStateSingleton.RadioReceivingState,
                     ClientCountConnected = _clients.Total,
                     TunedClients = tunedClients,
                 };
@@ -521,9 +521,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
 
             //HANDLE MIC IDENT
-            if (!playerRadioInfo.ptt && playerRadioInfo.iff.mic >0 && UdpVoiceHandler.RadioSendingState.IsSending)
+            if (!playerRadioInfo.ptt && playerRadioInfo.iff.mic >0 && _clientStateSingleton.RadioSendingState.IsSending)
             {
-                if (UdpVoiceHandler.RadioSendingState.SendingOn == playerRadioInfo.iff.mic)
+                if (_clientStateSingleton.RadioSendingState.SendingOn == playerRadioInfo.iff.mic)
                 {
                     playerRadioInfo.iff.status = Transponder.IFFStatus.IDENT;
                 }

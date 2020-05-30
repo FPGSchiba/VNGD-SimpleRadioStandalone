@@ -226,7 +226,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     return;
                 }
 
-                var transmitting = UdpVoiceHandler.RadioSendingState;
+                var transmitting = _clientStateSingleton.RadioSendingState;
                 if (RadioId == dcsPlayerRadioInfo.selected)
                 {
 
@@ -456,7 +456,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
             else
             {
-                var receiveState = UdpVoiceHandler.RadioReceivingState[RadioId];
+                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
                 //check if current
 
                 if ((receiveState == null) || !receiveState.IsReceiving)
@@ -466,6 +466,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else if ((receiveState != null) && receiveState.IsReceiving)
                 {
+                    if (receiveState.SentBy.Length > 0)
+                    {
+                        RadioFrequency.Text = receiveState.SentBy;
+                    }
+
                     if (receiveState.IsSecondary)
                     {
                         RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);

@@ -61,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.LOTATC_EXPORT_PORT.ToString(), "10712" },
             { ServerSettingsKeys.LOTATC_EXPORT_IP.ToString(), "127.0.0.1" },
             { ServerSettingsKeys.UPNP_ENABLED.ToString(), "true" },
+            { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
         };
     }
 }

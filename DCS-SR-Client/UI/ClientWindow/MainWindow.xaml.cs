@@ -626,6 +626,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             AutoSelectInputProfile.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoSelectSettingsProfile);
 
             VAICOMTXInhibitEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled);
+
+            ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
         }
 
         private void ReloadProfileSettings()
@@ -1666,6 +1668,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _clientListWindow?.Close();
                 _clientListWindow = null;
             }
+        }
+
+        private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
+        { 
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
         }
     }
 }
