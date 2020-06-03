@@ -24,17 +24,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 UnitId = 1,
                 Encryptions = new byte[] { 0 },
                 Modulations = new byte[] { 4 },
+                TransmissionBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
                 PacketNumber = 1
             };
 
             var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
 
-            Assert.AreEqual(56, udpVoicePacket.PacketLength);
-            Assert.AreEqual(56, encodedUdpVoicePacket.Length);
+            Assert.AreEqual(78, udpVoicePacket.PacketLength);
+            Assert.AreEqual(78, encodedUdpVoicePacket.Length);
 
-            var expectedEncodedUdpVoicePacket = new byte[56] {
+            var expectedEncodedUdpVoicePacket = new byte[78] {
                 // Total packet length
-                56, 0,
+                78, 0,
                 // Length of audio part
                 6, 0,
                 // Length of frequencies part
@@ -51,6 +52,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 1, 0, 0, 0,
                 // Packet ID
                 1, 0, 0, 0, 0, 0, 0, 0,
+                // Transmission GUID
+                117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65,
                 // Client GUID
                 117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65
             };
@@ -61,9 +64,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
         [TestMethod()]
         public void DecodeInitialVoicePacket()
         {
-            var encodedUdpVoicePacket = new byte[56] {
+            var encodedUdpVoicePacket = new byte[78] {
                 // Total packet length
-                56, 0,
+                78, 0,
                 // Length of audio part
                 6, 0,
                 // Length of frequencies part
@@ -80,6 +83,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 1, 0, 0, 0,
                 // Packet ID
                 1, 0, 0, 0, 0, 0, 0, 0,
+                // Transmission GUID
+                117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65,
                 // Client GUID
                 117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65
             };
@@ -95,6 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
             CollectionAssert.AreEqual(new byte[] { 4 }, udpVoicePacket.Modulations);
             Assert.AreEqual((ulong)1, udpVoicePacket.PacketNumber);
             Assert.AreEqual((ushort)56, udpVoicePacket.PacketLength);
+            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.TransmissionGuid);
         }
 
         [TestMethod()]
@@ -109,17 +115,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 UnitId = 1,
                 Encryptions = new byte[] { 0, 0, 1 },
                 Modulations = new byte[] { 0, 1, 0 },
-                PacketNumber = 1
+                PacketNumber = 1,
+                TransmissionBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
             };
-
+        
             var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
-
-            Assert.AreEqual(76, udpVoicePacket.PacketLength);
-            Assert.AreEqual(76, encodedUdpVoicePacket.Length);
-
-            var expectedEncodedUdpVoicePacket = new byte[76] {
+        
+            Assert.AreEqual(98, udpVoicePacket.PacketLength);
+            Assert.AreEqual(98, encodedUdpVoicePacket.Length);
+        
+            var expectedEncodedUdpVoicePacket = new byte[98] {
                 // Total packet length
-                76, 0,
+                98, 0,
                 // Length of audio part
                 6, 0,
                 // Length of frequencies part
@@ -148,19 +155,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 1, 0, 0, 0,
                 // Packet ID
                 1, 0, 0, 0, 0, 0, 0, 0,
+                // Transmission GUID
+                117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65,
                 // Client GUID
                 117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65
             };
-
+        
             CollectionAssert.AreEqual(expectedEncodedUdpVoicePacket, encodedUdpVoicePacket);
         }
-
+        
         [TestMethod()]
         public void DecodeMultipleFrequencyVoicePacket()
         {
-            var encodedUdpVoicePacket = new byte[76] {
+            var encodedUdpVoicePacket = new byte[98] {
                 // Total packet length
-                76, 0,
+                98, 0,
                 // Length of audio part
                 6, 0,
                 // Length of frequencies part
@@ -189,13 +198,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 1, 0, 0, 0,
                 // Packet ID
                 1, 0, 0, 0, 0, 0, 0, 0,
+                // Transmission GUID
+                117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65,
                 // Client GUID
                 117, 102, 89, 83, 95, 87, 108, 76, 86, 107, 109, 70, 80, 106, 113, 67, 103, 120, 122, 54, 71, 65
             };
-
+        
             var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedUdpVoicePacket);
-
+        
             Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.Guid);
+            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.TransmissionGuid);
             CollectionAssert.AreEqual(new byte[] { 0, 1, 2, 3, 4, 5 }, udpVoicePacket.AudioPart1Bytes);
             Assert.AreEqual(6, udpVoicePacket.AudioPart1Length);
             CollectionAssert.AreEqual(new double[] { 251000000, 30000000, 251000000 }, udpVoicePacket.Frequencies);
@@ -203,7 +215,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
             CollectionAssert.AreEqual(new byte[] { 0, 0, 1 }, udpVoicePacket.Encryptions);
             CollectionAssert.AreEqual(new byte[] { 0, 1, 0 }, udpVoicePacket.Modulations);
             Assert.AreEqual((ulong)1, udpVoicePacket.PacketNumber);
-            Assert.AreEqual((ushort)76, udpVoicePacket.PacketLength);
+            Assert.AreEqual((ushort)98, udpVoicePacket.PacketLength);
         }
     }
 }

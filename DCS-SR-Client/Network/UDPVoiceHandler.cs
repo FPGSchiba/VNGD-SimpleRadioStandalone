@@ -804,7 +804,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                             Encryptions = encryptions.ToArray(),
                             Modulations = modulations.ToArray(),
-                            PacketNumber = _packetNumber++
+                            PacketNumber = _packetNumber++,
+                            TransmissionBytes = _guidAsciiBytes
                         };
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();

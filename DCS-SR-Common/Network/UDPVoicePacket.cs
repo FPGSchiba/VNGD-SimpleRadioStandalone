@@ -20,7 +20,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
        * - FIXED SEGMENT
        * UInt UnitId - 4 bytes
        * UInt64 PacketId - 8 bytes
-       * Bytes / ASCII String GUID - 22 bytes
+       * Bytes / ASCII String TRANSMISSION GUID - 22 bytes used for transmission relay
+       * Bytes / ASCII String CLIENT GUID - 22 bytes
        */
 
     public class UDPVoicePacket
@@ -42,6 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public static readonly int FixedPacketLength =
             sizeof(uint) // UInt UnitId - 4 bytes
             + sizeof(ulong) // UInt64 PacketId - 8 bytes
+            + GuidLength  // Bytes / ASCII String Transmission GUID - 22 bytes
             + GuidLength; // Bytes / ASCII String GUID - 22 bytes
 
         // HEADER SEGMENT
@@ -70,6 +72,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public uint UnitId { get; set; }
         public byte[] GuidBytes { get; set; }
         public string Guid { get; set; }
+
+        public byte[] TransmissionBytes { get; set; }
+        public string TransmissionGuid { get; set; }
         public ulong PacketNumber { get; set; }
 
         public byte[] EncodePacket()
@@ -170,6 +175,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             combinedBytes[fixedSegmentOffset + 10] = packetNumber[6];
             combinedBytes[fixedSegmentOffset + 11] = packetNumber[7];
 
+            //Copy Transmission nearly at the end - just before the clientGUID
+            Buffer.BlockCopy(TransmissionBytes, 0, combinedBytes, totalPacketLength - (GuidLength + GuidLength), GuidLength);
+
             // Copy client GUID to end of packet
             Buffer.BlockCopy(GuidBytes, 0, combinedBytes, totalPacketLength - GuidLength, GuidLength);
 
@@ -180,11 +188,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         {
             try
             {
-
-
                 // Last 22 bytes of packet are always the client GUID
                 var receivingGuid = Encoding.ASCII.GetString(
                     encodedOpusAudio, encodedOpusAudio.Length - GuidLength, GuidLength);
+
+                //Copy Transmission nearly at the end - just before the client GUID
+                var transmissionGuid = Encoding.ASCII.GetString(
+                    encodedOpusAudio, encodedOpusAudio.Length - (GuidLength + GuidLength), GuidLength);
 
                 var packetLength = BitConverter.ToUInt16(encodedOpusAudio, 0);
 
@@ -230,7 +240,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                     Encryptions = encryptions,
                     Modulations = modulations,
                     PacketNumber = packetNumber,
-                    PacketLength = packetLength
+                    PacketLength = packetLength,
+                    TransmissionGuid = transmissionGuid
                 };
             }
             catch (Exception ex)
