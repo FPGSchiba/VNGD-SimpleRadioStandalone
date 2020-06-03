@@ -1,4 +1,4 @@
--- Version 1.8.0.5
+-- Version 1.8.0.6
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
@@ -104,7 +104,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     simultaneousTransmissionControl = 0,
                     unitId = 0,
                     ptt = false,
-					capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
+                    capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
                     radios = {
                         -- Radio 1 is always Intercom
                         { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false },
@@ -169,6 +169,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                     _update = SR.exportRadioF5E(_update)
                 elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
                     _update = SR.exportRadioP51(_update)
+                elseif _update.unit == "P-47D-30"then
+                    _update = SR.exportRadioP47(_update)
                 elseif _update.unit == "FW-190D9" or _update.unit == "FW-190A8" then
                     _update = SR.exportRadioFW190(_update)
                 elseif _update.unit == "Bf-109K-4" then
@@ -255,7 +257,7 @@ LuaExportActivityNextEvent = function(tCurrent)
                     unit = "CA",
                     selected = 1,
                     ptt = false,
-					capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
+                    capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
                     simultaneousTransmissionControl = 1,
                     latLng = { lat = 0, lng = 0, alt = 0 },
                     unitId = 100000001, -- pass through starting unit id here
@@ -752,16 +754,16 @@ end
 
 function SR.exportRadioUH1H(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
-	local intercomOn =  SR.getButtonPosition(27)
+    local intercomOn =  SR.getButtonPosition(27)
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
 
     if intercomOn < 0.5 then
-    	_data.radios[1].modulation = 3
+        _data.radios[1].modulation = 3
     end
 
     local fmOn =  SR.getButtonPosition(23)
@@ -771,7 +773,7 @@ function SR.exportRadioUH1H(_data)
     _data.radios[2].volume = SR.getRadioVolume(0, 37, { 0.3, 1.0 }, true)
 
     if fmOn < 0.5 then
-    	_data.radios[2].freq = 1
+        _data.radios[2].freq = 1
     end
 
     local uhfOn =  SR.getButtonPosition(24)
@@ -788,8 +790,8 @@ function SR.exportRadioUH1H(_data)
     end
 
     if uhfOn < 0.5 then
-    	_data.radios[3].freq = 1
-    	_data.radios[3].channel = -1
+        _data.radios[3].freq = 1
+        _data.radios[3].channel = -1
     end
 
     --guard mode for UHF Radio
@@ -805,7 +807,7 @@ function SR.exportRadioUH1H(_data)
     _data.radios[4].volume = SR.getRadioVolume(0, 9, { 0.0, 0.60 }, false)
 
     if vhfOn < 0.5 then
-    	_data.radios[4].freq = 1
+        _data.radios[4].freq = 1
     end
 
     --_device:get_argument_value(_arg)
@@ -898,7 +900,7 @@ end
 
 function SR.exportRadioSA342(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -973,7 +975,7 @@ end
 
 function SR.exportRadioKA50(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     local _panel = GetDevice(0)
 
@@ -1025,7 +1027,7 @@ function SR.exportRadioKA50(_data)
 end
 function SR.exportRadioMI8(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     -- Doesnt work but might as well allow selection
     _data.radios[1].name = "Intercom"
@@ -1099,7 +1101,7 @@ end
 
 function SR.exportRadioL39(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -1158,7 +1160,7 @@ end
 
 function SR.exportRadioEagleII(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -1220,7 +1222,7 @@ end
 
 function SR.exportRadioYak52(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -1279,7 +1281,7 @@ end
 --for A10C
 function SR.exportRadioA10C(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
@@ -1307,14 +1309,14 @@ function SR.exportRadioA10C(_data)
     _data.radios[3].name = "AN/ARC-164 UHF"
     _data.radios[3].freq = SR.getRadioFrequency(54)
     
-	local modulation = SR.getSelectorPosition(162, 0.1)
+    local modulation = SR.getSelectorPosition(162, 0.1)
 
-	--is HQ selected (A on the Radio)
-	if modulation == 2 then
-		_data.radios[3].modulation = 4
-	else
-		_data.radios[3].modulation = 0
-	end
+    --is HQ selected (A on the Radio)
+    if modulation == 2 then
+        _data.radios[3].modulation = 4
+    else
+        _data.radios[3].modulation = 0
+    end
 
 
     _data.radios[3].volume = SR.getRadioVolume(0, 171, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 238, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 227, { 0.0, 1.0 }, false) * SR.getButtonPosition(228)
@@ -1483,19 +1485,19 @@ From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
 
 ARC-210(RT-1556 and DCS)
 
-Frequency Band(MHz) Modulation 	Guard Channel (MHz)
-	30 to 87.995 		FM
-	*108 to 135.995 	AM 			121.5
-	136 to 155.995 		AM/FM
-	156 to 173.995 		FM
-	225 to 399.975 		AM/FM 		243.0 (AM)
+Frequency Band(MHz) Modulation  Guard Channel (MHz)
+    30 to 87.995        FM
+    *108 to 135.995     AM          121.5
+    136 to 155.995      AM/FM
+    156 to 173.995      FM
+    225 to 399.975      AM/FM       243.0 (AM)
 
 *Cannot transmit on 108 thru 117.995 MHz
 ]]--
 
 function SR.exportRadioFA18C(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     local _ufc = SR.getListIndicatorValue(6)
 
@@ -1680,14 +1682,14 @@ function SR.exportRadioFA18C(_data)
 
     _fa18.radio3.channel = midsAChannel
 
-	_data.radios[4].name = "MIDS A"
+    _data.radios[4].name = "MIDS A"
     _data.radios[4].modulation = 6
     _data.radios[4].volume = SR.getRadioVolume(0, 362, { 0.0, 1.0 }, false)
     _data.radios[4].encMode = 2 -- Mode 2 is set by aircraft
 
     if midsAChannel < 127 and _fa18.radio3.channel > 0 then
         _data.radios[4].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsAChannel)
-		_data.radios[4].channel = midsAChannel
+        _data.radios[4].channel = midsAChannel
     else
         _data.radios[4].freq = 1
         _data.radios[4].channel = -1
@@ -1699,10 +1701,10 @@ function SR.exportRadioFA18C(_data)
     -- Set MIDS data
     _fa18.radio4.channel = midsBChannel
 
-	_data.radios[5].name = "MIDS B"
-	_data.radios[5].modulation = 6
-	_data.radios[5].volume = SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
-	_data.radios[5].encMode = 2 -- Mode 2 is set by aircraft
+    _data.radios[5].name = "MIDS B"
+    _data.radios[5].modulation = 6
+    _data.radios[5].volume = SR.getRadioVolume(0, 361, { 0.0, 1.0 }, false)
+    _data.radios[5].encMode = 2 -- Mode 2 is set by aircraft
 
     if midsBChannel < 127 and _fa18.radio4.channel > 0 then
         _data.radios[5].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsBChannel)
@@ -1722,7 +1724,7 @@ _f16.radio1.guard = 0
 
 function SR.exportRadioF16C(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
     -- UHF
     _data.radios[2].name = "AN/ARC-164"
     _data.radios[2].freq = SR.getRadioFrequency(36)
@@ -1749,24 +1751,24 @@ function SR.exportRadioF16C(_data)
             _data.radios[2].channel = _channel
         end
     else
-    	-- Parse the UFC - LOOK FOR BOTH (OR MAIN)
-		local ded = SR.getListIndicatorValue(6)
-		--PANEL 6{"Active Frequency or Channel":"305.00","Asterisks on Scratchpad_lhs":"*","Asterisks on Scratchpad_rhs":"*","Bandwidth":"NB","Bandwidth_placeholder":"","COM 1 Mode":"UHF","Preset Frequency":"305.00","Preset Frequency_placeholder":"","Preset Label":"PRE     a","Preset Number":" 1","Preset Number_placeholder":"","Receiver Mode":"BOTH","Scratchpad":"305.00","Scratchpad_placeholder":"","TOD Label":"TOD"}
-		
-		if ded and ded["Receiver Mode"] ~= nil and  ded["COM 1 Mode"] == "UHF" then
-			if ded["Receiver Mode"] == "BOTH" then
-				_f16.radio1.guard= 243.0 * 1000000
-			else
-				_f16.radio1.guard= 0
-			end
-		else
-			if _data.radios[2].freq < 1000 then
-				_f16.radio1.guard= 0
-			end
-		end
+        -- Parse the UFC - LOOK FOR BOTH (OR MAIN)
+        local ded = SR.getListIndicatorValue(6)
+        --PANEL 6{"Active Frequency or Channel":"305.00","Asterisks on Scratchpad_lhs":"*","Asterisks on Scratchpad_rhs":"*","Bandwidth":"NB","Bandwidth_placeholder":"","COM 1 Mode":"UHF","Preset Frequency":"305.00","Preset Frequency_placeholder":"","Preset Label":"PRE     a","Preset Number":" 1","Preset Number_placeholder":"","Receiver Mode":"BOTH","Scratchpad":"305.00","Scratchpad_placeholder":"","TOD Label":"TOD"}
+        
+        if ded and ded["Receiver Mode"] ~= nil and  ded["COM 1 Mode"] == "UHF" then
+            if ded["Receiver Mode"] == "BOTH" then
+                _f16.radio1.guard= 243.0 * 1000000
+            else
+                _f16.radio1.guard= 0
+            end
+        else
+            if _data.radios[2].freq < 1000 then
+                _f16.radio1.guard= 0
+            end
+        end
 
-		_data.radios[2].secFreq = _f16.radio1.guard
-    	    
+        _data.radios[2].secFreq = _f16.radio1.guard
+            
      end
 
     -- VHF
@@ -1874,7 +1876,7 @@ end
 
 function SR.exportRadioF86Sabre(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "AN/ARC-27"
     _data.radios[2].freq = SR.getRadioFrequency(26)
@@ -1936,7 +1938,7 @@ end
 
 function SR.exportRadioMIG15(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "RSI-6K"
     _data.radios[2].freq = SR.getRadioFrequency(30)
@@ -1985,7 +1987,7 @@ end
 
 function SR.exportRadioMIG19(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "RSIU-4V"
     _data.radios[2].freq = SR.getRadioFrequency(17)
@@ -2027,7 +2029,7 @@ end
 
 function SR.exportRadioMIG21(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "R-832"
     _data.radios[2].freq = SR.getRadioFrequency(22)
@@ -2077,7 +2079,7 @@ end
 
 function SR.exportRadioF5E(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "AN/ARC-164"
     _data.radios[2].freq = SR.getRadioFrequency(23)
@@ -2085,12 +2087,12 @@ function SR.exportRadioF5E(_data)
 
     local modulation = SR.getSelectorPosition(327, 0.1)
 
-	--is HQ selected (A on the Radio)
-	if modulation == 0 then
-		_data.radios[2].modulation = 4
-	else
-		_data.radios[2].modulation = 0
-	end
+    --is HQ selected (A on the Radio)
+    if modulation == 0 then
+        _data.radios[2].modulation = 4
+    else
+        _data.radios[2].modulation = 0
+    end
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(307, 0.1)
@@ -2202,7 +2204,7 @@ end
 
 function SR.exportRadioP51(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "SCR522A"
     _data.radios[2].freq = SR.getRadioFrequency(24)
@@ -2248,9 +2250,59 @@ function SR.exportRadioP51(_data)
     return _data;
 end
 
+
+function SR.exportRadioP47(_data)
+
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
+
+    _data.radios[2].name = "SCR522"
+    _data.radios[2].freq = SR.getRadioFrequency(21)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 77, { 0.0, 1.0 }, false)
+
+    _data.selected = 1
+
+    --Cant find the button in the cockpit?
+    -- if (SR.getButtonPosition(44)) > 0.5 then
+    --     _data.ptt = true
+    -- else
+    --     _data.ptt = false
+    -- end
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8 * 1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5 * 1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116 * 1000000
+    _data.radios[3].freqMax = 151.975 * 1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0 * 1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225 * 1000000
+    _data.radios[4].freqMax = 399.975 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0; -- hotas radio
+
+    return _data;
+end
+
 function SR.exportRadioFW190(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "FuG 16ZY"
     _data.radios[2].freq = SR.getRadioFrequency(15)
@@ -2293,9 +2345,9 @@ function SR.exportRadioFW190(_data)
 end
 
 function SR.exportRadioBF109(_data)
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
     
-	_data.radios[2].name = "FuG 16ZY"
+    _data.radios[2].name = "FuG 16ZY"
     _data.radios[2].freq = SR.getRadioFrequency(14)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 130, { 0.0, 1.0 }, false)
@@ -2335,7 +2387,7 @@ end
 
 function SR.exportRadioSpitfireLFMkIX (_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "A.R.I. 1063" --minimal bug in the ME GUI and in the LUA. SRC5222 is the P-51 radio.
     _data.radios[2].freq = SR.getRadioFrequency(15)
@@ -2378,7 +2430,7 @@ end
 
 function SR.exportRadioC101EB(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     _data.radios[1].name = "INTERCOM"
     _data.radios[1].freq = 100
@@ -2483,7 +2535,7 @@ end
 
 function SR.exportRadioC101CC(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
     -- TODO - figure out channels.... it saves state??
     -- figure out volume
@@ -2662,7 +2714,7 @@ local _mirageEncStatus = false
 local _previousEncState = 0
 function SR.exportRadioM2000C(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(19)
@@ -2801,7 +2853,7 @@ local newJF17Interface = nil
 
 function SR.exportRadioJF17(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "COMM1 VHF Radio"
     _data.radios[2].freq = SR.getRadioFrequency(25)
@@ -2870,8 +2922,8 @@ _av8.radio2.encKey = -1
 _av8.radio2.enc = false
 
 function SR.exportRadioAV8BNA(_data)
-	
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     local _ufc = SR.getListIndicatorValue(6)
 
@@ -2932,8 +2984,8 @@ function SR.exportRadioAV8BNA(_data)
 
     end
 
-	local getEncryption = function ( freq, currentEnc,currentEncKey )
-	if freq > 1000000 then
+    local getEncryption = function ( freq, currentEnc,currentEncKey )
+    if freq > 1000000 then
 
             -- check if LEFT UFC is currently displaying the encryption for this radio
  
@@ -2944,23 +2996,23 @@ function SR.exportRadioAV8BNA(_data)
                 if _ufcFreq and _ufcFreq * 1000000 == SR.round(freq,1000) then
                     if _ufc.ODU_Option_4_Text == "CIPH" then
 
-						-- validate number
-						-- ODU_Option_5_Text
-						if string.find(_ufc.ODU_Option_5_Text, "CD",1,true) then
+                        -- validate number
+                        -- ODU_Option_5_Text
+                        if string.find(_ufc.ODU_Option_5_Text, "CD",1,true) then
 
-						  local cduStr = string.gsub(_ufc.ODU_Option_5_Text, "CD ", ""):gsub("^%s*(.-)%s*$", "%1")
+                          local cduStr = string.gsub(_ufc.ODU_Option_5_Text, "CD ", ""):gsub("^%s*(.-)%s*$", "%1")
 
-							--remove CD and trim
-							local encNum = tonumber(cduStr)
+                            --remove CD and trim
+                            local encNum = tonumber(cduStr)
 
-							if encNum and encNum > 0 then 
-								return true,encNum
-							else
-								return false,-1
-							end
-						else
-							return false,-1
-						end
+                            if encNum and encNum > 0 then 
+                                return true,encNum
+                            else
+                                return false,-1
+                            end
+                        else
+                            return false,-1
+                        end
                     else
                         return false,-1
                     end
@@ -2982,24 +3034,24 @@ end
     _data.radios[2].freq = SR.getRadioFrequency(2)
     _data.radios[2].modulation = SR.getRadioModulation(2)
     _data.radios[2].volume = SR.getRadioVolume(0, 298, { 0.0, 1.0 }, false)
-	_data.radios[2].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
+    _data.radios[2].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
 
     local radio1Guard = getGuardFreq(_data.radios[2].freq, _av8.radio1.guard)
 
     _av8.radio1.guard = radio1Guard
     _data.radios[2].secFreq = _av8.radio1.guard
 
-	local radio1Enc, radio1EncKey = getEncryption(_data.radios[2].freq, _av8.radio1.enc, _av8.radio1.encKey)
+    local radio1Enc, radio1EncKey = getEncryption(_data.radios[2].freq, _av8.radio1.enc, _av8.radio1.encKey)
 
-	_av8.radio1.enc = radio1Enc
-	_av8.radio1.encKey = radio1EncKey
+    _av8.radio1.enc = radio1Enc
+    _av8.radio1.encKey = radio1EncKey
 
-	if _av8.radio1.enc then
-		_data.radios[2].enc = _av8.radio1.enc 
-		_data.radios[2].encKey = _av8.radio1.encKey 
-	end
+    if _av8.radio1.enc then
+        _data.radios[2].enc = _av8.radio1.enc 
+        _data.radios[2].encKey = _av8.radio1.encKey 
+    end
 
-	
+    
     -- get channel selector
     --  local _selector  = SR.getSelectorPosition(448,0.50)
 
@@ -3011,22 +3063,22 @@ end
     _data.radios[3].freq = SR.getRadioFrequency(3)
     _data.radios[3].modulation = SR.getRadioModulation(3)
     _data.radios[3].volume = SR.getRadioVolume(0, 299, { 0.0, 1.0 }, false)
-	_data.radios[3].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
+    _data.radios[3].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
 
     local radio2Guard = getGuardFreq(_data.radios[3].freq, _av8.radio2.guard)
 
     _av8.radio2.guard = radio2Guard
     _data.radios[3].secFreq = _av8.radio2.guard
 
-	local radio2Enc, radio2EncKey = getEncryption(_data.radios[3].freq, _av8.radio2.enc, _av8.radio2.encKey)
+    local radio2Enc, radio2EncKey = getEncryption(_data.radios[3].freq, _av8.radio2.enc, _av8.radio2.encKey)
 
-	_av8.radio2.enc = radio2Enc
-	_av8.radio2.encKey = radio2EncKey
+    _av8.radio2.enc = radio2Enc
+    _av8.radio2.encKey = radio2EncKey
 
-	if _av8.radio2.enc then
-		_data.radios[3].enc = _av8.radio2.enc 
-		_data.radios[3].encKey = _av8.radio2.encKey 
-	end
+    if _av8.radio2.enc then
+        _data.radios[3].enc = _av8.radio2.enc 
+        _data.radios[3].encKey = _av8.radio2.encKey 
+    end
 
     --https://en.wikipedia.org/wiki/AN/ARC-210
 
@@ -3055,7 +3107,7 @@ end
 --for F-14
 function SR.exportRadioF14(_data)
 
-	_data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
 
     local ics_devid = 2
     local arc159_devid = 3
@@ -3183,7 +3235,7 @@ end
 
 function SR.exportRadioAJS37(_data)
 
-	_data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "FR 22"
     _data.radios[2].freq = SR.getRadioFrequency(31)
@@ -3433,4 +3485,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.5")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.8.0.6")
