@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using NLog;
 
@@ -16,6 +17,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly ConcurrentDictionary<string, string> _settings;
 
         public List<double> GlobalFrequencies { get; set; } = new List<double>();
+
+        // Node Limit of 0 means no retransmission
+        public int RetransmitNodeLimit { get; set; } = 0;
 
         public SyncedServerSettings()
         {
@@ -71,6 +75,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     }
 
                     GlobalFrequencies = newList;
+                }
+                else if(kvp.Key.Equals(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT.ToString()))
+                {
+                    if (!int.TryParse(kvp.Value, out var nodeLimit))
+                    {
+                        nodeLimit = 0;
+                    }
+                    else
+                    {
+                        RetransmitNodeLimit = nodeLimit;
+                    }
+
+
                 }
             }
         }

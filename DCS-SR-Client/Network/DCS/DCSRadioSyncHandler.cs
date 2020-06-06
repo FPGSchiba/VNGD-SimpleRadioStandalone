@@ -301,6 +301,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = 1;
                     clientRadio.freqMax = 1;
                     clientRadio.secFreq = 0;
+                    clientRadio.retransmit = false;
                     clientRadio.modulation = RadioInformation.Modulation.DISABLED;
                     clientRadio.name = "No Radio";
 
@@ -323,6 +324,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = 1;
                     clientRadio.freqMax = 1;
                     clientRadio.secFreq = 0;
+                    clientRadio.retransmit = false;
                     clientRadio.modulation = RadioInformation.Modulation.DISABLED;
                     clientRadio.name = "No Radio";
 

@@ -5,5 +5,6 @@
         public byte[] Audio { get; set; }
 
         public ulong PacketNumber { get; set; }
+        public string TransmissionGuid { get; set; }
     }
 }

@@ -31,7 +31,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         LOTATC_EXPORT_ENABLED = 20,
         LOTATC_EXPORT_PORT = 21,
         LOTATC_EXPORT_IP = 22,
-        UPNP_ENABLED = 23
+        UPNP_ENABLED = 23,
+        RETRANSMISSION_NODE_LIMIT= 24,
     }
 
     public class DefaultServerSettings
@@ -62,6 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.LOTATC_EXPORT_IP.ToString(), "127.0.0.1" },
             { ServerSettingsKeys.UPNP_ENABLED.ToString(), "true" },
             { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
+            { ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT.ToString(), "2" },
         };
     }
 }

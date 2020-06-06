@@ -55,6 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private UdpClient _listener;
 
         private ulong _packetNumber = 1;
+        private ulong _retransmitPacketNumber = 1;
 
         private volatile bool _ptt;
 
@@ -71,6 +72,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private RadioReceivingState[] _radioReceivingState;
 
+        private byte[] _retransmitGuidBytes;
+        private string _retransmitGuid;
+
         public UdpVoiceHandler(string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager,
             InputDeviceManager inputManager)
         {
@@ -79,6 +83,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             // _decoder = decoder;
             _audioManager = audioManager;
             _guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
+            _retransmitGuid = ShortGuid.NewGuid().ToString();
+            _retransmitGuidBytes = Encoding.ASCII.GetBytes(_retransmitGuid);
 
             _guid = guid;
             _address = address;
@@ -212,6 +218,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StartPing();
 
             _packetNumber = 1; //reset packet number
+            _retransmitPacketNumber = 1;
 
             while (!_stop)
             {
@@ -405,6 +412,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                     if (radioReceivingPriorities.Count > 0)
                                     {
+                                        
+
                                         //ALL GOOD!
                                         //create marker for bytes
                                         for (int i = 0; i < radioReceivingPriorities.Count; i++)
@@ -433,7 +442,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 LineOfSightLoss =
                                                     destinationRadio
                                                         .LineOfSightLoss, // Loss of 1.0 or greater is total loss
-                                                PacketNumber = udpVoicePacket.PacketNumber
+                                                PacketNumber = udpVoicePacket.PacketNumber,
+                                                TransmissionGuid = udpVoicePacket.TransmissionGuid
                                             };
 
 
@@ -446,7 +456,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             {
                                                 var audioDecryptable = audio.Decryptable || (audio.Encryption == 0);
 
-                                                //mark that we have decrpyted encrypted audio for sound effects
+                                                //mark that we have decrypted encrypted audio for sound effects
                                                 if (audioDecryptable && (audio.Encryption > 0))
                                                 {
                                                     _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
@@ -488,6 +498,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 _audioManager.AddClientAudio(audio);
                                             }
                                         }
+
+                                        //handle retransmission
+                                        RetransmitAudio(udpVoicePacket, radioReceivingPriorities);
                                     }
                                 }
                             }
@@ -506,6 +519,97 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 Logger.Info("Stopped DeJitter Buffer");
             }
+        }
+
+        private void RetransmitAudio(UDPVoicePacket udpVoicePacket, List<RadioReceivingPriority> radioReceivingPriorities)
+        {
+
+            if (udpVoicePacket.Guid == _guid)
+            {
+                return;
+                //my own transmission - throw away
+            }
+
+            //Hop count can limit the retransmission too
+            var nodeLimit = _serverSettings.RetransmitNodeLimit;
+
+            if (nodeLimit < udpVoicePacket.RetransmissionCount+1)
+            {
+                //Reached hop limit - no retransmit
+                return;
+            }
+
+            //TODO check if it needs to be retransmitted
+            //if a radio needs to retransmit - dont play the Rx and Tx audio - as its just retransmiting the transmission?
+            //OR do it and also resend?
+            // store unique ID against the radio thats retransmitting from and use that for all the retransmisson messages and count the packet number up by radio
+
+            // filter radios by ability to hear it AND decryption works
+            List<RadioReceivingPriority> retransmitOn = new List<RadioReceivingPriority>();
+            //artificially limit some retransmissions - if encryption fails dont retransmit
+
+            //from the subset of receiving radios - find any other radios that have retransmit - and dont retransmit on any with the same frequency?
+            //to stop loops?
+
+            var receivingWithRetransmit = radioReceivingPriorities.Where(receivingRadio => (receivingRadio.Decryptable || (receivingRadio.Encryption == 0)) && receivingRadio.ReceivingRadio.retransmit);
+
+            //radios able to retransmit
+            var radiosWithRetransmit = _clientStateSingleton.DcsPlayerRadioInfo.radios.Where(radio => radio.retransmit);
+
+            //Check we're not retransmitting through a radio we just received on?
+            //TODO handle GUARD here - makes this logic more tricky!
+            foreach (var receivingRadio in receivingWithRetransmit)
+            {
+                radiosWithRetransmit = radiosWithRetransmit.Where(radio => !DCSPlayerRadioInfo.FreqCloseEnough(radio.freq, receivingRadio.Frequency));
+            }
+
+            var finalList = radiosWithRetransmit.ToList();
+
+            if (finalList.Count == 0)
+            {
+                //quit
+                return;
+            }
+
+            //From the remaining list - build up a new outgoing packet
+            var frequencies = new double[finalList.Count];
+            var encryptions = new byte[finalList.Count];
+            var modulations = new byte[finalList.Count];
+
+            for (int i = 0; i < finalList.Count; i++)
+            {
+                frequencies[i] = finalList[i].freq;
+                encryptions[i] = finalList[i].encKey;
+                modulations[i] = (byte)finalList[i].modulation;
+            }
+
+            //generate packet
+            var relayedPacket = new UDPVoicePacket
+            {
+                GuidBytes = _guidAsciiBytes,
+                AudioPart1Bytes = udpVoicePacket.AudioPart1Bytes,
+                AudioPart1Length = udpVoicePacket.AudioPart1Length,
+                Frequencies = frequencies,
+                UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
+                Encryptions = encryptions,
+                Modulations = modulations,
+                PacketNumber = udpVoicePacket.RetransmissionCount == 0? _packetNumber++: udpVoicePacket.PacketNumber, //always want to keep packet number? //TODO check this
+                TransmissionBytes = udpVoicePacket.RetransmissionCount == 0? _retransmitGuidBytes:udpVoicePacket.TransmissionBytes, // TODO Check this?
+                RetransmissionCount = (byte)(udpVoicePacket.RetransmissionCount+1),
+            };
+
+            var packet = relayedPacket.EncodePacket();
+
+            try
+            {
+                _listener.Send(packet, packet.Length,
+                    new IPEndPoint(_address, _port));
+            }
+            catch (Exception)
+            {
+            }
+
+            
         }
 
         private List<int> CurrentlyBlockedRadios()

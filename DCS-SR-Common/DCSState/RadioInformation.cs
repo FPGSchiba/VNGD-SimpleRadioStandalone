@@ -42,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             MIDS = 6,
         }
 
-        public bool enc = false; // encrytion enabled
+        public bool enc = false; // encryption enabled
         public byte encKey = 0;
 
         [JsonNetworkIgnoreSerialization]
@@ -64,6 +64,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public string name = "";
         
         public double secFreq = 1;
+
+       //should the radio restransmit?
+        public bool retransmit = false;
 
         [JsonNetworkIgnoreSerialization]
         public float volume = 1.0f;
@@ -120,6 +123,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 return false;
             }
+            if (retransmit != compare.retransmit)
+            {
+                return false;
+            }
             if (!DCSPlayerRadioInfo.FreqCloseEnough(secFreq, compare.secFreq))
             {
                 return false;
@@ -162,6 +169,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 simul = this.simul,
                 volMode = this.volMode,
                 volume = this.volume,
+                retransmit = this.retransmit
 
             };
         }

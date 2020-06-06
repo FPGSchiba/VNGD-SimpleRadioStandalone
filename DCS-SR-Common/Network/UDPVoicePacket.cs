@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Windows.Documents;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
@@ -43,6 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public static readonly int FixedPacketLength =
             sizeof(uint) // UInt UnitId - 4 bytes
             + sizeof(ulong) // UInt64 PacketId - 8 bytes
+            + sizeof(byte) // Byte indicating number of hops for this message // default is 0
             + GuidLength  // Bytes / ASCII String Transmission GUID - 22 bytes
             + GuidLength; // Bytes / ASCII String GUID - 22 bytes
 
@@ -76,6 +78,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public byte[] TransmissionBytes { get; set; }
         public string TransmissionGuid { get; set; }
         public ulong PacketNumber { get; set; }
+
+        //Number of times its been retransmitted - added to stop retransmission loop with sensible limit
+        public byte RetransmissionCount { get; set; } = new byte();
 
         public byte[] EncodePacket()
         {
@@ -175,6 +180,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             combinedBytes[fixedSegmentOffset + 10] = packetNumber[6];
             combinedBytes[fixedSegmentOffset + 11] = packetNumber[7];
 
+            // back before Transmission GUID
+            combinedBytes[totalPacketLength - (GuidLength + GuidLength + 1)] = RetransmissionCount;
+
             //Copy Transmission nearly at the end - just before the clientGUID
             Buffer.BlockCopy(TransmissionBytes, 0, combinedBytes, totalPacketLength - (GuidLength + GuidLength), GuidLength);
 
@@ -193,8 +201,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                     encodedOpusAudio, encodedOpusAudio.Length - GuidLength, GuidLength);
 
                 //Copy Transmission nearly at the end - just before the client GUID
+                var transmissionBytes = new byte[GuidLength];
+
+                //copy the raw bytes as we'll need them for retransmit
+                Buffer.BlockCopy(encodedOpusAudio, encodedOpusAudio.Length - (GuidLength + GuidLength),
+                    transmissionBytes, 0, GuidLength);
+
                 var transmissionGuid = Encoding.ASCII.GetString(
                     encodedOpusAudio, encodedOpusAudio.Length - (GuidLength + GuidLength), GuidLength);
+
+                //just before transmission GUID
+                var retransmissionCount = encodedOpusAudio[encodedOpusAudio.Length - (GuidLength + GuidLength + 1)];
 
                 var packetLength = BitConverter.ToUInt16(encodedOpusAudio, 0);
 
@@ -241,7 +258,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                     Modulations = modulations,
                     PacketNumber = packetNumber,
                     PacketLength = packetLength,
-                    TransmissionGuid = transmissionGuid
+                    TransmissionGuid = transmissionGuid,
+                    TransmissionBytes =  transmissionBytes,
+                    RetransmissionCount = retransmissionCount
                 };
             }
             catch (Exception ex)

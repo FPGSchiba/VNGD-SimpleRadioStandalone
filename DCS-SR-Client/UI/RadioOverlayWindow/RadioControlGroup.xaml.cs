@@ -174,6 +174,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 PresetChannelsView.IsEnabled = true;
 
                 ChannelTab.Visibility = Visibility.Visible;
+
+                Retransmit.Visibility = Visibility.Visible;
             }
             else
             {
@@ -192,6 +194,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 PresetChannelsView.IsEnabled = false;
 
                 ChannelTab.Visibility = Visibility.Collapsed;
+
+                Retransmit.Visibility = Visibility.Hidden;
             }
         }
 
@@ -269,6 +273,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioVolume.IsEnabled = false;
 
                     TunedClients.Visibility = Visibility.Hidden;
+
+                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
 
                     ToggleButtons(false);
 
@@ -371,6 +377,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (_dragging == false)
                 {
                     RadioVolume.Value = currentRadio.volume * 100.0;
+                }
+
+                //Retransmit - temp
+                if (currentRadio.retransmit)
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
                 }
             }
 
@@ -517,6 +533,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         {
             if (EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
+        }
+
+        private void RetransmitClick(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.ToggleRetransmit(RadioId);
         }
     }
 }

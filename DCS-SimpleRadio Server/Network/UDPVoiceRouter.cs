@@ -290,6 +290,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private OutgoingUDPPackets GenerateOutgoingPacket(UDPVoicePacket udpVoice, PendingPacket pendingPacket,
             SRClient fromClient)
         {
+            var nodeHopCount =
+                _serverSettings.GetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT).IntValue;
+
+            if (udpVoice.RetransmissionCount > nodeHopCount)
+            {
+                //not allowed to retransmit any further
+                return null;
+            }
+
             var outgoingList = new HashSet<IPEndPoint>();
 
             var coalitionSecurity =

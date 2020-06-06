@@ -663,7 +663,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 client = new ClientAudioProvider();
                 _clientsBufferedAudio[audio.ClientGuid] = client;
 
-                _clientAudioMixer.AddMixerInput(client.SampleProvider);
+                _clientAudioMixer.AddMixerInput(client.MixingSampleProvider);
             }
 
             client.AddClientAudioSamples(audio);
@@ -681,7 +681,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             try
             {
-                _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
+                _clientAudioMixer.RemoveMixerInput(clientAudio.MixingSampleProvider);
             }
             catch (Exception ex)
             {
