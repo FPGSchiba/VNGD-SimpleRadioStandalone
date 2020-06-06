@@ -37,17 +37,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public delegate void VOIPConnectCallback(bool result, bool connectionError, string connection);
-
         private readonly CachedAudioEffect[] _cachedAudioEffects;
 
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
             new ConcurrentDictionary<string, ClientAudioProvider>();
 
-        private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private MixingSampleProvider _clientAudioMixer;
-
-        private OpusDecoder _decoder;
 
         //buffer for effects
         //plays in parallel with radio output buffer
@@ -67,16 +62,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public float MicMax { get; set; } = -100;
         public float SpeakerMax { get; set; } = -100;
 
-        private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
-        private AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
-        private AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
+        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
+        private readonly AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
 
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private Preprocessor _speex;
-        private bool windowsN = false;
+        private readonly bool windowsN;
 
         public AudioManager(bool windowsN)
         {
@@ -172,8 +167,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //opus
                 _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, Application.Voip);
                 _encoder.ForwardErrorCorrection = false;
-                _decoder = OpusDecoder.Create(INPUT_SAMPLE_RATE, 1);
-                _decoder.ForwardErrorCorrection = false;
 
                 //speex
                 _speex = new Preprocessor(AudioManager.SEGMENT_FRAMES, AudioManager.INPUT_SAMPLE_RATE);
@@ -256,7 +249,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
                     _udpVoiceHandler =
-                        new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager);
+                        new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
                     var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
@@ -279,7 +272,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 //no mic....
                 _udpVoiceHandler =
-                    new UdpVoiceHandler(guid, ipAddress, port, _decoder, this, inputManager);
+                    new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
                 MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();
@@ -625,9 +618,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _encoder?.Dispose();
                 _encoder = null;
 
-                _decoder?.Dispose();
-                _decoder = null;
-
                 if (_udpVoiceHandler != null)
                 {
                     _udpVoiceHandler.RequestStop();
@@ -654,16 +644,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             //TODO: Clean  - remove if we havent received audio in a while?
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.ClientGuid))
+            if (_clientsBufferedAudio.ContainsKey(audio.OriginalClientGuid))
             {
-                client = _clientsBufferedAudio[audio.ClientGuid];
+                client = _clientsBufferedAudio[audio.OriginalClientGuid];
             }
             else
             {
                 client = new ClientAudioProvider();
-                _clientsBufferedAudio[audio.ClientGuid] = client;
+                _clientsBufferedAudio[audio.OriginalClientGuid] = client;
 
-                _clientAudioMixer.AddMixerInput(client.MixingSampleProvider);
+                _clientAudioMixer.AddMixerInput(client.SampleProvider);
             }
 
             client.AddClientAudioSamples(audio);
@@ -681,7 +671,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             try
             {
-                _clientAudioMixer.RemoveMixerInput(clientAudio.MixingSampleProvider);
+                _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
             }
             catch (Exception ex)
             {

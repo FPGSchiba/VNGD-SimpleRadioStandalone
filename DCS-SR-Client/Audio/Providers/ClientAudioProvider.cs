@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
@@ -38,11 +37,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         //used for comparison
         public static readonly short FM = Convert.ToInt16((int)RadioInformation.Modulation.FM);
 
-        private readonly Dictionary<string,JitterBufferProviderInterface> JitterBuffers = new Dictionary<string,JitterBufferProviderInterface>();
-
-
-        public MixingSampleProvider MixingSampleProvider { get; }
-
         public ClientAudioProvider()
         {
             _filters = new OnlineFilter[2];
@@ -51,8 +45,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _filters[1] =
                 OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 100, 4500);
 
-            MixingSampleProvider =  new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
-            MixingSampleProvider.ReadFully = true;
+            JitterBufferProviderInterface =
+                new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
+
+            SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
 
             _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
@@ -75,6 +71,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
             }
         }
+
+        public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
+        public Pcm16BitToSampleProvider SampleProvider { get; }
 
         public long LastUpdate { get; private set; }
 
@@ -143,6 +142,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AddEncryptionFailureEffect(audio);
 
+                AdjustVolume(audio);
+
                 if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                 {
                     AddRadioEffect(audio);
@@ -165,20 +166,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = DateTime.Now.Ticks;
 
-            if (!JitterBuffers.TryGetValue(audio.TransmissionGuid, out var jitterBuffer))
-            {
-                jitterBuffer = new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
-                JitterBuffers[audio.TransmissionGuid] = jitterBuffer;
-                MixingSampleProvider.AddMixerInput(new Pcm16BitToSampleProvider(jitterBuffer));
-            }
-
-            jitterBuffer.AddSamples(new JitterBufferAudio
+            JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
             {
                 Audio =
                     SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
                         audio.ReceivedRadio),
-                PacketNumber = audio.PacketNumber,
-                TransmissionGuid = audio.TransmissionGuid
+                PacketNumber = audio.PacketNumber
             });
 
             //timer.Stop();
@@ -322,8 +315,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         //destructor to clear up opus
         ~ClientAudioProvider()
         {
-            MixingSampleProvider?.RemoveAllMixerInputs();
-            _decoder?.Dispose();
+            _decoder.Dispose();
             _decoder = null;
         }
 

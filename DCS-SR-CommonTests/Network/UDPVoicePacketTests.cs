@@ -24,7 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 UnitId = 1,
                 Encryptions = new byte[] { 0 },
                 Modulations = new byte[] { 4 },
-                TransmissionBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
+                OriginalClientGuidBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
                 PacketNumber = 1,
                 RetransmissionCount = (byte)4u
             };
@@ -110,7 +110,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
             Assert.AreEqual((ulong)1, udpVoicePacket.PacketNumber);
             Assert.AreEqual((ushort)79, udpVoicePacket.PacketLength);
             Assert.AreEqual((byte)231, udpVoicePacket.RetransmissionCount);
-            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.TransmissionGuid);
+            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.OriginalClientGuid);
         }
 
         [TestMethod()]
@@ -126,7 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
                 Encryptions = new byte[] { 0, 0, 1 },
                 Modulations = new byte[] { 0, 1, 0 },
                 PacketNumber = 1,
-                TransmissionBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
+                OriginalClientGuidBytes = Encoding.ASCII.GetBytes("ufYS_WlLVkmFPjqCgxz6GA"),
                 RetransmissionCount = (byte)254u,
             };
         
@@ -221,7 +221,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
             var udpVoicePacket = UDPVoicePacket.DecodeVoicePacket(encodedUdpVoicePacket);
         
             Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.Guid);
-            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.TransmissionGuid);
+            Assert.AreEqual("ufYS_WlLVkmFPjqCgxz6GA", udpVoicePacket.OriginalClientGuid);
             CollectionAssert.AreEqual(new byte[] { 0, 1, 2, 3, 4, 5 }, udpVoicePacket.AudioPart1Bytes);
             Assert.AreEqual(6, udpVoicePacket.AudioPart1Length);
             CollectionAssert.AreEqual(new double[] { 251000000, 30000000, 251000000 }, udpVoicePacket.Frequencies);

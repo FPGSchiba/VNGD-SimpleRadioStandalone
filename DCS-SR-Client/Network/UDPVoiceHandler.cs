@@ -55,7 +55,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private UdpClient _listener;
 
         private ulong _packetNumber = 1;
-        private ulong _retransmitPacketNumber = 1;
 
         private volatile bool _ptt;
 
@@ -72,19 +71,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private RadioReceivingState[] _radioReceivingState;
 
-        private byte[] _retransmitGuidBytes;
-        private string _retransmitGuid;
-
-        public UdpVoiceHandler(string guid, IPAddress address, int port, OpusDecoder decoder, AudioManager audioManager,
+        public UdpVoiceHandler(string guid, IPAddress address, int port, AudioManager audioManager,
             InputDeviceManager inputManager)
         {
             _radioReceivingState = _clientStateSingleton.RadioReceivingState;
 
-            // _decoder = decoder;
             _audioManager = audioManager;
             _guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
-            _retransmitGuid = ShortGuid.NewGuid().ToString();
-            _retransmitGuidBytes = Encoding.ASCII.GetBytes(_retransmitGuid);
 
             _guid = guid;
             _address = address;
@@ -218,8 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             StartPing();
 
             _packetNumber = 1; //reset packet number
-            _retransmitPacketNumber = 1;
-
+            
             while (!_stop)
             {
                if(_ready)
@@ -443,7 +435,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                     destinationRadio
                                                         .LineOfSightLoss, // Loss of 1.0 or greater is total loss
                                                 PacketNumber = udpVoicePacket.PacketNumber,
-                                                TransmissionGuid = udpVoicePacket.TransmissionGuid
+                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid
                                             };
 
 
@@ -524,7 +516,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private void RetransmitAudio(UDPVoicePacket udpVoicePacket, List<RadioReceivingPriority> radioReceivingPriorities)
         {
 
-            if (udpVoicePacket.Guid == _guid)
+            if (udpVoicePacket.Guid == _guid )//|| udpVoicePacket.OriginalClientGuid == _guid
             {
                 return;
                 //my own transmission - throw away
@@ -533,7 +525,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //Hop count can limit the retransmission too
             var nodeLimit = _serverSettings.RetransmitNodeLimit;
 
-            if (nodeLimit < udpVoicePacket.RetransmissionCount+1)
+            if (nodeLimit < udpVoicePacket.RetransmissionCount)
             {
                 //Reached hop limit - no retransmit
                 return;
@@ -579,7 +571,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             for (int i = 0; i < finalList.Count; i++)
             {
                 frequencies[i] = finalList[i].freq;
-                encryptions[i] = finalList[i].encKey;
+                encryptions[i] = finalList[i].enc ? (byte)finalList[i].encKey:(byte)0 ;
                 modulations[i] = (byte)finalList[i].modulation;
             }
 
@@ -593,9 +585,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                 Encryptions = encryptions,
                 Modulations = modulations,
-                PacketNumber = udpVoicePacket.RetransmissionCount == 0? _packetNumber++: udpVoicePacket.PacketNumber, //always want to keep packet number? //TODO check this
-                TransmissionBytes = udpVoicePacket.RetransmissionCount == 0? _retransmitGuidBytes:udpVoicePacket.TransmissionBytes, // TODO Check this?
-                RetransmissionCount = (byte)(udpVoicePacket.RetransmissionCount+1),
+                PacketNumber = udpVoicePacket.PacketNumber, 
+                OriginalClientGuidBytes = udpVoicePacket.OriginalClientGuidBytes,
+                RetransmissionCount = (byte)(udpVoicePacket.RetransmissionCount+1u),
             };
 
             var packet = relayedPacket.EncodePacket();
@@ -608,8 +600,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             catch (Exception)
             {
             }
-
-            
         }
 
         private List<int> CurrentlyBlockedRadios()
@@ -909,7 +899,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Encryptions = encryptions.ToArray(),
                             Modulations = modulations.ToArray(),
                             PacketNumber = _packetNumber++,
-                            TransmissionBytes = _guidAsciiBytes
+                            OriginalClientGuidBytes = _guidAsciiBytes
                         };
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();

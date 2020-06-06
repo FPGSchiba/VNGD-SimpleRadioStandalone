@@ -75,8 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public byte[] GuidBytes { get; set; }
         public string Guid { get; set; }
 
-        public byte[] TransmissionBytes { get; set; }
-        public string TransmissionGuid { get; set; }
+        public byte[] OriginalClientGuidBytes { get; set; }
+        public string OriginalClientGuid { get; set; }
         public ulong PacketNumber { get; set; }
 
         //Number of times its been retransmitted - added to stop retransmission loop with sensible limit
@@ -184,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             combinedBytes[totalPacketLength - (GuidLength + GuidLength + 1)] = RetransmissionCount;
 
             //Copy Transmission nearly at the end - just before the clientGUID
-            Buffer.BlockCopy(TransmissionBytes, 0, combinedBytes, totalPacketLength - (GuidLength + GuidLength), GuidLength);
+            Buffer.BlockCopy(OriginalClientGuidBytes, 0, combinedBytes, totalPacketLength - (GuidLength + GuidLength), GuidLength);
 
             // Copy client GUID to end of packet
             Buffer.BlockCopy(GuidBytes, 0, combinedBytes, totalPacketLength - GuidLength, GuidLength);
@@ -258,8 +258,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                     Modulations = modulations,
                     PacketNumber = packetNumber,
                     PacketLength = packetLength,
-                    TransmissionGuid = transmissionGuid,
-                    TransmissionBytes =  transmissionBytes,
+                    OriginalClientGuid = transmissionGuid,
+                    OriginalClientGuidBytes =  transmissionBytes,
                     RetransmissionCount = retransmissionCount
                 };
             }
