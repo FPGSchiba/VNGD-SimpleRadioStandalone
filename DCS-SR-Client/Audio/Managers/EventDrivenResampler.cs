@@ -65,7 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         /// Dispose
         /// </summary>
         /// <param name="disposing">True if disposing (not from finalizer)</param>
-        protected void Dispose(bool disposing)
+        public void Dispose(bool disposing)
         {
             if (inputMediaBuffer != null)
             {
@@ -78,6 +78,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 dmoResampler = null;
             }
     
+        }
+        ~EventDrivenResampler(){
+            Dispose(false);
         }
 
     }

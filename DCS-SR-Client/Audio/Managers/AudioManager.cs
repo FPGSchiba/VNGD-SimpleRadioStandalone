@@ -244,14 +244,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                     device.AudioEndpointVolume.Mute = false;
 
-                    _wasapiCapture = new WasapiCapture(device);
+                    _wasapiCapture = new WasapiCapture(device, false,40);
                     _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
                     _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
 
-                    _resampler = new EventDrivenResampler(windowsN,_wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, _wasapiCapture.WaveFormat.BitsPerSample, _wasapiCapture.WaveFormat.Channels));
-                    
-                    
+                   
                     //_acmStream = new AcmStream(_wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, _wasapiCapture.WaveFormat.BitsPerSample, _wasapiCapture.WaveFormat.Channels));
 
                     // _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
@@ -303,6 +301,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
        
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
         {
+            if (_resampler == null)
+            {
+                _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, 16, 1));
+            }
+
             if (e.BytesRecorded > 0)
             {
                 Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
@@ -310,6 +313,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {result.Length}");
                 _stopwatch.Restart();
+
+                _micWaveOutBuffer?.AddSamples(result, 0, result.Length);
             }
         
 
@@ -636,6 +641,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _wasapiCapture?.StopRecording();
                 _wasapiCapture?.Dispose();
                 _wasapiCapture = null;
+
+                _resampler?.Dispose(true);
+                _resampler = null;
 
                 _waveOut?.Stop();
                 _waveOut?.Dispose();
