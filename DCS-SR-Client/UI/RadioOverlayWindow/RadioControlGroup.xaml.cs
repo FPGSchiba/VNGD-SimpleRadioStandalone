@@ -174,8 +174,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 PresetChannelsView.IsEnabled = true;
 
                 ChannelTab.Visibility = Visibility.Visible;
-
-                Retransmit.Visibility = Visibility.Visible;
             }
             else
             {
@@ -194,14 +192,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 PresetChannelsView.IsEnabled = false;
 
                 ChannelTab.Visibility = Visibility.Collapsed;
-
-                Retransmit.Visibility = Visibility.Hidden;
             }
         }
 
         internal void RepaintRadioStatus()
         {
-            SetupEncryption();
+            HandleEncryptionStatus();
+            HandleRetransmitStatus();
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
@@ -212,7 +209,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 RadioFrequency.Text = "Unknown";
 
                 RadioVolume.IsEnabled = false;
-                RadioVolume.Width = 115;
 
                 TunedClients.Visibility = Visibility.Hidden;
 
@@ -273,8 +269,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                     RadioVolume.IsEnabled = false;
 
                     TunedClients.Visibility = Visibility.Hidden;
-
-                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
 
                     ToggleButtons(false);
 
@@ -346,13 +340,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (count > 0)
                 {
                     TunedClients.Text = "👤" + count;
-                    RadioVolume.Width = 105;
                     TunedClients.Visibility = Visibility.Visible;
                 }
                 else
                 {
                     TunedClients.Visibility = Visibility.Hidden;
-                    RadioVolume.Width = 115;
                 }
 
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
@@ -378,16 +370,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
-
-                //Retransmit - temp
-                if (currentRadio.retransmit)
-                {
-                    Retransmit.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
-                }
+               
             }
 
             TabItem item = TabControl.SelectedItem as TabItem;
@@ -398,7 +381,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
-        private void SetupEncryption()
+        private void HandleEncryptionStatus()
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
@@ -462,6 +445,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
+        public void HandleRetransmitStatus()
+        {
+
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio.rtMode == RadioInformation.RetransmitMode.DISABLED)
+                {
+                    Retransmit.Visibility = Visibility.Hidden;
+                }
+                else if(currentRadio.rtMode == RadioInformation.RetransmitMode.COCKPIT)
+                {
+                    Retransmit.Visibility = Visibility.Visible;
+                    Retransmit.IsEnabled = false;
+                }
+                else
+                {
+                    Retransmit.Visibility = Visibility.Visible;
+                    Retransmit.IsEnabled = true;
+                }
+
+                if (currentRadio.retransmit)
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
+                }
+            }
+            else
+            {
+                Retransmit.Visibility = Visibility.Hidden;
+            }
+        }
 
         internal void RepaintRadioReceive()
         {

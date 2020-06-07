@@ -31,6 +31,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             OVERLAY = 1,
         }
 
+        public enum RetransmitMode
+        {
+            COCKPIT = 0,
+            OVERLAY = 1,
+            DISABLED = 2,
+        }
+
         public enum Modulation
         {
             AM = 0,
@@ -65,7 +72,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         
         public double secFreq = 1;
 
-       //should the radio restransmit?
+        [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
+        public RetransmitMode rtMode = RetransmitMode.DISABLED;
+        //should the radio restransmit?
         public bool retransmit = false;
 
         [JsonNetworkIgnoreSerialization]
@@ -74,9 +84,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public FreqMode freqMode = FreqMode.COCKPIT;
+
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
+
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public VolumeMode volMode = VolumeMode.COCKPIT;
@@ -169,7 +181,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 simul = this.simul,
                 volMode = this.volMode,
                 volume = this.volume,
-                retransmit = this.retransmit
+                retransmit = this.retransmit,
+                rtMode = this.rtMode
 
             };
         }
