@@ -17,6 +17,7 @@ using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using NAudio.Wave.Compression;
 using NAudio.Wave.SampleProviders;
 using NLog;
 using WPFCustomMessageBox;
@@ -56,8 +57,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
 
-        private WaveIn _waveIn;
+        private WasapiCapture _wasapiCapture;
         private WasapiOut _waveOut;
+        private AcmStream _acmStream;
 
         public float MicMax { get; set; } = -100;
         public float SpeakerMax { get; set; } = -100;
@@ -238,15 +240,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 try
                 {
-                    _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
-                    {
-                        BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
-                        DeviceNumber = _audioInputSingleton.SelectedAudioInputDeviceNumber()
-                    };
+                    var device = (MMDevice) _audioInputSingleton.SelectedAudioInput.Value;
 
-                    _waveIn.NumberOfBuffers = 2;
-                    _waveIn.DataAvailable += _waveIn_DataAvailable;
-                    _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
+                    device.AudioEndpointVolume.Mute = false;
+
+                    _wasapiCapture = new WasapiCapture(device);
+                    _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
+                    _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
+                    _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
+                    
+                    //_acmStream = new AcmStream(_wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, _wasapiCapture.WaveFormat.BitsPerSample, _wasapiCapture.WaveFormat.Channels));
+
+                    // _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback())
+                    // {
+                    //     BufferMilliseconds = INPUT_AUDIO_LENGTH_MS,
+                    //     DeviceNumber = _audioInputSingleton.SelectedAudioInputDeviceNumber()
+                    // };
+                    //
+                    // _waveIn.NumberOfBuffers = 2;
+                    // _waveIn.DataAvailable += _waveIn_DataAvailable;
+                    // _waveIn.WaveFormat = new WaveFormat(INPUT_SAMPLE_RATE, 16, 1);
 
                     _udpVoiceHandler =
                         new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
@@ -254,7 +267,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                     voiceSenderThread.Start();
 
-                    _waveIn.StartRecording();
+                    _wasapiCapture.StartRecording();
 
 
                     MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
@@ -277,6 +290,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();
             }
+        }
+
+        private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
+        {
+            Logger.Error("Recording Stopped");
+        }
+        Stopwatch _stopwatch = new Stopwatch();
+       
+        private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
+        { 
+
+            Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+             _stopwatch.Restart();
+
         }
 
         private void ShowInputError(string message)
@@ -597,9 +624,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         {
             lock(lockObj)
             {
-                _waveIn?.StopRecording();
-                _waveIn?.Dispose();
-                _waveIn = null;
+                _wasapiCapture?.StopRecording();
+                _wasapiCapture?.Dispose();
+                _wasapiCapture = null;
 
                 _waveOut?.Stop();
                 _waveOut?.Dispose();
