@@ -181,6 +181,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />
     <Compile Include="Audio\Managers\AudioManager.cs" />

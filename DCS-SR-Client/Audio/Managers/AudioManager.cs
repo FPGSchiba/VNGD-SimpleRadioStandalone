@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private WasapiCapture _wasapiCapture;
         private WasapiOut _waveOut;
-        private AcmStream _acmStream;
+        private EventDrivenResampler _resampler;
 
         public float MicMax { get; set; } = -100;
         public float SpeakerMax { get; set; } = -100;
@@ -248,6 +248,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
                     _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
+
+                    _resampler = new EventDrivenResampler(windowsN,_wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, _wasapiCapture.WaveFormat.BitsPerSample, _wasapiCapture.WaveFormat.Channels));
+                    
                     
                     //_acmStream = new AcmStream(_wasapiCapture.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, _wasapiCapture.WaveFormat.BitsPerSample, _wasapiCapture.WaveFormat.Channels));
 
@@ -299,10 +302,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         Stopwatch _stopwatch = new Stopwatch();
        
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
-        { 
+        {
+            if (e.BytesRecorded > 0)
+            {
+                Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+                byte[] result = _resampler.Resample(e.Buffer, e.BytesRecorded);
 
-            Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-             _stopwatch.Restart();
+                Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {result.Length}");
+                _stopwatch.Restart();
+            }
+        
 
         }
 

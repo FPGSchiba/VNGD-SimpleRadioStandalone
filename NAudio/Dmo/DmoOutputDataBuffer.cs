@@ -62,7 +62,7 @@ namespace NAudio.Dmo
         public DmoOutputDataBufferFlags StatusFlags
         {
             get { return dwStatus; }
-            internal set { dwStatus = value; }
+            set { dwStatus = value; }
         }
 
         /// <summary>
