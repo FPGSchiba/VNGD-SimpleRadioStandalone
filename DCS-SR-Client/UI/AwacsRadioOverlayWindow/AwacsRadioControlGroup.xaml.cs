@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -468,9 +469,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         public void HandleRetransmitStatus()
         {
+            var serverSettings = SyncedServerSettings.Instance;
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && serverSettings.RetransmitNodeLimit > 0)
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 

@@ -447,10 +447,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         public void HandleRetransmitStatus()
         {
-
+            var serverSettings = SyncedServerSettings.Instance;
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && serverSettings.RetransmitNodeLimit > 0)
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
 
