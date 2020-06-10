@@ -134,55 +134,57 @@ namespace NetCoreServer
         /// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
         public virtual bool Disconnect()
         {
-   
-                if (!IsConnected)
-                    return false;
+            if (!IsConnected)
+                return false;
 
-                // Reset event args
-                _receiveEventArg.Completed -= OnAsyncCompleted;
-                _sendEventArg.Completed -= OnAsyncCompleted;
+            // Reset event args
+            _receiveEventArg.Completed -= OnAsyncCompleted;
+            _sendEventArg.Completed -= OnAsyncCompleted;
 
+            try
+            {
                 try
                 {
-                    try
-                    {
-                        // Shutdown the socket associated with the client
-                        Socket.Shutdown(SocketShutdown.Both);
-                    }
-                    catch (SocketException) { }
-
-                    // Close the session socket
-                    Socket.Close();
-
-                    // Dispose the session socket
-                    Socket.Dispose();
-
-                    // Update the session socket disposed flag
-                    IsSocketDisposed = true;
+                    // Shutdown the socket associated with the client
+                    Socket.Shutdown(SocketShutdown.Both);
                 }
+                catch (SocketException) {}
+
+                // Close the session socket
+                Socket.Close();
+
+                // Dispose the session socket
+                Socket.Dispose();
+
+                // Dispose event arguments
+                _receiveEventArg.Dispose();
+                _sendEventArg.Dispose();
+
+                // Update the session socket disposed flag
+                IsSocketDisposed = true;
+            }
                 catch (Exception) { }
 
-                // Update the connected flag
-                IsConnected = false;
+            // Update the connected flag
+            IsConnected = false;
 
-                // Update sending/receiving flags
-                _receiving = false;
-                _sending = false;
+            // Update sending/receiving flags
+            _receiving = false;
+            _sending = false;
 
-                // Clear send/receive buffers
-                ClearBuffers();
+            // Clear send/receive buffers
+            ClearBuffers();
 
-                // Call the session disconnected handler
-                OnDisconnected();
+            // Call the session disconnected handler
+            OnDisconnected();
 
-                // Call the session disconnected handler in the server
-                Server.OnDisconnectedInternal(this);
+            // Call the session disconnected handler in the server
+            Server.OnDisconnectedInternal(this);
 
-                // Unregister session
-                Server.UnregisterSession(Id);
-            
+            // Unregister session
+            Server.UnregisterSession(Id);
 
-                return true;
+            return true;
         }
 
         #endregion
@@ -268,11 +270,11 @@ namespace NetCoreServer
         /// <returns>'true' if the data was successfully sent, 'false' if the session is not connected</returns>
         public virtual bool SendAsync(byte[] buffer, long offset, long size)
         {
-                if (!IsConnected)
-                    return false;
+            if (!IsConnected)
+                return false;
 
-                if (size == 0)
-                    return true;
+            if (size == 0)
+                return true;
 
             lock (_sendLock)
             {
@@ -290,8 +292,8 @@ namespace NetCoreServer
                     return true;
             }
 
-                // Try to send the main buffer
-                Task.Factory.StartNew(TrySend);
+            // Try to send the main buffer
+            Task.Factory.StartNew(TrySend);
 
             return true;
         }
@@ -402,17 +404,17 @@ namespace NetCoreServer
         /// </summary>
         private void TrySend()
         {
-                if (_sending)
-                    return;
+            if (_sending)
+                return;
 
-                if (!IsConnected)
-                    return;
+            if (!IsConnected)
+                return;
 
-                bool process = true;
+            bool process = true;
 
-                while (process)
-                {
-                    process = false;
+            while (process)
+            {
+                process = false;
 
                 lock (_sendLock)
                 {
@@ -436,26 +438,26 @@ namespace NetCoreServer
                         return;
                 }
 
-                    // Check if the flush buffer is empty
-                    if (_sendBufferFlush.IsEmpty)
-                    {
-                        // Call the empty send buffer handler
-                        OnEmpty();
-                        return;
-                    }
+                // Check if the flush buffer is empty
+                if (_sendBufferFlush.IsEmpty)
+                {
+                    // Call the empty send buffer handler
+                    OnEmpty();
+                    return;
+                }
 
-                    try
-                    {
-                        // Async write with the write handler
-                        _sendEventArg.SetBuffer(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset));
-                        if (!Socket.SendAsync(_sendEventArg))
-                            process = ProcessSend(_sendEventArg);
-                    }
-                    catch (ObjectDisposedException) { }
+                try
+                {
+                    // Async write with the write handler
+                    _sendEventArg.SetBuffer(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset));
+                    if (!Socket.SendAsync(_sendEventArg))
+                        process = ProcessSend(_sendEventArg);
+                }
+                catch (ObjectDisposedException) {}
                     catch(Exception ex) {
                         OnTrySendException(ex);
                     }
-                }
+            }
         }
 
         /// <summary>
