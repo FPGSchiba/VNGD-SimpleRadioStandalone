@@ -395,7 +395,7 @@
                         <Label HorizontalAlignment="Right" Grid.Column="1" FontSize="10" Content="5" />
                     </Grid>
                     <Slider 
-                        Value="{Binding  PlayerPosition, Mode=OneWay}"
+                        Value="{Binding  NodeLimit}"
                             Width="75"
                             Height="40"
                             VerticalAlignment="Center"

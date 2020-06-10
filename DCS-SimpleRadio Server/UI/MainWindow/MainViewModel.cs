@@ -40,6 +40,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 
         public string ServerButtonText => IsServerRunning ? "Stop Server" : "Start Server";
 
+        public int NodeLimit
+        {
+            get => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT).IntValue;
+            set
+            {
+                ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT,
+                    value.ToString());
+                _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            }
+        }
+
         public int ClientsCount { get; private set; }
 
         public string RadioSecurityText

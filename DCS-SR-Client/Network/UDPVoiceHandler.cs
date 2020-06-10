@@ -519,7 +519,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if (udpVoicePacket.Guid == _guid )//|| udpVoicePacket.OriginalClientGuid == _guid
             {
                 return;
-                //my own transmission - throw away
+                //my own transmission - throw away - stops test frequencies
             }
 
             //Hop count can limit the retransmission too
@@ -531,19 +531,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return;
             }
 
-            //TODO check if it needs to be retransmitted
-            //if a radio needs to retransmit - dont play the Rx and Tx audio - as its just retransmiting the transmission?
-            //OR do it and also resend?
-            // store unique ID against the radio thats retransmitting from and use that for all the retransmisson messages and count the packet number up by radio
+            //Check if Global
+            List<double> globalFrequencies = _serverSettings.GlobalFrequencies;
 
             // filter radios by ability to hear it AND decryption works
             List<RadioReceivingPriority> retransmitOn = new List<RadioReceivingPriority>();
             //artificially limit some retransmissions - if encryption fails dont retransmit
 
-            //from the subset of receiving radios - find any other radios that have retransmit - and dont retransmit on any with the same frequency?
-            //to stop loops?
-
-            var receivingWithRetransmit = radioReceivingPriorities.Where(receivingRadio => (receivingRadio.Decryptable || (receivingRadio.Encryption == 0)) && receivingRadio.ReceivingRadio.retransmit);
+            //from the subset of receiving radios - find any other radios that have retransmit - and dont retransmit on any with the same frequency
+            //to stop loops
+            //and ignore global frequencies 
+            //and only if we can decrypt it (or no encryption)
+            //and not received on Guard
+            var receivingWithRetransmit = radioReceivingPriorities.Where(receivingRadio => 
+                (receivingRadio.Decryptable || (receivingRadio.Encryption == 0)) 
+                && receivingRadio.ReceivingRadio.retransmit
+                && !globalFrequencies.Contains(receivingRadio.ReceivingRadio.freq)
+                && receivingRadio.ReceivingState.IsSimultaneous);
 
             //radios able to retransmit
             var radiosWithRetransmit = _clientStateSingleton.DcsPlayerRadioInfo.radios.Where(radio => radio.retransmit);
