@@ -1,70 +1,103 @@
 ﻿using System;
 using System.Diagnostics;
 using NAudio.Dmo;
+using NAudio.Dsp;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 {
 
     public class EventDrivenResampler
     {
-        private DmoResampler dmoResampler;
-        private MediaBuffer inputMediaBuffer;
-        private DmoOutputDataBuffer outputBuffer;
+        private readonly bool windowsN;
+        private ResamplerDmoStream dmoResampler;
+
+        private WaveFormat input;
+        private WaveFormat output;
+        private WdlResampler resampler;
+        private WdlResamplingSampleProvider mediaFoundationResampler;
+        private BufferedWaveProvider buf;
+        private IWaveProvider waveOut;
 
         public EventDrivenResampler(bool windowsN, WaveFormat input,WaveFormat output)
         {
-            dmoResampler = new DmoResampler();
-            if (!dmoResampler.MediaObject.SupportsInputWaveFormat(0, input))
+            this.windowsN = windowsN;
+            this.input = input;
+            this.output = output;
+            buf = new BufferedWaveProvider(input);
+            buf.ReadFully = false;
+
+            if (windowsN)
             {
-                throw new ArgumentException("Unsupported Input Stream format", nameof(input));
+                mediaFoundationResampler = new WdlResamplingSampleProvider(buf.ToSampleProvider(), output.SampleRate);
+                waveOut = mediaFoundationResampler.ToMono().ToWaveProvider16();
             }
-
-            dmoResampler.MediaObject.SetInputWaveFormat(0, input);
-            if (!dmoResampler.MediaObject.SupportsOutputWaveFormat(0, output))
+            else
             {
-                throw new ArgumentException("Unsupported Output Stream format", nameof(output));
+                dmoResampler = new ResamplerDmoStream(buf,output);
             }
+        }
 
-            dmoResampler.MediaObject.SetOutputWaveFormat(0, output);
+        private byte[] ResampleBytesDMO(byte[] inputByteArray, int length)
+        {
+            byte[] outBuffer = new byte[length * 2];
+            buf.AddSamples(inputByteArray, 0, length);
 
-            inputMediaBuffer = new MediaBuffer(input.AverageBytesPerSecond);
-            outputBuffer = new DmoOutputDataBuffer(output.AverageBytesPerSecond);
+            int read = dmoResampler.Read(outBuffer, 0, outBuffer.Length);
+
+            if (read == 0)
+            {
+                return new byte[0];
+            }
+            else
+            {
+                byte[] finalBuf = new byte[read];
+                Buffer.BlockCopy(outBuffer, 0, finalBuf, 0, read);
+
+                return finalBuf;
+            }
+        }
+
+        private byte[] ResampleBytesMFC(byte[] inputByteArray, int length)
+        {
+            byte[] outBuffer = new byte[length * 2];
+
+            buf.AddSamples(inputByteArray, 0, length);
+
+            int read = waveOut.Read(outBuffer, 0, outBuffer.Length);
+
+            if (read == 0)
+            {
+                return new byte[0];
+            }
+            else
+            {
+
+                byte[] finalBuf = new byte[read];
+                Buffer.BlockCopy(outBuffer,0,finalBuf,0,read);
+
+                return finalBuf;
+            }
 
         }
 
         public byte[] ResampleBytes(byte[] inputByteArray, int length)
         {
-            // 1. Read from the input stream 
-
-            // 2. copy into our DMO's input buffer
-            inputMediaBuffer.LoadData(inputByteArray, length);
-
-            // 3. Give the input buffer to the DMO to process
-            dmoResampler.MediaObject.ProcessInput(0, inputMediaBuffer, DmoInputDataBufferFlags.None, 0, 0);
-
-            outputBuffer.MediaBuffer.SetLength(0);
-            outputBuffer.StatusFlags = DmoOutputDataBufferFlags.None;
-
-            // 4. Now ask the DMO for some output data
-            dmoResampler.MediaObject.ProcessOutput(DmoProcessOutputFlags.None, 1, new[] { outputBuffer });
-
-            if (outputBuffer.Length == 0)
+            if (windowsN)
             {
-                Debug.WriteLine("ResamplerDmoStream.Read: No output data available");
-                return new byte[0];
+                return ResampleBytesMFC(inputByteArray,length);
+
             }
-
-            //TODO improve buffer handling here
-
-            byte[] result = new byte[outputBuffer.Length];
-            // 5. Now get the data out of the output buffer
-            outputBuffer.RetrieveData(result, 0);
-            return result;
+            else
+            {
+                return ResampleBytesDMO(inputByteArray, length);
+            }
         }
 
-        public short[] Resample(byte[] inputByteArray, int length)
+        private short[] ResampleDMO(byte[] inputByteArray, int length)
         {
+
             byte[] bytes = ResampleBytes(inputByteArray, length);
 
             if (bytes.Length == 0)
@@ -74,9 +107,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             //convert byte to short
             short[] sdata = new short[bytes.Length / 2];
-            Buffer.BlockCopy(bytes, 0, sdata, 0, bytes.Length); ;
+            Buffer.BlockCopy(bytes, 0, sdata, 0, bytes.Length);
 
             return sdata;
+        }
+
+        public short[] Resample(byte[] inputByteArray, int length)
+        {
+            if (windowsN)
+            {
+                return ResampleMFC(inputByteArray,length);
+            }
+            else
+            {
+                return ResampleDMO(inputByteArray, length);
+            }
+            
+        }
+
+        private short[] ResampleMFC(byte[] inputByteArray, int length)
+        {
+            byte[] outBuffer = new byte[length * 2];
+
+            buf.AddSamples(inputByteArray, 0, length);
+
+            int read = waveOut.Read(outBuffer, 0, outBuffer.Length);
+
+            if (read == 0)
+            {
+                return new short[0];
+            }
+            else
+            {
+                //convert byte to short
+                short[] sdata = new short[read / 2];
+                Buffer.BlockCopy(outBuffer, 0, sdata, 0, read);
+                return sdata;
+            }
         }
 
         /// <summary>
@@ -85,17 +152,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         /// <param name="disposing">True if disposing (not from finalizer)</param>
         public void Dispose(bool disposing)
         {
-            if (inputMediaBuffer != null)
+            buf.ClearBuffer();
+            if (windowsN)
             {
-                inputMediaBuffer.Dispose();
-                inputMediaBuffer = null;
+                buf.ClearBuffer();
+
             }
-            outputBuffer.Dispose();
-            if (dmoResampler != null)
+            else
             {
+                dmoResampler?.Dispose();
                 dmoResampler = null;
             }
-    
         }
         ~EventDrivenResampler(){
             Dispose(false);

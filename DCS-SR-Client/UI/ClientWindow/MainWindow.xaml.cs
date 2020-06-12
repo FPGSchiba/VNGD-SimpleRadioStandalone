@@ -836,7 +836,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    var input = ((MMDevice)AudioInput.SelectedAudioInput.Value).DeviceFriendlyName;
+                    var input = ((MMDevice)AudioInput.SelectedAudioInput.Value).ID;
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, input);
                 }
             }

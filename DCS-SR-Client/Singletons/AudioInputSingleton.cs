@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private List<AudioDeviceListItem> BuildAudioInputs()
         {
             Logger.Info("Audio Input - Saved ID " +
-                        GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue);
+                        GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue);
 
             var inputs = new List<AudioDeviceListItem>();
 
@@ -76,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             inputs.Add(new AudioDeviceListItem()
             {
                 Text = "Default Microphone",
-                Value = WasapiCapture.GetDefaultCaptureDevice()
+                Value = null
             });
             SelectedAudioInput = inputs[0];
 
@@ -92,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 Logger.Info("Audio Input - " + item.DeviceFriendlyName + " " + item.ID.ToString() + " - Name GUID" +
                             item.FriendlyName);
 
-                if (item.DeviceFriendlyName.Trim().StartsWith(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).StringValue.Trim()))
+                if (item.ID.Trim().Equals(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue.Trim()))
                 {
                     SelectedAudioInput = input;
                     Logger.Info("Audio Input - Found Saved ");
@@ -102,25 +102,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             return inputs;
         }
 
-        // public int SelectedAudioInputDeviceNumber()
-        // {
-        //     // Special case for the default
-        //     if (SelectedAudioInput.Value == null) {
-        //         return 0;
-        //     }
-        //
-        //     for (var i = 0; i < WaveIn.DeviceCount; i++)
-        //     {
-        //         var device = WaveIn.GetCapabilities(i);
-        //         var selectedAudioInput = (WaveInCapabilities)SelectedAudioInput.Value;
-        //         if ((device.ProductName == selectedAudioInput.ProductName) &&
-        //             (device.ProductGuid == selectedAudioInput.ProductGuid))
-        //         {
-        //             return i;
-        //         }
-        //     }
-        //     throw new IndexOutOfRangeException("No device number matches selected");
-        // }
         #endregion
     }
 }

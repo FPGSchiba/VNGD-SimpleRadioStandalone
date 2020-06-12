@@ -149,6 +149,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
 
+                if (device == null)
+                {
+                    device = WasapiCapture.GetDefaultCaptureDevice();
+                }
+
                 device.AudioEndpointVolume.Mute = false;
 
                 _wasapiCapture = new WasapiCapture(device, true);
@@ -157,7 +162,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
 
                 //debug wave file
-                _waveFile = new WaveFileWriter(@"C:\Temp\Test-Preview.wav", new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+          //      _waveFile = new WaveFileWriter(@"C:\Temp\Test-Preview.wav", new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
 
                 _wasapiCapture.StartRecording();
             }
