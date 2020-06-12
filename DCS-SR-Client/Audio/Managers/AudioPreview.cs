@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
 using NAudio.Dmo;
+using NAudio.Utils;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
@@ -28,6 +29,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         private WasapiCapture _wasapiCapture;
         private WasapiOut _waveOut;
         private EventDrivenResampler _resampler;
+        //private readonly CircularBuffer _circularBuffer = new CircularBuffer();
 
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
         private BufferedWaveProvider _buffBufferedWaveProvider;
@@ -149,14 +151,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 device.AudioEndpointVolume.Mute = false;
 
-                _wasapiCapture = new WasapiCapture(device, true, 40);
+                _wasapiCapture = new WasapiCapture(device, true);
                 _wasapiCapture.ShareMode = AudioClientShareMode.Shared;
                 _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
                 _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
-
-                // _waveIn.NumberOfBuffers = 2;
-                // _waveIn.DataAvailable += _waveIn_DataAvailable;
-                // _waveIn.WaveFormat = new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1);
 
                 //debug wave file
                 _waveFile = new WaveFileWriter(@"C:\Temp\Test-Preview.wav", new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
@@ -229,6 +227,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         {
             Logger.Error("Recording Stopped");
         }
+
         //Stopwatch _stopwatch = new Stopwatch();
 
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
@@ -241,11 +240,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             if (e.BytesRecorded > 0)
             {
-               // Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
+               //Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
                 short[] resampledPCM16Bit = _resampler.Resample(e.Buffer, e.BytesRecorded);
 
                // Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {resampledPCM16Bit.Length}");
-               // _stopwatch.Restart();
+              
 
                 //fill sound buffer
 
@@ -256,7 +255,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     _micInputQueue.Enqueue(resampledPCM16Bit[i]);
                 }
                 
-
                 //read out the queue
                 while ((pcmShort != null) || (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES))
                 {
@@ -273,26 +271,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                     try
                     {
-                        //volume boost pre
-                        //                    for (var i = 0; i < pcmShort.Length; i++)
-                        //                    {
-                        //                        //clipping tests thanks to Coug4r
-                        //                        if (_globalSettings.GetClientSetting(GlobalSettingsKeys.RadioEffects).BoolValue)
-                        //                        {
-                        //                            if (pcmShort[i] > 4000)
-                        //                            {
-                        //                                pcmShort[i] = 4000;
-                        //                            }
-                        //                            else if (pcmShort[i] < -4000)
-                        //                            {
-                        //                                pcmShort[i] = -4000;
-                        //                            }
-                        //                        }
-                        //
-                        //                        // n.b. no clipping test going on here
-                        //                        //pcmShort[i] = (short) (pcmShort[i] * MicBoost);
-                        //                    }
-
                         //process with Speex
                         _speex.Process(new ArraySegment<short>(pcmShort));
 
@@ -335,7 +313,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                             _buffBufferedWaveProvider.AddSamples(decodedBytes, 0, decodedLength);
 
-                            
+                //            Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Added samples");
+
+
                         }
                         else
                         {
@@ -351,6 +331,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                     pcmShort = null;
                 }
             }
+
+          //   _stopwatch.Restart();
         }
 
         object lockob = new object();
