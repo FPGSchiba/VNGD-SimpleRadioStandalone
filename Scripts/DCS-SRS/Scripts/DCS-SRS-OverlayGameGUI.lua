@@ -368,7 +368,7 @@ function srsOverlay.paintRadio()
 end
 
 function srsOverlay.createWindow()
-    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Tech\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
+    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Services\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
 
     box         = window.Box
     pNoVisible  = window.pNoVisible --PlaceHolder - Not Visible
