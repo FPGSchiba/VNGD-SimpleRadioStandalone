@@ -1,13 +1,7 @@
 -- Version 1.8.0.6
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
--- Add (without the --) To the END OF your Export.lua to enable Simple Radio Standalone :
-
---      local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Scripts\DCS-SimpleRadioStandalone.lua]])
-
--- 
--- Make sure you COPY this file to the same location as the Export.lua as well.
--- If an Export.lua doesn't exist, just create one add add the single line in
+-- Run the installer to correctly install this file
 local SR = {}
 
 SR.LOS_RECEIVE_PORT = 9086

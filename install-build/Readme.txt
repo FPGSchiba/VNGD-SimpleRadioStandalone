@@ -6,7 +6,7 @@ Dedicated servers DO NOT need the installer run.
 
 *** To Install Manually for Clients ***
 
-Copy Scripts\DCS-SRS folder to C:\Users\USERNAME\Saved Games\DCS\Mods\Tech\ 
+Copy Scripts\DCS-SRS folder to C:\Users\USERNAME\Saved Games\DCS\Mods\Services 
 
 Copy Scripts\Hooks\DCS-SRS-Hook.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts\Hooks -- NOTE: Sub-folder in Scripts folder
 
@@ -14,7 +14,7 @@ Create the folders if they dont exist
 
 Add:
 
-pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\\Tech\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);
+pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\Services\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);
 
 To the END of the Export.lua file in C:\Users\USERNAME\Saved Games\DCS\Scripts
 
