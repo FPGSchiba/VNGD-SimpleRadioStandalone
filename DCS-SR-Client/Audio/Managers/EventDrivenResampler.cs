@@ -19,6 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private WdlResamplingSampleProvider mediaFoundationResampler;
         private BufferedWaveProvider buf;
         private IWaveProvider waveOut;
+        private int bufferMultiplier = 1;
 
         public EventDrivenResampler(bool windowsN, WaveFormat input,WaveFormat output)
         {
@@ -27,6 +28,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             this.output = output;
             buf = new BufferedWaveProvider(input);
             buf.ReadFully = false;
+
+            if (output.BitsPerSample > input.BitsPerSample)
+            {
+                bufferMultiplier = 2;
+            }
+
 
             if (windowsN)
             {
@@ -41,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private byte[] ResampleBytesDMO(byte[] inputByteArray, int length)
         {
-            byte[] outBuffer = new byte[length * 2];
+            byte[] outBuffer = new byte[length * bufferMultiplier];
             buf.AddSamples(inputByteArray, 0, length);
 
             int read = dmoResampler.Read(outBuffer, 0, outBuffer.Length);
@@ -61,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private byte[] ResampleBytesMFC(byte[] inputByteArray, int length)
         {
-            byte[] outBuffer = new byte[length * 2];
+            byte[] outBuffer = new byte[length * bufferMultiplier];
 
             buf.AddSamples(inputByteArray, 0, length);
 
@@ -127,7 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private short[] ResampleMFC(byte[] inputByteArray, int length)
         {
-            byte[] outBuffer = new byte[length * 2];
+            byte[] outBuffer = new byte[length * bufferMultiplier];
 
             buf.AddSamples(inputByteArray, 0, length);
 
@@ -156,7 +163,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             if (windowsN)
             {
                 buf.ClearBuffer();
-
             }
             else
             {

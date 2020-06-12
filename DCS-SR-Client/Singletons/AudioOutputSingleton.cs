@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private AudioOutputSingleton()
         {
-            WindowsN = true;//DetectWindowsN();
+            WindowsN = DetectWindowsN();
             OutputAudioDevices = BuildNormalAudioOutputs();
             MicOutputAudioDevices = BuildMicAudioOutputs();
         }
