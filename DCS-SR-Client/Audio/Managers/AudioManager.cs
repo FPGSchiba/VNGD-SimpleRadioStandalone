@@ -309,7 +309,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             if (e.BytesRecorded > 0)
             {
                 Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {e.BytesRecorded}");
-                byte[] result = _resampler.Resample(e.Buffer, e.BytesRecorded);
+                byte[] result = _resampler.ResampleBytes(e.Buffer, e.BytesRecorded);
 
                 Logger.Info($"Time: {_stopwatch.ElapsedMilliseconds} - Bytes: {result.Length}");
                 _stopwatch.Restart();

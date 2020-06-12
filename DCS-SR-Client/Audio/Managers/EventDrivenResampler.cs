@@ -33,12 +33,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         }
 
-        public byte[] Resample(byte[] inputByteArray, int length)
+        public byte[] ResampleBytes(byte[] inputByteArray, int length)
         {
             // 1. Read from the input stream 
 
             // 2. copy into our DMO's input buffer
-            inputMediaBuffer.LoadData(inputByteArray, inputByteArray.Length);
+            inputMediaBuffer.LoadData(inputByteArray, length);
 
             // 3. Give the input buffer to the DMO to process
             dmoResampler.MediaObject.ProcessInput(0, inputMediaBuffer, DmoInputDataBufferFlags.None, 0, 0);
@@ -55,10 +55,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 return new byte[0];
             }
 
+            //TODO improve buffer handling here
+
             byte[] result = new byte[outputBuffer.Length];
             // 5. Now get the data out of the output buffer
             outputBuffer.RetrieveData(result, 0);
             return result;
+        }
+
+        public short[] Resample(byte[] inputByteArray, int length)
+        {
+            byte[] bytes = ResampleBytes(inputByteArray, length);
+
+            if (bytes.Length == 0)
+            {
+                return new short[0];
+            }
+
+            //convert byte to short
+            short[] sdata = new short[bytes.Length / 2];
+            Buffer.BlockCopy(bytes, 0, sdata, 0, bytes.Length); ;
+
+            return sdata;
         }
 
         /// <summary>
