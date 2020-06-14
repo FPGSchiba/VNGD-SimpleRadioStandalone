@@ -54,12 +54,13 @@
                            Padding="0"
                            Text="Radio" />
             </TabItem.Header>
-            <WrapPanel>
+            <StackPanel Orientation="Vertical">
                 <!--    -->
                 <!--  <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10"  -->
                 <!--  Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>  -->
 
-                <Button x:Name="Up10"
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="Up10"
                         Width="15"
                         Height="10"
                         Margin="20,0,0,0"
@@ -69,7 +70,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+10MHz" />
-                <Button x:Name="Up1"
+                    <Button x:Name="Up1"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -79,7 +80,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+1MHZ" />
-                <Button x:Name="Up01"
+                    <Button x:Name="Up01"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -89,7 +90,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+0.1MHz" />
-                <Button x:Name="Up001"
+                    <Button x:Name="Up001"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -99,7 +100,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+0.01MHz" />
-                <Button x:Name="Up0001"
+                    <Button x:Name="Up0001"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -109,32 +110,35 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+0.001MHz" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="RadioFrequency"
+                               Width="145"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Background="Black"
+                               Foreground="#00FF00"
+                               MouseDown="RadioFrequencyText_Click"
+                               MouseRightButtonDown="RadioFrequencyText_RightClick"
+                               Style="{x:Null}"
+                               Text="000.00AM"
+                               TextAlignment="Center"
+                               TextWrapping="NoWrap" />
 
-                <TextBlock x:Name="RadioFrequency"
-                           Width="145"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Background="Black"
-                           Foreground="#00FF00"
-                           MouseDown="RadioFrequencyText_Click"
-                           MouseRightButtonDown="RadioFrequencyText_RightClick"
-                           Style="{x:Null}"
-                           Text="000.00AM"
-                           TextAlignment="Center"
-                           TextWrapping="NoWrap" />
-
-                <Ellipse x:Name="RadioActive"
-                         Width="12"
-                         Height="12"
-                         Margin="2"
-                         HorizontalAlignment="Right"
-                         VerticalAlignment="Center"
-                         Fill="#FF9900"
-                         MouseDown="RadioSelectSwitch"
-                         Stroke="Black"
-                         Style="{x:Null}"
-                         ToolTip="Selected Radio" />
-                <Button x:Name="Down10"
+                    <Ellipse x:Name="RadioActive"
+                             Width="12"
+                             Height="12"
+                             Margin="2"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Center"
+                             Fill="#FF9900"
+                             MouseDown="RadioSelectSwitch"
+                             Stroke="Black"
+                             Style="{x:Null}"
+                             ToolTip="Selected Radio" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="Down10"
                         Width="15"
                         Height="10"
                         Margin="20,0,0,0"
@@ -144,7 +148,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-10MHZ" />
-                <Button x:Name="Down1"
+                    <Button x:Name="Down1"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -154,7 +158,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-1MHz" />
-                <Button x:Name="Down01"
+                    <Button x:Name="Down01"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -164,7 +168,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.1MHz" />
-                <Button x:Name="Down001"
+                    <Button x:Name="Down001"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -174,7 +178,7 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.01MHz" />
-                <Button x:Name="Down0001"
+                    <Button x:Name="Down0001"
                         Width="15"
                         Height="10"
                         Margin="5,0,0,0"
@@ -184,27 +188,46 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.001MHz" />
-                <Slider x:Name="RadioVolume"
-                        Width="105"
-                        Height="15"
-                        Margin="20,1,0,0"
-                        IsEnabled="False"
-                        Maximum="100"
-                        Style="{x:Null}"
-                        Thumb.DragCompleted="RadioVolume_DragCompleted"
-                        Thumb.DragStarted="RadioVolume_DragStarted" />
+                </StackPanel>
+               
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,1,0,0">
 
-                <TextBlock x:Name="TunedClients"
-                           Width="35"
-                           Height="15"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Foreground="White"
-                           Text="👤 30"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap" />
 
-            </WrapPanel>
+                    <TextBlock x:Name="TunedClients"
+                               Width="35"
+                               Height="15"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               Text="👤 30"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap" />
+
+                    <Slider x:Name="RadioVolume"
+                            Width="100"
+                            Height="15"
+                            Margin="0,1,0,0"
+                            IsEnabled="False"
+                            Maximum="100"
+                            Style="{x:Null}"
+                            Thumb.DragCompleted="RadioVolume_DragCompleted"
+                            Thumb.DragStarted="RadioVolume_DragStarted" />
+
+                    <Button x:Name="Retransmit"
+                            Width="16"
+                            FontSize="8"
+                            Height="16"
+                            Margin="10,0,0,0"
+                            HorizontalAlignment="Center"
+                            Content="RT"
+                            IsEnabled="True"
+                            Foreground="Black"
+                            Style="{StaticResource DarkStyle-Button}"
+                            Click="RetransmitClick"
+                            ToolTip="Retransmit" />
+
+                </StackPanel>
+            </StackPanel>
         </TabItem>
         <TabItem Name="EncryptionTab">
             <TabItem.Header>

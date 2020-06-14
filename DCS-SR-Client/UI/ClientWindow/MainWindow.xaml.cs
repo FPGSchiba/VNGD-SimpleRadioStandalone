@@ -836,7 +836,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    var input = ((WaveInCapabilities)AudioInput.SelectedAudioInput.Value).ProductName;
+                    var input = ((MMDevice)AudioInput.SelectedAudioInput.Value).ID;
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, input);
                 }
             }
@@ -988,23 +988,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 //get device
                 try
                 {
-                    var inputId = Mic.SelectedIndex - 1;
-
-                    MMDevice output;
-                    if (Speakers.SelectedIndex == 0)
-                    {
-                        output = WasapiOut.GetDefaultAudioEndpoint();
-                    }
-                    else
-                    {
-                        output = (MMDevice)((AudioDeviceListItem)Speakers.SelectedItem).Value;
-                    }
-
                     SaveSelectedInputAndOutput();
 
                     _audioPreview = new AudioPreview();
                     _audioPreview.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-                    _audioPreview.StartPreview(inputId, output, AudioOutput.WindowsN);
+                    _audioPreview.StartPreview(AudioOutput.WindowsN);
 
                     Preview.Content = "Stop Preview";
                 }

@@ -197,7 +197,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         internal void RepaintRadioStatus()
         {
-            SetupEncryption();
+            HandleEncryptionStatus();
+            HandleRetransmitStatus();
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
@@ -208,7 +209,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 RadioFrequency.Text = "Unknown";
 
                 RadioVolume.IsEnabled = false;
-                RadioVolume.Width = 115;
 
                 TunedClients.Visibility = Visibility.Hidden;
 
@@ -340,13 +340,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (count > 0)
                 {
                     TunedClients.Text = "👤" + count;
-                    RadioVolume.Width = 105;
                     TunedClients.Visibility = Visibility.Visible;
                 }
                 else
                 {
                     TunedClients.Visibility = Visibility.Hidden;
-                    RadioVolume.Width = 115;
                 }
 
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
@@ -372,6 +370,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 {
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
+               
             }
 
             TabItem item = TabControl.SelectedItem as TabItem;
@@ -382,7 +381,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
-        private void SetupEncryption()
+        private void HandleEncryptionStatus()
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
@@ -446,6 +445,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
             }
         }
 
+        public void HandleRetransmitStatus()
+        {
+            var serverSettings = SyncedServerSettings.Instance;
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && serverSettings.RetransmitNodeLimit > 0)
+            {
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
+                if (currentRadio.rtMode == RadioInformation.RetransmitMode.DISABLED)
+                {
+                    Retransmit.Visibility = Visibility.Hidden;
+                }
+                else if(currentRadio.rtMode == RadioInformation.RetransmitMode.COCKPIT)
+                {
+                    Retransmit.Visibility = Visibility.Visible;
+                    Retransmit.IsEnabled = false;
+                }
+                else
+                {
+                    Retransmit.Visibility = Visibility.Visible;
+                    Retransmit.IsEnabled = true;
+                }
+
+                if (currentRadio.retransmit)
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
+                }
+            }
+            else
+            {
+                Retransmit.Visibility = Visibility.Hidden;
+            }
+        }
 
         internal void RepaintRadioReceive()
         {
@@ -517,6 +554,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
         {
             if (EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
+        }
+
+        private void RetransmitClick(object sender, RoutedEventArgs e)
+        {
+            RadioHelper.ToggleRetransmit(RadioId);
         }
     }
 }

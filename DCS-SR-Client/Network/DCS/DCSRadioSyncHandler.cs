@@ -301,8 +301,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = 1;
                     clientRadio.freqMax = 1;
                     clientRadio.secFreq = 0;
+                    clientRadio.retransmit = false;
                     clientRadio.modulation = RadioInformation.Modulation.DISABLED;
                     clientRadio.name = "No Radio";
+                    clientRadio.rtMode = RadioInformation.RetransmitMode.DISABLED;
+                    clientRadio.retransmit = false;
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
@@ -323,8 +326,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     clientRadio.freqMin = 1;
                     clientRadio.freqMax = 1;
                     clientRadio.secFreq = 0;
+                    clientRadio.retransmit = false;
                     clientRadio.modulation = RadioInformation.Modulation.DISABLED;
                     clientRadio.name = "No Radio";
+                    clientRadio.rtMode = RadioInformation.RetransmitMode.DISABLED;
+                    clientRadio.retransmit = false;
 
                     clientRadio.freqMode = RadioInformation.FreqMode.COCKPIT;
                     clientRadio.guardFreqMode = RadioInformation.FreqMode.COCKPIT;
@@ -354,6 +360,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     //update modes
                     clientRadio.freqMode = updateRadio.freqMode;
                     clientRadio.guardFreqMode = updateRadio.guardFreqMode;
+                    clientRadio.rtMode = updateRadio.rtMode;
 
                     if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION))
                     {
@@ -392,8 +399,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                             }
 
                         }
-
-
 
                         clientRadio.channel = updateRadio.channel;
                     }
@@ -456,6 +461,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                     if ((updateRadio.volMode == RadioInformation.VolumeMode.COCKPIT) || overrideFreqAndVol)
                     {
                         clientRadio.volume = updateRadio.volume;
+                    }
+
+                    //handle Retransmit mode
+                    if ((updateRadio.rtMode == RadioInformation.RetransmitMode.COCKPIT))
+                    {
+                        clientRadio.rtMode = updateRadio.rtMode;
+                        clientRadio.retransmit = updateRadio.retransmit;
+                    }else if (updateRadio.rtMode == RadioInformation.RetransmitMode.DISABLED)
+                    {
+                        clientRadio.rtMode = updateRadio.rtMode;
+                        clientRadio.retransmit = false;
                     }
 
                     //handle Channels load for radios

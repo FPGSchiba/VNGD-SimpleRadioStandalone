@@ -7,265 +7,413 @@
              Width="330"
              Height="575"
              mc:Ignorable="d">
-    <Grid Margin="0,0,-6,0">
-        <Button x:Name="ServerStartStop"
-                Width="75"
-                Margin="18,18,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding ServerButtonText}" />
-        <Label Width="55"
-               Margin="106,0,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Clients:" />
-        <Label x:Name="ClientsCount"
-               Width="44"
-               Margin="157,0,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="0" />
-        <Button x:Name="ShowClientList"
-                Width="75"
-                Margin="206,18,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="Client Admin" />
-        <Button x:Name="RadioSecurityToggle"
-                Width="75"
-                Margin="206,60,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding RadioSecurityText}" />
-        <Button x:Name="SpectatorAudioToggle"
-                Width="75"
-                Margin="206,88,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding SpectatorAudioText}" />
-        <Label Width="143"
-               Margin="18,55,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Secure Coalition Radios" />
-        <Label Width="143"
-               Margin="18,81,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Spectator Audio" />
-        <Label Width="143"
-               Margin="18,107,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Auto Export List" />
+    <ScrollViewer VerticalScrollBarVisibility="Visible"  Margin="0,0,0,0" >
+        <StackPanel Orientation="Vertical" Margin="5" >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-        <Button x:Name="ExportListToggle"
-                Width="75"
-                Margin="206,114,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding ExportListText}" />
+                <Button Grid.Row="0"
+                        Grid.Column="0" x:Name="ServerStartStop"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Content="{Binding ServerButtonText}" />
 
-        <Label Width="143"
-               Margin="18,133,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Line of Sight" />
-
-        <Button x:Name="LOSToggle"
-                Width="75"
-                Margin="206,139,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding LOSText}" />
-
-        <Label Width="143"
-               Margin="18,159,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Distance Limit" />
-
-        <Button x:Name="DistanceLimitToggle"
-                Width="75"
-                Margin="206,165,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding DistanceLimitText}" />
+                <StackPanel Orientation="Vertical" Grid.Row="0"
+                            Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="55"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Content="Clients:" />
+                        <Label x:Name="ClientsCount"
+                               Width="44"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Content="0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="55"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Content="Port:" />
+                        <Label x:Name="ListeningPort"
+                               Width="44"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Content="5002" />
+                    </StackPanel>
 
 
-        <Label Width="143"
-               Margin="18,185,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="IRL Radio Tx Behaviour" />
+                </StackPanel>
 
-        <Button x:Name="RealRadioToggle"
-                Width="75"
-                Margin="206,192,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding RealRadioText}" />
 
-        <Label Width="143"
-               Margin="18,216,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="IRL Radio Rx Behaviour" />
+                <Button x:Name="ShowClientList"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Content="Client Admin" Grid.Row="0"
+                        Grid.Column="2" />
 
-        <Button x:Name="IRLRadioRxBehaviourToggle"
-                Width="75"
-                Margin="206,221,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding IRLRadioRxText}" />
+                <Label
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Content="Secure Coalition Radios"
+                    Grid.Row="1"
+                    Grid.Column="0" Grid.ColumnSpan="2"/>
 
-        <Label Width="143"
-               Margin="18,247,0,-3"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Radio Expansion" />
+                <Button x:Name="RadioSecurityToggle"
+                        Content="{Binding RadioSecurityText}"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
 
-        <Button x:Name="RadioExpansionToggle"
-                Width="75"
-                Margin="206,252,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding RadioExpansion}" />
+                <Label Content="Spectator Audio" 
+                       Grid.Row="2"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="143"
-               Margin="18,278,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Allow Radio Encryption" />
+                <Button x:Name="SpectatorAudioToggle"
+                        Content="{Binding SpectatorAudioText}"
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
 
-        <Button x:Name="AllowRadioEncryptionToggle"
-                Width="75"
-                Margin="206,278,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding AllowRadioEncryption}" />
+                <Label Content="Auto Export List" 
+                       Grid.Row="3"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="165"
-               Margin="18,309,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Check for beta updates" />
+                <Button x:Name="ExportListToggle"
+                        Content="{Binding ExportListText}"
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center" />
 
-        <Button x:Name="CheckForBetaUpdatesToggle"
-                Width="75"
-                Margin="206,309,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding CheckForBetaUpdates}" />
+                <Label Content="Line of Sight" 
+                       Grid.Row="4"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="165"
-               Margin="18,340,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="External AWACS Mode (EAM)" />
+                <Button x:Name="LOSToggle"
+                        Content="{Binding LOSText}"
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
 
-        <Button x:Name="ExternalAWACSModeToggle"
-                Width="75"
-                Margin="206,340,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Content="{Binding ExternalAWACSMode}" />
+                <Label Content="Distance Limit" 
+                       Grid.Row="5"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="143"
-               Margin="18,366,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="EAM blue coal. password" />
+                <Button x:Name="DistanceLimitToggle"
+                        Content="{Binding DistanceLimitText}"
+                        Grid.Row="5"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
 
-        <TextBox x:Name="ExternalAWACSModeBluePassword"
-                Width="106"
-                Margin="206,374,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                IsEnabled="{Binding IsExternalAWACSModeEnabled}"
-                Text="{Binding Path=ExternalAWACSModeBluePassword, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Content="IRL Radio Tx Behaviour" 
+                       Grid.Row="6"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="143"
-               Margin="18,392,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="EAM red coal. password" />
+                <Button x:Name="RealRadioToggle"
+                        Content="{Binding RealRadioText}"
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
 
-        <TextBox x:Name="ExternalAWACSModeRedPassword"
-                Width="106"
-                Margin="206,400,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                IsEnabled="{Binding IsExternalAWACSModeEnabled}"
-                Text="{Binding Path=ExternalAWACSModeRedPassword, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Content="IRL Radio Rx Behaviour" 
+                       Grid.Row="7"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
-        <Label Width="55"
-               Margin="106,18,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Port:" />
-        <Label x:Name="ListeningPort"
-               Width="44"
-               Margin="157,18,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="5002" />
-        <Label Width="165"
-            Margin="18,418,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="Test Frequencies AM (MHz)" />
-        <TextBox x:Name="TestFrequencies"
-            Width="106"
-            Margin="206,426,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            IsEnabled="True"
-            Text="247.2,120.3"/>
-        <Label Width="165"
-            Margin="18,476,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="Show Tuned/Client Count" />
-        <Button x:Name="TunedCountToggle"
-            Width="75"
-            Margin="206,483,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="{Binding TunedCountText}" />
-        <Label Width="170"
-            Margin="18,446,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="Global Lobby Freq. AM (MHz)" />
-        <TextBox x:Name="GlobalLobbyFrequencies"
-            Width="106"
-            Margin="206,454,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            IsEnabled="True"
-            Text="241.2,122.3"/>
-        <Label Width="165"
-            Margin="18,502,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="LotATC Transponder Export" />
-        <Button x:Name="LotATCExportToggle"
-            Width="75"
-            Margin="206,508,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="{Binding LotATCExportText}" />
-        <Label Width="165"
-            Margin="18,528,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="Show Transmitter Name" />
-        <Button x:Name="ShowTransmitterNameToggle"
-            Width="75"
-            Margin="206,534,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="{Binding ShowTransmitterNameText}" />
-    </Grid>
+                <Button x:Name="IRLRadioRxBehaviourToggle"
+                        Content="{Binding IRLRadioRxText}"
+                        Grid.Row="7"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Radio Expansion"
+                       Grid.Row="8"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="RadioExpansionToggle"
+                        Content="{Binding RadioExpansion}"    
+                        Grid.Row="8"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Allow Radio Encryption"
+                       Grid.Row="9"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="AllowRadioEncryptionToggle"
+                        Content="{Binding AllowRadioEncryption}"
+                        Grid.Row="9"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Check for beta updates" 
+                       Grid.Row="10"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="CheckForBetaUpdatesToggle"
+                       Content="{Binding CheckForBetaUpdates}" 
+                       Grid.Row="10"
+                       Grid.Column="2"
+                       Width="75"
+                       Height="20"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+
+
+                <Label Content="External AWACS Mode (EAM)" 
+                       Grid.Row="11"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="ExternalAWACSModeToggle"
+                        Content="{Binding ExternalAWACSMode}" 
+                        Grid.Row="11"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="EAM blue coal. password" 
+                       Grid.Row="12"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <TextBox x:Name="ExternalAWACSModeBluePassword"
+                         IsEnabled="{Binding IsExternalAWACSModeEnabled}"
+                         Text="{Binding Path=ExternalAWACSModeBluePassword, UpdateSourceTrigger=PropertyChanged}"
+                         Grid.Row="12"
+                         Grid.Column="2"
+                         Width="75"
+                         Height="20"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"/>
+
+                <Label Content="EAM red coal. password"
+                       Grid.Row="13"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <TextBox x:Name="ExternalAWACSModeRedPassword"
+                         IsEnabled="{Binding IsExternalAWACSModeEnabled}"
+                         Text="{Binding Path=ExternalAWACSModeRedPassword, UpdateSourceTrigger=PropertyChanged}"
+                         Grid.Row="13"
+                         Grid.Column="2"
+                         Width="75"
+                         Height="20"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"/>
+
+                <Label Content="Test Frequencies AM (MHz)"
+                       Grid.Row="14"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <TextBox x:Name="TestFrequencies"
+                         IsEnabled="True"
+                         Text="247.2,120.3"
+                         Grid.Row="14"
+                         Grid.Column="2"
+                         Width="75"
+                         Height="20"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"/>
+
+
+                <Label Content="Show Tuned/Client Count" 
+                       Grid.Row="15"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="TunedCountToggle"
+                       Content="{Binding TunedCountText}"
+                       Grid.Row="15"
+                       Grid.Column="2"
+                       Width="75"
+                       Height="20"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+
+                <Label Content="Global Lobby Freq. AM (MHz)"
+                       Grid.Row="16"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <TextBox x:Name="GlobalLobbyFrequencies"
+                         IsEnabled="True"
+                         Text="241.2,122.3"  
+                         Grid.Row="16"
+                         Grid.Column="2"
+                         Width="75"
+                         Height="20"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"/>
+
+                <Label Content="LotATC Transponder Export" 
+                       Grid.Row="17"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="LotATCExportToggle"
+                        Content="{Binding LotATCExportText}"
+                        Grid.Row="17"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Show Transmitter Name" 
+                       Grid.Row="18"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="ShowTransmitterNameToggle"
+                        Content="{Binding ShowTransmitterNameText}" 
+                        Grid.Row="18"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Retransmit Hop/Node Count"
+                       Grid.Row="19"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+                <StackPanel Orientation="Vertical"
+                            Grid.Row="19"
+                            Grid.Column="2">
+                    <Grid  Width="75">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" FontSize="10" Content="0" HorizontalAlignment="Left" />
+                        <Label HorizontalAlignment="Right" Grid.Column="1" FontSize="10" Content="5" />
+                    </Grid>
+                    <Slider 
+                        Value="{Binding  NodeLimit}"
+                            Width="75"
+                            Height="40"
+                            VerticalAlignment="Center"
+                            Interval="1"
+                            Minimum="0"
+                            Maximum="5"
+                            Ticks="0,1,2,3,4,5"
+                            TickPlacement="TopLeft"
+                            IsSnapToTickEnabled="True"
+                            HorizontalAlignment="Center">
+
+                    </Slider>
+
+
+
+                </StackPanel>
+                
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

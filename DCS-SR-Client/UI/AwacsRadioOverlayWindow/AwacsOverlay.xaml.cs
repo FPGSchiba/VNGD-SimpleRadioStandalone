@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -121,6 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 else
                 {
                     ToggleGlobalSimultaneousTransmissionButton.IsEnabled = false;
+                    ToggleGlobalSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
                     ToggleGlobalSimultaneousTransmissionButton.Content = "Simul. Transmission OFF";
                 }
             }
@@ -258,12 +260,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
 
                 ToggleGlobalSimultaneousTransmissionButton.Content = _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission ? "Simul. Transmission ON" : "Simul. Transmission OFF";
+                ToggleGlobalSimultaneousTransmissionButton.Foreground = _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission ? new SolidColorBrush(Colors.Orange) : new SolidColorBrush(Colors.White);
 
                 foreach (var radio in radioControlGroup)
                 {
                     if (!dcsPlayerRadioInfo.simultaneousTransmission)
                     {
-                        radio.ToggleSimultaneousTransmissionButton.Content = "Sim. OFF";
+                        radio.ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
                     }
 
                     radio.RepaintRadioStatus();
