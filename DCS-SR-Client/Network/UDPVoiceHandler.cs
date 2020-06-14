@@ -546,14 +546,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             var receivingWithRetransmit = radioReceivingPriorities.Where(receivingRadio => 
                 (receivingRadio.Decryptable || (receivingRadio.Encryption == 0)) 
                 && receivingRadio.ReceivingRadio.retransmit
-                && !globalFrequencies.Contains(receivingRadio.ReceivingRadio.freq)
-                && !receivingRadio.ReceivingState.IsSecondary);
+                //check global
+                && !globalFrequencies.Any(freq => DCSPlayerRadioInfo.FreqCloseEnough(receivingRadio.ReceivingRadio.freq, freq))
+                && !receivingRadio.ReceivingState.IsSecondary).ToList();
+
+            //didnt receive on any radios that we could decrypt
+            //stop
+            if (receivingWithRetransmit.Count == 0)
+            {
+                return;
+            }
 
             //radios able to retransmit
             var radiosWithRetransmit = _clientStateSingleton.DcsPlayerRadioInfo.radios.Where(radio => radio.retransmit);
 
             //Check we're not retransmitting through a radio we just received on?
-            //TODO handle GUARD here - makes this logic more tricky!
             foreach (var receivingRadio in receivingWithRetransmit)
             {
                 radiosWithRetransmit = radiosWithRetransmit.Where(radio => !DCSPlayerRadioInfo.FreqCloseEnough(radio.freq, receivingRadio.Frequency));
