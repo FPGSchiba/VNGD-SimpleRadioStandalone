@@ -21,6 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
        * - FIXED SEGMENT
        * UInt UnitId - 4 bytes
        * UInt64 PacketId - 8 bytes
+       * byte Retransmit / node / hop count - 1 byte
        * Bytes / ASCII String TRANSMISSION GUID - 22 bytes used for transmission relay
        * Bytes / ASCII String CLIENT GUID - 22 bytes
        */
