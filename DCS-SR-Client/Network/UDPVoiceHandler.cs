@@ -547,7 +547,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 (receivingRadio.Decryptable || (receivingRadio.Encryption == 0)) 
                 && receivingRadio.ReceivingRadio.retransmit
                 && !globalFrequencies.Contains(receivingRadio.ReceivingRadio.freq)
-                && receivingRadio.ReceivingState.IsSimultaneous);
+                && !receivingRadio.ReceivingState.IsSecondary);
 
             //radios able to retransmit
             var radiosWithRetransmit = _clientStateSingleton.DcsPlayerRadioInfo.radios.Where(radio => radio.retransmit);
