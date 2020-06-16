@@ -908,8 +908,9 @@ function SR.exportRadioSA342(_data)
     _data.radios[2].freq = SR.getRadioFrequency(5)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 68, { 1.0, 0.0 }, true)
-
-    _data.radios[3].name = "UHF TRA 6031"
+	_data.radios[2].rtMode = 1
+	
+	_data.radios[3].name = "UHF TRA 6031"
 
     -- deal with odd radio tune & rounding issue... BUG you cannot set frequency 243.000 ever again
     local freq = SR.getRadioFrequency(31, 500)
@@ -922,6 +923,7 @@ function SR.exportRadioSA342(_data)
 
     _data.radios[3].encKey = 1
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
+	_data.radios[3].rtMode = 1
 
     _data.radios[4].name = "TRC 9600 PR4G"
     _data.radios[4].freq = SR.getRadioFrequency(28)
@@ -930,6 +932,7 @@ function SR.exportRadioSA342(_data)
 
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
+	_data.radios[4].rtMode = 1
 
     --- is UHF ON?
     if SR.getSelectorPosition(383, 0.167) == 0 then

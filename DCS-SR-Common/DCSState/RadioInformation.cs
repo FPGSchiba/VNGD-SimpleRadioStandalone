@@ -75,6 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public RetransmitMode rtMode = RetransmitMode.DISABLED;
+
         //should the radio restransmit?
         public bool retransmit = false;
 

@@ -406,7 +406,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (radio != null)
             {
-                if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
+                if (radio.rtMode == RadioInformation.RetransmitMode.OVERLAY)
                 {
                     radio.retransmit = !radio.retransmit;
 
