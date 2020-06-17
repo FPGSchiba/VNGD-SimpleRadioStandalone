@@ -1,4 +1,4 @@
--- Version 1.9.0.0
+-- Version 1.9.0.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -3483,4 +3483,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.1")
