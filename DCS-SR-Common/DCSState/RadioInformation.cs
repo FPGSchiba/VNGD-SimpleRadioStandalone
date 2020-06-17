@@ -31,6 +31,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             OVERLAY = 1,
         }
 
+        public enum RetransmitMode
+        {
+            COCKPIT = 0,
+            OVERLAY = 1,
+            DISABLED = 2,
+        }
+
         public enum Modulation
         {
             AM = 0,
@@ -42,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             MIDS = 6,
         }
 
-        public bool enc = false; // encrytion enabled
+        public bool enc = false; // encryption enabled
         public byte encKey = 0;
 
         [JsonNetworkIgnoreSerialization]
@@ -66,14 +73,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public double secFreq = 1;
 
         [JsonNetworkIgnoreSerialization]
+        [JsonDCSIgnoreSerialization]
+        public RetransmitMode rtMode = RetransmitMode.DISABLED;
+
+        //should the radio restransmit?
+        public bool retransmit = false;
+
+        [JsonNetworkIgnoreSerialization]
         public float volume = 1.0f;
 
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public FreqMode freqMode = FreqMode.COCKPIT;
+
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public FreqMode guardFreqMode = FreqMode.COCKPIT;
+
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public VolumeMode volMode = VolumeMode.COCKPIT;
@@ -120,6 +136,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 return false;
             }
+            if (retransmit != compare.retransmit)
+            {
+                return false;
+            }
             if (!DCSPlayerRadioInfo.FreqCloseEnough(secFreq, compare.secFreq))
             {
                 return false;
@@ -162,6 +182,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 simul = this.simul,
                 volMode = this.volMode,
                 volume = this.volume,
+                retransmit = this.retransmit,
+                rtMode = this.rtMode
 
             };
         }

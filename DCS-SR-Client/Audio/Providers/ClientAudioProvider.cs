@@ -142,6 +142,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AddEncryptionFailureEffect(audio);
 
+                AdjustVolume(audio);
+
                 if (globalSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                 {
                     AddRadioEffect(audio);

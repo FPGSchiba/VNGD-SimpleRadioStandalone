@@ -399,5 +399,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 currentRadio.volume = volume;
             }
         }
+
+        public static void ToggleRetransmit(int radioId)
+        {
+            var radio = GetRadio(radioId);
+
+            if (radio != null)
+            {
+                if (radio.rtMode == RadioInformation.RetransmitMode.OVERLAY)
+                {
+                    radio.retransmit = !radio.retransmit;
+
+                    //make radio data stale to force resysnc
+                    ClientStateSingleton.Instance.LastSent = 0;
+                }
+            }
+
+        }
     }
 }

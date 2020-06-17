@@ -31,7 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             _clientAdminViewModel = clientAdminViewModel;
             _eventAggregator.Subscribe(this);
 
-            DisplayName = "DCS-SRS Server - " + UpdaterChecker.VERSION;
+            DisplayName = $"DCS-SRS Server - {UpdaterChecker.VERSION} - {ListeningPort}" ;
 
             Logger.Info("DCS-SRS Server Running - " + UpdaterChecker.VERSION);
         }
@@ -39,6 +39,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public bool IsServerRunning { get; private set; } = true;
 
         public string ServerButtonText => IsServerRunning ? "Stop Server" : "Start Server";
+
+        public int NodeLimit
+        {
+            get => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT).IntValue;
+            set
+            {
+                ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT,
+                    value.ToString());
+                _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            }
+        }
 
         public int ClientsCount { get; private set; }
 

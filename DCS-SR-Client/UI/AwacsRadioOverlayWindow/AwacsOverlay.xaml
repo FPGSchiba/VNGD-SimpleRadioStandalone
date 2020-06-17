@@ -169,6 +169,6 @@
                 Click="ToggleGlobalSimultaneousTransmissionButton_Click"
                 Content="Simul. Transmission OFF"
                 Margin="0,5,25,5"
-                Style="{x:Null}" />
+                Style="{StaticResource DarkStyle-Button}" />
     </Grid>
 </Window>

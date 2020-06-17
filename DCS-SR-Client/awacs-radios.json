@@ -1,4 +1,5 @@
-﻿[{
+﻿[
+  {
     "enc": false,
     "encKey": 0,
     "encMode": 0,
@@ -13,8 +14,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 2
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -29,8 +32,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -45,8 +50,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -61,8 +68,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -77,8 +86,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -93,8 +104,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 0,
     "encMode": 0,
@@ -109,8 +122,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 0,
     "encMode": 0,
@@ -125,8 +140,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 1,
     "encMode": 1,
@@ -141,8 +158,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 0,
     "encMode": 0,
@@ -157,8 +176,10 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}, {
+    "simul": false,
+    "rtMode": 1
+  },
+  {
     "enc": false,
     "encKey": 0,
     "encMode": 0,
@@ -173,5 +194,6 @@
     "volMode": 1,
     "expansion": false,
     "channel": -1,
-    "simul": false
-}]
+    "simul": false,
+    "rtMode": 1
+  }]

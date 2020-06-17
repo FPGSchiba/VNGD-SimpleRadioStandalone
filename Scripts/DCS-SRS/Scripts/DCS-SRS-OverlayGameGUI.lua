@@ -1,9 +1,9 @@
--- Version 1.8.0.6
+-- Version 1.9.0.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
 
-net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.8.0.6 ")
+net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.9.0.0 ")
 
 local base = _G
 
@@ -178,16 +178,20 @@ function srsOverlay.updateRadio()
 
             local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
 
-			if  _radio.modulation == 5 or _radio.modulation == 6 then 
+            if  _radio.modulation == 5 or _radio.modulation == 6 then 
 
-				fullMessage = _radio.name.." - "
-				if  _radio.channel > 0 then
+                fullMessage = _radio.name.." - "
+                if  _radio.channel > 0 then
 
                     if _compactMode and (_isReceiving == 1 or _isReceiving == 2) and _sentBy ~= "" then
                         fullMessage = fullMessage .._sentBy
                     else
                        
                         fullMessage = fullMessage.." CHN ".._radio.channel
+
+                        if _radio.retransmit then
+                            fullMessage = fullMessage.." RT"
+                        end
                     
                         if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
                             fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
@@ -195,19 +199,19 @@ function srsOverlay.updateRadio()
 
                     end
 
-					local tuned = _radioState.TunedClients
+                    local tuned = _radioState.TunedClients
 
-					if tuned then
-						local tunedRadio = tuned[_i]
+                    if tuned then
+                        local tunedRadio = tuned[_i]
 
-						if tunedRadio > 0 then
-							fullMessage  = fullMessage.." ⚡"..tunedRadio
-						end
+                        if tunedRadio > 0 then
+                            fullMessage  = fullMessage.." ⚡"..tunedRadio
+                        end
 
-					end
-				else
-					fullMessage = fullMessage.." OFF"
-				end
+                    end
+                else
+                    fullMessage = fullMessage.." OFF"
+                end
             elseif _radio.modulation == 3 then
                      fullMessage = ""
                     
@@ -230,8 +234,8 @@ function srsOverlay.updateRadio()
                      elseif _radio.modulation == 1 then
                         fullMessage = fullMessage.." FM"
                      elseif _radio.modulation == 4 then
-						fullMessage = fullMessage.." HQ"
-					 end
+                        fullMessage = fullMessage.." HQ"
+                     end
 
                      if _radio.secFreq > 100 then
                         fullMessage = fullMessage.." G"
@@ -243,6 +247,10 @@ function srsOverlay.updateRadio()
 
                      if _radio.enc and _radio.encKey > 0 then
                         fullMessage = fullMessage.." E".._radio.encKey
+                     end
+
+                     if _radio.retransmit then
+                        fullMessage = fullMessage.." RT"
                      end
 
                      if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
@@ -292,7 +300,7 @@ function srsOverlay.updateRadio()
             elseif  _isReceiving == 2 then
                 _skin = typesMessage.guard
 
-				if not _compactMode then 
+                if not _compactMode then 
                     fullMessage = fullMessage .." ".._sentBy
                 end
             end
@@ -368,7 +376,7 @@ function srsOverlay.paintRadio()
 end
 
 function srsOverlay.createWindow()
-    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Tech\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
+    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Services\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
 
     box         = window.Box
     pNoVisible  = window.pNoVisible --PlaceHolder - Not Visible
@@ -606,4 +614,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.8.0.6 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.9.0.0 ")

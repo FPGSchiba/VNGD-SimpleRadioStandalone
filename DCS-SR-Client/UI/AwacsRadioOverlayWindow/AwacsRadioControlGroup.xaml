@@ -53,11 +53,11 @@
                            Padding="0"
                            Text="Radio" />
             </TabItem.Header>
-            <WrapPanel>
+            <StackPanel Orientation="Vertical">
                 <!--    -->
                 <!--  <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10"  -->
                 <!--  Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>  -->
-
+<StackPanel Orientation="Horizontal">
                 <Button x:Name="Up10"
                         Width="15"
                         Height="10"
@@ -108,7 +108,8 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="+0.01MHz" />
-
+</StackPanel>
+                <StackPanel Orientation="Horizontal">
                 <TextBox x:Name="RadioFrequency"
                          Width="60"
                          Height="15"
@@ -160,6 +161,8 @@
                          Stroke="Black"
                          Style="{x:Null}"
                          ToolTip="Selected Radio" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
                 <Button x:Name="Down10"
                         Width="15"
                         Height="10"
@@ -210,23 +213,44 @@
                         IsEnabled="False"
                         Style="{StaticResource DarkStyle-Button}"
                         ToolTip="-0.01MHz" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
                 <Slider x:Name="RadioVolume"
-                        Width="95"
+                        Width="90"
                         Height="20"
-                        Margin="3,2,0,0"
+                        Margin="2,2,0,0"
                         IsEnabled="False"
                         Maximum="100"
                         Style="{x:Null}"
                         Thumb.DragCompleted="RadioVolume_DragCompleted"
                         Thumb.DragStarted="RadioVolume_DragStarted" />
+                <Button x:Name="Retransmit"
+                        Width="24"
+                        FontSize="10"
+                        Height="16"
+                        Margin="5,0,5,0"
+                        HorizontalAlignment="Center"
+                        Content="RT"
+                        IsEnabled="True"
+                        Foreground="White"
+                        Style="{StaticResource DarkStyle-Button}"
+                        Click="RetransmitClick"
+                        ToolTip="Retransmit" />
 
-                <Button Name="ToggleSimultaneousTransmissionButton"
+                    <Button x:Name="ToggleSimultaneousTransmissionButton"
+                        Width="24"
+                        FontSize="10"
+                        Height="16"
+                        Margin="2,0,2,0"
+                        HorizontalAlignment="Center"
+                        Content="ST"
+                        IsEnabled="True"
+                        Foreground="White"
+                        Style="{StaticResource DarkStyle-Button}"
                         Click="ToggleSimultaneousTransmissionButton_Click"
-                        Content="Sim. OFF"
-                        Width="50"
-                        Margin="3,0,0,2"
-                        Style="{x:Null}" />
-            </WrapPanel>
+                        ToolTip="Simultaneous Transmission" />
+                </StackPanel>
+                </StackPanel>
         </TabItem>
         <TabItem Name="EncryptionTab">
             <TabItem.Header>

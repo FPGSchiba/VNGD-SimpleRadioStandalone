@@ -38,7 +38,7 @@ namespace NAudio.Dsp
     /// <summary>
     /// Fully managed resampler, based on Cockos WDL Resampler
     /// </summary>
-    class WdlResampler
+    public class WdlResampler
     {
         private const int WDL_RESAMPLE_MAX_FILTERS = 4;
         private const int WDL_RESAMPLE_MAX_NCH = 64;

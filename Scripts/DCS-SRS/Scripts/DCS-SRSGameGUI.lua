@@ -1,8 +1,8 @@
--- Version 1.8.0.6
+-- Version 1.9.0.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Radio Might not work
 
-net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.8.0.6")
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.9.0.0")
 local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
@@ -20,7 +20,7 @@ end
 
 package.path  = package.path..";.\\LuaSocket\\?.lua;"
 package.cpath = package.cpath..";.\\LuaSocket\\?.dll;"
-package.cpath = package.cpath..";"..lfs.writedir().."Mods\\tech\\DCS-SRS\\bin\\?.dll;"
+package.cpath = package.cpath..";"..lfs.writedir().."Mods\\Services\\DCS-SRS\\bin\\?.dll;"
 
 local socket = require("socket")
 
@@ -369,4 +369,4 @@ end
 
 DCS.setUserCallbacks(SRS)
 
-net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.8.0.6")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.9.0.0")
