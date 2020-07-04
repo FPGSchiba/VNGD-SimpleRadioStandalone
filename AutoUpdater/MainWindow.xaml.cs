@@ -215,7 +215,7 @@ namespace AutoUpdater
                 Process.Start(procInfo);
 
 
-                Process.Start(changelogURL);
+                //Process.Start(changelogURL);
             }
             
             Close();
