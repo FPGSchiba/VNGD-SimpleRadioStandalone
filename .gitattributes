@@ -10,5 +10,6 @@
 *.cpp text eol=crlf
 *.cs text eol=crlf
 *.xml text eol=crlf
-
+*.xaml text eol=crlf
+*.conf text eol=crlf
 *.lua text eol=crlf

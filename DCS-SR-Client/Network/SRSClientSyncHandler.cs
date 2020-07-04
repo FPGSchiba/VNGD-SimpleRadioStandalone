@@ -530,8 +530,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             MessageBox.Show($"The SRS server you're connecting to is incompatible with this Client. " +
                             $"\n\nMake sure to always run the latest version of the SRS Server & Client" +
                             $"\n\nServer Version: {serverVersion}" +
-                            $"\nClient Version: {UpdaterChecker.VERSION}" +
-                            $"\nMinimum Version: {UpdaterChecker.MINIMUM_PROTOCOL_VERSION}",
+                            $"\nClient Version: {UpdaterChecker.VERSION}",
                             "SRS Server Incompatible",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);

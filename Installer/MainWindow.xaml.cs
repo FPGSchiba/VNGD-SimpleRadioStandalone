@@ -41,19 +41,6 @@ namespace Installer
             SetupLogging();
             InitializeComponent();
 
-            if (IsDCSRunning())
-            {
-                MessageBox.Show(
-                    "DCS must now be closed before continuing the installation!\n\nClose DCS and please try again.",
-                    "Please Close DCS",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-
-                Logger.Warn("DCS is Running - Installer quit");
-
-                Environment.Exit(0);
-
-                return;
-            }
 
             var assembly = Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -95,39 +82,6 @@ namespace Installer
             ListFiles(_currentDirectory);
             Logger.Info("Finished Listing Files / Directories");
 
-            new Action(async () =>
-            {
-                await Task.Delay(1).ConfigureAwait(false);
-
-                if (((App)Application.Current).Arguments.Length > 0)
-                {
-                    if (((App)Application.Current).Arguments[0].Equals("-autoupdate"))
-                    {
-                        Application.Current.Dispatcher?.Invoke(() =>
-                            {
-                                Logger.Info("Silent Installer Running");
-                                var result = MessageBox.Show(
-                                    "Do you want to install the SRS Scripts required for the SRS Client to DCS?\n\nThis scripts are NOT required if you plan to just host a Server on this machine or use SRS without DCS. \n\nEAM mode can be used to use SRS with any game",
-                                    "Install Scripts?",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                                if (result == MessageBoxResult.Yes)
-                                {
-                                    InstallScriptsCheckbox.IsChecked = true;
-                                }
-                                else
-                                {
-                                    InstallScriptsCheckbox.IsChecked = false;
-                                }
-
-                                InstallReleaseButton(null, null);
-                            }
-                        ); //end-invoke
-                    }
-                }
-
-            }).Invoke();
-
             if (!CheckExtracted())
             {
 
@@ -143,6 +97,15 @@ namespace Installer
                 return;
             }
 
+            var releaseNotes = MessageBox.Show(
+                "Do you want to read the release notes? \n\nHighly recommended! \n\n",
+                "Read Release Notes?",
+                MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+            if (releaseNotes == MessageBoxResult.Yes)
+            {
+                Process.Start("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
+            }
         }
 
         private bool CheckExtracted()
@@ -200,8 +163,19 @@ namespace Installer
 
         }
 
+        private void ShowDCSWarning()
+        {
+           
+                MessageBox.Show(
+                    "DCS must now be closed before continuing the install or uninstall!\n\nClose DCS and please try again.",
+                    "Please Close DCS",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            
+        }
+
         private async void  InstallReleaseButton(object sender, RoutedEventArgs e)
         {
+
             var dcScriptsPath = dcsScriptsPath.Text;
             if ((bool)!InstallScriptsCheckbox.IsChecked)
             {
@@ -214,12 +188,17 @@ namespace Installer
                 if (paths.Count == 0)
                 {
                     MessageBox.Show(
-                           "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
-                           "SR Standalone Installer",
-                           MessageBoxButton.OK, MessageBoxImage.Error);
+                        "Unable to find DCS Folder in Saved Games!\n\nPlease check the path to the \"Saved Games\" folder\n\nMake sure you are selecting the \"Saved Games\" folder - NOT the DCS folder inside \"Saved Games\" and NOT the DCS installation directory",
+                        "SR Standalone Installer",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                
+
+                if (IsDCSRunning())
+                {
+                    ShowDCSWarning();
+                    return;
+                }
             }
 
             InstallButton.IsEnabled = false;
@@ -255,9 +234,9 @@ namespace Installer
                     _progressBarDialog.UpdateProgress(true, "Installed SRS Successfully!");
 
                     Logger.Info($"Installed SRS Successfully!");
-                
+
                     //open to installation location
-                    Process.Start("explorer.exe", srPath.Text);
+                    // Process.Start("explorer.exe", srPath.Text);
                     Environment.Exit(0);
                 }
                 else
@@ -1084,6 +1063,14 @@ namespace Installer
             {
                 dcsScriptsPath.Text = "";
                 Logger.Info($"SRS Scripts path not valid - ignoring uninstall of scripts: {dcsScriptsPath.Text}");
+            }
+            else
+            {
+                if (IsDCSRunning())
+                {
+                    ShowDCSWarning();
+                    return;
+                }
             }
 
             _progressBarDialog = new ProgressBarDialog();
