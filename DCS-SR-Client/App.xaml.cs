@@ -59,9 +59,6 @@ namespace DCS_SR_Client
 
             ListArgs();
 
-            RequireAdmin();
-
-            
 #if !DEBUG
             if (IsClientRunning())
             {
@@ -99,6 +96,9 @@ namespace DCS_SR_Client
                 }
             }
 #endif
+
+            RequireAdmin();
+
             InitNotificationIcon();
 
         }

@@ -16,6 +16,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
@@ -179,7 +180,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             Logger.Debug("Sending Radio Update to Server");
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-            SendToServer(new NetworkMessage
+
+            var message = new NetworkMessage
             {
                 Client = new SRClient
                 {
@@ -187,28 +189,53 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
                     ClientGuid = _guid,
-                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    LatLngPosition = sideInfo.LngLngPosition
+                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
-            });
+            };
+
+            var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
+            if (needValidPosition)
+            {
+                message.Client.LatLngPosition = sideInfo.LngLngPosition;
+            }
+            else
+            {
+                message.Client.LatLngPosition = new DCSLatLngPosition();
+            }
+
+            SendToServer(message);
         }
 
         private void ClientCoalitionUpdate()
         {
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-            SendToServer(new NetworkMessage
+
+            var message =  new NetworkMessage
             {
                 Client = new SRClient
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
-                    LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
-            });
+            };
+
+            var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
+            if (needValidPosition)
+            {
+                message.Client.LatLngPosition = sideInfo.LngLngPosition;
+            }
+            else
+            {
+                message.Client.LatLngPosition = new DCSLatLngPosition();
+            }
+
+            SendToServer(message);
         }
 
         private void CallOnMain(bool result, bool connectionError = false)
@@ -267,7 +294,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Coalition = sideInfo.side,
                             Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
                             LatLngPosition = sideInfo.LngLngPosition,
-                            ClientGuid = _guid
+                            ClientGuid = _guid,
+                            RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
                     });
