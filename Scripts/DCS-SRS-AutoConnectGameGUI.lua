@@ -82,7 +82,7 @@ SRSAuto.onPlayerChangeSlot = function(id)
     end
     if SRSAuto.SERVER_SEND_AUTO_CONNECT and id ~= HOST_PLAYER_ID then
         SRSAuto.log(string.format("Sending auto connect message to player %d on switch ", id))
-        net.send_chat_to(string.format(SRSAuto.MESSAGE_PREFIX .. "%s", SRSAuto.SERVER_SRS_HOST..":"..SRSAuto.SERVER_SRS_HOST_PORT), id)
+        net.send_chat_to(string.format(SRSAuto.MESSAGE_PREFIX .. "%s", SRSAuto.SERVER_SRS_HOST..":"..SRSAuto.SERVER_SRS_PORT), id)
    end
 end
 
