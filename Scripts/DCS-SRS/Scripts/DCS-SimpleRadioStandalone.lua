@@ -387,29 +387,38 @@ function SR.checkLOS(_clientsList)
         if _hasLos then
             table.insert(_result, { id = _client.id, los = 0.0 })
         else
-            --check from 10 - 60 in incremenents of 10 if there is Line of sight
-
-            -- check Max
-            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
-
-            if _hasLos then
-                table.insert(_result, { id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
-            end
-
-            -- now check all the values that arent MAX offset and MIN offset
-
+        
+            -- find the lowest offset that would provide line of sight
             for _losOffset = SR.LOS_HEIGHT_OFFSET + SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_MAX - SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
 
                 _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
                 if _hasLos then
-                    table.insert(_result, { id = _client.id, los = (_losOffset / 100.0) })
+                    -- compute attenuation as a percentage of LOS_HEIGHT_OFFSET_MAX
+                    -- e.g.: 
+                    --    LOS_HEIGHT_OFFSET_MAX = 500   -- max offset
+                    --    _losOffset = 200              -- offset actually used
+                    --    -> attenuation would be 200 / 500 = 0.4
+                    table.insert(_result, { id = _client.id, los = (_losOffset / SR.LOS_HEIGHT_OFFSET_MAX) })
                     break ;
                 end
             end
-
+            
+            -- if there is still no LOS            
             if not _hasLos then
-                table.insert(_result, { id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+
+              -- then check max offset gives LOS
+              _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
+
+              if _hasLos then
+                  -- but make sure that we do not get 1.0 attenuation when using LOS_HEIGHT_OFFSET_MAX
+                  -- (LOS_HEIGHT_OFFSET_MAX / LOS_HEIGHT_OFFSET_MAX would give attenuation of 1.0)
+                  -- I'm using 0.99 as a placeholder, not sure what would work here
+                  table.insert(_result, { id = _client.id, los = (0.99) })
+              else
+                  -- otherwise set attenuation to 1.0
+                  table.insert(_result, { id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+              end
             end
         end
 
