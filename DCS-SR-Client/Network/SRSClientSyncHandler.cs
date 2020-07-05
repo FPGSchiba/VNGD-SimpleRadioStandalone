@@ -53,12 +53,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private static readonly int MAX_DECODE_ERRORS = 5;
         private VAICOMSyncHandler _vaicomSync;
 
+        private long _lastSent = -1;
+        private DispatcherTimer _idleTimeout;
+
 
         public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
             this._newAircraft = _newAircraft;
+
+            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
+            _idleTimeout.Tick += CheckIfIdleTimeOut;
+            _idleTimeout.Interval = TimeSpan.FromSeconds(10);
+        }
+
+        private void CheckIfIdleTimeOut(object sender, EventArgs e)
+        {
+            var timeout = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.IdleTimeOut).IntValue;
+            if (_lastSent != -1 && TimeSpan.FromTicks(DateTime.Now.Ticks - _lastSent).TotalSeconds > timeout)
+            {
+                Logger.Warn("Disconnecting - Idle Time out");
+                Disconnect();
+            }
+
         }
 
 
@@ -110,6 +128,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void Connect()
         {
+            _lastSent = DateTime.Now.Ticks;
+            _idleTimeout.Start();
+
             if (_radioDCSSync != null)
             {
                 _radioDCSSync.Stop();
@@ -171,6 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _radioDCSSync.Stop();
             _lotATCSync.Stop();
             _vaicomSync.Stop();
+            _idleTimeout?.Stop();
 
             //disconnect callback
             CallOnMain(false, connectionError);
@@ -540,7 +562,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             try
             {
-
+                _lastSent = DateTime.Now.Ticks;
                 message.Version = UpdaterChecker.VERSION;
 
                 var json = message.Encode();
@@ -569,6 +591,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public void Disconnect()
         {
             _stop = true;
+
+            _lastSent = DateTime.Now.Ticks;
+            _idleTimeout?.Stop();
 
             DisconnectExternalAWACSMode();
 

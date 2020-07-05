@@ -605,6 +605,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitSettingsScreen()
         {
+            AutoConnectEnabledToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnect);
             AutoConnectPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             AutoConnectMismatchPromptToggle.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
             RadioOverlayTaskbarItem.IsChecked =
@@ -1134,6 +1135,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
 
+            var enabled = _globalSettings.GetClientSetting(GlobalSettingsKeys.AutoConnect).BoolValue;
+
+            if (!enabled)
+            {
+                Logger.Info($"Ignored Autoconnect - not Enabled");
+            }
+
             if (ClientState.IsConnected)
             {
                 // Always show prompt about active/advertised SRS connection mismatch if client is already connected
@@ -1315,6 +1323,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _serverSettingsWindow?.Close();
                 _serverSettingsWindow = null;
             }
+        }
+
+
+
+        private void AutoConnectToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnect, (bool)AutoConnectEnabledToggle.IsChecked);
         }
 
         private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
@@ -1661,6 +1676,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
         { 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
+        }
+
+        private void Donate_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(
+                    "https://www.paypal.me/ciaranfisher/3");
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
