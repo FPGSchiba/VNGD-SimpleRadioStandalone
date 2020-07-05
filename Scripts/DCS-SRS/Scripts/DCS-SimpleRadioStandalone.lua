@@ -8,9 +8,9 @@ SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
 
-SR.LOS_HEIGHT_OFFSET = 10.0 -- sets the line of sight offset to simulate radio waves bending
-SR.LOS_HEIGHT_OFFSET_MAX = 80.0 -- max amount of "bend"
-SR.LOS_HEIGHT_OFFSET_STEP = 10.0 -- Interval to "bend" in
+SR.LOS_HEIGHT_OFFSET = 20.0 -- sets the line of sight offset to simulate radio waves bending
+SR.LOS_HEIGHT_OFFSET_MAX = 200.0 -- max amount of "bend"
+SR.LOS_HEIGHT_OFFSET_STEP = 20.0 -- Interval to "bend" in
 
 SR.unicast = true --DONT CHANGE THIS
 
