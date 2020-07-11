@@ -41,7 +41,6 @@ namespace Installer
             SetupLogging();
             InitializeComponent();
 
-
             var assembly = Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
@@ -97,15 +96,108 @@ namespace Installer
                 return;
             }
 
-            var releaseNotes = MessageBox.Show(
-                "Do you want to read the release notes? \n\nHighly recommended! \n\n",
-                "Read Release Notes?",
-                MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-            if (releaseNotes == MessageBoxResult.Yes)
+            new Action(async () =>
             {
-                Process.Start("https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest");
+                await Task.Delay(1).ConfigureAwait(false);
+
+                if (((App)Application.Current).Arguments.Length > 0)
+                {
+                    if(IsAutoUpdate() && !IsSilentServer())
+                    {
+                        Application.Current.Dispatcher?.Invoke(() =>
+                            {
+                                Logger.Info("Silent Installer Running");
+                                var result = MessageBox.Show(
+                                    "Do you want to make changes? \n\nYes - Pause install and make changes\n\nNo - Run with previous install path and install scripts as default. \n\nIf unsure - hit Yes!",
+                                    "Change Installer Settings?",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                                if (result == MessageBoxResult.Yes)
+                                {
+
+                                }
+                                else
+                                {
+                                    InstallScriptsCheckbox.IsChecked = true;
+                                    InstallReleaseButton(null, null);
+                                }
+
+                                
+                            }
+                        ); //end-invoke
+                    }
+                    else if(IsAutoUpdate()&& IsSilentServer())
+                    {
+                        Application.Current.Dispatcher?.Invoke(() =>
+                            {
+                                var path = ServerPath();
+                                Logger.Info("Silent Server Installer Running - "+path);
+
+                                srPath.Text = path;
+                                InstallScriptsCheckbox.IsChecked = false;
+                                InstallReleaseButton(null, null);
+                            }
+                        ); //end-invoke
+                    }
+                }
+
+            }).Invoke();
+        }
+
+        private bool IsAutoUpdate()
+        {
+            foreach (var commandLineArg in Environment.GetCommandLineArgs())
+            {
+                if (commandLineArg.Trim().Equals("-autoupdate"))
+                {
+                    return true;
+                }
             }
+
+            return false;
+        }
+
+        private bool IsSilentServer()
+        {
+            foreach (var commandLineArg in Environment.GetCommandLineArgs())
+            {
+                if (commandLineArg.Trim().Equals("-server"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private string ServerPath()
+        {
+            foreach (var commandLineArg in Environment.GetCommandLineArgs())
+            {
+                if (commandLineArg.Trim().StartsWith("-path="))
+                {
+                    var line = commandLineArg.Trim();
+                    line = line.Replace("-path=","");
+
+                    return line;
+                }
+            }
+
+            return "";
+        }
+
+        private bool ShouldRestart()
+        {
+            foreach (var arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.Trim().Equals("-restart"))
+                {
+                    return true;
+                }
+
+            }
+
+            return false;
         }
 
         private bool CheckExtracted()
@@ -334,10 +426,22 @@ namespace Installer
                 }
                 else
                 {
-                    string message = "Installation / Update Completed Successfully!";
+                    if (IsSilentServer())
+                    {
+                        if (ShouldRestart())
+                        {
+                            StartServer();
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        string message = "Installation / Update Completed Successfully!";
 
-                    MessageBox.Show(message, "SR Standalone Installer",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(message, "SR Standalone Installer",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    
                 }
                     
 
@@ -351,6 +455,11 @@ namespace Installer
             
                 return -1;
             }
+        }
+
+        private void StartServer()
+        {
+            Process.Start(srPath.Text+"\\"+"sr-server.exe");
         }
 
         private string GetWorkingDirectory()
