@@ -430,7 +430,7 @@ namespace Installer
                     {
                         if (ShouldRestart())
                         {
-                            StartServer();
+                            StartServer(srPath);
                             return 1;
                         }
                     }
@@ -457,9 +457,9 @@ namespace Installer
             }
         }
 
-        private void StartServer()
+        private void StartServer(string path)
         {
-            Process.Start(srPath.Text+"\\"+"sr-server.exe");
+            Process.Start(path + "\\"+"sr-server.exe");
         }
 
         private string GetWorkingDirectory()
