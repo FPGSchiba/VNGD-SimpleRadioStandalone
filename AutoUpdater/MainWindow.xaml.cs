@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Octokit;
 using MessageBox = System.Windows.MessageBox;
@@ -41,6 +31,8 @@ namespace AutoUpdater
         private bool _cancel = false;
         private DispatcherTimer _progressCheckTimer;
         private double _lastValue = -1;
+
+        private bool _finished = false;
 
         private string changelogURL = "";
 
@@ -121,7 +113,30 @@ namespace AutoUpdater
                         {
                             changelogURL = release.HtmlUrl;
                             Status.Content = "Downloading Version "+release.TagName;
-                            return new System.Uri(releaseAsset.BrowserDownloadUrl);
+
+                            if (ServerInstall())
+                            {
+                                //check the path and version
+                                var path = ServerPath();
+
+                                if (path.Length > 0)
+                                {
+                                    var latestVersion = new Version(release.TagName.Replace("v", ""));
+                                    var serverVersion = Assembly.LoadFile(Path.Combine(path, "SR-Server.exe")).GetName().Version;
+
+                                    if (serverVersion < latestVersion)
+                                    {
+                                        return new Uri(releaseAsset.BrowserDownloadUrl);
+                                    }
+                                    else
+                                    {
+                                        //no update
+                                        return null;
+                                    }
+
+                                }
+                            }
+                            return new Uri(releaseAsset.BrowserDownloadUrl);
                         }
 
                     }
@@ -146,6 +161,36 @@ namespace AutoUpdater
 
         }
 
+        private string ServerPath()
+        {
+            foreach (var commandLineArg in Environment.GetCommandLineArgs())
+            {
+                if (commandLineArg.Trim().StartsWith("-path="))
+                {
+                    var line = commandLineArg.Trim();
+                    line = line.Replace("-path=", "");
+
+                    return line;
+                }
+            }
+
+            return "";
+        }
+
+        private bool ServerInstall()
+        {
+            foreach (var arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.Trim().Equals("-server"))
+                {
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+
         public void ShowError()
         {
             MessageBox.Show("Error Auto Updating SRS - Please check internet connection and try again \n\nAlternatively: \n1. Download the latest DCS-SimpleRadioStandalone.zip from the SRS Github Release page\n2. Extract all the files to a temporary directory\n3. Run the installer.",
@@ -161,6 +206,12 @@ namespace AutoUpdater
             try
             {
                 _uri = await GetPathToLatestVersion();
+
+                if (_uri == null)
+                {
+                    Environment.Exit(0);
+                }
+
 
                 _directory = GetTemporaryDirectory();
                 _file = _directory + "\\temp.zip";
@@ -188,7 +239,7 @@ namespace AutoUpdater
 
         private void CheckProgress(object sender, EventArgs e)
         {
-            if (_lastValue == DownloadProgress.Value)
+            if (_lastValue == DownloadProgress.Value && _finished == false) 
             {
                 //no progress
                 ShowError();
@@ -199,23 +250,65 @@ namespace AutoUpdater
 
         }
 
+        private bool ShouldRestart()
+        {
+            foreach (var arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.Trim().Equals("-restart"))
+                {
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+
         private void DownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
+            _finished = true;
             if (!_cancel)
             {
                 ZipFile.ExtractToDirectory(_file, Path.Combine(_directory, "extract"));
 
                 Thread.Sleep(400);
 
+                if (!ServerInstall())
+                {
+                    var releaseNotes = MessageBox.Show(
+                        "Do you want to read the release notes? \n\nHighly recommended before installing! \n\n",
+                        "Read Release Notes?",
+                        MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                    if (releaseNotes == MessageBoxResult.Yes)
+                    {
+                        Process.Start(changelogURL);
+                    }
+                }
+
                 ProcessStartInfo procInfo = new ProcessStartInfo();
-                procInfo.WorkingDirectory = Path.Combine(_directory, "extract"); 
-                procInfo.Arguments = "-autoupdate";
+                procInfo.WorkingDirectory = Path.Combine(_directory, "extract");
+                if (ServerInstall())
+                {
+                    procInfo.Arguments = "-autoupdate";
+                    procInfo.Arguments += " -server ";
+                    procInfo.Arguments += " -path=\"" + ServerPath() + "\"";
+
+                    if (ShouldRestart())
+                    {
+                        procInfo.Arguments += " -restart ";
+                    }
+                }
+                else
+                {
+                    procInfo.Arguments = "-autoupdate";
+                }
                 procInfo.FileName = Path.Combine(Path.Combine(_directory, "extract"), "installer.exe");
                 procInfo.UseShellExecute = false;
                 Process.Start(procInfo);
 
 
-                Process.Start(changelogURL);
+                //Process.Start(changelogURL);
             }
             
             Close();

@@ -12,7 +12,7 @@
                       xmlns:converters="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters"
                       Title="DCS-SRS Client"
                       Width="550"
-                      Height="690"
+                      Height="710"
                       d:DataContext="{d:DesignInstance local:MainWindow}"
                       ResizeMode="CanMinimize"
                       mc:Ignorable="d">
@@ -310,7 +310,9 @@
                                Height="26"
                                HorizontalAlignment="Center" 
                                Margin="5,0,0,0" />
+                       
                     </StackPanel>
+                    <Button Content="Donate to Support SRS" Width="150" Click="Donate_OnClick" Margin="5"></Button>
                 </StackPanel>
             </GroupBox>
         </TabItem>
@@ -639,16 +641,44 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                              
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Auto Connect" />
+
+                            <ToggleButton Name="AutoConnectEnabledToggle"
+                                          Grid.Row="0"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="AutoConnectToggle_Click">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+
+                            <Label Grid.Row="1"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Connect Prompt" />
 
                             <ToggleButton Name="AutoConnectPromptToggle"
-                                      Grid.Row="0"
+                                      Grid.Row="1"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -669,14 +699,14 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="1"
+                            <Label Grid.Row="2"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Connect Mismatch Prompt" />
 
                             <ToggleButton Name="AutoConnectMismatchPromptToggle"
-                                      Grid.Row="1"
+                                      Grid.Row="2"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -696,13 +726,13 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="2"
+                            <Label Grid.Row="3"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Reset Radio Overlay" />
 
-                            <Button Grid.Row="2"
+                            <Button Grid.Row="3"
                                 Grid.Column="1"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
@@ -710,14 +740,14 @@
                                 Content="Reset" />
 
 
-                            <Label Grid.Row="3"
+                            <Label Grid.Row="4"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Hide Overlay Taskbar Item" />
 
                             <ToggleButton Name="RadioOverlayTaskbarItem"
-                                      Grid.Row="3"
+                                      Grid.Row="4"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -738,14 +768,14 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="4"
+                            <Label Grid.Row="5"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Refocus DCS" />
 
                             <ToggleButton Name="RefocusDCS"
-                                      Grid.Row="4"
+                                      Grid.Row="5"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -766,14 +796,14 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="5"
+                            <Label Grid.Row="6"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Allow More Input Devices" />
 
                             <ToggleButton Name="ExpandInputDevices"
-                                      Grid.Row="5"
+                                      Grid.Row="6"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -794,14 +824,14 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="6"
+                            <Label Grid.Row="7"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Microphone Automatic Gain Control" />
 
                             <ToggleButton Name="MicAGC"
-                                      Grid.Row="6"
+                                      Grid.Row="7"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -822,14 +852,14 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="7"
+                            <Label Grid.Row="8"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Microphone Noise Suppression" />
 
                             <ToggleButton Name="MicDenoise"
-                                      Grid.Row="7"
+                                      Grid.Row="8"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -849,14 +879,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="8"
+                            <Label Grid.Row="9"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Minimise to tray" />
 
                             <ToggleButton Name="MinimiseToTray"
-                                      Grid.Row="8"
+                                      Grid.Row="9"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -876,14 +906,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="9"
+                            <Label Grid.Row="10"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Start minimised" />
 
                             <ToggleButton Name="StartMinimised"
-                                      Grid.Row="9"
+                                      Grid.Row="10"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -903,14 +933,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="10"
+                            <Label Grid.Row="11"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Auto Select Profile For Aircraft" />
 
                             <ToggleButton Name="AutoSelectInputProfile"
-                                      Grid.Row="10"
+                                      Grid.Row="11"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -930,14 +960,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="11"
+                            <Label Grid.Row="12"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Check for beta updates" />
 
                             <ToggleButton Name="CheckForBetaUpdates"
-                                      Grid.Row="11"
+                                      Grid.Row="12"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -957,14 +987,14 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="12"
+                            <Label Grid.Row="13"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Play connection sounds" />
 
                             <ToggleButton Name="PlayConnectionSounds"
-                                      Grid.Row="12"
+                                      Grid.Row="13"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -984,27 +1014,27 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
-                            <Label Grid.Row="13"
+                            <Label Grid.Row="14"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Set SRS Path for DCS" />
 
-                            <Button Grid.Row="13"
+                            <Button Grid.Row="14"
                                 Grid.Column="1"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
                                 Click="SetSRSPath_Click"
                                 Content="Set Path" />
 
-                            <Label Grid.Row="14"
+                            <Label Grid.Row="15"
                                Grid.Column="0"
                                HorizontalContentAlignment="Center"
                                VerticalContentAlignment="Center"
                                Content="Require Admin" />
 
                             <ToggleButton Name="RequireAdminToggle"
-                                      Grid.Row="14"
+                                      Grid.Row="15"
                                       Grid.Column="1"
                                       HorizontalContentAlignment="Center"
                                       VerticalContentAlignment="Center"
@@ -1023,14 +1053,14 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                            <Label Grid.Row="15"
+                            <Label Grid.Row="16"
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
                                    Content="Allow VAICOM TX Inhibit" />
 
                             <ToggleButton Name="VAICOMTXInhibitEnabled"
-                                          Grid.Row="15"
+                                          Grid.Row="16"
                                           Grid.Column="1"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"
@@ -1049,14 +1079,14 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                            <Label Grid.Row="16"
+                            <Label Grid.Row="17"
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
                                    Content="Show Transmitter Name (Requires Server ON too)" />
 
                             <ToggleButton Name="ShowTransmitterName"
-                                          Grid.Row="16"
+                                          Grid.Row="17"
                                           Grid.Column="1"
                                           HorizontalContentAlignment="Center"
                                           VerticalContentAlignment="Center"

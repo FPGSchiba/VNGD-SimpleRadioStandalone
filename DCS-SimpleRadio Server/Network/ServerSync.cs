@@ -217,6 +217,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 _clients[srClient.ClientGuid] = srClient;
 
                 state.SRSGuid = srClient.ClientGuid;
+                
 
                 _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
@@ -281,7 +282,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     };
 
                     if (send)
-                        MulticastAllExeceptOne(replyMessage.Encode(),session.Id);
+                        Multicast(replyMessage.Encode());
 
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
@@ -336,6 +337,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     else
                     {
                         changed = !client.RadioInfo.Equals(message.Client.RadioInfo);
+                    }
+
+
+                    if (!changed)
+                    {
+                        changed = client.Name != message.Client.Name || client.Coalition != message.Client.Coalition
+                                                                     || !message.Client.LatLngPosition.Equals(client.LatLngPosition)
+                                                                     || message.Client.Seat != client.Seat;
                     }
 
                     client.LastUpdate = DateTime.Now.Ticks;
@@ -397,6 +406,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 Client = new SRClient
                 {
                     ClientGuid = message.Client.ClientGuid,
+                    RadioInfo = message.Client.RadioInfo,
+                    Name = message.Client.Name,
+                    Coalition = message.Client.Coalition,
+                    Seat = message.Client.Seat,
+                    LatLngPosition = message.Client.LatLngPosition
                 }
             };
 

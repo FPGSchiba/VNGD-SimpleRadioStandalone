@@ -16,6 +16,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
@@ -52,12 +53,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private static readonly int MAX_DECODE_ERRORS = 5;
         private VAICOMSyncHandler _vaicomSync;
 
+        private long _lastSent = -1;
+        private DispatcherTimer _idleTimeout;
+
 
         public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
             this._newAircraft = _newAircraft;
+
+            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
+            _idleTimeout.Tick += CheckIfIdleTimeOut;
+            _idleTimeout.Interval = TimeSpan.FromSeconds(10);
+        }
+
+        private void CheckIfIdleTimeOut(object sender, EventArgs e)
+        {
+            var timeout = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.IdleTimeOut).IntValue;
+            if (_lastSent != -1 && TimeSpan.FromTicks(DateTime.Now.Ticks - _lastSent).TotalSeconds > timeout)
+            {
+                Logger.Warn("Disconnecting - Idle Time out");
+                Disconnect();
+            }
+
         }
 
 
@@ -109,6 +128,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void Connect()
         {
+            _lastSent = DateTime.Now.Ticks;
+            _idleTimeout.Start();
+
             if (_radioDCSSync != null)
             {
                 _radioDCSSync.Stop();
@@ -170,6 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _radioDCSSync.Stop();
             _lotATCSync.Stop();
             _vaicomSync.Stop();
+            _idleTimeout?.Stop();
 
             //disconnect callback
             CallOnMain(false, connectionError);
@@ -179,7 +202,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             Logger.Debug("Sending Radio Update to Server");
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-            SendToServer(new NetworkMessage
+
+            var message = new NetworkMessage
             {
                 Client = new SRClient
                 {
@@ -187,28 +211,53 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
                     ClientGuid = _guid,
-                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    LatLngPosition = sideInfo.LngLngPosition
+                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
-            });
+            };
+
+            var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
+            if (needValidPosition)
+            {
+                message.Client.LatLngPosition = sideInfo.LngLngPosition;
+            }
+            else
+            {
+                message.Client.LatLngPosition = new DCSLatLngPosition();
+            }
+
+            SendToServer(message);
         }
 
         private void ClientCoalitionUpdate()
         {
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-            SendToServer(new NetworkMessage
+
+            var message =  new NetworkMessage
             {
                 Client = new SRClient
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
-                    LatLngPosition = sideInfo.LngLngPosition,
                     ClientGuid = _guid
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
-            });
+            };
+
+            var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
+
+            if (needValidPosition)
+            {
+                message.Client.LatLngPosition = sideInfo.LngLngPosition;
+            }
+            else
+            {
+                message.Client.LatLngPosition = new DCSLatLngPosition();
+            }
+
+            SendToServer(message);
         }
 
         private void CallOnMain(bool result, bool connectionError = false)
@@ -267,7 +316,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Coalition = sideInfo.side,
                             Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
                             LatLngPosition = sideInfo.LngLngPosition,
-                            ClientGuid = _guid
+                            ClientGuid = _guid,
+                            RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
                     });
@@ -502,8 +552,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             MessageBox.Show($"The SRS server you're connecting to is incompatible with this Client. " +
                             $"\n\nMake sure to always run the latest version of the SRS Server & Client" +
                             $"\n\nServer Version: {serverVersion}" +
-                            $"\nClient Version: {UpdaterChecker.VERSION}" +
-                            $"\nMinimum Version: {UpdaterChecker.MINIMUM_PROTOCOL_VERSION}",
+                            $"\nClient Version: {UpdaterChecker.VERSION}",
                             "SRS Server Incompatible",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
@@ -513,7 +562,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             try
             {
-
+                _lastSent = DateTime.Now.Ticks;
                 message.Version = UpdaterChecker.VERSION;
 
                 var json = message.Encode();
@@ -542,6 +591,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         public void Disconnect()
         {
             _stop = true;
+
+            _lastSent = DateTime.Now.Ticks;
+            _idleTimeout?.Stop();
 
             DisconnectExternalAWACSMode();
 

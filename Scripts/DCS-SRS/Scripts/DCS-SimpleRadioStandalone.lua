@@ -1,4 +1,4 @@
--- Version 1.9.0.0
+-- Version 1.9.0.2
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -8,9 +8,9 @@ SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
 
-SR.LOS_HEIGHT_OFFSET = 10.0 -- sets the line of sight offset to simulate radio waves bending
-SR.LOS_HEIGHT_OFFSET_MAX = 80.0 -- max amount of "bend"
-SR.LOS_HEIGHT_OFFSET_STEP = 10.0 -- Interval to "bend" in
+SR.LOS_HEIGHT_OFFSET = 20.0 -- sets the line of sight offset to simulate radio waves bending
+SR.LOS_HEIGHT_OFFSET_MAX = 200.0 -- max amount of "bend"
+SR.LOS_HEIGHT_OFFSET_STEP = 20.0 -- Interval to "bend" in
 
 SR.unicast = true --DONT CHANGE THIS
 
@@ -387,29 +387,38 @@ function SR.checkLOS(_clientsList)
         if _hasLos then
             table.insert(_result, { id = _client.id, los = 0.0 })
         else
-            --check from 10 - 60 in incremenents of 10 if there is Line of sight
-
-            -- check Max
-            _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
-
-            if _hasLos then
-                table.insert(_result, { id = _client.id, los = (SR.LOS_HEIGHT_OFFSET_MAX / 100.0) })
-            end
-
-            -- now check all the values that arent MAX offset and MIN offset
-
+        
+            -- find the lowest offset that would provide line of sight
             for _losOffset = SR.LOS_HEIGHT_OFFSET + SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_MAX - SR.LOS_HEIGHT_OFFSET_STEP, SR.LOS_HEIGHT_OFFSET_STEP do
 
                 _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + _losOffset, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
 
                 if _hasLos then
-                    table.insert(_result, { id = _client.id, los = (_losOffset / 100.0) })
+                    -- compute attenuation as a percentage of LOS_HEIGHT_OFFSET_MAX
+                    -- e.g.: 
+                    --    LOS_HEIGHT_OFFSET_MAX = 500   -- max offset
+                    --    _losOffset = 200              -- offset actually used
+                    --    -> attenuation would be 200 / 500 = 0.4
+                    table.insert(_result, { id = _client.id, los = (_losOffset / SR.LOS_HEIGHT_OFFSET_MAX) })
                     break ;
                 end
             end
-
+            
+            -- if there is still no LOS            
             if not _hasLos then
-                table.insert(_result, { id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+
+              -- then check max offset gives LOS
+              _hasLos = terrain.isVisible(SR.lastKnownPos.x, SR.lastKnownPos.y + SR.LOS_HEIGHT_OFFSET_MAX, SR.lastKnownPos.z, _point.x, _client.alt + SR.LOS_HEIGHT_OFFSET, _point.z)
+
+              if _hasLos then
+                  -- but make sure that we do not get 1.0 attenuation when using LOS_HEIGHT_OFFSET_MAX
+                  -- (LOS_HEIGHT_OFFSET_MAX / LOS_HEIGHT_OFFSET_MAX would give attenuation of 1.0)
+                  -- I'm using 0.99 as a placeholder, not sure what would work here
+                  table.insert(_result, { id = _client.id, los = (0.99) })
+              else
+                  -- otherwise set attenuation to 1.0
+                  table.insert(_result, { id = _client.id, los = 1.0 }) -- 1.0 Being NO line of sight - FULL signal loss
+              end
             end
         end
 
@@ -3483,4 +3492,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.2")

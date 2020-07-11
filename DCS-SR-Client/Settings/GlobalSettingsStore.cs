@@ -84,7 +84,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         LotATCHeightOffset,
 
         DCSAutoConnectUDP, // 5069
-        ShowTransmitterName
+        ShowTransmitterName,
+
+        IdleTimeOut,
+        AutoConnect
     }
 
     public enum InputBinding
@@ -314,6 +317,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private readonly Dictionary<string, string> defaultGlobalSettings = new Dictionary<string, string>()
         {
+            {GlobalSettingsKeys.AutoConnect.ToString(), "true"},
             {GlobalSettingsKeys.AutoConnectPrompt.ToString(), "false"},
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
@@ -390,6 +394,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
+
+            {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 
         };
 
