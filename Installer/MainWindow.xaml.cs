@@ -459,7 +459,14 @@ namespace Installer
 
         private void StartServer(string path)
         {
-            Process.Start(path + "\\"+"sr-server.exe");
+            Logger.Info($"Starting SRS Server - Paths: \nProgram:{path} ");
+            ProcessStartInfo procInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = path, 
+                FileName = (path + "\\" + "sr-server.exe"), 
+                UseShellExecute = false
+            };
+            Process.Start(procInfo);
         }
 
         private string GetWorkingDirectory()
