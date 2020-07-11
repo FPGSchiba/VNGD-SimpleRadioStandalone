@@ -245,12 +245,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             playerRadioInfo.unit = message.unit;
 
-
             if (!_clientStateSingleton.ShouldUseLotATCPosition())
             {
                 _clientStateSingleton.UpdatePlayerPosition(message.latLng);
             }
-            
+            else
+            {
+                _clientStateSingleton.UpdatePlayerPosition(new DCSLatLngPosition());
+            }
+
             var overrideFreqAndVol = false;
 
             var newAircraft = playerRadioInfo.unitId != message.unitId || !playerRadioInfo.IsCurrent();
