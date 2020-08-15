@@ -15,23 +15,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
 {
     public class SRSClientSyncHandler
     {
-        public delegate void ConnectCallback(bool result, bool connectionError, string connection);
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private volatile bool _stop = false;
 
-        public static string ServerVersion = "Unknown";
         private readonly string _guid;
         private readonly DCSPlayerRadioInfo gameState;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
 
-
         private static readonly int MAX_DECODE_ERRORS = 5;
-        private string name;
-        private int coalition;
-
+        private readonly string name;
+        private readonly int coalition;
 
         public SRSClientSyncHandler(string guid, DCSPlayerRadioInfo gameState, string name, int coalition)
         {
@@ -40,7 +35,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
             this.name = name;
             this.coalition = coalition;
         }
-
 
         public void TryConnect(IPEndPoint endpoint)
         {
@@ -56,6 +50,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
             {
                 try
                 {
+                    Logger.Info($"Connecting to server @{_serverEndpoint.Address}:{_serverEndpoint.Port} ");
                     _tcpClient.SendTimeout = 90000;
                     _tcpClient.NoDelay = true;
 
@@ -64,6 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
 
                     if (_tcpClient.Connected)
                     {
+                        Logger.Info($"Connected to {_serverEndpoint.Address}:{_serverEndpoint.Port} ");
                         _tcpClient.NoDelay = true;
                         ClientSyncLoop();
                     }
@@ -96,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
             {
                 try
                 {
-                    
+                    Logger.Info($"Sending client sync to {_serverEndpoint.Address}:{_serverEndpoint.Port} ");
                     //start the loop off by sending a SYNC Request
                     SendToServer(new NetworkMessage
                     {
@@ -111,6 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
 
                     });
 
+                    Logger.Info($"Sending radio update to {_serverEndpoint.Address}:{_serverEndpoint.Port} ");
                     SendToServer(new NetworkMessage
                     {
                         Client = new SRClient
@@ -156,7 +153,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                                         Disconnect();
                                         break;
                                     default:
-                                        Logger.Error("Recevied unknown " + line);
+                                        Logger.Error("Received unknown Message " + line);
                                         break;
                                 }
                             }
@@ -239,7 +236,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                 MessageHub.Instance.Publish(new DisconnectedMessage());
             }
 
-            Logger.Error("Disconnecting from server");
+            Logger.Info("Disconnecting from server");
 
         }
     }

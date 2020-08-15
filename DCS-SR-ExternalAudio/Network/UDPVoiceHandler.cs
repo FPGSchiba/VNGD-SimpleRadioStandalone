@@ -62,13 +62,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
 
             byte[] message = _guidAsciiBytes;
 
+            Logger.Info($"Sending UDP Ping");
             // Force immediate ping once to avoid race condition before starting to listen
             _listener.Send(message, message.Length, _serverEndpoint);
 
             Thread.Sleep(3000);
-
+            Logger.Info($"Ping Sent");
         }
-
 
         public void RequestStop()
         {
@@ -95,25 +95,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                 try
                 {
                     //generate packet
-                        var udpVoicePacket = new UDPVoicePacket
-                        {
-                            GuidBytes = _guidAsciiBytes,
-                            AudioPart1Bytes = bytes,
-                            AudioPart1Length = (ushort) bytes.Length,
-                            Frequencies =new[] {gameState.radios[1].freq},
-                            UnitId = gameState.unitId,
-                            Modulations = new [] {(byte)gameState.radios[1].modulation},
-                            PacketNumber = _packetNumber++,
-                            OriginalClientGuidBytes = _guidAsciiBytes,
-                            RetransmissionCount = 0,
-                            Encryptions = new byte[]{0},
-                        };
+                    var udpVoicePacket = new UDPVoicePacket
+                    {
+                        GuidBytes = _guidAsciiBytes,
+                        AudioPart1Bytes = bytes,
+                        AudioPart1Length = (ushort) bytes.Length,
+                        Frequencies =new[] {gameState.radios[1].freq},
+                        UnitId = gameState.unitId,
+                        Modulations = new [] {(byte)gameState.radios[1].modulation},
+                        PacketNumber = _packetNumber++,
+                        OriginalClientGuidBytes = _guidAsciiBytes,
+                        RetransmissionCount = 0,
+                        Encryptions = new byte[]{0},
+                    };
 
-                        var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
+                    var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
 
-                        _listener?.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
-
-                    
+                    _listener?.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
                 }
                 catch (Exception e)
                 {

@@ -7,11 +7,14 @@ using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network;
 using Easy.MessageHub;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
 {
     internal class ExternalAudioClient
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private string mp3Path;
         private double freq;
         private string modulation;
@@ -46,6 +49,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
             gameState.radios[1].freq = this.freq * 1000000; // get into Hz
             gameState.radios[1].name = name;
 
+            Logger.Info($"Starting with params:");
+            Logger.Info($"Path: {mp3Path} ");
+            Logger.Info($"Frequency: {gameState.radios[1].freq} Hz ");
+            Logger.Info($"Modulation: {gameState.radios[1].modulation} ");
+            Logger.Info($"Coalition: {coalition} ");
+            Logger.Info($"IP: 127.0.0.1 ");
+            Logger.Info($"Port: {port} ");
+            Logger.Info($"Client Name: {name} ");
+
             var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,name, coalition);
 
             srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, port));
@@ -54,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
             {
                 Thread.Sleep(5000);
             }
-            Console.WriteLine("Finished");
+            Logger.Info("Finished - Closing");
 
             udpVoiceHandler?.RequestStop();
             srsClientSyncHandler?.Disconnect();
@@ -66,6 +78,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
         {
             if (udpVoiceHandler == null)
             {
+                Logger.Info($"Connecting UDP VoIP");
                 udpVoiceHandler = new UdpVoiceHandler(Guid, IPAddress.Loopback, port, gameState);
                 udpVoiceHandler.Start();
                 new Thread(SendAudio).Start();
@@ -79,20 +92,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
 
         private void SendAudio()
         {
-            Console.WriteLine("Sending Audio");
+            Logger.Info("Sending Audio... Please Wait");
             MP3OpusReader mp3 = new MP3OpusReader(mp3Path);
-            foreach (var opusByte in mp3.GetOpusBytes())
+            var opusBytes = mp3.GetOpusBytes();
+            int count = 0;
+            foreach (var opusByte in opusBytes)
             {
                 //can use timer to run through it
-                Thread.Sleep(40);
+                Thread.Sleep(30);
 
                 if (!_finished)
                 {
                     udpVoiceHandler.Send(opusByte, opusByte.Length);
+                    count++;
+
+                    if (count % 50 ==0)
+                    {
+                        Logger.Info($"Playing audio - sent {count*40}ms - {((float)count / (float)opusBytes.Count ) * 100.0:F0}% ");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Client Disconnected");
+                    Logger.Error("Client Disconnected");
                     return;
                 }
             }
@@ -102,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
 
             //when empty - disconnect
 
-            Console.WriteLine("Finished Audio Buffer");
+            Logger.Info("Finished Sending Audio");
             _finished = true;
 
         }

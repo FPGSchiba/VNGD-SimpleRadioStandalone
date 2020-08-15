@@ -36,7 +36,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Ciribob.IL2.SimpleRadio.Standalone.ExternalAudio.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=4.1.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
@@ -69,12 +70,11 @@
     <Compile Include="Audio\EventDrivenResampler.cs" />
     <Compile Include="Audio\MP3OpusReader.cs" />
     <Compile Include="Client\ExternalAudioClient.cs" />
-    <Compile Include="Client\Program.cs" />
     <Compile Include="Models\DisconnectedMessage.cs" />
     <Compile Include="Models\ReadyMessage.cs" />
     <Compile Include="Network\SRSClientSyncHandler.cs" />
     <Compile Include="Network\UDPVoiceHandler.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Client\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 {
     public class MP3OpusReader
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly string path;
 
         public static readonly int INPUT_SAMPLE_RATE = 16000;
@@ -16,6 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
 
+
         public MP3OpusReader(string path)
         {
             this.path = path;
@@ -23,9 +27,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
         private IWaveProvider GetMP3WaveProvider()
         {
+            Logger.Info($"Reading MP3 @ {path}");
+
             var mp3Reader = new Mp3FileReader(path);
             int bytes = (int)mp3Reader.Length;
             byte[] buffer = new byte[bytes];
+
+            Logger.Info($"Read MP3 @ {mp3Reader.WaveFormat}");
 
             int read = mp3Reader.Read(buffer, 0, (int)bytes);
             BufferedWaveProvider bufferedWaveProvider = new BufferedWaveProvider(mp3Reader.WaveFormat);
@@ -37,6 +45,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             mp3Reader.Close();
             mp3Reader.Dispose();
+
+            Logger.Info($"Convert to Mono 16bit PCM");
 
             //after this we've got 16 bit PCM Mono  - just need to sort sample rate
             return bufferedWaveProvider.ToSampleProvider().ToMono().ToWaveProvider16(); 
@@ -52,6 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             //Sample is now 16 bit Mono - now change sample rate to 16KHz
 
+            Logger.Info($"Convert to Mono 16bit PCM 16000KHz from {waveProvider.WaveFormat}");
             //loop thorough in up to 1 second chunks
             var resample = new EventDrivenResampler(waveProvider.WaveFormat,new WaveFormat(INPUT_SAMPLE_RATE,1));
 
@@ -64,6 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 resampledBytesList.AddRange(resample.ResampleBytes(buffer, read));
             }
 
+            Logger.Info($"Converted to Mono 16bit PCM 16000KHz from {waveProvider.WaveFormat}");
+            Logger.Info($"Encode as Opus");
             var _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
 
             var resampledBytes = resampledBytesList.ToArray();
@@ -92,7 +105,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             }
             _encoder.Dispose();
-
+            Logger.Info($"Finished encoding as Opus");
 
             return opusBytes;
         }

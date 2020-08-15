@@ -1,17 +1,28 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient;
 
-namespace Ciribob.IL2.SimpleRadio.Standalone.ExternalAudio
+namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+  
+        private static void ConfigureLogging()
+        {
+            var config = new NLog.Config.LoggingConfiguration();
+            var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+            logconsole.Layout = "${longdate}|${level:uppercase=true}|${message}";
+            
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
+
+            // Apply config           
+            NLog.LogManager.Configuration = config;
+        }
+        public static void Main(string[] args)
         {
             if (args.Length != 6)
             {
@@ -20,6 +31,8 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.ExternalAudio
             }
             else
             {
+                ConfigureLogging();
+
                 string mp3 = args[0].Trim();
                 double freq = double.Parse(args[1].Trim(), CultureInfo.InvariantCulture);
                 string modulation = args[2].Trim().ToUpperInvariant();
@@ -27,7 +40,7 @@ namespace Ciribob.IL2.SimpleRadio.Standalone.ExternalAudio
                 int port = int.Parse(args[4].Trim());
                 string name = args[5].Trim();
 
-                ExternalAudioClient client = new ExternalAudioClient(mp3,freq,modulation,coalition,port,name);
+                ExternalAudioClient client = new ExternalAudioClient(mp3, freq, modulation, coalition, port, name);
                 client.Start();
 
             }
