@@ -20,10 +20,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         }
         public static void Main(string[] args)
         {
-            if (args.Length != 6)
+            if (args.Length != 7)
             {
-                Console.WriteLine("Error incorrect parameters - should be path frequency modulation coalition port name");
-                Console.WriteLine("Example: \"C:\\FULL\\PATH\\TO\\File.mp3\" 251.0 AM 1 5002 ciribob-robot");
+                Console.WriteLine("Error incorrect parameters - should be path or text frequency modulation coalition port name volume");
+                Console.WriteLine("Example: \"C:\\FULL\\PATH\\TO\\File.mp3\" 251.0 AM 1 5002 ciribob-robot 0.5");
+                Console.WriteLine("Example: \"I want this read out over this frequency - hello world! \" 251.0 AM 1 5002 ciribob-robot 0.5");
             }
             else
             {
@@ -35,8 +36,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 int coalition = int.Parse(args[3].Trim());
                 int port = int.Parse(args[4].Trim());
                 string name = args[5].Trim();
+                float volume = float.Parse(args[6].Trim(), CultureInfo.InvariantCulture);
 
-                Client.ExternalAudioClient client = new Client.ExternalAudioClient(mp3, freq, modulation, coalition, port, name);
+                Client.ExternalAudioClient client = new Client.ExternalAudioClient(mp3, freq, modulation, coalition, port, name,volume);
                 client.Start();
 
             }

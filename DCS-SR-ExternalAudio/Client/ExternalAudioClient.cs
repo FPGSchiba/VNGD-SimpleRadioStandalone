@@ -26,8 +26,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private DCSPlayerRadioInfo gameState;
         private UdpVoiceHandler udpVoiceHandler;
         private string name;
+        private readonly float volume;
 
-        public ExternalAudioClient(string mp3Path, double freq, string modulation, int coalition, int port, string name)
+        public ExternalAudioClient(string mp3Path, double freq, string modulation, int coalition, int port, string name, float volume)
         {
             this.mp3Path = mp3Path;
             this.freq = freq;
@@ -35,6 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             this.coalition = coalition;
             this.port = port;
             this.name = name;
+            this.volume = volume;
         }
 
         public void Start()
@@ -49,13 +51,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             gameState.radios[1].name = name;
 
             Logger.Info($"Starting with params:");
-            Logger.Info($"Path: {mp3Path} ");
+            Logger.Info($"Path or Text to Say: {mp3Path} ");
             Logger.Info($"Frequency: {gameState.radios[1].freq} Hz ");
             Logger.Info($"Modulation: {gameState.radios[1].modulation} ");
             Logger.Info($"Coalition: {coalition} ");
             Logger.Info($"IP: 127.0.0.1 ");
             Logger.Info($"Port: {port} ");
             Logger.Info($"Client Name: {name} ");
+            Logger.Info($"Volume: {volume} ");
 
             var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,name, coalition);
 
@@ -92,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private void SendAudio()
         {
             Logger.Info("Sending Audio... Please Wait");
-            MP3OpusReader mp3 = new MP3OpusReader(mp3Path);
+            AudioGenerator mp3 = new AudioGenerator(mp3Path, volume);
             var opusBytes = mp3.GetOpusBytes();
             int count = 0;
             foreach (var opusByte in opusBytes)

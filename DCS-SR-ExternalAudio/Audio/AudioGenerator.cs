@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Speech.AudioFormat;
+using System.Speech.Synthesis;
+using System.Threading.Tasks;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -7,7 +12,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 {
-    public class MP3OpusReader
+    public class AudioGenerator
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -19,10 +24,47 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
 
+        private readonly float volume;
 
-        public MP3OpusReader(string path)
+        public AudioGenerator(string path, float volume)
         {
             this.path = path;
+            this.volume = volume;
+        }
+
+        private byte[] TextToSpeech()
+        {
+            try
+            {
+                using (var synth = new SpeechSynthesizer())
+                using (var stream = new MemoryStream())
+                {
+                    synth.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult, 0, new CultureInfo("en-GB", false));
+                    synth.Rate = 1;
+
+                    var intVol = (int)(volume * 100.0);
+
+                    if (intVol > 100)
+                    {
+                        intVol = 100;
+                    }
+
+                    synth.Volume = intVol;
+                    
+                    synth.SetOutputToAudioStream(stream,
+                        new SpeechAudioFormatInfo(INPUT_SAMPLE_RATE, AudioBitsPerSample.Sixteen, AudioChannel.Mono));
+                    
+                    synth.Speak(path);
+
+                    return stream.ToArray();
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error with Text to Speech");
+            }
+             return new byte[0];
         }
 
         private IWaveProvider GetMP3WaveProvider()
@@ -42,6 +84,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             bufferedWaveProvider.DiscardOnBufferOverflow = true;
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
+            VolumeSampleProvider volumeSample = new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider());
+            volumeSample.Volume = volume;
 
             mp3Reader.Close();
             mp3Reader.Dispose();
@@ -49,37 +93,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             Logger.Info($"Convert to Mono 16bit PCM");
 
             //after this we've got 16 bit PCM Mono  - just need to sort sample rate
-            return bufferedWaveProvider.ToSampleProvider().ToMono().ToWaveProvider16(); 
+            return volumeSample.ToMono().ToWaveProvider16(); 
         }
 
-        public List<byte[]> GetOpusBytes()
+        private byte[] GetMP3Bytes()
         {
             List<byte> resampledBytesList = new List<byte>();
-
-            List<byte[]> opusBytes = new List<byte[]>();
-
             var waveProvider = GetMP3WaveProvider();
-
-            //Sample is now 16 bit Mono - now change sample rate to 16KHz
 
             Logger.Info($"Convert to Mono 16bit PCM 16000KHz from {waveProvider.WaveFormat}");
             //loop thorough in up to 1 second chunks
-            var resample = new EventDrivenResampler(waveProvider.WaveFormat,new WaveFormat(INPUT_SAMPLE_RATE,1));
+            var resample = new EventDrivenResampler(waveProvider.WaveFormat, new WaveFormat(INPUT_SAMPLE_RATE, 1));
 
-            byte[] buffer = new byte[waveProvider.WaveFormat.AverageBytesPerSecond*2];
+            byte[] buffer = new byte[waveProvider.WaveFormat.AverageBytesPerSecond * 2];
 
             int read = 0;
-            while( (read = waveProvider.Read(buffer, 0,waveProvider.WaveFormat.AverageBytesPerSecond)) > 0)
+            while ((read = waveProvider.Read(buffer, 0, waveProvider.WaveFormat.AverageBytesPerSecond)) > 0)
             {
                 //resample as we go
                 resampledBytesList.AddRange(resample.ResampleBytes(buffer, read));
             }
 
             Logger.Info($"Converted to Mono 16bit PCM 16000KHz from {waveProvider.WaveFormat}");
+
+            return resampledBytesList.ToArray();
+        }
+
+        public List<byte[]> GetOpusBytes()
+        {
+            List<byte[]> opusBytes = new List<byte[]>();
+
+            byte[] resampledBytes;
+
+            if (path.ToLower().EndsWith(".mp3"))
+            {
+
+                resampledBytes = GetMP3Bytes();
+            }
+            else
+            {
+                Logger.Info($"Doing Text To Speech as its not an MP3 path");
+                resampledBytes = TextToSpeech();
+            }
+
             Logger.Info($"Encode as Opus");
             var _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
 
-            var resampledBytes = resampledBytesList.ToArray();
             int pos = 0;
             while (pos +(SEGMENT_FRAMES*2) < resampledBytes.Length)
             {
