@@ -1,12 +1,8 @@
-﻿using NLog;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
+namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 {
     public class Program
     {
@@ -40,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
                 int port = int.Parse(args[4].Trim());
                 string name = args[5].Trim();
 
-                ExternalAudioClient client = new ExternalAudioClient(mp3, freq, modulation, coalition, port, name);
+                Client.ExternalAudioClient client = new Client.ExternalAudioClient(mp3, freq, modulation, coalition, port, name);
                 client.Start();
 
             }

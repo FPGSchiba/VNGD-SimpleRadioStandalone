@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -9,7 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network;
 using Easy.MessageHub;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient
+namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 {
     internal class ExternalAudioClient
     {
