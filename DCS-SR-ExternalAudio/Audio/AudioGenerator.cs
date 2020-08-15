@@ -78,14 +78,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             Logger.Info($"Read MP3 @ {mp3Reader.WaveFormat}");
 
             int read = mp3Reader.Read(buffer, 0, (int)bytes);
-            BufferedWaveProvider bufferedWaveProvider = new BufferedWaveProvider(mp3Reader.WaveFormat);
-            bufferedWaveProvider.BufferLength = read * 2;
-            bufferedWaveProvider.ReadFully = false;
-            bufferedWaveProvider.DiscardOnBufferOverflow = true;
+            BufferedWaveProvider bufferedWaveProvider = new BufferedWaveProvider(mp3Reader.WaveFormat)
+            {
+                BufferLength = read * 2, ReadFully = false, DiscardOnBufferOverflow = true
+            };
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
-            VolumeSampleProvider volumeSample = new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider());
-            volumeSample.Volume = volume;
+            VolumeSampleProvider volumeSample =
+                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) {Volume = volume};
 
             mp3Reader.Close();
             mp3Reader.Dispose();
@@ -127,7 +127,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             if (path.ToLower().EndsWith(".mp3"))
             {
-
+                Logger.Info($"Reading MP3 it looks like a file");
                 resampledBytes = GetMP3Bytes();
             }
             else
@@ -160,9 +160,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 }
 
                 pos += (SEGMENT_FRAMES * 2);
+            }
+            
+            if (pos+1 < resampledBytes.Length)
+            {
+                //last bit - less than 40 ms
+                byte[] buf = new byte[SEGMENT_FRAMES * 2];
+                Buffer.BlockCopy(resampledBytes, pos, buf, 0, resampledBytes.Length - pos);
 
+                var outLength = 0;
+                var frame = _encoder.Encode(buf, buf.Length, out outLength);
+
+                if (outLength > 0)
+                {
+                    //create copy with small buffer
+                    var encoded = new byte[outLength];
+
+                    Buffer.BlockCopy(frame, 0, encoded, 0, outLength);
+
+                    opusBytes.Add(encoded);
+                }
 
             }
+            
             _encoder.Dispose();
             Logger.Info($"Finished encoding as Opus");
 
