@@ -41,20 +41,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             _filters = new OnlineFilter[2];
             _filters[0] =
-                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 560, 3900);
+                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.OUTPUT_SAMPLE_RATE, 560, 3900);
             _filters[1] =
-                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.INPUT_SAMPLE_RATE, 100, 4500);
+                OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.OUTPUT_SAMPLE_RATE, 100, 4500);
 
             JitterBufferProviderInterface =
-                new JitterBufferProviderInterface(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 2));
+                new JitterBufferProviderInterface(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 2));
 
             SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
 
-            _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
+            _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
+            _decoder.MaxDataBytes = AudioManager.OUTPUT_FRAME_SIZE * 4;
 
-            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.INPUT_SAMPLE_RATE, 520, 0.97f);
-            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.INPUT_SAMPLE_RATE, 4130, 2.0f);
+            _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 520, 0.97f);
+            _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 4130, 2.0f);
 
             var effect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.NATO_TONE);
             
@@ -154,7 +155,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
                 //append ms of silence - this functions as our jitter buffer??
-                var silencePad = (AudioManager.INPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
+                var silencePad = (AudioManager.OUTPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
 
                 var newAudio = new short[audio.PcmAudioShort.Length + silencePad];
 

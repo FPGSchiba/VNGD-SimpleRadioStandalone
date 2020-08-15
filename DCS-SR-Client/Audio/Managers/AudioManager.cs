@@ -29,12 +29,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
     public class AudioManager
     {
         public static readonly int INPUT_SAMPLE_RATE = 16000;
+        public static readonly int OUTPUT_SAMPLE_RATE = 48000;
 
         // public static readonly int OUTPUT_SAMPLE_RATE = 44100;
         public static readonly int INPUT_AUDIO_LENGTH_MS = 40; //TODO test this! Was 80ms but that broke opus
 
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
+
+        public static readonly int OUTPUT_FRAME_SIZE = (OUTPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -447,7 +450,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void InitMixers()
         {
-            _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(INPUT_SAMPLE_RATE, 2));
+            _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
             _clientAudioMixer.ReadFully = true;
         }
 
@@ -457,7 +460,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             for (var i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
             {
-                _effectsOutputBuffer[i] = new RadioAudioProvider(INPUT_SAMPLE_RATE);
+                _effectsOutputBuffer[i] = new RadioAudioProvider(OUTPUT_SAMPLE_RATE);
                 _clientAudioMixer.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);
             }
         }

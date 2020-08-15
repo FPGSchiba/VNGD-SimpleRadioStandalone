@@ -86,20 +86,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 80, windowsN);
 
                 _buffBufferedWaveProvider =
-                    new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                    new BufferedWaveProvider(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;
                 _buffBufferedWaveProvider.DiscardOnBufferOverflow = true;
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
-                CachedLoopingAudioProvider natoEffect =
-                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(),new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
-
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(natoEffect.ToSampleProvider(),
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter,
                     (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
                 _volumeSampleProvider.Volume = SpeakerBoost;
-
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
                 {
@@ -144,8 +140,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1,
                     FragLabs.Audio.Codecs.Opus.Application.Voip);
                 _encoder.ForwardErrorCorrection = false;
-                _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
+                _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
                 _decoder.ForwardErrorCorrection = false;
+                _decoder.MaxDataBytes = AudioManager.OUTPUT_FRAME_SIZE*4;
 
                 var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
 
