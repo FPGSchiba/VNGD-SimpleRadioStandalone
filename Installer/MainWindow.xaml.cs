@@ -524,6 +524,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
                 DeleteFileIfExists(programPath + "\\SRS-AutoUpdater.exe");
                 DeleteFileIfExists(programPath + "\\SR-Server.exe");
+                DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SimpleRadioStandalone.lua");
                 DeleteFileIfExists(programPath + "\\DCS-SRSGameGUI.lua");
                 DeleteFileIfExists(programPath + "\\DCS-SRS-AutoConnectGameGUI.lua");
@@ -561,6 +562,7 @@ namespace Installer
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\opus.dll");
                 DeleteFileIfExists(programPath + "\\speexdsp.dll");
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
@@ -636,6 +638,7 @@ namespace Installer
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
+                DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\opus.dll");
                 DeleteFileIfExists(programPath + "\\speexdsp.dll");
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
@@ -853,8 +856,16 @@ namespace Installer
                     var config = directory + "\\config\\options.lua";
                     if (File.Exists(network) || File.Exists(config))
                     {
-                        Logger.Info($"Found DCS Saved Games Path {directory}");
-                        paths.Add(directory);
+                        if (!directory.ToUpper().Contains("SERVER") && !directory.ToUpper().Contains("DEDICATED"))
+                        {
+                            Logger.Info($"Found DCS Saved Games Path {directory}");
+                            paths.Add(directory);
+                        }
+                        else
+                        {
+                            Logger.Info($"Found DCS Saved Games Path {directory} - Ignoring as its a Server path");
+                        }
+                        
                     }
                 }
                
@@ -905,6 +916,7 @@ namespace Installer
             File.Copy(_currentDirectory + "\\SR-ClientRadio.exe", path + "\\SR-ClientRadio.exe", true);
             File.Copy(_currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
             File.Copy(_currentDirectory + "\\SRS-AutoUpdater.exe", path + "\\SRS-AutoUpdater.exe", true);
+            File.Copy(_currentDirectory + "\\DCS-SR-ExternalAudio.exe", path + "\\DCS-SR-ExternalAudio.exe", true);
 
             Logger.Info($"Copying directories");
             DirectoryCopy(_currentDirectory+"\\AudioEffects", path+"\\AudioEffects");

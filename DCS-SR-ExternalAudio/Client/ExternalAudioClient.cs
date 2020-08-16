@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -7,6 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network;
 using Easy.MessageHub;
 using NLog;
+using Timer = Cabhishek.Timers.Timer;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 {
@@ -15,20 +17,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private string mp3Path;
-        private double freq;
-        private string modulation;
+        private double[] freq;
+        private RadioInformation.Modulation[] modulation;
+        private byte[] modulationBytes;
         private int coalition;
         private readonly int port;
 
         private readonly string Guid = ShortGuid.NewGuid();
 
-        private bool _finished = false;
+        private CancellationTokenSource finished = new CancellationTokenSource();
         private DCSPlayerRadioInfo gameState;
         private UdpVoiceHandler udpVoiceHandler;
         private string name;
         private readonly float volume;
 
-        public ExternalAudioClient(string mp3Path, double freq, string modulation, int coalition, int port, string name, float volume)
+        public ExternalAudioClient(string mp3Path, double[] freq, RadioInformation.Modulation[] modulation, int coalition, int port, string name, float volume)
         {
             this.mp3Path = mp3Path;
             this.freq = freq;
@@ -37,6 +40,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             this.port = port;
             this.name = name;
             this.volume = volume;
+
+            this.modulationBytes = new byte[modulation.Length];
+            for (int i = 0; i < modulationBytes.Length; i++)
+            {
+                modulationBytes[i] = (byte)modulation[i];
+            }
+
         }
 
         public void Start()
@@ -46,14 +56,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             MessageHub.Instance.Subscribe<DisconnectedMessage>(Disconnected);
 
             gameState = new DCSPlayerRadioInfo();
-            gameState.radios[1].modulation = (RadioInformation.Modulation)(modulation == "AM" ? 0 : 1);
-            gameState.radios[1].freq = this.freq * 1000000; // get into Hz
+            gameState.radios[1].modulation = modulation[0];
+            gameState.radios[1].freq = freq[0]; // get into Hz
             gameState.radios[1].name = name;
 
             Logger.Info($"Starting with params:");
             Logger.Info($"Path or Text to Say: {mp3Path} ");
-            Logger.Info($"Frequency: {gameState.radios[1].freq} Hz ");
-            Logger.Info($"Modulation: {gameState.radios[1].modulation} ");
+            for (int i = 0; i < freq.Length; i++)
+            {
+                Logger.Info($"Frequency: {freq[i]} Hz - {modulation[i]} ");
+            }
             Logger.Info($"Coalition: {coalition} ");
             Logger.Info($"IP: 127.0.0.1 ");
             Logger.Info($"Port: {port} ");
@@ -64,10 +76,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 
             srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, port));
 
-            while (!_finished)
-            {
-                Thread.Sleep(5000);
-            }
+            //wait for it to end
+            finished.Token.WaitHandle.WaitOne();
             Logger.Info("Finished - Closing");
 
             udpVoiceHandler?.RequestStop();
@@ -89,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 
         private void Disconnected(DisconnectedMessage disconnected)
         {
-            _finished = true;
+            finished.Cancel();
         }
 
         private void SendAudio()
@@ -98,36 +108,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             AudioGenerator mp3 = new AudioGenerator(mp3Path, volume);
             var opusBytes = mp3.GetOpusBytes();
             int count = 0;
-            foreach (var opusByte in opusBytes)
-            {
-                //can use timer to run through it
-                Thread.Sleep(30);
 
-                if (!_finished)
-                {
-                    udpVoiceHandler.Send(opusByte, opusByte.Length);
-                    count++;
-
-                    if (count % 50 ==0)
-                    {
-                        Logger.Info($"Playing audio - sent {count*40}ms - {((float)count / (float)opusBytes.Count ) * 100.0:F0}% ");
-                    }
-                }
-                else
-                {
-                    Logger.Error("Client Disconnected");
-                    return;
-                }
-            }
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
 
             //get all the audio as Opus frames of 40 ms
             //send on 40 ms timer 
 
             //when empty - disconnect
+            //user timer for accurate sending
+            var _timer = new Timer(() =>
+            {
+
+                if (!finished.IsCancellationRequested)
+                {
+                    if (count < opusBytes.Count)
+                    {
+                        udpVoiceHandler.Send(opusBytes[count], opusBytes[count].Length, freq, modulationBytes);
+                        count++;
+
+                        if (count % 50 == 0)
+                        {
+                            Logger.Info($"Playing audio - sent {count * 40}ms - {((float)count / (float)opusBytes.Count) * 100.0:F0}% ");
+                        }
+                    }
+                    else
+                    {
+                        tokenSource.Cancel();
+                    }
+                }
+                else
+                {
+                    Logger.Error("Client Disconnected");
+                    tokenSource.Cancel();
+                    return;
+                }
+
+            }, TimeSpan.FromMilliseconds(40));
+            _timer.Start();
+
+            //wait for cancel
+            tokenSource.Token.WaitHandle.WaitOne();
+            _timer.Stop();
 
             Logger.Info("Finished Sending Audio");
-            _finished = true;
-
+            finished.Cancel();
         }
     }
 }

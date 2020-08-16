@@ -84,7 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
             _stopFlag.Cancel();
         }
 
-        public bool Send(byte[] bytes, int len)
+        public bool Send(byte[] bytes, int len, double[] freq, byte[] modulation)
         {
             
             if (!_stop
@@ -100,9 +100,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                         GuidBytes = _guidAsciiBytes,
                         AudioPart1Bytes = bytes,
                         AudioPart1Length = (ushort) bytes.Length,
-                        Frequencies =new[] {gameState.radios[1].freq},
+                        Frequencies =freq,
                         UnitId = gameState.unitId,
-                        Modulations = new [] {(byte)gameState.radios[1].modulation},
+                        Modulations = modulation,
                         PacketNumber = _packetNumber++,
                         OriginalClientGuidBytes = _guidAsciiBytes,
                         RetransmissionCount = 0,
