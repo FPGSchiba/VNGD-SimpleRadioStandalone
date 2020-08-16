@@ -254,6 +254,7 @@ copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\awacs-radios.json" "$(Solut
 xcopy /Y /e "$(SolutionDir)DCS-SR-Client\AudioEffects" "$(SolutionDir)install-build\AudioEffects"
 copy /Y "$(SolutionDir)Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)install-build\Installer.exe"
 copy /Y "$(SolutionDir)AutoUpdater\bin\Release\SRS-AutoUpdater.exe" "$(SolutionDir)install-build\SRS-AutoUpdater.exe" 
+copy /Y "$(SolutionDir)DCS-SR-ExternalAudio\bin\Release\DCS-SR-ExternalAudio.exe" "$(SolutionDir)install-build\DCS-SR-ExternalAudio.exe" 
 xcopy /Y /e "$(SolutionDir)Scripts" "$(SolutionDir)install-build\Scripts"
 if not exist "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\" mkdir "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\"
 copy /Y "$(SolutionDir)x64\Release\srs.dll" "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\srs.dll"
