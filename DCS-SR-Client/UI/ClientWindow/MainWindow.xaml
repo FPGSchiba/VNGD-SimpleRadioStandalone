@@ -312,7 +312,7 @@
                                Margin="5,0,0,0" />
                        
                     </StackPanel>
-                    <Button Content="Donate to Support SRS" Width="150" Click="Donate_OnClick" Margin="5"></Button>
+                    <Button Content="Patreon to Support SRS" Width="150" Click="Donate_OnClick" Margin="5"></Button>
                 </StackPanel>
             </GroupBox>
         </TabItem>
