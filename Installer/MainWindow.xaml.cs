@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -856,7 +857,8 @@ namespace Installer
                     var config = directory + "\\config\\options.lua";
                     if (File.Exists(network) || File.Exists(config))
                     {
-                        if (!directory.ToUpper().Contains("SERVER") && !directory.ToUpper().Contains("DEDICATED"))
+                        var split = directory.Split(Path.DirectorySeparatorChar);
+                        if (!split.Last().ToUpper().Contains("SERVER") && !split.Last().ToUpper().Contains("DEDICATED"))
                         {
                             Logger.Info($"Found DCS Saved Games Path {directory}");
                             paths.Add(directory);
