@@ -258,7 +258,7 @@ copy /Y "$(SolutionDir)DCS-SR-ExternalAudio\bin\Release\DCS-SR-ExternalAudio.exe
 xcopy /Y /e "$(SolutionDir)Scripts" "$(SolutionDir)install-build\Scripts"
 if not exist "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\" mkdir "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\"
 copy /Y "$(SolutionDir)x64\Release\srs.dll" "$(SolutionDir)install-build\Scripts\DCS-SRS\bin\srs.dll"
-</PostBuildEvent>
+del /S $(SolutionDir)install-build\*.git*</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

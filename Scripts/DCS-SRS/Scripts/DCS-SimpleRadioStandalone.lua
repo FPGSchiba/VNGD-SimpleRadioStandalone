@@ -1,4 +1,4 @@
--- Version 1.9.0.3
+-- Version 1.9.1.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -2263,7 +2263,7 @@ function SR.exportRadioP47(_data)
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "Only one radio by default" }
 
     _data.radios[2].name = "SCR522"
-    _data.radios[2].freq = SR.getRadioFrequency(21)
+    _data.radios[2].freq = SR.getRadioFrequency(23)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 77, { 0.0, 1.0 }, false)
 
@@ -3492,4 +3492,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.3")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.1.0")
