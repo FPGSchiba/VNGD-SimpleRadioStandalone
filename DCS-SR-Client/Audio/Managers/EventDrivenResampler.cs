@@ -20,6 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private BufferedWaveProvider buf;
         private IWaveProvider waveOut;
         private int bufferMultiplier = 1;
+        private  readonly bool resampleRequired = false;
 
         public EventDrivenResampler(bool windowsN, WaveFormat input,WaveFormat output)
         {
@@ -33,7 +34,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 bufferMultiplier = 2;
             }
-
 
             if (windowsN)
             {
