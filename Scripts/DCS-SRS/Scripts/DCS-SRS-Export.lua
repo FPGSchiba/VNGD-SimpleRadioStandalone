@@ -2,11 +2,17 @@
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
+
+
+net.log("Loading - DCS-SRS Export GameGUI - Ciribob: 1.9.1.0 ")
 local SR = {}
 
 SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
+
+SR.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
+SR.unicast = true
 
 SR.LOS_HEIGHT_OFFSET = 20.0 -- sets the line of sight offset to simulate radio waves bending
 SR.LOS_HEIGHT_OFFSET_MAX = 200.0 -- max amount of "bend"
@@ -29,6 +35,19 @@ end
 
 package.path = package.path .. ";.\\LuaSocket\\?.lua;"
 package.cpath = package.cpath .. ";.\\LuaSocket\\?.dll;"
+package.cpath = package.cpath..";"..lfs.writedir().."Mods\\Services\\DCS-SRS\\bin\\?.dll;"
+
+local srs = nil
+
+pcall(function()
+	srs = require("srs")
+
+	SR.log("Loaded SR.dll")
+end)
+
+if not srs then
+	SR.log("Couldnt load SR.dll")
+end
 
 ---- DCS Search Paths - So we can load Terrain!
 local guiBindPath = './dxgui/bind/?.lua;' ..
@@ -53,6 +72,7 @@ local JSON = loadfile("Scripts\\JSON.lua")()
 SR.JSON = JSON
 
 SR.UDPSendSocket = socket.udp()
+SR.UDPSendSocket:settimeout(0)
 SR.UDPLosReceiveSocket = socket.udp()
 
 --bind for listening for LOS info
@@ -65,252 +85,226 @@ if terrain ~= nil then
     SR.log("Loaded Terrain - SimpleRadio Standalone!")
 end
 
--- Prev Export functions.
-local _prevExport = {}
-_prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
-_prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 
-local _send = false
+local _sent = 0
+local _lastSent = 0
 
 local _lastUnitId = "" -- used for a10c volume
 
-LuaExportActivityNextEvent = function(tCurrent)
-    local tNext = tCurrent + 0.1 -- for helios support
-    -- we only want to send once every 0.2 seconds 
-    -- but helios (and other exports) require data to come much faster
-    -- so we just flip a boolean every run through to reduce to 0.2 rather than 0.1 seconds
-    if _send then
+SR.exportAircraftData = function()
+  
 
-        _send = false
+    local _status, _result = pcall(function()
 
-        local _status, _result = pcall(function()
+        local _update = nil
 
-            local _update = nil
+        local _data = Export.LoGetSelfData()
 
-            local _data = LoGetSelfData()
+        if _data ~= nil then
 
-            if _data ~= nil then
+            _update = {
+                name = "",
+                unit = "",
+                selected = 1,
+                simultaneousTransmissionControl = 0,
+                unitId = 0,
+                ptt = false,
+                capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
+                radios = {
+                    -- Radio 1 is always Intercom
+                    { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
+                    { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 }, -- enc means encrypted
+                    { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
+                    { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
+                    { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
+                    { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
+                },
+                control = 0, -- HOTAS
+            }
 
-                _update = {
-                    name = "",
-                    unit = "",
-                    selected = 1,
-                    simultaneousTransmissionControl = 0,
-                    unitId = 0,
-                    ptt = false,
-                    capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
-                    radios = {
-                        -- Radio 1 is always Intercom
-                        { name = "", freq = 100, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 }, -- enc means encrypted
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
-                        { name = "", freq = 0, modulation = 3, volume = 1.0, secFreq = 0, freqMin = 1, freqMax = 1, encKey = 0, enc = false, encMode = 0, freqMode = 0, guardFreqMode = 0, volMode = 0, expansion = false, rtMode = 2 },
-                    },
-                    control = 0, -- HOTAS
-                }
+            _update.name = _data.UnitName
+            _update.unit = _data.Name
+            _update.unitId = Export.LoGetPlayerPlaneId()
 
-                _update.name = _data.UnitName
-                _update.unit = _data.Name
-                _update.unitId = LoGetPlayerPlaneId()
+            local _latLng,_point = SR.exportPlayerLocation(_data)
 
-                local _latLng,_point = SR.exportPlayerLocation(_data)
+            _update.latLng = _latLng
+            SR.lastKnownPos = _point
 
-                _update.latLng = _latLng
-                SR.lastKnownPos = _point
+            -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC)
+            -- M1:-1 = off, any other number on
+            -- M3: -1 = OFF, any other number on
+            -- M4: 1 = ON or 0 = OFF
+            -- EXPANSION: only enabled if IFF Expansion is enabled
+            -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
+            -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
+            -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
 
-                -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC)
-                -- M1:-1 = off, any other number on
-                -- M3: -1 = OFF, any other number on
-                -- M4: 1 = ON or 0 = OFF
-                -- EXPANSION: only enabled if IFF Expansion is enabled
-                -- CONTROL: 1 - OVERLAY / SRS, 0 - COCKPIT / Realistic, 2 = DISABLED / NOT FITTED AT ALL
-                -- MIC - -1 for OFF or ID of the radio to trigger IDENT Mode if the PTT is used
-                -- IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2,mic=1}
+            _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
 
-                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
+            --SR.log(_update.unit.."\n\n")
 
-                --SR.log(_update.unit.."\n\n")
-
-                if _update.unit == "UH-1H" then
-                    _update = SR.exportRadioUH1H(_update)
-                elseif string.find(_update.unit, "SA342",1,true) then
-                    _update = SR.exportRadioSA342(_update)
-                elseif _update.unit == "Ka-50" then
-                    _update = SR.exportRadioKA50(_update)
-                elseif _update.unit == "Mi-8MT" then
-                    _update = SR.exportRadioMI8(_update)
-                elseif string.find(_update.unit, "L-39",1,true)  then
-                    _update = SR.exportRadioL39(_update)
-                elseif _update.unit == "Yak-52" then
-                    _update = SR.exportRadioYak52(_update)
-                elseif _update.unit == "A-10C" then
-                    _update = SR.exportRadioA10C(_update)
-                elseif _update.unit == "FA-18C_hornet" then
-                    _update = SR.exportRadioFA18C(_update)
-                elseif string.find(_update.unit, "F-14",1,true)  then
-                    _update = SR.exportRadioF14(_update)
-                elseif _update.unit == "F-86F Sabre" then
-                    _update = SR.exportRadioF86Sabre(_update)
-                elseif _update.unit == "MiG-15bis" then
-                    _update = SR.exportRadioMIG15(_update)
-                elseif _update.unit == "MiG-19P" then
-                    _update = SR.exportRadioMIG19(_update)
-                elseif _update.unit == "MiG-21Bis" then
-                    _update = SR.exportRadioMIG21(_update)
-                elseif _update.unit == "F-5E-3" then
-                    _update = SR.exportRadioF5E(_update)
-                elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
-                    _update = SR.exportRadioP51(_update)
-                elseif _update.unit == "P-47D-30"then
-                    _update = SR.exportRadioP47(_update)
-                elseif _update.unit == "FW-190D9" or _update.unit == "FW-190A8" then
-                    _update = SR.exportRadioFW190(_update)
-                elseif _update.unit == "Bf-109K-4" then
-                    _update = SR.exportRadioBF109(_update)
-                elseif string.find(_update.unit, "SpitfireLFMkIX",1,true)  then
-                    _update = SR.exportRadioSpitfireLFMkIX(_update)
-                elseif _update.unit == "C-101EB" then
-                    _update = SR.exportRadioC101EB(_update)
-                elseif _update.unit == "C-101CC" then
-                    _update = SR.exportRadioC101CC(_update)
-                elseif _update.unit == "Hawk" then
-                    _update = SR.exportRadioHawk(_update)
-                elseif _update.unit == "Christen Eagle II" then
-                    _update = SR.exportRadioEagleII(_update)
-                elseif _update.unit == "M-2000C" then
-                    _update = SR.exportRadioM2000C(_update)
-                elseif _update.unit == "JF-17"  then
-                    _update = SR.exportRadioJF17(_update)
-                elseif _update.unit == "AV8BNA" then
-                    _update = SR.exportRadioAV8BNA(_update)
-                elseif _update.unit == "AJS37" then
-                    _update = SR.exportRadioAJS37(_update)
-                elseif _update.unit == "A-10A" then
-                    _update = SR.exportRadioA10A(_update)
-                elseif _update.unit == "A-4E-C" then
-                    _update = SR.exportRadioA4E(_update)
-                elseif _update.unit == "F-15C" then
-                    _update = SR.exportRadioF15C(_update)
-                elseif _update.unit == "MiG-29A" or _update.unit == "MiG-29S" or _update.unit == "MiG-29G" then
-                    _update = SR.exportRadioMiG29(_update)
-                elseif _update.unit == "Su-27" or _update.unit == "Su-33" then
-                    _update = SR.exportRadioSU27(_update)
-                elseif _update.unit == "Su-25" or _update.unit == "Su-25T" then
-                    _update = SR.exportRadioSU25(_update)
-                elseif _update.unit == "F-16C_50" then
-                    _update = SR.exportRadioF16C(_update)
-                else
-                    -- FC 3
-                    _update.radios[2].name = "FC3 VHF"
-                    _update.radios[2].freq = 124.8 * 1000000 --116,00-151,975 MHz
-                    _update.radios[2].modulation = 0
-                    _update.radios[2].secFreq = 121.5 * 1000000
-                    _update.radios[2].volume = 1.0
-                    _update.radios[2].freqMin = 116 * 1000000
-                    _update.radios[2].freqMax = 151.975 * 1000000
-                    _update.radios[2].volMode = 1
-                    _update.radios[2].freqMode = 1
-					_update.radios[2].rtMode = 1
-
-                    _update.radios[3].name = "FC3 UHF"
-                    _update.radios[3].freq = 251.0 * 1000000 --225-399.975 MHZ
-                    _update.radios[3].modulation = 0
-                    _update.radios[3].secFreq = 243.0 * 1000000
-                    _update.radios[3].volume = 1.0
-                    _update.radios[3].freqMin = 225 * 1000000
-                    _update.radios[3].freqMax = 399.975 * 1000000
-                    _update.radios[3].volMode = 1
-                    _update.radios[3].freqMode = 1
-					_update.radios[3].rtMode = 1
-                    _update.radios[3].encKey = 1
-                    _update.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
-
-                    _update.radios[4].name = "FC3 FM"
-                    _update.radios[4].freq = 30.0 * 1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
-                    _update.radios[4].modulation = 1
-                    _update.radios[4].volume = 1.0
-                    _update.radios[4].freqMin = 30 * 1000000
-                    _update.radios[4].freqMax = 76 * 1000000
-                    _update.radios[4].volMode = 1
-                    _update.radios[4].freqMode = 1
-					_update.radios[4].encKey = 1
-                    _update.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
-					_update.radios[4].rtMode = 1
-
-                    _update.control = 0;
-                    _update.selected = 1
-                    _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
-                end
-
-                _lastUnitId = _update.unitId
+            if _update.unit == "UH-1H" then
+                _update = SR.exportRadioUH1H(_update)
+            elseif string.find(_update.unit, "SA342",1,true) then
+                _update = SR.exportRadioSA342(_update)
+            elseif _update.unit == "Ka-50" then
+                _update = SR.exportRadioKA50(_update)
+            elseif _update.unit == "Mi-8MT" then
+                _update = SR.exportRadioMI8(_update)
+            elseif string.find(_update.unit, "L-39",1,true)  then
+                _update = SR.exportRadioL39(_update)
+            elseif _update.unit == "Yak-52" then
+                _update = SR.exportRadioYak52(_update)
+            elseif _update.unit == "A-10C" then
+                _update = SR.exportRadioA10C(_update)
+            elseif _update.unit == "FA-18C_hornet" then
+                _update = SR.exportRadioFA18C(_update)
+            elseif string.find(_update.unit, "F-14",1,true)  then
+                _update = SR.exportRadioF14(_update)
+            elseif _update.unit == "F-86F Sabre" then
+                _update = SR.exportRadioF86Sabre(_update)
+            elseif _update.unit == "MiG-15bis" then
+                _update = SR.exportRadioMIG15(_update)
+            elseif _update.unit == "MiG-19P" then
+                _update = SR.exportRadioMIG19(_update)
+            elseif _update.unit == "MiG-21Bis" then
+                _update = SR.exportRadioMIG21(_update)
+            elseif _update.unit == "F-5E-3" then
+                _update = SR.exportRadioF5E(_update)
+            elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
+                _update = SR.exportRadioP51(_update)
+            elseif _update.unit == "P-47D-30"then
+                _update = SR.exportRadioP47(_update)
+            elseif _update.unit == "FW-190D9" or _update.unit == "FW-190A8" then
+                _update = SR.exportRadioFW190(_update)
+            elseif _update.unit == "Bf-109K-4" then
+                _update = SR.exportRadioBF109(_update)
+            elseif string.find(_update.unit, "SpitfireLFMkIX",1,true)  then
+                _update = SR.exportRadioSpitfireLFMkIX(_update)
+            elseif _update.unit == "C-101EB" then
+                _update = SR.exportRadioC101EB(_update)
+            elseif _update.unit == "C-101CC" then
+                _update = SR.exportRadioC101CC(_update)
+            elseif _update.unit == "Hawk" then
+                _update = SR.exportRadioHawk(_update)
+            elseif _update.unit == "Christen Eagle II" then
+                _update = SR.exportRadioEagleII(_update)
+            elseif _update.unit == "M-2000C" then
+                _update = SR.exportRadioM2000C(_update)
+            elseif _update.unit == "JF-17"  then
+                _update = SR.exportRadioJF17(_update)
+            elseif _update.unit == "AV8BNA" then
+                _update = SR.exportRadioAV8BNA(_update)
+            elseif _update.unit == "AJS37" then
+                _update = SR.exportRadioAJS37(_update)
+            elseif _update.unit == "A-10A" then
+                _update = SR.exportRadioA10A(_update)
+            elseif _update.unit == "A-4E-C" then
+                _update = SR.exportRadioA4E(_update)
+            elseif _update.unit == "F-15C" then
+                _update = SR.exportRadioF15C(_update)
+            elseif _update.unit == "MiG-29A" or _update.unit == "MiG-29S" or _update.unit == "MiG-29G" then
+                _update = SR.exportRadioMiG29(_update)
+            elseif _update.unit == "Su-27" or _update.unit == "Su-33" then
+                _update = SR.exportRadioSU27(_update)
+            elseif _update.unit == "Su-25" or _update.unit == "Su-25T" then
+                _update = SR.exportRadioSU25(_update)
+            elseif _update.unit == "F-16C_50" then
+                _update = SR.exportRadioF16C(_update)
             else
-                --Ground Commander or spectator
-                _update = {
-                    name = "Unknown",
-                    unit = "CA",
-                    selected = 1,
-                    ptt = false,
-                    capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
-                    simultaneousTransmissionControl = 1,
-                    latLng = { lat = 0, lng = 0, alt = 0 },
-                    unitId = 100000001, -- pass through starting unit id here
-                    radios = {
-                        --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
-                        { name = "SATCOM", freq = 100, modulation = 2, volume = 1.0, secFreq = 0, freqMin = 100, freqMax = 100, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 1, expansion = false, rtMode = 2 },
-                        { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF FM", freq = 30.0 * 1000000, modulation = 1, volume = 1.0, secFreq = 1, freqMin = 1 * 1000000, freqMax = 76 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF FM", freq = 30.0 * 1000000, modulation = 1, volume = 1.0, secFreq = 1, freqMin = 1 * 1000000, freqMax = 76 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                        { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
-                    },
-                    radioType = 3,
-                    iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
-                }
+                -- FC 3
+                _update.radios[2].name = "FC3 VHF"
+                _update.radios[2].freq = 124.8 * 1000000 --116,00-151,975 MHz
+                _update.radios[2].modulation = 0
+                _update.radios[2].secFreq = 121.5 * 1000000
+                _update.radios[2].volume = 1.0
+                _update.radios[2].freqMin = 116 * 1000000
+                _update.radios[2].freqMax = 151.975 * 1000000
+                _update.radios[2].volMode = 1
+                _update.radios[2].freqMode = 1
+				_update.radios[2].rtMode = 1
 
-                local _latLng,_point = SR.exportCameraLocation()
+                _update.radios[3].name = "FC3 UHF"
+                _update.radios[3].freq = 251.0 * 1000000 --225-399.975 MHZ
+                _update.radios[3].modulation = 0
+                _update.radios[3].secFreq = 243.0 * 1000000
+                _update.radios[3].volume = 1.0
+                _update.radios[3].freqMin = 225 * 1000000
+                _update.radios[3].freqMax = 399.975 * 1000000
+                _update.radios[3].volMode = 1
+                _update.radios[3].freqMode = 1
+				_update.radios[3].rtMode = 1
+                _update.radios[3].encKey = 1
+                _update.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
-                _update.latLng = _latLng
-                SR.lastKnownPos = _point
+                _update.radios[4].name = "FC3 FM"
+                _update.radios[4].freq = 30.0 * 1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
+                _update.radios[4].modulation = 1
+                _update.radios[4].volume = 1.0
+                _update.radios[4].freqMin = 30 * 1000000
+                _update.radios[4].freqMax = 76 * 1000000
+                _update.radios[4].volMode = 1
+                _update.radios[4].freqMode = 1
+				_update.radios[4].encKey = 1
+                _update.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+				_update.radios[4].rtMode = 1
 
-                _lastUnitId = ""
+                _update.control = 0;
+                _update.selected = 1
+                _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
             end
 
-            if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.0.0.1", SR.RADIO_SEND_TO_PORT))
-            else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.255.255.255", SR.RADIO_SEND_TO_PORT))
-            end
+            _lastUnitId = _update.unitId
+        else
+            --Ground Commander or spectator
+            _update = {
+                name = "Unknown",
+                unit = "CA",
+                selected = 1,
+                ptt = false,
+                capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" },
+                simultaneousTransmissionControl = 1,
+                latLng = { lat = 0, lng = 0, alt = 0 },
+                unitId = 100000001, -- pass through starting unit id here
+                radios = {
+                    --- Radio 0 is always intercom now -- disabled if AWACS panel isnt open
+                    { name = "SATCOM", freq = 100, modulation = 2, volume = 1.0, secFreq = 0, freqMin = 100, freqMax = 100, encKey = 0, enc = false, encMode = 0, freqMode = 0, volMode = 1, expansion = false, rtMode = 2 },
+                    { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF FM", freq = 30.0 * 1000000, modulation = 1, volume = 1.0, secFreq = 1, freqMin = 1 * 1000000, freqMax = 76 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "UHF Guard", freq = 251.0 * 1000000, modulation = 0, volume = 1.0, secFreq = 243.0 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF FM", freq = 30.0 * 1000000, modulation = 1, volume = 1.0, secFreq = 1, freqMin = 1 * 1000000, freqMax = 76 * 1000000, encKey = 1, enc = false, encMode = 1, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                    { name = "VHF Guard", freq = 124.8 * 1000000, modulation = 0, volume = 1.0, secFreq = 121.5 * 1000000, freqMin = 1 * 1000000, freqMax = 400 * 1000000, encKey = 0, enc = false, encMode = 0, freqMode = 1, volMode = 1, expansion = false, rtMode = 1 },
+                },
+                radioType = 3,
+                iff = {status=0,mode1=0,mode3=0,mode4=0,control=0,expansion=false,mic=-1}
+            }
 
-        end)
+            local _latLng,_point = SR.exportCameraLocation()
 
-        if not _status then
-            SR.log('ERROR: ' .. _result)
+            _update.latLng = _latLng
+            SR.lastKnownPos = _point
+
+            _lastUnitId = ""
         end
 
-    else
-        _send = true
-    end
-
-
-    -- call
-    local _status, _result = pcall(function()
-        -- Call original function if it exists
-        if _prevExport.LuaExportActivityNextEvent then
-            _prevExport.LuaExportActivityNextEvent(tCurrent)
+        if SR.unicast then
+            socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.0.0.1", SR.RADIO_SEND_TO_PORT))
+        else
+            socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.255.255.255", SR.RADIO_SEND_TO_PORT))
         end
 
     end)
 
     if not _status then
-        SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
+        SR.log('ERROR: ' .. _result)
     end
+
 
     if terrain == nil then
         SR.log("Terrain Export is not working")
@@ -318,12 +312,13 @@ LuaExportActivityNextEvent = function(tCurrent)
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     end
 
-    return tNext
+ 
 end
 
 local _lastCheck = 0;
 
-LuaExportBeforeNextFrame = function()
+
+SR.onSimulationFrame = function()
 
     -- read from socket
     local _status, _result = pcall(function()
@@ -355,19 +350,40 @@ LuaExportBeforeNextFrame = function()
         SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
     end
 
-    -- call original
-    _status, _result = pcall(function()
-        -- Call original function if it exists
-        if _prevExport.LuaExportBeforeNextFrame then
-            _prevExport.LuaExportBeforeNextFrame()
-        end
-    end)
+    local _status, _result = pcall(function()
+
+        local _now = DCS.getRealTime()
+
+        -- only if mission is running
+        if  DCS.getModelTime() > 0.5 then
+            -- SR.log('Exporting')
+            
+			--export aircraft every 0.2
+			if _now > _sent + 0.2 then
+				_sent = _now
+				SR.exportAircraftData()
+			end
+
+            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
+            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
+    
+			-- export coalition every 5 seconds
+			if _now > _lastSent + 5.0 then
+				_lastSent = _now 
+			 --    SR.log("sending update")
+				SR.exportCoalitionData(net.get_my_player_id())
+			end
+
+		end
+
+     end)
 
     if not _status then
-        SR.log('ERROR Calling other LuaExportBeforeNextFrame from another script: ' .. _result)
+        SR.log('ERROR Export SRS: ' .. _result)
     end
-
 end
+
+
 
 function SR.checkLOS(_clientsList)
 
@@ -377,7 +393,7 @@ function SR.checkLOS(_clientsList)
         -- add 10 meter tolerance
         --Coordinates convertion :
         --{x,y,z}                 = LoGeoCoordinatesToLoCoordinates(longitude_degrees,latitude_degrees)
-        local _point = LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
+        local _point = Export.LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
         -- Encoded Point: {"x":3758906.25,"y":0,"z":-1845112.125}
 
         local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
@@ -433,7 +449,7 @@ function SR.exportPlayerLocation(_data)
 
     if _data ~= nil and _data.Position ~= nil then
 
-        local latLng  = LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
+        local latLng  = Export.LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
         --LatLng: {"latitude":25.594814853729,"longitude":55.938746498011}
 
         return { lat = latLng.latitude, lng = latLng.longitude, alt = _data.Position.y },_data.Position
@@ -443,11 +459,11 @@ function SR.exportPlayerLocation(_data)
 end
 
 function SR.exportCameraLocation()
-    local _cameraPosition = LoGetCameraPosition()
+    local _cameraPosition = Export.LoGetCameraPosition()
 
     if _cameraPosition ~= nil and _cameraPosition.p ~= nil then
 
-        local latLng = LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
+        local latLng = Export.LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
 
         return { lat = latLng.latitude, lng = latLng.longitude, alt = _cameraPosition.p.y },_cameraPosition.p
     end
@@ -816,7 +832,7 @@ function SR.exportRadioUH1H(_data)
 
     --_device:get_argument_value(_arg)
 
-    local _panel = GetDevice(0)
+    local _panel = Export.GetDevice(0)
 
     local switch = _panel:get_argument_value(30)
 
@@ -984,7 +1000,7 @@ function SR.exportRadioKA50(_data)
 
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
-    local _panel = GetDevice(0)
+    local _panel = Export.GetDevice(0)
 
     _data.radios[2].name = "R-800L14 VHF/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(48)
@@ -1045,7 +1061,7 @@ function SR.exportRadioMI8(_data)
     _data.radios[2].name = "R-863"
     _data.radios[2].freq = SR.getRadioFrequency(38)
 
-    local _modulation = GetDevice(0):get_argument_value(369)
+    local _modulation = Export.GetDevice(0):get_argument_value(369)
     if _modulation > 0.5 then
         _data.radios[2].modulation = 1
     else
@@ -1053,7 +1069,7 @@ function SR.exportRadioMI8(_data)
     end
 
     -- get channel selector
-    local _selector = GetDevice(0):get_argument_value(132)
+    local _selector = Export.GetDevice(0):get_argument_value(132)
 
     if _selector > 0.5 then
         _data.radios[2].channel = SR.getSelectorPosition(370, 0.05) + 1 --add 1 as channel 0 is channel 1
@@ -1293,7 +1309,7 @@ function SR.exportRadioA10C(_data)
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
         -- New aircraft; Reset volumes to 100%
-        local _device = GetDevice(0)
+        local _device = Export.GetDevice(0)
 
         if _device then
             _device:set_argument_value(133, 1.0) -- VHF AM
@@ -2866,13 +2882,13 @@ function SR.exportRadioJF17(_data)
     _data.radios[2].freq = SR.getRadioFrequency(25)
     _data.radios[2].modulation = SR.getRadioModulation(25)
     _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false)
-    _data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
+    _data.radios[2].secFreq = Export.GetDevice(25):get_guard_plus_freq()
 
     _data.radios[3].name = "COMM2 UHF Radio"
     _data.radios[3].freq = SR.getRadioFrequency(26)
     _data.radios[3].modulation = SR.getRadioModulation(26)
     _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-    _data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
+    _data.radios[3].secFreq = Export.GetDevice(26):get_guard_plus_freq()
 
     -- Expansion Radio - Server Side Controlled
     _data.radios[4].name = "VHF/UHF Expansion"
@@ -2895,7 +2911,7 @@ function SR.exportRadioJF17(_data)
 
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
-    local _iff = GetDevice(15)
+    local _iff = Export.GetDevice(15)
 
     if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
         _data.iff.status = 1
@@ -3120,9 +3136,9 @@ function SR.exportRadioF14(_data)
     local arc159_devid = 3
     local arc182_devid = 4
 
-    local ICS_device = GetDevice(ics_devid)
-    local ARC159_device = GetDevice(arc159_devid)
-    local ARC182_device = GetDevice(arc182_devid)
+    local ICS_device = Export.GetDevice(ics_devid)
+    local ARC159_device = Export.GetDevice(arc159_devid)
+    local ARC182_device = Export.GetDevice(arc182_devid)
 
     local intercom_transmit = ICS_device:intercom_transmit()
     local ARC159_ptt = ARC159_device:is_ptt_pressed()
@@ -3287,7 +3303,7 @@ end
 
 function SR.getRadioVolume(_deviceId, _arg, _minMax, _invert)
 
-    local _device = GetDevice(_deviceId)
+    local _device = Export.GetDevice(_deviceId)
 
     if not _minMax then
         _minMax = { 0.0, 1.0 }
@@ -3308,7 +3324,7 @@ end
 
 function SR.getKnobPosition(_deviceId, _arg, _minMax, _mapMinMax)
 
-    local _device = GetDevice(_deviceId)
+    local _device = Export.GetDevice(_deviceId)
 
     if _device then
         local _val = tonumber(_device:get_argument_value(_arg))
@@ -3320,7 +3336,7 @@ function SR.getKnobPosition(_deviceId, _arg, _minMax, _mapMinMax)
 end
 
 function SR.getSelectorPosition(_args, _step)
-    local _value = GetDevice(0):get_argument_value(_args)
+    local _value = Export.GetDevice(0):get_argument_value(_args)
     local _num = math.abs(tonumber(string.format("%.0f", (_value) / _step)))
 
     return _num
@@ -3328,14 +3344,14 @@ function SR.getSelectorPosition(_args, _step)
 end
 
 function SR.getButtonPosition(_args)
-    local _value = GetDevice(0):get_argument_value(_args)
+    local _value = Export.GetDevice(0):get_argument_value(_args)
 
     return _value
 
 end
 
 function SR.getRadioFrequency(_deviceId, _roundTo)
-    local _device = GetDevice(_deviceId)
+    local _device = Export.GetDevice(_deviceId)
 
     if not _roundTo then
         _roundTo = 5000
@@ -3351,7 +3367,7 @@ function SR.getRadioFrequency(_deviceId, _roundTo)
 end
 
 function SR.getRadioModulation(_deviceId)
-    local _device = GetDevice(_deviceId)
+    local _device = Export.GetDevice(_deviceId)
 
     local _modulation = 0
 
@@ -3386,7 +3402,7 @@ end
 -- The function return a table with values of given indicator
 -- The value is retrievable via a named index. e.g. TmpReturn.txt_digits
 function SR.getListIndicatorValue(IndicatorID)
-    local ListIindicator = list_indication(IndicatorID)
+    local ListIindicator = Export.list_indication(IndicatorID)
     local TmpReturn = {}
 
     if ListIindicator == "" then
@@ -3492,4 +3508,320 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.1.0")
+--------------- Old GameGUI - Slot handling and Chat
+
+
+
+SR.onPlayerChangeSlot = function(_id)
+
+    -- send when there are changes
+    local _myPlayerId = net.get_my_player_id()
+
+    if _id == _myPlayerId then
+        SR.exportCoalitionData(net.get_my_player_id())
+    end
+  
+end
+
+SR.exportCoalitionData = function(playerID)
+  
+    local _update = {
+        name = "",
+        side = 0,
+        seat = 0,
+    }
+
+    _update.name = net.get_player_info(playerID, "name" )
+	_update.side = net.get_player_info(playerID,"side")
+
+	local slot =  net.get_player_info(playerID,"slot")
+
+	if slot and slot ~= '' then 
+		slot = tostring(slot)
+	    
+	    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
+	    if string.find(tostring(slot), "_", 1, true) then
+	        --extract substring - get the seat ID
+	        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
+
+	        local slotNum = tonumber(slot)
+
+	        if slotNum ~= nil and slotNum >= 1 then
+	        	_update.seat = slotNum -1 -- -1 as seat starts at 2
+	        end
+	    end
+	end
+
+    --SR.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
+
+	if SR.unicast then
+		socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+	else
+		socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 5068))
+	end
+
+
+end
+
+
+function string.startsWith(string, prefix)
+    return string.sub(string, 1, string.len(prefix)) == prefix
+end
+
+function string.trim(_str)
+    return string.format( "%s", _str:match( "^%s*(.-)%s*$" ) )
+end
+
+function SR.isAutoConnectMessage(msg)
+    return string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX) or string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD)
+end
+
+function SR.getHostFromMessage(msg)
+	if string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD) then
+		return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX_OLD) + 1))
+	else
+		return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX) + 1))
+	end
+end
+
+-- Register callbacks --
+
+SR.sendConnect = function(_message)
+
+    if SR.unicast then
+        socket.try(SR.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
+    else
+        socket.try(SR.UDPSendSocket:sendto(_message.."\n", "127.255.255.255", 5069))
+    end
+end
+
+SR.sendCommand = function(_message)
+
+    if SR.unicast then
+        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_message).."\n", "127.0.0.1", 9040))
+    else
+        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_message).."\n", "127.255.255.255", 9040))
+    end
+end
+
+SR.findCommandValue = function(key, list)
+
+	for index,str in ipairs(list) do
+			
+		if str == key then
+			
+			return list[index+1]
+		end
+	end
+	return nil
+end
+
+SR.handleTransponder = function(msg)
+
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
+
+	local commands = {}
+
+	--search for keys
+	for _,key in ipairs(keys) do
+
+		local val = SR.findCommandValue(key, split)
+
+		if val then
+			if key == "POWER" or key == "PWR" then
+				if val == "ON" then
+					table.insert(commands, {Command = 6, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 6, Enabled = false})
+				end
+			elseif key == "M1" then
+
+				if val == "OFF" then
+					table.insert(commands, {Command = 7, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 7, Code = code})
+					end
+				end
+			
+			elseif key == "M3" then
+				 if val == "OFF" then
+					table.insert(commands, {Command = 8, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 8, Code = code})
+					end
+				end
+
+			elseif key == "M4" then
+				if val == "ON" then
+					table.insert(commands, {Command = 9, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 9, Enabled = false})
+				end
+			elseif key == "IDENT" then
+				if val == "ON" then
+					table.insert(commands, {Command = 10, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 10, Enabled = false})
+				end
+			end
+		end
+	end
+
+	return commands
+
+end
+
+
+SR.handleRadio = function(msg)
+
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"SELECT",
+					"RADIO","FREQ","GUARD",
+					"FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
+
+	local commands = {}
+
+	local radioId = -1
+
+	--search for keys
+	for _,key in ipairs(keys) do
+
+		local val = SR.findCommandValue(key, split)
+
+		if val then
+			if key == "SELECT" or key == "RADIO" then
+
+				local code = tonumber(val)
+				if code ~= nil then
+					radioId  = code
+					if key == "SELECT" then
+						table.insert(commands, {Command = 1, RadioId = radioId})
+					end
+				end
+
+			elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
+
+				if radioId > 0 then
+					local frq = tonumber(val)
+
+					if frq ~= nil then
+						table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
+					end
+				end
+			elseif key == "VOL" or key == "VOLUME" then
+
+				if radioId > 0 then
+					local vol = tonumber(val)
+
+					if vol ~= nil then
+
+						if vol > 1.0 then
+							vol = 1.0
+						elseif vol < 0 then
+							vol = 0
+						end
+
+						table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
+					end
+				end
+			elseif key == "CHN" or key == "CHANNEL" then
+
+				if radioId > 0 then
+					if val == "UP" or val == "+" then
+						table.insert(commands, {Command = 3,  RadioId = radioId})
+					elseif val == "DOWN" or val == "-" then
+						table.insert(commands, {Command = 4,  RadioId = radioId})
+					end
+				end
+			elseif key == "GUARD" or key == "GRD" then
+				if val == "ON" then
+					table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
+				end
+			end
+		end
+	end
+
+	if radioId > 0 then
+		return commands
+	end
+
+	return {}
+
+end
+
+SR.onChatMessage = function(msg, from)
+
+
+    -- Only accept auto connect message coming from host.
+    if SR.CLIENT_ACCEPT_AUTO_CONNECT
+                        and from == 1
+            and  SR.isAutoConnectMessage(msg) then
+        local host = SR.getHostFromMessage(msg)
+        SR.log(string.format("Got SRS Auto Connect message: %s", host))
+
+        local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
+        if srs and enabled then
+            local path = SR.get_srs_path()
+            if path ~= "" then
+
+                net.log("Trying to Launch SRS @ "..path)
+                SR.start_srs(host)
+            end
+
+        end
+        SR.sendConnect(host) 
+    end
+
+    -- MESSAGE FROM MYSELF
+    if from == net.get_my_player_id() then
+		
+		msg = msg:upper()
+
+		if string.find(msg,"SRSTRANS",1,true) then
+			local commands = SR.handleTransponder(msg) 
+
+			for _,command in pairs(commands) do
+				SR.sendCommand(command)
+			end
+		elseif string.find(msg,"SRSRADIO",1,true) then
+			local commands = SR.handleRadio(msg) 
+
+			for _,command in pairs(commands) do
+				SR.sendCommand(command)
+			end
+		end
+	end
+
+end
+
+
+
+DCS.setUserCallbacks(SR)
+
+net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.0")
+SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.0")
