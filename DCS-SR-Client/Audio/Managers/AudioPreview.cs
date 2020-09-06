@@ -45,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private Preprocessor _speex;
 
-        private readonly Queue<short> _micInputQueue = new Queue<short>(AudioManager.SEGMENT_FRAMES * 3);
+        private readonly Queue<short> _micInputQueue = new Queue<short>(AudioManager.MIC_SEGMENT_FRAMES * 3);
         
         private WaveFileWriter _waveFile;
 
@@ -86,14 +86,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 80, windowsN);
 
                 _buffBufferedWaveProvider =
-                    new BufferedWaveProvider(new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                    new BufferedWaveProvider(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
                 _buffBufferedWaveProvider.ReadFully = true;
                 _buffBufferedWaveProvider.DiscardOnBufferOverflow = true;
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
                 CachedLoopingAudioProvider natoEffect =
-                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(), new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
+                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(), new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(natoEffect.ToSampleProvider(),
@@ -138,14 +138,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             try
             {
-                _speex = new Preprocessor(AudioManager.SEGMENT_FRAMES, AudioManager.INPUT_SAMPLE_RATE);
+                _speex = new Preprocessor(AudioManager.MIC_SEGMENT_FRAMES, AudioManager.MIC_SAMPLE_RATE);
                 //opus
-                _encoder = OpusEncoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1,
+                _encoder = OpusEncoder.Create(AudioManager.MIC_SAMPLE_RATE, 1,
                     FragLabs.Audio.Codecs.Opus.Application.Voip);
                 _encoder.ForwardErrorCorrection = false;
-                _decoder = OpusDecoder.Create(AudioManager.INPUT_SAMPLE_RATE, 1);
+                _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
                 _decoder.ForwardErrorCorrection = false;
-                _decoder.MaxDataBytes = AudioManager.INPUT_SAMPLE_RATE * 4;
+                _decoder.MaxDataBytes = AudioManager.OUTPUT_SAMPLE_RATE * 4;
 
                 var device = (MMDevice)_audioInputSingleton.SelectedAudioInput.Value;
 
@@ -240,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
             if (_resampler == null)
             {
-                _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.INPUT_SAMPLE_RATE, 16, 1));
+                _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
             }
 
             if (e.BytesRecorded > 0)
@@ -261,14 +261,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 }
                 
                 //read out the queue
-                while ((pcmShort != null) || (_micInputQueue.Count >= AudioManager.SEGMENT_FRAMES))
+                while ((pcmShort != null) || (_micInputQueue.Count >= AudioManager.MIC_SEGMENT_FRAMES))
                 {
                     //null sound buffer so read from the queue
                     if (pcmShort == null)
                     {
-                        pcmShort = new short[AudioManager.SEGMENT_FRAMES];
+                        pcmShort = new short[AudioManager.MIC_SEGMENT_FRAMES];
 
-                        for (var i = 0; i < AudioManager.SEGMENT_FRAMES; i++)
+                        for (var i = 0; i < AudioManager.MIC_SEGMENT_FRAMES; i++)
                         {
                             pcmShort[i] = _micInputQueue.Dequeue();
                         }
@@ -325,7 +325,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         else
                         {
                             Logger.Error(
-                                $"Invalid Bytes for Encoding - {e.BytesRecorded} should be {AudioManager.SEGMENT_FRAMES} ");
+                                $"Invalid Bytes for Encoding - {e.BytesRecorded} should be {AudioManager.MIC_SEGMENT_FRAMES} ");
                         }
                     }
                     catch (Exception ex)
