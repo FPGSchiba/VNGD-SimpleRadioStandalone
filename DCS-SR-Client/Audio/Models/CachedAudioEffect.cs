@@ -22,8 +22,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         }
 
         //order must match ENUM above
-        private static readonly string[] FileNameLookup = new[] { "Radio-TX-1600.wav","Radio-RX-1600.wav",
-            "KY-58-TX-1600.wav","KY-58-RX-1600.wav","nato-tone-16k.wav", "nato-mids-tone.wav", "nato-mids-tone-out.wav"};
+        private static readonly string[] FileNameLookup = new[] { "Radio-TX-48K.wav","Radio-RX-48K.wav",
+            "KY-58-TX-48K.wav","KY-58-RX-48K.wav","nato-tone-48k.wav", "nato-mids-tone-48K.wav", "nato-mids-tone-out-48K.wav"};
 
         public CachedAudioEffect(AudioEffectTypes audioEffect)
         {
@@ -46,7 +46,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     }
                     else
                     {
-                        Logger.Info($"Unable to read Effect {audioEffect} from {file} Successfully - not 16 bits!");
+                        Logger.Info($"Unable to read Effect {audioEffect} from {file} Successfully - not 16 bits or stereo {reader.WaveFormat} !");
                     }
 
                 }

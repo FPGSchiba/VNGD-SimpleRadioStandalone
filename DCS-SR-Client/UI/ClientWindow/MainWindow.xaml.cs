@@ -1683,7 +1683,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             try
             {
                 Process.Start(
-                    "https://www.paypal.me/ciaranfisher/3");
+                    "https://www.patreon.com/ciribob");
             }
             catch (Exception ex)
             {

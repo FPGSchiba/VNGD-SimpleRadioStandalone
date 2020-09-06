@@ -13,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public static readonly int MAXIMUM_BUFFER_SIZE_MS = 2500;
 
-        private readonly byte[] _silence = new byte[AudioManager.SEGMENT_FRAMES * 2]; //*2 for stereo
+        private readonly byte[] _silence = new byte[AudioManager.OUTPUT_SEGMENT_FRAMES * 2]; //*2 for stereo
 
         private readonly LinkedList<JitterBufferAudio> _bufferedAudio = new LinkedList<JitterBufferAudio>();
 
@@ -138,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 }
                 else if (jitterBufferAudio.PacketNumber > _lastRead)
                 { 
-                    var time = _bufferedAudio.Count * AudioManager.INPUT_AUDIO_LENGTH_MS; // this isnt quite true as there can be padding audio but good enough
+                    var time = _bufferedAudio.Count * AudioManager.OUTPUT_AUDIO_LENGTH_MS; // this isnt quite true as there can be padding audio but good enough
 
                     if (time > MAXIMUM_BUFFER_SIZE_MS)
                     {
