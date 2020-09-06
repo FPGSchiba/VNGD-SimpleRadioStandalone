@@ -32,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 Console.WriteLine("Frequency in MHz comma separated - 251.0,252.0 or just 252.0  ");
                 Console.WriteLine("Modulation AM or FM comma separated - AM,FM or just AM  ");
                 Console.WriteLine("Coalition - 0 is Spectator, 1 is Red, 2 is Blue");
-                Console.WriteLine("Port - 6002 is the default");
+                Console.WriteLine("Port - 5002 is the default");
                 Console.WriteLine("Name - name of your transmitter - no spaces");
                 Console.WriteLine("Volume - 1.0 is max, 0.0 is silence");
             }
