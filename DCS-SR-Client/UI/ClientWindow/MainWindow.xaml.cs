@@ -653,6 +653,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             AlwaysAllowHotas.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls);
             AllowDCSPTT.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT);
             AlwaysAllowTransponderOverlay.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay);
+
+            //disable to set without triggering onchange
+            PTTReleaseDelay.IsEnabled = false;
+            PTTReleaseDelay.ValueChanged += PushToTalkReleaseDelay_ValueChanged;
+            PTTReleaseDelay.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.PTTReleaseDelay).RawValue, CultureInfo.InvariantCulture);
+            PTTReleaseDelay.IsEnabled = true;
         }
 
         private void Connect()
@@ -1676,6 +1682,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
         { 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
+        }
+
+        private void PushToTalkReleaseDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (PTTReleaseDelay.IsEnabled)
+                _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.PTTReleaseDelay, e.NewValue.ToString(CultureInfo.InvariantCulture));
         }
 
         private void Donate_OnClick(object sender, RoutedEventArgs e)
