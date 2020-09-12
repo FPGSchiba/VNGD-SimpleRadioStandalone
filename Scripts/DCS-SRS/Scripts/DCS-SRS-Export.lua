@@ -40,13 +40,13 @@ package.cpath = package.cpath..";"..lfs.writedir().."Mods\\Services\\DCS-SRS\\bi
 local srs = nil
 
 pcall(function()
-	srs = require("srs")
+    srs = require("srs")
 
-	SR.log("Loaded SR.dll")
+    SR.log("Loaded SRS.dll")
 end)
 
 if not srs then
-	SR.log("Couldnt load SR.dll")
+    SR.log("Couldnt load SRS.dll")
 end
 
 ---- DCS Search Paths - So we can load Terrain!
@@ -223,7 +223,7 @@ SR.exportAircraftData = function()
                 _update.radios[2].freqMax = 151.975 * 1000000
                 _update.radios[2].volMode = 1
                 _update.radios[2].freqMode = 1
-				_update.radios[2].rtMode = 1
+                _update.radios[2].rtMode = 1
 
                 _update.radios[3].name = "FC3 UHF"
                 _update.radios[3].freq = 251.0 * 1000000 --225-399.975 MHZ
@@ -234,7 +234,7 @@ SR.exportAircraftData = function()
                 _update.radios[3].freqMax = 399.975 * 1000000
                 _update.radios[3].volMode = 1
                 _update.radios[3].freqMode = 1
-				_update.radios[3].rtMode = 1
+                _update.radios[3].rtMode = 1
                 _update.radios[3].encKey = 1
                 _update.radios[3].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
@@ -246,9 +246,9 @@ SR.exportAircraftData = function()
                 _update.radios[4].freqMax = 76 * 1000000
                 _update.radios[4].volMode = 1
                 _update.radios[4].freqMode = 1
-				_update.radios[4].encKey = 1
+                _update.radios[4].encKey = 1
                 _update.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
-				_update.radios[4].rtMode = 1
+                _update.radios[4].rtMode = 1
 
                 _update.control = 0;
                 _update.selected = 1
@@ -358,23 +358,23 @@ SR.onSimulationFrame = function()
         if  DCS.getModelTime() > 0.5 then
             -- SR.log('Exporting')
             
-			--export aircraft every 0.2
-			if _now > _sent + 0.2 then
-				_sent = _now
-				SR.exportAircraftData()
-			end
+            --export aircraft every 0.2
+            if _now > _sent + 0.2 then
+                _sent = _now
+                SR.exportAircraftData()
+            end
 
             -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
             -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     
-			-- export coalition every 5 seconds
-			if _now > _lastSent + 5.0 then
-				_lastSent = _now 
-			 --    SR.log("sending update")
-				SR.exportCoalitionData(net.get_my_player_id())
-			end
+            -- export coalition every 5 seconds
+            if _now > _lastSent + 5.0 then
+                _lastSent = _now 
+             --    SR.log("sending update")
+                SR.exportCoalitionData(net.get_my_player_id())
+            end
 
-		end
+        end
 
      end)
 
@@ -459,10 +459,13 @@ function SR.exportPlayerLocation(_data)
 end
 
 function SR.exportCameraLocation()
+
     local _cameraPosition = Export.LoGetCameraPosition()
 
-    if _cameraPosition ~= nil and _cameraPosition.p ~= nil then
-
+    -- IF Camera position is 0 its loading
+    if _cameraPosition ~= nil and _cameraPosition.p ~= nil 
+        and _cameraPosition.p.x ~= 0 and _cameraPosition.p.z ~= 0 then
+        
         local latLng = Export.LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
 
         return { lat = latLng.latitude, lng = latLng.longitude, alt = _cameraPosition.p.y },_cameraPosition.p
@@ -933,9 +936,9 @@ function SR.exportRadioSA342(_data)
     _data.radios[2].freq = SR.getRadioFrequency(5)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 68, { 1.0, 0.0 }, true)
-	_data.radios[2].rtMode = 1
-	
-	_data.radios[3].name = "UHF TRA 6031"
+    _data.radios[2].rtMode = 1
+    
+    _data.radios[3].name = "UHF TRA 6031"
 
     -- deal with odd radio tune & rounding issue... BUG you cannot set frequency 243.000 ever again
     local freq = SR.getRadioFrequency(31, 500)
@@ -948,7 +951,7 @@ function SR.exportRadioSA342(_data)
 
     _data.radios[3].encKey = 1
     _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
-	_data.radios[3].rtMode = 1
+    _data.radios[3].rtMode = 1
 
     _data.radios[4].name = "TRC 9600 PR4G"
     _data.radios[4].freq = SR.getRadioFrequency(28)
@@ -957,7 +960,7 @@ function SR.exportRadioSA342(_data)
 
     _data.radios[4].encKey = 1
     _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
-	_data.radios[4].rtMode = 1
+    _data.radios[4].rtMode = 1
 
     --- is UHF ON?
     if SR.getSelectorPosition(383, 0.167) == 0 then
@@ -3532,33 +3535,33 @@ SR.exportCoalitionData = function(playerID)
     }
 
     _update.name = net.get_player_info(playerID, "name" )
-	_update.side = net.get_player_info(playerID,"side")
+    _update.side = net.get_player_info(playerID,"side")
 
-	local slot =  net.get_player_info(playerID,"slot")
+    local slot =  net.get_player_info(playerID,"slot")
 
-	if slot and slot ~= '' then 
-		slot = tostring(slot)
-	    
-	    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
-	    if string.find(tostring(slot), "_", 1, true) then
-	        --extract substring - get the seat ID
-	        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
+    if slot and slot ~= '' then 
+        slot = tostring(slot)
+        
+        -- Slot 2744_2 -- backseat slot is Unit ID  _2 
+        if string.find(tostring(slot), "_", 1, true) then
+            --extract substring - get the seat ID
+            slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
 
-	        local slotNum = tonumber(slot)
+            local slotNum = tonumber(slot)
 
-	        if slotNum ~= nil and slotNum >= 1 then
-	        	_update.seat = slotNum -1 -- -1 as seat starts at 2
-	        end
-	    end
-	end
+            if slotNum ~= nil and slotNum >= 1 then
+                _update.seat = slotNum -1 -- -1 as seat starts at 2
+            end
+        end
+    end
 
     --SR.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
-	if SR.unicast then
-		socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
-	else
-		socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 5068))
-	end
+    if SR.unicast then
+        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+    else
+        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 5068))
+    end
 
 
 end
@@ -3572,16 +3575,19 @@ function string.trim(_str)
     return string.format( "%s", _str:match( "^%s*(.-)%s*$" ) )
 end
 
+SR.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
+SR.MESSAGE_PREFIX = "SRS Running @ " -- DO NOT MODIFY!!!
+
 function SR.isAutoConnectMessage(msg)
     return string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX) or string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD)
 end
 
 function SR.getHostFromMessage(msg)
-	if string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD) then
-		return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX_OLD) + 1))
-	else
-		return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX) + 1))
-	end
+    if string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD) then
+        return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX_OLD) + 1))
+    else
+        return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX) + 1))
+    end
 end
 
 -- Register callbacks --
@@ -3606,171 +3612,171 @@ end
 
 SR.findCommandValue = function(key, list)
 
-	for index,str in ipairs(list) do
-			
-		if str == key then
-			
-			return list[index+1]
-		end
-	end
-	return nil
+    for index,str in ipairs(list) do
+            
+        if str == key then
+            
+            return list[index+1]
+        end
+    end
+    return nil
 end
 
 SR.handleTransponder = function(msg)
 
-	local transMsg = msg:gsub(':',' ')
+    local transMsg = msg:gsub(':',' ')
 
-	local split = {}
-	for token in string.gmatch(transMsg, "[^%s]+") do
-	 
-	  table.insert(split,token)
-	
-	end
+    local split = {}
+    for token in string.gmatch(transMsg, "[^%s]+") do
+     
+      table.insert(split,token)
+    
+    end
 
-	local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
+    local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
 
-	local commands = {}
+    local commands = {}
 
-	--search for keys
-	for _,key in ipairs(keys) do
+    --search for keys
+    for _,key in ipairs(keys) do
 
-		local val = SR.findCommandValue(key, split)
+        local val = SR.findCommandValue(key, split)
 
-		if val then
-			if key == "POWER" or key == "PWR" then
-				if val == "ON" then
-					table.insert(commands, {Command = 6, Enabled = true})
-				elseif val == "OFF" then
-					table.insert(commands, {Command = 6, Enabled = false})
-				end
-			elseif key == "M1" then
+        if val then
+            if key == "POWER" or key == "PWR" then
+                if val == "ON" then
+                    table.insert(commands, {Command = 6, Enabled = true})
+                elseif val == "OFF" then
+                    table.insert(commands, {Command = 6, Enabled = false})
+                end
+            elseif key == "M1" then
 
-				if val == "OFF" then
-					table.insert(commands, {Command = 7, Code = -1})
-				else
-					local code = tonumber(val)
+                if val == "OFF" then
+                    table.insert(commands, {Command = 7, Code = -1})
+                else
+                    local code = tonumber(val)
 
-					if code ~= nil then
-						table.insert(commands, {Command = 7, Code = code})
-					end
-				end
-			
-			elseif key == "M3" then
-				 if val == "OFF" then
-					table.insert(commands, {Command = 8, Code = -1})
-				else
-					local code = tonumber(val)
+                    if code ~= nil then
+                        table.insert(commands, {Command = 7, Code = code})
+                    end
+                end
+            
+            elseif key == "M3" then
+                 if val == "OFF" then
+                    table.insert(commands, {Command = 8, Code = -1})
+                else
+                    local code = tonumber(val)
 
-					if code ~= nil then
-						table.insert(commands, {Command = 8, Code = code})
-					end
-				end
+                    if code ~= nil then
+                        table.insert(commands, {Command = 8, Code = code})
+                    end
+                end
 
-			elseif key == "M4" then
-				if val == "ON" then
-					table.insert(commands, {Command = 9, Enabled = true})
-				elseif val == "OFF" then
-					table.insert(commands, {Command = 9, Enabled = false})
-				end
-			elseif key == "IDENT" then
-				if val == "ON" then
-					table.insert(commands, {Command = 10, Enabled = true})
-				elseif val == "OFF" then
-					table.insert(commands, {Command = 10, Enabled = false})
-				end
-			end
-		end
-	end
+            elseif key == "M4" then
+                if val == "ON" then
+                    table.insert(commands, {Command = 9, Enabled = true})
+                elseif val == "OFF" then
+                    table.insert(commands, {Command = 9, Enabled = false})
+                end
+            elseif key == "IDENT" then
+                if val == "ON" then
+                    table.insert(commands, {Command = 10, Enabled = true})
+                elseif val == "OFF" then
+                    table.insert(commands, {Command = 10, Enabled = false})
+                end
+            end
+        end
+    end
 
-	return commands
+    return commands
 
 end
 
 
 SR.handleRadio = function(msg)
 
-	local transMsg = msg:gsub(':',' ')
+    local transMsg = msg:gsub(':',' ')
 
-	local split = {}
-	for token in string.gmatch(transMsg, "[^%s]+") do
-	 
-	  table.insert(split,token)
-	
-	end
+    local split = {}
+    for token in string.gmatch(transMsg, "[^%s]+") do
+     
+      table.insert(split,token)
+    
+    end
 
-	local keys =  {"SELECT",
-					"RADIO","FREQ","GUARD",
-					"FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
+    local keys =  {"SELECT",
+                    "RADIO","FREQ","GUARD",
+                    "FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
 
-	local commands = {}
+    local commands = {}
 
-	local radioId = -1
+    local radioId = -1
 
-	--search for keys
-	for _,key in ipairs(keys) do
+    --search for keys
+    for _,key in ipairs(keys) do
 
-		local val = SR.findCommandValue(key, split)
+        local val = SR.findCommandValue(key, split)
 
-		if val then
-			if key == "SELECT" or key == "RADIO" then
+        if val then
+            if key == "SELECT" or key == "RADIO" then
 
-				local code = tonumber(val)
-				if code ~= nil then
-					radioId  = code
-					if key == "SELECT" then
-						table.insert(commands, {Command = 1, RadioId = radioId})
-					end
-				end
+                local code = tonumber(val)
+                if code ~= nil then
+                    radioId  = code
+                    if key == "SELECT" then
+                        table.insert(commands, {Command = 1, RadioId = radioId})
+                    end
+                end
 
-			elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
+            elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
 
-				if radioId > 0 then
-					local frq = tonumber(val)
+                if radioId > 0 then
+                    local frq = tonumber(val)
 
-					if frq ~= nil then
-						table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
-					end
-				end
-			elseif key == "VOL" or key == "VOLUME" then
+                    if frq ~= nil then
+                        table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
+                    end
+                end
+            elseif key == "VOL" or key == "VOLUME" then
 
-				if radioId > 0 then
-					local vol = tonumber(val)
+                if radioId > 0 then
+                    local vol = tonumber(val)
 
-					if vol ~= nil then
+                    if vol ~= nil then
 
-						if vol > 1.0 then
-							vol = 1.0
-						elseif vol < 0 then
-							vol = 0
-						end
+                        if vol > 1.0 then
+                            vol = 1.0
+                        elseif vol < 0 then
+                            vol = 0
+                        end
 
-						table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
-					end
-				end
-			elseif key == "CHN" or key == "CHANNEL" then
+                        table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
+                    end
+                end
+            elseif key == "CHN" or key == "CHANNEL" then
 
-				if radioId > 0 then
-					if val == "UP" or val == "+" then
-						table.insert(commands, {Command = 3,  RadioId = radioId})
-					elseif val == "DOWN" or val == "-" then
-						table.insert(commands, {Command = 4,  RadioId = radioId})
-					end
-				end
-			elseif key == "GUARD" or key == "GRD" then
-				if val == "ON" then
-					table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
-				elseif val == "OFF" then
-					table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
-				end
-			end
-		end
-	end
+                if radioId > 0 then
+                    if val == "UP" or val == "+" then
+                        table.insert(commands, {Command = 3,  RadioId = radioId})
+                    elseif val == "DOWN" or val == "-" then
+                        table.insert(commands, {Command = 4,  RadioId = radioId})
+                    end
+                end
+            elseif key == "GUARD" or key == "GRD" then
+                if val == "ON" then
+                    table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
+                elseif val == "OFF" then
+                    table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
+                end
+            end
+        end
+    end
 
-	if radioId > 0 then
-		return commands
-	end
+    if radioId > 0 then
+        return commands
+    end
 
-	return {}
+    return {}
 
 end
 
@@ -3780,17 +3786,19 @@ SR.onChatMessage = function(msg, from)
     -- Only accept auto connect message coming from host.
     if SR.CLIENT_ACCEPT_AUTO_CONNECT
                         and from == 1
-            and  SR.isAutoConnectMessage(msg) then
+            and SR.isAutoConnectMessage(msg) then
         local host = SR.getHostFromMessage(msg)
         SR.log(string.format("Got SRS Auto Connect message: %s", host))
 
         local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
+
         if srs and enabled then
-            local path = SR.get_srs_path()
+            local path = srs.get_srs_path()
             if path ~= "" then
 
+                SR.log("Trying to Launch SRS @ "..path)
                 net.log("Trying to Launch SRS @ "..path)
-                SR.start_srs(host)
+                srs.start_srs(host)
             end
 
         end
@@ -3799,23 +3807,23 @@ SR.onChatMessage = function(msg, from)
 
     -- MESSAGE FROM MYSELF
     if from == net.get_my_player_id() then
-		
-		msg = msg:upper()
+        
+        msg = msg:upper()
 
-		if string.find(msg,"SRSTRANS",1,true) then
-			local commands = SR.handleTransponder(msg) 
+        if string.find(msg,"SRSTRANS",1,true) then
+            local commands = SR.handleTransponder(msg) 
 
-			for _,command in pairs(commands) do
-				SR.sendCommand(command)
-			end
-		elseif string.find(msg,"SRSRADIO",1,true) then
-			local commands = SR.handleRadio(msg) 
+            for _,command in pairs(commands) do
+                SR.sendCommand(command)
+            end
+        elseif string.find(msg,"SRSRADIO",1,true) then
+            local commands = SR.handleRadio(msg) 
 
-			for _,command in pairs(commands) do
-				SR.sendCommand(command)
-			end
-		end
-	end
+            for _,command in pairs(commands) do
+                SR.sendCommand(command)
+            end
+        end
+    end
 
 end
 
