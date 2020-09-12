@@ -156,7 +156,7 @@ SR.exportAircraftData = function()
                 _update = SR.exportRadioL39(_update)
             elseif _update.unit == "Yak-52" then
                 _update = SR.exportRadioYak52(_update)
-            elseif _update.unit == "A-10C" then
+            elseif string.find(_update.unit, "A-10C",1,true) then
                 _update = SR.exportRadioA10C(_update)
             elseif _update.unit == "FA-18C_hornet" then
                 _update = SR.exportRadioFA18C(_update)
@@ -172,9 +172,9 @@ SR.exportAircraftData = function()
                 _update = SR.exportRadioMIG21(_update)
             elseif _update.unit == "F-5E-3" then
                 _update = SR.exportRadioF5E(_update)
-            elseif _update.unit == "P-51D" or _update.unit == "P-51D-30-NA" or _update.unit == "TF-51D" then
+            elseif string.find(_update.unit, "P-51",1,true) or _update.unit == "TF-51D" then
                 _update = SR.exportRadioP51(_update)
-            elseif _update.unit == "P-47D-30"then
+            elseif string.find(_update.unit, "P-47",1,true) then
                 _update = SR.exportRadioP47(_update)
             elseif _update.unit == "FW-190D9" or _update.unit == "FW-190A8" then
                 _update = SR.exportRadioFW190(_update)
