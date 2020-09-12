@@ -90,7 +90,7 @@ namespace Installer
                     "Please Extract Installation zip",
                     MessageBoxButton.OK, MessageBoxImage.Error);
 
-                Logger.Warn("DCS is Running - Installer quit");
+                Logger.Warn("Files missing from Installation Directory");
 
                 Environment.Exit(0);
 
@@ -204,8 +204,10 @@ namespace Installer
         private bool CheckExtracted()
         {
             return File.Exists(_currentDirectory + "\\opus.dll") 
+                   && File.Exists(_currentDirectory + "\\speexdsp.dll")
                    && File.Exists(_currentDirectory + "\\awacs-radios.json")
-                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")&& File.Exists(_currentDirectory + "\\Scripts\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua");
+                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")
+                   && File.Exists(_currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-export-hook.lua");
         }
 
 
