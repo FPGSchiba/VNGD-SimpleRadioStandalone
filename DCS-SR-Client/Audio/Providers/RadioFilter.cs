@@ -45,6 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
             get { return _source.WaveFormat; }
         }
 
+        public static readonly float BOOST = 1.5f;
         public static readonly float CLIPPING_MAX = 4000 / 32768f;
         public static readonly float CLIPPING_MIN = (4000 / 32768f)*-1;
 
@@ -85,7 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
                     if (double.IsNaN(audio))
                         audio = buffer[offset + n];
                 }
-                buffer[offset + n] = (float) audio;
+                buffer[offset + n] = (float) audio * BOOST;
             }
 
             //   Console.WriteLine("Read:"+samplesRead+" Time - " + _stopwatch.ElapsedMilliseconds);

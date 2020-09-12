@@ -89,8 +89,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 };
                 inputs.Add(input);
 
-                Logger.Info("Audio Input - " + item.FriendlyName + " " + item.ID.ToString() + " - Name GUID" +
-                            item.FriendlyName);
+                Logger.Info("Audio Input - " + item.DeviceFriendlyName + " " + item.ID + " CHN:" +
+                            item.AudioClient.MixFormat.Channels + " Rate:" +
+                            item.AudioClient.MixFormat.SampleRate.ToString());
 
                 if (item.ID.Trim().Equals(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue.Trim()))
                 {

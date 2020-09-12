@@ -77,6 +77,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             Logger.Info($"Read MP3 @ {mp3Reader.WaveFormat}");
 
+            if (mp3Reader.WaveFormat.SampleRate < INPUT_SAMPLE_RATE)
+            {
+                Logger.Error($"MP3 Sample rate must be at least 16000 but is {mp3Reader.WaveFormat.SampleRate} - Quitting. Use Audacity or another tool to resample as 16000 or Higher");
+                Environment.Exit(1);
+            }
+
             int read = mp3Reader.Read(buffer, 0, (int)bytes);
             BufferedWaveProvider bufferedWaveProvider = new BufferedWaveProvider(mp3Reader.WaveFormat)
             {
