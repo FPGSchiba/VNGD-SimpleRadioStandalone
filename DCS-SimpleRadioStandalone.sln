@@ -28,12 +28,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68C7B1F8-DF0E-4504-8C7D-6FEF4225466B}"
 	ProjectSection(SolutionItems) = preProject
 		install-build\awacs-radios.json = install-build\awacs-radios.json
+		Scripts\DCS-SRS\Scripts\DCS-SimpleRadioStandalone.lua = Scripts\DCS-SRS\Scripts\DCS-SimpleRadioStandalone.lua
 		Scripts\DCS-SRS-AutoConnectGameGUI.lua = Scripts\DCS-SRS-AutoConnectGameGUI.lua
-		Scripts\Hooks\DCS-SRS-export-hook.lua = Scripts\Hooks\DCS-SRS-export-hook.lua
-		Scripts\DCS-SRS\Scripts\DCS-SRS-Export.lua = Scripts\DCS-SRS\Scripts\DCS-SRS-Export.lua
-		Scripts\Hooks\DCS-SRS-overlay-hook.lua = Scripts\Hooks\DCS-SRS-overlay-hook.lua
+		Scripts\Hooks\DCS-SRS-hook.lua = Scripts\Hooks\DCS-SRS-hook.lua
 		Scripts\DCS-SRS\UI\DCS-SRS-Overlay.dlg = Scripts\DCS-SRS\UI\DCS-SRS-Overlay.dlg
-		Scripts\DCS-SRS\Scripts\DCS-SRS-Overlay.lua = Scripts\DCS-SRS\Scripts\DCS-SRS-Overlay.lua
+		Scripts\DCS-SRS\Scripts\DCS-SRS-OverlayGameGUI.lua = Scripts\DCS-SRS\Scripts\DCS-SRS-OverlayGameGUI.lua
+		Scripts\DCS-SRS\Scripts\DCS-SRSGameGUI.lua = Scripts\DCS-SRS\Scripts\DCS-SRSGameGUI.lua
 		Scripts\DCS-SRS\entry.lua = Scripts\DCS-SRS\entry.lua
 	EndProjectSection
 EndProject

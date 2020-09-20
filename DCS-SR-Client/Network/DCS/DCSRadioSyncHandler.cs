@@ -249,10 +249,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 _clientStateSingleton.UpdatePlayerPosition(message.latLng);
             }
-            else
-            {
-                _clientStateSingleton.UpdatePlayerPosition(new DCSLatLngPosition());
-            }
 
             var overrideFreqAndVol = false;
 
