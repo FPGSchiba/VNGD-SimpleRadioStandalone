@@ -1,4 +1,4 @@
--- Version 1.9.1.1
+-- Version 1.9.1.2
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
