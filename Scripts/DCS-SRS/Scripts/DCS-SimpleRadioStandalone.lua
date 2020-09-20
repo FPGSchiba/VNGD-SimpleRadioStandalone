@@ -2,17 +2,11 @@
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
-
-
-net.log("Loading - DCS-SRS Export GameGUI - Ciribob: 1.9.1.1 ")
 local SR = {}
 
 SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
-
-SR.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
-SR.unicast = true
 
 SR.LOS_HEIGHT_OFFSET = 20.0 -- sets the line of sight offset to simulate radio waves bending
 SR.LOS_HEIGHT_OFFSET_MAX = 200.0 -- max amount of "bend"
@@ -35,19 +29,6 @@ end
 
 package.path = package.path .. ";.\\LuaSocket\\?.lua;"
 package.cpath = package.cpath .. ";.\\LuaSocket\\?.dll;"
-package.cpath = package.cpath..";"..lfs.writedir().."Mods\\Services\\DCS-SRS\\bin\\?.dll;"
-
-local srs = nil
-
-pcall(function()
-    srs = require("srs")
-
-    SR.log("Loaded SRS.dll")
-end)
-
-if not srs then
-    SR.log("Couldnt load SRS.dll")
-end
 
 ---- DCS Search Paths - So we can load Terrain!
 local guiBindPath = './dxgui/bind/?.lua;' ..
@@ -72,7 +53,6 @@ local JSON = loadfile("Scripts\\JSON.lua")()
 SR.JSON = JSON
 
 SR.UDPSendSocket = socket.udp()
-SR.UDPSendSocket:settimeout(0)
 SR.UDPLosReceiveSocket = socket.udp()
 
 --bind for listening for LOS info
@@ -85,20 +65,29 @@ if terrain ~= nil then
     SR.log("Loaded Terrain - SimpleRadio Standalone!")
 end
 
+-- Prev Export functions.
+local _prevExport = {}
+_prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
+_prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 
-local _sent = 0
-local _lastSent = 0
+local _send = false
 
 local _lastUnitId = "" -- used for a10c volume
 
-SR.exportAircraftData = function()
+LuaExportActivityNextEvent = function(tCurrent)
+    local tNext = tCurrent + 0.1 -- for helios support
+    -- we only want to send once every 0.2 seconds 
+    -- but helios (and other exports) require data to come much faster
+    -- so we just flip a boolean every run through to reduce to 0.2 rather than 0.1 seconds
+    if _send then
   
+        _send = false
 
     local _status, _result = pcall(function()
 
         local _update = nil
 
-        local _data = Export.LoGetSelfData()
+            local _data = LoGetSelfData()
 
         if _data ~= nil then
 
@@ -124,7 +113,7 @@ SR.exportAircraftData = function()
 
             _update.name = _data.UnitName
             _update.unit = _data.Name
-            _update.unitId = Export.LoGetPlayerPlaneId()
+            _update.unitId = LoGetPlayerPlaneId()
 
             local _latLng,_point = SR.exportPlayerLocation(_data)
 
@@ -305,6 +294,23 @@ SR.exportAircraftData = function()
         SR.log('ERROR: ' .. _result)
     end
 
+    else
+        _send = true
+    end
+
+
+    -- call
+    local _status, _result = pcall(function()
+        -- Call original function if it exists
+        if _prevExport.LuaExportActivityNextEvent then
+            _prevExport.LuaExportActivityNextEvent(tCurrent)
+        end
+
+    end)
+
+    if not _status then
+        SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
+    end
 
     if terrain == nil then
         SR.log("Terrain Export is not working")
@@ -312,13 +318,12 @@ SR.exportAircraftData = function()
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     end
 
- 
+    return tNext
 end
 
 local _lastCheck = 0;
 
-
-SR.onSimulationFrame = function()
+LuaExportBeforeNextFrame = function()
 
     -- read from socket
     local _status, _result = pcall(function()
@@ -350,40 +355,19 @@ SR.onSimulationFrame = function()
         SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
     end
 
-    local _status, _result = pcall(function()
-
-        local _now = DCS.getRealTime()
-
-        -- only if mission is running
-        if  DCS.getModelTime() > 0.5 then
-            -- SR.log('Exporting')
-            
-            --export aircraft every 0.2
-            if _now > _sent + 0.2 then
-                _sent = _now
-                SR.exportAircraftData()
+    -- call original
+    _status, _result = pcall(function()
+        -- Call original function if it exists
+        if _prevExport.LuaExportBeforeNextFrame then
+            _prevExport.LuaExportBeforeNextFrame()
             end
-
-            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
-            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
-    
-            -- export coalition every 5 seconds
-            if _now > _lastSent + 5.0 then
-                _lastSent = _now 
-             --    SR.log("sending update")
-                SR.exportCoalitionData(net.get_my_player_id())
-            end
-
-        end
-
      end)
 
     if not _status then
-        SR.log('ERROR Export SRS: ' .. _result)
-    end
+        SR.log('ERROR Calling other LuaExportBeforeNextFrame from another script: ' .. _result)
 end
 
-
+end
 
 function SR.checkLOS(_clientsList)
 
@@ -393,7 +377,7 @@ function SR.checkLOS(_clientsList)
         -- add 10 meter tolerance
         --Coordinates convertion :
         --{x,y,z}                 = LoGeoCoordinatesToLoCoordinates(longitude_degrees,latitude_degrees)
-        local _point = Export.LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
+        local _point = LoGeoCoordinatesToLoCoordinates(_client.lng,_client.lat)
         -- Encoded Point: {"x":3758906.25,"y":0,"z":-1845112.125}
 
         local _los = 1.0 -- 1.0 is NO line of sight as in full signal loss - 0.0 is full signal, NO Loss
@@ -449,7 +433,7 @@ function SR.exportPlayerLocation(_data)
 
     if _data ~= nil and _data.Position ~= nil then
 
-        local latLng  = Export.LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
+        local latLng  = LoLoCoordinatesToGeoCoordinates(_data.Position.x,_data.Position.z)
         --LatLng: {"latitude":25.594814853729,"longitude":55.938746498011}
 
         return { lat = latLng.latitude, lng = latLng.longitude, alt = _data.Position.y },_data.Position
@@ -459,14 +443,11 @@ function SR.exportPlayerLocation(_data)
 end
 
 function SR.exportCameraLocation()
+    local _cameraPosition = LoGetCameraPosition()
 
-    local _cameraPosition = Export.LoGetCameraPosition()
+    if _cameraPosition ~= nil and _cameraPosition.p ~= nil then
 
-    -- IF Camera position is 0 its loading
-    if _cameraPosition ~= nil and _cameraPosition.p ~= nil 
-        and _cameraPosition.p.x ~= 0 and _cameraPosition.p.z ~= 0 then
-        
-        local latLng = Export.LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
+        local latLng = LoLoCoordinatesToGeoCoordinates(_cameraPosition.p.x, _cameraPosition.p.z)
 
         return { lat = latLng.latitude, lng = latLng.longitude, alt = _cameraPosition.p.y },_cameraPosition.p
     end
@@ -835,7 +816,7 @@ function SR.exportRadioUH1H(_data)
 
     --_device:get_argument_value(_arg)
 
-    local _panel = Export.GetDevice(0)
+    local _panel = GetDevice(0)
 
     local switch = _panel:get_argument_value(30)
 
@@ -1003,7 +984,7 @@ function SR.exportRadioKA50(_data)
 
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
 
-    local _panel = Export.GetDevice(0)
+    local _panel = GetDevice(0)
 
     _data.radios[2].name = "R-800L14 VHF/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(48)
@@ -1064,7 +1045,7 @@ function SR.exportRadioMI8(_data)
     _data.radios[2].name = "R-863"
     _data.radios[2].freq = SR.getRadioFrequency(38)
 
-    local _modulation = Export.GetDevice(0):get_argument_value(369)
+    local _modulation = GetDevice(0):get_argument_value(369)
     if _modulation > 0.5 then
         _data.radios[2].modulation = 1
     else
@@ -1072,7 +1053,7 @@ function SR.exportRadioMI8(_data)
     end
 
     -- get channel selector
-    local _selector = Export.GetDevice(0):get_argument_value(132)
+    local _selector = GetDevice(0):get_argument_value(132)
 
     if _selector > 0.5 then
         _data.radios[2].channel = SR.getSelectorPosition(370, 0.05) + 1 --add 1 as channel 0 is channel 1
@@ -1312,7 +1293,7 @@ function SR.exportRadioA10C(_data)
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
         -- New aircraft; Reset volumes to 100%
-        local _device = Export.GetDevice(0)
+        local _device = GetDevice(0)
 
         if _device then
             _device:set_argument_value(133, 1.0) -- VHF AM
@@ -2885,13 +2866,13 @@ function SR.exportRadioJF17(_data)
     _data.radios[2].freq = SR.getRadioFrequency(25)
     _data.radios[2].modulation = SR.getRadioModulation(25)
     _data.radios[2].volume = SR.getRadioVolume(0, 934, { 0.0, 1.0 }, false)
-    _data.radios[2].secFreq = Export.GetDevice(25):get_guard_plus_freq()
+    _data.radios[2].secFreq = GetDevice(25):get_guard_plus_freq()
 
     _data.radios[3].name = "COMM2 UHF Radio"
     _data.radios[3].freq = SR.getRadioFrequency(26)
     _data.radios[3].modulation = SR.getRadioModulation(26)
     _data.radios[3].volume = SR.getRadioVolume(0, 938, { 0.0, 1.0 }, false)
-    _data.radios[3].secFreq = Export.GetDevice(26):get_guard_plus_freq()
+    _data.radios[3].secFreq = GetDevice(26):get_guard_plus_freq()
 
     -- Expansion Radio - Server Side Controlled
     _data.radios[4].name = "VHF/UHF Expansion"
@@ -2914,7 +2895,7 @@ function SR.exportRadioJF17(_data)
 
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
-    local _iff = Export.GetDevice(15)
+    local _iff = GetDevice(15)
 
     if _iff:is_m1_trs_on() or _iff:is_m2_trs_on() or _iff:is_m3_trs_on() or _iff:is_m6_trs_on() then
         _data.iff.status = 1
@@ -3139,9 +3120,9 @@ function SR.exportRadioF14(_data)
     local arc159_devid = 3
     local arc182_devid = 4
 
-    local ICS_device = Export.GetDevice(ics_devid)
-    local ARC159_device = Export.GetDevice(arc159_devid)
-    local ARC182_device = Export.GetDevice(arc182_devid)
+    local ICS_device = GetDevice(ics_devid)
+    local ARC159_device = GetDevice(arc159_devid)
+    local ARC182_device = GetDevice(arc182_devid)
 
     local intercom_transmit = ICS_device:intercom_transmit()
     local ARC159_ptt = ARC159_device:is_ptt_pressed()
@@ -3306,7 +3287,7 @@ end
 
 function SR.getRadioVolume(_deviceId, _arg, _minMax, _invert)
 
-    local _device = Export.GetDevice(_deviceId)
+    local _device = GetDevice(_deviceId)
 
     if not _minMax then
         _minMax = { 0.0, 1.0 }
@@ -3327,7 +3308,7 @@ end
 
 function SR.getKnobPosition(_deviceId, _arg, _minMax, _mapMinMax)
 
-    local _device = Export.GetDevice(_deviceId)
+    local _device = GetDevice(_deviceId)
 
     if _device then
         local _val = tonumber(_device:get_argument_value(_arg))
@@ -3339,7 +3320,7 @@ function SR.getKnobPosition(_deviceId, _arg, _minMax, _mapMinMax)
 end
 
 function SR.getSelectorPosition(_args, _step)
-    local _value = Export.GetDevice(0):get_argument_value(_args)
+    local _value = GetDevice(0):get_argument_value(_args)
     local _num = math.abs(tonumber(string.format("%.0f", (_value) / _step)))
 
     return _num
@@ -3347,14 +3328,14 @@ function SR.getSelectorPosition(_args, _step)
 end
 
 function SR.getButtonPosition(_args)
-    local _value = Export.GetDevice(0):get_argument_value(_args)
+    local _value = GetDevice(0):get_argument_value(_args)
 
     return _value
 
 end
 
 function SR.getRadioFrequency(_deviceId, _roundTo)
-    local _device = Export.GetDevice(_deviceId)
+    local _device = GetDevice(_deviceId)
 
     if not _roundTo then
         _roundTo = 5000
@@ -3370,7 +3351,7 @@ function SR.getRadioFrequency(_deviceId, _roundTo)
 end
 
 function SR.getRadioModulation(_deviceId)
-    local _device = Export.GetDevice(_deviceId)
+    local _device = GetDevice(_deviceId)
 
     local _modulation = 0
 
@@ -3405,7 +3386,7 @@ end
 -- The function return a table with values of given indicator
 -- The value is retrievable via a named index. e.g. TmpReturn.txt_digits
 function SR.getListIndicatorValue(IndicatorID)
-    local ListIindicator = Export.list_indication(IndicatorID)
+    local ListIindicator = list_indication(IndicatorID)
     local TmpReturn = {}
 
     if ListIindicator == "" then
@@ -3511,325 +3492,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
---------------- Old GameGUI - Slot handling and Chat
-
-
-
-SR.onPlayerChangeSlot = function(_id)
-
-    -- send when there are changes
-    local _myPlayerId = net.get_my_player_id()
-
-    if _id == _myPlayerId then
-        SR.exportCoalitionData(net.get_my_player_id())
-    end
-  
-end
-
-SR.exportCoalitionData = function(playerID)
-  
-    local _update = {
-        name = "",
-        side = 0,
-        seat = 0,
-    }
-
-    _update.name = net.get_player_info(playerID, "name" )
-    _update.side = net.get_player_info(playerID,"side")
-
-    local slot =  net.get_player_info(playerID,"slot")
-
-    if slot and slot ~= '' then 
-        slot = tostring(slot)
-        
-        -- Slot 2744_2 -- backseat slot is Unit ID  _2 
-        if string.find(tostring(slot), "_", 1, true) then
-            --extract substring - get the seat ID
-            slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
-
-            local slotNum = tonumber(slot)
-
-            if slotNum ~= nil and slotNum >= 1 then
-                _update.seat = slotNum -1 -- -1 as seat starts at 2
-            end
-        end
-    end
-
-    --SR.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
-
-    if SR.unicast then
-        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.0.0.1", 5068))
-    else
-        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update).." \n", "127.255.255.255", 5068))
-    end
-
-
-end
-
-
-function string.startsWith(string, prefix)
-    return string.sub(string, 1, string.len(prefix)) == prefix
-end
-
-function string.trim(_str)
-    return string.format( "%s", _str:match( "^%s*(.-)%s*$" ) )
-end
-
-SR.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
-SR.MESSAGE_PREFIX = "SRS Running @ " -- DO NOT MODIFY!!!
-
-function SR.isAutoConnectMessage(msg)
-    return string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX) or string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD)
-end
-
-function SR.getHostFromMessage(msg)
-    if string.startsWith(string.trim(msg), SR.MESSAGE_PREFIX_OLD) then
-        return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX_OLD) + 1))
-    else
-        return string.trim(string.sub(msg, string.len(SR.MESSAGE_PREFIX) + 1))
-    end
-end
-
--- Register callbacks --
-
-SR.sendConnect = function(_message)
-
-    if SR.unicast then
-        socket.try(SR.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
-    else
-        socket.try(SR.UDPSendSocket:sendto(_message.."\n", "127.255.255.255", 5069))
-    end
-end
-
-SR.sendCommand = function(_message)
-
-    if SR.unicast then
-        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_message).."\n", "127.0.0.1", 9040))
-    else
-        socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_message).."\n", "127.255.255.255", 9040))
-    end
-end
-
-SR.findCommandValue = function(key, list)
-
-    for index,str in ipairs(list) do
-            
-        if str == key then
-            
-            return list[index+1]
-        end
-    end
-    return nil
-end
-
-SR.handleTransponder = function(msg)
-
-    local transMsg = msg:gsub(':',' ')
-
-    local split = {}
-    for token in string.gmatch(transMsg, "[^%s]+") do
-     
-      table.insert(split,token)
-    
-    end
-
-    local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
-
-    local commands = {}
-
-    --search for keys
-    for _,key in ipairs(keys) do
-
-        local val = SR.findCommandValue(key, split)
-
-        if val then
-            if key == "POWER" or key == "PWR" then
-                if val == "ON" then
-                    table.insert(commands, {Command = 6, Enabled = true})
-                elseif val == "OFF" then
-                    table.insert(commands, {Command = 6, Enabled = false})
-                end
-            elseif key == "M1" then
-
-                if val == "OFF" then
-                    table.insert(commands, {Command = 7, Code = -1})
-                else
-                    local code = tonumber(val)
-
-                    if code ~= nil then
-                        table.insert(commands, {Command = 7, Code = code})
-                    end
-                end
-            
-            elseif key == "M3" then
-                 if val == "OFF" then
-                    table.insert(commands, {Command = 8, Code = -1})
-                else
-                    local code = tonumber(val)
-
-                    if code ~= nil then
-                        table.insert(commands, {Command = 8, Code = code})
-                    end
-                end
-
-            elseif key == "M4" then
-                if val == "ON" then
-                    table.insert(commands, {Command = 9, Enabled = true})
-                elseif val == "OFF" then
-                    table.insert(commands, {Command = 9, Enabled = false})
-                end
-            elseif key == "IDENT" then
-                if val == "ON" then
-                    table.insert(commands, {Command = 10, Enabled = true})
-                elseif val == "OFF" then
-                    table.insert(commands, {Command = 10, Enabled = false})
-                end
-            end
-        end
-    end
-
-    return commands
-
-end
-
-
-SR.handleRadio = function(msg)
-
-    local transMsg = msg:gsub(':',' ')
-
-    local split = {}
-    for token in string.gmatch(transMsg, "[^%s]+") do
-     
-      table.insert(split,token)
-    
-    end
-
-    local keys =  {"SELECT",
-                    "RADIO","FREQ","GUARD",
-                    "FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
-
-    local commands = {}
-
-    local radioId = -1
-
-    --search for keys
-    for _,key in ipairs(keys) do
-
-        local val = SR.findCommandValue(key, split)
-
-        if val then
-            if key == "SELECT" or key == "RADIO" then
-
-                local code = tonumber(val)
-                if code ~= nil then
-                    radioId  = code
-                    if key == "SELECT" then
-                        table.insert(commands, {Command = 1, RadioId = radioId})
-                    end
-                end
-
-            elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
-
-                if radioId > 0 then
-                    local frq = tonumber(val)
-
-                    if frq ~= nil then
-                        table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
-                    end
-                end
-            elseif key == "VOL" or key == "VOLUME" then
-
-                if radioId > 0 then
-                    local vol = tonumber(val)
-
-                    if vol ~= nil then
-
-                        if vol > 1.0 then
-                            vol = 1.0
-                        elseif vol < 0 then
-                            vol = 0
-                        end
-
-                        table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
-                    end
-                end
-            elseif key == "CHN" or key == "CHANNEL" then
-
-                if radioId > 0 then
-                    if val == "UP" or val == "+" then
-                        table.insert(commands, {Command = 3,  RadioId = radioId})
-                    elseif val == "DOWN" or val == "-" then
-                        table.insert(commands, {Command = 4,  RadioId = radioId})
-                    end
-                end
-            elseif key == "GUARD" or key == "GRD" then
-                if val == "ON" then
-                    table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
-                elseif val == "OFF" then
-                    table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
-                end
-            end
-        end
-    end
-
-    if radioId > 0 then
-        return commands
-    end
-
-    return {}
-
-end
-
-SR.onChatMessage = function(msg, from)
-
-
-    -- Only accept auto connect message coming from host.
-    if SR.CLIENT_ACCEPT_AUTO_CONNECT
-                        and from == 1
-            and SR.isAutoConnectMessage(msg) then
-        local host = SR.getHostFromMessage(msg)
-        SR.log(string.format("Got SRS Auto Connect message: %s", host))
-
-        local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
-
-        if srs and enabled then
-            local path = srs.get_srs_path()
-            if path ~= "" then
-
-                SR.log("Trying to Launch SRS @ "..path)
-                net.log("Trying to Launch SRS @ "..path)
-                srs.start_srs(host)
-            end
-
-        end
-        SR.sendConnect(host) 
-    end
-
-    -- MESSAGE FROM MYSELF
-    if from == net.get_my_player_id() then
-        
-        msg = msg:upper()
-
-        if string.find(msg,"SRSTRANS",1,true) then
-            local commands = SR.handleTransponder(msg) 
-
-            for _,command in pairs(commands) do
-                SR.sendCommand(command)
-            end
-        elseif string.find(msg,"SRSRADIO",1,true) then
-            local commands = SR.handleRadio(msg) 
-
-            for _,command in pairs(commands) do
-                SR.sendCommand(command)
-            end
-        end
-    end
-
-end
-
-
-
-DCS.setUserCallbacks(SR)
-
-net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.1")
-SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.1")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.3")

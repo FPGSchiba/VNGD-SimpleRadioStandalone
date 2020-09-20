@@ -206,8 +206,7 @@ namespace Installer
             return File.Exists(_currentDirectory + "\\opus.dll") 
                    && File.Exists(_currentDirectory + "\\speexdsp.dll")
                    && File.Exists(_currentDirectory + "\\awacs-radios.json")
-                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")
-                   && File.Exists(_currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-export-hook.lua");
+                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")&& File.Exists(_currentDirectory + "\\Scripts\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua");
         }
 
 
@@ -388,7 +387,7 @@ namespace Installer
 
                     ClearVersionPreModsTechDCS(srPath, dcsScriptsPath);
                     ClearVersionPostModsTechDCS(srPath, dcsScriptsPath);
-                    ClearVersionPostModsServicesDCS(srPath, dcsScriptsPath); ;
+                    ClearVersionPostModsServicesDCS(srPath, dcsScriptsPath);
 
                     foreach (var path in paths)
                     {
@@ -634,7 +633,6 @@ namespace Installer
             {
                 _progressBarDialog.UpdateProgress(false, $"Removing SRS at {path}");
                 RemoveScriptsPostModsServicesDCS(path);
-                RemoveScriptsPostExportLuaDCS(path);
             }
 
             Logger.Info($"Removed SRS program files at {programPath}");
@@ -690,26 +688,6 @@ namespace Installer
             Logger.Info($"Removed Hooks file");
             //Hooks Folder
             DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-Hook.lua");
-
-            //MODs folder
-            if (Directory.Exists(path + "\\Mods\\Services\\DCS-SRS"))
-            {
-                Logger.Info($"Removed Mods/Services/DCS-SRS folder");
-                Directory.Delete(path + "\\Mods\\Services\\DCS-SRS", true);
-            }
-
-            Logger.Info($"Finished Removing Mods/Services & Scripts for SRS");
-        }
-
-        private void RemoveScriptsPostExportLuaDCS(string path)
-        {
-            Logger.Info($"Removing SRS Scripts at {path}");
-      
-
-            Logger.Info($"Removed Hooks file");
-            //Hooks Folder
-            DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-export-hook.lua");
-            DeleteFileIfExists(path + "\\Hooks\\DCS-SRS-overlay-hook.lua");
 
             //MODs folder
             if (Directory.Exists(path + "\\Mods\\Services\\DCS-SRS"))
@@ -981,15 +959,64 @@ namespace Installer
 
             Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
 
+            _progressBarDialog.UpdateProgress(false, $"Updating / Creating Export.lua @ {path}");
+            Logger.Info($"Handling Export.lua");
+            //does it contain an export.lua?
+            if (File.Exists(path + "\\Scripts\\Export.lua"))
+            {
+                var contents = File.ReadAllText(path + "\\Scripts\\Export.lua");
+
+                contents.Split('\n');
+
+                if (contents.Contains("SimpleRadioStandalone.lua"))
+                {
+                    Logger.Info($"Updating existing Export.lua with existing SRS install");
+                    var lines = contents.Split('\n');
+
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("SimpleRadioStandalone.lua") )
+                        {
+                            sb.Append("\n");
+                            sb.Append(EXPORT_SRS_LUA);
+                            sb.Append("\n");
+                        }
+                        else if(line.Trim().Length>0)
+                        {
+                            sb.Append(line);
+                            sb.Append("\n");
+                        }
+                        
+                    }
+                    File.WriteAllText(path + "\\Scripts\\Export.lua", sb.ToString());
+                }
+                else
+                {
+                    Logger.Info($"Appending to existing Export.lua");
+                    var writer = File.AppendText(path + "\\Scripts\\Export.lua");
+
+                    writer.WriteLine("\n" + EXPORT_SRS_LUA + "\n");
+                    writer.Close();
+                }
+            }
+            else
+            {
+                Logger.Info($"Creating new Export.lua");
+                var writer = File.CreateText(path + "\\Scripts\\Export.lua");
+
+                writer.WriteLine("\n"+EXPORT_SRS_LUA+"\n");
+                writer.Close();
+            }
+
+
             //Now sort out Scripts//Hooks folder contents
             Logger.Info($"Creating / installing Hooks & Mods / Services");
             _progressBarDialog.UpdateProgress(false, $"Creating / installing Hooks & Mods/Services @ {path}");
             try
             {
-                File.Copy(_currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-overlay-hook.lua", path + "\\Scripts\\Hooks\\DCS-SRS-overlay-hook.lua",
-                    true);
-
-                File.Copy(_currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-export-hook.lua", path + "\\Scripts\\Hooks\\DCS-SRS-export-hook.lua",
+                File.Copy(_currentDirectory + "\\Scripts\\Hooks\\DCS-SRS-hook.lua", path + "\\Scripts\\Hooks\\DCS-SRS-hook.lua",
                     true);
 
                 DirectoryCopy(_currentDirectory + "\\Scripts\\DCS-SRS",path+"\\Mods\\Services\\DCS-SRS");
