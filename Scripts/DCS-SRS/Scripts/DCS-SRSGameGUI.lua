@@ -1,617 +1,372 @@
--- Version 1.9.1.2
+-- Version 1.9.0.1
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
--- Otherwise the Overlay will not work
+-- Otherwise the Radio Might not work
 
+net.log("Loading - DCS-SRS GameGUI - Ciribob: 1.9.1.2")
+local SRS = {}
 
-net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.9.1.2 ")
+SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
 
-local base = _G
+SRS.unicast = true
 
-package.path  = package.path..";.\\LuaSocket\\?.lua;"..'.\\Scripts\\?.lua;'.. '.\\Scripts\\UI\\?.lua;'
+SRS.dbg = {}
+SRS.logFile = io.open(lfs.writedir()..[[Logs\DCS-SRS-GameGUI.log]], "w")
+function SRS.log(str)
+    if SRS.logFile then
+        SRS.logFile:write(str.."\n")
+        SRS.logFile:flush()
+    end
+end
+
+package.path  = package.path..";.\\LuaSocket\\?.lua;"
 package.cpath = package.cpath..";.\\LuaSocket\\?.dll;"
+package.cpath = package.cpath..";"..lfs.writedir().."Mods\\Services\\DCS-SRS\\bin\\?.dll;"
+
+local socket = require("socket")
+
+local srs = nil
+
+pcall(function()
+	srs = require("srs")
+
+	SRS.log("Loaded SRS.dll")
+end)
+
+if not srs then
+	SRS.log("Couldnt load SRS.dll")
+end
 
 local JSON = loadfile("Scripts\\JSON.lua")()
+SRS.JSON = JSON
 
-module("srs_overlay")
+SRS.UDPSendSocket = socket.udp()
+SRS.UDPSendSocket:settimeout(0)
 
-local require           = base.require
-local os                = base.os
-local io                = base.io
-local table             = base.table
-local string            = base.string
-local math              = base.math
-local assert            = base.assert
-local pairs             = base.pairs
+local _lastSent = 0;
 
-local lfs               = require('lfs')
-local socket            = require("socket") 
-local net               = require('net')
-local DCS               = require("DCS") 
-local U                 = require('me_utilities')
-local Skin              = require('Skin')
-local Gui               = require('dxgui')
-local DialogLoader      = require('DialogLoader')
-local Static            = require('Static')
-local Tools             = require('tools')
+SRS.onPlayerChangeSlot = function(_id)
 
-local _modes = {     
-    hidden = "hidden",
-    minimum = "minimum",
-    minimum_vol =  "minimum_vol",
-    full = "full",
-}
+    -- send when there are changes
+    local _myPlayerId = net.get_my_player_id()
 
-local _isWindowCreated = false
-local _listenSocket = {}
-local _radioState = {}
-local _listStatics = {} -- placeholder objects
-local _listMessages = {} -- data
-
-local WIDTH = 420
-local HEIGHT = 160
-
-local _lastReceived = 0
-
-local srsOverlay = { 
-    connection = nil,
-    logFile = io.open(lfs.writedir()..[[Logs\DCS-SRS-InGameRadio.log]], "w")
-}
-
-function srsOverlay.loadConfiguration()
-    srsOverlay.log("Loading config file...")
-    local tbl = Tools.safeDoFile(lfs.writedir() .. 'Config/SRSConfig.lua', false)
-    if (tbl and tbl.config) then
-        srsOverlay.log("Configuration exists...")
-        srsOverlay.config = tbl.config
-    else
-        srsOverlay.log("Configuration not found, creating defaults...")
-        srsOverlay.config = {
-            mode = "full",
-            restoreAfterRestart = true,
-            hotkey = "Ctrl+Shift+escape",
-            windowPosition = { x = 200, y = 200 }
-        }
-        srsOverlay.saveConfiguration()
+    if _id == _myPlayerId then
+        SRS.sendUpdate(net.get_my_player_id())
     end
-    -- migration for config values added during an update
-    if srsOverlay.config and srsOverlay.config.restoreAfterRestart == nil then
-        srsOverlay.config.restoreAfterRestart = true
-        srsOverlay.saveConfiguration()
-    end
+  
 end
 
-function srsOverlay.saveConfiguration()
-    U.saveInFile(srsOverlay.config, 'config', lfs.writedir() .. 'Config/SRSConfig.lua')
-end
-
-function srsOverlay.log(str)
-    if not str then 
-        return
-    end
-
-    if srsOverlay.logFile then
-        srsOverlay.logFile:write("["..os.date("%H:%M:%S").."] "..str.."\r\n")
-        srsOverlay.logFile:flush()
-    end
-end
-
-
-function srsOverlay.updateRadio()    
-
-
-    local _compactMode = base.OptionsData.getPlugin("DCS-SRS","srsOverlayCompactModeEnabled")
-
-    _listMessages = {}
-
-    if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
-
-        if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected then
-            local clientCountMsg = string.format("Connected clients: %i", _radioState.ClientCountConnected)
-
-            local countMsg = {message = clientCountMsg, skin = typesMessage.normal, height = 20 }
-
-            table.insert(_listMessages, countMsg)
-        end
-
-        
-        local _radioInfo  =_radioState.RadioInfo
-
-        -- IFF_STATUS:  OFF = 0,  NORMAL = 1 , or IDENT = 2 (IDENT means Blink on LotATC) , 3 DISABLED
-        -- M1:-1 = OFF, any other number on 
-        -- M3: -1 = OFF, any other number on 
-        -- M4: 1 = ON or 0 = OFF
-        -- EXPANSION: only enabled if IFF Expansion is enabled
-        -- CONTROL: 0 - COCKPIT / Realistic, 1 - OVERLAY / SRS, 
-        --IFF STATUS{"control":1,"expansion":false,"mode1":51,"mode3":7700,"mode4":1,"status":2}
-
-        -- Handle IFF
-        if _radioInfo.iff then
-
-            if _radioInfo.iff.status == 1 or _radioInfo.iff.status == 2 then
-
-                local _iff = "TRANS:"
-
-                if _radioInfo.iff.status == 2 then
-                    _iff = _iff .. " IDENT"
-                end
-                
-                if _radioInfo.iff.mode1 == -1 then
-                     _iff = _iff .. " M1:OFF"
-                else
-                     _iff = _iff .. string.format(" M1:%02d",_radioInfo.iff.mode1)
-                end
-
-                if _radioInfo.iff.mode3 == -1 then
-                     _iff = _iff .. " M3:OFF"
-                else
-                     _iff = _iff .. string.format(" M3:%04d",_radioInfo.iff.mode3)
-                end
-
-                if _radioInfo.iff.mode4 then
-                    _iff = _iff.." M4:ON"
-                else
-                    _iff = _iff.." M4:OFF"
-                end
-
-                 local _iffMsg = {message = _iff, skin = typesMessage.normal, height = 20 }
-
-                table.insert(_listMessages, _iffMsg)
-
-               --    srsOverlay.log("Added IFF Message")
---
-            else
-
-                if _radioInfo.iff.status == 0 then
-                   -- local _iffMsg = {message = "TRANS: OFF", skin = typesMessage.normal, height = 20 }
-                  --  table.insert(_listMessages, _iffMsg)
-                      -- srsOverlay.log("Added IFF Message OFF")
-                else
-                   --    srsOverlay.log("IGNORED IFF Message")
-                end
-                --ELSE DISABLED so dont show
-            end         
-        end
-
-        for _i,_radio in pairs(_radioInfo.radios) do
-
-            local fullMessage
-
-            local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
-
-            if  _radio.modulation == 5 or _radio.modulation == 6 then 
-
-                fullMessage = _radio.name.." - "
-                if  _radio.channel > 0 then
-
-                    if _compactMode and (_isReceiving == 1 or _isReceiving == 2) and _sentBy ~= "" then
-                        fullMessage = fullMessage .._sentBy
-                    else
-                       
-                        fullMessage = fullMessage.." CHN ".._radio.channel
-
-                        if _radio.retransmit then
-                            fullMessage = fullMessage.." RT"
-                        end
-                    
-                        if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
-                            fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
-                        end
-
-                    end
-
-                    local tuned = _radioState.TunedClients
-
-                    if tuned then
-                        local tunedRadio = tuned[_i]
-
-                        if tunedRadio > 0 then
-                            fullMessage  = fullMessage.." ⚡"..tunedRadio
-                        end
-
-                    end
-                else
-                    fullMessage = fullMessage.." OFF"
-                end
-            elseif _radio.modulation == 3 then
-                     fullMessage = ""
-                    
-            elseif _radio.modulation == 2 then 
-
-                     fullMessage = "INTERCOM "
-                
-            else
-                 fullMessage = _radio.name.." - "
-
-                 if _compactMode and (_isReceiving == 1 or _isReceiving == 2) and _sentBy ~= "" then
-                    fullMessage = fullMessage .._sentBy
-                 else
-                     fullMessage = fullMessage..string.format("%.3f", _radio.freq/1000000.0)
-
-         --            srsOverlay.log( _radio.freq)
-
-                     if _radio.modulation == 0 then
-                        fullMessage = fullMessage.." AM"
-                     elseif _radio.modulation == 1 then
-                        fullMessage = fullMessage.." FM"
-                     elseif _radio.modulation == 4 then
-                        fullMessage = fullMessage.." HQ"
-                     end
-
-                     if _radio.secFreq > 100 then
-                        fullMessage = fullMessage.." G"
-                     end
-
-                     if _radio.channel >= 0 then
-                        fullMessage = fullMessage.." C".._radio.channel
-                     end
-
-                     if _radio.enc and _radio.encKey > 0 then
-                        fullMessage = fullMessage.." E".._radio.encKey
-                     end
-
-                     if _radio.retransmit then
-                        fullMessage = fullMessage.." RT"
-                     end
-
-                     if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
-                        fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
-                    end
-                end
-
-                local tuned = _radioState.TunedClients
-
-                if tuned then
-                    local tunedRadio = tuned[_i]
-
-                    if tunedRadio > 0 then
-                        fullMessage  = fullMessage.." ⚡"..tunedRadio
-                    end
-                end
-            end
-
-            local _selected = _i == (_radioInfo.selected+1)
-
-            if _selected then
-                fullMessage = fullMessage.." *"
-
-                if _radioState.RadioSendingState
-                        and _radioState.RadioSendingState.SendingOn == _i -1
-                        and _radioState.RadioSendingState.IsSending then
-
-                    fullMessage = fullMessage.." +TR"
-                end
-             elseif _radioState.RadioSendingState 
-                and  _radioState.RadioSendingState.IsSending 
-                and  _radio.simul 
-                then 
-                fullMessage = fullMessage.." +TR"
-            end
-
-       --     srsOverlay.log(fullMessage)
-
-            local _skin = typesMessage.normal
-
-            if _isReceiving == 1 then
-                _skin = typesMessage.receive
-
-                if not _compactMode then 
-                    fullMessage = fullMessage .." ".._sentBy
-                end
-            elseif  _isReceiving == 2 then
-                _skin = typesMessage.guard
-
-                if not _compactMode then 
-                    fullMessage = fullMessage .." ".._sentBy
-                end
-            end
-
-            local msg = {message = fullMessage, skin =_skin, height = 20 }
-
-
-            table.insert(_listMessages, msg)
-        end
-
-        
-    end
-
-    srsOverlay.paintRadio()
-end
-
-function srsOverlay.isReceiving(_radioPos )
-
-    if _radioState.RadioReceivingState then
-
-        for  _i, _rxState in pairs(_radioState.RadioReceivingState) do
-
-            -- off by one in lua
-            if _rxState ~= nil and _rxState.ReceivedOn+1 == _radioPos and _rxState.IsReceiving then
-
-                if _rxState.IsSecondary then
-                    return 2,_rxState.SentBy
-                end
-
-                return 1,_rxState.SentBy
-            end
-        end
-
-    end
-
-    return 0,""
-
-end
-
-
-function srsOverlay.paintRadio()
-
-    local offset = 0
-   
-    for k,v in pairs(_listStatics) do
-
-        v:setText("")
-    end
-
-    local curStatic = 1
-    offset = 10 -- 10 offset from top
-
-    if #_listMessages == 0 then
-        table.insert(_listMessages, {message = "No Radio Connected", skin =typesMessage.guard, height = 20 })
-        table.insert(_listMessages, {message = "Connect to SRS server and", skin =typesMessage.guard, height = 20 })
-        table.insert(_listMessages, {message = "start or join a mission", skin =typesMessage.guard, height = 20 })
-    end
-
-    for _i,_msg in pairs(_listMessages) do
-
-        if(_msg~=nil and _msg.message ~= nil and  _listStatics[curStatic] ~= nil ) then
-            _listStatics[curStatic]:setSkin(_msg.skin)
-            _listStatics[curStatic]:setBounds(10,offset,WIDTH-10,_msg.height)
-            _listStatics[curStatic]:setText(_msg.message)
-
-            --10 padding
-            offset = offset +20
-            curStatic = curStatic +1
-        end
-
+SRS.onSimulationFrame = function()
+
+    local _now = DCS.getRealTime()
+
+    -- send every 5 seconds
+    if _now > _lastSent + 5.0 then
+        _lastSent = _now 
+     --    SRS.log("sending update")
+        SRS.sendUpdate(net.get_my_player_id())
     end
 
 end
 
-function srsOverlay.createWindow()
-    window = DialogLoader.spawnDialogFromFile(lfs.writedir() .. 'Mods\\Services\\DCS-SRS\\UI\\DCS-SRS-Overlay.dlg', cdata)
-
-    box         = window.Box
-    pNoVisible  = window.pNoVisible --PlaceHolder - Not Visible
-   -- pDown       = box.pDown
-
-    window:addHotKeyCallback(srsOverlay.config.hotkey, srsOverlay.onHotkey)
-    
-    window:setVisible(true) -- if you make the window invisible, its destroyed
-    
-    skinModeFull = pNoVisible.windowModeFull:getSkin()
-    skinMinimum = pNoVisible.windowModeMin:getSkin()
-
-    typesMessage =
-    {
-        normal        = pNoVisible.eYellowText:getSkin(),
-        receive       = pNoVisible.eWhiteText:getSkin(),
-        guard         = pNoVisible.eRedText:getSkin(),
+SRS.sendUpdate = function(playerID)
+  
+    local _update = {
+        name = "",
+        side = 0,
+        seat = 0,
     }
-    
-    _listStatics = {}
-    
-    for i = 1, 6 do
-        local staticNew = Static.new()
-        table.insert(_listStatics, staticNew)
-        box:insertWidget(staticNew)
-    end
 
-    w, h = Gui.GetWindowSize()
-            
-    srsOverlay.resize(w, h)
-    
-    local enabled = base.OptionsData.getPlugin("DCS-SRS","srsOverlayEnabled")
+    _update.name = net.get_player_info(playerID, "name" )
+	_update.side = net.get_player_info(playerID,"side")
 
-    if enabled then
+	local slot =  net.get_player_info(playerID,"slot")
 
-        if _modes.hidden == srsOverlay.config.mode then
-            -- set to minimum
-            srsOverlay.setMode(_modes.minimum)
-        else
-            srsOverlay.setMode(srsOverlay.config.mode) 
-        end
+	if slot and slot ~= '' then 
+		slot = tostring(slot)
+	    
+	    -- Slot 2744_2 -- backseat slot is Unit ID  _2 
+	    if string.find(tostring(slot), "_", 1, true) then
+	        --extract substring - get the seat ID
+	        slot = string.sub(slot, string.find(slot, "_", 1, true)+1, string.len(slot))
 
+	        local slotNum = tonumber(slot)
+
+	        if slotNum ~= nil and slotNum >= 1 then
+	        	_update.seat = slotNum -1 -- -1 as seat starts at 2
+	        end
+	    end
+	end
+
+    --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
+
+	if SRS.unicast then
+		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.0.0.1", 5068))
+	else
+		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
+	end
+
+
+end
+
+SRS.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
+SRS.MESSAGE_PREFIX = "SRS Running @ " -- DO NOT MODIFY!!!
+
+function string.startsWith(string, prefix)
+    return string.sub(string, 1, string.len(prefix)) == prefix
+end
+
+function string.trim(_str)
+    return string.format( "%s", _str:match( "^%s*(.-)%s*$" ) )
+end
+
+function SRS.isAutoConnectMessage(msg)
+    return string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX) or string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX_OLD)
+end
+
+function SRS.getHostFromMessage(msg)
+	if string.startsWith(string.trim(msg), SRS.MESSAGE_PREFIX_OLD) then
+		return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX_OLD) + 1))
+	else
+		return string.trim(string.sub(msg, string.len(SRS.MESSAGE_PREFIX) + 1))
+	end
+end
+
+-- Register callbacks --
+
+SRS.sendConnect = function(_message)
+
+    if SRS.unicast then
+        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
     else
-        srsOverlay.setMode(_modes.hidden)
+        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.255.255.255", 5069))
     end
-
-   
-    window:addPositionCallback(srsOverlay.positionCallback)     
-    srsOverlay.positionCallback()
-
-    _isWindowCreated = true
-
-    srsOverlay.log("SRS Window created")
---
---    srsOverlay.addMessage("124.00 *", "AN/ARC-186(V)", typesMessage.sys)
- --   srsOverlay.addMessage("256.00", "AN/ARC-164 UHF", typesMessage.msg)
-  --  srsOverlay.addMessage("10.00", "AN/ARC-186(V)FM", typesMessage.msg)
-  --  srsOverlay.addMessage("10.00", "INTERCOM", typesMessage.msg)
 end
 
+SRS.sendCommand = function(_message)
 
-function srsOverlay.setMode(mode)
-    srsOverlay.log("setMode called "..mode)
-    srsOverlay.config.mode = mode 
-    
-    if window == nil then
-        return
-    end
-    
-    if srsOverlay.config.mode == _modes.hidden then
-
-        box:setVisible(false)
-   --     pDown:setVisible(false)
-        window:setSize(0,0) -- Make it tiny!
-        window:setHasCursor(false) -- hide cursor
-
-        window:setSkin(Skin.windowSkinChatMin())
-
+    if SRS.unicast then
+        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.0.0.1", 9040))
     else
-        box:setVisible(true)
-        window:setSize(WIDTH, HEIGHT)
-
-        if srsOverlay.config.mode == _modes.minimum or srsOverlay.config.mode == _modes.minimum_vol then
-
-            box:setSkin(skinMinimum)
-
-         --   pDown:setVisible(false)
-
-            window:setSkin(Skin.windowSkinChatMin())
-
-            window:setHasCursor(false) -- hide cursor
-
-
-            --  DCS.banMouse(false)
-        end
-        
-        if srsOverlay.config.mode == _modes.full then
-            box:setSkin(skinModeFull)
-
-            box:setVisible(true)
-           -- pDown:setVisible(true)
-
-            window:setSkin(Skin.windowSkinChatWrite())
-
-            window:setHasCursor(true) -- show cursor
-        end    
+        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.255.255.255", 9040))
     end
-
-    window:setVisible(true) -- if you make the window invisible, its destroyed
-
-
-    srsOverlay.paintRadio()
-    srsOverlay.saveConfiguration()
 end
 
-function srsOverlay.getMode()
-    return srsOverlay.config.mode
+SRS.findCommandValue = function(key, list)
+
+	for index,str in ipairs(list) do
+			
+		if str == key then
+			
+			return list[index+1]
+		end
+	end
+	return nil
 end
 
-function srsOverlay.onHotkey()
+SRS.handleTransponder = function(msg)
 
-    if (srsOverlay.getMode() == _modes.full) then
-        srsOverlay.setMode(_modes.minimum)
-    elseif (srsOverlay.getMode() == _modes.minimum) then
-        srsOverlay.setMode(_modes.minimum_vol)
-    elseif (srsOverlay.getMode() == _modes.minimum_vol) then
-        srsOverlay.setMode(_modes.hidden)
-    else
-        srsOverlay.setMode(_modes.full)
-    end 
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"POWER","PWR","M1","M3","M4","IDENT"}
+
+	local commands = {}
+
+	--search for keys
+	for _,key in ipairs(keys) do
+
+		local val = SRS.findCommandValue(key, split)
+
+		if val then
+			if key == "POWER" or key == "PWR" then
+				if val == "ON" then
+					table.insert(commands, {Command = 6, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 6, Enabled = false})
+				end
+			elseif key == "M1" then
+
+				if val == "OFF" then
+					table.insert(commands, {Command = 7, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 7, Code = code})
+					end
+				end
+			
+			elseif key == "M3" then
+				 if val == "OFF" then
+					table.insert(commands, {Command = 8, Code = -1})
+				else
+					local code = tonumber(val)
+
+					if code ~= nil then
+						table.insert(commands, {Command = 8, Code = code})
+					end
+				end
+
+			elseif key == "M4" then
+				if val == "ON" then
+					table.insert(commands, {Command = 9, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 9, Enabled = false})
+				end
+			elseif key == "IDENT" then
+				if val == "ON" then
+					table.insert(commands, {Command = 10, Enabled = true})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 10, Enabled = false})
+				end
+			end
+		end
+	end
+
+	return commands
+
 end
 
-function srsOverlay.resize(w, h)
-    window:setBounds(srsOverlay.config.windowPosition.x, srsOverlay.config.windowPosition.y, WIDTH, HEIGHT)
-    box:setBounds(0, 0, WIDTH, HEIGHT)
+
+SRS.handleRadio = function(msg)
+
+	local transMsg = msg:gsub(':',' ')
+
+	local split = {}
+	for token in string.gmatch(transMsg, "[^%s]+") do
+	 
+	  table.insert(split,token)
+	
+	end
+
+	local keys =  {"SELECT",
+					"RADIO","FREQ","GUARD",
+					"FREQUENCY","GRD","FRQ", "VOL","VOLUME","CHANNEL","CHN"}
+
+	local commands = {}
+
+	local radioId = -1
+
+	--search for keys
+	for _,key in ipairs(keys) do
+
+		local val = SRS.findCommandValue(key, split)
+
+		if val then
+			if key == "SELECT" or key == "RADIO" then
+
+				local code = tonumber(val)
+				if code ~= nil then
+					radioId  = code
+					if key == "SELECT" then
+						table.insert(commands, {Command = 1, RadioId = radioId})
+					end
+				end
+
+			elseif key == "FREQ" or key == "FREQUENCY" or key == "FRQ" then
+
+				if radioId > 0 then
+					local frq = tonumber(val)
+
+					if frq ~= nil then
+						table.insert(commands, {Command = 12,  RadioId = radioId, Frequency = frq})
+					end
+				end
+			elseif key == "VOL" or key == "VOLUME" then
+
+				if radioId > 0 then
+					local vol = tonumber(val)
+
+					if vol ~= nil then
+
+						if vol > 1.0 then
+							vol = 1.0
+						elseif vol < 0 then
+							vol = 0
+						end
+
+						table.insert(commands, {Command = 5,  RadioId = radioId, Volume = vol})
+					end
+				end
+			elseif key == "CHN" or key == "CHANNEL" then
+
+				if radioId > 0 then
+					if val == "UP" or val == "+" then
+						table.insert(commands, {Command = 3,  RadioId = radioId})
+					elseif val == "DOWN" or val == "-" then
+						table.insert(commands, {Command = 4,  RadioId = radioId})
+					end
+				end
+			elseif key == "GUARD" or key == "GRD" then
+				if val == "ON" then
+					table.insert(commands, {Command = 11, Enabled = true, RadioId = radioId})
+				elseif val == "OFF" then
+					table.insert(commands, {Command = 11, Enabled = false, RadioId = radioId})
+				end
+			end
+		end
+	end
+
+	if radioId > 0 then
+		return commands
+	end
+
+	return {}
+
 end
 
-function srsOverlay.positionCallback()
-    local x, y = window:getPosition()
-
-    x = math.max(math.min(x, w-WIDTH), 0)
-    y = math.max(math.min(y, h-HEIGHT), 0)
-
-    window:setPosition(x, y)
-
-    srsOverlay.config.windowPosition = { x = x, y = y }
-    srsOverlay.saveConfiguration()
-end
+SRS.onChatMessage = function(msg, from)
 
 
+    -- Only accept auto connect message coming from host.
+    if SRS.CLIENT_ACCEPT_AUTO_CONNECT
+                        and from == 1
+            and  SRS.isAutoConnectMessage(msg) then
+        local host = SRS.getHostFromMessage(msg)
+        SRS.log(string.format("Got SRS Auto Connect message: %s", host))
 
-function srsOverlay.initListener()
+        local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
+        if srs and enabled then
+            local path = srs.get_srs_path()
+            if path ~= "" then
 
-_listenSocket = socket.udp()
-
---bind for listening for Radio info
-_listenSocket:setsockname("*", 7080)
-_listenSocket:settimeout(0) 
-
-end
-
-function srsOverlay.listen()
-
-    -- Receive buffer is 8192 in LUA Socket
-    -- will contain 10 clients for LOS
-    local _received = _listenSocket:receive()
-
-    if _received then
-
-    --KNOWN BUG - Hitting Left Control + Windows Key + L causes lag
-    -- Fix by disabling overlay or hitting L CNTRL + L SHIFT + L
-        if srsOverlay.getMode() ~= _modes.hidden then
-            local _decoded = JSON:decode(_received)
-
-          --srsOverlay.log(_received)
-
-            if _decoded then
-
-                _lastReceived  = os.clock()
-
-                _radioState = _decoded
-
-                return true
+                net.log("Trying to Launch SRS @ "..path)
+                srs.start_srs(host)
             end
 
         end
+        SRS.sendConnect(host) 
     end
 
-    return false
+    -- MESSAGE FROM MYSELF
+    if from == net.get_my_player_id() then
+		
+		msg = msg:upper()
+
+		if string.find(msg,"SRSTRANS",1,true) then
+			local commands = SRS.handleTransponder(msg) 
+
+			for _,command in pairs(commands) do
+				SRS.sendCommand(command)
+			end
+		elseif string.find(msg,"SRSRADIO",1,true) then
+			local commands = SRS.handleRadio(msg) 
+
+			for _,command in pairs(commands) do
+				SRS.sendCommand(command)
+			end
+		end
+	end
+
 end
 
 
-function srsOverlay.onSimulationFrame()
+DCS.setUserCallbacks(SRS)
 
-    -- if not base.OptionsData then
-    --     --srsOverlay.log("NO Options Data")
-    --     return
-    -- end
-
-    if srsOverlay.config == nil then
-        srsOverlay.loadConfiguration()
-    end
-
-    if not window then
-
-        if _isWindowCreated == false then
-            srsOverlay.createWindow()
-        end
-
-        -- init connection
-        srsOverlay.initListener()
-    end
-
-    if srsOverlay.listen() then
-
-        local _status, _result = base.pcall(function() 
-            srsOverlay.updateRadio()
-        end)
-
-        if not _status then
-            srsOverlay.log("Error: ".._result)
-        end
-        
-    else
-        local _now = os.clock()
-
-        if _now - _lastReceived > 5 and _radioState and _radioState.RadioInfo then
-            _radioState = {}
-
-            --repaint lost radio
-            srsOverlay.updateRadio()
-        end
-    end
-end 
-
-DCS.setUserCallbacks(srsOverlay)
-
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.9.1.2 ")
+net.log("Loaded - DCS-SRS GameGUI - Ciribob: 1.9.1.2")
