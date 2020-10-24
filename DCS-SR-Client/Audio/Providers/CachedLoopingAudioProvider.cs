@@ -17,10 +17,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         private readonly short[] _audioEffectShort;
         private IWaveProvider source;
 
-        public CachedLoopingAudioProvider(IWaveProvider source, WaveFormat waveFormat, CachedAudioEffect.AudioEffectTypes effectType)
+        public CachedLoopingAudioProvider(IWaveProvider source, WaveFormat waveFormat, CachedAudioEffect effect)
         {
             this.WaveFormat = waveFormat;
-            var effect = new CachedAudioEffect(effectType);
             _audioEffectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
 
             var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.NATOToneVolume)

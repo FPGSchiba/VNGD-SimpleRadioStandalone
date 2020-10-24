@@ -47,7 +47,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         MIDSRadioEffect, //if on and Radio TX effects are on the MIDS tone is used
         
-        PTTReleaseDelay
+        PTTReleaseDelay,
+
+        RadioTransmissionStartSelection,
+        RadioTransmissionEndSelection
     }
 
     public class ProfileSettingsStore
@@ -66,6 +69,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
+
+            {ProfileSettingsKeys.RadioTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_START+".wav"},
+            {ProfileSettingsKeys.RadioTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END+".wav"},
+
+
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},

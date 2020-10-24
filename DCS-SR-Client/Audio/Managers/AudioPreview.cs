@@ -92,8 +92,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 RadioFilter filter = new RadioFilter(_buffBufferedWaveProvider.ToSampleProvider());
 
+                var audioEffect = CachedAudioEffectProvider.Instance.NATOTone;
+
                 CachedLoopingAudioProvider natoEffect =
-                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(), new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1), CachedAudioEffect.AudioEffectTypes.NATO_TONE);
+                    new CachedLoopingAudioProvider(filter.ToWaveProvider16(), new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1),audioEffect );
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(natoEffect.ToSampleProvider(),

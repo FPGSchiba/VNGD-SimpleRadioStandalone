@@ -3492,4 +3492,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.0.3")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.1.2")
