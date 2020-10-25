@@ -198,7 +198,7 @@
     <Compile Include="Audio\Managers\AudioManager.cs" />
     <Compile Include="Audio\Managers\AudioPreview.cs" />
     <Compile Include="Audio\Models\ClientAudio.cs" />
-    <Compile Include="Audio\Providers\CachedLoopingAudioProvider.cs" />
+    <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
@@ -399,6 +399,15 @@
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="AudioEffects\FM_NOISE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\HAVEQUICK_TONE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\HF_NOISE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="AudioEffects\KY_58_RX.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -424,6 +433,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START_ALTERNATE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\UHF_NOISE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\VHF_NOISE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="NLog.config">

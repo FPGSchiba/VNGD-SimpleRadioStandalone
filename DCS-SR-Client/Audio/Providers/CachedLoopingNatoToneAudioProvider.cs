@@ -4,30 +4,25 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Wave;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 {
-    public class CachedLoopingAudioProvider:IWaveProvider
+    public class CachedLoopingNatoToneAudioProvider:IWaveProvider
     {
         private int _position = 0;
 
         private readonly short[] _audioEffectShort;
         private IWaveProvider source;
 
-        public CachedLoopingAudioProvider(IWaveProvider source, WaveFormat waveFormat, CachedAudioEffect effect)
+        public CachedLoopingNatoToneAudioProvider(IWaveProvider source, WaveFormat waveFormat)
         {
-            this.WaveFormat = waveFormat;
-            _audioEffectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
 
-            var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.NATOToneVolume)
-                .FloatValue;
-            for (int i = 0; i < _audioEffectShort.Length; i++)
-            {
-                _audioEffectShort[i] = (short) (_audioEffectShort[i] * vol);
-            }
+            this.WaveFormat = waveFormat;
+            _audioEffectShort = CachedAudioEffectProvider.Instance.NATOTone.AudioEffectShort;
 
             this.source = source;
         }
@@ -37,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         {
             int read = source.Read(buffer, offset, count);
 
-            if (!GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
+            if (!GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone) || _audioEffectShort == null)
             {
                 return read;
             }
@@ -49,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             {
                 short audio = ConversionHelpers.ToShort(buffer[(offset + i) * 2], buffer[((i + offset) * 2) + 1]);
 
-                audio = (short)(audio + _audioEffectShort[i]);
+                audio = (short)(audio + effectBytes[i]);
 
                 //buffer[i + offset] = effectBytes[i]+buffer[i + offset];
 

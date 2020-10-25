@@ -87,7 +87,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ShowTransmitterName,
 
         IdleTimeOut,
-        AutoConnect
+        AutoConnect,
+
+        HQToneVolume,
+        FMNoiseVolume,
+        VHFNoiseVolume,
+        UHFNoiseVolume,
+        HFNoiseVolume,
     }
 
     public enum InputBinding
@@ -390,6 +396,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.LotATCHeightOffset.ToString(), "50"},
 
             {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
+            {GlobalSettingsKeys.HQToneVolume.ToString(), "0.3"},
+
+            {GlobalSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
 
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},

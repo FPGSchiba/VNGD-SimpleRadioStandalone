@@ -667,6 +667,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioSoundEffectsClipping.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
             NATORadioToneToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
 
+            BackgroundRadioNoiseToggle.IsChecked =
+                _globalSettings.ProfileSettingsStore.GetClientSettingBool(
+                    ProfileSettingsKeys.RadioBackgroundNoiseEffect);
+
             AutoSelectChannel.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel);
 
             AlwaysAllowHotas.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls);
@@ -1730,6 +1734,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             catch (Exception ex)
             {
             }
+        }
+
+        private void BackgroundRadioNoiseToggle_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioBackgroundNoiseEffect, (bool)BackgroundRadioNoiseToggle.IsChecked);
         }
     }
 }

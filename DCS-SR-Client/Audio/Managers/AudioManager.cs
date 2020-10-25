@@ -483,7 +483,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 _effectsBuffer.VolumeSampleProvider.Volume = volume;
 
-                var effect = _cachedAudioEffectsProvider.kY58EncryptionEndTone;
+                var effect = _cachedAudioEffectsProvider.KY58EncryptionEndTone;
                 if (effect.Loaded)
                 {
                     _effectsBuffer.AddAudioSamples(
@@ -519,7 +519,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
             {
                 _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.kY58EncryptionTransmitTone;
+                var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
                 if (effect.Loaded)
                 {
                     _effectBuffer.AddAudioSamples(

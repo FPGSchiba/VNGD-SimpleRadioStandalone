@@ -7,11 +7,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
     public abstract class AudioProvider
     {
-        protected readonly Settings.ProfileSettingsStore globalSettings;
+        protected readonly Settings.ProfileSettingsStore profileSettings;
 
         public AudioProvider()
         {
-            globalSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+            profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
         }
 
         public byte[] SeperateAudio(byte[] pcmAudio, int radioId)
@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             float balance = 0;
             try
             {
-                balance  = globalSettings.GetClientSetting(settingType).FloatValue;
+                balance  = profileSettings.GetClientSetting(settingType).FloatValue;
             }
             catch (Exception ex)
             {

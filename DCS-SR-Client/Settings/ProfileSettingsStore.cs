@@ -50,7 +50,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         PTTReleaseDelay,
 
         RadioTransmissionStartSelection,
-        RadioTransmissionEndSelection
+        RadioTransmissionEndSelection,
+        HAVEQUICKTone,
+        RadioBackgroundNoiseEffect
     }
 
     public class ProfileSettingsStore
@@ -63,9 +65,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly Dictionary<string, string> defaultSettingsProfileSettings = new Dictionary<string, string>()
         {
             {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
-            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "true"},
+            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
+
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},
+            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
@@ -87,6 +91,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
+
+            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
         };
 
 

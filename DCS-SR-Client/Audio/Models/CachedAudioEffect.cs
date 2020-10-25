@@ -50,6 +50,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             NATO_TONE=4,
             MIDS_TX = 5,
             MIDS_TX_END = 6,
+            HAVEQUICK_TONE = 7,
+            VHF_NOISE = 8,
+            HF_NOISE = 9,
+            UHF_NOISE = 10,
+            FM_NOISE = 11,
         }
 
         public CachedAudioEffect(AudioEffectTypes audioEffect): this(audioEffect, audioEffect.ToString() + ".wav", AppDomain.CurrentDomain.BaseDirectory + "\\AudioEffects\\"+ audioEffect.ToString() + ".wav") { }
@@ -92,5 +97,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public AudioEffectTypes AudioEffectType { get; }
 
         public byte[] AudioEffectBytes { get; }
+        public short[] AudioEffectShort { get; set; }
     }
 }
