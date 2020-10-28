@@ -260,8 +260,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
                 {
-                    audio = audio * RadioFilter.BOOST;
-
                     if (audio > RadioFilter.CLIPPING_MAX)
                     {
                         audio = RadioFilter.CLIPPING_MAX;
@@ -279,16 +277,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     audio = filter.ProcessSample(audio);
                     if (double.IsNaN(audio))
                     {
-                        audio = (double) mixedAudio[j] / 32768f;
+                        audio = mixedAudio[j];
                     }
+
+                    audio = audio * RadioFilter.BOOST;
                 }
 
                 if (clientAudio.Modulation == FM
                     && effectProvider.NATOTone.Loaded 
                     && profileSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone))
                 {
-                    var natoTone = effectProvider.NATOTone.AudioEffectShort;
-                    audio +=  (short)(natoTone[natoPosition] / 32768f);
+                    var natoTone = effectProvider.NATOTone.AudioEffectDouble;
+                    audio +=  (double)(natoTone[natoPosition]);
                     natoPosition++;
 
                     if (natoPosition == natoTone.Length)
@@ -301,9 +301,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                      && effectProvider.HAVEQUICKTone.Loaded 
                      && profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone))
                 {
-                    var hqTone = effectProvider.HAVEQUICKTone.AudioEffectShort;
+                    var hqTone = effectProvider.HAVEQUICKTone.AudioEffectDouble;
 
-                    audio += (short) (hqTone[hqTonePosition] / 32768f);
+                    audio += (double) (hqTone[hqTonePosition]);
                     hqTonePosition++;
 
                     if (hqTonePosition == hqTone.Length)
@@ -336,9 +336,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         if (effectProvider.UHFNoise.Loaded)
                         {
-                            var noise = effectProvider.UHFNoise.AudioEffectShort;
+                            var noise = effectProvider.UHFNoise.AudioEffectDouble;
                             //UHF Band?
-                            audio += (double)(noise[uhfNoisePosition] / 32768f);
+                            audio += (noise[uhfNoisePosition]);
                             uhfNoisePosition++;
 
                             if (uhfNoisePosition == noise.Length)
@@ -352,8 +352,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         if (effectProvider.VHFNoise.Loaded)
                         {
                             //VHF Band? - Very rough
-                            var noise = effectProvider.VHFNoise.AudioEffectShort;
-                            audio += (double)(noise[vhfNoisePosition] / 32768f);
+                            var noise = effectProvider.VHFNoise.AudioEffectDouble;
+                            audio += (double)(noise[vhfNoisePosition]);
                             vhfNoisePosition++;
 
                             if (vhfNoisePosition == noise.Length)
@@ -367,8 +367,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         if (effectProvider.HFNoise.Loaded)
                         {
                             //HF!
-                            var noise = effectProvider.HFNoise.AudioEffectShort;
-                            audio += (double)(noise[hfNoisePosition] / 32768f);
+                            var noise = effectProvider.HFNoise.AudioEffectDouble;
+                            audio += (double)(noise[hfNoisePosition] );
                             hfNoisePosition++;
 
                             if (hfNoisePosition == noise.Length)
@@ -386,9 +386,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         //FM picks up most of the 20-60 ish range + has a different effect
                         //HF!
-                        var noise = effectProvider.FMNoise.AudioEffectShort;
+                        var noise = effectProvider.FMNoise.AudioEffectDouble;
                         //UHF Band?
-                        audio += (double)(noise[fmNoisePosition] / 32768f);
+                        audio += (double)(noise[fmNoisePosition] );
                         fmNoisePosition++;
 
                         if (fmNoisePosition == noise.Length)

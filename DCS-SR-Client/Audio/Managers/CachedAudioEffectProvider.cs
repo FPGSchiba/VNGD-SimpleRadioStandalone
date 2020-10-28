@@ -123,17 +123,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             if (effect.Loaded)
             {
+
                 var effectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
+                var effectDouble = new double[effectShort.Length];
 
                 var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(key)
                     .FloatValue;
 
                 for (int i = 0; i < effectShort.Length; i++)
                 {
-                    effectShort[i] = (short)(effectShort[i] * vol);
+                    effectDouble[i] = ((effectShort[i]/ 32768f) * vol);
                 }
+                effect.AudioEffectDouble = effectDouble;
 
-                effect.AudioEffectShort = effectShort;
             }
 
         }
