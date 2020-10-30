@@ -535,13 +535,6 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\serverlog.txt");
                 DeleteFileIfExists(programPath + "\\clientlog.txt");
                 DeleteFileIfExists(programPath + "\\DCS-SRS-hook.lua");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\KY-58-RX-1600.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\KY-58-TX-1600.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-RX-1600.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\Radio-TX-1600.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\nato-tone-16k.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\nato-mids-tone.wav");
-                DeleteFileIfExists(programPath + "\\AudioEffects\\nato-mids-tone-out.wav");
             }
             Logger.Info($"Finished clearing scripts and program Pre Mods ");
 
@@ -573,7 +566,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\serverlog.txt");
                 DeleteFileIfExists(programPath + "\\clientlog.txt");
 
-                DeleteDirectory(programPath + "\\AudioEffects");
+               
                 DeleteDirectory(programPath + "\\Scripts");
             }
             Logger.Info($"Finished clearing scripts and program Post Mods ");
@@ -649,7 +642,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\serverlog.txt");
                 DeleteFileIfExists(programPath + "\\clientlog.txt");
 
-                DeleteDirectory(programPath + "\\AudioEffects");
+          
                 DeleteDirectory(programPath + "\\Scripts");
             }
             Logger.Info($"Finished clearing scripts and program Post Mods ");

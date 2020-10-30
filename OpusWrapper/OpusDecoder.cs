@@ -129,6 +129,54 @@ namespace FragLabs.Audio.Codecs
         }
 
         /// <summary>
+        ///     Produces Float samples from Opus encoded data.
+        /// </summary>
+        /// <param name="inputOpusData">Opus encoded data to decode, <c>null</c> for dropped packet.</param>
+        /// <param name="dataLength">Length of data to decode or skipped data if <paramref name="inputOpusData" /> is <c>null</c>.</param>
+        /// <param name="decodedLength">Set to the length of the decoded sample data.</param>
+        /// <returns>PCM audio samples.</returns>
+        public unsafe byte[] DecodeFloat(byte[] inputOpusData, int dataLength, out int decodedLength, bool reset = false)
+        {
+            if (disposed)
+                throw new ObjectDisposedException("OpusDecoder");
+
+            IntPtr decodedPtr;
+            var decoded = new byte[MaxDataBytes];
+
+            var length = 0;
+            fixed (byte* bdec = decoded)
+            {
+                decodedPtr = new IntPtr(bdec);
+
+                if (reset)
+                {
+                    //https://notabug.org/xiph/opus/raw/v0.9.10/include/opus_defines.h
+                    var ret = API.opus_decoder_ctl(_decoder, 4028); //reset opus state - packets missing and it'll get confused
+                    if (ret < 0)
+                    {
+                        throw new Exception("Error Resetting Oppus");
+                    }
+                }
+
+                if (inputOpusData != null)
+                {
+                    var frameCount = FrameCount(MaxDataBytes);
+                    length = API.opus_decode_float(_decoder, inputOpusData, dataLength, decodedPtr, frameCount,
+                        ForwardErrorCorrection ? 1 : 0);
+                }
+                else
+                    length = API.opus_decode_float(_decoder, null, 0, decodedPtr, FrameCount(dataLength), 0);
+            }
+            decodedLength = length * 2;
+            if (length < 0)
+                throw new Exception("Decoding failed - " + (Errors)length);
+
+            return decoded;
+        }
+
+        //opus_decode_float
+
+        /// <summary>
         ///     Determines the number of frames that can fit into a buffer of the given size.
         /// </summary>
         /// <param name="bufferSize"></param>
@@ -140,6 +188,7 @@ namespace FragLabs.Audio.Codecs
             var bytesPerSample = bitrate / 8 * OutputChannels;
             return bufferSize / bytesPerSample;
         }
+
 
         ~OpusDecoder()
         {
