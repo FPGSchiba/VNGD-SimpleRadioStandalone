@@ -32,19 +32,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-
         //used for comparison
         public static readonly short FM = Convert.ToInt16((int)RadioInformation.Modulation.FM);
         public static readonly short HQ = Convert.ToInt16((int)RadioInformation.Modulation.HAVEQUICK);
         public static readonly short AM = Convert.ToInt16((int)RadioInformation.Modulation.AM);
+        
+        private static readonly double HQ_RESET_CHANCE = 0.8;
+        
         private int hqTonePosition = 0;
         private int natoPosition = 0;
         private int fmNoisePosition = 0;
-        private int amNoisePosition = 0;
         private int vhfNoisePosition = 0;
         private int uhfNoisePosition = 0;
         private int hfNoisePosition = 0;
+
         private readonly CachedAudioEffectProvider effectProvider = CachedAudioEffectProvider.Instance;
+   
 
         public ClientAudioProvider()
         {
@@ -120,17 +123,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //adjust for LOS + Distance + Volume
                 AdjustVolumeForLoss(audio);
 
-                if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                if (audio.ReceivedRadio == 0 
+                    || audio.Modulation == (short)RadioInformation.Modulation.MIDS)
                 {
-                    if (audio.ReceivedRadio == 0 
-                        || audio.Modulation == (short)RadioInformation.Modulation.MIDS)
+                    if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
                         AddRadioEffectIntercom(audio);
                     }
-                    else
-                    {
-                        AddRadioEffect(audio);
-                    }
+                }
+                else
+                {
+                    AddRadioEffect(audio);
                 }
 
                 //final adjust
@@ -141,11 +144,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AddEncryptionFailureEffect(audio);
 
-                if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
-                {
-                    AddRadioEffect(audio);
-                }
-
+                AddRadioEffect(audio);
+                
                 //final adjust
                 AdjustVolume(audio);
 
@@ -258,29 +258,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 var audio = (double) mixedAudio[i] / 32768f;
 
-                if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
+                if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                 {
-                    if (audio > RadioFilter.CLIPPING_MAX)
+                    if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping))
                     {
-                        audio = RadioFilter.CLIPPING_MAX;
-                    }
-                    else if (audio < RadioFilter.CLIPPING_MIN)
-                    {
-                        audio = RadioFilter.CLIPPING_MIN;
-                    }
-                }
-
-                //high and low pass filter
-                for (int j = 0; j < _filters.Length; j++)
-                {
-                    var filter = _filters[j];
-                    audio = filter.ProcessSample(audio);
-                    if (double.IsNaN(audio))
-                    {
-                        audio = mixedAudio[j];
+                        if (audio > RadioFilter.CLIPPING_MAX)
+                        {
+                            audio = RadioFilter.CLIPPING_MAX;
+                        }
+                        else if (audio < RadioFilter.CLIPPING_MIN)
+                        {
+                            audio = RadioFilter.CLIPPING_MIN;
+                        }
                     }
 
-                    audio = audio * RadioFilter.BOOST;
+                    //high and low pass filter
+                    for (int j = 0; j < _filters.Length; j++)
+                    {
+                        var filter = _filters[j];
+                        audio = filter.ProcessSample(audio);
+                        if (double.IsNaN(audio))
+                        {
+                            audio = mixedAudio[j];
+                        }
+
+                        audio = audio * RadioFilter.BOOST;
+                    }
                 }
 
                 if (clientAudio.Modulation == FM
@@ -308,12 +311,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                     if (hqTonePosition == hqTone.Length)
                     {
-                        hqTonePosition = 0;
+                        var reset = _random.NextDouble();
+
+                        if (reset > HQ_RESET_CHANCE)
+                        {
+                            hqTonePosition = 0;
+                        }
+                        else
+                        {
+                            //one back to try again
+                            hqTonePosition += -1;
+                        }
                     }
                 }
 
                 audio = AddRadioBackgroundNoiseEffect(audio, clientAudio);
-
 
                 // clip
                 if (audio > 1.0f)
@@ -376,9 +388,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                                 hfNoisePosition = 0;
                             }
                         }
-                     
                     }
-
                 }
                 else if (clientAudio.Modulation == FM)
                 {
