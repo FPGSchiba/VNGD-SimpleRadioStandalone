@@ -345,6 +345,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ControlsProfile.SelectionChanged += OnProfileDropDownChanged;
 
+            RadioStartTransmitEffect.SelectionChanged += OnRadioStartTransmitEffectChanged;
+            RadioEndTransmitEffect.SelectionChanged += OnRadioEndTransmitEffectChanged;
+
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
@@ -483,6 +486,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (ControlsProfile.IsEnabled)
                 ReloadProfile();
+        }
+
+        private void OnRadioStartTransmitEffectChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RadioStartTransmitEffect.IsEnabled)
+            {
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioTransmissionStartSelection, ((CachedAudioEffect)RadioStartTransmitEffect.SelectedItem).FileName);
+            }
+        }
+
+        private void OnRadioEndTransmitEffectChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RadioEndTransmitEffect.IsEnabled)
+            { 
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioTransmissionEndSelection, ((CachedAudioEffect)RadioEndTransmitEffect.SelectedItem).FileName);
+            }
         }
 
         private void ReloadInputBindings()
@@ -647,6 +666,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioSoundEffects.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
             RadioSoundEffectsClipping.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
             NATORadioToneToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
+            HQEffectToggle.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
+            BackgroundRadioNoiseToggle.IsChecked =
+                _globalSettings.ProfileSettingsStore.GetClientSettingBool(
+                    ProfileSettingsKeys.RadioBackgroundNoiseEffect);
 
             AutoSelectChannel.IsChecked = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel);
 
@@ -659,6 +682,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTTReleaseDelay.ValueChanged += PushToTalkReleaseDelay_ValueChanged;
             PTTReleaseDelay.Value = double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.PTTReleaseDelay).RawValue, CultureInfo.InvariantCulture);
             PTTReleaseDelay.IsEnabled = true;
+
+            RadioEndTransmitEffect.IsEnabled = false;
+            RadioEndTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionEnd;
+            RadioEndTransmitEffect.SelectedItem = CachedAudioEffectProvider.Instance.SelectedRadioTransmissionEndEffect;
+            RadioEndTransmitEffect.IsEnabled = true;
+
+            RadioStartTransmitEffect.IsEnabled = false;
+            RadioStartTransmitEffect.SelectedIndex = 0;
+            RadioStartTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionStart;
+            RadioStartTransmitEffect.SelectedItem = CachedAudioEffectProvider.Instance.SelectedRadioTransmissionStartEffect;
+            RadioStartTransmitEffect.IsEnabled = true;
         }
 
         private void Connect()
@@ -1700,6 +1734,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             catch (Exception ex)
             {
             }
+        }
+
+        private void BackgroundRadioNoiseToggle_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.RadioBackgroundNoiseEffect, (bool)BackgroundRadioNoiseToggle.IsChecked);
+        }
+
+        private void HQEffect_Click(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.HAVEQUICKTone, (bool)HQEffectToggle.IsChecked);
         }
     }
 }

@@ -191,13 +191,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />
     <Compile Include="Audio\Managers\AudioManager.cs" />
     <Compile Include="Audio\Managers\AudioPreview.cs" />
     <Compile Include="Audio\Models\ClientAudio.cs" />
-    <Compile Include="Audio\Providers\CachedLoopingAudioProvider.cs" />
+    <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
@@ -398,25 +399,46 @@
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="AudioEffects\KY-58-RX-48K.wav">
+    <Content Include="AudioEffects\FM_NOISE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\KY-58-TX-48K.wav">
+    <Content Include="AudioEffects\HAVEQUICK_TONE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\nato-mids-tone-48K.wav">
+    <Content Include="AudioEffects\HF_NOISE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\nato-mids-tone-out-48k.wav">
+    <Content Include="AudioEffects\KY_58_RX.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\nato-tone-48k.wav">
+    <Content Include="AudioEffects\KY_58_TX.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\Radio-RX-48K.wav">
+    <Content Include="AudioEffects\MIDS_TX.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\Radio-TX-48K.wav">
+    <Content Include="AudioEffects\MIDS_TX_END.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\NATO_TONE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_END.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_END_ALTERNATE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START_ALTERNATE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\UHF_NOISE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\VHF_NOISE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="NLog.config">

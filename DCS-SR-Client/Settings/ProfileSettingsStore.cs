@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Microsoft.Win32;
@@ -47,7 +48,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         MIDSRadioEffect, //if on and Radio TX effects are on the MIDS tone is used
         
-        PTTReleaseDelay
+        PTTReleaseDelay,
+
+        RadioTransmissionStartSelection,
+        RadioTransmissionEndSelection,
+        HAVEQUICKTone,
+        RadioBackgroundNoiseEffect
     }
 
     public class ProfileSettingsStore
@@ -60,12 +66,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly Dictionary<string, string> defaultSettingsProfileSettings = new Dictionary<string, string>()
         {
             {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
-            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "true"},
+            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
+
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},
+            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
+
+            {ProfileSettingsKeys.RadioTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_START+".wav"},
+            {ProfileSettingsKeys.RadioTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END+".wav"},
+
+
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
@@ -79,6 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
+
+            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
         };
 
 
@@ -119,7 +134,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 Configuration _configuration = null;
                 try
                 {
-                     _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
+                    int count = 0;
+                    while (GlobalSettingsStore.IsFileLocked(new FileInfo(Path + GetProfileCfgFileName(profile))) && count <10)
+                    {
+                        Thread.Sleep(200);
+                        count++;
+                    }
+                    _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
                     InputConfigs[GetProfileCfgFileName(profile)] = _configuration;
 
                     var inputProfile = new Dictionary<InputBinding, InputDevice>();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -87,7 +88,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ShowTransmitterName,
 
         IdleTimeOut,
-        AutoConnect
+        AutoConnect,
+
+        HQToneVolume,
+        FMNoiseVolume,
+        VHFNoiseVolume,
+        UHFNoiseVolume,
+        HFNoiseVolume,
     }
 
     public enum InputBinding
@@ -235,6 +242,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             try
             {
+                int count = 0;
+                while (IsFileLocked(new FileInfo(ConfigFileName)) && count < 10)
+                {
+                    Thread.Sleep(200);
+                    count++;
+                }
                 _configuration = Configuration.LoadFromFile(ConfigFileName);
             }
             catch (FileNotFoundException ex)
@@ -276,6 +289,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
 
             _profileSettingsStore = new ProfileSettingsStore(this);
+        }
+
+        public static bool IsFileLocked(FileInfo file)
+        {
+            if (!file.Exists)
+            {
+                return false;
+            }
+
+            try
+            {
+                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+
+            //file is not locked
+            return false;
         }
 
         private void MigrateSettings()
@@ -390,6 +430,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.LotATCHeightOffset.ToString(), "50"},
 
             {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
+            {GlobalSettingsKeys.HQToneVolume.ToString(), "0.3"},
+
+            {GlobalSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
+            {GlobalSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
 
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
