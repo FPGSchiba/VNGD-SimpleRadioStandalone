@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Microsoft.Win32;
@@ -133,7 +134,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 Configuration _configuration = null;
                 try
                 {
-                     _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
+                    int count = 0;
+                    while (GlobalSettingsStore.IsFileLocked(new FileInfo(Path + GetProfileCfgFileName(profile))) && count <10)
+                    {
+                        Thread.Sleep(200);
+                        count++;
+                    }
+                    _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
                     InputConfigs[GetProfileCfgFileName(profile)] = _configuration;
 
                     var inputProfile = new Dictionary<InputBinding, InputDevice>();

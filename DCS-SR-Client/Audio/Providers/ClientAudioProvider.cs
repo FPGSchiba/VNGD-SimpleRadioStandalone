@@ -47,8 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private int hfNoisePosition = 0;
 
         private readonly CachedAudioEffectProvider effectProvider = CachedAudioEffectProvider.Instance;
-   
-
+        
         public ClientAudioProvider()
         {
             _filters = new OnlineFilter[2];

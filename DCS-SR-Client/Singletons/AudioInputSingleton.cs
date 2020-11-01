@@ -82,22 +82,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             foreach (var item in devices)
             {
-                var input = new AudioDeviceListItem()
+                try
                 {
-                    Text = item.FriendlyName,
-                    Value = item
-                };
-                inputs.Add(input);
+                    var input = new AudioDeviceListItem()
+                    {
+                        Text = item.FriendlyName,
+                        Value = item
+                    };
 
-                Logger.Info("Audio Input - " + item.DeviceFriendlyName + " " + item.ID + " CHN:" +
-                            item.AudioClient.MixFormat.Channels + " Rate:" +
-                            item.AudioClient.MixFormat.SampleRate.ToString());
+                    Logger.Info("Audio Input - " + item.DeviceFriendlyName + " " + item.ID + " CHN:" +
+                                item.AudioClient.MixFormat.Channels + " Rate:" +
+                                item.AudioClient.MixFormat.SampleRate.ToString());
 
-                if (item.ID.Trim().Equals(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue.Trim()))
-                {
-                    SelectedAudioInput = input;
-                    Logger.Info("Audio Input - Found Saved ");
+                    inputs.Add(input);
+
+                    if (item.ID.Trim().Equals(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue.Trim()))
+                    {
+                        SelectedAudioInput = input;
+                        Logger.Info("Audio Input - Found Saved ");
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex,"Audio Input - " + item.DeviceFriendlyName );
+                }
+            
             }
 
             return inputs;
