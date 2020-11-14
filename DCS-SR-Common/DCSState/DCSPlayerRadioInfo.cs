@@ -51,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public Transponder iff = new Transponder();
 
         [JsonIgnore]
-        public readonly static uint UnitIdOffset = 100000001
+        public readonly static uint UnitIdOffset = 100000000
             ; // this is where non aircraft "Unit" Ids start from for satcom intercom
 
         [JsonNetworkIgnoreSerialization]

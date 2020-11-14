@@ -254,16 +254,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             var newAircraft = playerRadioInfo.unitId != message.unitId || !playerRadioInfo.IsCurrent();
 
-            if (message.unitId >= DCSPlayerRadioInfo.UnitIdOffset &&
-                playerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
-            {
-                //overriden so leave as is
-            }
-            else
-            {
-                overrideFreqAndVol = playerRadioInfo.unitId != message.unitId;
-                playerRadioInfo.unitId = message.unitId;
-            }
+            overrideFreqAndVol = playerRadioInfo.unitId != message.unitId;
+            
+            //save unit id
+            playerRadioInfo.unitId = message.unitId;
+            
 
             if (newAircraft)
             {

@@ -120,8 +120,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 Logger.Debug("Starting external AWACS mode loop");
 
+                _clientStateSingleton.IntercomOffset = 1;
                 while (!_stopExternalAWACSMode)
                 {
+                    var unitId = DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset;
+
+                    //save
                     _dcsRadioSyncHandler.ProcessRadioInfo(new DCSPlayerRadioInfo
                     {
                         LastUpdate = 0,
@@ -134,7 +138,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         simultaneousTransmission = false,
                         simultaneousTransmissionControl = DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS,
                         unit = "External AWACS",
-                        unitId = 100000001,
+                        unitId = (uint)unitId,
                         inAircraft = false
                     });
 
@@ -144,6 +148,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 var radio = new DCSPlayerRadioInfo();
                 radio.Reset();
                 _dcsRadioSyncHandler.ProcessRadioInfo(radio);
+                _clientStateSingleton.IntercomOffset = 1;
 
                 Logger.Debug("Stopping external AWACS mode loop");
             });
