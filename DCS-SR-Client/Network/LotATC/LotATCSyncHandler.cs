@@ -55,16 +55,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             {
                 while (!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any,
-                   _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
+                    
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any,
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP));
                         _lotATCPositionListener = new UdpClient(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the LotATC Export Listener Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the LotATC Export Listener Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.LotATCIncomingUDP)}");
                         Thread.Sleep(500);
                     }
                 }

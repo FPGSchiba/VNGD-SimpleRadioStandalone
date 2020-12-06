@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -871,7 +872,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return transmittingRadios;
         }
 
-        public bool Send(byte[] bytes, int len)
+        public TransmittedAudio Send(byte[] bytes, int len)
         {
             // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
             List<RadioInformation> transmittingRadios;
@@ -957,7 +958,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             LastSentAt = DateTime.Now.Ticks,
                             SendingOn = sendingOn
                         };
-                        return true;
+                        var send = new TransmittedAudio
+                        {
+                             Frequency = frequencies[0], Modulation = modulations[0]
+                        };
+                        return send;
                     }
                 }
                 catch (Exception e)
@@ -980,7 +985,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
             }
 
-            return false;
+            return null;
         }
 
         private void StartPing()

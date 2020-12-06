@@ -50,15 +50,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                 while (!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
+                    
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP));
                         _dcsLOSListener = new UdpClient(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the DCS LOS Listner Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the DCS LOS Listner Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSLOSIncomingUDP)}");
                         Thread.Sleep(500);
                     }
 

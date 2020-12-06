@@ -488,7 +488,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public int GetNetworkSetting(GlobalSettingsKeys key)
         {
-            return GetSetting("Network Settings", key.ToString()).IntValue;
+            var networkSetting = GetSetting("Network Settings", key.ToString());
+
+            if (networkSetting == null || networkSetting.RawValue.Length == 0)
+            {
+                var defaultSetting  = defaultGlobalSettings[key.ToString()];
+                networkSetting.IntValue = int.Parse(defaultSetting, CultureInfo.InvariantCulture);
+            }
+
+            return networkSetting.IntValue;
         }
 
         public void SetNetworkSetting(GlobalSettingsKeys key, int value)

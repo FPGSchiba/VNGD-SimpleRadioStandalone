@@ -49,16 +49,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 while(!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any,
-                   GlobalSettingsStore.Instance.GetNetworkSetting(GlobalSettingsKeys.DCSAutoConnectUDP));
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any,
+                            GlobalSettingsStore.Instance.GetNetworkSetting(GlobalSettingsKeys.DCSAutoConnectUDP));
                         _dcsUdpListener = new UdpClient(localEp);
                         break;
                     }
                     catch(Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the AutoConnect Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the AutoConnect Socket Port: {GlobalSettingsStore.Instance.GetNetworkSetting(GlobalSettingsKeys.DCSAutoConnectUDP)}");
                         Thread.Sleep(500);
                     }
                     
