@@ -1486,6 +1486,8 @@ _fa18.radio1.guard = 0
 _fa18.radio2.guard = 0
 _fa18.radio3.channel = 127 --127 is disabled for MIDS
 _fa18.radio4.channel = 127
+ -- initial IFF status set to -1 to indicate its not initialized, status then set depending on cold/hot start
+_fa18.iff = {status=-1,mode1=-1,mode3=-1,mode4=true,control=0,expansion=false}
 
 --[[
 From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
@@ -1504,7 +1506,7 @@ Frequency Band(MHz) Modulation  Guard Channel (MHz)
 
 function SR.exportRadioFA18C(_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     local _ufc = SR.getListIndicatorValue(6)
 
@@ -1716,12 +1718,122 @@ function SR.exportRadioFA18C(_data)
     if midsBChannel < 127 and _fa18.radio4.channel > 0 then
         _data.radios[5].freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsBChannel)
         _data.radios[5].channel = midsBChannel
-      
+
     else
         _data.radios[5].freq = 1
         _data.radios[5].channel = -1
     end
 
+    local validateIffCode = function (code, mode)
+        -- returns false if code is not valid, true if it is
+        local codeString = tostring(code)
+        if mode == 1 then
+            -- mode 1 code is 2-digit and is valid if the first digit is 0-7 and the second digit is 0-3
+            if code == 0 then return true end
+            if #codeString < 2 then return false end
+            for i = 1, #codeString do
+                local c = codeString:sub(i,i)
+                if i == 1 and (c == "8" or c == "9") then return false end
+                if i == 2 and (c == "4" or c == "5" or c == "6" or c == "7" or c == "8" or c == "9") then
+                    return false
+                end
+            end
+        elseif mode == 3 then
+            -- mode 3 code is 4-digit and is valid if all digits are 0-7
+            if code == 0 then return true end
+            if #codeString < 4 then return false end
+            for i = 1, #codeString do
+                local c = codeString:sub(i,i)
+                if c == "8" or c == "9" then return false end
+            end
+        end
+        return true
+    end
+
+    local getTransponderStatus = function (currentStatus)
+        -- returns current status if status can't be read from the UFC, else returns 1 for xpdr ON or 0 for xpdr OFF
+        if _ufc.UFC_OptionDisplay2 == "2   " then
+            if _ufc.UFC_ScratchPadString1Display == "X" or _ufc.UFC_ScratchPadString1Display == "A" then return 1
+            elseif _ufc.UFC_ScratchPadString1Display == "" then return 0
+            end
+        end
+        return currentStatus
+    end
+
+    local getIffCode = function (currentCode, iffMode)
+        -- for a given mode returns current code if status can't be read from the UFC, else returns the selected code
+        -- provided it passes validation
+        if _ufc.UFC_OptionDisplay2 == "2   " and _ufc.UFC_ScratchPadString1Display == "X" then
+            -- UFC IFF transponder (XP) menu (don't confuse with IFF interrogator (AI) menu)
+
+            -- Which mode's code is being edited
+            local editingMode = string.sub(_ufc.UFC_ScratchPadNumberDisplay, 0, 2)
+
+            if iffMode == 1 then
+                 if _ufc.UFC_OptionCueing1 == ":" then
+                     if editingMode == "1-" then
+                         local code = tonumber(string.sub(_ufc.UFC_OptionDisplay1, -2))
+                         if validateIffCode(code, 1) then return code end
+                     end
+                 else return -1
+                 end
+
+            elseif iffMode == 3 then
+                 if _ufc.UFC_OptionCueing3 == ":" then
+                     if editingMode == "3-" then
+                         local code = tonumber(string.sub(_ufc.UFC_ScratchPadNumberDisplay, -4))
+                         if validateIffCode(code, 3) then return code end
+                     end
+                 else return -1
+                 end
+
+            elseif iffMode == 4 then
+                 if _ufc.UFC_OptionCueing4 == ":" then
+                     return true
+                 else return false
+                 end
+            end
+        end
+        return currentCode
+    end
+
+    -- set initial IFF status based on cold/hot start since it can't be read directly off the panel
+    local batterySwitch = SR.getButtonPosition(404)
+    if _fa18.iff.status == -1 then
+        if batterySwitch == 0 then
+            -- cold start, everything off
+            _fa18.iff = {status=0,mode1=-1,mode3=-1,mode4=false,control=0,expansion=false }
+        elseif batterySwitch == 0 then
+            -- hot start, M4 on
+            _fa18.iff = {status=1,mode1=-1,mode3=-1,mode4=true,control=0,expansion=false }
+        end
+    end
+
+    local iffStatus = getTransponderStatus(_fa18.iff.status)
+    local iffMode1 = getIffCode(_fa18.iff.mode1, 1)
+    local iffMode3 = getIffCode(_fa18.iff.mode3, 3)
+    local iffMode4 = getIffCode(_fa18.iff.mode4, 4)
+    local iffIdent = SR.getButtonPosition(99)
+
+    -- Mode 1/3 IDENT, requires mode 1 or mode 3 to be on and I/P pushbutton press
+    if iffStatus == 1 and iffIdent == 1 and (iffMode1 ~= -1 or iffMode3 ~= -1) then
+        iffStatus = 2
+    elseif iffStatus == 2 and iffIdent == 0 then
+        -- remove IDENT status when pushbutton released
+        iffStatus = 1
+    end
+
+    _data.iff.status = iffStatus
+    _data.iff.mode1 = iffMode1
+    _data.iff.mode3 = iffMode3
+    _data.iff.mode4 = iffMode4
+    _data.iff.control = _fa18.iff.control
+    _data.iff.expansion = _fa18.iff.expansion
+
+    -- set current IFF settings
+    _fa18.iff = _data.iff
+
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
     return _data
 end
 
