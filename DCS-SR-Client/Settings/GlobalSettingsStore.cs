@@ -355,7 +355,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             SetSetting("Client Settings", key.ToString(), strArray);
         }
 
-        private readonly Dictionary<string, string> defaultGlobalSettings = new Dictionary<string, string>()
+        public static readonly Dictionary<string, string> DefaultGlobalSettings = new Dictionary<string, string>()
         {
             {GlobalSettingsKeys.AutoConnect.ToString(), "true"},
             {GlobalSettingsKeys.AutoConnectPrompt.ToString(), "false"},
@@ -492,7 +492,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             if (networkSetting == null || networkSetting.RawValue.Length == 0)
             {
-                var defaultSetting  = defaultGlobalSettings[key.ToString()];
+                var defaultSetting  = DefaultGlobalSettings[key.ToString()];
                 networkSetting.IntValue = int.Parse(defaultSetting, CultureInfo.InvariantCulture);
             }
 
@@ -513,11 +513,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             if (!_configuration[section].Contains(setting))
             {
-                if (defaultGlobalSettings.ContainsKey(setting))
+                if (DefaultGlobalSettings.ContainsKey(setting))
                 {
                     //save
                     _configuration[section]
-                        .Add(new Setting(setting, defaultGlobalSettings[setting]));
+                        .Add(new Setting(setting, DefaultGlobalSettings[setting]));
 
                     Save();
                 }

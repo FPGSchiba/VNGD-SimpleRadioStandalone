@@ -648,6 +648,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             VAICOMTXInhibitEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled);
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
+
+            //TODO! Sort this later
+            FMNoiseVolume.IsEnabled = false;
+            FMNoiseVolume.Value = (_globalSettings.GetClientSetting(GlobalSettingsKeys.FMNoiseVolume).FloatValue 
+                                   / float.Parse(GlobalSettingsStore.DefaultGlobalSettings[GlobalSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture)) *100.0f;
+            FMNoiseVolume.IsEnabled = true;
+            FMNoiseVolume.ValueChanged += (sender, args) =>
+            {
+
+            };
+
+            HFNoiseVolume.IsEnabled = false;
+            HFNoiseVolume.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.HFNoiseVolume).FloatValue;
+            HFNoiseVolume.IsEnabled = true;
+            HFNoiseVolume.ValueChanged += (sender, args) =>
+            {
+
+            };
+
+            VHFNoiseVolume.IsEnabled = false;
+            VHFNoiseVolume.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.VHFNoiseVolume).FloatValue;
+            VHFNoiseVolume.IsEnabled = true;
+            VHFNoiseVolume.ValueChanged += (sender, args) =>
+            {
+
+            };
+
+            UHFNoiseVolume.IsEnabled = false;
+            UHFNoiseVolume.Value = _globalSettings.GetClientSetting(GlobalSettingsKeys.UHFNoiseVolume).FloatValue;
+            UHFNoiseVolume.IsEnabled = true;
+            UHFNoiseVolume.ValueChanged += (sender, args) =>
+            {
+
+            };
         }
 
         private void ReloadProfileSettings()
