@@ -1116,148 +1116,6 @@
                             </ToggleButton>
 
 
-                            <Label Grid.Row="18"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="Radio HF Effect Volume &#xA;Requires re-connect" />
-
-                            <StackPanel Grid.Row="18"
-                                                Grid.Column="1"
-                                                Margin="0,10,0,0"
-                                    >
-                                <Slider x:Name="HFNoiseVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="1"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="20"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                    <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                    <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                </Grid>
-                            </StackPanel>
-
-                            <Label Grid.Row="19"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="Radio VHF Effect Volume &#xA;Requires re-connect" />
-
-                            <StackPanel Grid.Row="19"
-                                                Grid.Column="1"
-                                                Margin="0,10,0,0"
-                                    >
-                                <Slider x:Name="VHFNoiseVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="1"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="20"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                    <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                    <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                </Grid>
-                            </StackPanel>
-
-                            <Label Grid.Row="20"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="Radio UHF Effect Volume &#xA;Requires re-connect" />
-
-                            <StackPanel Grid.Row="20"
-                                                Grid.Column="1"
-                                                Margin="0,10,0,0">
-                                <Slider x:Name="UHFNoiseVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="1"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="20"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                    <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                    <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                </Grid>
-                            </StackPanel>
-
-                            <Label Grid.Row="21"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="Radio FM Effect Volume &#xA;Requires re-connect" />
-
-                            <StackPanel Grid.Row="21"
-                                                Grid.Column="1"
-                                                Margin="0,10,0,0">
-                                <Slider x:Name="FMNoiseVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="1"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="20"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                    <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                    <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                </Grid>
-                            </StackPanel>
-
                         </Grid>
 
                     </GroupBox>
@@ -1787,17 +1645,19 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
+
                                     <Label Grid.Row="8"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Enable FM (NATO) Radio Tone" />
-                                    
-                                        <ToggleButton Name="NATORadioToneToggle"
-                                                      HorizontalContentAlignment="Center"
-                                                      VerticalContentAlignment="Center"
-                                                      Click="NATORadioTone_Click" Grid.Row="8"
-                                                      Grid.Column="1">
+                                           Content="Enable FM Radio Tone" />
+
+                                    <ToggleButton Name="NATORadioToneToggle"
+                                                  Grid.Row="8"
+                                                  Grid.Column="1"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Click="NATORadioTone_Click">
                                         <ToggleButton.Style>
                                             <Style TargetType="{x:Type ToggleButton}">
                                                 <Setter Property="Content" Value="ON" />
@@ -1812,19 +1672,20 @@
                                             </Style>
                                         </ToggleButton.Style>
                                     </ToggleButton>
-                                    
+
+
                                     <Label Grid.Row="9"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable HAVEQUICK Effect" />
-                                 
-                                        <ToggleButton Name="HQEffectToggle"
-                                                      Grid.Row="9"
-                                                      Grid.Column="1"
-                                                      HorizontalContentAlignment="Center"
-                                                      VerticalContentAlignment="Center"
-                                                      Click="HQEffect_Click">
+
+                                    <ToggleButton Name="HQEffectToggle"
+                                                  Grid.Row="9"
+                                                  Grid.Column="1"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Click="HQEffect_Click">
                                         <ToggleButton.Style>
                                             <Style TargetType="{x:Type ToggleButton}">
                                                 <Setter Property="Content" Value="ON" />
@@ -1840,17 +1701,18 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
+
                                     <Label Grid.Row="10"
-                                               Grid.Column="0"
-                                               HorizontalContentAlignment="Center"
-                                               VerticalContentAlignment="Center"
-                                               Content="Enable Background Radio Effects" />
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="Enable Background Radio Effects" />
 
                                     <ToggleButton Name="BackgroundRadioNoiseToggle"
-                                                  HorizontalContentAlignment="Center"
-                                                  VerticalContentAlignment="Center"
                                                   Grid.Row="10"
                                                   Grid.Column="1"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
                                                   Click="BackgroundRadioNoiseToggle_OnClick">
                                         <ToggleButton.Style>
                                             <Style TargetType="{x:Type ToggleButton}">
@@ -1866,8 +1728,10 @@
                                             </Style>
                                         </ToggleButton.Style>
                                     </ToggleButton>
+
                                 </Grid>
                             </GroupBox>
+
 
                             <GroupBox Header="Audio"
                                       Grid.Row="2"
