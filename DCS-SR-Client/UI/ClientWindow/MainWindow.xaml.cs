@@ -157,7 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
 
-            ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue;
+            ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
 
             _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);

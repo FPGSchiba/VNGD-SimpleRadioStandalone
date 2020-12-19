@@ -3316,10 +3316,16 @@ function SR.exportRadioF14(_data)
     if iffPower >= 2 then
         _data.iff.status = 1 -- NORMAL
 
+
         if iffIdent == 1 then
             _data.iff.status = 2 -- IDENT (BLINKY THING)
         end
 
+        if iffIdent == -1 then
+            if ARC159_ptt then -- ONLY on UHF radio PTT press
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
     end
 
     local mode1On =  SR.getButtonPosition(162)

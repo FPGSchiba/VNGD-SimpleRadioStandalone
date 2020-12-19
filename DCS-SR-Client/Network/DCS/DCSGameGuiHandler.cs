@@ -40,16 +40,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 while (!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any,
-                  _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any,
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP));
+
                         _dcsGameGuiUdpListener = new UdpClient(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the DCS GameGUI Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the DCS GameGUI Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingGameGUIUDP)}");
                         Thread.Sleep(500);
                     }
 

@@ -42,16 +42,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
             {
                 while (!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any,
-                   _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
+                   
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any,
+                            _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
                         _vaicomUDPListener = new UdpClient(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the VAICOM Listener Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the VAICOM Listener Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP)}");
                         Thread.Sleep(500);
                     }
                 }

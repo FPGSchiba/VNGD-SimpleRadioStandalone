@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -848,6 +849,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 // Add all radios toggled for simultaneous transmission if the global flag has been set
                 if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
                 {
+                    //dont transmit on all if the INTERCOM is selected & AWACS
+                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM && _clientStateSingleton.DcsPlayerRadioInfo.inAircraft == false)
+                    {
+                        //even if simul transmission is enabled - if we're an AWACS we probably dont want this
+                        var intercom = new List<RadioInformation>();
+                        intercom.Add(radioInfo.radios[0]);
+                        sendingOn = 0;
+                        return intercom;
+                    }
+
                     var i = 0;
                     foreach (var radio in _clientStateSingleton.DcsPlayerRadioInfo.radios)
                     {
@@ -871,7 +882,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return transmittingRadios;
         }
 
-        public bool Send(byte[] bytes, int len)
+        public TransmittedAudio Send(byte[] bytes, int len)
         {
             // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
             List<RadioInformation> transmittingRadios;
@@ -957,7 +968,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             LastSentAt = DateTime.Now.Ticks,
                             SendingOn = sendingOn
                         };
-                        return true;
+                        var send = new TransmittedAudio
+                        {
+                             Frequency = frequencies[0], Modulation = modulations[0]
+                        };
+                        return send;
                     }
                 }
                 catch (Exception e)
@@ -980,7 +995,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 }
             }
 
-            return false;
+            return null;
         }
 
         private void StartPing()
