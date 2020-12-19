@@ -150,7 +150,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             IsConnected = false;
             ExternalAWACSModelSelected = false;
 
-            LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).StringValue;
+            LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).RawValue;
         }
 
         public static ClientStateSingleton Instance
@@ -169,6 +169,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 return _instance;
             }
         }
+
+        public int IntercomOffset { get; set; }
 
         private void NotifyPropertyChanged(string propertyName = "")
         {

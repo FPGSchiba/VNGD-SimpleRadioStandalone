@@ -77,8 +77,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         SettingsProfiles,
         AutoSelectSettingsProfile,
 
-        NATOToneVolume,
-
         VAICOMIncomingUDP, //33501 
         VAICOMTXInhibitEnabled,
 
@@ -88,13 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ShowTransmitterName,
 
         IdleTimeOut,
-        AutoConnect,
-
-        HQToneVolume,
-        FMNoiseVolume,
-        VHFNoiseVolume,
-        UHFNoiseVolume,
-        HFNoiseVolume,
+        AutoConnect
     }
 
     public enum InputBinding
@@ -197,6 +189,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioChannelDown = 132,
         ModifierRadioChannelDown = 232,
+
+        TransponderIDENT = 133,
+        ModifierTransponderIDENT = 233,
     }
 
 
@@ -429,13 +424,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.LotATCOutgoingUDP.ToString(), "10711"},
             {GlobalSettingsKeys.LotATCHeightOffset.ToString(), "50"},
 
-            {GlobalSettingsKeys.NATOToneVolume.ToString(), "0.5"},
-            {GlobalSettingsKeys.HQToneVolume.ToString(), "0.3"},
 
-            {GlobalSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
-            {GlobalSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
-            {GlobalSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
-            {GlobalSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
 
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
@@ -488,7 +477,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public int GetNetworkSetting(GlobalSettingsKeys key)
         {
-            return GetSetting("Network Settings", key.ToString()).IntValue;
+            var networkSetting = GetSetting("Network Settings", key.ToString());
+
+            if (networkSetting == null || networkSetting.RawValue.Length == 0)
+            {
+                var defaultSetting  = defaultGlobalSettings[key.ToString()];
+                networkSetting.IntValue = int.Parse(defaultSetting, CultureInfo.InvariantCulture);
+            }
+
+            return networkSetting.IntValue;
         }
 
         public void SetNetworkSetting(GlobalSettingsKeys key, int value)

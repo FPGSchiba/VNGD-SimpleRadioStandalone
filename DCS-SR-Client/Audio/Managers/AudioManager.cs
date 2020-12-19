@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -78,6 +79,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         private Preprocessor _speex;
         private readonly bool windowsN;
+
+        private ClientPassThroughAudioProvider _passThroughAudioProvider;
 
         public AudioManager(bool windowsN)
         {
@@ -189,6 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 try
                 {
+                    _passThroughAudioProvider = new ClientPassThroughAudioProvider();
                     _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40,windowsN);
 
                     _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
@@ -201,24 +205,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         if (sampleProvider.WaveFormat.Channels == 2)
                         {
-                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToMono()));
+                            _micWaveOut.Init(sampleProvider.ToMono());
                         }
                         else
                         {
                             //already mono
-                            _micWaveOut.Init(new RadioFilter(sampleProvider));
+                            _micWaveOut.Init(sampleProvider);
                         }
                     }
                     else
                     {
                         if (sampleProvider.WaveFormat.Channels == 1)
                         {
-                            _micWaveOut.Init(new RadioFilter(sampleProvider.ToStereo()));
+                            _micWaveOut.Init(sampleProvider.ToStereo());
                         }
                         else
                         {
                             //already stereo
-                            _micWaveOut.Init(new RadioFilter(sampleProvider));
+                            _micWaveOut.Init(sampleProvider);
                         }
                     }
 
@@ -358,10 +362,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            if (_udpVoiceHandler.Send(encoded, len))
+                            var clientAudio = _udpVoiceHandler.Send(encoded, len);
+                            if (clientAudio != null && _micWaveOutBuffer != null)
                             {
                                 //send audio so play over local too
-                                _micWaveOutBuffer?.AddSamples(pcmBytes, 0, pcmBytes.Length);
+
+                                var passThroughPCMBytes  = _passThroughAudioProvider.AddClientAudioSamples(clientAudio, pcmShort);
+                                //process bytes and add effects
+                                _micWaveOutBuffer?.AddSamples(passThroughPCMBytes, 0, passThroughPCMBytes.Length);
                             }
                         }
                         else
@@ -564,20 +572,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             if (modulation == Modulation.MIDS && midsTone)
             {
-                //no tone for MIDS
-                return;
+                //end receive tone for MIDS
+                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
+
+                effectsBuffer.VolumeSampleProvider.Volume = volume;
+                var effect = _cachedAudioEffectsProvider.MIDSEndTone;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
             }
-
-            var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
-
-            _effectsBuffer.VolumeSampleProvider.Volume = volume;
-            var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
-            if (effect.Loaded)
+            else
             {
-                _effectsBuffer.AddAudioSamples(
-                    effect.AudioEffectBytes,
-                    transmitOnRadio);
+                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
+
+                effectsBuffer.VolumeSampleProvider.Volume = volume;
+                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
             }
+
         }
 
         public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume, Modulation modulation)

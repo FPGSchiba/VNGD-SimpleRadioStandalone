@@ -113,13 +113,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
                     {
                         IntercomNumberSpinner.IsEnabled = true;
-                        IntercomNumberSpinner.Value =
-                            (int) (dcsPlayerRadioInfo.unitId - DCSPlayerRadioInfo.UnitIdOffset);
+                        IntercomNumberSpinner.Value = _clientStateSingleton.IntercomOffset;
                     }
                     else
                     {
-                        IntercomNumberSpinner.Value = 1;
                         IntercomNumberSpinner.IsEnabled = false;
+                        IntercomNumberSpinner.Value = 1;
+                        _clientStateSingleton.IntercomOffset = 1;
                     }
                 }
                 else
@@ -129,6 +129,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioVolume.IsEnabled = false;
                     IntercomNumberSpinner.Value = 1;
                     IntercomNumberSpinner.IsEnabled = false;
+                    _clientStateSingleton.IntercomOffset = 1;
                 }
 
                 if (_dragging == false)
@@ -151,8 +152,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
                 (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
             {
+                _clientStateSingleton.IntercomOffset = (int) IntercomNumberSpinner.Value;
                 dcsPlayerRadioInfo.unitId =
-                    DCSPlayerRadioInfo.UnitIdOffset + ((uint) ((uint) IntercomNumberSpinner.Value));
+                    (uint) (DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
                 _clientStateSingleton.LastSent = 0; //force refresh
             }
         }

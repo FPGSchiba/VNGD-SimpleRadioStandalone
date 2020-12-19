@@ -34,15 +34,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 while (!_stop)
                 {
-                    var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.CommandListenerUDP));
+                    
                     try
                     {
+                        var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.CommandListenerUDP));
                         _udpCommandListener = new UdpClient(localEp);
                         break;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, $"Unable to bind to the UDP Command Listener Socket Port: {localEp.Port}");
+                        Logger.Warn(ex, $"Unable to bind to the UDP Command Listener Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.CommandListenerUDP)}");
                         Thread.Sleep(500);
                     }
                 }

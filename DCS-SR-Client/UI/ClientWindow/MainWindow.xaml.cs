@@ -157,7 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
 
-            ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue;
+            ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
 
             _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
@@ -480,6 +480,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputName = "Radio Channel Down";
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
+
+            TransponderIDENT.InputName = "Transponder IDENT Toggle";
+            TransponderIDENT.ControlInputBinding = InputBinding.TransponderIDENT;
+            TransponderIDENT.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -693,6 +697,109 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioStartTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionStart;
             RadioStartTransmitEffect.SelectedItem = CachedAudioEffectProvider.Instance.SelectedRadioTransmissionStartEffect;
             RadioStartTransmitEffect.IsEnabled = true;
+
+            NATOToneVolume.IsEnabled = false;
+            NATOToneVolume.ValueChanged += (sender, e) =>
+            {
+                if (NATOToneVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.NATOToneVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+                    
+            };
+            NATOToneVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.NATOToneVolume).RawValue, CultureInfo.InvariantCulture)
+                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture)) *100;
+            NATOToneVolume.IsEnabled = true;
+
+            HQToneVolume.IsEnabled = false;
+            HQToneVolume.ValueChanged += (sender, e) =>
+            {
+                if (HQToneVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.HQToneVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+
+            };
+            HQToneVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.HQToneVolume).RawValue, CultureInfo.InvariantCulture)
+                                  / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+            HQToneVolume.IsEnabled = true;
+
+            FMEffectVolume.IsEnabled = false;
+            FMEffectVolume.ValueChanged += (sender, e) =>
+            {
+                if (FMEffectVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.FMNoiseVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+
+            };
+            FMEffectVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.FMNoiseVolume).RawValue, CultureInfo.InvariantCulture)
+                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+            FMEffectVolume.IsEnabled = true;
+
+            VHFEffectVolume.IsEnabled = false;
+            VHFEffectVolume.ValueChanged += (sender, e) =>
+            {
+                if (VHFEffectVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.VHFNoiseVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+
+            };
+            VHFEffectVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.VHFNoiseVolume).RawValue, CultureInfo.InvariantCulture)
+                                     / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+            VHFEffectVolume.IsEnabled = true;
+
+            UHFEffectVolume.IsEnabled = false;
+            UHFEffectVolume.ValueChanged += (sender, e) =>
+            {
+                if (UHFEffectVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.UHFNoiseVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+
+            };
+            UHFEffectVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.UHFNoiseVolume).RawValue, CultureInfo.InvariantCulture)
+                                     / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+            UHFEffectVolume.IsEnabled = true;
+
+            HFEffectVolume.IsEnabled = false;
+            HFEffectVolume.ValueChanged += (sender, e) =>
+            {
+                if (HFEffectVolume.IsEnabled)
+                {
+                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+
+                    var vol = orig * (e.NewValue / 100);
+
+                    _globalSettings.ProfileSettingsStore.SetClientSetting(ProfileSettingsKeys.HFNoiseVolume, vol.ToString(CultureInfo.InvariantCulture));
+                }
+
+            };
+            HFEffectVolume.Value = (double.Parse(_globalSettings.ProfileSettingsStore.GetClientSetting(ProfileSettingsKeys.HFNoiseVolume).RawValue, CultureInfo.InvariantCulture)
+                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+            HFEffectVolume.IsEnabled = true;
+
         }
 
         private void Connect()

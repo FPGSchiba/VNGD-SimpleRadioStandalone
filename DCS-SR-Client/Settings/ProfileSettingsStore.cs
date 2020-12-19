@@ -53,7 +53,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTransmissionStartSelection,
         RadioTransmissionEndSelection,
         HAVEQUICKTone,
-        RadioBackgroundNoiseEffect
+        RadioBackgroundNoiseEffect,
+        NATOToneVolume,
+        HQToneVolume,
+        FMNoiseVolume,
+        VHFNoiseVolume,
+        UHFNoiseVolume,
+        HFNoiseVolume,
     }
 
     public class ProfileSettingsStore
@@ -63,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public string CurrentProfileName { get; set; } = "default";
         public string Path { get; }
 
-        private readonly Dictionary<string, string> defaultSettingsProfileSettings = new Dictionary<string, string>()
+        public static readonly Dictionary<string, string> DefaultSettingsProfileSettings = new Dictionary<string, string>()
         {
             {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
@@ -94,6 +100,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
 
             {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
+
+            {ProfileSettingsKeys.NATOToneVolume.ToString(), "3.0"},
+            {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},
+
+            {ProfileSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
+            {ProfileSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
+            {ProfileSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
+            {ProfileSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
         };
 
 
@@ -357,19 +371,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             if (!_configuration[section].Contains(setting))
             {
-                if (defaultSettingsProfileSettings.ContainsKey(setting))
+                if (DefaultSettingsProfileSettings.ContainsKey(setting))
                 {
                     //save
                     _configuration[section]
-                        .Add(new Setting(setting, defaultSettingsProfileSettings[setting]));
+                        .Add(new Setting(setting, DefaultSettingsProfileSettings[setting]));
 
                     Save();
                 }
-                else if (defaultSettingsProfileSettings.ContainsKey(setting))
+                else if (DefaultSettingsProfileSettings.ContainsKey(setting))
                 {
                     //save
                     _configuration[section]
-                        .Add(new Setting(setting, defaultSettingsProfileSettings[setting]));
+                        .Add(new Setting(setting, DefaultSettingsProfileSettings[setting]));
 
                     Save();
                 }

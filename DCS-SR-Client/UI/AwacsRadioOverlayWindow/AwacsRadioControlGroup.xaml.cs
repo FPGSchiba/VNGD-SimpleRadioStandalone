@@ -390,7 +390,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     {
                         RadioFrequency.Text =
                             (currentRadio.freq / MHz).ToString("0.000",
-                                CultureInfo.InvariantCulture); //make nuber UK / US style with decimals not commas!
+                                CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
                     }
 
                     if (currentRadio.modulation == RadioInformation.Modulation.AM)
