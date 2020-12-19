@@ -1536,6 +1536,7 @@ function SR.exportRadioFA18C(_data)
         _fa18.radio2.guard = 0
         _fa18.radio3.channel = 127 --127 is disabled for MIDS
         _fa18.radio4.channel = 127
+        _fa18.iff = {status=-1,mode1=-1,mode3=-1,mode4=true,control=0,expansion=false}
     end
 
     local getGuardFreq = function (freq,currentGuard,modulation)
@@ -1802,10 +1803,10 @@ function SR.exportRadioFA18C(_data)
     if _fa18.iff.status == -1 then
         if batterySwitch == 0 then
             -- cold start, everything off
-            _fa18.iff = {status=0,mode1=-1,mode3=-1,mode4=false,control=0,expansion=false }
+            _fa18.iff = {status=0,mode1=-1,mode3=-1,mode4=false,control=0,expansion=false}
         elseif batterySwitch == 0 then
             -- hot start, M4 on
-            _fa18.iff = {status=1,mode1=-1,mode3=-1,mode4=true,control=0,expansion=false }
+            _fa18.iff = {status=1,mode1=-1,mode3=-1,mode4=true,control=0,expansion=false}
         end
     end
 
