@@ -480,6 +480,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.InputName = "Radio Channel Down";
             RadioChannelDown.ControlInputBinding = InputBinding.RadioChannelDown;
             RadioChannelDown.InputDeviceManager = InputManager;
+
+            TransponderIDENT.InputName = "Transponder IDENT Toggle";
+            TransponderIDENT.ControlInputBinding = InputBinding.TransponderIDENT;
+            TransponderIDENT.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)

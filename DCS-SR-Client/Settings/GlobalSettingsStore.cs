@@ -189,6 +189,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioChannelDown = 132,
         ModifierRadioChannelDown = 232,
+
+        TransponderIDENT = 133,
+        ModifierTransponderIDENT = 233,
     }
 
 

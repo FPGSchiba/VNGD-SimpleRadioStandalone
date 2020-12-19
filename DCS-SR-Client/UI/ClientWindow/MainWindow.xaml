@@ -587,6 +587,12 @@
                                                        ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
                                                        InputName="Radio Channel Down" />
 
+                            <local:InputBindingControl x:Name="TransponderIDENT"
+                                                       Grid.Row="34"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
+                                                       InputName="Transponder IDENT" />
+
 
                         </Grid>
                     </StackPanel>
