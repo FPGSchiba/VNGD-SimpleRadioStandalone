@@ -1,4 +1,4 @@
--- Version 1.9.2.1
+-- Version 1.9.3.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -2550,7 +2550,7 @@ end
 
 function SR.exportRadioC101EB(_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Pull the HOT MIC breaker up to enable HOT MIC" }
 
     _data.radios[1].name = "INTERCOM"
     _data.radios[1].freq = 100
@@ -2650,12 +2650,19 @@ function SR.exportRadioC101EB(_data)
     end
     _data.control = 1; -- full radio
 
+    local frontHotMic =  SR.getButtonPosition(287)
+    local rearHotMic =   SR.getButtonPosition(891)
+    -- only if The hot mic talk button (labeled TALK in cockpit) is up
+    if frontHotMic == 1 or rearHotMic == 1 then
+       _data.intercomHotMic = true
+    end
+
     return _data;
 end
 
 function SR.exportRadioC101CC(_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "The hot mic talk button (labeled TALK in cockpit) must be pulled out" }
 
     -- TODO - figure out channels.... it saves state??
     -- figure out volume
@@ -2770,6 +2777,14 @@ function SR.exportRadioC101CC(_data)
     end
 
     _data.control = 1;
+
+
+    local frontHotMic =  SR.getButtonPosition(287)
+    local rearHotMic =   SR.getButtonPosition(891)
+    -- only if The hot mic talk button (labeled TALK in cockpit) is up
+    if frontHotMic == 1 or rearHotMic == 1 then
+       _data.intercomHotMic = true
+    end
 
     return _data;
 end
@@ -3611,4 +3626,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.2.1")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.3.0")

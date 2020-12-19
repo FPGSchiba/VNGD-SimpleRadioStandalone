@@ -259,7 +259,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     }
 
                     //search down to current radio
-                    for (int i = dcsPlayerRadioInfo.radios.Length; i < currentRadio; i--)
+                    for (int i = dcsPlayerRadioInfo.radios.Length; i > currentRadio; i--)
                     {
                         if (SelectRadio(i))
                         {
