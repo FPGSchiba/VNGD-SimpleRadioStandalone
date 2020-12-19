@@ -110,15 +110,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             HFNoise = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.HF_NOISE);
 
             //sort out volume (if needed)
-            // ChangeVolumeOfEffect(HAVEQUICKTone,GlobalSettingsKeys.HQToneVolume);
-            // ChangeVolumeOfEffect(NATOTone, GlobalSettingsKeys.NATOToneVolume);
-            // ChangeVolumeOfEffect(FMNoise, GlobalSettingsKeys.FMNoiseVolume);
-            // ChangeVolumeOfEffect(UHFNoise, GlobalSettingsKeys.UHFNoiseVolume);
-            // ChangeVolumeOfEffect(VHFNoise, GlobalSettingsKeys.VHFNoiseVolume);
-            // ChangeVolumeOfEffect(HFNoise, GlobalSettingsKeys.HFNoiseVolume);
+            CreateAudioEffectDouble(HAVEQUICKTone);
+            CreateAudioEffectDouble(NATOTone);
+            CreateAudioEffectDouble(FMNoise);
+            CreateAudioEffectDouble(UHFNoise);
+            CreateAudioEffectDouble(VHFNoise);
+            CreateAudioEffectDouble(HFNoise);
         }
 
-        private void ChangeVolumeOfEffect(CachedAudioEffect effect, GlobalSettingsKeys key)
+        private void CreateAudioEffectDouble(CachedAudioEffect effect)
         {
 
             if (effect.Loaded)
@@ -127,12 +127,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 var effectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
                 var effectDouble = new double[effectShort.Length];
 
-                var vol = Settings.GlobalSettingsStore.Instance.GetClientSetting(key)
-                    .FloatValue;
-
                 for (int i = 0; i < effectShort.Length; i++)
                 {
-                    effectDouble[i] = ((effectShort[i]/ 32768f) * vol);
+                    effectDouble[i] = ((effectShort[i]/ 32768f));
                 }
                 effect.AudioEffectDouble = effectDouble;
 

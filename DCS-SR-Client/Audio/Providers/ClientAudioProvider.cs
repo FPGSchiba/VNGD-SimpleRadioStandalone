@@ -256,14 +256,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var hqToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
             var radioEffectsEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
             var clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
-            var hqToneVolume = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.HQToneVolume)
+            var hqToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.HQToneVolume)
                 .DoubleValue;
-            var natoToneVolume = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.HQToneVolume)
+            var natoToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.NATOToneVolume)
                 .DoubleValue;
 
             for (var i = 0; i < mixedAudio.Length; i++)
             {
-                var audio = (double) mixedAudio[i] / 32768f;
+                var audio = (double)mixedAudio[i] / 32768f;
 
                 if (radioEffectsEnabled)
                 {
@@ -294,11 +294,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
                 if (clientAudio.Modulation == FM
-                    && effectProvider.NATOTone.Loaded 
+                    && effectProvider.NATOTone.Loaded
                     && natoToneEnabled)
                 {
                     var natoTone = effectProvider.NATOTone.AudioEffectDouble;
-                    audio +=  ((double)(natoTone[natoPosition])*natoToneVolume);
+                    audio += ((double)(natoTone[natoPosition]) * natoToneVolume);
                     natoPosition++;
 
                     if (natoPosition == natoTone.Length)
@@ -308,12 +308,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 }
 
                 if (clientAudio.Modulation == HQ
-                     && effectProvider.HAVEQUICKTone.Loaded 
+                     && effectProvider.HAVEQUICKTone.Loaded
                      && hqToneEnabled)
                 {
                     var hqTone = effectProvider.HAVEQUICKTone.AudioEffectDouble;
 
-                    audio += ((double) (hqTone[hqTonePosition])* hqToneVolume);
+                    audio += ((double)(hqTone[hqTonePosition]) * hqToneVolume);
                     hqTonePosition++;
 
                     if (hqTonePosition == hqTone.Length)
@@ -340,19 +340,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 if (audio < -1.0f)
                     audio = -1.0f;
 
-                mixedAudio[i] = (short) (audio * 32768f);
+                mixedAudio[i] = (short)(audio * 32768f);
             }
         }
 
-        private double AddRadioBackgroundNoiseEffect(double audio,ClientAudio clientAudio)
+        private double AddRadioBackgroundNoiseEffect(double audio, ClientAudio clientAudio)
         {
-            var fmVol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.FMNoiseVolume)
+            var fmVol = profileSettings.GetClientSetting(ProfileSettingsKeys.FMNoiseVolume)
                 .DoubleValue;
-            var hfVol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.HFNoiseVolume)
+
+            var hfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.HFNoiseVolume)
                 .DoubleValue;
-            var uhfVol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.UHFNoiseVolume)
+            var uhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.UHFNoiseVolume)
                 .DoubleValue;
-            var vhfVol = Settings.GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.VHFNoiseVolume)
+            var vhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.VHFNoiseVolume)
                 .DoubleValue;
 
             if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect))
@@ -366,7 +367,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         {
                             var noise = effectProvider.UHFNoise.AudioEffectDouble;
                             //UHF Band?
-                            audio += ((noise[uhfNoisePosition])*uhfVol);
+                            audio += ((noise[uhfNoisePosition]) * uhfVol);
                             uhfNoisePosition++;
 
                             if (uhfNoisePosition == noise.Length)
@@ -381,7 +382,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         {
                             //VHF Band? - Very rough
                             var noise = effectProvider.VHFNoise.AudioEffectDouble;
-                            audio += ((double)(noise[vhfNoisePosition])*vhfVol);
+                            audio += ((double)(noise[vhfNoisePosition]) * vhfVol);
                             vhfNoisePosition++;
 
                             if (vhfNoisePosition == noise.Length)
@@ -396,7 +397,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         {
                             //HF!
                             var noise = effectProvider.HFNoise.AudioEffectDouble;
-                            audio += ((double)(noise[hfNoisePosition] )*hfVol);
+                            audio += ((double)(noise[hfNoisePosition]) * hfVol);
                             hfNoisePosition++;
 
                             if (hfNoisePosition == noise.Length)
@@ -415,7 +416,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         //HF!
                         var noise = effectProvider.FMNoise.AudioEffectDouble;
                         //UHF Band?
-                        audio += (((double)noise[fmNoisePosition]) *fmVol);
+                        audio += ((double)(noise[fmNoisePosition]) * fmVol);
                         fmNoisePosition++;
 
                         if (fmNoisePosition == noise.Length)
