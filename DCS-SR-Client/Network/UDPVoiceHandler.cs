@@ -849,6 +849,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 // Add all radios toggled for simultaneous transmission if the global flag has been set
                 if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
                 {
+                    //dont transmit on all if the INTERCOM is selected & AWACS
+                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM && _clientStateSingleton.DcsPlayerRadioInfo.inAircraft == false)
+                    {
+                        //even if simul transmission is enabled - if we're an AWACS we probably dont want this
+                        var intercom = new List<RadioInformation>();
+                        intercom.Add(radioInfo.radios[0]);
+                        sendingOn = 0;
+                        return intercom;
+                    }
+
                     var i = 0;
                     foreach (var radio in _clientStateSingleton.DcsPlayerRadioInfo.radios)
                     {

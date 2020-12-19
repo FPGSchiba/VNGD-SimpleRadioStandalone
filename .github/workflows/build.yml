@@ -33,3 +33,5 @@ jobs:
 
     - name: VSTest DCS-SR-CommonTests
       run: VSTest.Console DCS-SR-CommonTests\bin\x64\Release\DCS-SR-CommonTests.dll
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
