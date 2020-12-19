@@ -110,12 +110,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             HFNoise = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.HF_NOISE);
 
             //sort out volume (if needed)
-            ChangeVolumeOfEffect(HAVEQUICKTone,GlobalSettingsKeys.HQToneVolume);
-            ChangeVolumeOfEffect(NATOTone, GlobalSettingsKeys.NATOToneVolume);
-            ChangeVolumeOfEffect(FMNoise, GlobalSettingsKeys.FMNoiseVolume);
-            ChangeVolumeOfEffect(UHFNoise, GlobalSettingsKeys.UHFNoiseVolume);
-            ChangeVolumeOfEffect(VHFNoise, GlobalSettingsKeys.VHFNoiseVolume);
-            ChangeVolumeOfEffect(HFNoise, GlobalSettingsKeys.HFNoiseVolume);
+            // ChangeVolumeOfEffect(HAVEQUICKTone,GlobalSettingsKeys.HQToneVolume);
+            // ChangeVolumeOfEffect(NATOTone, GlobalSettingsKeys.NATOToneVolume);
+            // ChangeVolumeOfEffect(FMNoise, GlobalSettingsKeys.FMNoiseVolume);
+            // ChangeVolumeOfEffect(UHFNoise, GlobalSettingsKeys.UHFNoiseVolume);
+            // ChangeVolumeOfEffect(VHFNoise, GlobalSettingsKeys.VHFNoiseVolume);
+            // ChangeVolumeOfEffect(HFNoise, GlobalSettingsKeys.HFNoiseVolume);
         }
 
         private void ChangeVolumeOfEffect(CachedAudioEffect effect, GlobalSettingsKeys key)
