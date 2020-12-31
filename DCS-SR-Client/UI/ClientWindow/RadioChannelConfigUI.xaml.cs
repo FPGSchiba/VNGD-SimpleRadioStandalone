@@ -33,35 +33,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public void Reload()
         {
             ChannelSelector.IsEnabled = false;
-            var value = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSetting(ProfileSettingKey).StringValue;
 
-            float balance = 0f;
-            if (value == null || value == "")
-            {
-                balance = 0f;
-            }
-            else
-            {
-                if (!float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out balance))
-                {
-                    if (value.ToUpper() == "LEFT")
-                    {
-                        balance = -1.0f;
-                    }
-                    else if (value.ToUpper() == "BOTH")
-                    {
-                        balance = 0f;
-                    }
-                    else if (value.ToUpper() == "RIGHT")
-                    {
-                        balance = 1.0f;
-                    }
-                }
-            }
-
-            GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingKey, balance.ToString(CultureInfo.InvariantCulture));
-
-            ChannelSelector.Value = balance;
+            ChannelSelector.Value = GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingKey);
 
             ChannelSelector.IsEnabled = true;
         }
@@ -71,9 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             //the selected value changes when 
             if (ChannelSelector.IsEnabled)
             {
-                var selected = ChannelSelector.Value.ToString(CultureInfo.InvariantCulture);
-
-                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSetting(ProfileSettingKey, selected);
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingKey,(float) ChannelSelector.Value);
             }
         }
     }
