@@ -457,38 +457,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return setting;
         }
 
-        public int GetClientSettingInt(ProfileSettingsKeys key)
-        {
-            if (_settingsCache.TryGetValue(key.ToString(), out var val))
-            {
-                return (int)val;
-            }
-
-            var setting = GetSetting("Client Settings", key.ToString()).IntValue;
-
-            _settingsCache[key.ToString()] = setting;
-
-            return setting;
-        }
 
         public void SetClientSettingBool(ProfileSettingsKeys key, bool value)
         {
-            _settingsCache[key.ToString()] = value;
-
             SetSetting("Client Settings", key.ToString(), value);
+
+            _settingsCache.TryRemove(key.ToString(), out var res);
         }
 
         public void SetClientSettingFloat(ProfileSettingsKeys key, float value)
         {
-            _settingsCache[key.ToString()] = value;
-
             SetSetting("Client Settings", key.ToString(), value);
+
+            _settingsCache.TryRemove(key.ToString(), out var res);
         }
         public void SetClientSettingString(ProfileSettingsKeys key, string value)
         {
-            _settingsCache[key.ToString()] = value;
-
             SetSetting("Client Settings", key.ToString(), value);
+            _settingsCache.TryRemove(key.ToString(), out var res);
         }
 
         private void SetSetting(string section, string key, object setting)
