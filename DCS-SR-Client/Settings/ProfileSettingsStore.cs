@@ -117,7 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
 
-            {ProfileSettingsKeys.NATOToneVolume.ToString(), "3.0"},
+            {ProfileSettingsKeys.NATOToneVolume.ToString(), "1.2"},
             {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},
 
             {ProfileSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
