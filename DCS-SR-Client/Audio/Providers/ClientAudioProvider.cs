@@ -36,9 +36,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public static readonly short FM = Convert.ToInt16((int)RadioInformation.Modulation.FM);
         public static readonly short HQ = Convert.ToInt16((int)RadioInformation.Modulation.HAVEQUICK);
         public static readonly short AM = Convert.ToInt16((int)RadioInformation.Modulation.AM);
-        
+
         private static readonly double HQ_RESET_CHANCE = 0.8;
-        
+
         private int hqTonePosition = 0;
         private int natoPosition = 0;
         private int fmNoisePosition = 0;
@@ -47,7 +47,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private int hfNoisePosition = 0;
 
         private readonly CachedAudioEffectProvider effectProvider = CachedAudioEffectProvider.Instance;
-        
+
+        private bool natoToneEnabled;
+        private bool hqToneEnabled;
+        private bool radioEffectsEnabled;
+        private bool clippingEnabled;
+        private double hqToneVolume;
+        private double natoToneVolume;
+
+        private double fmVol;
+        private double hfVol;
+        private double uhfVol;
+        private double vhfVol;
+
+        private long lastRefresh = 0; //last refresh of settings
+
         public ClientAudioProvider()
         {
             _filters = new OnlineFilter[2];
@@ -91,15 +105,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public void AddClientAudioSamples(ClientAudio audio)
         {
             //sort out volume
-//            var timer = new Stopwatch();
-//            timer.Start();
+            //            var timer = new Stopwatch();
+            //            timer.Start();
 
             bool newTransmission = LikelyNewTransmission();
 
-            int decodedLength = 0;
-
             var decoded = _decoder.Decode(audio.EncodedAudio,
-                audio.EncodedAudio.Length, out decodedLength, newTransmission);
+                audio.EncodedAudio.Length, out var decodedLength, newTransmission);
 
             if (decodedLength <= 0)
             {
@@ -115,6 +127,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             audio.PcmAudioShort = ConversionHelpers.ByteArrayToShortArray(tmp);
 
+            //only get settings every 3 seconds - and cache them - issues with performance
+            long now = DateTime.Now.Ticks;
+
+            if (TimeSpan.FromTicks(now - lastRefresh).TotalSeconds > 3) //3 seconds since last refresh
+            {
+                lastRefresh = now;
+
+                natoToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
+                hqToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
+                radioEffectsEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
+                clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
+                hqToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HQToneVolume);
+                natoToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume);
+
+                fmVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.FMNoiseVolume);
+                hfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HFNoiseVolume);
+                uhfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.UHFNoiseVolume);
+                vhfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.VHFNoiseVolume);
+            }
+
             var decrytable = audio.Decryptable || (audio.Encryption == 0);
 
             if (decrytable)
@@ -122,7 +154,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //adjust for LOS + Distance + Volume
                 AdjustVolumeForLoss(audio);
 
-                if (audio.ReceivedRadio == 0 
+                if (audio.ReceivedRadio == 0
                     || audio.Modulation == (short)RadioInformation.Modulation.MIDS)
                 {
                     if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
@@ -144,7 +176,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 AddEncryptionFailureEffect(audio);
 
                 AddRadioEffect(audio);
-                
+
                 //final adjust
                 AdjustVolume(audio);
 
@@ -174,6 +206,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 PacketNumber = audio.PacketNumber
             });
 
+
+
+
             //timer.Stop();
         }
 
@@ -183,7 +218,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var audio = clientAudio.PcmAudioShort;
             for (var i = 0; i < audio.Length; i++)
             {
-                var speaker1Short = (short) (audio[i] * clientAudio.Volume);
+                var speaker1Short = (short)(audio[i] * clientAudio.Volume);
 
                 audio[i] = speaker1Short;
             }
@@ -248,18 +283,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             }
         }
 
-
         private void AddRadioEffect(ClientAudio clientAudio)
         {
             var mixedAudio = clientAudio.PcmAudioShort;
-            var natoToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
-            var hqToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
-            var radioEffectsEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
-            var clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
-            var hqToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.HQToneVolume)
-                .DoubleValue;
-            var natoToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.NATOToneVolume)
-                .DoubleValue;
 
             for (var i = 0; i < mixedAudio.Length; i++)
             {
@@ -346,16 +372,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private double AddRadioBackgroundNoiseEffect(double audio, ClientAudio clientAudio)
         {
-            var fmVol = profileSettings.GetClientSetting(ProfileSettingsKeys.FMNoiseVolume)
-                .DoubleValue;
-
-            var hfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.HFNoiseVolume)
-                .DoubleValue;
-            var uhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.UHFNoiseVolume)
-                .DoubleValue;
-            var vhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.VHFNoiseVolume)
-                .DoubleValue;
-
             if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect))
             {
                 if (clientAudio.Modulation == HQ || clientAudio.Modulation == AM)
@@ -444,7 +460,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private short RandomShort()
         {
             //random short at max volume at eights
-            return (short) _random.Next(-32768 / 8, 32768 / 8);
+            return (short)_random.Next(-32768 / 8, 32768 / 8);
         }
 
         //destructor to clear up opus

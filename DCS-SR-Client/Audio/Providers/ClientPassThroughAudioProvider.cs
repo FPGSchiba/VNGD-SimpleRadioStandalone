@@ -45,6 +45,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         private readonly CachedAudioEffectProvider effectProvider = CachedAudioEffectProvider.Instance;
         private readonly ProfileSettingsStore profileSettings;
 
+        private bool natoToneEnabled;
+        private bool hqToneEnabled;
+        private bool radioEffectsEnabled;
+        private bool clippingEnabled;
+        private double hqToneVolume;
+        private double natoToneVolume;
+
+        private double fmVol;
+        private double hfVol;
+        private double uhfVol;
+        private double vhfVol;
+
+        private long lastRefresh = 0; //last refresh of settings
+
         public ClientPassThroughAudioProvider()
         {
             profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
@@ -62,6 +76,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         public byte[] AddClientAudioSamples(TransmittedAudio audio, short[] pcmShort)
         {
             audio.PcmAudioShort = pcmShort;
+
+            //only get settings every 3 seconds - and cache them - issues with performance
+            long now = DateTime.Now.Ticks;
+
+            if (TimeSpan.FromTicks(now - lastRefresh).TotalSeconds > 3) //3 seconds since last refresh
+            {
+                lastRefresh = now;
+
+                natoToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
+                hqToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
+                radioEffectsEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
+                clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
+                hqToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HQToneVolume);
+                natoToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume);
+
+                fmVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.FMNoiseVolume);
+                hfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HFNoiseVolume);
+                uhfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.UHFNoiseVolume);
+                vhfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.VHFNoiseVolume);
+            }
 
             if (audio.Modulation == (short) RadioInformation.Modulation.INTERCOM ||
                 audio.Modulation == (short) RadioInformation.Modulation.MIDS)
@@ -113,14 +147,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         private void AddRadioEffect(TransmittedAudio clientAudio)
         {
             var mixedAudio = clientAudio.PcmAudioShort;
-            var natoToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.NATOTone);
-            var hqToneEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone);
-            var radioEffectsEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
-            var clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
-            var hqToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.HQToneVolume)
-                .DoubleValue;
-            var natoToneVolume = profileSettings.GetClientSetting(ProfileSettingsKeys.NATOToneVolume)
-                .DoubleValue;
 
             for (var i = 0; i < mixedAudio.Length; i++)
             {
@@ -207,15 +233,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         private double AddRadioBackgroundNoiseEffect(double audio, TransmittedAudio clientAudio)
         {
-            var fmVol = profileSettings.GetClientSetting(ProfileSettingsKeys.FMNoiseVolume)
-                .DoubleValue; 
-
-            var hfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.HFNoiseVolume)
-                .DoubleValue;
-            var uhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.UHFNoiseVolume)
-                .DoubleValue;
-            var vhfVol = profileSettings.GetClientSetting(ProfileSettingsKeys.VHFNoiseVolume)
-                .DoubleValue;
 
             if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect))
             {
