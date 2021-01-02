@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -66,7 +67,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
     {
         private static readonly object _lock = new object();
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public string CurrentProfileName { get; set; } = "default";
+
+        //cache all the settings in their correct types for speed
+        //fixes issue where we access settings a lot and have issues
+        private ConcurrentDictionary<string, object> _settingsCache = new ConcurrentDictionary<string, object>();
+
+        public string CurrentProfileName
+        {
+            get => _currentProfileName;
+            set
+            {
+                _settingsCache.Clear();
+                _currentProfileName = value;
+
+            }
+        }
+
         public string Path { get; }
 
         public static readonly Dictionary<string, string> DefaultSettingsProfileSettings = new Dictionary<string, string>()
@@ -101,7 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
 
-            {ProfileSettingsKeys.NATOToneVolume.ToString(), "3.0"},
+            {ProfileSettingsKeys.NATOToneVolume.ToString(), "1.2"},
             {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},
 
             {ProfileSettingsKeys.VHFNoiseVolume.ToString(), "0.15"},
@@ -134,6 +150,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private Dictionary<string, Configuration> InputConfigs = new Dictionary<string, Configuration>();
 
         private readonly GlobalSettingsStore _globalSettings;
+        private string _currentProfileName = "default";
 
         public ProfileSettingsStore(GlobalSettingsStore globalSettingsStore)
         {
@@ -283,11 +300,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return cfg;
         }
 
-        public InputDevice GetControlSetting(InputBinding key)
-        {
-            return GetControlSetting(key, GetCurrentProfile());
-        }
-
         public InputDevice GetControlSetting(InputBinding key, Configuration configuration)
         {
             if (!configuration.Contains(key.ToString()))
@@ -355,11 +367,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             Save();
         }
 
-        public Setting GetClientSetting(ProfileSettingsKeys key)
-        {
-            return GetSetting("Client Settings", key.ToString());
-        }
-
         private Setting GetSetting(string section, string setting)
         {
             var _configuration = GetCurrentProfile();
@@ -398,13 +405,76 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return _configuration[section][setting];
         }
 
-        public void SetClientSetting(ProfileSettingsKeys key, bool value)
+        public bool GetClientSettingBool(ProfileSettingsKeys key)
         {
-            SetSetting("Client Settings", key.ToString(), value);
+
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (bool)val;
+            }
+
+            var setting = GetSetting("Client Settings", key.ToString());
+            if (setting.RawValue.Length == 0)
+            {
+                _settingsCache[key.ToString()] = false;
+                return false;
+            }
+
+            _settingsCache[key.ToString()] = setting.BoolValue;
+
+            return setting.BoolValue;
         }
-        public void SetClientSetting(ProfileSettingsKeys key, string value)
+
+        public float GetClientSettingFloat(ProfileSettingsKeys key)
+        {
+            if (_settingsCache.TryGetValue(key.ToString(),out var val))
+            {
+                if (val == null)
+                {
+                    return 0f;
+                }
+                return (float) val;
+            }
+
+            var setting =  GetSetting("Client Settings", key.ToString()).FloatValue;
+
+            _settingsCache[key.ToString()] = setting;
+
+            return setting;
+        }
+
+        public string GetClientSettingString(ProfileSettingsKeys key)
+        {
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (string)val;
+            }
+
+            var setting = GetSetting("Client Settings", key.ToString()).RawValue;
+
+            _settingsCache[key.ToString()] = setting;
+
+            return setting;
+        }
+
+
+        public void SetClientSettingBool(ProfileSettingsKeys key, bool value)
         {
             SetSetting("Client Settings", key.ToString(), value);
+
+            _settingsCache.TryRemove(key.ToString(), out var res);
+        }
+
+        public void SetClientSettingFloat(ProfileSettingsKeys key, float value)
+        {
+            SetSetting("Client Settings", key.ToString(), value);
+
+            _settingsCache.TryRemove(key.ToString(), out var res);
+        }
+        public void SetClientSettingString(ProfileSettingsKeys key, string value)
+        {
+            SetSetting("Client Settings", key.ToString(), value);
+            _settingsCache.TryRemove(key.ToString(), out var res);
         }
 
         private void SetSetting(string section, string key, object setting)
@@ -429,6 +499,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 if (setting is bool)
                 {
                     _configuration[section][key].BoolValue = (bool)setting;
+                }
+                else if (setting is float)
+                {
+                    _configuration[section][key].FloatValue = (float)setting;
+                }
+                else if (setting is double)
+                {
+                    _configuration[section][key].DoubleValue = (double)setting;
+                }
+                else if (setting is int)
+                {
+                    _configuration[section][key].DoubleValue = (int)setting;
                 }
                 else if (setting.GetType() == typeof(string))
                 {
@@ -532,16 +614,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         }
 
-        public bool GetClientSettingBool(ProfileSettingsKeys key)
-        {
-            var setting = GetSetting("Client Settings", key.ToString());
-            if (setting.RawValue.Length == 0)
-            {
-                return false;
-            }
 
-            return setting.BoolValue;
-        }
 
     }
 }

@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             float balance = 0;
             try
             {
-                balance  = profileSettings.GetClientSetting(settingType).FloatValue;
+                balance  = profileSettings.GetClientSettingFloat(settingType);
             }
             catch (Exception ex)
             {

@@ -216,7 +216,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //Release the PTT ONLY if X ms have passed and we didnt switch radios to handle
                 //shitty buttons
                 var releaseTime = _globalSettings.ProfileSettingsStore
-                    .GetClientSetting(ProfileSettingsKeys.PTTReleaseDelay).IntValue;
+                    .GetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay);
 
                 if (!ptt
                     && releaseTime > 0
@@ -394,6 +394,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             if (
                                                 radio.modulation == RadioInformation.Modulation.INTERCOM
+                                                || radio.modulation == RadioInformation.Modulation.MIDS // IGNORE LOS and Distance for MIDS - we assume a Link16 Network is in place
                                                 || globalFrequency
                                                 || (
                                                     HasLineOfSight(udpVoicePacket, out losLoss)

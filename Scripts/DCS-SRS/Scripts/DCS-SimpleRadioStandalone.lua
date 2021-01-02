@@ -898,6 +898,9 @@ function SR.exportRadioUH1H(_data)
         _data.iff.mode4 = false
     end
 
+    --temporary hot mic
+    _data.intercomHotMic = true
+
     return _data
 
 end
@@ -1725,12 +1728,10 @@ function SR.exportRadioFA18C(_data)
         _data.radios[5].channel = -1
     end
 
-    local validateIffCode = function (code, mode)
+    local validateIffCode = function (codeString, mode)
         -- returns false if code is not valid, true if it is
-        local codeString = tostring(code)
         if mode == 1 then
             -- mode 1 code is 2-digit and is valid if the first digit is 0-7 and the second digit is 0-3
-            if code == 0 then return true end
             if #codeString < 2 then return false end
             for i = 1, #codeString do
                 local c = codeString:sub(i,i)
@@ -1741,7 +1742,6 @@ function SR.exportRadioFA18C(_data)
             end
         elseif mode == 3 then
             -- mode 3 code is 4-digit and is valid if all digits are 0-7
-            if code == 0 then return true end
             if #codeString < 4 then return false end
             for i = 1, #codeString do
                 local c = codeString:sub(i,i)
@@ -1773,7 +1773,7 @@ function SR.exportRadioFA18C(_data)
             if iffMode == 1 then
                  if _ufc.UFC_OptionCueing1 == ":" then
                      if editingMode == "1-" then
-                         local code = tonumber(string.sub(_ufc.UFC_OptionDisplay1, -2))
+                         local code = (string.sub(_ufc.UFC_OptionDisplay1, -2))
                          if validateIffCode(code, 1) then return code end
                      end
                  else return -1
@@ -1782,7 +1782,7 @@ function SR.exportRadioFA18C(_data)
             elseif iffMode == 3 then
                  if _ufc.UFC_OptionCueing3 == ":" then
                      if editingMode == "3-" then
-                         local code = tonumber(string.sub(_ufc.UFC_ScratchPadNumberDisplay, -4))
+                         local code = (string.sub(_ufc.UFC_ScratchPadNumberDisplay, -4))
                          if validateIffCode(code, 3) then return code end
                      end
                  else return -1

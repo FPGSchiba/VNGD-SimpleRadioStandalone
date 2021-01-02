@@ -36,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             get
             {
                 var selectedTone = GlobalSettingsStore.Instance.ProfileSettingsStore
-                    .GetClientSetting(ProfileSettingsKeys.RadioTransmissionStartSelection).RawValue.ToLowerInvariant();
+                    .GetClientSettingString(ProfileSettingsKeys.RadioTransmissionStartSelection).ToLowerInvariant();
 
                 foreach (var startEffect in RadioTransmissionStart)
                 {
@@ -55,7 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             get
             {
                 var selectedTone = GlobalSettingsStore.Instance.ProfileSettingsStore
-                    .GetClientSetting(ProfileSettingsKeys.RadioTransmissionEndSelection).RawValue.ToLowerInvariant();
+                    .GetClientSettingString(ProfileSettingsKeys.RadioTransmissionEndSelection).ToLowerInvariant();
 
                 foreach (var endEffect in RadioTransmissionEnd)
                 {
