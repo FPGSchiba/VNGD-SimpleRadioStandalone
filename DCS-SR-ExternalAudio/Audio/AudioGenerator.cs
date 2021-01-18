@@ -54,7 +54,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 using (var stream = new MemoryStream())
                 {
                     synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo("en-GB", false));
-                    //synth.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult, 0, new CultureInfo("en-GB", false));
                     synth.Rate = 1;
 
                     var intVol = (int)(volume * 100.0);
