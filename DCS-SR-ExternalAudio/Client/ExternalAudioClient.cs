@@ -32,8 +32,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private readonly float volume;
 
         private readonly string SpeakerGender;
+        private readonly string SpeakerCulture;
 
-        public ExternalAudioClient(string mp3Path, double[] freq, RadioInformation.Modulation[] modulation, int coalition, int port, string name, float volume, string SpeakerGender)
+
+        public ExternalAudioClient(string mp3Path, double[] freq, RadioInformation.Modulation[] modulation, int coalition, int port, string name, float volume, string SpeakerGender, string SpeakerCulture)
         {
             this.mp3Path = mp3Path;
             this.freq = freq;
@@ -43,6 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             this.name = name;
             this.volume = volume;
             this.SpeakerGender = SpeakerGender;
+            this.SpeakerCulture = SpeakerCulture;
 
             this.modulationBytes = new byte[modulation.Length];
             for (int i = 0; i < modulationBytes.Length; i++)
@@ -109,7 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private void SendAudio()
         {
             Logger.Info("Sending Audio... Please Wait");
-            AudioGenerator mp3 = new AudioGenerator(mp3Path, volume, SpeakerGender);
+            AudioGenerator mp3 = new AudioGenerator(mp3Path, volume, SpeakerGender, SpeakerCulture);
             var opusBytes = mp3.GetOpusBytes();
             int count = 0;
 
