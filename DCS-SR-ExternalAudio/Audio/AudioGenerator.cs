@@ -66,7 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                             break;
                         }
                     }
-                    if (!isVoiceInstalled) this.SpeakerCulture = "en-US";
+                    if (!isVoiceInstalled) this.SpeakerCulture = "en-GB";
 
                     synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(this.SpeakerCulture, false));
                     synth.Rate = 1;

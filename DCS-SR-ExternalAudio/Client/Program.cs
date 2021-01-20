@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 string name = args[5].Trim();
                 float volume = float.Parse(args[6].Trim(), CultureInfo.InvariantCulture);
                 string gender = "female";
-                string culture = "en-US";
+                string culture = "en-GB";
                 if (args.Length > 7)
                 {
                     gender = args[7].Trim().ToLowerInvariant();

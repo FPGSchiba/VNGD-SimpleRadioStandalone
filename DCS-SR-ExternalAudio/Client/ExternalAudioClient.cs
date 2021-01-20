@@ -77,7 +77,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             Logger.Info($"Port: {port} ");
             Logger.Info($"Client Name: {name} ");
             Logger.Info($"Volume: {volume} ");
-            Logger.Info($"Speaker Gender: {SpeakerGender} ");
+            Logger.Info($"Voice: {SpeakerGender}|{SpeakerCulture} ");
+
 
             var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,name, coalition);
 
