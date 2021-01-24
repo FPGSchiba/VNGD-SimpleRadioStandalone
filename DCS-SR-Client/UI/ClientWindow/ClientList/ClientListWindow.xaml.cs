@@ -29,23 +29,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly DispatcherTimer _updateTimer;
 
+        private readonly ObservableCollection<SRClient> _clientList = new ObservableCollection<SRClient>();
+
+
         public ClientListWindow()
         {
             InitializeComponent();
+            ClientList.ItemsSource = _clientList;
+            UpdateList();
 
-            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
             _updateTimer.Tick += UpdateTimer_Tick;
             _updateTimer.Start();
-            var list = ConnectedClientsSingleton.Instance.Values;
-
-            ClientList.ItemsSource = ConnectedClientsSingleton.Instance.Values;
         }
 
-     
+        private void UpdateList()
+        {
+            _clientList.Clear();
+
+            //first create temporary list to sort
+            var tempList = new List<SRClient>();
+
+
+            foreach (var srClient in ConnectedClientsSingleton.Instance.Values)
+            {
+                tempList.Add(srClient);
+            }
+
+            foreach (var clientListModel in tempList.OrderByDescending(model => model.Coalition)
+                .ThenBy(model => model.Name.ToLower()).ToList())
+            {
+                _clientList.Add(clientListModel);
+            }
+        }
+
+
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            //tricky to bind
-            ClientList.ItemsSource = ConnectedClientsSingleton.Instance.Values;
+            UpdateList();
         }
 
         protected override void OnClosing(CancelEventArgs e)
