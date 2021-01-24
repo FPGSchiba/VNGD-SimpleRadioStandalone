@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Speech.Synthesis;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 
@@ -22,8 +23,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         }
         public static void Main(string[] args)
         {
-            if (args.Length != 7)
+            if ((args.Length < 7) || (args.Length > 9 ))
             {
+                CultureInfo[] Cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+                string availableCultures = "";
+                var synthesizer = new SpeechSynthesizer();
+                foreach (var voice in synthesizer.GetInstalledVoices())
+                {
+                    var info = voice.VoiceInfo;
+                    availableCultures += info.Culture+"/"+info.Gender + " ";
+                }
+
                 Console.WriteLine("Error incorrect parameters - should be path or text frequency modulation coalition port name volume");
                 Console.WriteLine("Example: \"C:\\FULL\\PATH\\TO\\File.mp3\" 251.0 AM 1 5002 ciribob-robot 0.5");
                 Console.WriteLine("Example: \"I want this read out over this frequency - hello world! \" 251.0 AM 1 5002 ciribob-robot 0.5");
@@ -35,6 +45,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 Console.WriteLine("Port - 5002 is the default");
                 Console.WriteLine("Name - name of your transmitter - no spaces");
                 Console.WriteLine("Volume - 1.0 is max, 0.0 is silence");
+                Console.WriteLine("(optional) TTS Gender - male/female");
+                Console.WriteLine("(optional) TTS culture - local for the voice");
+                Console.WriteLine("currently installed Voices on this system: " + availableCultures);
+
             }
             else
             {
@@ -47,9 +61,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 int port = int.Parse(args[4].Trim());
                 string name = args[5].Trim();
                 float volume = float.Parse(args[6].Trim(), CultureInfo.InvariantCulture);
+                string gender = "female";
+                string culture = "en-GB";
+                if (args.Length > 7)
+                {
+                    gender = args[7].Trim().ToLowerInvariant();
+                }
+                if (args.Length == 9)
+                {
+                    culture = args[8].Trim();
+                }
 
                 //process freqs
-                var freqStr= freqs.Split(',');
+                var freqStr = freqs.Split(',');
 
                 List<double> freqDouble = new List<double>();
                 foreach (var s in freqStr)
@@ -78,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 else
                 {
 
-                    ExternalAudioClient client = new ExternalAudioClient(mp3, freqDouble.ToArray(), modulation.ToArray(), coalition, port, name, volume);
+                    ExternalAudioClient client = new ExternalAudioClient(mp3, freqDouble.ToArray(), modulation.ToArray(), coalition, port, name, volume,gender,culture);
                     client.Start();
                 }
 
