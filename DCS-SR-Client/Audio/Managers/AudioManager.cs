@@ -80,7 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private Preprocessor _speex;
         private readonly bool windowsN;
 
-        private ClientPassThroughAudioProvider _passThroughAudioProvider;
+        private ClientAudioProvider _passThroughAudioProvider;
 
         public AudioManager(bool windowsN)
         {
@@ -192,10 +192,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 try
                 {
-                    _passThroughAudioProvider = new ClientPassThroughAudioProvider();
+                    _passThroughAudioProvider = new ClientAudioProvider(true);
                     _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40,windowsN);
 
-                    _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
+                    _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
                     _micWaveOutBuffer.ReadFully = true;
                     _micWaveOutBuffer.DiscardOnBufferOverflow = true;
 
@@ -292,13 +292,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             Logger.Error("Recording Stopped");
         }
         Stopwatch _stopwatch = new Stopwatch();
-       
+        // private WaveFileWriter _beforeWaveFile;
+        // private WaveFileWriter _afterFileWriter;
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
         {
             if (_resampler == null)
             {
                 //create and use in the same thread or COM issues
                 _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
+                // _beforeWaveFile = new WaveFileWriter(@"C:\Temp\Test-Preview-Before.wav", new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
+                // _afterFileWriter = new WaveFileWriter(@"C:\Temp\Test-Preview-after.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
             }
 
             if (e.BytesRecorded > 0)
@@ -363,13 +366,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
                             var clientAudio = _udpVoiceHandler.Send(encoded, len);
+
+                            // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
+
                             if (clientAudio != null && _micWaveOutBuffer != null)
                             {
+                                //todo see if we can fix the resample / opus decode
                                 //send audio so play over local too
-
-                                var passThroughPCMBytes  = _passThroughAudioProvider.AddClientAudioSamples(clientAudio, pcmShort);
+                                var processedAudioBytes = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
+                                
                                 //process bytes and add effects
-                                _micWaveOutBuffer?.AddSamples(passThroughPCMBytes, 0, passThroughPCMBytes.Length);
+                                if (processedAudioBytes?.Length > 0)
+                                {
+                                     // _afterFileWriter.Write(processedAudioBytes, 0, processedAudioBytes.Length);
+                                    _micWaveOutBuffer?.AddSamples(processedAudioBytes, 0, processedAudioBytes.Length);
+                                }
+                                
                             }
                         }
                         else
@@ -650,6 +662,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 _resampler?.Dispose(true);
                 _resampler = null;
+
+                //Debug Wav
+                // _afterFileWriter?.Close();
+                // _afterFileWriter?.Dispose();
+                // _beforeWaveFile?.Close();
+                // _beforeWaveFile?.Dispose();
 
                 _waveOut?.Stop();
                 _waveOut?.Dispose();

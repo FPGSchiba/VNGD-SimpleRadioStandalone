@@ -352,11 +352,21 @@ function srsOverlay.paintRadio()
 
     local curStatic = 1
     offset = 10 -- 10 offset from top
+	
+	local enabled = base.OptionsData.getPlugin("DCS-SRS","srsOverlayHelpTextEnabled")
 
     if #_listMessages == 0 then
-        table.insert(_listMessages, {message = "No Radio Connected", skin =typesMessage.guard, height = 20 })
-        table.insert(_listMessages, {message = "Connect to SRS server and", skin =typesMessage.guard, height = 20 })
-        table.insert(_listMessages, {message = "start or join a mission", skin =typesMessage.guard, height = 20 })
+
+		if enabled then
+			table.insert(_listMessages, {message = "SRS not connected", skin =typesMessage.guard, height = 20 })
+			table.insert(_listMessages, {message = "Connect to an SRS server and join a mission", skin =typesMessage.guard, height = 20 })
+			table.insert(_listMessages, {message = "SRS DCS settings:", skin =typesMessage.guard, height = 20 })
+			table.insert(_listMessages, {message = "Options -> SPECIAL -> DCS-SRS", skin =typesMessage.guard, height = 20 })
+			table.insert(_listMessages, {message = "Toggle (by default) with:", skin =typesMessage.guard, height = 20 })
+			table.insert(_listMessages, {message = "LEFT CTRL + LEFT SHIFT + ESC", skin =typesMessage.guard, height = 20 })
+		else
+			table.insert(_listMessages, {message = "SRS not connected", skin =typesMessage.guard, height = 20 })
+		end
     end
 
     for _i,_msg in pairs(_listMessages) do
@@ -487,6 +497,10 @@ function srsOverlay.setMode(mode)
 
     window:setVisible(true) -- if you make the window invisible, its destroyed
 
+    --force window to re-render if the help text status changed
+    if not _radioState or not _radioState.RadioInfo then
+        _listMessages = {}
+    end
 
     srsOverlay.paintRadio()
     srsOverlay.saveConfiguration()

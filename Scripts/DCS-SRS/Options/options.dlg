@@ -238,6 +238,48 @@ dialog = {
 
 					-----------------------------------------------
 
+					-----------------------------------------------
+					-- SRS Helper Text
+					-----------------------------------------------
+					["srsOverlayHelpTextEnabledCheckbox"] = {
+						["params"] = {
+							["bounds"] = {
+								["x"] = leftMargin,
+								["y"] = 405,
+								["w"] = width,
+								["h"] = 20,
+							},
+							["enabled"] = true,
+							["state"] = false,
+							["text"] = "$DCS_SRS_OVERLAY_HELP_TEXT",
+							["tooltip"] = "",
+							["visible"] = true,
+							["zindex"] = 0,
+							["tabOrder"] = 0,
+						},
+						["skin"] = CheckBoxSkin,
+						["type"] = "CheckBox",
+					},
+
+					["srsOverlayHelpTextEnabledCheckboxLabel"] = {
+						["params"] = {
+							["bounds"] = {
+								["x"] = leftMargin,
+								["y"] = 420,
+								["w"] = width,
+								["h"] = 90,
+							},
+							["enabled"] = true,
+							["text"] = "$DCS_SRS_OVERLAY_HELP_TEXT_INFO",
+							["tooltip"] = "",
+							["visible"] = true,
+							["zindex"] = 0,
+						},
+						["skin"] = HelpSkin,
+						["type"] = "Static",
+					},
+
+					-----------------------------------------------
 				},
 			["type"] = "Panel",
 			["skin"] = {
