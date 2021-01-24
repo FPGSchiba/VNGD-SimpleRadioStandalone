@@ -25,12 +25,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
 
         private readonly float volume;
+        private readonly VoiceGender SpeakerGender;
+        private string SpeakerCulture;
 
-        public AudioGenerator(string path, float volume)
+        public AudioGenerator(string path, float volume, string SpeakerGender, string SpeakerCulture)
         {
             this.path = path;
             this.volume = volume;
+            if (SpeakerGender.ToLower() == "male") {
+                this.SpeakerGender = VoiceGender.Male;
+            } 
+            else if (SpeakerGender.ToLower() == "neutral")
+            {
+                this.SpeakerGender = VoiceGender.Neutral;
+            }
+            else
+            {
+                this.SpeakerGender = VoiceGender.Female;
+            }
+
+            this.SpeakerCulture = SpeakerCulture;
+
         }
+    
 
         private byte[] TextToSpeech()
         {
@@ -39,7 +56,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 using (var synth = new SpeechSynthesizer())
                 using (var stream = new MemoryStream())
                 {
-                    synth.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult, 0, new CultureInfo("en-GB", false));
+                    bool isVoiceInstalled = false;
+                        foreach (var voice in synth.GetInstalledVoices())
+                    {
+                        var info = voice.VoiceInfo;
+                        if (this.SpeakerCulture == info.Culture.ToString())
+                        {
+                            isVoiceInstalled = true;
+                            break;
+                        }
+                    }
+                    if (!isVoiceInstalled) this.SpeakerCulture = "en-GB";
+
+                    synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(this.SpeakerCulture, false));
                     synth.Rate = 1;
 
                     var intVol = (int)(volume * 100.0);
