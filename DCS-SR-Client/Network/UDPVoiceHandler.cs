@@ -883,7 +883,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return transmittingRadios;
         }
 
-        public TransmittedAudio Send(byte[] bytes, int len)
+        public ClientAudio Send(byte[] bytes, int len)
         {
             // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
             List<RadioInformation> transmittingRadios;
@@ -969,9 +969,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             LastSentAt = DateTime.Now.Ticks,
                             SendingOn = sendingOn
                         };
-                        var send = new TransmittedAudio
+                        var send = new ClientAudio()
                         {
-                             Frequency = frequencies[0], Modulation = modulations[0]
+                             Frequency = frequencies[0], Modulation = modulations[0],
+                             EncodedAudio = bytes,
+                             Encryption = 0,
+                             Volume = 1,
+                             Decryptable = true,
+                             LineOfSightLoss = 0,
+                             RecevingPower = 0,
+                             ReceivedRadio = 1
                         };
                         return send;
                     }

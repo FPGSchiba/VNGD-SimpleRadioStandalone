@@ -92,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},
-            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "false"},
+            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "true"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
@@ -115,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
 
-            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
+            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "true"},
 
             {ProfileSettingsKeys.NATOToneVolume.ToString(), "1.2"},
             {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},

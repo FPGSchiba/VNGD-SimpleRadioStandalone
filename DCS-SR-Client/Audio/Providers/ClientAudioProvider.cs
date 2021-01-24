@@ -62,18 +62,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private long lastRefresh = 0; //last refresh of settings
 
-        public ClientAudioProvider()
+        private bool passThrough;
+
+        public ClientAudioProvider(bool passThrough = false)
         {
+            this.passThrough = passThrough;
             _filters = new OnlineFilter[2];
             _filters[0] =
                 OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.OUTPUT_SAMPLE_RATE, 560, 3900);
             _filters[1] =
                 OnlineFilter.CreateBandpass(ImpulseResponse.Finite, AudioManager.OUTPUT_SAMPLE_RATE, 100, 4500);
 
-            JitterBufferProviderInterface =
-                new JitterBufferProviderInterface(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 2));
+            if (!passThrough)
+            {
+                JitterBufferProviderInterface =
+                    new JitterBufferProviderInterface(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 2));
 
-            SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
+                SampleProvider = new Pcm16BitToSampleProvider(JitterBufferProviderInterface);
+            }
 
             _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
@@ -92,6 +98,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         //is it a new transmission?
         public bool LikelyNewTransmission()
         {
+            if (passThrough)
+            {
+                return false;
+            }
+
             //400 ms since last update
             long now = DateTime.Now.Ticks;
             if ((now - LastUpdate) > 4000000) //400 ms since last update
@@ -102,7 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return false;
         }
 
-        public void AddClientAudioSamples(ClientAudio audio)
+        public byte[] AddClientAudioSamples(ClientAudio audio)
         {
             //sort out volume
             //            var timer = new Stopwatch();
@@ -116,7 +127,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             if (decodedLength <= 0)
             {
                 Logger.Info("Failed to decode audio from Packet for client");
-                return;
+                return null;
             }
 
             // for some reason if this is removed then it lags?!
@@ -198,16 +209,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = DateTime.Now.Ticks;
 
-            JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
+            if (!passThrough)
             {
-                Audio =
-                    SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
-                        audio.ReceivedRadio),
-                PacketNumber = audio.PacketNumber
-            });
+                JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
+                {
+                    Audio =
+                        SeperateAudio(ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort),
+                            audio.ReceivedRadio),
+                    PacketNumber = audio.PacketNumber
+                });
 
-
-
+                return null;
+            }
+            else
+            {
+                //return MONO PCM 16 as bytes
+                return ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort);
+            }
 
             //timer.Stop();
         }
@@ -312,7 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         audio = filter.ProcessSample(audio);
                         if (double.IsNaN(audio))
                         {
-                            audio = mixedAudio[j];
+                            audio = (double)mixedAudio[i] / 32768f;
                         }
 
                         audio *= RadioFilter.BOOST;

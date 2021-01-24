@@ -205,7 +205,6 @@
     <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
-    <Compile Include="Audio\Providers\ClientPassThroughAudioProvider.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
