@@ -103,7 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
          
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
-                var avalilableRadios = 0;
+                var availableRadios = 0;
 
                 //handle 4th radio on the overlay or not
                 if (dcsPlayerRadioInfo.radios.Length < 5)
@@ -143,12 +143,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
                     {
-                        avalilableRadios++;
+                        availableRadios++;
 
                     }
                 }
 
-                if (avalilableRadios > 1)
+                if (availableRadios > 1)
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
