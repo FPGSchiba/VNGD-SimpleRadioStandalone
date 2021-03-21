@@ -123,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Exception stoping DCS listener ");
+                    Logger.Error(e, "Exception stopping DCS listener ");
                 }
                 
             });
