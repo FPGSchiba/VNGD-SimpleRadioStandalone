@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                         LanguageCode = opts.culture,
                     };
 
-                    switch (opts.gender)
+                    switch (opts.gender.ToLowerInvariant().Trim())
                     {
                         case "male":
                             voice.SsmlGender = SsmlVoiceGender.Male;
@@ -285,7 +285,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             }
 
             Logger.Info($"Encode as Opus");
-            var _encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
+            var encoder = OpusEncoder.Create(INPUT_SAMPLE_RATE, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
 
             int pos = 0;
             while (pos +(SEGMENT_FRAMES*2) < resampledBytes.Length)
@@ -295,7 +295,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 Buffer.BlockCopy(resampledBytes, pos,buf,0,SEGMENT_FRAMES*2);
 
                 var outLength = 0;
-                var frame = _encoder.Encode(buf, buf.Length, out outLength);
+                var frame = encoder.Encode(buf, buf.Length, out outLength);
 
                 if (outLength > 0)
                 {
@@ -317,7 +317,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 Buffer.BlockCopy(resampledBytes, pos, buf, 0, resampledBytes.Length - pos);
 
                 var outLength = 0;
-                var frame = _encoder.Encode(buf, buf.Length, out outLength);
+                var frame = encoder.Encode(buf, buf.Length, out outLength);
 
                 if (outLength > 0)
                 {
@@ -331,7 +331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             }
             
-            _encoder.Dispose();
+            encoder.Dispose();
             Logger.Info($"Finished encoding as Opus");
 
             return opusBytes;

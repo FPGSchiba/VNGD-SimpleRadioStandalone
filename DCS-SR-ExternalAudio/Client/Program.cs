@@ -210,9 +210,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             var first = synthesizer.GetInstalledVoices().First();
             Console.WriteLine($"Example:\n --text=\"I want a specific voice \" --freqs=251.0 --modulations=AM --coalition=1 --voice=\"{first.VoiceInfo.Name}\"");
 
-            Console.WriteLine($"Example:\n --text=\"I want a any female voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=female");
+            Console.WriteLine($"Example:\n --text=\"I want any female voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=female");
 
-            Console.WriteLine($"Example:\n --text=\"I want a any male voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male");
+            Console.WriteLine($"Example:\n --text=\"I want any male voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male");
+
+
+            Console.WriteLine("");
+            Console.WriteLine("Google Cloud Text to Speech Examples - see locale and voices https://cloud.google.com/text-to-speech/docs/voices  : \n");
+
+            Console.WriteLine($"Example:\n --text=\"Ahoj, jak se máš - Specific Czech voice\" --freqs=251.0 --modulations=AM --coalition=1 --googleCredentials=\"C:\\\\folder\\\\credentials.json\" --voice=\"cs-CZ-Wavenet-A\"");
+
+            Console.WriteLine($"Example:\n --text=\"I want any female voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=female --googleCredentials=\"C:\\\\folder\\\\credentials.json\" ");
+
+            Console.WriteLine($"Example:\n --text=\"I want any male voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male --googleCredentials=\"C:\\\\folder\\\\credentials.json\" ");
+
+            Console.WriteLine($"Example:\n --text=\"I want any male voice with a French accent \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male --locale=fr-FR --googleCredentials=\"C:\\\\folder\\\\credentials.json\" ");
+
+            Console.WriteLine($"Example:\n --text=\"I want any female voice with a German accent \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male --locale=de-DE --googleCredentials=\"C:\\\\folder\\\\credentials.json\" ");
+
+
 
 
         }
