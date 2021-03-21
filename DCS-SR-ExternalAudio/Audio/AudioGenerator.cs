@@ -5,12 +5,19 @@ using System.IO;
 using System.Speech.AudioFormat;
 using System.Speech.Synthesis;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client;
 using FragLabs.Audio.Codecs;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
 using NVorbis;
+
+using Google.Cloud.TextToSpeech.V1;
+using Grpc.Core;
+
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 {
@@ -18,26 +25,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly string path;
-
         public static readonly int INPUT_SAMPLE_RATE = 16000;
         public static readonly int INPUT_AUDIO_LENGTH_MS = 40;
 
         public static readonly int SEGMENT_FRAMES = (INPUT_SAMPLE_RATE / 1000) * INPUT_AUDIO_LENGTH_MS
             ; //640 is 40ms as INPUT_SAMPLE_RATE / 1000 *40 = 640
 
-        private readonly float volume;
-        private readonly VoiceGender SpeakerGender;
-        private string SpeakerCulture;
+        private Program.Options opts;
 
-        public AudioGenerator(string path, float volume, string SpeakerGender, string SpeakerCulture)
+        public AudioGenerator(Program.Options opts)
         {
-            this.path = path;
-            this.volume = volume;
-            if (SpeakerGender.ToLower() == "male") {
+            this.opts = opts;
+
+            if (opts.gender.ToLower() == "male")
+            {
                 this.SpeakerGender = VoiceGender.Male;
-            } 
-            else if (SpeakerGender.ToLower() == "neutral")
+            }
+            else if (opts.gender.ToLower() == "neutral")
             {
                 this.SpeakerGender = VoiceGender.Neutral;
             }
@@ -46,63 +50,150 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 this.SpeakerGender = VoiceGender.Female;
             }
 
-            this.SpeakerCulture = SpeakerCulture;
-
         }
-    
 
-        private byte[] TextToSpeech()
+        public VoiceGender SpeakerGender { get; set; }
+
+        private byte[] GoogleTTS(string msg)
+        {
+            try
+            {
+                TextToSpeechClientBuilder builder = new TextToSpeechClientBuilder();
+                builder.CredentialsPath = opts.googleCredentials;
+
+                TextToSpeechClient client = builder.Build();
+
+                SynthesisInput input = new SynthesisInput
+                {
+                    Text = msg
+                };
+
+                VoiceSelectionParams voice = null;
+
+                if (!string.IsNullOrEmpty(opts.voice))
+                {
+                    voice = new VoiceSelectionParams()
+                    {
+                        Name = opts.voice,
+                        LanguageCode = opts.voice.Substring(0,5),
+                    };
+                }
+                else
+                {
+                    voice = new VoiceSelectionParams
+                    {
+                        LanguageCode = opts.culture,
+                    };
+
+                    switch (opts.gender)
+                    {
+                        case "male":
+                            voice.SsmlGender = SsmlVoiceGender.Male;
+                            break;
+                        case "neutral":
+                            voice.SsmlGender = SsmlVoiceGender.Neutral;
+                            break;
+                        case "female":
+                            voice.SsmlGender = SsmlVoiceGender.Female;
+                            break;
+                        default:
+                            voice.SsmlGender = SsmlVoiceGender.Male;
+                            break;
+                    }
+                }
+
+                AudioConfig config = new AudioConfig
+                {
+                    AudioEncoding = AudioEncoding.Linear16,
+                    SampleRateHertz = INPUT_SAMPLE_RATE
+                };
+
+                var response = client.SynthesizeSpeech(new SynthesizeSpeechRequest
+                {
+                    Input = input,
+                    Voice = voice,
+                    AudioConfig = config
+                });
+
+                var tempFile = Path.GetTempFileName();
+
+                using (var stream = File.Create(tempFile))
+                {
+                    response.AudioContent.WriteTo(stream);
+                }
+
+                using (var reader = new WaveFileReader(tempFile))
+                {
+                    var bytes = new byte[reader.Length];
+                    var read = reader.Read(bytes, 0, bytes.Length);
+                    Logger.Info($"Success with Google TTS - read {read} bytes");
+
+                    return bytes;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error with Google Text to Speech");
+            }
+            return new byte[0];
+        }
+
+        private byte[] LocalTTS(string msg)
         {
             try
             {
                 using (var synth = new SpeechSynthesizer())
                 using (var stream = new MemoryStream())
                 {
-                    bool isVoiceInstalled = false;
-                        foreach (var voice in synth.GetInstalledVoices())
+                    if (opts.voice == null || opts.voice.Length == 0)
                     {
-                        var info = voice.VoiceInfo;
-                        if (this.SpeakerCulture == info.Culture.ToString())
+                        if (opts.culture == null)
                         {
-                            isVoiceInstalled = true;
-                            break;
+                            synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult);
+                        }
+                        else
+                        {
+                            synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(opts.culture, false));
                         }
                     }
-                    if (!isVoiceInstalled) this.SpeakerCulture = "en-GB";
-
-                    synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(this.SpeakerCulture, false));
-                    synth.Rate = 1;
-
-                    var intVol = (int)(volume * 100.0);
-
+                    else
+                    {
+                        synth.SelectVoice(opts.voice);
+                    }
+                    
+                    synth.Rate = opts.speed;
+            
+                    var intVol = (int)(opts.volume * 100.0);
+            
                     if (intVol > 100)
                     {
                         intVol = 100;
                     }
-
+            
                     synth.Volume = intVol;
                     
                     synth.SetOutputToAudioStream(stream,
                         new SpeechAudioFormatInfo(INPUT_SAMPLE_RATE, AudioBitsPerSample.Sixteen, AudioChannel.Mono));
-                    
-                    synth.Speak(path);
 
+                    synth.Speak(msg);
+            
                     return stream.ToArray();
                    
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error with Text to Speech");
+                Logger.Error(ex, "Error with Microsoft Text to Speech");
             }
-             return new byte[0];
+
+            return new byte[0];
         }
 
         private IWaveProvider GetMP3WaveProvider()
         {
-            Logger.Info($"Reading MP3 @ {path}");
+            Logger.Info($"Reading MP3 @ {opts.file}");
 
-            var mp3Reader = new Mp3FileReader(path);
+            var mp3Reader = new Mp3FileReader(opts.file);
             int bytes = (int)mp3Reader.Length;
             byte[] buffer = new byte[bytes];
 
@@ -122,7 +213,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
             VolumeSampleProvider volumeSample =
-                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) {Volume = volume};
+                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) {Volume = opts.volume};
 
             mp3Reader.Close();
             mp3Reader.Dispose();
@@ -162,20 +253,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             byte[] resampledBytes;
 
-            if (path.ToLower().EndsWith(".mp3"))
+            if (opts.file != null && opts.file.ToLowerInvariant().EndsWith(".mp3"))
             {
                 Logger.Info($"Reading MP3 it looks like a file");
                 resampledBytes = GetMP3Bytes();
             }
-            else if (path.ToLower().EndsWith(".ogg"))
+            else if (opts.file != null && opts.file.ToLowerInvariant().EndsWith(".ogg"))
             {
                 Logger.Info($"Reading OGG it looks like a file");
                 resampledBytes = GetOggBytes();
             }
             else
             {
-                Logger.Info($"Doing Text To Speech as its not an MP3 path");
-                resampledBytes = TextToSpeech();
+                Logger.Info($"Doing Text To Speech as its not an MP3/Ogg path");
+
+                var msg = opts.text;
+                if (opts.textFile != null)
+                {
+                    Logger.Info($"Reading text in file from path: {opts.textFile}");
+                    msg = File.ReadAllText(opts.textFile);
+                }
+
+                if (!string.IsNullOrEmpty(opts.googleCredentials))
+                {
+                    resampledBytes = GoogleTTS(msg);
+                }
+                else
+                {
+                    resampledBytes = LocalTTS(msg);
+                }
             }
 
             Logger.Info($"Encode as Opus");
@@ -256,9 +362,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
         private IWaveProvider GetOggWaveProvider()
         {
-            Logger.Info($"Reading Ogg @ {path}");
+            Logger.Info($"Reading Ogg @ {opts.file}");
 
-            var oggReader = new VorbisWaveReader(path);
+            var oggReader = new VorbisWaveReader(opts.file);
             int bytes = (int)oggReader.Length;
             byte[] buffer = new byte[bytes];
 
@@ -280,7 +386,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
             VolumeSampleProvider volumeSample =
-                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) { Volume = volume };
+                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) { Volume = opts.volume };
 
             oggReader.Close();
             oggReader.Dispose();

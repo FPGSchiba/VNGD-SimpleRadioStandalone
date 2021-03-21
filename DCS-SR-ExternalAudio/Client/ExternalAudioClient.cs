@@ -16,43 +16,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private string mp3Path;
         private double[] freq;
         private RadioInformation.Modulation[] modulation;
         private byte[] modulationBytes;
-        private int coalition;
-        private readonly int port;
 
         private readonly string Guid = ShortGuid.NewGuid();
 
         private CancellationTokenSource finished = new CancellationTokenSource();
         private DCSPlayerRadioInfo gameState;
         private UdpVoiceHandler udpVoiceHandler;
-        private string name;
-        private readonly float volume;
+        private Program.Options opts;
 
-        private readonly string SpeakerGender;
-        private readonly string SpeakerCulture;
-
-
-        public ExternalAudioClient(string mp3Path, double[] freq, RadioInformation.Modulation[] modulation, int coalition, int port, string name, float volume, string SpeakerGender, string SpeakerCulture)
+        public ExternalAudioClient(double[] freq, RadioInformation.Modulation[] modulation, Program.Options opts)
         {
-            this.mp3Path = mp3Path;
             this.freq = freq;
             this.modulation = modulation;
-            this.coalition = coalition;
-            this.port = port;
-            this.name = name;
-            this.volume = volume;
-            this.SpeakerGender = SpeakerGender;
-            this.SpeakerCulture = SpeakerCulture;
-
+            this.opts = opts;
             this.modulationBytes = new byte[modulation.Length];
             for (int i = 0; i < modulationBytes.Length; i++)
             {
                 modulationBytes[i] = (byte)modulation[i];
             }
-
         }
 
         public void Start()
@@ -64,25 +48,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             gameState = new DCSPlayerRadioInfo();
             gameState.radios[1].modulation = modulation[0];
             gameState.radios[1].freq = freq[0]; // get into Hz
-            gameState.radios[1].name = name;
+            gameState.radios[1].name = opts.name;
 
             Logger.Info($"Starting with params:");
-            Logger.Info($"Path or Text to Say: {mp3Path} ");
             for (int i = 0; i < freq.Length; i++)
             {
                 Logger.Info($"Frequency: {freq[i]} Hz - {modulation[i]} ");
             }
-            Logger.Info($"Coalition: {coalition} ");
-            Logger.Info($"IP: 127.0.0.1 ");
-            Logger.Info($"Port: {port} ");
-            Logger.Info($"Client Name: {name} ");
-            Logger.Info($"Volume: {volume} ");
-            Logger.Info($"Voice: {SpeakerGender}|{SpeakerCulture} ");
 
+            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,opts.name, opts.coalition);
 
-            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,name, coalition);
-
-            srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, port));
+            srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, opts.port));
 
             //wait for it to end
             finished.Token.WaitHandle.WaitOne();
@@ -99,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             if (udpVoiceHandler == null)
             {
                 Logger.Info($"Connecting UDP VoIP");
-                udpVoiceHandler = new UdpVoiceHandler(Guid, IPAddress.Loopback, port, gameState);
+                udpVoiceHandler = new UdpVoiceHandler(Guid, IPAddress.Loopback, opts.port, gameState);
                 udpVoiceHandler.Start();
                 new Thread(SendAudio).Start();
             }
@@ -113,8 +89,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         private void SendAudio()
         {
             Logger.Info("Sending Audio... Please Wait");
-            AudioGenerator mp3 = new AudioGenerator(mp3Path, volume, SpeakerGender, SpeakerCulture);
-            var opusBytes = mp3.GetOpusBytes();
+            AudioGenerator audioGenerator = new AudioGenerator(opts);
+            var opusBytes = audioGenerator.GetOpusBytes();
             int count = 0;
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
