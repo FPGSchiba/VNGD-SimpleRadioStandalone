@@ -2090,7 +2090,7 @@
                         <Paragraph FontSize="14">
                             SRS has an optional DCS in-game overlay - to toggle use
                             <Run FontSize="16" FontWeight="Bold">Left Ctrl + Left Shift + ESC.</Run>
-                            This will toggle through various states including hidden. The position and visibily state are automatically saved
+                            This will toggle through various states including hidden. The position and visibility state are automatically saved
                         </Paragraph>
 
                         <Paragraph>
