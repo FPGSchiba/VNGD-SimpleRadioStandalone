@@ -47,6 +47,98 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             this.SpeakerCulture = SpeakerCulture;
 
         }
+
+        public VoiceGender SpeakerGender { get; set; }
+
+        private byte[] GoogleTTS(string msg)
+        {
+            try
+            {
+                TextToSpeechClientBuilder builder = new TextToSpeechClientBuilder
+                {
+                    CredentialsPath = opts.googleCredentials
+                };
+
+                TextToSpeechClient client = builder.Build();
+
+                SynthesisInput input = new SynthesisInput
+                {
+                    Text = msg
+                };
+
+                VoiceSelectionParams voice = null;
+
+                if (!string.IsNullOrEmpty(opts.voice))
+                {
+                    voice = new VoiceSelectionParams()
+                    {
+                        Name = opts.voice,
+                        LanguageCode = opts.voice.Substring(0,5),
+                    };
+                }
+                else
+                {
+                    voice = new VoiceSelectionParams
+                    {
+                        LanguageCode = opts.culture,
+                    };
+
+                    switch (opts.gender.ToLowerInvariant().Trim())
+                    {
+                        case "male":
+                            voice.SsmlGender = SsmlVoiceGender.Male;
+                            break;
+                        case "neutral":
+                            voice.SsmlGender = SsmlVoiceGender.Neutral;
+                            break;
+                        case "female":
+                            voice.SsmlGender = SsmlVoiceGender.Female;
+                            break;
+                        default:
+                            voice.SsmlGender = SsmlVoiceGender.Male;
+                            break;
+                    }
+                }
+
+                AudioConfig config = new AudioConfig
+                {
+                    AudioEncoding = AudioEncoding.Linear16,
+                    SampleRateHertz = INPUT_SAMPLE_RATE
+                };
+
+                var response = client.SynthesizeSpeech(new SynthesizeSpeechRequest
+                {
+                    Input = input,
+                    Voice = voice,
+                    AudioConfig = config
+                });
+
+                var tempFile = Path.GetTempFileName();
+
+                using (var stream = File.Create(tempFile))
+                {
+                    response.AudioContent.WriteTo(stream);
+                }
+
+                byte[] bytes = null;
+                using (var reader = new WaveFileReader(tempFile))
+                {
+                    bytes = new byte[reader.Length];
+                    var read = reader.Read(bytes, 0, bytes.Length);
+                    Logger.Info($"Success with Google TTS - read {read} bytes");
+                }
+
+                //cleanup
+                File.Delete(tempFile);
+
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error with Google Text to Speech");
+            }
+            return new byte[0];
+        }
     
 
         private byte[] TextToSpeech()

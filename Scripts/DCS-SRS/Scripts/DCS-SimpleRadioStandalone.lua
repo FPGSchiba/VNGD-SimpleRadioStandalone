@@ -191,6 +191,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update = SR.exportRadioA10A(_update)
             elseif _update.unit == "A-4E-C" then
                 _update = SR.exportRadioA4E(_update)
+			elseif _update.unit == "A-29B" then
+                _update = SR.exportRadioA29B(_update)
             elseif _update.unit == "F-15C" then
                 _update = SR.exportRadioF15C(_update)
             elseif _update.unit == "MiG-29A" or _update.unit == "MiG-29S" or _update.unit == "MiG-29G" then
@@ -628,52 +630,30 @@ end
 
 function SR.exportRadioA4E(_data)
 
-    local mainFreq = 0
-    local guardFreq = 0
-    local channel = nil
+    local arc51 = _data.radios[2]
+    arc51.name = "AN/ARC-51BX"
+    arc51.freq = SR.getRadioFrequency(3)
+    arc51.channel = channel
+    arc51.modulation = 0  -- AM only
 
-    -- Oil pressure gauge is the most reliable way to get power status
-    local hasPower = SR.getButtonPosition(152) > 0.05
     -- "Function Select Switch" near the right edge controls radio power
     local functionSelect = SR.getButtonPosition(372)
 
-    if hasPower and functionSelect > 0.05 then
+    if functionSelect > 0.05 then
         -- Left edge Mode Selector Switch controls local oscillator source
         -- -1 OFF, 0 MAN, 1 PRESET
         local modeSelector = SR.getButtonPosition(366)
         if modeSelector > -0.5 then
             if modeSelector > 0.5 then
-                -- PRESET mode, currently hardcoded support for Hoggit's usual defaults
-                -- TODO Find a way to copy presets from the .miz file
-                channel = SR.getSelectorPosition(361, 0.05) + 1
-                mainFreq = 246.000e6 + 3.500e6 * channel
-            else
-                -- MAN mode, frequency from the three middle dials
-                -- Moving the coeffients below inside the getSelectorPosition
-                -- function call would cause relatively large rounding errors.
-                local left = 10.000e6 * SR.getSelectorPosition(367, 1 / 20)
-                local middle = 1.000e6 * SR.getSelectorPosition(368, 1 / 10)
-                local right = 0.050e6 * SR.getSelectorPosition(369, 1 / 20)
-                mainFreq = 220e6 + left + middle + right
+                -- PRESET mode, 
+                arc51.channel = SR.getSelectorPosition(361, 0.05) + 1
             end
             -- Additionally, enable guard monitor if Function knob is in position T/R+G
             if 0.15 < functionSelect and functionSelect < 0.25 then
-                guardFreq = 243.000e6
+                arc51.secFreq = 243.000e6
             end
-        else
-            -- GD XMIT (Guard Transmit) mode
-            mainFreq = 243.000e6
         end
     end
-
-    local arc51 = _data.radios[2]
-    arc51.name = "AN/ARC-51BX"
-    arc51.freq = mainFreq
-    arc51.secFreq = guardFreq
-    arc51.channel = channel
-    arc51.modulation = 0  -- AM only
-    arc51.freqMin = 220.000e6
-    arc51.freqMax = 399.950e6
 
     -- TODO Check if there are other volume knobs in series
     arc51.volume = SR.getRadioVolume(0, 365, {0.2, 0.8}, false)
@@ -706,6 +686,84 @@ function SR.exportRadioA4E(_data)
     _data.radios[4].expansion = true
 
     _data.control = 0;
+    _data.selected = 1
+
+    return _data
+end
+
+function SR.exportRadioA29B(_data)
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    local com1_freq = 0
+    local com1_mod = 0
+    local com1_sql = 0
+    local com1_pwr = 0
+    local com1_mode = 2
+
+    local com2_freq = 0
+    local com2_mod = 0
+    local com2_sql = 0
+    local com2_pwr = 0
+    local com2_mode = 1
+
+    local _ufcp = SR.getListIndicatorValue(4)
+    if _ufcp then 
+        if _ufcp.com1_freq then com1_freq = (_ufcp.com1_freq * 1000000) end
+        if _ufcp.com1_mod then com1_mod = _ufcp.com1_mod * 1 end
+        if _ufcp.com1_sql then com1_sql = _ufcp.com1_sql end
+        if _ufcp.com1_pwr then com1_pwr = _ufcp.com1_pwr end
+        if _ufcp.com1_mode then com1_mode = _ufcp.com1_mode * 1 end
+
+        if _ufcp.com2_freq then com2_freq = (_ufcp.com2_freq * 1000000) end
+        if _ufcp.com2_mod then com2_mod = _ufcp.com2_mod * 1 end
+        if _ufcp.com2_sql then com2_sql = _ufcp.com2_sql end
+        if _ufcp.com2_pwr then com2_pwr = _ufcp.com2_pwr end
+        if _ufcp.com2_mode then com2_mode = _ufcp.com2_mode * 1 end
+    end
+
+    _data.radios[2].name = "XT-6013 COM1"
+    _data.radios[2].modulation = com1_mod
+    _data.radios[2].volume = SR.getRadioVolume(0, 762, { 0.0, 1.0 }, false)
+
+    if com1_mode == 0 then 
+        _data.radios[2].freq = 0
+        _data.radios[2].secFreq = 0
+    elseif com1_mode == 1 then 
+        _data.radios[2].freq = com1_freq
+        _data.radios[2].secFreq = 0
+    elseif com1_mode == 2 then 
+        _data.radios[2].freq = com1_freq
+        _data.radios[2].secFreq = 121.5 * 1000000
+    end
+
+    _data.radios[3].name = "XT-6313D COM2"
+    _data.radios[3].modulation = com2_mod
+    _data.radios[3].volume = SR.getRadioVolume(0, 763, { 0.0, 1.0 }, false)
+
+    if com2_mode == 0 then 
+        _data.radios[3].freq = 0
+        _data.radios[3].secFreq = 0
+    elseif com2_mode == 1 then 
+        _data.radios[3].freq = com2_freq
+        _data.radios[3].secFreq = 0
+    elseif com2_mode == 2 then 
+        _data.radios[3].freq = com2_freq
+        _data.radios[3].secFreq = 243.0 * 1000000
+    end
+
+    _data.radios[4].name = "KTR-953 HF"
+    _data.radios[4].freq = 15.0 * 1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
+    _data.radios[4].modulation = 1
+    _data.radios[4].volume = SR.getRadioVolume(0, 764, { 0.0, 1.0 }, false)
+    _data.radios[4].freqMin = 2 * 1000000
+    _data.radios[4].freqMax = 30 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+    _data.radios[4].rtMode = 1
+
+    _data.control = 0 -- Hotas Controls radio
     _data.selected = 1
 
     return _data
