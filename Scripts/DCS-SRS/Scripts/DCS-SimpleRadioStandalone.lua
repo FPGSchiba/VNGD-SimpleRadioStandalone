@@ -320,6 +320,8 @@ LuaExportActivityNextEvent = function(tCurrent)
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     end
 
+	 SR.log(SR.tableShow(_G).."\n\n")
+
     return tNext
 end
 
@@ -3077,7 +3079,7 @@ function SR.exportRadioJF17(_data)
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
 
-    -- SR.log(SR.tableShow(_G).."\n\n")
+
 
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 

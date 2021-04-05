@@ -160,7 +160,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
 
-
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
@@ -686,6 +685,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay);
             PTTReleaseDelay.IsEnabled = true;
 
+            PTTStartDelay.IsEnabled = false;
+            PTTStartDelay.ValueChanged += PushToTalkStartDelay_ValueChanged;
+            PTTStartDelay.Value =
+                _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay);
+            PTTStartDelay.IsEnabled = true;
+
             RadioEndTransmitEffect.IsEnabled = false;
             RadioEndTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionEnd;
             RadioEndTransmitEffect.SelectedItem = CachedAudioEffectProvider.Instance.SelectedRadioTransmissionEndEffect;
@@ -1007,6 +1012,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, "");
+            }
+
+            ShowMicPassthroughWarning();
+        }
+
+        private void ShowMicPassthroughWarning()
+        {
+            if (_globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue
+                .Equals(_globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue))
+            {
+                MessageBox.Show("Mic Output and Speaker Output should not be set to the same device!\n\nMic Output is just for recording and not for use as a sidetone. You will hear yourself with a small delay!\n\nHit disconnect and change Mic Output / Passthrough", "Warning", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
@@ -1828,6 +1845,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (PTTReleaseDelay.IsEnabled)
                 _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay, (float)e.NewValue);
+        }
+
+        private void PushToTalkStartDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (PTTStartDelay.IsEnabled)
+                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay, (float)e.NewValue);
         }
 
         private void Donate_OnClick(object sender, RoutedEventArgs e)
