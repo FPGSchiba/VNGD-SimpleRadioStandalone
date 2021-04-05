@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 Logger.Debug("Starting external AWACS mode loop");
 
                 _clientStateSingleton.IntercomOffset = 1;
-                while (!_stopExternalAWACSMode)
+                while (!_stopExternalAWACSMode )
                 {
                     var unitId = DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset;
 
@@ -178,7 +178,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _dcsGameGuiHandler.Stop();
             _lineOfSightHandler.Stop();
             _udpCommandHandler.Stop();
-            
+
         }
     }
 }

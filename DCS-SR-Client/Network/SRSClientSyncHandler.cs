@@ -200,6 +200,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private void ClientRadioUpdated()
         {
+            //disconnect AWACS
+            if (_clientStateSingleton.ExternalAWACSModelSelected && _clientStateSingleton.IsGameConnected)
+            {
+                Logger.Debug("Disconnect AWACS Mode as Game Detected");
+                DisconnectExternalAWACSMode();
+            }
+
             Logger.Debug("Sending Radio Update to Server");
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
 
@@ -228,6 +235,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SendToServer(message);
+
+           
         }
 
         private void ClientCoalitionUpdate()
