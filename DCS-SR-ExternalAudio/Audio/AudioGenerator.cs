@@ -37,11 +37,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
         {
             this.opts = opts;
 
-            if (opts.gender.ToLower() == "male")
+            if (opts.Gender.Trim().ToLower() == "male")
             {
                 this.SpeakerGender = VoiceGender.Male;
             }
-            else if (opts.gender.ToLower() == "neutral")
+            else if (opts.Gender.Trim().ToLower() == "neutral")
             {
                 this.SpeakerGender = VoiceGender.Neutral;
             }
@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             {
                 TextToSpeechClientBuilder builder = new TextToSpeechClientBuilder
                 {
-                    CredentialsPath = opts.googleCredentials
+                    CredentialsPath = opts.GoogleCredentials
                 };
 
                 TextToSpeechClient client = builder.Build();
@@ -72,22 +72,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
                 VoiceSelectionParams voice = null;
 
-                if (!string.IsNullOrEmpty(opts.voice))
+                if (!string.IsNullOrEmpty(opts.Voice))
                 {
                     voice = new VoiceSelectionParams()
                     {
-                        Name = opts.voice,
-                        LanguageCode = opts.voice.Substring(0,5),
+                        Name = opts.Voice,
+                        LanguageCode = opts.Voice.Substring(0,5),
                     };
                 }
                 else
                 {
                     voice = new VoiceSelectionParams
                     {
-                        LanguageCode = opts.culture,
+                        LanguageCode = opts.Culture,
                     };
 
-                    switch (opts.gender.ToLowerInvariant().Trim())
+                    switch (opts.Gender.ToLowerInvariant().Trim())
                     {
                         case "male":
                             voice.SsmlGender = SsmlVoiceGender.Male;
@@ -139,7 +139,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error with Google Text to Speech");
+                Logger.Error(ex, $"Error with Google Text to Speech: {ex.Message}");
             }
             return new byte[0];
         }
@@ -153,25 +153,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 using (var synth = new SpeechSynthesizer())
                 using (var stream = new MemoryStream())
                 {
-                    if (opts.voice == null || opts.voice.Length == 0)
+                    if (opts.Voice == null || opts.Voice.Length == 0)
                     {
-                        if (opts.culture == null)
+                        if (opts.Culture == null)
                         {
                             synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult);
                         }
                         else
                         {
-                            synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(opts.culture, false));
+                            synth.SelectVoiceByHints(this.SpeakerGender, VoiceAge.Adult, 0, new CultureInfo(opts.Culture, false));
                         }
                     }
                     else
                     {
-                        synth.SelectVoice(opts.voice);
+                        synth.SelectVoice(opts.Voice);
                     }
                     
                     synth.Rate = opts.speed;
             
-                    var intVol = (int)(opts.volume * 100.0);
+                    var intVol = (int)(opts.Volume * 100.0);
             
                     if (intVol > 100)
                     {
@@ -191,7 +191,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error with Microsoft Text to Speech");
+                Logger.Error(ex, $"Error with Microsoft Text to Speech: {ex.Message}");
             }
 
             return new byte[0];
@@ -199,9 +199,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
         private IWaveProvider GetMP3WaveProvider()
         {
-            Logger.Info($"Reading MP3 @ {opts.file}");
+            Logger.Info($"Reading MP3 @ {opts.File}");
 
-            var mp3Reader = new Mp3FileReader(opts.file);
+            var mp3Reader = new Mp3FileReader(opts.File);
             int bytes = (int)mp3Reader.Length;
             byte[] buffer = new byte[bytes];
 
@@ -221,7 +221,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
             VolumeSampleProvider volumeSample =
-                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) {Volume = opts.volume};
+                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) {Volume = opts.Volume};
 
             mp3Reader.Close();
             mp3Reader.Dispose();
@@ -261,12 +261,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             byte[] resampledBytes;
 
-            if (opts.file != null && opts.file.ToLowerInvariant().EndsWith(".mp3"))
+            if (opts.File != null && opts.File.ToLowerInvariant().EndsWith(".mp3"))
             {
                 Logger.Info($"Reading MP3 it looks like a file");
                 resampledBytes = GetMP3Bytes();
             }
-            else if (opts.file != null && opts.file.ToLowerInvariant().EndsWith(".ogg"))
+            else if (opts.File != null && opts.File.ToLowerInvariant().EndsWith(".ogg"))
             {
                 Logger.Info($"Reading OGG it looks like a file");
                 resampledBytes = GetOggBytes();
@@ -275,19 +275,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
             {
                 Logger.Info($"Doing Text To Speech as its not an MP3/Ogg path");
 
-                var msg = opts.text;
-                if (opts.textFile != null)
+                var msg = opts.Text;
+                if (opts.TextFile != null)
                 {
-                    Logger.Info($"Reading text in file from path: {opts.textFile}");
-                    msg = File.ReadAllText(opts.textFile);
+                    Logger.Info($"Reading text in file from path: {opts.TextFile}");
+                    msg = File.ReadAllText(opts.TextFile);
                 }
 
-                if (!string.IsNullOrEmpty(opts.googleCredentials))
+                if (!string.IsNullOrEmpty(opts.GoogleCredentials))
                 {
                     resampledBytes = GoogleTTS(msg);
                 }
                 else
                 {
+                    //TODO fix gender
                     resampledBytes = LocalTTS(msg);
                 }
             }
@@ -370,9 +371,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
         private IWaveProvider GetOggWaveProvider()
         {
-            Logger.Info($"Reading Ogg @ {opts.file}");
+            Logger.Info($"Reading Ogg @ {opts.File}");
 
-            var oggReader = new VorbisWaveReader(opts.file);
+            var oggReader = new VorbisWaveReader(opts.File);
             int bytes = (int)oggReader.Length;
             byte[] buffer = new byte[bytes];
 
@@ -394,7 +395,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
             bufferedWaveProvider.AddSamples(buffer, 0, read);
             VolumeSampleProvider volumeSample =
-                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) { Volume = opts.volume };
+                new VolumeSampleProvider(bufferedWaveProvider.ToSampleProvider()) { Volume = opts.Volume };
 
             oggReader.Close();
             oggReader.Dispose();

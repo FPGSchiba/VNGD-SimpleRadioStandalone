@@ -320,7 +320,7 @@ LuaExportActivityNextEvent = function(tCurrent)
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     end
 
-	 SR.log(SR.tableShow(_G).."\n\n")
+	 --SR.log(SR.tableShow(_G).."\n\n")
 
     return tNext
 end
@@ -632,30 +632,52 @@ end
 
 function SR.exportRadioA4E(_data)
 
-    local arc51 = _data.radios[2]
-    arc51.name = "AN/ARC-51BX"
-    arc51.freq = SR.getRadioFrequency(3)
-    arc51.channel = channel
-    arc51.modulation = 0  -- AM only
+    local mainFreq = 0
+    local guardFreq = 0
+    local channel = nil
 
+    -- Oil pressure gauge is the most reliable way to get power status
+    local hasPower = SR.getButtonPosition(152) > 0.05
     -- "Function Select Switch" near the right edge controls radio power
     local functionSelect = SR.getButtonPosition(372)
 
-    if functionSelect > 0.05 then
+    if hasPower and functionSelect > 0.05 then
         -- Left edge Mode Selector Switch controls local oscillator source
         -- -1 OFF, 0 MAN, 1 PRESET
         local modeSelector = SR.getButtonPosition(366)
         if modeSelector > -0.5 then
             if modeSelector > 0.5 then
-                -- PRESET mode, 
-                arc51.channel = SR.getSelectorPosition(361, 0.05) + 1
+                -- PRESET mode, currently hardcoded support for Hoggit's usual defaults
+                -- TODO Find a way to copy presets from the .miz file
+                channel = SR.getSelectorPosition(361, 0.05) + 1
+                mainFreq = 246.000e6 + 3.500e6 * channel
+            else
+                -- MAN mode, frequency from the three middle dials
+                -- Moving the coeffients below inside the getSelectorPosition
+                -- function call would cause relatively large rounding errors.
+                local left = 10.000e6 * SR.getSelectorPosition(367, 1 / 20)
+                local middle = 1.000e6 * SR.getSelectorPosition(368, 1 / 10)
+                local right = 0.050e6 * SR.getSelectorPosition(369, 1 / 20)
+                mainFreq = 220e6 + left + middle + right
             end
             -- Additionally, enable guard monitor if Function knob is in position T/R+G
             if 0.15 < functionSelect and functionSelect < 0.25 then
-                arc51.secFreq = 243.000e6
+                guardFreq = 243.000e6
             end
+        else
+            -- GD XMIT (Guard Transmit) mode
+            mainFreq = 243.000e6
         end
     end
+
+    local arc51 = _data.radios[2]
+    arc51.name = "AN/ARC-51BX"
+    arc51.freq = mainFreq
+    arc51.secFreq = guardFreq
+    arc51.channel = channel
+    arc51.modulation = 0  -- AM only
+    arc51.freqMin = 220.000e6
+    arc51.freqMax = 399.950e6
 
     -- TODO Check if there are other volume knobs in series
     arc51.volume = SR.getRadioVolume(0, 365, {0.2, 0.8}, false)

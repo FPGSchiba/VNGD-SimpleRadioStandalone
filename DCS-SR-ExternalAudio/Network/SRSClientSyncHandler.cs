@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Models;
 using Easy.MessageHub;
@@ -27,13 +28,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
         private static readonly int MAX_DECODE_ERRORS = 5;
         private readonly string name;
         private readonly int coalition;
+        private DCSLatLngPosition position;
 
-        public SRSClientSyncHandler(string guid, DCSPlayerRadioInfo gameState, string name, int coalition)
+        public SRSClientSyncHandler(string guid, DCSPlayerRadioInfo gameState, string name, int coalition, DCSLatLngPosition position)
         {
             _guid = guid;
             this.gameState = gameState;
             this.name = name;
             this.coalition = coalition;
+            this.position = position;
         }
 
         public void TryConnect(IPEndPoint endpoint)
@@ -101,7 +104,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                             Coalition = coalition,
                             Name = this.name,
                             ClientGuid = _guid,
-                            RadioInfo = gameState
+                            RadioInfo = gameState,
+                            LatLngPosition = position
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
 
@@ -116,6 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                             Name = this.name,
                             ClientGuid = _guid,
                             RadioInfo = gameState,
+                            LatLngPosition = position
                         },
                         MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
 

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Models;
@@ -48,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             gameState = new DCSPlayerRadioInfo();
             gameState.radios[1].modulation = modulation[0];
             gameState.radios[1].freq = freq[0]; // get into Hz
-            gameState.radios[1].name = opts.name;
+            gameState.radios[1].name = opts.Name;
 
             Logger.Info($"Starting with params:");
             for (int i = 0; i < freq.Length; i++)
@@ -56,9 +57,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 Logger.Info($"Frequency: {freq[i]} Hz - {modulation[i]} ");
             }
 
-            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,opts.name, opts.coalition);
+            DCSLatLngPosition position = new DCSLatLngPosition()
+            {
+                alt = opts.Altitude,
+                lat = opts.Latitude,
+                lng = opts.Longitude
+            };
 
-            srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, opts.port));
+            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,opts.Name, opts.Coalition,position);
+
+            srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, opts.Port));
 
             //wait for it to end
             finished.Token.WaitHandle.WaitOne();
@@ -75,7 +83,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
             if (udpVoiceHandler == null)
             {
                 Logger.Info($"Connecting UDP VoIP");
-                udpVoiceHandler = new UdpVoiceHandler(Guid, IPAddress.Loopback, opts.port, gameState);
+                udpVoiceHandler = new UdpVoiceHandler(Guid, IPAddress.Loopback, opts.Port, gameState);
                 udpVoiceHandler.Start();
                 new Thread(SendAudio).Start();
             }

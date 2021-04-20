@@ -56,36 +56,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 SetName = "file",
                 HelpText = "Full path to MP3 or Ogg - File must end .mp3 or .ogg",
                 Required = true )]
-            public string file { get; set; }
+            public string File { get; set; }
 
             [Option('t',"text",
                 HelpText = "Text to say",
                 SetName = "TTS",
                 Required = true)]
-            public string text { get; set; }
+            public string Text { get; set; }
 
             [Option('I',"textFile",
                 SetName = "textFile",
                 HelpText = "Path to text file for TTS ",
                 Required = true)]
-            public string textFile { get; set; }
+            public string TextFile { get; set; }
 
             [Option('f',"freqs",
                 HelpText = "Frequency in MHz comma separated - 251.0,252.0 or just 252.0 ",
                 Required = true)]
-            public string freqs { get; set; }
+            public string Freqs { get; set; }
 
 
             [Option('m',"modulations",
                 HelpText = "Modulation AM or FM comma separated - AM,FM or just AM  ",
                 Required = true)]
-            public string modulations { get; set; }
+            public string Modulations { get; set; }
 
 
             [Option('c',"coalition",
                 HelpText = "Coalition - 0 is Spectator, 1 is Red, 2 is Blue",
                 Required = true)]
-            public int coalition { get; set; }
+            public int Coalition { get; set; }
 
             [Option('s',"speed",
                 Default = 1,
@@ -97,47 +97,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 HelpText = "Port - 5002 is the default",
                 Default = 5002,
                 Required = false)]
-            public int port { get; set; }
+            public int Port { get; set; }
 
             [Option('n',"name",
                 HelpText = "Name - name of your transmitter - no spaces",
                 Default = "DCS-STTS",
                 Required = false)]
-            public string name { get; set; }
+            public string Name { get; set; }
 
             [Option('v',"volume",
                 HelpText = "Volume - 1.0 is max, 0.0 is silence",
                 Default = 1.0f,
                 Required = false)]
-            public float volume { get; set; }
+            public float Volume { get; set; }
 
             [Option('l',"culture",
                 HelpText = "TTS culture - local for the voice",
                 Required = false,
                 Default = "en-GB")]
-            public string culture { get; set; }
+            public string Culture { get; set; }
 
             [Option('g',"gender",
                 HelpText = "TTS Gender - male/female",
                 Required = false,
                 Default = "female")]
-            public string gender { get; set; }
+            public string Gender { get; set; }
 
             [Option('V',"voice",
                 HelpText = "The voice NAME - see the list from --help or if using google see: https://cloud.google.com/text-to-speech/docs/voices ",
                 Required = false)]
-            public string voice { get; set; }
+            public string Voice { get; set; }
 
             [Option('h',"minimise",
                 HelpText = "Minimise the command line window on run",
                 Required = false,
                 Default = false)]
-            public bool minimise { get; set; }
+            public bool Minimise { get; set; }
 
             [Option('G',"googleCredentials",
                 HelpText = "Full path to Google JSON Credentials file - see https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries",
                 Required = false)]
-            public string googleCredentials { get; set; }
+            public string GoogleCredentials { get; set; }
+
+            [Option('L', "latitude",
+                HelpText = "Latitude of transmission",
+                Required = false, Default = 0.0)]
+            public double Latitude { get; set; }
+
+            [Option('O', "longitude",
+                HelpText = "Longitude of transmission",
+                Required = false, Default = 0.0)]
+            public double Longitude { get; set; }
+
+            [Option('A', "Altitude",
+                HelpText = "Altitude of transmission in meters above sea level",
+                Required = false, Default = 0.0)]
+            public double Altitude { get; set; }
         }
         public static void Main(string[] args)
         {
@@ -149,13 +164,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 
         private static void ProcessArgs(Options opts)
         {
-            if (opts.minimise)
+            if (opts.Minimise)
             {
                 MinimizeConsoleWindow();
             }
 
             //process freqs
-            var freqStr = opts.freqs.Split(',');
+            var freqStr = opts.Freqs.Split(',');
 
             List<double> freqDouble = new List<double>();
             foreach (var s in freqStr)
@@ -163,7 +178,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 freqDouble.Add(double.Parse(s, CultureInfo.InvariantCulture) * 1000000d);
             }
 
-            var modulationStr = opts.modulations.Split(',');
+            var modulationStr = opts.Modulations.Split(',');
 
             List<RadioInformation.Modulation> modulation = new List<RadioInformation.Modulation>();
             foreach (var s in modulationStr)

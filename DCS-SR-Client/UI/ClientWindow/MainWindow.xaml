@@ -1347,7 +1347,7 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Push to Talk Release Delay (ms)" />
+                                           Content="Push to Talk Release Delay (ms) - SRS Hotkeys only" />
 
                                     <StackPanel Grid.Row="5"
                                                 Grid.Column="1" Margin="10">
@@ -1383,7 +1383,7 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Push to Talk Start Delay (ms)" />
+                                           Content="Push to Talk Start Delay (ms) - SRS Hotkeys only" />
 
                                     <StackPanel Grid.Row="6"
                                                 Grid.Column="1" Margin="10">
