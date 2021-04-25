@@ -149,7 +149,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 Required = false, Default = 0.0)]
             public double Longitude { get; set; }
 
-            [Option('A', "Altitude",
+            [Option('A', "altitude",
                 HelpText = "Altitude of transmission in meters above sea level",
                 Required = false, Default = 0.0)]
             public double Altitude { get; set; }
@@ -206,6 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
         
             Console.WriteLine("");
             Console.WriteLine("Example:\n --file=\"C:\\FULL\\PATH\\TO\\File.mp3\" --freqs=251.0 --modulations=AM --coalition=1 --port=5002 --name=\"ciribob-robot\" --volume=0.5");
+            Console.WriteLine("Example:\n --file=\"C:\\FULL\\PATH\\TO\\File.mp3\" --freqs=251.0 --modulations=AM --coalition=1 --port=5002 --name=\"ciribob-robot\" --volume=0.5 --latitude=50.82653 --longitude=-0.15210 --altitude=20");
             Console.WriteLine("Example:\n --text=\"I want this read out over this frequency - hello world! \" --freqs=251.0 --modulations=AM --coalition=1 --port=5002 --name=\"ciribob-robot\" --volume=0.5");
             Console.WriteLine("Example:\n --text=\"I want this read out over TWO frequencies - hello world! \" --freqs=251.0,252.0 --modulations=AM,AM --coalition=1 --port=5002 --name=\"ciribob-robot\" --volume=0.5");
 
@@ -227,8 +228,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
 
             Console.WriteLine($"Example:\n --text=\"I want any female voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=female");
 
-            Console.WriteLine($"Example:\n --text=\"I want any male voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male");
+            Console.WriteLine($"Example:\n --text=\"I want any female voice at a location \" --freqs=251.0 --modulations=AM --coalition=1 --gender=female --latitude=50.82653 --longitude=-0.15210 --altitude=20");
 
+            Console.WriteLine($"Example:\n --text=\"I want any male voice \" --freqs=251.0 --modulations=AM --coalition=1 --gender=male");
 
             Console.WriteLine("");
             Console.WriteLine("Google Cloud Text to Speech Examples - see locale and voices https://cloud.google.com/text-to-speech/docs/voices  : \n");
