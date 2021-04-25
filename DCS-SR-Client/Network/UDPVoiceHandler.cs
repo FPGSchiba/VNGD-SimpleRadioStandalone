@@ -60,6 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private volatile bool _ptt;
         private long _lastPTTPress; // to handle dodgy PTT - release time
+        private long _firstPTTPress; // to delay start PTT time
 
         private volatile bool _ready;
 
@@ -210,6 +211,46 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                 }
 
+                /**
+             * Handle DELAYING PTT START
+             */
+
+                if (!ptt)
+                {
+                    //reset
+                    _firstPTTPress = -1;
+                }
+
+                if (_firstPTTPress == -1 && ptt)
+                {
+                    _firstPTTPress = DateTime.Now.Ticks;
+                }
+
+                if (ptt)
+                {
+                    //should inhibit for a bit
+                    var startDiff = new TimeSpan(DateTime.Now.Ticks - _firstPTTPress);
+
+                    var startInhibit = _globalSettings.ProfileSettingsStore
+                        .GetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay);
+
+                    if (startDiff.TotalMilliseconds < startInhibit)
+                    {
+                        _ptt = false;
+                        _lastPTTPress = -1;
+                        return;
+                    }
+                }
+
+                /**
+                 * End Handle DELAYING PTT START
+                 */
+
+
+                /**
+                 * Start Handle PTT HOLD after release
+                 */
+
                 //if length is zero - no keybinds or no PTT pressed set to false
                 var diff = new TimeSpan(DateTime.Now.Ticks - _lastPTTPress);
 
@@ -225,6 +266,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     ptt = true;
                 }
+
+                /**
+                 * End Handle PTT HOLD after release
+                 */
+
+            
 
                 _ptt = ptt;
             });

@@ -1,4 +1,4 @@
--- Version 1.9.5.0
+-- Version 1.9.6.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -191,6 +191,10 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update = SR.exportRadioA10A(_update)
             elseif _update.unit == "A-4E-C" then
                 _update = SR.exportRadioA4E(_update)
+            elseif _update.unit == "T-45" then
+                _update = SR.exportRadioT45(_update)
+			elseif _update.unit == "A-29B" then
+                _update = SR.exportRadioA29B(_update)
             elseif _update.unit == "F-15C" then
                 _update = SR.exportRadioF15C(_update)
             elseif _update.unit == "MiG-29A" or _update.unit == "MiG-29S" or _update.unit == "MiG-29G" then
@@ -317,6 +321,8 @@ LuaExportActivityNextEvent = function(tCurrent)
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
         --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     end
+
+	 --SR.log(SR.tableShow(_G).."\n\n")
 
     return tNext
 end
@@ -628,6 +634,8 @@ end
 
 function SR.exportRadioA4E(_data)
 
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
     local mainFreq = 0
     local guardFreq = 0
     local channel = nil
@@ -706,6 +714,187 @@ function SR.exportRadioA4E(_data)
     _data.radios[4].expansion = true
 
     _data.control = 0;
+    _data.selected = 1
+
+    return _data
+end
+
+
+function SR.exportRadioT45(_data)
+
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+
+    local radio1Device = GetDevice(1)
+    local radio2Device = GetDevice(2)
+    local mainFreq1 = 0
+    local guardFreq1 = 0
+    local mainFreq2 = 0
+    local guardFreq2 = 0
+    
+    local comm1Switch = GetDevice(0):get_argument_value(191) 
+    local comm2Switch = GetDevice(0):get_argument_value(192) 
+    local comm1PTT = GetDevice(0):get_argument_value(294)
+    local comm2PTT = GetDevice(0):get_argument_value(294) 
+    local intercomPTT = GetDevice(0):get_argument_value(295)    
+    local ICSMicSwitch = GetDevice(0):get_argument_value(196) --0 cold, 1 hot
+    
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = GetDevice(0):get_argument_value(198)
+    
+    local modeSelector1 = GetDevice(0):get_argument_value(256) -- 0:off, 0.25:T/R, 0.5:T/R+G
+    if modeSelector1 == 0.5 and comm1Switch == 1 then
+        mainFreq1 = SR.round(radio1Device:get_frequency(), 5000)
+        if mainFreq1 > 225000000 then
+            guardFreq1 = 243.000E6
+        elseif mainFreq1 < 155975000 then
+            guardFreq1 = 121.500E6
+        else
+            guardFreq1 = 0
+        end
+    elseif modeSelector1 == 0.25 and comm1Switch == 1 then
+        guardFreq1 = 0
+        mainFreq1 = SR.round(radio1Device:get_frequency(), 5000)
+    else
+        guardFreq1 = 0
+        mainFreq1 = 0
+    end
+
+    local arc182 = _data.radios[2]
+    arc182.name = "AN/ARC-182(V) - 1"
+    arc182.freq = mainFreq1
+    arc182.secFreq = guardFreq1
+    arc182.modulation = radio1Device:get_modulation()  
+    arc182.freqMin = 30.000e6
+    arc182.freqMax = 399.975e6
+    arc182.volume = GetDevice(0):get_argument_value(246)
+
+    local modeSelector2 = GetDevice(0):get_argument_value(280) -- 0:off, 0.25:T/R, 0.5:T/R+G
+    if modeSelector2 == 0.5 and comm2Switch == 1 then
+        mainFreq2 = SR.round(radio2Device:get_frequency(), 5000)
+        if mainFreq2 > 225000000 then
+            guardFreq2 = 243.000E6
+        elseif mainFreq2 < 155975000 then
+            guardFreq2 = 121.500E6
+        else
+            guardFreq2 = 0
+        end
+    elseif modeSelector2 == 0.25 and comm2Switch == 1 then
+        guardFreq2 = 0
+        mainFreq2 = SR.round(radio2Device:get_frequency(), 5000)
+    else
+        guardFreq2 = 0
+        mainFreq2 = 0
+    end
+    
+    local arc182_2 = _data.radios[3]
+    arc182_2.name = "AN/ARC-182(V) - 2"
+    arc182_2.freq = mainFreq2
+    arc182_2.secFreq = guardFreq2
+    arc182_2.modulation = radio2Device:get_modulation()  
+    arc182_2.freqMin = 30.000e6
+    arc182_2.freqMax = 399.975e6
+    arc182_2.volume = GetDevice(0):get_argument_value(270)
+
+    if comm1PTT == 1 then
+        _data.selected = 1 -- comm 1
+        _data.ptt = true
+    elseif comm2PTT == -1 then
+        _data.selected = 2 -- comm 2
+        _data.ptt = true
+    elseif intercomPTT == 1 then
+        _data.selected = 0 -- intercom
+        _data.ptt = true
+    else
+        _data.selected = -1
+        _data.ptt = false
+    end
+    
+    if ICSMicSwitch == 1 then
+        _data.intercomHotMic = true
+    else
+        _data.intercomHotMic = false
+    end
+
+    _data.control = 1; -- full radio HOTAS control
+    
+    return _data
+end
+
+function SR.exportRadioA29B(_data)
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    local com1_freq = 0
+    local com1_mod = 0
+    local com1_sql = 0
+    local com1_pwr = 0
+    local com1_mode = 2
+
+    local com2_freq = 0
+    local com2_mod = 0
+    local com2_sql = 0
+    local com2_pwr = 0
+    local com2_mode = 1
+
+    local _ufcp = SR.getListIndicatorValue(4)
+    if _ufcp then 
+        if _ufcp.com1_freq then com1_freq = (_ufcp.com1_freq * 1000000) end
+        if _ufcp.com1_mod then com1_mod = _ufcp.com1_mod * 1 end
+        if _ufcp.com1_sql then com1_sql = _ufcp.com1_sql end
+        if _ufcp.com1_pwr then com1_pwr = _ufcp.com1_pwr end
+        if _ufcp.com1_mode then com1_mode = _ufcp.com1_mode * 1 end
+
+        if _ufcp.com2_freq then com2_freq = (_ufcp.com2_freq * 1000000) end
+        if _ufcp.com2_mod then com2_mod = _ufcp.com2_mod * 1 end
+        if _ufcp.com2_sql then com2_sql = _ufcp.com2_sql end
+        if _ufcp.com2_pwr then com2_pwr = _ufcp.com2_pwr end
+        if _ufcp.com2_mode then com2_mode = _ufcp.com2_mode * 1 end
+    end
+
+    _data.radios[2].name = "XT-6013 COM1"
+    _data.radios[2].modulation = com1_mod
+    _data.radios[2].volume = SR.getRadioVolume(0, 762, { 0.0, 1.0 }, false)
+
+    if com1_mode == 0 then 
+        _data.radios[2].freq = 0
+        _data.radios[2].secFreq = 0
+    elseif com1_mode == 1 then 
+        _data.radios[2].freq = com1_freq
+        _data.radios[2].secFreq = 0
+    elseif com1_mode == 2 then 
+        _data.radios[2].freq = com1_freq
+        _data.radios[2].secFreq = 121.5 * 1000000
+    end
+
+    _data.radios[3].name = "XT-6313D COM2"
+    _data.radios[3].modulation = com2_mod
+    _data.radios[3].volume = SR.getRadioVolume(0, 763, { 0.0, 1.0 }, false)
+
+    if com2_mode == 0 then 
+        _data.radios[3].freq = 0
+        _data.radios[3].secFreq = 0
+    elseif com2_mode == 1 then 
+        _data.radios[3].freq = com2_freq
+        _data.radios[3].secFreq = 0
+    elseif com2_mode == 2 then 
+        _data.radios[3].freq = com2_freq
+        _data.radios[3].secFreq = 243.0 * 1000000
+    end
+
+    _data.radios[4].name = "KTR-953 HF"
+    _data.radios[4].freq = 15.0 * 1000000 --VHF/FM opera entre 30.000 y 76.000 MHz.
+    _data.radios[4].modulation = 1
+    _data.radios[4].volume = SR.getRadioVolume(0, 764, { 0.0, 1.0 }, false)
+    _data.radios[4].freqMin = 2 * 1000000
+    _data.radios[4].freqMax = 30 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+    _data.radios[4].rtMode = 1
+
+    _data.control = 0 -- Hotas Controls radio
     _data.selected = 1
 
     return _data
@@ -3019,7 +3208,7 @@ function SR.exportRadioJF17(_data)
     _data.selected = 1
     _data.control = 0; -- partial radio, allows hotkeys
 
-    -- SR.log(SR.tableShow(_G).."\n\n")
+
 
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
@@ -3626,4 +3815,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.5.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.6.0")

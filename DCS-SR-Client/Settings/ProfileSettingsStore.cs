@@ -61,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         VHFNoiseVolume,
         UHFNoiseVolume,
         HFNoiseVolume,
+
+        PTTStartDelay,
     }
 
     public class ProfileSettingsStore
@@ -114,6 +116,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
+            {ProfileSettingsKeys.PTTStartDelay.ToString(), "0"},
 
             {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "true"},
 

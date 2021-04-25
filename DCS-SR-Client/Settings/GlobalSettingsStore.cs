@@ -427,7 +427,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
 
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
-            {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "true"},
+            {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "false"},
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
 
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins

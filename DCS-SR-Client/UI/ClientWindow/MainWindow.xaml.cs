@@ -119,8 +119,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
 
-
-
             Title = Title + " - " + UpdaterChecker.VERSION;
 
             CheckWindowVisibility();
@@ -161,7 +159,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _audioManager = new AudioManager(AudioOutput.WindowsN);
             _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
-
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
@@ -652,6 +649,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             VAICOMTXInhibitEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled);
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
+
+            var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
+            if(objValue == null || (string) objValue == "TRUE")
+            {
+                AllowAnonymousUsage.IsChecked = false;
+            }
+            else
+            {
+                AllowAnonymousUsage.IsChecked = true;
+            }
         }
 
         private void ReloadProfileSettings()
@@ -687,6 +694,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTTReleaseDelay.Value =
                 _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay);
             PTTReleaseDelay.IsEnabled = true;
+
+            PTTStartDelay.IsEnabled = false;
+            PTTStartDelay.ValueChanged += PushToTalkStartDelay_ValueChanged;
+            PTTStartDelay.Value =
+                _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay);
+            PTTStartDelay.IsEnabled = true;
 
             RadioEndTransmitEffect.IsEnabled = false;
             RadioEndTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionEnd;
@@ -1009,6 +1022,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             else
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId, "");
+            }
+
+            ShowMicPassthroughWarning();
+        }
+
+        private void ShowMicPassthroughWarning()
+        {
+            if (_globalSettings.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue
+                .Equals(_globalSettings.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue))
+            {
+                MessageBox.Show("Mic Output and Speaker Output should not be set to the same device!\n\nMic Output is just for recording and not for use as a sidetone. You will hear yourself with a small delay!\n\nHit disconnect and change Mic Output / Passthrough", "Warning", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
@@ -1832,6 +1857,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay, (float)e.NewValue);
         }
 
+        private void PushToTalkStartDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (PTTStartDelay.IsEnabled)
+                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay, (float)e.NewValue);
+        }
+
         private void Donate_OnClick(object sender, RoutedEventArgs e)
         {
             try
@@ -1852,6 +1883,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void HQEffect_Click(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone, (bool)HQEffectToggle.IsChecked);
+        }
+
+        private void AllowAnonymousUsage_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!(bool) AllowAnonymousUsage.IsChecked)
+            {
+                MessageBox.Show(
+                    "Please leave this ticked - SRS logging is extremely minimal (you can verify by looking at the source) - and limited to: Country & SRS Version on startup.\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                    "Please leave this ticked", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "TRUE");
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Thank you for enabling this!\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                    "Thank You!", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
+            }
+            
         }
     }
 }
