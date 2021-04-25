@@ -649,6 +649,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             VAICOMTXInhibitEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled);
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
+
+            var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
+            if(objValue == null || (string) objValue == "TRUE")
+            {
+                AllowAnonymousUsage.IsChecked = false;
+            }
+            else
+            {
+                AllowAnonymousUsage.IsChecked = true;
+            }
         }
 
         private void ReloadProfileSettings()
@@ -1873,6 +1883,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void HQEffect_Click(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone, (bool)HQEffectToggle.IsChecked);
+        }
+
+        private void AllowAnonymousUsage_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!(bool) AllowAnonymousUsage.IsChecked)
+            {
+                MessageBox.Show(
+                    "Please leave this ticked - SRS logging is extremely minimal (you can verify by looking at the source) - and limited to: Country & SRS Version on startup.\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                    "Please leave this ticked", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "TRUE");
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Thank you for enabling this!\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                    "Thank You!", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
+            }
+            
         }
     }
 }
