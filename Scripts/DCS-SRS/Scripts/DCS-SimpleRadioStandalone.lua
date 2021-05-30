@@ -1106,7 +1106,18 @@ function SR.exportRadioSA342(_data)
     _data.radios[1].simul = true
 
     _data.radios[2].name = "TRAP 138A"
-    _data.radios[2].freq = SR.getRadioFrequency(5)
+    local MHZ = 1000000
+    local _hundreds = SR.round(SR.getKnobPosition(0, 133, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100 * MHZ
+    local _tens = SR.round(SR.getKnobPosition(0, 134, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10 * MHZ
+    local _ones = SR.round(SR.getKnobPosition(0, 136, { 0.0, 0.9 }, { 0, 9 }), 0.1) * MHZ
+    local _tenth = SR.round(SR.getKnobPosition(0, 138, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100000
+    local _hundreth = SR.round(SR.getKnobPosition(0, 139, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10000
+
+    if SR.getSelectorPosition(128, 0.33) > 0.65 then -- Check VHF ON?
+        _data.radios[2].freq = _hundreds + _tens + _ones + _tenth + _hundreth
+    else
+        _data.radios[2].freq = 1
+    end
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 68, { 1.0, 0.0 }, true)
     _data.radios[2].rtMode = 1
