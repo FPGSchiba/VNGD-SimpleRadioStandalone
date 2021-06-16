@@ -66,7 +66,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            UpdateList();
+            try
+            {
+                UpdateList();
+            }
+            catch (Exception)
+            {
+            }
+
         }
 
         protected override void OnClosing(CancelEventArgs e)

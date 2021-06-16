@@ -1,4 +1,4 @@
--- Version 1.9.6.0
+-- Version 1.9.7.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -141,6 +141,8 @@ LuaExportActivityNextEvent = function(tCurrent)
                 _update = SR.exportRadioKA50(_update)
             elseif _update.unit == "Mi-8MT" then
                 _update = SR.exportRadioMI8(_update)
+            elseif _update.unit == "Mi-24P" then
+                _update = SR.exportRadioMI24P(_update)
             elseif string.find(_update.unit, "L-39",1,true)  then
                 _update = SR.exportRadioL39(_update)
             elseif _update.unit == "Yak-52" then
@@ -1235,6 +1237,7 @@ function SR.exportRadioKA50(_data)
     return _data
 
 end
+
 function SR.exportRadioMI8(_data)
 
     _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
@@ -1304,6 +1307,52 @@ function SR.exportRadioMI8(_data)
     end
 
     _data.control = 1; -- full radio
+
+    return _data
+
+end
+
+
+function SR.exportRadioMI24P(_data)
+
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = 1.0
+    _data.radios[1].volMode = 0
+
+    _data.radios[2].name = "R-863"
+    _data.radios[2].freq = SR.getRadioFrequency(49)
+    _data.radios[2].modulation = SR.getRadioModulation(49)
+    _data.radios[2].volume = SR.getRadioVolume(0, 511, { 0.0, 1.0 }, false)
+    _data.radios[2].volMode = 0
+
+    local guard = SR.getSelectorPosition(507, 1)
+    if guard == 1 and _data.radios[2].freq > 1000 then
+        _data.radios[2].secFreq = 121.5 * 1000000
+    end
+
+    _data.radios[3].name = "JADRO-1I"
+    _data.radios[3].freq = SR.getRadioFrequency(50, 500)
+    _data.radios[3].modulation = SR.getRadioModulation(50)
+    _data.radios[3].volume = SR.getRadioVolume(0, 426, { 0.0, 1.0 }, false)
+    _data.radios[3].volMode = 0
+
+    _data.radios[4].name = "R-828"
+    _data.radios[4].freq = SR.getRadioFrequency(51)
+    _data.radios[4].modulation = 1 --SR.getRadioModulation(50)
+    _data.radios[4].volume = SR.getRadioVolume(0, 339, { 0.0, 1.0 }, false)
+    _data.radios[4].volMode = 0
+
+    _data.radios[5].name = "R-852"
+    _data.radios[5].freq = SR.getRadioFrequency(52)
+    _data.radios[5].modulation = SR.getRadioModulation(52)
+    _data.radios[5].volume = SR.getRadioVolume(0, 517, { 0.0, 1.0 }, false)
+    _data.radios[5].volMode = 0
+
+    _data.control = 0; -- HOTAS for now
 
     return _data
 
@@ -2747,7 +2796,6 @@ function SR.exportRadioSpitfireLFMkIX (_data)
 
     return _data;
 end
-
 function SR.exportRadioC101EB(_data)
 
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Pull the HOT MIC breaker up to enable HOT MIC" }
@@ -2780,7 +2828,15 @@ function SR.exportRadioC101EB(_data)
 
     _data.radios[3].freq = SR.getRadioFrequency(10)
 
-    local _selector = SR.getSelectorPosition(404, 0.5)
+    local _seat = GetDevice(0):get_current_seat()
+
+    local _selector
+
+    if _seat == 0 then
+    	_selector = SR.getSelectorPosition(404, 0.5)
+    else
+    	_selector = SR.getSelectorPosition(947, 0.5)
+    end
 
     if _selector == 1 then
         _data.selected = 1
@@ -2881,6 +2937,7 @@ function SR.exportRadioC101CC(_data)
 
     -- SR.log("Channel SELECTOR: ".. SR.getButtonPosition(231).."\n")
 
+
     local uhfModeKnob = SR.getSelectorPosition(232, 0.1)
     if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
         -- Function dial set to BOTH
@@ -2905,7 +2962,14 @@ function SR.exportRadioC101CC(_data)
     --    _data.radios[3].freq = 1
     --end
     --
-    local _selector = SR.getSelectorPosition(404, 0.05)
+    local _seat = GetDevice(0):get_current_seat()
+    local _selector
+
+    if _seat == 0 then
+    	_selector = SR.getSelectorPosition(404, 0.05)
+    else
+    	_selector = SR.getSelectorPosition(947, 0.05)
+    end
 
     if _selector == 0 then
         _data.selected = 0
@@ -3826,4 +3890,4 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
     end
 end
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.6.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.7.0")
