@@ -65,10 +65,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
                 TextToSpeechClient client = builder.Build();
 
-                SynthesisInput input = new SynthesisInput
+                SynthesisInput input;
+
+                if (opts.SSML)
                 {
-                    Text = msg
-                };
+                    input = new SynthesisInput
+                    {
+                        Ssml = msg,
+                    };
+                }
+                else
+                {
+                    input = new SynthesisInput
+                    {
+                        Text = msg,
+                    };
+                }
 
                 VoiceSelectionParams voice = null;
 

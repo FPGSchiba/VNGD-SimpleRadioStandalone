@@ -64,6 +64,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 Required = true)]
             public string Text { get; set; }
 
+            [Option('z', "text",
+                HelpText = "Text is SSML - this is only for Google TTS",
+                SetName = "TTS",
+                Default = false,
+                Required = false)]
+            public bool SSML { get; set; }
+
             [Option('I',"textFile",
                 SetName = "textFile",
                 HelpText = "Path to text file for TTS ",
