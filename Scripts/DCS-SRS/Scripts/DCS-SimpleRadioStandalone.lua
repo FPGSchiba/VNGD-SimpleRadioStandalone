@@ -2854,7 +2854,7 @@ function SR.exportRadioC101EB(_data)
 
     local iffPower =  SR.getSelectorPosition(347,0.25)
 
-    SR.log("IFF iffPower"..iffPower.."\n\n")
+    -- SR.log("IFF iffPower"..iffPower.."\n\n")
 
     local iffIdent =  SR.getButtonPosition(361) -- -1 is off 0 or more is on
 
