@@ -1695,8 +1695,6 @@ Frequency Band(MHz) Modulation  Guard Channel (MHz)
 
 function SR.exportRadioFA18C(_data)
 
-    SR.log("exportRadioFA18C")
-
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     local _ufc = SR.getListIndicatorValue(6)
@@ -1868,7 +1866,6 @@ function SR.exportRadioFA18C(_data)
     if midsBChannel < 127 then
         _radio.freq = SR.MIDS_FREQ +  (SR.MIDS_FREQ_SEPARATION * midsBChannel)
         _radio.channel = midsBChannel
-
     else
         _radio.freq = 1
         _radio.channel = -1
@@ -1983,7 +1980,6 @@ function SR.exportRadioFA18C(_data)
             if _fa18.enttries > 5 then
                 _fa18ent = 0
                 _fa18.enttries = 0
-                SR.log("ah: enttries timeout")
             end
         else
             _fa18.enttries = 0
