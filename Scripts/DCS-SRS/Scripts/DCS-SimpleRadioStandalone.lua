@@ -1916,7 +1916,7 @@ function SR.exportRadioFA18C(_data)
             iff.mode4 = _ufc.UFC_OptionCueing4 == ":"
 
         -- Check if on AI
-        elseif _ufc.UFC_ScratchPadString2Display == "A" then
+        elseif _ufc.UFC_ScratchPadString1Display == "A" then
             iff.status = 1
         -- Check if it is OFF
         else
