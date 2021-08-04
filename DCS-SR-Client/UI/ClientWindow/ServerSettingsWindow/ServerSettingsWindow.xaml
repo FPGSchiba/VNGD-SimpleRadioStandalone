@@ -29,6 +29,7 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Label Grid.Row="0"
                Grid.Column="0"
@@ -154,9 +155,9 @@
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-               Content="Show Tuned Client Count" />
+               Content="Strict Radio Encryption" />
 
-        <Label Name="TunedClientCount"
+        <Label Name="StrictRadioEncryption"
                Grid.Row="9"
                Grid.Column="1"
                HorizontalContentAlignment="Center"
@@ -167,9 +168,9 @@
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-               Content="Show Transmitter Name" />
+               Content="Show Tuned Client Count" />
 
-        <Label Name="ShowTransmitterName"
+        <Label Name="TunedClientCount"
                Grid.Row="10"
                Grid.Column="1"
                HorizontalContentAlignment="Center"
@@ -180,9 +181,9 @@
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-               Content="Server Version" />
+               Content="Show Transmitter Name" />
 
-        <Label Name="ServerVersion"
+        <Label Name="ShowTransmitterName"
                Grid.Row="11"
                Grid.Column="1"
                HorizontalContentAlignment="Center"
@@ -193,16 +194,29 @@
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
+               Content="Server Version" />
+
+        <Label Name="ServerVersion"
+               Grid.Row="12"
+               Grid.Column="1"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Content="Unknown" />
+
+        <Label Grid.Row="13"
+               Grid.Column="0"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
                Content="Retransmit Node Limit" />
 
         <Label Name="NodeLimit"
-               Grid.Row="12"
+               Grid.Row="13"
                Grid.Column="1"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
                Content="0" />
 
-        <Button Grid.Row="13"
+        <Button Grid.Row="14"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Width="80"
