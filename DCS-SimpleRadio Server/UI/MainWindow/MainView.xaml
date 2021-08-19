@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="330"
-             Height="575"
+             Height="655"
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Visible"  Margin="0,0,0,0" >
         <StackPanel Orientation="Vertical" Margin="5" >
@@ -16,6 +16,8 @@
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -377,6 +379,43 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"/>
 
+                <Label Content="Log Received Transmissions"
+                       Grid.Row="20"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="TransmissionLogEnabledToggle"
+                        Content="{Binding TransmissionLogEnabledText}"
+                        Grid.Row="20"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Transmission Archive History"
+                       Grid.Row="21"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <!--<Slider 
+                        Value="Test"
+                        Width="75"
+                        Height="40"
+                        VerticalAlignment="Center"
+                        Interval="1"
+                        Minimum="0"
+                        Maximum="7"
+                        Ticks="1,2,3,4,5,6,7"
+                        TickPlacement="TopLeft"
+                        IsSnapToTickEnabled="True"
+                        HorizontalAlignment="Center">
+                </Slider>-->
+
                 <Label Content="Retransmit Hop/Node Count"
                        Grid.Row="19"
                        Grid.Column="0" 
@@ -408,9 +447,6 @@
                             HorizontalAlignment="Center">
 
                     </Slider>
-
-
-
                 </StackPanel>
                 
             </Grid>
