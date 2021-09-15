@@ -425,5 +425,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
+
+        public int ArchiveLimit
+        {
+            get => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue;
+            set
+            {
+                ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION,
+                    value.ToString());
+
+                _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            }
+        }
     }
 }

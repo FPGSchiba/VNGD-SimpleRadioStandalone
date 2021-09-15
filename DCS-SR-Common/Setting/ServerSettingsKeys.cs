@@ -34,6 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         UPNP_ENABLED = 23,
         RETRANSMISSION_NODE_LIMIT= 24,
         TRANSMISSION_LOG_ENABLED = 25,
+        TRANSMISSION_LOG_RETENTION = 26
     }
 
     public class DefaultServerSettings
@@ -66,6 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
             { ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT.ToString(), "0" },
             { ServerSettingsKeys.TRANSMISSION_LOG_ENABLED.ToString(), "false" },
+            { ServerSettingsKeys.TRANSMISSION_LOG_RETENTION.ToString(), "2" }
         };
     }
 }

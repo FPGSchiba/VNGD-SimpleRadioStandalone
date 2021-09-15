@@ -3,6 +3,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using NLog;
 using NLog.Targets;
+using NLog.Targets.Wrappers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         private ConcurrentDictionary<SRClient, TransmissionLog> _currentTransmissionLog { get; } = new ConcurrentDictionary<SRClient, TransmissionLog>();
         private bool _stop;
         private bool _log;
+        private readonly FileTarget _fileTarget;
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
         private readonly XDocument _nlogConfig = XDocument.Load("NLog.config");
 
@@ -25,10 +27,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         {
             _log = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue;
             _stop = false;
+
+            WrapperTargetBase b = (WrapperTargetBase)LogManager.Configuration.FindTargetByName("asyncTransmissionFileTarget");
+            _fileTarget = (FileTarget)b.WrappedTarget;
         }
         
-        //public int FileArchivePeriod { get {return _nlogConfig.Descendants(_nlogConfig.Root.GetDefaultNamespace() + "target")
-
         public void LogTransmission(SRClient client)
         {
             if (!_stop)
@@ -55,26 +58,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
                         
         }
 
-        public void UpdateArchivePeriod(string days)
-        {
-            FileTarget target = (FileTarget)LogManager.Configuration.FindTargetByName("asyncTransmissionFileTarget");
-            Console.WriteLine(target.ArchiveEvery);
-            target.MaxArchiveFiles = int.Parse(days);
-            LogManager.ReconfigExistingLoggers();
-            Console.WriteLine(target.ArchiveEvery);
-        }
-
         private void LogCompleteTransmissions()
         {
-            while(!_stop)
-            {
 
+            while (!_stop)
+            {
                 if (_log != !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue)
                 {
                     _log = !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue;
                     string newSetting = _log ? "TRANSMISSION LOGGING ENABLED" : "TRANSMISSION LOGGING DISABLED";
 
                     Logger.Info($"{newSetting}");
+                }
+
+                if (_fileTarget.MaxArchiveFiles != _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue)
+                {
+                    _fileTarget.MaxArchiveFiles = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue;
+                    LogManager.ReconfigExistingLoggers();
                 }
 
                 if(_log && !_currentTransmissionLog.IsEmpty)
