@@ -1,4 +1,4 @@
--- Version 1.9.7.0
+-- Version 1.9.8.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -3967,4 +3967,4 @@ LuaExportBeforeNextFrame = function()
 end
 
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.7.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 1.9.8.0")
