@@ -134,6 +134,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                             var receivingRadio = radioInfo.CanHearTransmission(freq,
                                 modulation,
                                 0,
+                                false,
                                 currentUnitId,
                                 new List<int>(),
                                 out radioReceivingState,

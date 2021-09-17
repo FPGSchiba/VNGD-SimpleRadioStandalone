@@ -410,8 +410,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         new List<RadioReceivingPriority>(frequencyCount);
                                     List<int> blockedRadios = CurrentlyBlockedRadios();
 
-                                    // Parse frequencies into receiving radio priority for selection below
-                                    for (var i = 0; i < frequencyCount; i++)
+                                    var strictEncryption = _serverSettings.GetSettingAsBool(ServerSettingsKeys.STRICT_RADIO_ENCRYPTION);
+
+                                        // Parse frequencies into receiving radio priority for selection below
+                                        for (var i = 0; i < frequencyCount; i++)
                                     {
                                         RadioReceivingState state = null;
                                         bool decryptable;
@@ -429,6 +431,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             udpVoicePacket.Frequencies[i],
                                             (RadioInformation.Modulation) udpVoicePacket.Modulations[i],
                                             udpVoicePacket.Encryptions[i],
+                                            strictEncryption,
                                             udpVoicePacket.UnitId,
                                             blockedRadios,
                                             out state,
@@ -451,9 +454,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 )
                                             )
                                             {
-                                                decryptable =
-                                                    (udpVoicePacket.Encryptions[i] == 0) ||
-                                                    (udpVoicePacket.Encryptions[i] == radio.encKey && radio.enc);
+                                                // This is already done in CanHearTransmission!!
+                                                //decryptable =
+                                                //    (udpVoicePacket.Encryptions[i] == radio.encKey && radio.enc) ||
+                                                //    (!strictEncryption && udpVoicePacket.Encryptions[i] == 0);
 
                                                 radioReceivingPriorities.Add(new RadioReceivingPriority()
                                                 {
@@ -517,7 +521,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 (radioState == null || radioState.PlayedEndOfTransmission ||
                                                  !radioState.IsReceiving))
                                             {
-                                                var audioDecryptable = audio.Decryptable || (audio.Encryption == 0);
+                                                var audioDecryptable = audio.Decryptable /* || (audio.Encryption == 0) <--- this has already been tested above */;
 
                                                 //mark that we have decrypted encrypted audio for sound effects
                                                 if (audioDecryptable && (audio.Encryption > 0))

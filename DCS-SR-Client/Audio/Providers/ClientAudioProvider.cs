@@ -158,7 +158,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 vhfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.VHFNoiseVolume);
             }
 
-            var decrytable = audio.Decryptable || (audio.Encryption == 0);
+            var decrytable = audio.Decryptable /* || (audio.Encryption == 0) <--- this test has already been performed by all callers and would require another call to check for STRICT_AUDIO_ENCRYPTION */;
 
             if (decrytable)
             {
