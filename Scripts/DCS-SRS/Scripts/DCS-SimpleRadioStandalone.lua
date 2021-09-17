@@ -74,9 +74,9 @@ local _lastUnitType = ""    -- used for F/A-18C ENT button
 local _fa18ent = false      -- saves ENT button state (needs to be declared before LuaExportBeforeNextFrame)
 local _tNextSRS = 0
 
-local _exporters = {}   -- exporter table. Initialized at the end
+SR.exporters = {}   -- exporter table. Initialized at the end
 
-local function _RunExporters()
+function SR.exporter()
     local _update
     local _data = LoGetSelfData()
 
@@ -124,10 +124,10 @@ local function _RunExporters()
 
         -- SR.log(_update.unit.."\n\n")
 
-        local exporter = _exporters[_update.unit]
+        local aircraftExporter = SR.exporters[_update.unit]
 
-        if exporter then
-            _update = exporter(_update)
+        if aircraftExporter then
+            _update = aircraftExporter(_update)
         else
             -- FC 3
             _update.radios[2].name = "FC3 VHF"
@@ -217,46 +217,8 @@ local function _RunExporters()
     end
 end
 
-LuaExportActivityNextEvent = function(tCurrent)
-    -- we only want to send once every 0.2 seconds
-    -- but helios (and other exports) require data to come much faster
-    if _tNextSRS - tCurrent < 0.01 then   -- has to be written this way as the function is being called with a loss of precision at times
-        _tNextSRS = tCurrent + 0.2
 
-        local _status, _result = pcall(_RunExporters)
-
-        if not _status then
-            SR.log('ERROR: ' .. _result)
-        end
-    end
-
-    local tNext = _tNextSRS
-
-    -- call previous
-    if _prevLuaExportActivityNextEvent then
-        local _status, _result = pcall(_prevLuaExportActivityNextEvent, tCurrent)
-        if _status then
-            -- Use lower of our tNext (0.2s) or the previous export's
-            if _result and _result < tNext and _result > tCurrent then
-                tNext = _result
-            end
-        else
-            SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
-        end
-    end
-
-    if terrain == nil then
-        SR.log("Terrain Export is not working")
-        --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
-        --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
-    end
-
-	 --SR.log(SR.tableShow(_G).."\n\n")
-
-    return tNext
-end
-
-local function ReadSocket()
+function SR.readSocket()
     -- Receive buffer is 8192 in LUA Socket
     -- will contain 10 clients for LOS
     local _received = SR.UDPLosReceiveSocket:receive()
@@ -277,31 +239,6 @@ local function ReadSocket()
             end
         end
 
-    end
-end
-
-LuaExportBeforeNextFrame = function()
-
-    -- read from socket
-    local _status, _result = pcall(ReadSocket)
-
-    if not _status then
-        SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
-    end
-
-    -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
-    if _lastUnitType == "FA-18C_hornet" then
-        if not _fa18ent and SR.getButtonPosition(122) > 0 then
-            _fa18ent = true
-        end
-    end
-
-    -- call original
-    if _prevLuaExportBeforeNextFrame then
-        _status, _result = pcall(_prevLuaExportBeforeNextFrame)
-        if not _status then
-            SR.log('ERROR Calling other LuaExportBeforeNextFrame from another script: ' .. _result)
-        end
     end
 end
 
@@ -733,6 +670,71 @@ function SR.exportRadioT45(_data)
 
     _data.control = 1; -- full radio HOTAS control
     
+    return _data
+end
+
+
+function SR.exportRadioPUCARA(_data)
+   _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+   
+   _data.radios[1].name = "Intercom"
+   _data.radios[1].freq = 100.0
+   _data.radios[1].modulation = 2 --Special intercom modulation
+   _data.radios[1].volume = GetDevice(0):get_argument_value(764)
+    
+    local comm1Switch = GetDevice(0):get_argument_value(762) 
+    local comm2Switch = GetDevice(0):get_argument_value(763) 
+    local comm1PTT = GetDevice(0):get_argument_value(765)
+    local comm2PTT = GetDevice(0):get_argument_value(7655) 
+    local modeSelector1 = GetDevice(0):get_argument_value(1080) -- 0:off, 0.25:T/R, 0.5:T/R+G
+    local amfm = GetDevice(0):get_argument_value(770)
+
+    _data.radios[2].name = "SUNAIR ASB-850 COM1"
+    _data.radios[2].modulation = amfm
+    _data.radios[2].volume = SR.getRadioVolume(0, 1079, { 0.0, 1.0 }, false)
+
+    if comm1Switch == 0 then 
+        _data.radios[2].freq = 246.000e6
+        _data.radios[2].secFreq = 0
+    elseif comm1Switch == 1 then 
+        local one = 100.000e6 * SR.getSelectorPosition(1090, 1 / 4)
+        local two = 10.000e6 * SR.getSelectorPosition(1082, 1 / 10)
+        local three = 1.000e6 * SR.getSelectorPosition(1084, 1 / 10)
+        local four = 0.1000e6 * SR.getSelectorPosition(1085, 1 / 10)
+        local five = 0.010e6 * SR.getSelectorPosition(1087, 1 / 10)
+        local six = 0.0010e6 * SR.getSelectorPosition(1086, 1 / 10)
+        mainFreq =  one + two + three + four + five - six
+        _data.radios[2].freq = mainFreq
+        _data.radios[2].secFreq = 0
+    
+    end
+    
+    _data.radios[3].name = "RTA-42A BENDIX COM2"
+    _data.radios[3].modulation = 0
+    _data.radios[3].volume = SR.getRadioVolume(0, 1100, { 0.0, 1.0 }, false)
+
+    if comm2Switch == 0 then 
+        _data.radios[3].freq = 140.000e6
+        _data.radios[3].secFreq = 0
+    elseif comm2Switch == 1 then 
+        local onea = 100.000e6 * SR.getSelectorPosition(1104, 1 / 4)
+        local twoa = 10.000e6 * SR.getSelectorPosition(1103, 1 / 10)
+                
+        mainFreqa =  onea + twoa 
+        _data.radios[3].freq = mainFreqa
+        _data.radios[3].secFreq = 0
+    
+    end
+   
+    
+    
+  
+    _data.control = 1 -- Hotas Controls radio
+    
+    
+     _data.control = 0;
+    _data.selected = 1
+     
     return _data
 end
 
@@ -2682,6 +2684,56 @@ function SR.exportRadioSpitfireLFMkIX (_data)
 
     return _data;
 end
+
+function SR.exportRadioMosquitoFBMkVI (_data)
+
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    _data.radios[1].name = "INTERCOM"
+    _data.radios[1].freq = 100
+    _data.radios[1].modulation = 2
+    _data.radios[1].volume = 1.0
+    _data.radios[1].volMode = 1
+
+    _data.radios[2].name = "SCR522A" 
+    _data.radios[2].freq = SR.getRadioFrequency(24)
+    _data.radios[2].modulation = 0
+    _data.radios[2].volume = SR.getRadioVolume(0, 364, { 0.0, 1.0 }, false)
+
+    _data.selected = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8 * 1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5 * 1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116 * 1000000
+    _data.radios[3].freqMax = 151.975 * 1000000
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+    _data.radios[3].expansion = true
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-164 UHF"
+    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0 * 1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 225 * 1000000
+    _data.radios[4].freqMax = 399.975 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0; -- no ptt, same as the FW and 109. No connector.
+
+    return _data;
+end
+
+
 function SR.exportRadioC101EB(_data)
 
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Pull the HOT MIC breaker up to enable HOT MIC" }
@@ -2719,9 +2771,9 @@ function SR.exportRadioC101EB(_data)
     local _selector
 
     if _seat == 0 then
-    	_selector = SR.getSelectorPosition(404, 0.5)
+        _selector = SR.getSelectorPosition(404, 0.5)
     else
-    	_selector = SR.getSelectorPosition(947, 0.5)
+        _selector = SR.getSelectorPosition(947, 0.5)
     end
 
     if _selector == 1 then
@@ -2852,9 +2904,9 @@ function SR.exportRadioC101CC(_data)
     local _selector
 
     if _seat == 0 then
-    	_selector = SR.getSelectorPosition(404, 0.05)
+        _selector = SR.getSelectorPosition(404, 0.05)
     else
-    	_selector = SR.getSelectorPosition(947, 0.05)
+        _selector = SR.getSelectorPosition(947, 0.05)
     end
 
     if _selector == 0 then
@@ -3707,6 +3759,21 @@ function SR.basicSerialize(var)
     end
 end
 
+function SR.debugDump(o)
+
+    if type(o) == 'table' then
+        local s = '{ '
+        for k,v in pairs(o) do
+                if type(k) ~= 'number' then k = '"'..k..'"' end
+                s = s .. '['..k..'] = ' .. SR.debugDump(v) .. ','
+        end
+        return s .. '} '
+    else
+        return tostring(o)
+    end
+
+end
+
 
 function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slmod, this is a _G serialization
     tableshow_tbls = tableshow_tbls or {} --create table of tables
@@ -3777,60 +3844,127 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
 end
 
 ---- Exporters init ----
-_exporters["UH-1H"] = SR.exportRadioUH1H
-_exporters["Ka-50"] = SR.exportRadioKA50
-_exporters["Mi-8MT"] = SR.exportRadioMI8
-_exporters["Mi-24P"] = SR.exportRadioMI24P
-_exporters["Yak-52"] = SR.exportRadioYak52
-_exporters["FA-18C_hornet"] = SR.exportRadioFA18C
-_exporters["F-86F Sabre"] = SR.exportRadioF86Sabre
-_exporters["MiG-15bis"] = SR.exportRadioMIG15
-_exporters["MiG-19P"] = SR.exportRadioMIG19
-_exporters["MiG-21Bis"] = SR.exportRadioMIG21
-_exporters["F-5E-3"] = SR.exportRadioF5E
-_exporters["FW-190D9"] = SR.exportRadioFW190
-_exporters["FW-190A8"] = SR.exportRadioFW190
-_exporters["Bf-109K-4"] = SR.exportRadioBF109
-_exporters["C-101EB"] = SR.exportRadioC101EB
-_exporters["C-101CC"] = SR.exportRadioC101CC
-_exporters["Hawk"] = SR.exportRadioHawk
-_exporters["Christen Eagle II"] = SR.exportRadioEagleII
-_exporters["M-2000C"] = SR.exportRadioM2000C
-_exporters["JF-17"] = SR.exportRadioJF17
-_exporters["AV8BNA"] = SR.exportRadioAV8BNA
-_exporters["AJS37"] = SR.exportRadioAJS37
-_exporters["A-10A"] = SR.exportRadioA10A
-_exporters["A-4E-C"] = SR.exportRadioA4E
-_exporters["T-45"] = SR.exportRadioT45
-_exporters["A-29B"] = SR.exportRadioA29B
-_exporters["F-15C"] = SR.exportRadioF15C
-_exporters["MiG-29A"] = SR.exportRadioMiG29
-_exporters["MiG-29S"] = SR.exportRadioMiG29
-_exporters["MiG-29G"] = SR.exportRadioMiG29
-_exporters["Su-27"] = SR.exportRadioSU27
-_exporters["Su-33"] = SR.exportRadioSU27
-_exporters["Su-25"] = SR.exportRadioSU25
-_exporters["Su-25T"] = SR.exportRadioSU25
-_exporters["F-16C_50"] = SR.exportRadioF16C
+SR.exporters["UH-1H"] = SR.exportRadioUH1H
+SR.exporters["Ka-50"] = SR.exportRadioKA50
+SR.exporters["Mi-8MT"] = SR.exportRadioMI8
+SR.exporters["Mi-24P"] = SR.exportRadioMI24P
+SR.exporters["Yak-52"] = SR.exportRadioYak52
+SR.exporters["FA-18C_hornet"] = SR.exportRadioFA18C
+SR.exporters["F-86F Sabre"] = SR.exportRadioF86Sabre
+SR.exporters["MiG-15bis"] = SR.exportRadioMIG15
+SR.exporters["MiG-19P"] = SR.exportRadioMIG19
+SR.exporters["MiG-21Bis"] = SR.exportRadioMIG21
+SR.exporters["F-5E-3"] = SR.exportRadioF5E
+SR.exporters["FW-190D9"] = SR.exportRadioFW190
+SR.exporters["FW-190A8"] = SR.exportRadioFW190
+SR.exporters["Bf-109K-4"] = SR.exportRadioBF109
+SR.exporters["C-101EB"] = SR.exportRadioC101EB
+SR.exporters["C-101CC"] = SR.exportRadioC101CC
+SR.exporters["Hawk"] = SR.exportRadioHawk
+SR.exporters["Christen Eagle II"] = SR.exportRadioEagleII
+SR.exporters["M-2000C"] = SR.exportRadioM2000C
+SR.exporters["JF-17"] = SR.exportRadioJF17
+SR.exporters["AV8BNA"] = SR.exportRadioAV8BNA
+SR.exporters["AJS37"] = SR.exportRadioAJS37
+SR.exporters["A-10A"] = SR.exportRadioA10A
+SR.exporters["A-4E-C"] = SR.exportRadioA4E
+SR.exporters["PUCARA"] = SR.exportRadioPUCARA
+SR.exporters["T-45"] = SR.exportRadioT45
+SR.exporters["A-29B"] = SR.exportRadioA29B
+SR.exporters["F-15C"] = SR.exportRadioF15C
+SR.exporters["MiG-29A"] = SR.exportRadioMiG29
+SR.exporters["MiG-29S"] = SR.exportRadioMiG29
+SR.exporters["MiG-29G"] = SR.exportRadioMiG29
+SR.exporters["Su-27"] = SR.exportRadioSU27
+SR.exporters["Su-33"] = SR.exportRadioSU27
+SR.exporters["Su-25"] = SR.exportRadioSU25
+SR.exporters["Su-25T"] = SR.exportRadioSU25
+SR.exporters["F-16C_50"] = SR.exportRadioF16C
+SR.exporters["SA342M"] = SR.exportRadioSA342
+SR.exporters["SA342L"] = SR.exportRadioSA342
+SR.exporters["SA342Mistral"] = SR.exportRadioSA342
+SR.exporters["SA342Minigun"] = SR.exportRadioSA342
+SR.exporters["L-39C"] = SR.exportRadioL39
+SR.exporters["L-39ZA"] = SR.exportRadioL39
+SR.exporters["F-14B"] = SR.exportRadioF14
+SR.exporters["F-14A-135-GR"] = SR.exportRadioF14
+SR.exporters["A-10C"] = SR.exportRadioA10C
+SR.exporters["A-10C_2"] = SR.exportRadioA10C
+SR.exporters["P-51D"] = SR.exportRadioP51
+SR.exporters["P-51D-30-NA"] = SR.exportRadioP51
+SR.exporters["TF-51D"] = SR.exportRadioP51
+SR.exporters["P-47D-30"] = SR.exportRadioP47
+SR.exporters["P-47D-30bl1"] = SR.exportRadioP47
+SR.exporters["P-47D-40"] = SR.exportRadioP47
+SR.exporters["SpitfireLFMkIX"] = SR.exportRadioSpitfireLFMkIX
+SR.exporters["SpitfireLFMkIXCW"] = SR.exportRadioSpitfireLFMkIX
+SR.exporters["MosquitoFBMkVI"] = SR.exportRadioMosquitoFBMkVI
 
--- All below were listed with string.find. Added all variants
-_exporters["SA342M"] = SR.exportRadioSA342
-_exporters["SA342L"] = SR.exportRadioSA342
-_exporters["SA342Mistral"] = SR.exportRadioSA342
-_exporters["SA342Minigun"] = SR.exportRadioSA342
-_exporters["L-39C"] = SR.exportRadioL39
-_exporters["L-39ZA"] = SR.exportRadioL39
-_exporters["F-14B"] = SR.exportRadioF14
-_exporters["F-14A-135-GR"] = SR.exportRadioF14
-_exporters["A-10C"] = SR.exportRadioA10C
-_exporters["A-10C_2"] = SR.exportRadioA10C
-_exporters["P-51D"] = SR.exportRadioP51
-_exporters["P-51D-30-NA"] = SR.exportRadioP51
-_exporters["TF-51D"] = SR.exportRadioP51
-_exporters["P-47D-30"] = SR.exportRadioP47
-_exporters["P-47D-30bl1"] = SR.exportRadioP47
-_exporters["P-47D-40"] = SR.exportRadioP47
-_exporters["SpitfireLFMkIX"] = SR.exportRadioSpitfireLFMkIX
-_exporters["SpitfireLFMkIXCW"] = SR.exportRadioSpitfireLFMkIX
+
+--- DCS EXPORT FUNCTIONS
+LuaExportActivityNextEvent = function(tCurrent)
+    -- we only want to send once every 0.2 seconds
+    -- but helios (and other exports) require data to come much faster
+    if _tNextSRS - tCurrent < 0.01 then   -- has to be written this way as the function is being called with a loss of precision at times
+        _tNextSRS = tCurrent + 0.2
+
+        local _status, _result = pcall(SR.exporter)
+
+        if not _status then
+            SR.log('ERROR: ' ..  SR.debugDump(_result))
+        end
+    end
+
+    local tNext = _tNextSRS
+
+    -- call previous
+    if _prevLuaExportActivityNextEvent then
+        local _status, _result = pcall(_prevLuaExportActivityNextEvent, tCurrent)
+        if _status then
+            -- Use lower of our tNext (0.2s) or the previous export's
+            if _result and _result < tNext and _result > tCurrent then
+                tNext = _result
+            end
+        else
+            SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. SR.debugDump(_result))
+        end
+    end
+
+    if terrain == nil then
+        SR.log("Terrain Export is not working")
+        --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
+        --SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
+    end
+
+     --SR.log(SR.tableShow(_G).."\n\n")
+
+    return tNext
+end
+
+LuaExportBeforeNextFrame = function()
+
+    -- read from socket
+    local _status, _result = pcall(SR.readSocket)
+
+    if not _status then
+        SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
+    end
+
+    -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
+    if _lastUnitType == "FA-18C_hornet" then
+        if not _fa18ent and SR.getButtonPosition(122) > 0 then
+            _fa18ent = true
+        end
+    end
+
+    -- call original
+    if _prevLuaExportBeforeNextFrame then
+        _status, _result = pcall(_prevLuaExportBeforeNextFrame)
+        if not _status then
+            SR.log('ERROR Calling other LuaExportBeforeNextFrame from another script: ' .. SR.debugDump(_result))
+        end
+    end
+end
+
 
 SR.log("Loaded SimpleRadio Standalone Export version: 1.9.7.0")
