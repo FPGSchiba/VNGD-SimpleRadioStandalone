@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
                     _log = !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue;
                     string newSetting = _log ? "TRANSMISSION LOGGING ENABLED" : "TRANSMISSION LOGGING DISABLED";
 
-                    Logger.Info($"{newSetting}");
+                    Logger.Info($"EVENT, {newSetting}");
                 }
 
                 if (_fileTarget.MaxArchiveFiles != _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue)
@@ -85,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
                         {
                             if (_currentTransmissionLog.TryRemove(LoggedTransmission.Key, out TransmissionLog completedLog))
                             {
-                                Logger.Info($"{LoggedTransmission.Key.ClientGuid}, {LoggedTransmission.Key.Name}, " +
+                                Logger.Info($"TRANSMISSION, {LoggedTransmission.Key.ClientGuid}, {LoggedTransmission.Key.Name}, " +
                                     $"{LoggedTransmission.Key.Coalition}, {LoggedTransmission.Value.TransmissionFrequency}. " +
                                     $"{completedLog.TransmissionStart}, {completedLog.TransmissionEnd}, {LoggedTransmission.Key.VoipPort}");
                             }

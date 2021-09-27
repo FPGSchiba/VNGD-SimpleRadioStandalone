@@ -53,13 +53,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             var config = new LoggingConfiguration();
             var transmissionFileTarget = new FileTarget
             {
-                FileName = @"${date:format=yyyy-MM-dd}-transmissionlog.txt",
-                ArchiveFileName = @"${basedir}/TransmissionLogArchive/{#}-transmissionlog.old.txt",
+                FileName = @"${date:format=yyyy-MM-dd}-transmissionlog.csv",
+                ArchiveFileName = @"${basedir}/TransmissionLogArchive/{#}-transmissionlog.old.csv",
                 ArchiveNumbering = ArchiveNumberingMode.Date,
                 MaxArchiveFiles = ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue,
                 ArchiveEvery = FileArchivePeriod.Day,
                 Layout =
-                 @"${longdate} | ${message}"
+                 @"${longdate}, ${message}"
             };
             var fileTarget = new FileTarget
             {
