@@ -313,6 +313,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             var guid = fromClient.ClientGuid;
 
+            var strictEncryption = _serverSettings.GetGeneralSetting(ServerSettingsKeys.STRICT_RADIO_ENCRYPTION).BoolValue;
+
             foreach (var client in _clientsList)
             {
                 if (!client.Key.Equals(guid))
@@ -354,6 +356,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
                                         (RadioInformation.Modulation)udpVoice.Modulations[i],
                                         udpVoice.Encryptions[i],
+                                        strictEncryption,
                                         udpVoice.UnitId,
                                         _emptyBlockedRadios,
                                         out radioReceivingState,

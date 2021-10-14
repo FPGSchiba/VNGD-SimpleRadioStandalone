@@ -196,6 +196,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public RadioInformation CanHearTransmission(double frequency,
             RadioInformation.Modulation modulation,
             byte encryptionKey,
+            bool strictEncryption,
             uint sendingUnitId,
             List<int> blockedRadios,
             out RadioReceivingState receivingState,
@@ -250,7 +251,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {
-                        bool isDecryptable = (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey);
+                        bool isDecryptable = (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey || (!strictEncryption && encryptionKey == 0);
 
                         if (isDecryptable && !blockedRadios.Contains(i))
                         {
@@ -276,7 +277,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                     if ((receivingRadio.secFreq == frequency)
                         && (receivingRadio.secFreq > 10000))
                     {
-                        if (encryptionKey == 0 || (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey)
+                        if ((receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey || (!strictEncryption && encryptionKey == 0))
                         {
                             receivingState = new RadioReceivingState
                             {

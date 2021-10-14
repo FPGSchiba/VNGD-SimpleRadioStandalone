@@ -38,6 +38,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0"
@@ -229,8 +230,24 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"/>
 
-                <Label Content="Check for beta updates" 
+                <Label Content="Strict Radio Encryption"
                        Grid.Row="10"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="StrictRadioEncryptionToggle"
+                        Content="{Binding StrictRadioEncryption}"
+                        Grid.Row="10"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Check for beta updates" 
+                       Grid.Row="11"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -238,7 +255,7 @@
 
                 <Button x:Name="CheckForBetaUpdatesToggle"
                        Content="{Binding CheckForBetaUpdates}" 
-                       Grid.Row="10"
+                       Grid.Row="11"
                        Grid.Column="2"
                        Width="75"
                        Height="20"
@@ -247,7 +264,7 @@
 
 
                 <Label Content="External AWACS Mode (EAM)" 
-                       Grid.Row="11"
+                       Grid.Row="12"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -255,7 +272,7 @@
 
                 <Button x:Name="ExternalAWACSModeToggle"
                         Content="{Binding ExternalAWACSMode}" 
-                        Grid.Row="11"
+                        Grid.Row="12"
                         Grid.Column="2"
                         Width="75"
                         Height="20"
@@ -263,7 +280,7 @@
                         HorizontalAlignment="Center"/>
 
                 <Label Content="EAM blue coal. password" 
-                       Grid.Row="12"
+                       Grid.Row="13"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -272,7 +289,7 @@
                 <TextBox x:Name="ExternalAWACSModeBluePassword"
                          IsEnabled="{Binding IsExternalAWACSModeEnabled}"
                          Text="{Binding Path=ExternalAWACSModeBluePassword, UpdateSourceTrigger=PropertyChanged}"
-                         Grid.Row="12"
+                         Grid.Row="13"
                          Grid.Column="2"
                          Width="75"
                          Height="20"
@@ -280,7 +297,7 @@
                          HorizontalAlignment="Center"/>
 
                 <Label Content="EAM red coal. password"
-                       Grid.Row="13"
+                       Grid.Row="14"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -289,7 +306,7 @@
                 <TextBox x:Name="ExternalAWACSModeRedPassword"
                          IsEnabled="{Binding IsExternalAWACSModeEnabled}"
                          Text="{Binding Path=ExternalAWACSModeRedPassword, UpdateSourceTrigger=PropertyChanged}"
-                         Grid.Row="13"
+                         Grid.Row="14"
                          Grid.Column="2"
                          Width="75"
                          Height="20"
@@ -297,7 +314,7 @@
                          HorizontalAlignment="Center"/>
 
                 <Label Content="Test Frequencies AM (MHz)"
-                       Grid.Row="14"
+                       Grid.Row="15"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -306,7 +323,7 @@
                 <TextBox x:Name="TestFrequencies"
                          IsEnabled="True"
                          Text="247.2,120.3"
-                         Grid.Row="14"
+                         Grid.Row="15"
                          Grid.Column="2"
                          Width="75"
                          Height="20"
@@ -315,7 +332,7 @@
 
 
                 <Label Content="Show Tuned/Client Count" 
-                       Grid.Row="15"
+                       Grid.Row="16"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -323,7 +340,7 @@
 
                 <Button x:Name="TunedCountToggle"
                        Content="{Binding TunedCountText}"
-                       Grid.Row="15"
+                       Grid.Row="16"
                        Grid.Column="2"
                        Width="75"
                        Height="20"
@@ -331,7 +348,7 @@
                        HorizontalAlignment="Center"/>
 
                 <Label Content="Global Lobby Freq. AM (MHz)"
-                       Grid.Row="16"
+                       Grid.Row="17"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -340,7 +357,7 @@
                 <TextBox x:Name="GlobalLobbyFrequencies"
                          IsEnabled="True"
                          Text="241.2,122.3"  
-                         Grid.Row="16"
+                         Grid.Row="17"
                          Grid.Column="2"
                          Width="75"
                          Height="20"
@@ -348,7 +365,7 @@
                          HorizontalAlignment="Center"/>
 
                 <Label Content="LotATC Transponder Export" 
-                       Grid.Row="17"
+                       Grid.Row="18"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -356,7 +373,7 @@
 
                 <Button x:Name="LotATCExportToggle"
                         Content="{Binding LotATCExportText}"
-                        Grid.Row="17"
+                        Grid.Row="18"
                         Grid.Column="2"
                         Width="75"
                         Height="20"
@@ -364,7 +381,7 @@
                         HorizontalAlignment="Center"/>
 
                 <Label Content="Show Transmitter Name" 
-                       Grid.Row="18"
+                       Grid.Row="19"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -372,7 +389,7 @@
 
                 <Button x:Name="ShowTransmitterNameToggle"
                         Content="{Binding ShowTransmitterNameText}" 
-                        Grid.Row="18"
+                        Grid.Row="19"
                         Grid.Column="2"
                         Width="75"
                         Height="20"
@@ -430,13 +447,13 @@
                 </StackPanel>
 
                 <Label Content="Retransmit Hop/Node Count"
-                       Grid.Row="19"
+                       Grid.Row="20"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"/>
                 <StackPanel Orientation="Vertical"
-                            Grid.Row="19"
+                            Grid.Row="20"
                             Grid.Column="2">
                     <Grid  Width="75">
                         <Grid.ColumnDefinitions>
