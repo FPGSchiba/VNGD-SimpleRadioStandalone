@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Server.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="330"
-             Height="685"
+             Height="575"
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Visible"  Margin="0,0,0,0" >
         <StackPanel Orientation="Vertical" Margin="5" >
@@ -397,7 +397,7 @@
                         HorizontalAlignment="Center"/>
 
                 <Label Content="Log Received Transmissions"
-                       Grid.Row="20"
+                       Grid.Row="21"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -405,7 +405,7 @@
 
                 <Button x:Name="TransmissionLogEnabledToggle"
                         Content="{Binding TransmissionLogEnabledText}"
-                        Grid.Row="20"
+                        Grid.Row="21"
                         Grid.Column="2"
                         Width="75"
                         Height="20"
@@ -413,14 +413,14 @@
                         HorizontalAlignment="Center"/>
 
                 <Label Content="Transmission Archive Time"
-                       Grid.Row="21"
+                       Grid.Row="22"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"/>
 
                 <StackPanel Orientation="Vertical"
-                            Grid.Row="21"
+                            Grid.Row="22"
                             Grid.Column="2">
                     <Grid  Width="75">
                         <Grid.ColumnDefinitions>

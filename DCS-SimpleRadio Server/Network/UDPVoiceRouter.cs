@@ -243,7 +243,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                 }
                                                 client.LastTransmissionReceived = DateTime.Now;
 
-                                                transmissionLoggingQueue.LogTransmission(client);
+                                                // Only log the initial transmission
+                                                if (udpVoicePacket.RetransmissionCount == 0)
+                                                {
+                                                    transmissionLoggingQueue.LogTransmission(client);
+                                                }
                                             }
                                         }
 

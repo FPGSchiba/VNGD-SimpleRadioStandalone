@@ -36,7 +36,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         {
             if (!_stop)
             {
-                _currentTransmissionLog.AddOrUpdate(client, new TransmissionLog(client.LastTransmissionReceived, client.TransmittingFrequency),
+                _currentTransmissionLog.AddOrUpdate(client, 
+                   new TransmissionLog(client.LastTransmissionReceived, client.TransmittingFrequency),
                    (k, v) => UpdateTransmission(client, v));
             }
         }
