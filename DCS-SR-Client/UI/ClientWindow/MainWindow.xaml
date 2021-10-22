@@ -1375,7 +1375,7 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Model Rotary Frequency Increment/Decrement" />
+                                           Content="Rotary Style Frequency Increment/Decrement" />
 
                                     <ToggleButton Name="AllowRotaryIncrement"
                                                   Grid.Row="5"
@@ -1385,7 +1385,7 @@
                                                   Click="AllowRotaryIncrement_OnClick">
                                         <ToggleButton.Style>
                                             <Style TargetType="{x:Type ToggleButton}">
-                                                <Setter Property="Content" Value="ON" />
+                                                <Setter Property="Content" Value="OFF" />
                                                 <Style.Triggers>
                                                     <Trigger Property="IsChecked" Value="True">
                                                         <Setter Property="Content" Value="ON" />

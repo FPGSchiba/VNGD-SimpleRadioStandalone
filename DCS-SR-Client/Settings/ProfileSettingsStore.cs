@@ -130,7 +130,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
             {ProfileSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
 
-            {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), "True"},
+            {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), "false"},
         };
 
 
