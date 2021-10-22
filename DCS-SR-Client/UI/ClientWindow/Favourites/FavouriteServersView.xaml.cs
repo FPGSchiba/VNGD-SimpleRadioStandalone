@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
 
         private void DataGridRow_MouseMove(object sender, MouseEventArgs e)
         {
-            DataGridCell selectedRow = sender as DataGridCell;
+            DataGridRow selectedRow = sender as DataGridRow;
 
             if (selectedRow != null && e.LeftButton == MouseButtonState.Pressed)
             {
@@ -56,31 +56,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
                 catch(Exception ex)
                 {
                     // catches any out of bounds movements, should probably be replaced with validation at some point
-                }
-                               
+                }                              
             }
-        }
-        public void DataGridRow_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
-        }
-
-        private void DataGridRow_DragEnter(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
-        }
-        private void FavouritesGrid_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
-        }
-
-        private void FavouritesGrid_DragEnter(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
         }
     }
 }

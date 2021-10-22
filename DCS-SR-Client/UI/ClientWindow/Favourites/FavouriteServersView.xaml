@@ -88,16 +88,20 @@
                   SelectedItem="{Binding Path=SelectedItem}"
                   SelectionMode="Single"
                   AllowDrop="True"
-                  DragOver="FavouritesGrid_DragOver"
-                  DragEnter="FavouritesGrid_DragEnter" CanUserResizeRows="False" CanUserDeleteRows="False"
                     >
 
-            <DataGrid.CellStyle>
-                <Style TargetType="{x:Type DataGridCell}">
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
                     <EventSetter Event="MouseMove" Handler="DataGridRow_MouseMove"/>
                     <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{x:Static SystemColors.HighlightBrush}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </DataGrid.CellStyle>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name">
                 </DataGridTextColumn>
