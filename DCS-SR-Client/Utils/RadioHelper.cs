@@ -83,8 +83,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                         if (GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement))
                         {
                             double adjustedFrequency;
-                            double magnitude;
-
 
                             // Easier to simply shift the decimal place value to the ones position
                             adjustedFrequency = Math.Abs((int)Math.Round(radio.freq / frequency));
