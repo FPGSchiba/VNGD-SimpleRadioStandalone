@@ -87,21 +87,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                             // Easier to simply shift the decimal place value to the ones position
                             adjustedFrequency = Math.Abs((int)Math.Round(radio.freq / frequency));
 
-                            // calculate the value of the position where the delta will be applied
-                            double deltaPosition = (adjustedFrequency %  10) - (adjustedFrequency % 1) / 1;
+                            double deltaPosition = (adjustedFrequency %  10) - (adjustedFrequency % 1) / 1; // calculate the value of the position where the delta will be applied
                             double rollOverValue = frequency < 0 ? 0 : 9;
-     
-                            if(deltaPosition == rollOverValue && Math.Abs(frequency) <= 1000000)
+                            double futureValue = frequency + radio.freq; // used for checking 10Mhz increments 
+
+                            if (Math.Abs(frequency) <= 1000000)
                             {
-                                frequency *= -9;
+                                frequency = deltaPosition == rollOverValue ? frequency *= -9 : frequency;
                             }
-                            else if (deltaPosition == 1 && frequency == -10000000 && radio.modulation == RadioInformation.Modulation.FM) // this is horrific
+                            else if (frequency < 0 && radio.freqMin >= futureValue)
                             {
                                 frequency = 0;
                             }
-
-                            Console.WriteLine($"{deltaPosition} {frequency} {radio.modulation}");
-
+                            else if (futureValue >= radio.freqMax)
+                            {
+                                frequency = radio.freqMax - radio.freq;
+                            }
                         }
                         
                         radio.freq = (int)Math.Round(radio.freq + frequency);
