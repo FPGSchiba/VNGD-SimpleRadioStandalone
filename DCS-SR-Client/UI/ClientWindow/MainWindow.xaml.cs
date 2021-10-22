@@ -1612,6 +1612,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT,(bool)AllowDCSPTT.IsChecked);
         }
 
+        private void AllowRotaryIncrement_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement, (bool)AllowDCSPTT.IsChecked);
+        }
+
         private void AlwaysAllowHotas_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls,(bool)AlwaysAllowHotas.IsChecked);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -78,6 +79,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 {
                     if (delta)
                     {
+                        
+                        if (GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement))
+                        {
+                            double adjustedFrequency;
+                            double magnitude;
+
+
+                            // Easier to simply shift the decimal place value to the ones position
+                            adjustedFrequency = Math.Abs((int)Math.Round(radio.freq / frequency));
+
+                            // calculate the value of the position where the delta will be applied
+                            double deltaPosition = (adjustedFrequency %  10) - (adjustedFrequency % 1) / 1;
+                            double rollOverValue = frequency < 0 ? 0 : 9;
+
+                            Console.WriteLine($"{rollOverValue} : {deltaPosition}");
+                            if(deltaPosition == rollOverValue)
+                            {
+
+                                frequency *= -9;
+                            }                          
+                        }
+                        
                         radio.freq = (int)Math.Round(radio.freq + frequency);
                     }
                     else
