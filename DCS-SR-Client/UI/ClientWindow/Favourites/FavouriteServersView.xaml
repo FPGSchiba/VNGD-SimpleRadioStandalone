@@ -85,9 +85,22 @@
                   HorizontalAlignment="Center"
                   AutoGenerateColumns="False"
                   ItemsSource="{Binding Path=Addresses}"
-                  SelectedItem="{Binding Path=SelectedItem}">
+                  SelectedItem="{Binding Path=SelectedItem}"
+                  SelectionMode="Single"
+                  AllowDrop="True"
+                  DragOver="FavouritesGrid_DragOver"
+                  DragEnter="FavouritesGrid_DragEnter" CanUserResizeRows="False" CanUserDeleteRows="False"
+                    >
+
+            <DataGrid.CellStyle>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <EventSetter Event="MouseMove" Handler="DataGridRow_MouseMove"/>
+                    <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name" />
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name">
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Path=Address}" Header="ServerAddress/port" />
                 <DataGridTextColumn Binding="{Binding Path=EAMCoalitionPassword}" Header="EAM coal. pass" />
                 <DataGridTemplateColumn Header="Is Default">
