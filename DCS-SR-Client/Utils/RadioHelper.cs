@@ -8,6 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 {
@@ -79,7 +80,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 {
                     if (delta)
                     {
-                        
                         if (GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement))
                         {
                             double adjustedFrequency;
@@ -90,13 +90,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                             // calculate the value of the position where the delta will be applied
                             double deltaPosition = (adjustedFrequency %  10) - (adjustedFrequency % 1) / 1;
                             double rollOverValue = frequency < 0 ? 0 : 9;
-
-                            Console.WriteLine($"{rollOverValue} : {deltaPosition}");
-                            if(deltaPosition == rollOverValue)
+     
+                            if(deltaPosition == rollOverValue && Math.Abs(frequency) <= 1000000)
                             {
-
                                 frequency *= -9;
-                            }                          
+                            }
+                            else if (deltaPosition == 1 && frequency == -10000000 && radio.modulation == RadioInformation.Modulation.FM) // this is horrific
+                            {
+                                frequency = 0;
+                            }
+
+                            Console.WriteLine($"{deltaPosition} {frequency} {radio.modulation}");
+
                         }
                         
                         radio.freq = (int)Math.Round(radio.freq + frequency);
