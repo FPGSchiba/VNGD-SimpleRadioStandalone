@@ -95,13 +95,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                             {
                                 frequency = deltaPosition == rollOverValue ? frequency *= -9 : frequency;
                             }
-                            else if (frequency < 0 && radio.freqMin >= futureValue)
+                            else if (frequency < 0 && radio.freqMin > futureValue)
                             {
                                 frequency = 0;
                             }
-                            else if (futureValue >= radio.freqMax)
+                            else if (futureValue > radio.freqMax)
                             {
-                                frequency = radio.freqMax - radio.freq;
+                                frequency = 0;
                             }
                         }
                         
