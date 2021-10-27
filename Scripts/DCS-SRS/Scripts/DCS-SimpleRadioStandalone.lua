@@ -1663,6 +1663,7 @@ _fa18.iff = {
 }
 _fa18.enttries = 0
 _fa18.mode3opt =  ""    -- to distinguish between 3 and 3/C while ED doesn't fix the different codes for those
+_fa18.identEnd = 0      -- time to end IFF ident -(18 seconds)
 
 --[[
 From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
@@ -1715,6 +1716,7 @@ function SR.exportRadioFA18C(_data)
         _fa18ent = false
         _fa18.enttries = 0
         _fa18.mode3opt = ""
+        _fa18.identEnd = 0
     end
 
     local getGuardFreq = function (freq,currentGuard,modulation)
@@ -1879,7 +1881,9 @@ function SR.exportRadioFA18C(_data)
     if _ufc.UFC_OptionDisplay2 == "2   " then
         -- Check if on XP
         if _ufc.UFC_ScratchPadString1Display == "X" then
-            iff.status = 1
+            if iff.status <= 0 then
+                iff.status = 1
+            end
             if _ufc.UFC_OptionCueing1 == ":" then
                 local code = string.match(_ufc.UFC_OptionDisplay1, "1-%d%d")    -- actual code is displayed in the option display
                 if code then
@@ -1903,22 +1907,23 @@ function SR.exportRadioFA18C(_data)
 
         -- Check if on AI
         elseif _ufc.UFC_ScratchPadString1Display == "A" then
-            iff.status = 1
+            if iff.status <= 0 then
+                iff.status = 1
+            end
         -- Check if it is OFF
         else
             iff.status = 0
         end
     end
 
-    -- check if identing (this should last 30 seconds...)
-    local iffIdent = SR.getButtonPosition(99)
-
     -- Mode 1/3 IDENT, requires mode 1 or mode 3 to be on and I/P pushbutton press
-    if iffIdent == 1 and iff.status == 1 and (iff.mode1 ~= -1 or iff.mode3 ~= -1) then
-        iff.status = 2
-    elseif iff.status == 2 and iffIdent == 0 then
-        -- remove IDENT status when pushbutton released
-        iff.status = 1
+    if iff.status > 0 then
+        if SR.getButtonPosition(99) == 1 and (iff.mode1 ~= -1 or iff.mode3 ~= -1) then
+            _fa18.identEnd = LoGetModelTime() + 18
+            iff.status = 2
+        elseif iff.status == 2 and LoGetModelTime() >= _fa18.identEnd then
+            iff.status = 1
+        end
     end
 
     -- set current IFF settings
