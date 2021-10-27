@@ -206,7 +206,7 @@ function SR.exporter()
 
         _update.latLng = _latLng
         SR.lastKnownPos = _point
-        _lastUnitType = ""
+
         _lastUnitId = ""
         _lastUnitType = ""
     end
@@ -1664,6 +1664,7 @@ _fa18.iff = {
 }
 _fa18.enttries = 0
 _fa18.mode3opt =  ""    -- to distinguish between 3 and 3/C while ED doesn't fix the different codes for those
+_fa18.identEnd = 0      -- time to end IFF ident -(18 seconds)
 
 --[[
 From NATOPS - https://info.publicintelligence.net/F18-ABCD-000.pdf (VII-23-2)
@@ -1716,6 +1717,7 @@ function SR.exportRadioFA18C(_data)
         _fa18ent = false
         _fa18.enttries = 0
         _fa18.mode3opt = ""
+        _fa18.identEnd = 0
     end
 
     local getGuardFreq = function (freq,currentGuard,modulation)
@@ -1880,7 +1882,9 @@ function SR.exportRadioFA18C(_data)
     if _ufc.UFC_OptionDisplay2 == "2   " then
         -- Check if on XP
         if _ufc.UFC_ScratchPadString1Display == "X" then
-            iff.status = 1
+            if iff.status <= 0 then
+                iff.status = 1
+            end
             if _ufc.UFC_OptionCueing1 == ":" then
                 local code = string.match(_ufc.UFC_OptionDisplay1, "1-%d%d")    -- actual code is displayed in the option display
                 if code then
@@ -1904,22 +1908,23 @@ function SR.exportRadioFA18C(_data)
 
         -- Check if on AI
         elseif _ufc.UFC_ScratchPadString1Display == "A" then
-            iff.status = 1
+            if iff.status <= 0 then
+                iff.status = 1
+            end
         -- Check if it is OFF
         else
             iff.status = 0
         end
     end
 
-    -- check if identing (this should last 30 seconds...)
-    local iffIdent = SR.getButtonPosition(99)
-
     -- Mode 1/3 IDENT, requires mode 1 or mode 3 to be on and I/P pushbutton press
-    if iffIdent == 1 and iff.status == 1 and (iff.mode1 ~= -1 or iff.mode3 ~= -1) then
-        iff.status = 2
-    elseif iff.status == 2 and iffIdent == 0 then
-        -- remove IDENT status when pushbutton released
-        iff.status = 1
+    if iff.status > 0 then
+        if SR.getButtonPosition(99) == 1 and (iff.mode1 ~= -1 or iff.mode3 ~= -1) then
+            _fa18.identEnd = LoGetModelTime() + 18
+            iff.status = 2
+        elseif iff.status == 2 and LoGetModelTime() >= _fa18.identEnd then
+            iff.status = 1
+        end
     end
 
     -- set current IFF settings
@@ -3278,12 +3283,49 @@ local _mirageEncStatus = false
 local _previousEncState = 0
 function SR.exportRadioM2000C(_data)
 
+	local RED_devid = 20
+	local GREEN_devid = 19
+    local RED_device = GetDevice(RED_devid)
+    local GREEN_device = GetDevice(GREEN_devid)
+	
+	local has_cockpit_ptt = false;
+	
+    local RED_ptt = false
+    local GREEN_ptt = false
+	
+	pcall(function() 
+		RED_ptt = RED_device:is_ptt_pressed()
+		GREEN_ptt = GREEN_device:is_ptt_pressed()
+		has_cockpit_ptt = true
+		end)
+		
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.control = 0 
+	
+	-- Different PTT/select control if the module version supports cockpit PTT
+	if has_cockpit_ptt then
+	    _data.control = 1
+		_data.capabilities.dcsPtt = true
+		_data.capabilities.dcsRadioSwitch = true
+		if (GREEN_ptt) then
+			_data.selected = 1 -- radios[2] GREEN V/UHF
+			_data.ptt = true
+		elseif (RED_ptt) then
+			_data.selected = 2 -- radios[3] RED UHF
+			_data.ptt = true
+		else
+			_data.selected = -1
+			_data.ptt = false
+		end
+	end
+	
+	
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(19)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707, { 0.0, 1.0 }, false)
+
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(448, 0.50)
@@ -3335,7 +3377,7 @@ function SR.exportRadioM2000C(_data)
 
     _previousEncState = SR.getButtonPosition(432)
 
-    _data.control = 0; -- partial radio, allows hotkeys
+
 
     -- Handle transponder
 

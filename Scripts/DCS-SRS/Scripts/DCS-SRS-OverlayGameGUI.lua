@@ -47,6 +47,9 @@ local _radioState = {}
 local _listStatics = {} -- placeholder objects
 local _listMessages = {} -- data
 
+
+
+
 local WIDTH = 420
 local HEIGHT = 160
 
@@ -56,6 +59,29 @@ local srsOverlay = {
     connection = nil,
     logFile = io.open(lfs.writedir()..[[Logs\DCS-SRS-InGameRadio.log]], "w")
 }
+
+
+srsOverlay.module_specific = {}
+
+srsOverlay.module_specific["M-2000C"] = function(radios)
+		for _i,_radio in pairs(radios) do
+			local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
+			if _i==2 then
+				if _isReceiving>0 then
+					base.Export.GetDevice(19):set_ext_rx(true)
+				else
+					base.Export.GetDevice(19):set_ext_rx(false)
+				end
+			elseif _i==3 then
+				if _isReceiving>0 then
+					base.Export.GetDevice(20):set_ext_rx(true)
+				else
+					base.Export.GetDevice(20):set_ext_rx(false)
+				end
+			end
+		end
+	end
+
 
 function srsOverlay.loadConfiguration()
     srsOverlay.log("Loading config file...")
@@ -105,6 +131,15 @@ function srsOverlay.updateRadio()
 
     if _radioState and _radioState.RadioInfo and _radioState.RadioInfo.radios then
 
+		--Call module specific updates
+		local _dcs_data = base.Export.LoGetSelfData()
+		if _dcs_data and _dcs_data.Name then
+			if srsOverlay.module_specific[_dcs_data.Name] ~= nil then
+				base.pcall(srsOverlay.module_specific[_dcs_data.Name], _radioState.RadioInfo.radios)
+			end
+		end
+		
+		
         if srsOverlay.getMode() == _modes.full and _radioState.ClientCountConnected then
             local clientCountMsg = string.format("Connected clients: %i", _radioState.ClientCountConnected)
 
@@ -175,8 +210,11 @@ function srsOverlay.updateRadio()
         for _i,_radio in pairs(_radioInfo.radios) do
 
             local fullMessage
+			
 
             local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
+			
+		
 
             if  _radio.modulation == 5 or _radio.modulation == 6 then 
 
@@ -293,7 +331,6 @@ function srsOverlay.updateRadio()
 
             if _isReceiving == 1 then
                 _skin = typesMessage.receive
-
                 if not _compactMode then 
                     fullMessage = fullMessage .." ".._sentBy
                 end
@@ -562,7 +599,7 @@ function srsOverlay.listen()
 
     --KNOWN BUG - Hitting Left Control + Windows Key + L causes lag
     -- Fix by disabling overlay or hitting L CNTRL + L SHIFT + L
-        if srsOverlay.getMode() ~= _modes.hidden then
+        --if srsOverlay.getMode() ~= _modes.hidden then
             local _decoded = JSON:decode(_received)
 
           --srsOverlay.log(_received)
@@ -576,7 +613,7 @@ function srsOverlay.listen()
                 return true
             end
 
-        end
+        --end
     end
 
     return false
@@ -589,7 +626,7 @@ function srsOverlay.onSimulationFrame()
     --     --srsOverlay.log("NO Options Data")
     --     return
     -- end
-
+	
     if srsOverlay.config == nil then
         srsOverlay.loadConfiguration()
     end
@@ -624,6 +661,9 @@ function srsOverlay.onSimulationFrame()
             srsOverlay.updateRadio()
         end
     end
+	
+
+
 end 
 
 DCS.setUserCallbacks(srsOverlay)
