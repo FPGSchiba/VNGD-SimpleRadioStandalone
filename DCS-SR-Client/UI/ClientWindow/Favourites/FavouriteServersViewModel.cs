@@ -146,6 +146,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites
                     address.PropertyChanged -= OnServerAddressPropertyChanged;
                 }
             }
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            {
+                Save();
+            }
         }
 
         private void OnServerAddressPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
