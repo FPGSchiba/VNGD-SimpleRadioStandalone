@@ -63,6 +63,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         HFNoiseVolume,
 
         PTTStartDelay,
+
+        RotaryStyleIncrement
     }
 
     public class ProfileSettingsStore
@@ -127,6 +129,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
             {ProfileSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
             {ProfileSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
+
+            {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), "false"},
         };
 
 
