@@ -206,7 +206,7 @@ function SR.exporter()
 
         _update.latLng = _latLng
         SR.lastKnownPos = _point
-
+        _lastUnitType = ""
         _lastUnitId = ""
         _lastUnitType = ""
     end
