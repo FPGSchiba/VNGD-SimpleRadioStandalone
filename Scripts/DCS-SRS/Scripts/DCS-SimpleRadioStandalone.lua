@@ -206,7 +206,7 @@ function SR.exporter()
 
         _update.latLng = _latLng
         SR.lastKnownPos = _point
-        _lastUnitType = ""
+
         _lastUnitId = ""
     end
 
@@ -3056,12 +3056,49 @@ local _mirageEncStatus = false
 local _previousEncState = 0
 function SR.exportRadioM2000C(_data)
 
+	local RED_devid = 20
+	local GREEN_devid = 19
+    local RED_device = GetDevice(RED_devid)
+    local GREEN_device = GetDevice(GREEN_devid)
+	
+	local has_cockpit_ptt = false;
+	
+    local RED_ptt = false
+    local GREEN_ptt = false
+	
+	pcall(function() 
+		RED_ptt = RED_device:is_ptt_pressed()
+		GREEN_ptt = GREEN_device:is_ptt_pressed()
+		has_cockpit_ptt = true
+		end)
+		
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.control = 0 
+	
+	-- Different PTT/select control if the module version supports cockpit PTT
+	if has_cockpit_ptt then
+	    _data.control = 1
+		_data.capabilities.dcsPtt = true
+		_data.capabilities.dcsRadioSwitch = true
+		if (GREEN_ptt) then
+			_data.selected = 1 -- radios[2] GREEN V/UHF
+			_data.ptt = true
+		elseif (RED_ptt) then
+			_data.selected = 2 -- radios[3] RED UHF
+			_data.ptt = true
+		else
+			_data.selected = -1
+			_data.ptt = false
+		end
+	end
+	
+	
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(19)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707, { 0.0, 1.0 }, false)
+
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(448, 0.50)
@@ -3113,7 +3150,7 @@ function SR.exportRadioM2000C(_data)
 
     _previousEncState = SR.getButtonPosition(432)
 
-    _data.control = 0; -- partial radio, allows hotkeys
+
 
     -- Handle transponder
 
