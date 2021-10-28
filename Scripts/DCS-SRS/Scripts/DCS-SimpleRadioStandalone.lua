@@ -208,6 +208,7 @@ function SR.exporter()
         SR.lastKnownPos = _point
 
         _lastUnitId = ""
+        _lastUnitType = ""
     end
 
     if SR.unicast then
