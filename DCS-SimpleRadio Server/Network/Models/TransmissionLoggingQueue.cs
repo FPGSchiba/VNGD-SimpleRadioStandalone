@@ -64,6 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
 
             while (!_stop)
             {
+                Thread.Sleep(500);
                 if (_log != !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue)
                 {
                     _log = !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue;
