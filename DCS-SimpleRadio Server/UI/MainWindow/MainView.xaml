@@ -37,6 +37,8 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0"
@@ -394,6 +396,56 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"/>
 
+                <Label Content="Log Received Transmissions"
+                       Grid.Row="21"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="TransmissionLogEnabledToggle"
+                        Content="{Binding TransmissionLogEnabledText}"
+                        Grid.Row="21"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Transmission Archive Time"
+                       Grid.Row="22"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <StackPanel Orientation="Vertical"
+                            Grid.Row="22"
+                            Grid.Column="2">
+                    <Grid  Width="75">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" FontSize="10" Content="0" HorizontalAlignment="Left" />
+                        <Label HorizontalAlignment="Right" Grid.Column="1" FontSize="10" Content="7" />
+                    </Grid>
+                    
+                    <Slider 
+                        Value="{Binding ArchiveLimit}"
+                        Width="75"
+                        Height="40"
+                        VerticalAlignment="Center"
+                        Interval="1"
+                        Minimum="0"
+                        Maximum="7"
+                        Ticks="1,2,3,4,5,6,7"
+                        TickPlacement="TopLeft"
+                        IsSnapToTickEnabled="True"
+                        HorizontalAlignment="Center">
+                    </Slider>
+                </StackPanel>
+
                 <Label Content="Retransmit Hop/Node Count"
                        Grid.Row="20"
                        Grid.Column="0" 
@@ -423,13 +475,8 @@
                             TickPlacement="TopLeft"
                             IsSnapToTickEnabled="True"
                             HorizontalAlignment="Center">
-
                     </Slider>
-
-
-
                 </StackPanel>
-
             </Grid>
         </StackPanel>
     </ScrollViewer>
