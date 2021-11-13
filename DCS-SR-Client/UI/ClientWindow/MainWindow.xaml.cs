@@ -481,6 +481,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             TransponderIDENT.InputName = "Transponder IDENT Toggle";
             TransponderIDENT.ControlInputBinding = InputBinding.TransponderIDENT;
             TransponderIDENT.InputDeviceManager = InputManager;
+
+            RadioVolumeUp.InputName = "Radio Volume Up";
+            RadioVolumeUp.ControlInputBinding = InputBinding.RadioVolumeUp;
+            RadioVolumeUp.InputDeviceManager = InputManager;
+
+            RadioVolumeDown.InputName = "Radio Volume Down";
+            RadioVolumeDown.ControlInputBinding = InputBinding.RadioVolumeDown;
+            RadioVolumeDown.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -540,6 +548,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             EncryptionKeyDecrease.LoadInputSettings();
             RadioChannelUp.LoadInputSettings();
             RadioChannelDown.LoadInputSettings();
+            RadioVolumeUp.LoadInputSettings();
+            RadioVolumeDown.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()

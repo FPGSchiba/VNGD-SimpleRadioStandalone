@@ -17,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                 {
@@ -40,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                 {
@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED
                     && radio.modulation != RadioInformation.Modulation.INTERCOM
@@ -166,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
@@ -328,7 +328,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
-            if (currentRadio != null)
+            if (currentRadio != null && radioId > 0)
             {
                 if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
@@ -368,7 +368,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
-            if (currentRadio != null)
+            if (currentRadio != null && radioId > 0)
             {
                 if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
@@ -428,7 +428,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.rtMode == RadioInformation.RetransmitMode.OVERLAY)
                 {
@@ -439,6 +439,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 }
             }
 
+        }
+
+        public static void RadioVolumeUp(short radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+
+                var volume = currentRadio.volume;
+
+                volume += 0.1f; 
+
+                if (volume > 1.0)
+                {
+                    volume = 1.0f;
+                }
+              
+                currentRadio.volume = volume;
+            }
+         
+
+        }
+
+        public static void RadioVolumeDown(short radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+
+                3var volume = currentRadio.volume;
+
+                volume -= 0.1f;
+
+                if (volume < 0)
+                {
+                    volume = 0f;
+                }
+
+                currentRadio.volume = volume;
+            }
         }
     }
 }

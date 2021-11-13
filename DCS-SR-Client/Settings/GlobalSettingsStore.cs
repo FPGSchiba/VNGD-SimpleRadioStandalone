@@ -192,6 +192,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         TransponderIDENT = 133,
         ModifierTransponderIDENT = 233,
+
+        RadioVolumeUp = 134,
+        ModifierRadioVolumeUp = 234,
+
+        RadioVolumeDown = 135,
+        ModifierRadioVolumeDown = 235,
     }
 
 
