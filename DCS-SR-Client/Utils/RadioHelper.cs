@@ -474,7 +474,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
             {
 
-                3var volume = currentRadio.volume;
+                var volume = currentRadio.volume;
 
                 volume -= 0.1f;
 
