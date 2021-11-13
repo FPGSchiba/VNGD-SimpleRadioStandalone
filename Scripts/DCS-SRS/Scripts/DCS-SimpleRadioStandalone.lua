@@ -2706,35 +2706,32 @@ function SR.exportRadioMosquitoFBMkVI (_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 364, { 0.0, 1.0 }, false)
 
-    _data.selected = 1
-
-    -- Expansion Radio - Server Side Controlled
-    _data.radios[3].name = "AN/ARC-186(V)"
-    _data.radios[3].freq = 124.8 * 1000000 --116,00-151,975 MHz
+    _data.radios[3].name = "R1155" 
+    _data.radios[3].freq = SR.getRadioFrequency(27,500,true)
     _data.radios[3].modulation = 0
-    _data.radios[3].secFreq = 121.5 * 1000000
-    _data.radios[3].volume = 1.0
-    _data.radios[3].freqMin = 116 * 1000000
-    _data.radios[3].freqMax = 151.975 * 1000000
-    _data.radios[3].volMode = 1
-    _data.radios[3].freqMode = 1
-    _data.radios[3].expansion = true
+    _data.radios[3].volume = SR.getRadioVolume(0, 229, { 0.0, 1.0 }, false)
+
+    _data.radios[4].name = "T1154" 
+    _data.radios[4].freq = SR.getRadioFrequency(26,500,true)
+    _data.radios[4].modulation = 0
+    _data.radios[4].volume = 1
+    _data.radios[4].volMode = 1
+
 
     -- Expansion Radio - Server Side Controlled
-    _data.radios[4].name = "AN/ARC-164 UHF"
-    _data.radios[4].freq = 251.0 * 1000000 --225-399.975 MHZ
-    _data.radios[4].modulation = 0
-    _data.radios[4].secFreq = 243.0 * 1000000
-    _data.radios[4].volume = 1.0
-    _data.radios[4].freqMin = 225 * 1000000
-    _data.radios[4].freqMax = 399.975 * 1000000
-    _data.radios[4].volMode = 1
-    _data.radios[4].freqMode = 1
-    _data.radios[4].expansion = true
-    _data.radios[4].encKey = 1
-    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+    _data.radios[5].name = "AN/ARC-210"
+    _data.radios[5].freq = 124.8 * 1000000 
+    _data.radios[5].modulation = 0
+    _data.radios[5].secFreq = 121.5 * 1000000
+    _data.radios[5].volume = 1.0
+    _data.radios[5].freqMin = 116 * 1000000
+    _data.radios[5].freqMax = 300 * 1000000
+    _data.radios[5].volMode = 1
+    _data.radios[5].freqMode = 1
+    _data.radios[5].expansion = true
 
     _data.control = 0; -- no ptt, same as the FW and 109. No connector.
+    _data.selected = 1
 
     return _data;
 end
@@ -3939,7 +3936,7 @@ function SR.getButtonPosition(_args)
 
 end
 
-function SR.getRadioFrequency(_deviceId, _roundTo)
+function SR.getRadioFrequency(_deviceId, _roundTo, _ignoreIsOn)
     local _device = GetDevice(_deviceId)
 
     if not _roundTo then
@@ -3947,13 +3944,14 @@ function SR.getRadioFrequency(_deviceId, _roundTo)
     end
 
     if _device then
-        if _device:is_on() then
+        if _device:is_on() or _ignoreIsOn then
             -- round as the numbers arent exact
             return SR.round(_device:get_frequency(), _roundTo)
         end
     end
     return 1
 end
+
 
 function SR.getRadioModulation(_deviceId)
     local _device = GetDevice(_deviceId)
