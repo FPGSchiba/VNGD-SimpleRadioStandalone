@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,6 +11,7 @@ using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using NLog;
 using LogManager = NLog.LogManager;
@@ -20,6 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
     internal class UDPVoiceRouter: IHandle<ServerFrequenciesChanged>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly ConcurrentDictionary<string, SRClient> _clientsList;
         private readonly IEventAggregator _eventAggregator;
 
@@ -39,6 +41,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private static readonly List<int> _emptyBlockedRadios = new List<int>(); // Used in radio reachability check below, server does not track blocked radios, so forward all
         private List<double> _testFrequencies = new List<double>();
         private List<double> _globalFrequencies = new List<double>();
+
+        private readonly TransmissionLoggingQueue transmissionLoggingQueue = new TransmissionLoggingQueue();
 
         public UDPVoiceRouter(ConcurrentDictionary<string, SRClient> clientsList, IEventAggregator eventAggregator)
         {
@@ -99,6 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             new Thread(ProcessPackets).Start();
             //outgoing packets
             new Thread(SendPendingPackets).Start();
+            transmissionLoggingQueue.Start();
 
             var port = _serverSettings.GetServerPort();
             _listener = new UdpClient();
@@ -221,7 +226,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                         {
                                             //Add to the processing queue
                                             _outGoing.Add(outgoingVoice);
-
+                                            
                                             //mark as transmitting for the UI
                                             double mainFrequency = udpVoicePacket.Frequencies.FirstOrDefault();
                                             // Only trigger transmitting frequency update for "proper" packets (excluding invalid frequencies and magic ping packets with modulation 4)
@@ -237,6 +242,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                                     client.TransmittingFrequency = $"{(mainFrequency / 1000000).ToString("0.000", CultureInfo.InvariantCulture)} {mainModulation}";
                                                 }
                                                 client.LastTransmissionReceived = DateTime.Now;
+
+                                                // Only log the initial transmission
+                                                // only log received transmissions!
+                                                if (udpVoicePacket.RetransmissionCount == 0)
+                                                {
+                                                    transmissionLoggingQueue.LogTransmission(client);
+                                                }
                                             }
                                         }
 
@@ -386,7 +398,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     }
                 }
             }
-
             if (outgoingList.Count > 0)
             {
                 return new OutgoingUDPPackets

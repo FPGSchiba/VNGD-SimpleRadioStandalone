@@ -560,7 +560,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.TransponderIDENT)
+                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.RadioVolumeDown)
                         {
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
@@ -642,6 +642,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                             break;
                                         case InputBinding.TransponderIDENT:
                                             TransponderHelper.ToggleIdent();
+                                            break;
+                                        case InputBinding.RadioVolumeUp:
+                                            RadioHelper.RadioVolumeUp(dcsPlayerRadioInfo.selected);
+                                            break;
+                                        case InputBinding.RadioVolumeDown:
+                                            RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
                                             break;
 
 
@@ -745,7 +751,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.TransponderIDENT; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioVolumeDown; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

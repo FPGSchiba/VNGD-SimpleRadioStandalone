@@ -10,7 +10,9 @@ using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow;
 using NLog;
@@ -49,6 +51,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
 
             var config = new LoggingConfiguration();
+            var transmissionFileTarget = new FileTarget
+            {
+                FileName = @"${date:format=yyyy-MM-dd}-transmissionlog.csv",
+                ArchiveFileName = @"${basedir}/TransmissionLogArchive/{#}-transmissionlog.old.csv",
+                ArchiveNumbering = ArchiveNumberingMode.Date,
+                MaxArchiveFiles = ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue,
+                ArchiveEvery = FileArchivePeriod.Day,
+                Layout =
+                 @"${longdate}, ${message}"
+            };
             var fileTarget = new FileTarget
             {
                 FileName = "serverlog.txt",
@@ -60,8 +72,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             };
 
             var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            var transmissionWrapper = new AsyncTargetWrapper(transmissionFileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", wrapper);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, wrapper));
+            config.AddTarget("asyncTransmissionFileTarget", transmissionWrapper);
+
+
+            var transmissionRule = new LoggingRule(
+                "Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models.TransmissionLoggingQueue",
+                LogLevel.Info,
+                transmissionWrapper
+                );
+            transmissionRule.Final = true;
+
+            config.LoggingRules.Add(transmissionRule);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, transmissionWrapper));
 
             LogManager.Configuration = config;
             loggingReady = true;

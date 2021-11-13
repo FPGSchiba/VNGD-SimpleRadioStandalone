@@ -42,19 +42,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
                     {
                         try
                         {
-                            double frequency = Double.Parse(trimmed, CultureInfo.InvariantCulture);
+                            var split =  trimmed.Split('|');
+
+                            var name = "";
+                            double frequency = 0;
+                            if (split.Length >= 2)
+                            {
+                                name = split[0]; 
+                                frequency = Double.Parse(split[1], CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                name = trimmed;
+                                frequency = Double.Parse(trimmed, CultureInfo.InvariantCulture);
+                            }
+
                             channels.Add(new PresetChannel()
                             {
-                                Text = trimmed,
+                                Text = name,
                                 Value = frequency * MHz,
                             });
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log(LogLevel.Info, "Error parsing frequency  ");
+                            Logger.Log(LogLevel.Info, "Error parsing frequency  "+trimmed);
                         }
                     }
                 }
+            }
+
+            int i = 1;
+            foreach (var channel in channels)
+            {
+                channel.Text = i + " - " + channel.Text;
+                i++;
             }
 
             return channels;

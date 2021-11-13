@@ -376,6 +376,8 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
 
@@ -592,6 +594,18 @@
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
                                                        InputName="Transponder IDENT" />
+
+                            <local:InputBindingControl x:Name="RadioVolumeUp"
+                                                       Grid.Row="35"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeUp}"
+                                                       InputName="Radio Volume Up" />
+
+                            <local:InputBindingControl x:Name="RadioVolumeDown"
+                                                       Grid.Row="36"
+                                                       Grid.ColumnSpan="5"
+                                                       ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
+                                                       InputName="Radio Volume Down" />
 
 
                         </Grid>
@@ -1375,9 +1389,36 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
+                                           Content="Rotary Style Frequency Increment/Decrement" />
+
+                                    <ToggleButton Name="AllowRotaryIncrement"
+                                                  Grid.Row="5"
+                                                  Grid.Column="1"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Click="AllowRotaryIncrement_OnClick">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="{x:Type ToggleButton}">
+                                                <Setter Property="Content" Value="OFF" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Content" Value="ON" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="False">
+                                                        <Setter Property="Content" Value="OFF" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
+
+                                    <Label Grid.Row="6"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
                                            Content="Push to Talk Release Delay (ms) - SRS Hotkeys only" />
 
-                                    <StackPanel Grid.Row="5"
+                                    <StackPanel Grid.Row="6"
                                                 Grid.Column="1" Margin="10">
 
                                         <Slider x:Name="PTTReleaseDelay"
@@ -1407,13 +1448,13 @@
 
                                     </StackPanel>
 
-                                    <Label Grid.Row="6"
+                                    <Label Grid.Row="7"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Push to Talk Start Delay (ms) - SRS Hotkeys only" />
 
-                                    <StackPanel Grid.Row="6"
+                                    <StackPanel Grid.Row="7"
                                                 Grid.Column="1" Margin="10">
 
                                         <Slider x:Name="PTTStartDelay"

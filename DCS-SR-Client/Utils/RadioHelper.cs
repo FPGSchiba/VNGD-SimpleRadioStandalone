@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -16,7 +17,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                 {
@@ -39,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.freqMode == RadioInformation.FreqMode.OVERLAY || radio.guardFreqMode == RadioInformation.FreqMode.OVERLAY)
                 {
@@ -70,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED
                     && radio.modulation != RadioInformation.Modulation.INTERCOM
@@ -78,6 +79,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 {
                     if (delta)
                     {
+                        if (GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement))
+                        {
+                            // Easier to simply shift the decimal place value to the ones position for finding numeral at specific position
+                            double adjustedFrequency = Math.Abs((int)Math.Round(radio.freq / frequency));
+
+                            double deltaPosition = (adjustedFrequency %  10) - (adjustedFrequency % 1) / 1; // calculate the value of the position where the delta will be applied
+                            double rollOverValue = frequency < 0 ? 0 : 9;
+                            double futureValue = frequency + radio.freq; // used for checking 10Mhz increments 
+
+                            if (Math.Abs(frequency) <= 1000000)
+                            {
+                                frequency = deltaPosition == rollOverValue ? frequency *= -9 : frequency;
+                            }
+                            else if (frequency < 0 && radio.freqMin > futureValue)
+                            {
+                                frequency = 0;
+                            }
+                            else if (futureValue > radio.freqMax)
+                            {
+                                frequency = 0;
+                            }
+                        }
+                        
                         radio.freq = (int)Math.Round(radio.freq + frequency);
                     }
                     else
@@ -142,7 +166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED) // disabled
                 {
@@ -304,7 +328,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
-            if (currentRadio != null)
+            if (currentRadio != null && radioId > 0)
             {
                 if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
@@ -344,7 +368,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var currentRadio = RadioHelper.GetRadio(radioId);
 
-            if (currentRadio != null)
+            if (currentRadio != null && radioId > 0)
             {
                 if (currentRadio.modulation != RadioInformation.Modulation.DISABLED
                     && ClientStateSingleton.Instance.DcsPlayerRadioInfo.control ==
@@ -404,7 +428,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var radio = GetRadio(radioId);
 
-            if (radio != null)
+            if (radio != null && radioId > 0)
             {
                 if (radio.rtMode == RadioInformation.RetransmitMode.OVERLAY)
                 {
@@ -415,6 +439,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 }
             }
 
+        }
+
+        public static void RadioVolumeUp(short radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+
+                var volume = currentRadio.volume;
+
+                volume += 0.1f; 
+
+                if (volume > 1.0)
+                {
+                    volume = 1.0f;
+                }
+              
+                currentRadio.volume = volume;
+            }
+         
+
+        }
+
+        public static void RadioVolumeDown(short radioId)
+        {
+            var currentRadio = RadioHelper.GetRadio(radioId);
+
+            if (currentRadio != null
+                && currentRadio.modulation != RadioInformation.Modulation.DISABLED
+                && currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
+            {
+
+                var volume = currentRadio.volume;
+
+                volume -= 0.1f;
+
+                if (volume < 0)
+                {
+                    volume = 0f;
+                }
+
+                currentRadio.volume = volume;
+            }
         }
     }
 }
