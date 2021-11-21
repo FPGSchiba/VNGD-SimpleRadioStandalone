@@ -21,7 +21,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         private bool _log;
         private readonly FileTarget _fileTarget;
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
-        private readonly XDocument _nlogConfig = XDocument.Load("NLog.config");
 
         public TransmissionLoggingQueue()
         {
