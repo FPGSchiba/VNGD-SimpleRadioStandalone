@@ -113,7 +113,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return false;
         }
 
-        public byte[] AddClientAudioSamples(ClientAudio audio)
+        public byte[] AddClientAudioSamples(ClientAudio audio, bool skipEffects = false)
         {
             //sort out volume
             //            var timer = new Stopwatch();
@@ -165,17 +165,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 //adjust for LOS + Distance + Volume
                 AdjustVolumeForLoss(audio);
 
-                if (audio.ReceivedRadio == 0
+                if (!skipEffects)
+                {
+                    if (audio.ReceivedRadio == 0
                     || audio.Modulation == (short)RadioInformation.Modulation.MIDS)
-                {
-                    if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
                     {
-                        AddRadioEffectIntercom(audio);
+                        if (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects))
+                        {
+                            AddRadioEffectIntercom(audio);
+                        }
                     }
-                }
-                else
-                {
-                    AddRadioEffect(audio);
+                    else
+                    {
+                        AddRadioEffect(audio);
+                    }
                 }
 
                 //final adjust
