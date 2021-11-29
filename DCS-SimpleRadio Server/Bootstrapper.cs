@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
@@ -51,16 +52,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
 
             var config = new LoggingConfiguration();
-            var transmissionFileTarget = new FileTarget
-            {
-                FileName = @"${date:format=yyyy-MM-dd}-transmissionlog.csv",
-                ArchiveFileName = @"${basedir}/TransmissionLogArchive/{#}-transmissionlog.old.csv",
-                ArchiveNumbering = ArchiveNumberingMode.Date,
-                MaxArchiveFiles = ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue,
-                ArchiveEvery = FileArchivePeriod.Day,
-                Layout =
-                 @"${longdate}, ${message}"
-            };
             var fileTarget = new FileTarget
             {
                 FileName = "serverlog.txt",
@@ -72,25 +63,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             };
 
             var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
-            var transmissionWrapper = new AsyncTargetWrapper(transmissionFileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", wrapper);
-            config.AddTarget("asyncTransmissionFileTarget", transmissionWrapper);
 
-
-            var transmissionRule = new LoggingRule(
-                "Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models.TransmissionLoggingQueue",
-                LogLevel.Info,
-                transmissionWrapper
-                );
-            transmissionRule.Final = true;
-
-            config.LoggingRules.Add(transmissionRule);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, transmissionWrapper));
+            // only add transmission logging at launch if its enabled, defer rule and target creation otherwise
+            if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue)
+            {
+                config = LoggingHelper.GenerateTransmissionLoggingConfig(config,
+                            ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue);
+            }
 
             LogManager.Configuration = config;
             loggingReady = true;
         }
-
 
         protected override void Configure()
         {
@@ -140,7 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         protected override void OnExit(object sender, EventArgs e)
         {
-            var serverState = (ServerState) _simpleContainer.GetInstance(typeof(ServerState), null);
+            var serverState = (ServerState)_simpleContainer.GetInstance(typeof(ServerState), null);
             serverState.StopServer();
         }
 
