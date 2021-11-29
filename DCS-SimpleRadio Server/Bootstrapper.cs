@@ -64,6 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", wrapper);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, wrapper));
 
             // only add transmission logging at launch if its enabled, defer rule and target creation otherwise
             if (ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue)
