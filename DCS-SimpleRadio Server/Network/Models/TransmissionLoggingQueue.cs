@@ -1,7 +1,9 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using NLog;
+using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using System;
@@ -19,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         private ConcurrentDictionary<SRClient, TransmissionLog> _currentTransmissionLog { get; } = new ConcurrentDictionary<SRClient, TransmissionLog>();
         private bool _stop;
         private bool _log;
-        private readonly FileTarget _fileTarget;
+        private FileTarget _fileTarget;
         private readonly ServerSettingsStore _serverSettings = ServerSettingsStore.Instance;
 
         public TransmissionLoggingQueue()
@@ -28,9 +30,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
             _stop = false;
 
             WrapperTargetBase b = (WrapperTargetBase)LogManager.Configuration.FindTargetByName("asyncTransmissionFileTarget");
-            _fileTarget = (FileTarget)b.WrappedTarget;
+            _fileTarget = b != null ? (FileTarget)b.WrappedTarget : null;
+            //_fileTarget = (FileTarget)b.WrappedTarget;
         }
-        
+
         public void LogTransmission(SRClient client)
         {
             if (!_stop)
@@ -62,7 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
         public void Stop()
         {
             _stop = true;
-                        
+
         }
 
         private void LogCompleteTransmissions()
@@ -76,16 +79,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
                     _log = !_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue;
                     string newSetting = _log ? "TRANSMISSION LOGGING ENABLED" : "TRANSMISSION LOGGING DISABLED";
 
+                    if (_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue
+                        && _fileTarget == null) // require initialization of transmission logging filetarget and rule
+                    {
+                        LoggingConfiguration config = LogManager.Configuration;
+
+                        config = LoggingHelper.GenerateTransmissionLoggingConfig(config,
+                            _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue);
+
+                        LogManager.Configuration = config;
+
+                        WrapperTargetBase b = (WrapperTargetBase)LogManager.Configuration.FindTargetByName("asyncTransmissionFileTarget");
+                        _fileTarget = (FileTarget)b.WrappedTarget;
+                    }
+
                     Logger.Info($"EVENT, {newSetting}");
                 }
 
-                if (_fileTarget.MaxArchiveFiles != _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue)
+                if (_serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue &&
+                    _fileTarget.MaxArchiveFiles != _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue)
                 {
                     _fileTarget.MaxArchiveFiles = _serverSettings.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION).IntValue;
                     LogManager.ReconfigExistingLoggers();
                 }
 
-                if(_log && !_currentTransmissionLog.IsEmpty)
+                if (_log && !_currentTransmissionLog.IsEmpty)
                 {
                     foreach (KeyValuePair<SRClient, TransmissionLog> LoggedTransmission in _currentTransmissionLog)
                     {

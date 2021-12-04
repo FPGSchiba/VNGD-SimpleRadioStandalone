@@ -119,6 +119,7 @@
     <Compile Include="Helpers\JsonDCSPropertiesResolver.cs" />
     <Compile Include="Helpers\JsonNetworkPropertiesResolver.cs" />
     <Compile Include="Helpers\ListHelper.cs" />
+    <Compile Include="Helpers\LoggingHelper.cs" />
     <Compile Include="Helpers\VolumeConversionHelper.cs" />
     <Compile Include="Network\Analytics.cs" />
     <Compile Include="Network\ClientListExport.cs" />
