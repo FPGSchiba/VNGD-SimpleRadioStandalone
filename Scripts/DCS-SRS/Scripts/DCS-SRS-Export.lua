@@ -4413,7 +4413,7 @@ SR.exportCoalitionData = function(playerID)
 
     local slot =  net.get_player_info(playerID,"slot")
 
-      SR.log("Update -  Slot "..slot.."  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
+    -- SR.log("Update -  Slot "..slot.."  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
 
     if slot and slot ~= '' then 
         slot = tostring(slot)
@@ -4706,14 +4706,14 @@ end
 -- Reloading callbacks 
 -- DEBUG FUNCTION - enable to reload hooks on every mission start
 -- DO NOT LEAVE ENABLED
-function SR.onMissionLoadBegin()
+-- function SR.onMissionLoadBegin()
 
-    SR.shutdown()
+--     -- SR.shutdown()
 
-    net.log('Mission starts loading');
-    DCS.reloadUserScripts();
-    net.log('Scripts successfully reloaded.');
-end
+--     -- net.log('Mission starts loading');
+--     -- DCS.reloadUserScripts();
+--     -- net.log('Scripts successfully reloaded.');
+-- end
 
 function SR.shutdown()
 
