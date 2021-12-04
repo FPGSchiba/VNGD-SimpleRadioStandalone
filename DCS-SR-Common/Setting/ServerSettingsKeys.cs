@@ -35,7 +35,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
         RETRANSMISSION_NODE_LIMIT= 24,
         STRICT_RADIO_ENCRYPTION = 25,
         TRANSMISSION_LOG_ENABLED = 26,
-        TRANSMISSION_LOG_RETENTION = 27
+        TRANSMISSION_LOG_RETENTION = 27,
+        RADIO_EFFECT_OVERRIDE = 28,
     }
 
     public class DefaultServerSettings
@@ -69,7 +70,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT.ToString(), "0" },
             { ServerSettingsKeys.STRICT_RADIO_ENCRYPTION.ToString(), "false" },
             { ServerSettingsKeys.TRANSMISSION_LOG_ENABLED.ToString(), "false" },
-            { ServerSettingsKeys.TRANSMISSION_LOG_RETENTION.ToString(), "2" }
+            { ServerSettingsKeys.TRANSMISSION_LOG_RETENTION.ToString(), "2" },
+            { ServerSettingsKeys.RADIO_EFFECT_OVERRIDE.ToString(), "" }
         };
     }
 }
