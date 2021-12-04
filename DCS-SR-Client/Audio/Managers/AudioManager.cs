@@ -704,7 +704,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void AddClientAudio(ClientAudio audio)
+        public void AddClientAudio(ClientAudio audio, bool skipEffects = false)
         {
             //sort out effects!
 
@@ -724,7 +724,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _clientAudioMixer.AddMixerInput(client.SampleProvider);
             }
 
-            client.AddClientAudioSamples(audio);
+            client.AddClientAudioSamples(audio, skipEffects);
         }
 
         private void RemoveClientBuffer(SRClient srClient)
