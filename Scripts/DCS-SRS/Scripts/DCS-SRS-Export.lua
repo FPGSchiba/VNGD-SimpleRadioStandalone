@@ -958,16 +958,15 @@ end
 
 function SR.exportRadioUH1H(_data)
 
-    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
-
     local intercomOn =  SR.getButtonPosition(27)
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
 
-    if intercomOn < 0.5 then
-        _data.radios[1].modulation = 3
+    if intercomOn > 0.5 then
+        --- control hot mic instead of turning it on and off
+        _data.intercomHotMic = true
     end
 
     local fmOn =  SR.getButtonPosition(23)
@@ -1016,34 +1015,52 @@ function SR.exportRadioUH1H(_data)
 
     --_device:get_argument_value(_arg)
 
-    local _panel = Export.GetDevice(0)
+    local _seat = SR.currentSeat
 
-    local switch = _panel:get_argument_value(30)
+    if _seat == 0 then
 
-    if SR.nearlyEqual(switch, 0.1, 0.03) then
-        _data.selected = 0
-    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
-        _data.selected = 1
-    elseif SR.nearlyEqual(switch, 0.3, 0.03) then
-        _data.selected = 2
-    elseif SR.nearlyEqual(switch, 0.4, 0.03) then
-        _data.selected = 3
-    else
-        _data.selected = -1
-    end
+         local _panel = Export.GetDevice(0)
 
-    local _pilotPTT = SR.getButtonPosition(194)
-    if _pilotPTT >= 0.1 then
+        local switch = _panel:get_argument_value(30)
 
-        if _pilotPTT == 0.5 then
-            -- intercom
+        if SR.nearlyEqual(switch, 0.1, 0.03) then
             _data.selected = 0
+        elseif SR.nearlyEqual(switch, 0.2, 0.03) then
+            _data.selected = 1
+        elseif SR.nearlyEqual(switch, 0.3, 0.03) then
+            _data.selected = 2
+        elseif SR.nearlyEqual(switch, 0.4, 0.03) then
+            _data.selected = 3
+        else
+            _data.selected = -1
         end
 
-        _data.ptt = true
+        local _pilotPTT = SR.getButtonPosition(194)
+        if _pilotPTT >= 0.1 then
+
+            if _pilotPTT == 0.5 then
+                -- intercom
+                _data.selected = 0
+            end
+
+            _data.ptt = true
+        end
+
+        _data.control = 1; -- Full Radio
+
+
+        _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Hot mic on INT switch" }
+    else
+        _data.control = 0; -- no copilot or gunner radio controls - allow them to switch
+        
+        _data.radios[1].volMode = 1 
+        _data.radios[2].volMode = 1 
+        _data.radios[3].volMode = 1 
+        _data.radios[4].volMode = 1
+
+        _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = true, desc = "Hot mic on INT switch" }
     end
 
-    _data.control = 1; -- Full Radio
 
     -- HANDLE TRANSPONDER
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
@@ -1098,8 +1115,6 @@ function SR.exportRadioUH1H(_data)
         _data.iff.mode4 = false
     end
 
-    --temporary hot mic
-    _data.intercomHotMic = true
 
     return _data
 
@@ -2871,8 +2886,6 @@ end
 
 function SR.exportRadioMosquitoFBMkVI (_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
-
     _data.radios[1].name = "INTERCOM"
     _data.radios[1].freq = 100
     _data.radios[1].modulation = 2
@@ -2883,6 +2896,21 @@ function SR.exportRadioMosquitoFBMkVI (_data)
     _data.radios[2].freq = SR.getRadioFrequency(24)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 364, { 0.0, 1.0 }, false)
+
+    local _seat = SR.currentSeat
+
+    if _seat == 0 then
+
+         _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+        local ptt =  SR.getButtonPosition(4)
+
+        if ptt == 1 then
+            _data.ptt = true
+        end
+    else
+         _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    end
 
     _data.radios[3].name = "R1155" 
     _data.radios[3].freq = SR.getRadioFrequency(27,500,true)
@@ -2907,6 +2935,7 @@ function SR.exportRadioMosquitoFBMkVI (_data)
     _data.radios[5].volMode = 1
     _data.radios[5].freqMode = 1
     _data.radios[5].expansion = true
+
 
     _data.control = 0; -- no ptt, same as the FW and 109. No connector.
     _data.selected = 1
