@@ -70,19 +70,19 @@ srsOverlay.module_specific["M-2000C"] = function(radios)
              srsOverlay.log(_isReceiving.." sent by ".._sentBy.." interator ".._i)
 			if _i==2 then
 				if _isReceiving>0 then
-                    srsOverlay.log("19 recieving")
-				--	base.Export.GetDevice(19):set_ext_rx(true)
+                    --srsOverlay.log("19 recieving")
+					base.Export.GetDevice(19):set_ext_rx(true)
 				else
-                    srsOverlay.log("19 not recieving")
-				--	base.Export.GetDevice(19):set_ext_rx(false)
+                   -- srsOverlay.log("19 not recieving")
+					base.Export.GetDevice(19):set_ext_rx(false)
 				end
 			elseif _i==3 then
 				if _isReceiving>0 then
-                    srsOverlay.log("20 recieving")
-				--	base.Export.GetDevice(20):set_ext_rx(true)
+                   -- srsOverlay.log("20 recieving")
+					base.Export.GetDevice(20):set_ext_rx(true)
 				else
-                    srsOverlay.log("20 not recieving")
-				--	base.Export.GetDevice(20):set_ext_rx(false)
+                   -- srsOverlay.log("20 not recieving")
+					base.Export.GetDevice(20):set_ext_rx(false)
 				end
 			end
 		end
