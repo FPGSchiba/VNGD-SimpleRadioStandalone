@@ -559,10 +559,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                             _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
 
-                                            // Only play actual audio once
                                             if (i == 0)
                                             {
-                                                _audioManager.AddClientAudio(audio);
+
+                                                bool overrideEffects = false;
+                                                try
+                                                {
+                                                    double[] overrideEffectChannels = SyncedServerSettings.Instance.GetSetting(Common.Setting.ServerSettingsKeys.RADIO_EFFECT_OVERRIDE)
+                                                        .Split(',')
+                                                        .Select(Double.Parse)
+                                                        .ToArray();
+                                                    overrideEffects = overrideEffectChannels.Contains(audio.Frequency / 1000000) ? true : false;
+                                                }
+                                                catch 
+                                                { 
+                                                }
+                                                _audioManager.AddClientAudio(audio, overrideEffects);
                                             }
                                         }
 

@@ -1,9 +1,9 @@
--- Version 1.9.9.0
+-- Version 2.0.0.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
 
-net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 1.9.9.0 ")
+net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 2.0.0.0 ")
 
 local base = _G
 
@@ -66,16 +66,22 @@ srsOverlay.module_specific = {}
 srsOverlay.module_specific["M-2000C"] = function(radios)
 		for _i,_radio in pairs(radios) do
 			local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
+
+             srsOverlay.log(_isReceiving.." sent by ".._sentBy.." interator ".._i)
 			if _i==2 then
 				if _isReceiving>0 then
+                    --srsOverlay.log("19 recieving")
 					base.Export.GetDevice(19):set_ext_rx(true)
 				else
+                   -- srsOverlay.log("19 not recieving")
 					base.Export.GetDevice(19):set_ext_rx(false)
 				end
 			elseif _i==3 then
 				if _isReceiving>0 then
+                   -- srsOverlay.log("20 recieving")
 					base.Export.GetDevice(20):set_ext_rx(true)
 				else
+                   -- srsOverlay.log("20 not recieving")
 					base.Export.GetDevice(20):set_ext_rx(false)
 				end
 			end
@@ -668,4 +674,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 1.9.9.0 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 2.0.0.0 ")
