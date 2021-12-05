@@ -86,8 +86,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         RetransmitNodeLimit = nodeLimit;
                     }
-
-
                 }
             }
         }

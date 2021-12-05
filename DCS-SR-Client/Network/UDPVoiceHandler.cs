@@ -563,17 +563,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             {
 
                                                 bool overrideEffects = false;
-                                                try
+
+                                                if (_serverSettings.GetSettingAsBool(ServerSettingsKeys
+                                                    .RADIO_EFFECT_OVERRIDE))
                                                 {
-                                                    double[] overrideEffectChannels = SyncedServerSettings.Instance.GetSetting(Common.Setting.ServerSettingsKeys.RADIO_EFFECT_OVERRIDE)
-                                                        .Split(',')
-                                                        .Select(Double.Parse)
-                                                        .ToArray();
-                                                    overrideEffects = overrideEffectChannels.Contains(audio.Frequency / 1000000) ? true : false;
+                                                    overrideEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
                                                 }
-                                                catch 
-                                                { 
-                                                }
+
                                                 _audioManager.AddClientAudio(audio, overrideEffects);
                                             }
                                         }

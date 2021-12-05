@@ -39,6 +39,8 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0"
@@ -364,15 +366,15 @@
                          VerticalAlignment="Center"
                          HorizontalAlignment="Center"/>
 
-                <Label Content="LotATC Transponder Export" 
+                <Label Content="Ignore Radio Effect on Global Freq" 
                        Grid.Row="18"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"/>
 
-                <Button x:Name="LotATCExportToggle"
-                        Content="{Binding LotATCExportText}"
+                <Button x:Name="OverrideEffectsOnGlobalToggle"
+                        Content="{Binding OverrideEffectsOnGlobal}"
                         Grid.Row="18"
                         Grid.Column="2"
                         Width="75"
@@ -380,8 +382,24 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"/>
 
-                <Label Content="Show Transmitter Name" 
+                <Label Content="LotATC Transponder Export" 
                        Grid.Row="19"
+                       Grid.Column="0" 
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
+
+                <Button x:Name="LotATCExportToggle"
+                        Content="{Binding LotATCExportText}"
+                        Grid.Row="19"
+                        Grid.Column="2"
+                        Width="75"
+                        Height="20"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+
+                <Label Content="Show Transmitter Name" 
+                       Grid.Row="20"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
@@ -389,7 +407,7 @@
 
                 <Button x:Name="ShowTransmitterNameToggle"
                         Content="{Binding ShowTransmitterNameText}" 
-                        Grid.Row="19"
+                        Grid.Row="20"
                         Grid.Column="2"
                         Width="75"
                         Height="20"
@@ -447,13 +465,13 @@
                 </StackPanel>
 
                 <Label Content="Retransmit Hop/Node Count"
-                       Grid.Row="20"
+                       Grid.Row="23"
                        Grid.Column="0" 
                        Grid.ColumnSpan="2"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"/>
                 <StackPanel Orientation="Vertical"
-                            Grid.Row="20"
+                            Grid.Row="23"
                             Grid.Column="2">
                     <Grid  Width="75">
                         <Grid.ColumnDefinitions>

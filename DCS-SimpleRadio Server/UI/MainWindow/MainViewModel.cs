@@ -203,6 +203,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             }
         }
 
+        public string OverrideEffectsOnGlobal 
+            => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE).BoolValue ? "ON" : "OFF";
+
         public string TunedCountText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT).BoolValue ? "ON" : "OFF";
 
@@ -215,8 +218,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public string TransmissionLogEnabledText
             => ServerSettingsStore.Instance.GetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED).BoolValue ? "ON" : "OFF";
 
-        //public string TransmissionArchiveHistory
-        //    =>  
 
         public string ListeningPort
             => ServerSettingsStore.Instance.GetServerSetting(ServerSettingsKeys.SERVER_PORT).StringValue;
@@ -344,6 +345,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             var newSetting = CheckForBetaUpdates != "ON";
             ServerSettingsStore.Instance.SetServerSetting(ServerSettingsKeys.CHECK_FOR_BETA_UPDATES, newSetting);
             NotifyOfPropertyChange(() => CheckForBetaUpdates);
+
+            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+        }
+
+        public void OverrideEffectsOnGlobalToggle()
+        {
+            var newSetting = OverrideEffectsOnGlobal != "ON";
+            ServerSettingsStore.Instance.SetServerSetting(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE, newSetting);
+            NotifyOfPropertyChange(() => OverrideEffectsOnGlobal);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
         }
