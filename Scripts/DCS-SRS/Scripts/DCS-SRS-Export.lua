@@ -259,38 +259,35 @@ local _lastCheck = 0;
 
 SR.onSimulationFrame = function()
 
+    --check DCS is running
+    if DCS.getModelTime() < 0.5 then
+        return
+    end
+
     -- read from socket
     local _status, _result = pcall(function()
 
+        -- Receive buffer is 8192 in LUA Socket
+        -- will contain 10 clients for LOS
+        local _received = SR.UDPLosReceiveSocket:receive()
 
-    -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
-    if _lastUnitType == "FA-18C_hornet" then
-        if not _fa18ent and SR.getButtonPosition(122) > 0 then
-           _fa18ent = true
-        end
-    end
+        if _received then
+            local _decoded = SR.JSON:decode(_received)
 
-    -- Receive buffer is 8192 in LUA Socket
-    -- will contain 10 clients for LOS
-    local _received = SR.UDPLosReceiveSocket:receive()
+            if _decoded then
 
-    if _received then
-        local _decoded = SR.JSON:decode(_received)
+                local _losList = SR.checkLOS(_decoded)
 
-        if _decoded then
-
-            local _losList = SR.checkLOS(_decoded)
-
-            --DEBUG
-            -- SR.log('LOS check ' .. SR.JSON:encode(_losList))
-            if SR.unicast then
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList) .. " \n", "127.0.0.1", SR.LOS_SEND_TO_PORT))
-            else
-                socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList) .. " \n", "127.255.255.255", SR.LOS_SEND_TO_PORT))
+                --DEBUG
+                -- SR.log('LOS check ' .. SR.JSON:encode(_losList))
+                if SR.unicast then
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList) .. " \n", "127.0.0.1", SR.LOS_SEND_TO_PORT))
+                else
+                    socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList) .. " \n", "127.255.255.255", SR.LOS_SEND_TO_PORT))
+                end
             end
-        end
 
-    end
+        end
     end)
 
     if not _status then
@@ -299,40 +296,40 @@ SR.onSimulationFrame = function()
 
     local _status, _result = pcall(function()
 
-        local _now = DCS.getRealTime()
-
-        -- only if mission is running
-        if  DCS.getModelTime() > 0.5 then
-            -- SR.log('Exporting')
-            
-            --export aircraft every 0.2
-            if _now > _sent + 0.2 then
-                _sent = _now
-
-                -- SR.log("Seat "..SR.currentSeat.."\n\n")
-                SR.exportAircraftData()
+        -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
+        if _lastUnitType == "FA-18C_hornet" then
+            if not _fa18ent and SR.getButtonPosition(122) > 0 then
+               _fa18ent = true
             end
-
-            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
-            -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
-    
-            -- export coalition every 5 seconds
-            if _now > _lastSent + 5.0 then
-                _lastSent = _now 
-             --    SR.log("sending update")
-                SR.exportCoalitionData(net.get_my_player_id())
-            end
-
         end
 
+        local _now = DCS.getRealTime()
+
+        -- SR.log('Exporting')
+            
+        --export aircraft every 0.2
+        if _now > _sent + 0.2 then
+            _sent = _now
+
+            -- SR.log("Seat "..SR.currentSeat.."\n\n")
+            SR.exportAircraftData()
+        end
+
+        -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,100,1,1,100,1)))
+        -- SR.log("EXPORT CHECK "..tostring(terrain.isVisible(1,1,1,1,-100,-100)))
     
+        -- export coalition every 5 seconds
+        if _now > _lastSent + 5.0 then
+            _lastSent = _now 
+            --    SR.log("sending update")
+            SR.exportCoalitionData(net.get_my_player_id())
+        end
 
      end)
 
     if not _status then
         SR.log('ERROR onSimulationFrame Export SRS: ' .. _result)
     end
-
 
 end
 
@@ -4733,5 +4730,5 @@ end
 
 DCS.setUserCallbacks(SR)
 
-net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.1")
-SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.1.1")
+net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.9.0")
+SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.9.0")
