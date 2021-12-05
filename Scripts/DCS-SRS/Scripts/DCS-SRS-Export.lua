@@ -1,10 +1,10 @@
--- Version 1.9.9.0
+-- Version 2.0.0.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
 
 
-net.log("Loading - DCS-SRS Export GameGUI - Ciribob: 1.9.9.0 ")
+net.log("Loading - DCS-SRS Export GameGUI - Ciribob: 2.0.0.0 ")
 local SR = {}
 
 SR.LOS_RECEIVE_PORT = 9086
@@ -4730,5 +4730,5 @@ end
 
 DCS.setUserCallbacks(SR)
 
-net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.9.0")
-SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 1.9.9.0")
+net.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 2.0.0.0")
+SR.log("Loaded - DCS-SRS Export GameGUI - Ciribob: 2.0.0.0")
