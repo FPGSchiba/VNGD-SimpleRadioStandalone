@@ -4051,8 +4051,8 @@ function SR.exportRadioAJS37(_data)
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "FR 22"
-    _data.radios[2].freq = SR.getRadioFrequency(31)
-    _data.radios[2].modulation = SR.getRadioModulation(31)
+    _data.radios[2].freq = SR.getRadioFrequency(30)
+    _data.radios[2].modulation = SR.getRadioModulation(30)
 
     --   local _modulation =SR.getButtonPosition(3008)
 
@@ -4066,8 +4066,8 @@ function SR.exportRadioAJS37(_data)
     _data.radios[2].volMode = 1
 
     _data.radios[3].name = "FR 24"
-    _data.radios[3].freq = SR.getRadioFrequency(30)
-    _data.radios[3].modulation = SR.getRadioModulation(30)
+    _data.radios[3].freq = SR.getRadioFrequency(31)
+    _data.radios[3].modulation = SR.getRadioModulation(31)
     _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[3].volMode = 1
 
