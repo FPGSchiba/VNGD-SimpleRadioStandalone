@@ -87,7 +87,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 4130, 2.0f);
-
         }
 
         public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
@@ -211,6 +210,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = DateTime.Now.Ticks;
+
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            {
+                RecordingManager.Instance.AppendClientAudio(audio);
+            }
+            else
+            {
+                RecordingManager.Instance.Stop();
+            }
 
             if (!passThrough)
             {

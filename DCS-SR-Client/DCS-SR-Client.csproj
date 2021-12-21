@@ -113,6 +113,9 @@
       <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NAudio.Lame, Version=1.0.8.41605, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.Lame.1.0.8\lib\net40\NAudio.Lame.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -196,6 +199,7 @@
     </ApplicationDefinition>
     <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
+    <Compile Include="Audio\Managers\RecordingManager.cs" />
     <Compile Include="Audio\Models\TransmittedAudio.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />
@@ -534,8 +538,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets'))" />
   </Target>
   <Import Project="..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets" Condition="Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" />
+  <Import Project="..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

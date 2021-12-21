@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
@@ -56,6 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private DispatcherTimer _idleTimeout;
 
+        private readonly RecordingManager _recordingManager;
 
         public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
@@ -66,6 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
             _idleTimeout.Tick += CheckIfIdleTimeOut;
             _idleTimeout.Interval = TimeSpan.FromSeconds(10);
+            _recordingManager = RecordingManager.Instance;
         }
 
         private void CheckIfIdleTimeOut(object sender, EventArgs e)
@@ -107,7 +110,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     LatLngPosition = sideInfo.LngLngPosition,
-                    ClientGuid = _guid
+                    ClientGuid = _guid,
+                    AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                 },
                 ExternalAWACSModePassword = password,
                 MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD
@@ -193,6 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _lotATCSync.Stop();
             _vaicomSync.Stop();
             _idleTimeout?.Stop();
+            _recordingManager.Stop();
 
             //disconnect callback
             CallOnMain(false, connectionError);
@@ -218,7 +223,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
                     ClientGuid = _guid,
-                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
+                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
+                    AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                 },
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             };
@@ -234,9 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 message.Client.LatLngPosition = new DCSLatLngPosition();
             }
 
-            SendToServer(message);
-
-           
+            SendToServer(message);    
         }
 
         private void ClientCoalitionUpdate()
@@ -250,7 +254,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
                     Seat = sideInfo.seat,
-                    ClientGuid = _guid
+                    ClientGuid = _guid,
+                    AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
             };
@@ -326,7 +331,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
                             LatLngPosition = sideInfo.LngLngPosition,
                             ClientGuid = _guid,
-                            RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo
+                            RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
+                            AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
                     });

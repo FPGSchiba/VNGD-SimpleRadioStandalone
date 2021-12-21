@@ -679,7 +679,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                 Encryptions = encryptions,
                 Modulations = modulations,
-                PacketNumber = udpVoicePacket.PacketNumber, 
+                PacketNumber = udpVoicePacket.PacketNumber,
                 OriginalClientGuidBytes = udpVoicePacket.OriginalClientGuidBytes,
                 RetransmissionCount = (byte)(udpVoicePacket.RetransmissionCount+1u),
             };
@@ -997,7 +997,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             GuidBytes = _guidAsciiBytes,
                             AudioPart1Bytes = bytes,
-                            AudioPart1Length = (ushort) bytes.Length,
+                            AudioPart1Length = (ushort)bytes.Length,
                             Frequencies = frequencies.ToArray(),
                             UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                             Encryptions = encryptions.ToArray(),

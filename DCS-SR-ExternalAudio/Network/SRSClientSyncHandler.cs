@@ -29,14 +29,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
         private readonly string name;
         private readonly int coalition;
         private DCSLatLngPosition position;
+        private bool _allowRecord;
 
-        public SRSClientSyncHandler(string guid, DCSPlayerRadioInfo gameState, string name, int coalition, DCSLatLngPosition position)
+        public SRSClientSyncHandler(string guid, DCSPlayerRadioInfo gameState, string name, int coalition, DCSLatLngPosition position, bool Record)
         {
             _guid = guid;
             this.gameState = gameState;
             this.name = name;
             this.coalition = coalition;
             this.position = position;
+            _allowRecord = Record;
         }
 
         public void TryConnect(IPEndPoint endpoint)
@@ -105,7 +107,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                             Name = this.name,
                             ClientGuid = _guid,
                             RadioInfo = gameState,
-                            LatLngPosition = position
+                            LatLngPosition = position,
+                            AllowRecord = _allowRecord
                         },
                         MsgType = NetworkMessage.MessageType.SYNC,
 
@@ -120,7 +123,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                             Name = this.name,
                             ClientGuid = _guid,
                             RadioInfo = gameState,
-                            LatLngPosition = position
+                            LatLngPosition = position,
+                            AllowRecord = _allowRecord
                         },
                         MsgType = NetworkMessage.MessageType.RADIO_UPDATE,
 

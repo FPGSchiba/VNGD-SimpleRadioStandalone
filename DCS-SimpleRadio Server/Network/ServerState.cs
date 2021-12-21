@@ -168,8 +168,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                             Coalition = srClient.Coalition,
                                             Name = srClient.Name,
                                             LatLngPosition = srClient?.LatLngPosition,
-                                            Seat = srClient.Seat
-
+                                            Seat = srClient.Seat,
+                                            AllowRecord = srClient.AllowRecord                                       
                                         };
 
                                         data.Clients.Add(newClient);

@@ -670,6 +670,8 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
 
                             </Grid.RowDefinitions>
 
@@ -1163,6 +1165,71 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
 
+                            <Label Grid.Row="19"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Allow Transmissions To Be Recorded" />
+
+                            <ToggleButton Name="AllowTransmissionsRecord"
+                                          Grid.Row="19"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="AllowTransmissionsRecord_OnClick"
+                                          ToolTipService.ShowOnDisabled="True">
+                                <!--<ToggleButton.ToolTip>
+                                    <ToolTip>
+                                        Recording disabled by server.
+                                    </ToolTip>
+                                </ToggleButton.ToolTip>-->
+                                <ToggleButton.Style>
+                                        <Style TargetType="{x:Type ToggleButton}">
+                                            <Setter Property="Content" Value="ON" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Content" Value="ON" />
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="False">
+                                                    <Setter Property="Content" Value="OFF" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                            </ToggleButton>
+
+                            <Label Grid.Row="20"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Record Transmissions" />
+
+                            <ToggleButton Name="RecordTransmissions"
+                                          Grid.Row="20"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="RecordTransmissions_OnClick"
+                                          ToolTipService.ShowOnDisabled="True">
+                                <!--<ToggleButton.ToolTip>
+                                    <ToolTip>
+                                        Recording disabled by server.
+                                    </ToolTip>
+                                </ToggleButton.ToolTip>-->
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
 
                         </Grid>
 

@@ -660,6 +660,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ShowTransmitterName.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName);
 
+            AllowTransmissionsRecord.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AllowRecording);
+            RecordTransmissions.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RecordAudio);
+
             var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
             if(objValue == null || (string) objValue == "TRUE")
             {
@@ -981,6 +984,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             try
             {
                 _audioManager.StopEncoding();
+                RecordingManager.Instance.Stop();
             }
             catch (Exception ex)
             {
@@ -1919,8 +1923,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     "Thank You!", MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
-            }
-            
+            }        
+        }
+
+        private void AllowTransmissionsRecord_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowRecording, (bool)AllowTransmissionsRecord.IsChecked);
+        }
+
+        private void RecordTransmissions_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordAudio, (bool)RecordTransmissions.IsChecked);
         }
     }
 }
