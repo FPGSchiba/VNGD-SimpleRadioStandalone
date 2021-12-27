@@ -81,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
         public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
-        
+
         /// <remarks>Used in the XAML for DataBinding the connected client count</remarks>
         public ConnectedClientsSingleton Clients { get; } = ConnectedClientsSingleton.Instance;
 
@@ -158,7 +158,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
 
             _audioManager = new AudioManager(AudioOutput.WindowsN);
-            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
+            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
 
             if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
             {
@@ -171,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
 
-            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(100)};
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
 
@@ -312,7 +312,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             foreach (var profile in _globalSettings.ProfileSettingsStore.InputProfiles.Keys)
             {
                 ControlsProfile.Items.Add(profile);
-            } 
+            }
             ControlsProfile.IsEnabled = true;
             ControlsProfile.SelectedIndex = 0;
 
@@ -508,7 +508,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void OnRadioEndTransmitEffectChanged(object sender, SelectionChangedEventArgs e)
         {
             if (RadioEndTransmitEffect.IsEnabled)
-            { 
+            {
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.RadioTransmissionEndSelection, ((CachedAudioEffect)RadioEndTransmitEffect.SelectedItem).FileName);
             }
         }
@@ -662,9 +662,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             AllowTransmissionsRecord.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AllowRecording);
             RecordTransmissions.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RecordAudio);
+            SingleFileMixdown.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown);
+            RecordTransmissions_IsEnabled();
+
+            RecordingQuality.ValueChanged += RecordingQuality_ValueChanged;
+            RecordingQuality.Value = double.Parse(
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.RecordingQuality).StringValue[1].ToString());
 
             var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
-            if(objValue == null || (string) objValue == "TRUE")
+            if (objValue == null || (string)objValue == "TRUE")
             {
                 AllowAnonymousUsage.IsChecked = false;
             }
@@ -735,12 +741,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     var vol = orig * (e.NewValue / 100);
 
-                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume,(float)vol);
+                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume, (float)vol);
                 }
-                    
+
             };
             NATOToneVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume)
-                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture)) *100;
+                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             NATOToneVolume.IsEnabled = true;
 
             HQToneVolume.IsEnabled = false;
@@ -803,7 +809,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                     var vol = orig * (e.NewValue / 100);
 
-                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.UHFNoiseVolume, (float) vol);
+                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.UHFNoiseVolume, (float)vol);
                 }
 
             };
@@ -851,7 +857,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
 
-                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate(string name)
+                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate (string name)
                         {
                             try
                             {
@@ -984,7 +990,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             try
             {
                 _audioManager.StopEncoding();
-                RecordingManager.Instance.Stop();
+                AudioRecordingManager.Instance.Stop();
             }
             catch (Exception ex)
             {
@@ -1006,7 +1012,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Only save selected microphone if one is actually available, resulting in a crash otherwise
             if (AudioInput.MicrophoneAvailable)
             {
-                if(AudioInput.SelectedAudioInput.Value == null)
+                if (AudioInput.SelectedAudioInput.Value == null)
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.AudioInputDeviceId, "default");
 
@@ -1221,7 +1227,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SpeakerBoost_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var convertedValue = VolumeConversionHelper.ConvertVolumeSliderToScale((float) SpeakerBoost.Value);
+            var convertedValue = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
 
             if (_audioPreview != null)
             {
@@ -1245,18 +1251,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void RadioEncryptionEffects_Click(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects,
-                (bool) RadioEncryptionEffectsToggle.IsChecked);
+                (bool)RadioEncryptionEffectsToggle.IsChecked);
         }
 
         private void NATORadioTone_Click(object sender, RoutedEventArgs e)
         {
-             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.NATOTone,
-                 (bool)NATORadioToneToggle.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.NATOTone,
+                (bool)NATORadioToneToggle.IsChecked);
         }
 
         private void RadioSwitchPTT_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT, (bool) RadioSwitchIsPTT.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT, (bool)RadioSwitchIsPTT.IsChecked);
         }
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
@@ -1486,11 +1492,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindow = null;
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY,300);
-                            
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, 300);
+
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, 122);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, 270);
-                         
+
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOpacity, 1.0);
         }
 
@@ -1522,17 +1528,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectPrompt,(bool) AutoConnectPromptToggle.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectPrompt, (bool)AutoConnectPromptToggle.IsChecked);
         }
 
         private void AutoConnectMismatchPromptToggle_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectMismatchPrompt, (bool) AutoConnectMismatchPromptToggle.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectMismatchPrompt, (bool)AutoConnectMismatchPromptToggle.IsChecked);
         }
 
         private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool) RadioOverlayTaskbarItem.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
 
             if (_radioOverlayWindow != null)
                 _radioOverlayWindow.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
@@ -1541,7 +1547,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RefocusDCS, (bool) RefocusDCS.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.RefocusDCS, (bool)RefocusDCS.IsChecked);
         }
 
         private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
@@ -1551,7 +1557,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 "Restart SimpleRadio Standalone", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool) ExpandInputDevices.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool)ExpandInputDevices.IsChecked);
         }
 
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
@@ -1561,38 +1567,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void MicAGC_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AGC, (bool) MicAGC.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AGC, (bool)MicAGC.IsChecked);
         }
 
         private void MicDenoise_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.Denoise, (bool) MicDenoise.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.Denoise, (bool)MicDenoise.IsChecked);
         }
 
         private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
         {
-             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffects,
-                 (bool) RadioSoundEffects.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffects,
+                (bool)RadioSoundEffects.IsChecked);
         }
 
         private void RadioTxStart_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start,(bool) RadioTxStartToggle.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start, (bool)RadioTxStartToggle.IsChecked);
         }
 
         private void RadioTxEnd_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End,(bool) RadioTxEndToggle.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End, (bool)RadioTxEndToggle.IsChecked);
         }
 
         private void RadioRxStart_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start,(bool) RadioRxStartToggle.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start, (bool)RadioRxStartToggle.IsChecked);
         }
 
         private void RadioRxEnd_Click(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End, (bool) RadioRxEndToggle.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End, (bool)RadioRxEndToggle.IsChecked);
         }
 
         private void RadioMIDS_Click(object sender, RoutedEventArgs e)
@@ -1602,29 +1608,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AudioSelectChannel_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel, (bool) AutoSelectChannel.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel, (bool)AutoSelectChannel.IsChecked);
         }
 
         private void RadioSoundEffectsClipping_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping,
-                (bool) RadioSoundEffectsClipping.IsChecked);
+                (bool)RadioSoundEffectsClipping.IsChecked);
 
         }
 
         private void MinimiseToTray_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.MinimiseToTray, (bool) MinimiseToTray.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.MinimiseToTray, (bool)MinimiseToTray.IsChecked);
         }
 
         private void StartMinimised_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.StartMinimised,(bool)StartMinimised.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.StartMinimised, (bool)StartMinimised.IsChecked);
         }
 
         private void AllowDCSPTT_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT,(bool)AllowDCSPTT.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT, (bool)AllowDCSPTT.IsChecked);
         }
 
         private void AllowRotaryIncrement_OnClick(object sender, RoutedEventArgs e)
@@ -1634,12 +1640,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AlwaysAllowHotas_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls,(bool)AlwaysAllowHotas.IsChecked);
+            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls, (bool)AlwaysAllowHotas.IsChecked);
         }
 
         private void CheckForBetaUpdates_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.CheckForBetaUpdates,(bool)CheckForBetaUpdates.IsChecked);
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.CheckForBetaUpdates, (bool)CheckForBetaUpdates.IsChecked);
         }
 
         private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
@@ -1708,7 +1714,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SetSRSPath_Click(object sender, RoutedEventArgs e)
         {
-            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone","SRPathStandalone",Directory.GetCurrentDirectory());
+            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRPathStandalone", Directory.GetCurrentDirectory());
 
             MessageBox.Show(this,
                 "SRS Path set to: " + Directory.GetCurrentDirectory(),
@@ -1734,7 +1740,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     {
                         _globalSettings.ProfileSettingsStore.AddNewProfile(name);
                         InitSettingsProfiles();
-                     
+
                     }
                 });
             inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -1792,10 +1798,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     if (name.Trim().Length > 0)
                     {
-                        _globalSettings.ProfileSettingsStore.RenameProfile(oldName,name);
+                        _globalSettings.ProfileSettingsStore.RenameProfile(oldName, name);
                         InitSettingsProfiles();
                     }
-                }, true,oldName);
+                }, true, oldName);
                 inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 inputProfileWindow.Owner = this;
                 inputProfileWindow.ShowDialog();
@@ -1805,7 +1811,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoSelectInputProfile_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile,((bool)AutoSelectInputProfile.IsChecked).ToString());
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile, ((bool)AutoSelectInputProfile.IsChecked).ToString());
         }
 
         private void CopyProfile(object sender, RoutedEventArgs e)
@@ -1815,7 +1821,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 if (name.Trim().Length > 0)
                 {
-                    _globalSettings.ProfileSettingsStore.CopyProfile(current,name);
+                    _globalSettings.ProfileSettingsStore.CopyProfile(current, name);
                     InitSettingsProfiles();
                 }
             });
@@ -1844,7 +1850,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
             }
             catch { }
-           
+
         }
 
         private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
@@ -1867,7 +1873,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         }
 
         private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
-        { 
+        {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
         }
 
@@ -1907,7 +1913,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AllowAnonymousUsage_OnClick(object sender, RoutedEventArgs e)
         {
-            if (!(bool) AllowAnonymousUsage.IsChecked)
+            if (!(bool)AllowAnonymousUsage.IsChecked)
             {
                 MessageBox.Show(
                     "Please leave this ticked - SRS logging is extremely minimal (you can verify by looking at the source) - and limited to: Country & SRS Version on startup.\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
@@ -1923,7 +1929,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     "Thank You!", MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
-            }        
+            }
         }
 
         private void AllowTransmissionsRecord_OnClick(object sender, RoutedEventArgs e)
@@ -1934,6 +1940,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void RecordTransmissions_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordAudio, (bool)RecordTransmissions.IsChecked);
+            RecordTransmissions_IsEnabled();
+        }
+
+        private void RecordTransmissions_IsEnabled()
+        {
+            if ((bool)RecordTransmissions.IsChecked)
+            {
+                SingleFileMixdown.IsEnabled = false;
+                RecordingQuality.IsEnabled = false;
+            }
+            else
+            {
+                SingleFileMixdown.IsEnabled = true;
+                RecordingQuality.IsEnabled = true;
+            }
+        }
+
+        private void SingleFileMixdown_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.SingleFileMixdown, (bool)SingleFileMixdown.IsChecked);
+        }
+
+        private void RecordingQuality_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordingQuality, $"V{(int)e.NewValue}");
         }
     }
 }

@@ -89,7 +89,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AutoConnect,
 
         AllowRecording,
-        RecordAudio
+        RecordAudio,
+        SingleFileMixdown,
+        RecordingQuality
     }
 
     public enum InputBinding
@@ -442,6 +444,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 
             {GlobalSettingsKeys.AllowRecording.ToString(), "false" },
+            {GlobalSettingsKeys.RecordAudio.ToString(), "false" },
+            {GlobalSettingsKeys.SingleFileMixdown.ToString(), "false" },
+            {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" }
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()

@@ -213,11 +213,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
             {
-                RecordingManager.Instance.AppendClientAudio(audio);
+                AudioRecordingManager.Instance.AppendClientAudio(audio);
             }
             else
             {
-                RecordingManager.Instance.Stop();
+                AudioRecordingManager.Instance.Stop();
             }
 
             if (!passThrough)

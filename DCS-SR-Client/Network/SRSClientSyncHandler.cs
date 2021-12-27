@@ -57,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private DispatcherTimer _idleTimeout;
 
-        private readonly RecordingManager _recordingManager;
+        private readonly AudioRecordingManager _recordingManager;
 
         public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
         {
@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
             _idleTimeout.Tick += CheckIfIdleTimeOut;
             _idleTimeout.Interval = TimeSpan.FromSeconds(10);
-            _recordingManager = RecordingManager.Instance;
+            _recordingManager = AudioRecordingManager.Instance;
         }
 
         private void CheckIfIdleTimeOut(object sender, EventArgs e)
