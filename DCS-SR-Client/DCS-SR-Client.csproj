@@ -199,10 +199,9 @@
     </ApplicationDefinition>
     <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
-    <Compile Include="Audio\Managers\AudioRecordingManager.cs" />
-    <Compile Include="Audio\Models\IAudioRecordingWriter.cs" />
-    <Compile Include="Audio\Models\MixDownRecordingWriter.cs" />
-    <Compile Include="Audio\Models\PerRadioRecordingWriter.cs" />
+    <Compile Include="Recording\AudioRecordingManager.cs" />
+    <Compile Include="Recording\MixDownLameRecordingWriter.cs" />
+    <Compile Include="Recording\PerRadioLameRecordingWriter.cs" />
     <Compile Include="Audio\Models\TransmittedAudio.cs" />
     <Compile Include="Audio\Providers\AudioProvider.cs" />
     <Compile Include="Audio\Models\CachedAudioEffect.cs" />
@@ -217,6 +216,7 @@
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
     <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
     <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
+    <Compile Include="Recording\AudioRecordingLameWriterBase.cs" />
     <Compile Include="Settings\ProfileSettingsStore.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
@@ -308,7 +308,7 @@
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
-    <Compile Include="Audio\Utility\AudioManipulationHelper.cs" />
+    <Compile Include="Recording\AudioManipulationHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\TransponderHelper.cs" />

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using MathNet.Filtering;
 using NAudio.Dsp;
@@ -13,6 +11,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
 using NLog;
 using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {

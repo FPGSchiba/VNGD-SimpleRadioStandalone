@@ -7,7 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 {
     class AudioRecordingManager
     {
@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ConcurrentQueue<ClientAudio>[] _clientAudioQueues;
 
         private bool _stop;
-        private IAudioRecordingWriter _audioRecordingWriter;
+        private AudioRecordingLameWriterBase _audioRecordingWriter;
 
         private AudioRecordingManager()
         {
@@ -90,11 +90,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             _logger.Debug("Transmission recording started.");
             if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
             {
-                _audioRecordingWriter = new MixDownRecordingWriter(_sampleRate);
+                _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
             }
             else
             {
-                _audioRecordingWriter = new PerRadioRecordingWriter(_sampleRate);
+                _audioRecordingWriter = new PerRadioLameRecordingWriter(_sampleRate);
             }
             _audioRecordingWriter.Start();
             _stop = false;
