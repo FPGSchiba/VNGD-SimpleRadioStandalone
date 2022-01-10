@@ -35,18 +35,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        private short[] MixDownRadios(List<short[]> processedAudio)
-        {
-            short[] finalShortArray = new short[_sampleRate * 2];
-            
-            for(int i = 0; i < processedAudio.Count; i++)
-            {
-                finalShortArray = AudioManipulationHelper.MixSamples(finalShortArray, processedAudio[i], 0);
-            }
-
-            return finalShortArray;
-        }
-
         public override void ProcessAudio(ConcurrentQueue<ClientAudio>[] queues)
         {
             for (int i = 0; i < 11; i++)
@@ -55,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
                 _processedAudio.Add(shortArray);
             }
-            short[] finalShortArray = MixDownRadios(_processedAudio);
+            short[] finalShortArray = AudioManipulationHelper.MixSamplesWithHeadroom(_processedAudio, _sampleRate * 2);
             _lastWrite += TimeSpan.TicksPerSecond * 2;
             OutputToFile(ConversionHelpers.ShortArrayToByteArray(finalShortArray));
             _processedAudio.Clear();

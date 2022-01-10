@@ -664,6 +664,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             AllowTransmissionsRecord.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AllowRecording);
             RecordTransmissions.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.RecordAudio);
             SingleFileMixdown.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown);
+            DisallowedAudioTone.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone);
             RecordTransmissions_IsEnabled();
 
             RecordingQuality.ValueChanged += RecordingQuality_ValueChanged;
@@ -1966,6 +1967,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void RecordingQuality_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordingQuality, $"V{(int)e.NewValue}");
+        }
+
+        private void DisallowedAudioTone_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.DisallowedAudioTone, (bool)DisallowedAudioTone.IsChecked);
         }
     }
 }

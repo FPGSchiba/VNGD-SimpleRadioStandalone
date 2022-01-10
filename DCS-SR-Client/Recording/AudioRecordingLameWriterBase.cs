@@ -12,54 +12,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         protected readonly WaveFormat _waveFormat;
         protected readonly int _sampleRate;
-
         protected long _lastWrite;
-        protected Dictionary<int, short[]> _sampleRemainders;
+        protected TransmissionAssembler _assembler;
 
         protected AudioRecordingLameWriterBase(int sampleRate)
         {
             _sampleRate = sampleRate;
             _waveFormat = new WaveFormat(sampleRate, 1);
-            _sampleRemainders = new Dictionary<int, short[]>();
-        }
-
-        protected short[] SplitRemainder(int radio, short[] sample, int indexPosition)
-        {
-            (short[], short[]) splitArrays = AudioManipulationHelper.SplitSampleByTime(_sampleRate * 2 - indexPosition, sample);
-            _sampleRemainders.Add(radio, splitArrays.Item2);
-
-            return splitArrays.Item1;
+            _assembler = new TransmissionAssembler();
         }
 
         protected short[] ProcessRadioAudio(ConcurrentQueue<ClientAudio>[] queues, int radio)
         {
-            short[] shortArray = new short[_sampleRate * 2];
-
-            if (_sampleRemainders.TryGetValue(radio, out short[] remainder))
-            {
-                remainder.CopyTo(shortArray, 0);
-                _sampleRemainders.Remove(radio);
-            }
-
             while (queues[radio].Count > 0)
             {
                 queues[radio].TryPeek(out ClientAudio firstInQueue);
                 int indexPosition = AudioManipulationHelper.CalculateSamplesStart(_lastWrite, firstInQueue.ReceiveTime, _sampleRate);
-                // Prevent audio sample exceeding two second time
-                if (indexPosition + firstInQueue.PcmAudioShort.Length < _sampleRate * 2)
-                {
-                    queues[radio].TryDequeue(out ClientAudio dequeued);
-                    var mixedDown = AudioManipulationHelper.MixSamples(shortArray, dequeued.PcmAudioShort, indexPosition);
-                    mixedDown.CopyTo(shortArray, indexPosition);
-                }
 
-                else if (indexPosition < _sampleRate * 2)
+                if (indexPosition < _sampleRate * 2)
                 {
                     queues[radio].TryDequeue(out ClientAudio dequeued);
-                    short[] finalAudio = SplitRemainder(radio, dequeued.PcmAudioShort, indexPosition);
-                    var mixedDown = AudioManipulationHelper.MixSamples(shortArray, finalAudio, indexPosition);
-                    mixedDown.CopyTo(shortArray, indexPosition);
-                    break;
+                    _assembler.AddTransmission(dequeued, indexPosition);
                 }
                 else
                 {
@@ -67,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 }
             }
 
-            return shortArray;
+            return _assembler.GetFinalSample();
         }
 
         protected string CreateFilePath()

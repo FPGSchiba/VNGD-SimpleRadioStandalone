@@ -1,46 +1,46 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 {
     public static class AudioManipulationHelper
     {
-        public static short[] MixSamples(short[] existingAudio, short[] newAudio, int offset)
+        public static short[] MixSamplesClipped(short[] pcmAudioOne, short[] pcmAudioTwo, int samplesLength)
         {
-            short[] mixedDown;
-            mixedDown = new short[newAudio.Length];
+            short[] mixedDown = new short[samplesLength];
 
-            for (int i = 0; i < mixedDown.Length; i++)
+            for(int i = 0; i < samplesLength; i++)
             {
-                mixedDown[i] = MixDown(existingAudio[i + offset], newAudio[i]);
+                int result = (pcmAudioOne[i] + pcmAudioTwo[i]);
+                if(result > short.MaxValue)
+                {
+                    result = short.MaxValue;
+                }
+                else if (result < short.MinValue)
+                {
+                    result = short.MinValue;
+                }
+                mixedDown[i] = (short)result;
             }
 
             return mixedDown;
         }
 
-        public static short MixDown(short pcmAudioOne, short pcmAudioTwo)
+        public static short[] MixSamplesWithHeadroom(List<short[]> samplesToMixdown, int samplesLength)
         {
-            // Based on http://www.vttoth.com/CMS/index.php/technical-notes/68, it appears to be the best light weight solution to
-            // mixing down audio to avoid clipping and volume issues
+            short[] mixedDown = new short[samplesLength];
 
-            short shortMixedDown;
-            ushort mixedDownUnsigned;
-
-            ushort audioOneUnsigned = (ushort)(pcmAudioOne + 32768);
-            ushort audioTwoUnsigned = (ushort)(pcmAudioTwo + 32768);
-
-            if ((audioOneUnsigned < 32768) || (audioTwoUnsigned < 32768))
-            {
-                mixedDownUnsigned = (ushort)(audioOneUnsigned * audioTwoUnsigned / 32768);
-            }
-            else
-            {
-                mixedDownUnsigned = (ushort)(2 * (audioOneUnsigned + audioTwoUnsigned) - (audioOneUnsigned * audioTwoUnsigned) / 32768 - 65536);
+            foreach(short[] sample in samplesToMixdown)
+            {           
+                for(int i = 0; i < samplesLength; i++)
+                {
+                    mixedDown[i] += (short)(sample[i] / samplesToMixdown.Count);
+                }
             }
 
-            shortMixedDown = (short)(mixedDownUnsigned - 32768);
-
-            return shortMixedDown;
+            return mixedDown;
         }
+
 
         public static (short[], short[]) SplitSampleByTime(long samplesRemaining, short[] samples)
         {
@@ -71,6 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             int necessarySamples = Convert.ToInt32(elapsedSinceLastWrite * sampleRate);
             // prevent any potential issues due to a negative time being returned
             return necessarySamples >= 0 ? necessarySamples : 0;
+            //return necessarySamples
         }
     }
 }

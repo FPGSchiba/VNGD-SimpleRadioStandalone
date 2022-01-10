@@ -91,7 +91,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         AllowRecording,
         RecordAudio,
         SingleFileMixdown,
-        RecordingQuality
+        RecordingQuality,
+        DisallowedAudioTone
     }
 
     public enum InputBinding
@@ -446,7 +447,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AllowRecording.ToString(), "false" },
             {GlobalSettingsKeys.RecordAudio.ToString(), "false" },
             {GlobalSettingsKeys.SingleFileMixdown.ToString(), "false" },
-            {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" }
+            {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" },
+            {GlobalSettingsKeys.DisallowedAudioTone.ToString(), "false"},
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
