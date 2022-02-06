@@ -33,7 +33,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
 
         public ServerSync(ConcurrentDictionary<string, SRClient> connectedClients, HashSet<IPAddress> _bannedIps,
-            IEventAggregator eventAggregator) : base(IPAddress.Any, ServerSettingsStore.Instance.GetServerPort())
+            IEventAggregator eventAggregator) : base(ServerSettingsStore.Instance.GetServerIP(), ServerSettingsStore.Instance.GetServerPort())
         {
             _clients = connectedClients;
             this._bannedIps = _bannedIps;
@@ -87,9 +87,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 {
                 }
 
-                Logger.Error(ex,$"Unable to start the SRS Server");
+                Logger.Error(ex,$"Unable to start the SRS Server {_serverSettings.GetServerIP()}:{_serverSettings.GetServerPort()}");
 
-                MessageBox.Show($"Unable to start the SRS Server\n\nPort {_serverSettings.GetServerPort()} in use\n\nChange the port by editing the .cfg", "Port in use",
+                MessageBox.Show($"Unable to start the SRS Server\n\nLikely Port {_serverSettings.GetServerPort()} in use\n\nChange the port by editing the .cfg", "Port in use",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }

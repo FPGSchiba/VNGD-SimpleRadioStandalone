@@ -352,7 +352,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         public void OverrideEffectsOnGlobalToggle()
         {
             var newSetting = OverrideEffectsOnGlobal != "ON";
-            ServerSettingsStore.Instance.SetServerSetting(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE, newSetting);
+            ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE, newSetting);
             NotifyOfPropertyChange(() => OverrideEffectsOnGlobal);
 
             _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());

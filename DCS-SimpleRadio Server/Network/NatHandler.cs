@@ -23,7 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         {
             this._port = port;
             _tcpMapping = new Mapping(Protocol.Tcp, _port, _port, $"SRS Server TCP - {_port}");
-            _udpMapping = new Mapping(Protocol.Udp, _port, _port, $"SRS Server TCP - {_port}");
+            _udpMapping = new Mapping(Protocol.Udp, _port, _port, $"SRS Server UDP - {_port}");
         }
         public async void OpenNAT()
         {

@@ -116,11 +116,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             _listener.ExclusiveAddressUse = true;
             _listener.DontFragment = true;
             _listener.Client.DontFragment = true;
-            _listener.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+            _listener.Client.Bind(new IPEndPoint(_serverSettings.GetServerIP(), port));
             while (!_stop)
                 try
                 {
-                    var groupEP = new IPEndPoint(IPAddress.Any, port);
+                    var groupEP = new IPEndPoint(_serverSettings.GetServerIP(), port);
                     var rawBytes = _listener.Receive(ref groupEP);
 
                     if (rawBytes?.Length == 22)
@@ -181,6 +181,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
             _outgoingCancellationToken.Cancel();
             _pendingProcessingCancellationToken.Cancel();
+            transmissionLoggingQueue.Stop();
         }
 
         private void ProcessPackets()
