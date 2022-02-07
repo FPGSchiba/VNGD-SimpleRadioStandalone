@@ -1943,10 +1943,10 @@ function SR.exportRadioA10C(_data)
         -- Power on!
 
         local _radio = nil
-        if SR.round(SR.getButtonPosition(781), 0.1) == 0.2 then
+        if SR.round(SR.getButtonPosition(781), 0.1) == 0.2 and SR.getSelectorPosition(149, 0.1) >= 2 then   -- encryption disabled when EMER AM/FM selected
             --crad/2 vhf - FM
             _radio = _data.radios[4]
-        elseif SR.getButtonPosition(781) == 0 then
+        elseif SR.getButtonPosition(781) == 0 and _selector ~= 2 then    -- encryption disabled when GRD selected
             --crad/1 uhf
             _radio = _data.radios[3]
         end
