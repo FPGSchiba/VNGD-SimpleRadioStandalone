@@ -4656,6 +4656,8 @@ SR.exportCoalitionData = function(playerID)
 
 end
 
+SR.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
+SR.MESSAGE_PREFIX = "SRS Running @ " -- DO NOT MODIFY!!!
 
 function string.startsWith(string, prefix)
     return string.sub(string, 1, string.len(prefix)) == prefix
@@ -4879,11 +4881,11 @@ SR.onChatMessage = function(msg, from)
 
         local enabled = OptionsData.getPlugin("DCS-SRS","srsAutoLaunchEnabled")
         if srs and enabled then
-            local path = SR.get_srs_path()
+            local path = srs.get_srs_path()
             if path ~= "" then
 
                 net.log("Trying to Launch SRS @ "..path)
-                SR.start_srs(host)
+                srs.start_srs(host)
             end
 
         end
