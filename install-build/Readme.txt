@@ -12,14 +12,6 @@ Copy Scripts\Hooks\DCS-SRS-Hook.lua to C:\Users\USERNAME\Saved Games\DCS\Scripts
 
 Create the folders if they dont exist
 
-Add:
-
-pcall(function() local dcsSr=require('lfs');dofile(dcsSr.writedir()..[[Mods\Services\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua]]); end,nil);
-
-To the END of the Export.lua file in C:\Users\USERNAME\Saved Games\DCS\Scripts
-
-If it doesnt exist, just create the file and add the single line to it.
-
 Copy the rest of the zip archive where ever you like and then run, don't forget to keep opus.dll with the rest of the .exes
 
 Thread on Forums: http://forums.eagle.ru/showthread.php?t=169387
