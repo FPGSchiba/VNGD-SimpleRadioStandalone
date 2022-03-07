@@ -32,7 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 if (indexPosition < _sampleRate * 2)
                 {
                     queues[radio].TryDequeue(out ClientAudio dequeued);
-                    _assembler.AddTransmission(dequeued, indexPosition);
+                    _assembler.AddTransmission(dequeued);
                 }
                 else
                 {
@@ -40,7 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 }
             }
 
-            return _assembler.GetFinalSample();
+            return _assembler.GetAssembledSample();
         }
 
         protected string CreateFilePath()

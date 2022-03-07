@@ -214,10 +214,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 AudioRecordingManager.Instance.AppendClientAudio(audio);
             }
-            else
-            {
-                AudioRecordingManager.Instance.Stop();
-            }
 
             if (!passThrough)
             {

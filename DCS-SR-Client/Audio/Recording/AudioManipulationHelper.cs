@@ -31,10 +31,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             short[] mixedDown = new short[samplesLength];
 
             foreach(short[] sample in samplesToMixdown)
-            {           
+            { 
                 for(int i = 0; i < samplesLength; i++)
                 {
-                    mixedDown[i] += (short)(sample[i] / samplesToMixdown.Count);
+                    // Unlikely to have duplicate signals across n radios, can use sqrt to find a sensible headroom level
+                    mixedDown[i] += (short)(sample[i] / Math.Sqrt(samplesToMixdown.Count));
                 }
             }
 

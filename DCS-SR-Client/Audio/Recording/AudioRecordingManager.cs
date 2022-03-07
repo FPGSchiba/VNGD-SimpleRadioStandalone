@@ -48,6 +48,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         {
             while (!_stop)
             {
+                if(!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+                {
+                    _stop = true;
+                }
                 Thread.Sleep(2000);
                 try
                 {
@@ -80,6 +84,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                     PcmAudioShort = AudioManipulationHelper.SineWaveOut(audio.PcmAudioShort.Length, _sampleRate, 0.25),
                     ReceivedRadio = audio.ReceivedRadio,
                     ReceiveTime = audio.ReceiveTime,
+                    PacketNumber = audio.PacketNumber,
                     OriginalClientGuid = audio.OriginalClientGuid,
                 };
             }
