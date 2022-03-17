@@ -94,6 +94,8 @@
 
         <radioOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" Visibility="Collapsed" />
 
+        <radioOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" Visibility="Collapsed" />
+
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
         <Separator Width="170" Margin="0 2" />
         <radioOverlayWindow:TransponderPanel x:Name="TransponderPanel"  />

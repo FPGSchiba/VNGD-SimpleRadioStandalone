@@ -26,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.RadioOverlayWindow.RadioControlGroup[] radioControlGroup =
-            new Client.UI.RadioOverlayWindow.RadioControlGroup[4];
+            new Client.UI.RadioOverlayWindow.RadioControlGroup[5];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -35,7 +35,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         private readonly double _originalMinHeight;
-    
+
+        private readonly double _radioHeight;
+
+
         public RadioOverlayWindow()
         {
             //load opacity before the intialising as the slider changed
@@ -48,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                
             _originalMinHeight = MinHeight;
-
+            _radioHeight = Radio1.Height;
 
             AllowsTransparency = true;
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOpacity).DoubleValue;
@@ -58,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             radioControlGroup[1] = Radio2;
             radioControlGroup[2] = Radio3;
             radioControlGroup[3] = Radio4;
+            radioControlGroup[4] = Radio5;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -105,40 +109,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 var availableRadios = 0;
 
-                //handle 4th radio on the overlay or not
-                if (dcsPlayerRadioInfo.radios.Length < 5)
-                {
-                    Radio4.Visibility = Visibility.Collapsed;
-                    if (MinHeight != _originalMinHeight)
-                    {
-                        MinHeight = _originalMinHeight;
-                        Recalculate();
-                    }
-                }
-                else
-                {
-                    if (dcsPlayerRadioInfo.radios[4].modulation == RadioInformation.Modulation.DISABLED)
-                    {
-                        Radio4.Visibility = Visibility.Collapsed;
-                        if (MinHeight != _originalMinHeight)
-                        {
-                            MinHeight = _originalMinHeight;
-                            Recalculate();
-                        }
-                    }
-                    else
-                    {
-                        //show it
-                        Radio4.Visibility = Visibility.Visible;
-
-                        if (MinHeight == _originalMinHeight)
-                        {
-                            MinHeight += Radio4.Height;
-                            Recalculate();
-                        }
-                    }
-                }
-
                 for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                 {
                     if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
@@ -147,6 +117,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     }
                 }
+
+                if (availableRadios == 6 
+                    || dcsPlayerRadioInfo.radios.Length >=6 
+                    && dcsPlayerRadioInfo.radios[5].modulation != RadioInformation.Modulation.DISABLED)
+                {
+                    Radio5.Visibility = Visibility.Visible;
+                    Radio4.Visibility = Visibility.Visible;
+
+                    if (MinHeight != _originalMinHeight + (_radioHeight * 2))
+                    {
+                        MinHeight = (_originalMinHeight + (_radioHeight * 2));
+                        Recalculate();
+                    }
+                }
+                else if (availableRadios == 5
+                         || dcsPlayerRadioInfo.radios.Length >= 5
+                         && dcsPlayerRadioInfo.radios[4].modulation != RadioInformation.Modulation.DISABLED)
+                {
+                    Radio5.Visibility = Visibility.Collapsed;
+                    Radio4.Visibility = Visibility.Visible;
+                    if (MinHeight != _originalMinHeight + _radioHeight)
+                    {
+                        MinHeight = _originalMinHeight + _radioHeight;
+                        Recalculate();
+                    }
+                }
+                else
+                {
+                    ResetHeight();
+                }
+
 
                 if (availableRadios > 1)
                 {
@@ -167,17 +168,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
             else
             {
-                Radio4.Visibility = Visibility.Collapsed;
-                if(MinHeight != _originalMinHeight)
-                {
-                    MinHeight = _originalMinHeight;
-                    Recalculate();
-                }
-
+                ResetHeight();
                 ControlText.Text = "";
             }
 
             FocusDCS();
+        }
+
+        private void ResetHeight()
+        {
+
+            Radio4.Visibility = Visibility.Collapsed;
+            Radio5.Visibility = Visibility.Collapsed;
+            if (MinHeight != _originalMinHeight)
+            {
+                MinHeight = _originalMinHeight;
+                Recalculate();
+            }
         }
 
         private void Recalculate()
@@ -314,7 +321,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             typeof(double), typeof(RadioOverlayWindow),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
-
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
