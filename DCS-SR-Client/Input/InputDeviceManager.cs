@@ -40,7 +40,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public static HashSet<Guid> _whitelistDevices = new HashSet<Guid>
         {
             new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle
-            new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 2 Usage: Generic Type: Supplemental
+            new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 1 Usage: Generic Type: Supplemental
+            new Guid("b352044f-0000-0000-0000-504944564944"), //F16 MFD 2 Usage: Generic Type: Supplemental
+            new Guid("b353044f-0000-0000-0000-504944564944"), //F16 MFD 3 Usage: Generic Type: Supplemental
+            new Guid("b354044f-0000-0000-0000-504944564944"), //F16 MFD 4 Usage: Generic Type: Supplemental
+            new Guid("b355044f-0000-0000-0000-504944564944"), //F16 MFD 5 Usage: Generic Type: Supplemental
+            new Guid("b356044f-0000-0000-0000-504944564944"), //F16 MFD 6 Usage: Generic Type: Supplemental
+            new Guid("b357044f-0000-0000-0000-504944564944"), //F16 MFD 7 Usage: Generic Type: Supplemental
+            new Guid("b358044f-0000-0000-0000-504944564944"), //F16 MFD 8 Usage: Generic Type: Supplemental
             new Guid("11401dd2-0000-0000-0000-504944564944"), //Leo Bodnar BUtton Box
             new Guid("204803eb-0000-0000-0000-504944564944"), // VPC Throttle
             new Guid("204303eb-0000-0000-0000-504944564944"), // VPC Stick
