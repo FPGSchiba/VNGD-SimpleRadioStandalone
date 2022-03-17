@@ -1,4 +1,4 @@
--- Version 1.9.9.0
+-- Version 2.0.0.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -509,13 +509,13 @@ function SR.exportRadioAH64D(_data)
     _data.radios[1].volume = 1.0
     _data.radios[1].volMode = 1
 
-    _data.radios[2].name = "UHF-ARC-164"
+    _data.radios[2].name = "VHF-ARC-186"
     _data.radios[2].freq = SR.getRadioFrequency(58)
     _data.radios[2].modulation = SR.getRadioModulation(58)
     _data.radios[2].volume = 1.0
     _data.radios[2].volMode = 1
 
-    _data.radios[3].name = "VHF-ARC-186"
+    _data.radios[3].name = "UHF-ARC-164"
     _data.radios[3].freq = SR.getRadioFrequency(57)
     _data.radios[3].modulation = SR.getRadioModulation(57)
     _data.radios[3].volume = 1.0
@@ -673,7 +673,7 @@ function SR.exportRadioUH60L(_data)
     local radioXMTSelectorValue = _data.selected or 0
     if isDCPower then
         radioXMTSelectorValue = SR.round(GetDevice(0):get_argument_value(400) * 5, 1)
-        SR.log(radioXMTSelectorValue)
+        -- SR.log(radioXMTSelectorValue)
     end
 
     _data.selected = radioXMTSelectorValue
@@ -4427,4 +4427,4 @@ LuaExportBeforeNextFrame = function()
 end
 
 
-SR.log("Loaded SimpleRadio Standalone Export version: 1.9.9.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 2.0.0.0")
