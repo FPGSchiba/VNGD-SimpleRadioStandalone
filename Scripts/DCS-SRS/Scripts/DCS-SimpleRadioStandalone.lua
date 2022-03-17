@@ -122,7 +122,7 @@ function SR.exporter()
 
         _update.iff = {status=0,mode1=0,mode3=0,mode4=0,control=1,expansion=false,mic=-1}
 
-        -- SR.log(_update.unit.."\n\n")
+        --SR.log(_update.unit.."\n\n")
 
         local aircraftExporter = SR.exporters[_update.unit]
 
@@ -500,6 +500,51 @@ function SR.exportRadioSU27(_data)
     return _data
 end
 
+function SR.exportRadioAH64D(_data)
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = true, desc = "" }
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = 1.0
+    _data.radios[1].volMode = 1
+
+    _data.radios[2].name = "UHF-ARC-164"
+    _data.radios[2].freq = SR.getRadioFrequency(58)
+    _data.radios[2].modulation = SR.getRadioModulation(58)
+    _data.radios[2].volume = 1.0
+    _data.radios[2].volMode = 1
+
+    _data.radios[3].name = "VHF-ARC-186"
+    _data.radios[3].freq = SR.getRadioFrequency(57)
+    _data.radios[3].modulation = SR.getRadioModulation(57)
+    _data.radios[3].volume = 1.0
+    _data.radios[3].volMode = 1
+
+    _data.radios[4].name = "FM1-ARC-201D"
+    _data.radios[4].freq = SR.getRadioFrequency(59)
+    _data.radios[4].modulation = SR.getRadioModulation(59)
+    _data.radios[4].volume = 1.0
+    _data.radios[4].volMode = 1
+
+    _data.radios[5].name = "FM2-ARC-201D"
+    _data.radios[5].freq = SR.getRadioFrequency(60)
+    _data.radios[5].modulation = SR.getRadioModulation(60)
+    _data.radios[5].volume = 1.0
+    _data.radios[5].volMode = 1
+
+    _data.radios[6].name = "HF-ARC-220"
+    _data.radios[6].freq = SR.getRadioFrequency(61)
+    _data.radios[6].modulation = 0
+    _data.radios[6].volume = 1.0
+    _data.radios[6].volMode = 1
+
+    _data.control = 0;
+    _data.selected = 1
+
+    return _data
+
+end
 
 function SR.exportRadioUH60L(_data)
     _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
@@ -1535,7 +1580,7 @@ end
 
 function SR.exportRadioYak52(_data)
 
-    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -1673,10 +1718,10 @@ function SR.exportRadioA10C(_data)
         -- Power on!
 
         local _radio = nil
-        if SR.round(SR.getButtonPosition(781), 0.1) == 0.2 then
+        if SR.round(SR.getButtonPosition(781), 0.1) == 0.2 and SR.getSelectorPosition(149, 0.1) >= 2 then -- encryption disabled when EMER AM/FM selected
             --crad/2 vhf - FM
             _radio = _data.radios[4]
-        elseif SR.getButtonPosition(781) == 0 then
+        elseif SR.getButtonPosition(781) == 0 and _selector ~= 2 then -- encryption disabled when GRD selected
             --crad/1 uhf
             _radio = _data.radios[3]
         end
@@ -3987,8 +4032,8 @@ function SR.exportRadioAJS37(_data)
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "FR 22"
-    _data.radios[2].freq = SR.getRadioFrequency(31)
-    _data.radios[2].modulation = SR.getRadioModulation(31)
+    _data.radios[2].freq = SR.getRadioFrequency(30)
+    _data.radios[2].modulation = SR.getRadioModulation(30)
 
     --   local _modulation =SR.getButtonPosition(3008)
 
@@ -4002,8 +4047,8 @@ function SR.exportRadioAJS37(_data)
     _data.radios[2].volMode = 1
 
     _data.radios[3].name = "FR 24"
-    _data.radios[3].freq = SR.getRadioFrequency(30)
-    _data.radios[3].modulation = SR.getRadioModulation(30)
+    _data.radios[3].freq = SR.getRadioFrequency(31)
+    _data.radios[3].modulation = SR.getRadioModulation(31)
     _data.radios[3].volume = 1.0-- SR.getRadioVolume(0, 3112,{0.00001,1.0},false) volume not working yet
     _data.radios[3].volMode = 1
 
@@ -4278,6 +4323,7 @@ SR.exporters["AV8BNA"] = SR.exportRadioAV8BNA
 SR.exporters["AJS37"] = SR.exportRadioAJS37
 SR.exporters["A-10A"] = SR.exportRadioA10A
 SR.exporters["UH-60L"] = SR.exportRadioUH60L
+SR.exporters["AH-64D_BLK_II"] = SR.exportRadioAH64D
 SR.exporters["A-4E-C"] = SR.exportRadioA4E
 SR.exporters["PUCARA"] = SR.exportRadioPUCARA
 SR.exporters["T-45"] = SR.exportRadioT45
@@ -4363,8 +4409,11 @@ LuaExportBeforeNextFrame = function()
 
     -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
     if _lastUnitType == "FA-18C_hornet" then
-        if not _fa18ent and SR.getButtonPosition(122) > 0 then
-            _fa18ent = true
+        if not _fa18ent then
+            local st, rv = pcall(SR.getButtonPosition, 122)     -- pcall to prevent dcs.log error after ejection
+            if st and rv > 0 then
+                _fa18ent = true
+            end
         end
     end
 
