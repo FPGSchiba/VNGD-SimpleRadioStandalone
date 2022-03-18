@@ -4,9 +4,11 @@
 -- Run the installer to correctly install this file
 local SR = {}
 
+SR.SEAT_INFO_PORT = 9087
 SR.LOS_RECEIVE_PORT = 9086
 SR.LOS_SEND_TO_PORT = 9085
 SR.RADIO_SEND_TO_PORT = 9084
+
 
 SR.LOS_HEIGHT_OFFSET = 20.0 -- sets the line of sight offset to simulate radio waves bending
 SR.LOS_HEIGHT_OFFSET_MAX = 200.0 -- max amount of "bend"
@@ -15,6 +17,7 @@ SR.LOS_HEIGHT_OFFSET_STEP = 20.0 -- Interval to "bend" in
 SR.unicast = true --DONT CHANGE THIS
 
 SR.lastKnownPos = { x = 0, y = 0, z = 0 }
+SR.lastKnownSeat = 0
 
 SR.MIDS_FREQ = 1030.0 * 1000000 -- Start at UHF 300
 SR.MIDS_FREQ_SEPARATION = 1.0 * 100000 -- 0.1 MHZ between MIDS channels
@@ -54,10 +57,14 @@ SR.JSON = JSON
 
 SR.UDPSendSocket = socket.udp()
 SR.UDPLosReceiveSocket = socket.udp()
+SR.UDPSeatReceiveSocket = socket.udp()
 
 --bind for listening for LOS info
 SR.UDPLosReceiveSocket:setsockname("*", SR.LOS_RECEIVE_PORT)
 SR.UDPLosReceiveSocket:settimeout(0) --receive timer was 0001
+
+SR.UDPSeatReceiveSocket:setsockname("*", SR.SEAT_INFO_PORT)
+SR.UDPSeatReceiveSocket:settimeout(0) 
 
 local terrain = require('terrain')
 
@@ -219,7 +226,7 @@ function SR.exporter()
 end
 
 
-function SR.readSocket()
+function SR.readLOSSocket()
     -- Receive buffer is 8192 in LUA Socket
     -- will contain 10 clients for LOS
     local _received = SR.UDPLosReceiveSocket:receive()
@@ -238,6 +245,21 @@ function SR.readSocket()
             else
                 socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_losList) .. " \n", "127.255.255.255", SR.LOS_SEND_TO_PORT))
             end
+        end
+
+    end
+end
+
+function SR.readSeatSocket()
+    -- Receive buffer is 8192 in LUA Socket
+    local _received = SR.UDPSeatReceiveSocket:receive()
+
+    if _received then
+        local _decoded = SR.JSON:decode(_received)
+
+        if _decoded then
+            SR.lastKnownSeat = _decoded.seat
+            --SR.log("lastKnownSeat "..SR.lastKnownSeat)
         end
 
     end
@@ -501,47 +523,248 @@ function SR.exportRadioSU27(_data)
 end
 
 function SR.exportRadioAH64D(_data)
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = true, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+
+-- 17 is the pilot (back seat)
+-- 18 is the gunner (front seat)
+-- Rts_FM1 is LEFT (single underscore) - current radio selected
+-- Rts__FM1 is RIGHT (double underscore) - current radio selected in the OTHER seat (swaps if front or back)
+-- we only care bout LEFT
+-- { ["Net_FM1"] = ,
+-- ["Net_Standby_FM2"] = ,
+-- ["Frequency_Standby_VHF"] = 121.500,
+-- ["Idm_FM2"] = ,
+-- ["Idm_UHF"] = ,
+-- ["Transponder_ID"] = XPNDR,
+-- ["Net_VHF"] = ,
+-- ["PowerStatus_FM1"] = NORM,
+-- ["AdvisoryList_1"] = TAIL WHL LOCK SEL ,
+-- ["Rts__FM1"] = =,
+-- ["Idm_FM1"] = ],
+-- ["Squelch_FM2"] = *,
+-- ["Net_Standby_FM1"] = ,
+-- ["Net_Standby_VHF"] = ,
+-- ["Symbols_1"] = |,
+-- ["RadioStats_HF"] = ,
+-- ["Call_Standby_FM2"] = -----,
+-- ["Idm_VHF"] = [,
+-- ["Call_Standby_VHF"] = -----,
+-- ["PowerStatus_HF"] = LOW,
+-- ["Frequency_FM1"] =  30.000,
+-- ["Symbols_5"] = |,
+-- ["Arrows_3"] = |,
+-- ["Symbols_10"] = |,
+-- ["Rts_FM1_"] = =,
+-- ["Symbols_6"] = |,
+-- ["Radio_VHF"] = VHF,
+-- ["Symbols_4"] = |,
+-- ["Squelch_VHF"] = *,
+-- ["Transponder_MODE_3A"] = 1200,
+-- ["Rts__VHF"] = =,
+-- ["Call_Standby_FM1"] = -----,
+-- ["Call_UHF"] = -----,
+-- ["Frequency_VHF"] = 121.000,
+-- ["Radio_FM1"] = FM1,
+-- ["background"] = ,
+-- ["Frequency_Standby_UHF"] = 305.000,
+-- ["Transponder_MC"] = NORM,
+-- ["Call_VHF"] = -----,
+-- ["Call_FM2"] = -----,
+-- ["Net_UHF"] = ,
+-- ["Arrows_4"] = |,
+-- ["Symbols_7"] = |,
+-- ["Frequency_HF"] =   2.0000A,
+-- ["Watch_"] = 04:02:40 Z,
+-- ["Frequency_Standby_FM1"] =  30.000,
+-- ["Symbols_2"] = |,
+-- ["Frequency_FM2"] =  30.000,
+-- ["Rts__FM2"] = =,
+-- ["XPNDR_MODE_S"] = S,
+-- ["Call_FM1"] = -----,
+-- ["Fuel_"] = 3140,
+-- ["Fuel"] = FUEL,
+-- ["XPNDR_MODE_4"] = A,
+-- ["Call_Standby_HF"] = -----,
+-- ["Symbols_3"] = |,
+-- ["Call_Standby_UHF"] = -----,
+-- ["Frequency_Standby_HF"] =   2.0000A,
+-- ["Frequency_Standby_FM2"] =  30.000,
+-- ["Idm_HF"] = ,
+-- ["Net_FM2"] = ,
+-- ["Rts__UHF"] = >,
+-- ["Rts_HF_"] = =,
+-- ["Guard"] = ,
+-- ["Symbols_9"] = |,
+-- ["Squelch_HF"] = *,
+-- ["Radio_HF"] = HF ,
+-- ["Arrows_1"] = |,
+-- ["Squelch_UHF"] = *,
+-- ["Squelch_FM1"] = *,
+-- ["Radio_FM2"] = FM2,
+-- ["Rts__HF"] = =,
+-- ["Arrows_2"] = |,
+-- ["Symbols_8"] = |,
+-- ["Rts_VHF_"] = =,
+-- ["Frequency_UHF"] = 305.000,
+-- ["Call_HF"] = -----,
+-- ["Rts_UHF_"] = =,
+-- ["Rts_FM2_"] = <,
+-- ["Radio_UHF"] = UHF,
+-- ["Net_Standby_UHF"] = ,
+-- } 
+
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
-    _data.radios[1].volume = 1.0
-    _data.radios[1].volMode = 1
+    _data.radios[1].volMode = 0
 
+    
     _data.radios[2].name = "VHF-ARC-186"
     _data.radios[2].freq = SR.getRadioFrequency(58)
     _data.radios[2].modulation = SR.getRadioModulation(58)
-    _data.radios[2].volume = 1.0
-    _data.radios[2].volMode = 1
+    _data.radios[2].volMode = 0
 
     _data.radios[3].name = "UHF-ARC-164"
     _data.radios[3].freq = SR.getRadioFrequency(57)
     _data.radios[3].modulation = SR.getRadioModulation(57)
-    _data.radios[3].volume = 1.0
-    _data.radios[3].volMode = 1
+    _data.radios[3].volMode = 0
 
     _data.radios[4].name = "FM1-ARC-201D"
     _data.radios[4].freq = SR.getRadioFrequency(59)
     _data.radios[4].modulation = SR.getRadioModulation(59)
-    _data.radios[4].volume = 1.0
-    _data.radios[4].volMode = 1
+    _data.radios[4].volMode = 0
 
     _data.radios[5].name = "FM2-ARC-201D"
     _data.radios[5].freq = SR.getRadioFrequency(60)
     _data.radios[5].modulation = SR.getRadioModulation(60)
-    _data.radios[5].volume = 1.0
-    _data.radios[5].volMode = 1
+    _data.radios[5].volMode = 0
 
     _data.radios[6].name = "HF-ARC-220"
     _data.radios[6].freq = SR.getRadioFrequency(61)
     _data.radios[6].modulation = 0
-    _data.radios[6].volume = 1.0
-    _data.radios[6].volMode = 1
+    _data.radios[6].volMode = 0
 
-    _data.control = 0;
-    _data.selected = 1
+    local _radioPanel = nil
 
+    if SR.lastKnownSeat == 0 then
+
+        _radioPanel = SR.getListIndicatorValue(17)
+
+        local _masterVolume = SR.getRadioVolume(0, 344, { 0.0, 1.0 }, false) 
+        
+        --intercom 
+        _data.radios[1].volume = SR.getRadioVolume(0, 345, { 0.0, 1.0 }, false) * _masterVolume
+
+        -- VHF
+        if SR.getButtonPosition(449) == 0 then
+            _data.radios[2].volume = SR.getRadioVolume(0, 334, { 0.0, 1.0 }, false) * _masterVolume 
+        else
+            _data.radios[2].volume = 0
+        end
+
+        -- UHF
+        if SR.getButtonPosition(450) == 0 then
+            _data.radios[3].volume = SR.getRadioVolume(0, 335, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[3].volume = 0
+        end
+
+        -- FM1
+        if SR.getButtonPosition(451) == 0 then
+            _data.radios[4].volume = SR.getRadioVolume(0, 336, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[4].volume = 0
+        end
+
+         -- FM2
+        if SR.getButtonPosition(452) == 0 then
+            _data.radios[5].volume = SR.getRadioVolume(0, 337, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[5].volume = 0
+        end
+
+         -- HF
+        if SR.getButtonPosition(453) == 0 then
+            _data.radios[6].volume = SR.getRadioVolume(0, 338, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[6].volume = 0
+        end
+
+         if SR.getButtonPosition(346) == -1 then
+            _data.intercomHotMic = true
+        end
+
+    else
+        local _masterVolume = SR.getRadioVolume(0, 385, { 0.0, 1.0 }, false) 
+
+        _radioPanel = SR.getListIndicatorValue(18)
+
+        --intercom 
+        _data.radios[1].volume = SR.getRadioVolume(0, 386, { 0.0, 1.0 }, false) * _masterVolume
+
+        -- VHF
+        if SR.getButtonPosition(459) == 0 then
+            _data.radios[2].volume = SR.getRadioVolume(0, 375, { 0.0, 1.0 }, false) * _masterVolume 
+        else
+            _data.radios[2].volume = 0
+        end
+
+        -- UHF
+        if SR.getButtonPosition(460) == 0 then
+            _data.radios[3].volume = SR.getRadioVolume(0, 376, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[3].volume = 0
+        end
+
+        -- FM1
+        if SR.getButtonPosition(461) == 0 then
+            _data.radios[4].volume = SR.getRadioVolume(0, 377, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[4].volume = 0
+        end
+
+         -- FM2
+        if SR.getButtonPosition(462) == 0 then
+            _data.radios[5].volume = SR.getRadioVolume(0, 378, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[5].volume = 0
+        end
+
+         -- HF
+        if SR.getButtonPosition(463) == 0 then
+            _data.radios[6].volume = SR.getRadioVolume(0, 379, { 0.0, 1.0 }, false) * _masterVolume
+        else
+            _data.radios[6].volume = 0
+        end
+
+        if SR.getButtonPosition(387) == -1 then
+            _data.intercomHotMic = true
+        end
+
+    end
+
+    -- figure out selected
+    if _radioPanel['Rts_VHF_'] == '<' then
+        _data.selected = 1
+    elseif _radioPanel['Rts_UHF_'] == '<' then
+        _data.selected = 2
+    elseif _radioPanel['Rts_FM1_'] == '<' then
+        _data.selected = 3
+    elseif _radioPanel['Rts_FM2_'] == '<' then
+        _data.selected = 4
+    elseif _radioPanel['Rts_HF_'] == '<' then
+        _data.selected = 5
+    end
+
+    if _radioPanel['Guard'] == 'G' then
+        _data.radios[3].secFreq = 243e6
+    end
+
+
+
+    _data.control = 1
+    
     return _data
 
 end
@@ -1048,16 +1271,15 @@ end
 
 function SR.exportRadioUH1H(_data)
 
-    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
-
     local intercomOn =  SR.getButtonPosition(27)
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volume =  SR.getRadioVolume(0, 29, { 0.3, 1.0 }, true)
 
-    if intercomOn < 0.5 then
-        _data.radios[1].modulation = 3
+    if intercomOn > 0.5 then
+        --- control hot mic instead of turning it on and off
+        _data.intercomHotMic = true
     end
 
     local fmOn =  SR.getButtonPosition(23)
@@ -1106,7 +1328,11 @@ function SR.exportRadioUH1H(_data)
 
     --_device:get_argument_value(_arg)
 
-    local _panel = GetDevice(0)
+    local _seat = SR.lastKnownSeat
+
+    if _seat == 0 then
+
+         local _panel = GetDevice(0)
 
     local switch = _panel:get_argument_value(30)
 
@@ -1134,6 +1360,20 @@ function SR.exportRadioUH1H(_data)
     end
 
     _data.control = 1; -- Full Radio
+
+
+        _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Hot mic on INT switch" }
+    else
+        _data.control = 0; -- no copilot or gunner radio controls - allow them to switch
+        
+        _data.radios[1].volMode = 1 
+        _data.radios[2].volMode = 1 
+        _data.radios[3].volMode = 1 
+        _data.radios[4].volMode = 1
+
+        _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = true, desc = "Hot mic on INT switch" }
+    end
+
 
     -- HANDLE TRANSPONDER
     _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
@@ -1414,7 +1654,7 @@ end
 
 function SR.exportRadioMI24P(_data)
 
-    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "Use Radio/ICS Switch to control Intercom Hot Mic" }
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
@@ -1433,25 +1673,108 @@ function SR.exportRadioMI24P(_data)
         _data.radios[2].secFreq = 121.5 * 1000000
     end
 
-    _data.radios[3].name = "JADRO-1I"
-    _data.radios[3].freq = SR.getRadioFrequency(50, 500)
-    _data.radios[3].modulation = SR.getRadioModulation(50)
-    _data.radios[3].volume = SR.getRadioVolume(0, 426, { 0.0, 1.0 }, false)
+
+    _data.radios[3].name = "R-828"
+    _data.radios[3].freq = SR.getRadioFrequency(51)
+    _data.radios[3].modulation = 1 --SR.getRadioModulation(50)
+    _data.radios[3].volume = SR.getRadioVolume(0, 339, { 0.0, 1.0 }, false)
     _data.radios[3].volMode = 0
 
-    _data.radios[4].name = "R-828"
-    _data.radios[4].freq = SR.getRadioFrequency(51)
-    _data.radios[4].modulation = 1 --SR.getRadioModulation(50)
-    _data.radios[4].volume = SR.getRadioVolume(0, 339, { 0.0, 1.0 }, false)
+    _data.radios[4].name = "JADRO-1I"
+    _data.radios[4].freq = SR.getRadioFrequency(50, 500)
+    _data.radios[4].modulation = SR.getRadioModulation(50)
+    _data.radios[4].volume = SR.getRadioVolume(0, 426, { 0.0, 1.0 }, false)
     _data.radios[4].volMode = 0
 
+    -- listen only radio - moved to expansion
     _data.radios[5].name = "R-852"
     _data.radios[5].freq = SR.getRadioFrequency(52)
     _data.radios[5].modulation = SR.getRadioModulation(52)
     _data.radios[5].volume = SR.getRadioVolume(0, 517, { 0.0, 1.0 }, false)
     _data.radios[5].volMode = 0
+    _data.radios[5].expansion = true
 
-    _data.control = 0; -- HOTAS for now
+    local _seat = SR.lastKnownSeat
+
+    if _seat == 0 then
+
+         _data.radios[1].volume = SR.getRadioVolume(0, 457, { 0.0, 1.0 }, false)
+
+        --Pilot SPU-8 selection
+        local _switch = SR.getSelectorPosition(455, 0.2)
+        if _switch == 0 then
+            _data.selected = 1            -- R-863
+        elseif _switch == 1 then 
+            _data.selected = -1          -- No Function
+        elseif _switch == 2 then
+            _data.selected = 2            -- R-828
+        elseif _switch == 3 then
+            _data.selected = 3            -- JADRO
+        elseif _switch == 4 then
+            _data.selected = 4
+        else
+            _data.selected = -1
+        end
+
+        local _pilotPTT = SR.getButtonPosition(738) 
+        if _pilotPTT >= 0.1 then
+
+            if _pilotPTT == 0.5 then
+                -- intercom
+              _data.selected = 0
+            end
+
+            _data.ptt = true
+        end
+
+        --hot mic 
+        if SR.getButtonPosition(456) >= 1.0 then
+            _data.intercomHotMic = true
+        end
+
+    else
+
+        --- copilot
+        _data.radios[1].volume = SR.getRadioVolume(0, 661, { 0.0, 1.0 }, false)
+        -- For the co-pilot allow volume control
+        _data.radios[2].volMode = 1
+        _data.radios[3].volMode = 1
+        _data.radios[4].volMode = 1
+        _data.radios[5].volMode = 1
+        
+        local _switch = SR.getSelectorPosition(659, 0.2)
+        if _switch == 0 then
+            _data.selected = 1            -- R-863
+        elseif _switch == 1 then 
+            _data.selected = -1          -- No Function
+        elseif _switch == 2 then
+            _data.selected = 2            -- R-828
+        elseif _switch == 3 then
+            _data.selected = 3            -- JADRO
+        elseif _switch == 4 then
+            _data.selected = 4
+        else
+            _data.selected = -1
+        end
+
+        local _copilotPTT = SR.getButtonPosition(856) 
+        if _copilotPTT >= 0.1 then
+
+            if _copilotPTT == 0.5 then
+                -- intercom
+              _data.selected = 0
+            end
+
+            _data.ptt = true
+        end
+
+        --hot mic 
+        if SR.getButtonPosition(660) >= 1.0 then
+            _data.intercomHotMic = true
+        end
+    end
+    
+    _data.control = 1;
 
     return _data
 
@@ -2890,6 +3213,21 @@ function SR.exportRadioMosquitoFBMkVI (_data)
     _data.radios[2].freq = SR.getRadioFrequency(24)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 364, { 0.0, 1.0 }, false)
+
+    local _seat = SR.lastKnownSeat
+
+    if _seat == 0 then
+
+         _data.capabilities = { dcsPtt = true, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+        local ptt =  SR.getButtonPosition(4)
+
+        if ptt == 1 then
+            _data.ptt = true
+        end
+    else
+         _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    end
 
     _data.radios[3].name = "R1155" 
     _data.radios[3].freq = SR.getRadioFrequency(27,500,true)
@@ -4401,10 +4739,16 @@ end
 LuaExportBeforeNextFrame = function()
 
     -- read from socket
-    local _status, _result = pcall(SR.readSocket)
+    local _status, _result = pcall(SR.readLOSSocket)
 
     if not _status then
-        SR.log('ERROR LuaExportBeforeNextFrame SRS: ' .. _result)
+        SR.log('ERROR LuaExportBeforeNextFrame readLOSSocket SRS: ' .. SR.debugDump(_result))
+    end
+
+    _status, _result = pcall(SR.readSeatSocket)
+
+    if not _status then
+        SR.log('ERROR LuaExportBeforeNextFrame readSeatSocket SRS: ' .. SR.debugDump(_result))
     end
 
     -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)

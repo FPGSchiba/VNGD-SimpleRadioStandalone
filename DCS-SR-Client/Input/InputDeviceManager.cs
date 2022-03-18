@@ -567,7 +567,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             break;
                         }
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.RadioVolumeDown)
+                                 (int)bindState.MainDevice.InputBind <= (int)InputBinding.IntercomPTT)
                         {
                             if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                             {
@@ -758,7 +758,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioVolumeDown; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.IntercomPTT; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

@@ -251,12 +251,15 @@ function srsOverlay.updateRadio()
                     fullMessage = fullMessage.." OFF"
                 end
             elseif _radio.modulation == 3 then
-                     fullMessage = ""
+                fullMessage = ""
                     
             elseif _radio.modulation == 2 then 
 
-                     fullMessage = "INTERCOM "
-                
+                fullMessage = "INTERCOM"
+
+                if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+                    fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+                end 
             else
                  fullMessage = _radio.name.." - "
 

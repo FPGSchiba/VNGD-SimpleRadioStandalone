@@ -62,6 +62,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastPTTPress; // to handle dodgy PTT - release time
         private long _firstPTTPress; // to delay start PTT time
 
+        private volatile bool _intercomPtt;
+
         private volatile bool _ready;
 
         private IPEndPoint _serverEndpoint;
@@ -166,6 +168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 var currentPtt = _ptt;
 
                 var ptt = false;
+                var intercomPtt = false;
                 foreach (var inputBindState in pressed)
                 {
                     if (inputBindState.IsActive)
@@ -207,6 +210,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             _lastPTTPress = DateTime.Now.Ticks;
                             ptt = true;
+                        }else if (inputBindState.MainDevice.InputBind == InputBinding.IntercomPTT)
+                        {
+                            intercomPtt = true;
+
                         }
                     }
                 }
@@ -271,8 +278,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                  * End Handle PTT HOLD after release
                  */
 
-            
 
+                _intercomPtt = intercomPtt;
                 _ptt = ptt;
             });
 
@@ -749,6 +756,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 return true;
             }
 
+            //anything below 30 MHz and AM ignore (AM stand-in for actual HF modulations)
+            for (int i = 0; i < udpVoicePacket.Frequencies.Length; i++)
+            {
+                if (udpVoicePacket.Modulations[i] == (int)Modulation.AM 
+                    && udpVoicePacket.Frequencies[i] <= RadioCalculator.HF_FREQUENCY_LOS_IGNORED)
+                {
+                    //assume HF is bouncing off the sky for now
+                    return true;
+                }
+            }
+
             SRClient transmittingClient;
             if (_clients.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
             {
@@ -871,9 +889,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //If its a hot intercom and thats not the currently selected radio
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
-            if (radioInfo.intercomHotMic 
+            if ((radioInfo.intercomHotMic
                 && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT
                 && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
+                ||
+                _intercomPtt
+
+                )
             {
                 if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
                 {

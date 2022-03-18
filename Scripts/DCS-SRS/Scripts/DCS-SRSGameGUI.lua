@@ -7,8 +7,6 @@ local SRS = {}
 
 SRS.CLIENT_ACCEPT_AUTO_CONNECT = true --- Set to false if you want to disable AUTO CONNECT
 
-SRS.unicast = true
-
 SRS.dbg = {}
 SRS.logFile = io.open(lfs.writedir()..[[Logs\DCS-SRS-GameGUI.log]], "w")
 function SRS.log(str)
@@ -97,15 +95,10 @@ SRS.sendUpdate = function(playerID)
 	    end
 	end
 
+	local _jsonUpdate = SRS.JSON:encode(_update).." \n"
     --SRS.log("Update -  Slot  ID:"..playerID.." Name: ".._update.name.." Side: ".._update.side)
-
-	if SRS.unicast then
-		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.0.0.1", 5068))
-	else
-		socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_update).." \n", "127.255.255.255", 5068))
-	end
-
-
+	socket.try(SRS.UDPSendSocket:sendto(_jsonUpdate, "127.0.0.1", 5068))
+	socket.try(SRS.UDPSendSocket:sendto(_jsonUpdate, "127.0.0.1", 9087))
 end
 
 SRS.MESSAGE_PREFIX_OLD = "This server is running SRS on - " -- DO NOT MODIFY!!!
@@ -134,21 +127,13 @@ end
 -- Register callbacks --
 
 SRS.sendConnect = function(_message)
-
-    if SRS.unicast then
-        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
-    else
-        socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.255.255.255", 5069))
-    end
+	socket.try(SRS.UDPSendSocket:sendto(_message.."\n", "127.0.0.1", 5069))
 end
 
 SRS.sendCommand = function(_message)
 
-    if SRS.unicast then
-        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.0.0.1", 9040))
-    else
-        socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.255.255.255", 9040))
-    end
+    socket.try(SRS.UDPSendSocket:sendto(SRS.JSON:encode(_message).."\n", "127.0.0.1", 9040))
+   
 end
 
 SRS.findCommandValue = function(key, list)
