@@ -620,7 +620,9 @@ function SR.exportRadioAH64D(_data)
 
         if _device then
             _device:set_argument_value(345, 1.0) -- Pilot SENS
-            _device:set_argument_value(385, 1.0) -- Gunner SENS
+            _device:set_argument_value(344, 1.0) -- Pilot Master
+            _device:set_argument_value(386, 1.0) -- Gunner SENS
+            _device:set_argument_value(385, 1.0) -- Gunner Master
         end
     end
 
