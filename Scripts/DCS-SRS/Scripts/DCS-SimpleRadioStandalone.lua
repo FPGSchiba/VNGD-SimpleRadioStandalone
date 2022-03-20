@@ -613,13 +613,22 @@ function SR.exportRadioAH64D(_data)
 -- ["Net_Standby_UHF"] = ,
 -- } 
 
+    -- Check if player is in a new aircraft
+    if _lastUnitId ~= _data.unitId then
+        -- New aircraft; SENS volume is at 0
+        local _device = GetDevice(0)
+
+        if _device then
+            _device:set_argument_value(345, 1.0) -- Pilot SENS
+            _device:set_argument_value(385, 1.0) -- Gunner SENS
+        end
+    end
 
     _data.radios[1].name = "Intercom"
     _data.radios[1].freq = 100.0
     _data.radios[1].modulation = 2 --Special intercom modulation
     _data.radios[1].volMode = 0
 
-    
     _data.radios[2].name = "VHF-ARC-186"
     _data.radios[2].freq = SR.getRadioFrequency(58)
     _data.radios[2].modulation = SR.getRadioModulation(58)
@@ -691,7 +700,7 @@ function SR.exportRadioAH64D(_data)
             _data.radios[6].volume = 0
         end
 
-         if SR.getButtonPosition(346) == -1 then
+         if SR.getButtonPosition(346) ~= 1 then
             _data.intercomHotMic = true
         end
 
@@ -738,7 +747,7 @@ function SR.exportRadioAH64D(_data)
             _data.radios[6].volume = 0
         end
 
-        if SR.getButtonPosition(387) == -1 then
+        if SR.getButtonPosition(387) ~= 1 then
             _data.intercomHotMic = true
         end
 
@@ -760,8 +769,6 @@ function SR.exportRadioAH64D(_data)
     if _radioPanel['Guard'] == 'G' then
         _data.radios[3].secFreq = 243e6
     end
-
-
 
     _data.control = 1
     

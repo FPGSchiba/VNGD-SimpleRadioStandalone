@@ -314,13 +314,14 @@ function srsOverlay.updateRadio()
 
             if _selected then
                 fullMessage = fullMessage.." *"
+            end
 
-                if _radioState.RadioSendingState
-                        and _radioState.RadioSendingState.SendingOn == _i -1
-                        and _radioState.RadioSendingState.IsSending then
+            if _radioState.RadioSendingState
+                and _radioState.RadioSendingState.SendingOn == _i -1
+                and _radioState.RadioSendingState.IsSending then
 
-                    fullMessage = fullMessage.." +TR"
-                end
+                fullMessage = fullMessage.." +TR"
+                
              elseif _radioState.RadioSendingState 
                 and  _radioState.RadioSendingState.IsSending 
                 and  _radio.simul 
