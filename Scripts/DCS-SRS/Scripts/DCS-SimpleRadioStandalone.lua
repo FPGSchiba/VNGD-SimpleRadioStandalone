@@ -88,6 +88,15 @@ function SR.exporter()
     local _data = LoGetSelfData()
 
     if _data ~= nil then
+        -- check for death / eject -- call below returns a number when so
+        local _device = GetDevice(0)
+
+        if type(_device) == 'number' then
+            _data = nil -- wipe out data - aircraft is gone really
+        end
+    end
+
+    if _data ~= nil then
 
         _update = {
             name = "",
