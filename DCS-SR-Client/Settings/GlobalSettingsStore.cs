@@ -198,6 +198,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioVolumeDown = 135,
         ModifierRadioVolumeDown = 235,
+
+        IntercomPTT = 136,
+        ModifierIntercomPTT = 236,
     }
 
 
