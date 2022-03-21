@@ -892,10 +892,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if ((radioInfo.intercomHotMic
                 && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT
                 && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
-                ||
-                _intercomPtt
-
-                )
+                || _intercomPtt)
             {
                 if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
                 {

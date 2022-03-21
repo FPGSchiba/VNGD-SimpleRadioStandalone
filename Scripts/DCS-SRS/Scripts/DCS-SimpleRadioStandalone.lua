@@ -523,7 +523,7 @@ function SR.exportRadioSU27(_data)
 end
 
 function SR.exportRadioAH64D(_data)
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "Recommended: Always Allow SRS Hotkeys - OFF. Bind Intercom Select & PTT, Radio PTT and DCS RTS up down" }
 
 -- 17 is the pilot (back seat)
 -- 18 is the gunner (front seat)

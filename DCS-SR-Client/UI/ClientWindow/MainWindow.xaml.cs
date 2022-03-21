@@ -365,7 +365,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Intercom.ControlInputBinding = InputBinding.Intercom;
             Intercom.InputDeviceManager = InputManager;
 
-            IntercomPTT.InputName = "Intercom Select & PTT";
+            IntercomPTT.InputName = "Special Intercom Select & PTT";
             IntercomPTT.ControlInputBinding = InputBinding.IntercomPTT;
             IntercomPTT.InputDeviceManager = InputManager;
 

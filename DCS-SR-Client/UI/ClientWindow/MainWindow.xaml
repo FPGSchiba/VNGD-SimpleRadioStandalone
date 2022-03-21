@@ -424,7 +424,7 @@
                                                        Grid.Row="6"
                                                        Grid.ColumnSpan="5"
                                                        ControlInputBinding="{x:Static settings:InputBinding.IntercomPTT}"
-                                                       InputName="Intercom Select &amp; PTT" />
+                                                       InputName="Special Intercom Select &amp; PTT" />
 
                             <local:InputBindingControl x:Name="RadioOverlay"
                                                        Grid.Row="7"
