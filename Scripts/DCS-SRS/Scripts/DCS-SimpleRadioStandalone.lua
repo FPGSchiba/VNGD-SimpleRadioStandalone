@@ -1343,32 +1343,32 @@ function SR.exportRadioUH1H(_data)
 
          local _panel = GetDevice(0)
 
-    local switch = _panel:get_argument_value(30)
+        local switch = _panel:get_argument_value(30)
 
-    if SR.nearlyEqual(switch, 0.1, 0.03) then
-        _data.selected = 0
-    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
-        _data.selected = 1
-    elseif SR.nearlyEqual(switch, 0.3, 0.03) then
-        _data.selected = 2
-    elseif SR.nearlyEqual(switch, 0.4, 0.03) then
-        _data.selected = 3
-    else
-        _data.selected = -1
-    end
-
-    local _pilotPTT = SR.getButtonPosition(194)
-    if _pilotPTT >= 0.1 then
-
-        if _pilotPTT == 0.5 then
-            -- intercom
+        if SR.nearlyEqual(switch, 0.1, 0.03) then
             _data.selected = 0
+        elseif SR.nearlyEqual(switch, 0.2, 0.03) then
+            _data.selected = 1
+        elseif SR.nearlyEqual(switch, 0.3, 0.03) then
+            _data.selected = 2
+        elseif SR.nearlyEqual(switch, 0.4, 0.03) then
+            _data.selected = 3
+        else
+            _data.selected = -1
         end
 
-        _data.ptt = true
-    end
+        local _pilotPTT = SR.getButtonPosition(194)
+        if _pilotPTT >= 0.1 then
 
-    _data.control = 1; -- Full Radio
+            if _pilotPTT == 0.5 then
+                -- intercom
+                _data.selected = 0
+            end
+
+            _data.ptt = true
+        end
+
+        _data.control = 1; -- Full Radio
 
 
         _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Hot mic on INT switch" }
