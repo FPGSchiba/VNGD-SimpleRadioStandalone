@@ -8,16 +8,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public InputBinding InputBind { get; set; }
 
         public string DeviceName { get; set; }
-
         public int Button { get; set; }
         public Guid InstanceGuid { get; internal set; }
         public int ButtonValue { get; internal set; }
+        public bool IsAxis { get; set; } = false;
+        public string Axis { get; set; }
+        public int AxisCenterValue { get; internal set; }
+
 
         public bool IsSameBind(InputDevice compare)
         {
-            return Button == compare.Button &&
+            if (IsAxis)
+            {
+                return Axis == compare.Axis &&
+                   compare.InstanceGuid == InstanceGuid;
+            }
+            else
+            {
+                return Button == compare.Button &&
                    compare.InstanceGuid == InstanceGuid &&
                    ButtonValue == compare.ButtonValue;
+            }
+
         }
     }
 }

@@ -208,6 +208,7 @@
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
+    <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
     <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
     <Compile Include="Settings\ProfileSettingsStore.cs" />
@@ -251,7 +252,6 @@
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceManager.cs" />
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />

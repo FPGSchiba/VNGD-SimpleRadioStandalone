@@ -318,13 +318,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 var device = new InputDevice();
                 device.DeviceName = configuration[key.ToString()]["name"].StringValue;
+                bool isAxis = configuration[key.ToString()]["axisassign"].BoolValue;
+                device.IsAxis = isAxis;
 
-                device.Button = configuration[key.ToString()]["button"].IntValue;
+                if (isAxis)
+                {
+                    device.Axis = configuration[key.ToString()]["axis"].StringValue;
+                    device.AxisCenterValue = configuration[key.ToString()]["value"].IntValue;
+                }
+                else
+                {
+                    device.Button = configuration[key.ToString()]["button"].IntValue;
+                    device.ButtonValue = configuration[key.ToString()]["value"].IntValue;
+                }
+
                 device.InstanceGuid =
                     Guid.Parse(configuration[key.ToString()]["guid"].RawValue);
                 device.InputBind = key;
-
-                device.ButtonValue = configuration[key.ToString()]["value"].IntValue;
 
                 return device;
             }
@@ -348,8 +358,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             var section = configuration[device.InputBind.ToString()];
 
             section.Add(new Setting("name", device.DeviceName.Replace("\0", "")));
-            section.Add(new Setting("button", device.Button));
-            section.Add(new Setting("value", device.ButtonValue));
+            section.Add(new Setting("axisassign", device.IsAxis));
+            if (device.IsAxis)
+            {
+                section.Add(new Setting("axis", device.Axis));
+                section.Add(new Setting("value", device.AxisCenterValue));
+            }
+            else
+            {
+                section.Add(new Setting("button", device.Button));
+                section.Add(new Setting("value", device.ButtonValue));
+            }
             section.Add(new Setting("guid", device.InstanceGuid.ToString()));
 
             var inputDevices = GetCurrentInputProfile();

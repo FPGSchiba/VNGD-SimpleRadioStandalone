@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -15,11 +16,11 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
     public class InputDeviceManager : IDisposable
     {
-        public delegate void DetectButton(InputDevice inputDevice);
+        public delegate void DetectInput(InputDevice inputDevice);
 
         public delegate void DetectPttCallback(List<InputBindState> buttonStates);
 
@@ -60,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly DirectInput _directInput;
         private readonly Dictionary<Guid, Device> _inputDevices = new Dictionary<Guid, Device>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
+        private readonly string[] propertyList = new[] { "X", "Y", "Z", "RotationX", "RotationY", "RotationZ" };
 
         private volatile bool _detectPtt;
 
@@ -255,7 +257,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return _whitelistDevices.Contains(device);
         }
 
-        public void AssignButton(DetectButton callback)
+        public void AssignButton(DetectInput callback)
         {
             //detect the state of all current buttons
             Task.Run(() =>
@@ -480,6 +482,136 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             });
         }
 
+        public void AssignAxis(DetectInput callback)
+        {
+            Task.Run(() =>
+            {
+                var deviceList = _inputDevices.Values.ToList();
+                Dictionary<string, int> initialAxisState = new Dictionary<string, int>();
+
+                for (int i = 0; i < deviceList.Count; i++)
+                {
+                    if (deviceList[i] == null || deviceList[i].IsDisposed)
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        if (deviceList[i] is Joystick)
+                        {
+                            deviceList[i].Poll();
+                            JoystickState state = (deviceList[i] as Joystick).GetCurrentState();
+
+                            foreach (string property in propertyList)
+                            {
+                                initialAxisState.Add(i.ToString() + property, (int)state.GetType().GetProperty(property).GetValue(state));
+                            }
+
+                            var z = deviceList[i];
+                            var sliders = state.Sliders;
+                            for (int j = 0; j < sliders.Length; j++)
+                            {
+                                initialAxisState.Add(i.ToString() + "Sliders" + j.ToString(), sliders[j]);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
+                            $"(ID: {deviceList[i].Information.ProductGuid}) while assigning axis, ignoring until next restart/rediscovery");
+
+                        deviceList[i].Unacquire();
+                        deviceList[i].Dispose();
+                        deviceList[i] = null;
+                    }
+                }
+
+                bool found = false;
+
+                while (!found)
+                {
+                    Thread.Sleep(100);
+
+                    for (var i = 0; i < _inputDevices.Count; i++)
+                    {
+                        if (deviceList[i] == null || deviceList[i].IsDisposed)
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            if (deviceList[i] is Joystick)
+                            {
+                                deviceList[i].Poll();
+
+                                var state = (deviceList[i] as Joystick).GetCurrentState();
+
+                                foreach (string property in propertyList)
+                                {
+                                    int current = (int)state.GetType().GetProperty(property).GetValue(state);
+
+                                    if (AxisDifference(initialAxisState[i.ToString() + property], current))
+                                    {
+                                        found = true;
+
+                                        InputDevice axisDevice = new InputDevice()
+                                        {
+                                            DeviceName =
+                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
+                                            IsAxis = true,
+                                            Axis = property,
+                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
+                                            AxisCenterValue = initialAxisState[i.ToString() + property] // Assume the initial state of an axis ~centered
+                                        };
+
+                                        Application.Current.Dispatcher.Invoke(
+                                            () => { callback(axisDevice); });
+                                        return;
+                                    }
+                                }
+
+                                var sliders = state.Sliders;
+                                for (int j = 0; j < sliders.Length; j++)
+                                {
+                                    var d = deviceList[i].Capabilities;
+
+                                    int current = sliders[j];
+
+                                    if (AxisDifference(initialAxisState[i.ToString() + "Sliders" + j.ToString()], current))
+                                    {
+                                        found = true;
+
+                                        InputDevice axisDevice = new InputDevice()
+                                        {
+                                            DeviceName =
+                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
+                                            IsAxis = true,
+                                            Axis = "Slider" + j.ToString(),
+                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
+                                            AxisCenterValue = initialAxisState[i.ToString() + "Sliders" + j.ToString()] // Assume the initial state of an axis ~centered
+                                        };
+
+                                        Application.Current.Dispatcher.Invoke(
+                                            () => { callback(axisDevice); });
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
+                                $"(ID: {deviceList[i].Information.ProductGuid}) while discovering button press while assigning, ignoring until next restart/rediscovery");
+
+                            deviceList[i].Unacquire();
+                            deviceList[i].Dispose();
+                            deviceList[i] = null;
+                        }
+                    }
+                }
+            });
+        }
 
         public void StartDetectPtt(DetectPttCallback callback)
         {
@@ -496,11 +628,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         //contains main binding and optional modifier binding + states of each
                         var bindState = bindStates[i];
 
-                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
+                        if (bindState.MainDevice.IsAxis)
+                        {
+                            bindState.MainDeviceState = GetAxisState(bindState.MainDevice);
+                        }
+                        else
+                        {
+                            bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
+                        }
 
                         if (bindState.ModifierDevice != null)
                         {
-                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+                            if (bindState.ModifierDevice.IsAxis)
+                            {
+                                bindState.ModifierState = GetAxisState(bindState.MainDevice);
+                            }
+                            else
+                            {
+                                bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+                            }
 
                             bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
                         }
@@ -751,6 +897,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return false;
         }
 
+        private bool GetAxisState(InputDevice inputDeviceBinding)
+        {
+            foreach (var kpDevice in _inputDevices)
+            {
+                var device = kpDevice.Value;
+                if (device == null ||
+                    device.IsDisposed ||
+                    !device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
+                {
+                    continue;
+                }
+                try
+                {
+                    if (device is Joystick)
+                    {
+                        device.Poll();
+                        var state = (device as Joystick).GetCurrentState();
+                        if (inputDeviceBinding.Axis.Contains("Slider"))
+                        {
+                            int[] sliders = (int[])state.GetType().GetProperty("Sliders").GetValue(state);
+  
+                            return AxisDifference(inputDeviceBinding.AxisCenterValue,
+                                sliders[int.Parse(inputDeviceBinding.Axis.Substring(inputDeviceBinding.Axis.Length - 1))]);
+                        }
+                        else
+                        { 
+                            return AxisDifference(inputDeviceBinding.AxisCenterValue, (int)state.GetType().GetProperty(inputDeviceBinding.Axis).GetValue(state)); 
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
+                        $"(ID: {device.Information.ProductGuid}) while retrieving axis state, ignoring until next restart/rediscovery");
+
+                    MessageBox.Show(
+                        $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
+                        $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
+                        "Input device error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    device.Unacquire();
+                    device.Dispose();
+                }
+
+            }
+            return false;
+        }
+
         public List<InputBindState> GenerateBindStateList()
         {
             var bindStates = new List<InputBindState>();
@@ -786,6 +982,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
 
             return bindStates;
+        }
+
+        private bool AxisDifference(int initial, int current)
+        {
+            return current != 0 ? Math.Abs(initial - current) > 10000 : Math.Abs(current - initial) > 10000;
         }
     }
 }
