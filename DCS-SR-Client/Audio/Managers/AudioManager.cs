@@ -9,6 +9,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -365,7 +366,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            var clientAudio = _udpVoiceHandler.Send(encoded, len);
+                            var clientAudio = _udpVoiceHandler.Send(encoded, len);                         
 
                             // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
 
@@ -383,6 +384,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 }
                                 
                             }
+
+                            AddClientAudio(clientAudio); // Hacky way to get own transmissions with the necessary effects and into recording queues
                         }
                         else
                         {

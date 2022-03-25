@@ -73,7 +73,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
             ClientAudio finalAudio;
 
-            if (ConnectedClientsSingleton.Instance[audio.OriginalClientGuid].AllowRecord)
+
+            if (ConnectedClientsSingleton.Instance[audio.OriginalClientGuid].AllowRecord 
+                || audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
             {
                 finalAudio = audio;
             }

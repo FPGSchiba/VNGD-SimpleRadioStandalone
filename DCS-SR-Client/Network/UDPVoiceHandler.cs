@@ -1030,15 +1030,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         };
                         var send = new ClientAudio()
                         {
-                             Frequency = frequencies[0], Modulation = modulations[0],
-                             EncodedAudio = bytes,
-                             Encryption = 0,
-                             Volume = 1,
-                             Decryptable = true,
-                             LineOfSightLoss = 0,
-                             RecevingPower = 0,
-                             ReceivedRadio = 1
+                            Frequency = frequencies[0], Modulation = modulations[0],
+                            EncodedAudio = bytes,
+                            Encryption = 0,
+                            Volume = 1,
+                            Decryptable = true,
+                            LineOfSightLoss = 0,
+                            RecevingPower = 0,
+                            ReceivedRadio = sendingOn,
+                            PacketNumber = _packetNumber,
+                            ReceiveTime = DateTime.Now.Ticks,
+                            OriginalClientGuid = _guid,
                         };
+
                         return send;
                     }
                 }

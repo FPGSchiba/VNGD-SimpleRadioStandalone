@@ -12,6 +12,7 @@ using FragLabs.Audio.Codecs;
 using NLog;
 using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -215,7 +216,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 AudioRecordingManager.Instance.AppendClientAudio(audio);
             }
 
-            if (!passThrough)
+            if(audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
+            {
+                // catch own transmissions and prevent them from being added to JitterBuffer
+                return null;
+            }
+            else if (!passThrough)
             {
                 JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
                 {
@@ -274,7 +280,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     mixedAudio[i] = (short)(audio * 32767);
                 }
             }
-
         }
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)

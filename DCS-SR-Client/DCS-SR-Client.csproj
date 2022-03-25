@@ -199,6 +199,7 @@
     </ApplicationDefinition>
     <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
+    <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Recording\AudioRecordingManager.cs" />
     <Compile Include="Audio\Recording\TransmissionAssembler.cs" />
     <Compile Include="Audio\Recording\MixDownLameRecordingWriter.cs" />
@@ -210,7 +211,6 @@
     <Compile Include="Audio\Managers\AudioPreview.cs" />
     <Compile Include="Audio\Models\ClientAudio.cs" />
     <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
-    <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Models\JitterBufferAudio.cs" />
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
