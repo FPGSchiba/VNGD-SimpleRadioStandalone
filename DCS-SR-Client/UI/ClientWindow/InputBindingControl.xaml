@@ -17,7 +17,6 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -51,15 +50,9 @@
                 Click="DeviceButton_Click"
                 Content="Set "
                 Style="{DynamicResource SquareButtonStyle}" />
-        <Button x:Name="DeviceAxis"
-                Grid.Row="0"
-                Grid.Column="4"
-                Click="DeviceAxis_Click"
-                Content="Axis "
-                Style="{DynamicResource SquareButtonStyle}"/>
         <Button x:Name="DeviceClear"
                 Grid.Row="0"
-                Grid.Column="5"
+                Grid.Column="4"
                 Click="DeviceClear_Click"
                 Content="Clear"
                 Style="{DynamicResource SquareButtonStyle}" />
@@ -89,15 +82,9 @@
                 Click="ModifierButton_Click"
                 Content="Set "
                 Style="{DynamicResource SquareButtonStyle}" />
-        <Button x:Name="ModifierAxis"
-                Grid.Row="1"
-                Grid.Column="4"
-                Click="ModifierAxis_Click"
-                Content="Axis "
-                Style="{DynamicResource SquareButtonStyle}" />
         <Button x:Name="ModifierButtonClear"
                 Grid.Row="1"
-                Grid.Column="5"
+                Grid.Column="4"
                 Click="ModifierClear_Click"
                 Content="Clear"
                 Style="{DynamicResource SquareButtonStyle}" />

@@ -44,13 +44,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 var devices = currentInputProfile;
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
-                    if (devices[ControlInputBinding].IsAxis)
+                    if (devices[ControlInputBinding] is InputAxisDevice axisDevice)
                     {
-                        DeviceText.Text = devices[ControlInputBinding].Axis + " Axis";
+                        DeviceText.Text = axisDevice.Axis + " Axis";
                     }
                     else
                     {
-                        var button = devices[ControlInputBinding].Button;
+                        var button = (devices[ControlInputBinding] as InputButtonDevice).Button;
                         DeviceText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info}
                     }
                     Device.Text = devices[ControlInputBinding].DeviceName;
@@ -63,15 +63,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
                 {
-                    if (devices[ControlInputBinding].IsAxis)
-                    {
-                        ModifierText.Text = devices[ControlInputBinding].Axis + " Axis";
-                    }
-                    else
-                    {
-                        var button = devices[ModifierBinding].Button;
+
+                        var button = (devices[ModifierBinding] as InputButtonDevice).Button;
                         ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
-                    }
 
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
                 }
@@ -87,38 +81,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             DeviceClear.IsEnabled = false;
             DeviceButton.IsEnabled = false;
-            DeviceAxis.IsEnabled = false;
 
             InputDeviceManager.AssignButton(device =>
             {
                 DeviceClear.IsEnabled = true;
                 DeviceButton.IsEnabled = true;
-                DeviceAxis.IsEnabled=true;
 
                 Device.Text = device.DeviceName;
                 DeviceText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
                 //output POV info;
-
-                device.InputBind = ControlInputBinding;
-
-                GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
-            });
-        }
-
-        private void DeviceAxis_Click(object sender, RoutedEventArgs e)
-        {
-            DeviceClear.IsEnabled = false;
-            DeviceButton.IsEnabled = false;
-            DeviceAxis.IsEnabled = false;
-
-            InputDeviceManager.AssignAxis(device =>
-            {
-                DeviceClear.IsEnabled = true;
-                DeviceButton.IsEnabled= true;
-                DeviceAxis.IsEnabled = true;
-
-                Device.Text = device.DeviceName;
-                DeviceText.Text = device.Axis + " Axis";
 
                 device.InputBind = ControlInputBinding;
 
@@ -146,26 +117,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ModifierDevice.Text = device.DeviceName;
                 ModifierText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
                 //output POV info;
-
-                device.InputBind = ModifierBinding;
-
-                GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
-            });
-        }
-
-
-        private void ModifierAxis_Click(object sender, RoutedEventArgs e)
-        {
-            ModifierButtonClear.IsEnabled = false;
-            ModifierButton.IsEnabled = false;
-
-            InputDeviceManager.AssignButton(device =>
-            {
-                ModifierButtonClear.IsEnabled = true;
-                ModifierButton.IsEnabled = true;
-
-                ModifierDevice.Text = device.DeviceName;
-                ModifierText.Text = device.Axis + " Axis";
 
                 device.InputBind = ModifierBinding;
 
