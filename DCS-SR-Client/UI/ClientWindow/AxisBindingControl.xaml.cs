@@ -1,7 +1,6 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using OpenTK.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
