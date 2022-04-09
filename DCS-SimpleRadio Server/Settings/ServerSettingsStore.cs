@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Windows;
 using NLog;
 using SharpConfig;
@@ -238,6 +239,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
             }
 
             return settings;
+        }
+
+        public IPAddress GetServerIP()
+        {
+            var str = GetServerSetting(ServerSettingsKeys.SERVER_IP).RawValue;
+
+            if(IPAddress.TryParse(str, out IPAddress address))
+            {
+                return address;
+            }
+            else
+            {
+                return IPAddress.Any;
+            }
         }
     }
 }

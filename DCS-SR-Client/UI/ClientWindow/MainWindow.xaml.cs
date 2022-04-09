@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
@@ -366,6 +367,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Intercom.ControlInputBinding = InputBinding.Intercom;
             Intercom.InputDeviceManager = InputManager;
 
+            IntercomPTT.InputName = "Special Intercom Select & PTT";
+            IntercomPTT.ControlInputBinding = InputBinding.IntercomPTT;
+            IntercomPTT.InputDeviceManager = InputManager;
+
             RadioOverlay.InputName = "Overlay Toggle";
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
@@ -490,6 +495,130 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioVolumeDown.InputName = "Radio Volume Down";
             RadioVolumeDown.ControlInputBinding = InputBinding.RadioVolumeDown;
             RadioVolumeDown.InputDeviceManager = InputManager;
+
+            IntercomVolume.InputName = "Intercom Volume";
+            IntercomVolume.ControlInputBinding= InputBinding.Intercom;
+            IntercomVolume.InputDeviceManager = InputManager;
+
+            Radio1Volume.InputName = "Radio 1 Volume";
+            Radio1Volume.ControlInputBinding= InputBinding.Radio1Volume;
+            Radio1Volume.InputDeviceManager = InputManager;
+
+            Radio2Volume.InputName = "Radio 2 Volume";
+            Radio2Volume.ControlInputBinding= InputBinding.Radio2Volume;
+            Radio2Volume.InputDeviceManager = InputManager;
+
+            Radio3Volume.InputName = "Radio 3 Volume";
+            Radio3Volume.ControlInputBinding= InputBinding.Radio3Volume;
+            Radio3Volume.InputDeviceManager = InputManager;
+
+            Radio4Volume.InputName = "Radio 4 Volume";
+            Radio4Volume.ControlInputBinding= InputBinding.Radio4Volume;
+            Radio4Volume.InputDeviceManager = InputManager;
+
+            Radio5Volume.InputName = "Radio 5 Volume";
+            Radio5Volume.ControlInputBinding= InputBinding.Radio5Volume;
+            Radio5Volume.InputDeviceManager = InputManager;
+
+            Radio6Volume.InputName = "Radio 6 Volume";
+            Radio6Volume.ControlInputBinding= InputBinding.Radio6Volume;
+            Radio6Volume.InputDeviceManager = InputManager;
+
+            Radio7Volume.InputName = "Radio 7 Volume";
+            Radio7Volume.ControlInputBinding= InputBinding.Radio7Volume;
+            Radio7Volume.InputDeviceManager = InputManager;
+
+            Radio8Volume.InputName = "Radio 8 Volume";
+            Radio8Volume.ControlInputBinding= InputBinding.Radio8Volume;
+            Radio8Volume.InputDeviceManager = InputManager;
+
+            Radio9Volume.InputName = "Radio 9 Volume";
+            Radio9Volume.ControlInputBinding= InputBinding.Radio9Volume;
+            Radio9Volume.InputDeviceManager = InputManager;
+
+            Radio10Volume.InputName = "Radio 10 Volume";
+            Radio10Volume.ControlInputBinding= InputBinding.Radio10Volume;
+            Radio10Volume.InputDeviceManager = InputManager;
+
+            Radio1Frequency.InputName = "Radio 1 Frequency";
+            Radio1Frequency.ControlInputBinding = InputBinding.Radio1Frequency;
+            Radio1Frequency.InputDeviceManager = InputManager;
+
+            Radio2Frequency.InputName = "Radio 2 Frequency";
+            Radio2Frequency.ControlInputBinding = InputBinding.Radio2Frequency;
+            Radio2Frequency.InputDeviceManager = InputManager;
+
+            Radio3Frequency.InputName = "Radio 3 Frequency";
+            Radio3Frequency.ControlInputBinding = InputBinding.Radio3Frequency;
+            Radio3Frequency.InputDeviceManager = InputManager;
+
+            Radio4Frequency.InputName = "Radio 4 Frequency";
+            Radio4Frequency.ControlInputBinding = InputBinding.Radio4Frequency;
+            Radio4Frequency.InputDeviceManager = InputManager;
+
+            Radio5Frequency.InputName = "Radio 5 Frequency";
+            Radio5Frequency.ControlInputBinding = InputBinding.Radio5Frequency;
+            Radio5Frequency.InputDeviceManager = InputManager;
+
+            Radio6Frequency.InputName = "Radio 6 Frequency";
+            Radio6Frequency.ControlInputBinding = InputBinding.Radio6Frequency;
+            Radio6Frequency.InputDeviceManager = InputManager;
+
+            Radio7Frequency.InputName = "Radio 7 Frequency";
+            Radio7Frequency.ControlInputBinding = InputBinding.Radio7Frequency;
+            Radio7Frequency.InputDeviceManager = InputManager;
+
+            Radio8Frequency.InputName = "Radio 8 Frequency";
+            Radio8Frequency.ControlInputBinding = InputBinding.Radio8Frequency;
+            Radio8Frequency.InputDeviceManager = InputManager;
+
+            Radio9Frequency.InputName = "Radio 9 Frequency";
+            Radio9Frequency.ControlInputBinding = InputBinding.Radio9Frequency;
+            Radio9Frequency.InputDeviceManager = InputManager;
+
+            Radio10Frequency.InputName = "Radio 10 Frequency";
+            Radio10Frequency.ControlInputBinding = InputBinding.Radio10Frequency;
+            Radio10Frequency.InputDeviceManager = InputManager;
+
+            Radio1Encryption.InputName = "Radio 1 Encryption";
+            Radio1Encryption.ControlInputBinding = InputBinding.Radio1Encryption;
+            Radio1Encryption.InputDeviceManager = InputManager;
+
+            Radio2Encryption.InputName = "Radio 2 Encryption";
+            Radio2Encryption.ControlInputBinding = InputBinding.Radio2Encryption;
+            Radio2Encryption.InputDeviceManager = InputManager;
+
+            Radio3Encryption.InputName = "Radio 3 Encryption";
+            Radio3Encryption.ControlInputBinding = InputBinding.Radio3Encryption;
+            Radio3Encryption.InputDeviceManager = InputManager;
+
+            Radio4Encryption.InputName = "Radio 4 Encryption";
+            Radio4Encryption.ControlInputBinding = InputBinding.Radio4Encryption;
+            Radio4Encryption.InputDeviceManager = InputManager;
+
+            Radio5Encryption.InputName = "Radio 5 Encryption";
+            Radio5Encryption.ControlInputBinding = InputBinding.Radio5Encryption;
+            Radio5Encryption.InputDeviceManager = InputManager;
+
+            Radio6Encryption.InputName = "Radio 6 Encryption";
+            Radio6Encryption.ControlInputBinding = InputBinding.Radio6Encryption;
+            Radio6Encryption.InputDeviceManager = InputManager;
+
+            Radio7Encryption.InputName = "Radio 7 Encryption";
+            Radio7Encryption.ControlInputBinding = InputBinding.Radio7Encryption;
+            Radio7Encryption.InputDeviceManager = InputManager;
+
+            Radio8Encryption.InputName = "Radio 8 Encryption";
+            Radio8Encryption.ControlInputBinding = InputBinding.Radio8Encryption;
+            Radio8Encryption.InputDeviceManager = InputManager;
+
+            Radio9Encryption.InputName = "Radio 9 Encryption";
+            Radio9Encryption.ControlInputBinding = InputBinding.Radio9Encryption;
+            Radio9Encryption.InputDeviceManager = InputManager;
+
+            Radio10Encryption.InputName = "Radio 10 Encryption";
+            Radio10Encryption.ControlInputBinding = InputBinding.Radio10Encryption;
+            Radio10Encryption.InputDeviceManager = InputManager;
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -521,6 +650,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio3.LoadInputSettings();
             PTT.LoadInputSettings();
             Intercom.LoadInputSettings();
+            IntercomPTT.LoadInputSettings();
             RadioOverlay.LoadInputSettings();
             Radio4.LoadInputSettings();
             Radio5.LoadInputSettings();

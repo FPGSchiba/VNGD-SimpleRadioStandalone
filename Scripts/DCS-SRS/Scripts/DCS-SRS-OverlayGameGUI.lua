@@ -1,9 +1,9 @@
--- Version 2.0.0.0
+-- Version 2.0.1.0
 -- Make sure you COPY this file to the same location as the Export.lua as well! 
 -- Otherwise the Overlay will not work
 
 
-net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 2.0.0.0 ")
+net.log("Loading - DCS-SRS Overlay GameGUI - Ciribob: 2.0.1.0 ")
 
 local base = _G
 
@@ -66,22 +66,16 @@ srsOverlay.module_specific = {}
 srsOverlay.module_specific["M-2000C"] = function(radios)
 		for _i,_radio in pairs(radios) do
 			local _isReceiving,_sentBy = srsOverlay.isReceiving(_i)
-
-             srsOverlay.log(_isReceiving.." sent by ".._sentBy.." interator ".._i)
 			if _i==2 then
 				if _isReceiving>0 then
-                    --srsOverlay.log("19 recieving")
 					base.Export.GetDevice(19):set_ext_rx(true)
 				else
-                   -- srsOverlay.log("19 not recieving")
 					base.Export.GetDevice(19):set_ext_rx(false)
 				end
 			elseif _i==3 then
 				if _isReceiving>0 then
-                   -- srsOverlay.log("20 recieving")
 					base.Export.GetDevice(20):set_ext_rx(true)
 				else
-                   -- srsOverlay.log("20 not recieving")
 					base.Export.GetDevice(20):set_ext_rx(false)
 				end
 			end
@@ -257,12 +251,15 @@ function srsOverlay.updateRadio()
                     fullMessage = fullMessage.." OFF"
                 end
             elseif _radio.modulation == 3 then
-                     fullMessage = ""
+                fullMessage = ""
                     
             elseif _radio.modulation == 2 then 
 
-                     fullMessage = "INTERCOM "
-                
+                fullMessage = "INTERCOM"
+
+                if srsOverlay.getMode() == _modes.minimum_vol or srsOverlay.getMode() == _modes.full  then
+                    fullMessage  = fullMessage.." - "..string.format("%.1f", _radio.volume*100).."%"
+                end 
             else
                  fullMessage = _radio.name.." - "
 
@@ -317,13 +314,14 @@ function srsOverlay.updateRadio()
 
             if _selected then
                 fullMessage = fullMessage.." *"
+            end
 
-                if _radioState.RadioSendingState
-                        and _radioState.RadioSendingState.SendingOn == _i -1
-                        and _radioState.RadioSendingState.IsSending then
+            if _radioState.RadioSendingState
+                and _radioState.RadioSendingState.SendingOn == _i -1
+                and _radioState.RadioSendingState.IsSending then
 
-                    fullMessage = fullMessage.." +TR"
-                end
+                fullMessage = fullMessage.." +TR"
+                
              elseif _radioState.RadioSendingState 
                 and  _radioState.RadioSendingState.IsSending 
                 and  _radio.simul 
@@ -674,4 +672,4 @@ end
 
 DCS.setUserCallbacks(srsOverlay)
 
-net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 2.0.0.0 ")
+net.log("Loaded - DCS-SRS Overlay GameGUI - Ciribob: 2.0.1.0 ")

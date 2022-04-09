@@ -16,6 +16,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private readonly ConcurrentDictionary<string, string> _settings;
 
+        //cache of processed settings as bools to make lookup slightly quicker
+        private readonly ConcurrentDictionary<string, bool> _settingsBool;
+
         public List<double> GlobalFrequencies { get; set; } = new List<double>();
 
         // Node Limit of 0 means no retransmission
@@ -24,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         public SyncedServerSettings()
         {
             _settings = new ConcurrentDictionary<string, string>();
+            _settingsBool = new ConcurrentDictionary<string, bool>();
         }
 
         public static SyncedServerSettings Instance
@@ -50,7 +54,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public bool GetSettingAsBool(ServerSettingsKeys key)
         {
-            return Convert.ToBoolean(GetSetting(key));
+            var strKey = key.ToString();
+            if (_settingsBool.TryGetValue(strKey, out bool res))
+            {
+                return res;
+            }
+            else
+            {
+                res = Convert.ToBoolean(GetSetting(key));
+                _settingsBool[strKey] = res;
+                return res;
+            }
         }
 
         public void Decode(Dictionary<string, string> encoded)
@@ -88,6 +102,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     }
                 }
             }
+            //cache will be refilled 
+            _settingsBool.Clear();
         }
     }
 }

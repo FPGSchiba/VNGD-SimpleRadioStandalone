@@ -204,6 +204,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         RadioVolumeDown = 135,
         ModifierRadioVolumeDown = 235,
+
+        IntercomPTT = 136,
+        ModifierIntercomPTT = 236,
+
+        IntercomVolume = 300,
+        Radio1Volume = 301,
+        Radio2Volume = 302,
+        Radio3Volume = 303,
+        Radio4Volume = 304,
+        Radio5Volume = 305,
+        Radio6Volume = 306,
+        Radio7Volume = 307,
+        Radio8Volume = 308,
+        Radio9Volume = 309,
+        Radio10Volume = 310,
+        Radio1Frequency = 311,
+        Radio2Frequency = 312,
+        Radio3Frequency = 313,
+        Radio4Frequency = 314,
+        Radio5Frequency = 315,
+        Radio6Frequency = 316,
+        Radio7Frequency = 317,
+        Radio8Frequency = 318,
+        Radio9Frequency = 319,
+        Radio10Frequency = 320,        
+        Radio1Encryption = 321,
+        Radio2Encryption = 322,
+        Radio3Encryption = 323,
+        Radio4Encryption = 324,
+        Radio5Encryption = 325,
+        Radio6Encryption = 326,
+        Radio7Encryption = 327,
+        Radio8Encryption = 328,
+        Radio9Encryption = 329,
+        Radio10Encryption = 330,
+
     }
 
 

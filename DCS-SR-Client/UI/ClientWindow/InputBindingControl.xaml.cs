@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
@@ -34,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             DeviceLabel.Content = InputName;
             ModifierLabel.Content = InputName + " Modifier";
-            ModifierBinding = (InputBinding) ((int) ControlInputBinding) + 100; //add 100 gets the enum of the modifier
+            ModifierBinding = (InputBinding)((int)ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
 
@@ -43,8 +44,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 var devices = currentInputProfile;
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
-                    var button = devices[ControlInputBinding].Button;
-                    DeviceText.Text = button < 128 ? (button+1).ToString() : "POV " + (button - 127); //output POV info
+                    if (devices[ControlInputBinding] is InputAxisDevice axisDevice)
+                    {
+                        DeviceText.Text = axisDevice.Axis + " Axis";
+                    }
+                    else
+                    {
+                        var button = (devices[ControlInputBinding] as InputButtonDevice).Button;
+                        DeviceText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info}
+                    }
                     Device.Text = devices[ControlInputBinding].DeviceName;
                 }
                 else
@@ -55,8 +63,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
                 {
-                    var button = devices[ModifierBinding].Button;
-                    ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
+
+                        var button = (devices[ModifierBinding] as InputButtonDevice).Button;
+                        ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
+
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
                 }
                 else
@@ -67,11 +77,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void Device_Click(object sender, RoutedEventArgs e)
+        private void DeviceButton_Click(object sender, RoutedEventArgs e)
         {
             DeviceClear.IsEnabled = false;
             DeviceButton.IsEnabled = false;
-
 
             InputDeviceManager.AssignButton(device =>
             {
@@ -79,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 DeviceButton.IsEnabled = true;
 
                 Device.Text = device.DeviceName;
-                DeviceText.Text = device.Button < 128 ? (device.Button+1).ToString() : "POV " + (device.Button - 127);
+                DeviceText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
                 //output POV info;
 
                 device.InputBind = ControlInputBinding;
@@ -88,7 +97,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
         }
 
-
         private void DeviceClear_Click(object sender, RoutedEventArgs e)
         {
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ControlInputBinding);
@@ -96,8 +104,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Device.Text = "None";
             DeviceText.Text = "None";
         }
-
-        private void Modifier_Click(object sender, RoutedEventArgs e)
+        private void ModifierButton_Click(object sender, RoutedEventArgs e)
         {
             ModifierButtonClear.IsEnabled = false;
             ModifierButton.IsEnabled = false;
@@ -116,7 +123,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });
         }
-
 
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
