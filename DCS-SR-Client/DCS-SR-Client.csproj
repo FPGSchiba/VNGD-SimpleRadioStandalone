@@ -208,6 +208,9 @@
     <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
     <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
     <Compile Include="Audio\Utility\SpeexWrapper.cs" />
+    <Compile Include="Input\InputAxisDevice.cs" />
+    <Compile Include="Input\InputButtonDevice.cs" />
+    <Compile Include="Input\InputDeviceBase.cs" />
     <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
     <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
     <Compile Include="Settings\ProfileSettingsStore.cs" />
@@ -239,6 +242,10 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
+    <Compile Include="UI\ClientWindow\AxisBindingControl.xaml.cs">
+      <DependentUpon>AxisBindingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
@@ -251,11 +258,9 @@
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceManager.cs" />
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
     <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
-    <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\Images.cs" />
     <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
       <DependentUpon>InputProfileWindow.xaml</DependentUpon>
@@ -301,6 +306,7 @@
     <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
     <Compile Include="UI\Sounds.cs" />
     <Compile Include="UI\ToolTips.cs" />
+    <Compile Include="Utils\AxisTuningHelper.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\RadioHelper.cs" />
     <Compile Include="Utils\TransponderHelper.cs" />
@@ -308,6 +314,10 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\ClientWindow\AxisBindingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

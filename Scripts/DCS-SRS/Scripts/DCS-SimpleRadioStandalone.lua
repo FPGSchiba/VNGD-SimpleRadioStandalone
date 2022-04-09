@@ -88,6 +88,15 @@ function SR.exporter()
     local _data = LoGetSelfData()
 
     if _data ~= nil then
+        -- check for death / eject -- call below returns a number when so
+        local _device = GetDevice(0)
+
+        if type(_device) == 'number' then
+            _data = nil -- wipe out data - aircraft is gone really
+        end
+    end
+
+    if _data ~= nil then
 
         _update = {
             name = "",
@@ -755,21 +764,23 @@ function SR.exportRadioAH64D(_data)
 
     end
 
-    -- figure out selected
-    if _radioPanel['Rts_VHF_'] == '<' then
-        _data.selected = 1
-    elseif _radioPanel['Rts_UHF_'] == '<' then
-        _data.selected = 2
-    elseif _radioPanel['Rts_FM1_'] == '<' then
-        _data.selected = 3
-    elseif _radioPanel['Rts_FM2_'] == '<' then
-        _data.selected = 4
-    elseif _radioPanel['Rts_HF_'] == '<' then
-        _data.selected = 5
-    end
+    if _radioPanel then
+        -- figure out selected
+        if _radioPanel['Rts_VHF_'] == '<' then
+            _data.selected = 1
+        elseif _radioPanel['Rts_UHF_'] == '<' then
+            _data.selected = 2
+        elseif _radioPanel['Rts_FM1_'] == '<' then
+            _data.selected = 3
+        elseif _radioPanel['Rts_FM2_'] == '<' then
+            _data.selected = 4
+        elseif _radioPanel['Rts_HF_'] == '<' then
+            _data.selected = 5
+        end
 
-    if _radioPanel['Guard'] == 'G' then
-        _data.radios[3].secFreq = 243e6
+        if _radioPanel['Guard'] == 'G' then
+            _data.radios[3].secFreq = 243e6
+        end
     end
 
     _data.control = 1
@@ -1343,32 +1354,32 @@ function SR.exportRadioUH1H(_data)
 
          local _panel = GetDevice(0)
 
-    local switch = _panel:get_argument_value(30)
+        local switch = _panel:get_argument_value(30)
 
-    if SR.nearlyEqual(switch, 0.1, 0.03) then
-        _data.selected = 0
-    elseif SR.nearlyEqual(switch, 0.2, 0.03) then
-        _data.selected = 1
-    elseif SR.nearlyEqual(switch, 0.3, 0.03) then
-        _data.selected = 2
-    elseif SR.nearlyEqual(switch, 0.4, 0.03) then
-        _data.selected = 3
-    else
-        _data.selected = -1
-    end
-
-    local _pilotPTT = SR.getButtonPosition(194)
-    if _pilotPTT >= 0.1 then
-
-        if _pilotPTT == 0.5 then
-            -- intercom
+        if SR.nearlyEqual(switch, 0.1, 0.03) then
             _data.selected = 0
+        elseif SR.nearlyEqual(switch, 0.2, 0.03) then
+            _data.selected = 1
+        elseif SR.nearlyEqual(switch, 0.3, 0.03) then
+            _data.selected = 2
+        elseif SR.nearlyEqual(switch, 0.4, 0.03) then
+            _data.selected = 3
+        else
+            _data.selected = -1
         end
 
-        _data.ptt = true
-    end
+        local _pilotPTT = SR.getButtonPosition(194)
+        if _pilotPTT >= 0.1 then
 
-    _data.control = 1; -- Full Radio
+            if _pilotPTT == 0.5 then
+                -- intercom
+                _data.selected = 0
+            end
+
+            _data.ptt = true
+        end
+
+        _data.control = 1; -- Full Radio
 
 
         _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = true, desc = "Hot mic on INT switch" }
@@ -2396,7 +2407,7 @@ function SR.exportRadioFA18C(_data)
     end
 
     -- Check if XP UFC is being displayed
-    if _ufc.UFC_OptionDisplay2 == "2   " then
+    if _ufc and _ufc.UFC_OptionDisplay2 == "2   " then
         -- Check if on XP
         if _ufc.UFC_ScratchPadString1Display == "X" then
             if iff.status <= 0 then
@@ -2448,7 +2459,7 @@ function SR.exportRadioFA18C(_data)
     _data.iff = _fa18.iff
 
     -- Parse ENT keypress
-    if _fa18ent then
+    if _fa18ent and _ufc then
         _fa18ent = false
         -- Check if on D/L page and D/L ON
         if _ufc.UFC_OptionDisplay4 == "VOCA" and _ufc.UFC_ScratchPadString1Display == "O" and _ufc.UFC_ScratchPadString2Display == "N" then
@@ -3812,43 +3823,43 @@ local _mirageEncStatus = false
 local _previousEncState = 0
 function SR.exportRadioM2000C(_data)
 
-	local RED_devid = 20
-	local GREEN_devid = 19
+    local RED_devid = 20
+    local GREEN_devid = 19
     local RED_device = GetDevice(RED_devid)
     local GREEN_device = GetDevice(GREEN_devid)
-	
-	local has_cockpit_ptt = false;
-	
+    
+    local has_cockpit_ptt = false;
+    
     local RED_ptt = false
     local GREEN_ptt = false
-	
-	pcall(function() 
-		RED_ptt = RED_device:is_ptt_pressed()
-		GREEN_ptt = GREEN_device:is_ptt_pressed()
-		has_cockpit_ptt = true
-		end)
-		
+    
+    pcall(function() 
+        RED_ptt = RED_device:is_ptt_pressed()
+        GREEN_ptt = GREEN_device:is_ptt_pressed()
+        has_cockpit_ptt = true
+        end)
+        
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
     _data.control = 0 
-	
-	-- Different PTT/select control if the module version supports cockpit PTT
-	if has_cockpit_ptt then
-	    _data.control = 1
-		_data.capabilities.dcsPtt = true
-		_data.capabilities.dcsRadioSwitch = true
-		if (GREEN_ptt) then
-			_data.selected = 1 -- radios[2] GREEN V/UHF
-			_data.ptt = true
-		elseif (RED_ptt) then
-			_data.selected = 2 -- radios[3] RED UHF
-			_data.ptt = true
-		else
-			_data.selected = -1
-			_data.ptt = false
-		end
-	end
-	
-	
+    
+    -- Different PTT/select control if the module version supports cockpit PTT
+    if has_cockpit_ptt then
+        _data.control = 1
+        _data.capabilities.dcsPtt = true
+        _data.capabilities.dcsRadioSwitch = true
+        if (GREEN_ptt) then
+            _data.selected = 1 -- radios[2] GREEN V/UHF
+            _data.ptt = true
+        elseif (RED_ptt) then
+            _data.selected = 2 -- radios[3] RED UHF
+            _data.ptt = true
+        else
+            _data.selected = -1
+            _data.ptt = false
+        end
+    end
+    
+    
 
     _data.radios[2].name = "TRT ERA 7000 V/UHF"
     _data.radios[2].freq = SR.getRadioFrequency(19)
