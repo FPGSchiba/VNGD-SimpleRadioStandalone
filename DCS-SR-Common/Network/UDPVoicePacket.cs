@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         SATCOM = 5,
         MIDS = 6,*/
         public byte[] Modulations { get; set; }
-    
+
         public byte[] Encryptions { get; set; }
 
         // FIXED SEGMENT
@@ -92,7 +92,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             var staticSegmentLength = PacketHeaderLength + FixedPacketLength;
             var totalPacketLength = staticSegmentLength + dynamicSegmentLength;
 
-            PacketLength = (ushort) totalPacketLength;
+            PacketLength = (ushort)totalPacketLength;
 
             // Allocate memory for all combined packet segments
             var combinedBytes = new byte[totalPacketLength];
@@ -260,13 +260,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                     PacketNumber = packetNumber,
                     PacketLength = packetLength,
                     OriginalClientGuid = transmissionGuid,
-                    OriginalClientGuidBytes =  transmissionBytes,
+                    OriginalClientGuidBytes = transmissionBytes,
                     RetransmissionCount = retransmissionCount
                 };
             }
             catch (Exception ex)
             {
-                Logger.Error(ex,"Unable to decode UDP Voice Packet");
+                Logger.Error(ex, "Unable to decode UDP Voice Packet");
             }
 
             return null;

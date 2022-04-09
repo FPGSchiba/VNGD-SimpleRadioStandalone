@@ -862,7 +862,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
-
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0"
@@ -1354,8 +1354,6 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-
-
                         </Grid>
 
                     </GroupBox>
@@ -2370,6 +2368,167 @@
                                                                 ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.IntercomChannel}" />
                                 </Grid>
                             </GroupBox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Recording">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Allow Transmissions To Be Recorded" />
+
+                            <ToggleButton Name="AllowTransmissionsRecord"
+                                          Grid.Row="0"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="AllowTransmissionsRecord_OnClick"
+                                          ToolTipService.ShowOnDisabled="True">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+
+                            </ToggleButton>
+                            <Label Grid.Row="1"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Record Transmissions" />
+
+                            <ToggleButton Name="RecordTransmissions"
+                                          Grid.Row="1"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="RecordTransmissions_OnClick"
+                                          ToolTipService.ShowOnDisabled="True">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+
+                            <Label Grid.Row="2"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Record to Single File" />
+
+                            <ToggleButton Name="SingleFileMixdown"
+                                          Grid.Row="2"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="SingleFileMixdown_OnClick"
+                                          ToolTip="Quality can only be set if Record Transmissions is set to off"
+                                          ToolTipService.ShowOnDisabled="True"
+                                          >
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+
+                            <Label Grid.Row="3"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Recording Quality" />
+                            <StackPanel Grid.Row="3"
+                                                Grid.Column="1" Margin="10">
+
+                                <Slider x:Name="RecordingQuality"
+                                                TickPlacement="BottomRight"
+                                                SmallChange="1"
+                                                LargeChange="3"
+                                                IsSnapToTickEnabled="True"
+                                                TickFrequency="1"
+                                                VerticalAlignment="Center"
+                                                VerticalContentAlignment="Center"
+                                                Maximum="9"
+                                                Value="0"
+                                                Minimum="0"
+                                                IsEnabled="True"
+                                                ToolTip="Quality can only be set if Record Transmissions is set to off"
+                                                ToolTipService.ShowOnDisabled="True"
+                                                />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" FontSize="10" Content="0 - Highest" HorizontalAlignment="Left" />
+                                    <Label Grid.Column="1" FontSize="10" Content="Lowest - 9"
+                                                   HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                            
+                            <Label Grid.Row="4"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Content="Record Tone for Disallowed Audio" />
+                            <ToggleButton Name="DisallowedAudioTone"
+                                          Grid.Row="4"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="DisallowedAudioTone_OnClick"
+                                          >
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="Content" Value="ON" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Content" Value="ON" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="OFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
                         </Grid>
                     </GroupBox>
                 </StackPanel>
