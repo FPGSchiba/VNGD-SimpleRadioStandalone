@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using MathNet.Filtering;
 using NAudio.Dsp;
@@ -13,6 +11,8 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
 using NLog;
 using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
@@ -87,7 +87,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 4130, 2.0f);
-
         }
 
         public JitterBufferProviderInterface JitterBufferProviderInterface { get; }
@@ -212,7 +211,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             _lastReceivedOn = audio.ReceivedRadio;
             LastUpdate = DateTime.Now.Ticks;
 
-            if (!passThrough)
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            {
+                AudioRecordingManager.Instance.AppendClientAudio(audio);
+            }
+
+            if(audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
+            {
+                // catch own transmissions and prevent them from being added to JitterBuffer
+                return null;
+            }
+            else if (!passThrough)
             {
                 JitterBufferProviderInterface.AddSamples(new JitterBufferAudio
                 {
@@ -271,7 +280,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     mixedAudio[i] = (short)(audio * 32767);
                 }
             }
-
         }
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)

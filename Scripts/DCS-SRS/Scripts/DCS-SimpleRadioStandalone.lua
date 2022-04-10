@@ -2329,29 +2329,29 @@ function SR.exportRadioFA18C(_data)
     _radio.freq = SR.getRadioFrequency(39)
     _radio.modulation = SR.getRadioModulation(39)
     _radio.volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false)
-    _radio.encMode = 2 -- Mode 2 is set by aircraft
+-- _radio.encMode = 2 -- Mode 2 is set by aircraft
 
-    _fa18.radio2.guard = getGuardFreq(_radio.freq, _fa18.radio2.guard, _radio.modulation)
-    _radio.secFreq = _fa18.radio2.guard
+_fa18.radio2.guard = getGuardFreq(_radio.freq, _fa18.radio2.guard, _radio.modulation)
+_radio.secFreq = _fa18.radio2.guard
 
-    -- KY-58 Radio Encryption
-    local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
-    if _ky58Power == 0.1 and SR.round(SR.getButtonPosition(444), 0.1) == 0.1 then
-        -- mode switch set to C and powered on
-        -- Power on!
+-- KY-58 Radio Encryption
+local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
+if _ky58Power == 0.1 and SR.round(SR.getButtonPosition(444), 0.1) == 0.1 then
+    -- mode switch set to C and powered on
+    -- Power on!
 
-        -- Get encryption key
-        local _channel = SR.getSelectorPosition(446, 0.1) + 1
-        if _channel > 6 then
-            _channel = 6 -- has two other options - lock to 6
-        end
-
-        -- _data.radios[2].encKey = _channel
-        -- _data.radios[2].enc = true
-
-        _data.radios[3].encKey = _channel
-        _data.radios[3].enc = true
+    -- Get encryption key
+    local _channel = SR.getSelectorPosition(446, 0.1) + 1
+    if _channel > 6 then
+        _channel = 6 -- has two other options - lock to 6
     end
+
+    _radio = _data.radios[2 + SR.getSelectorPosition(144, 0.3)]
+    _radio.encMode = 2 -- Mode 2 is set by aircraft
+    _radio.encKey = _channel
+    _radio.enc = true
+
+end
 
 
     -- MIDS

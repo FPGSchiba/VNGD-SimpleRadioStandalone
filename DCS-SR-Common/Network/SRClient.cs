@@ -18,6 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public string ClientGuid { get; set; }
         private string _name= "";
+
         public string Name
         {
             get
@@ -50,6 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
+        public bool AllowRecord { get; set; }
 
         [JsonIgnore]
         public SolidColorBrush ClientCoalitionColour
@@ -131,7 +133,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public override string ToString()
+        public override string ToString() 
         {
             string side;
 

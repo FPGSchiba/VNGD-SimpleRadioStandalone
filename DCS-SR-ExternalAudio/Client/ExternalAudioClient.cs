@@ -64,7 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Client
                 lng = opts.Longitude
             };
 
-            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,opts.Name, opts.Coalition,position);
+            var srsClientSyncHandler = new SRSClientSyncHandler(Guid, gameState,opts.Name, opts.Coalition,position, opts.Record);
 
             srsClientSyncHandler.TryConnect(new IPEndPoint(IPAddress.Loopback, opts.Port));
 

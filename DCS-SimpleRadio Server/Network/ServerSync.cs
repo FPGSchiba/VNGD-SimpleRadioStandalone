@@ -277,7 +277,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             Coalition = client.Coalition,
                             Name = client.Name,
                             LatLngPosition = client.LatLngPosition,
-                            Seat = client.Seat
+                            Seat = client.Seat,
+                            AllowRecord = client.AllowRecord
                         }
                     };
 
@@ -375,7 +376,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                     Name = client.Name,
                                     LatLngPosition = client.LatLngPosition,
                                     RadioInfo = client.RadioInfo, //send radio info
-                                    Seat = client.Seat
+                                    Seat = client.Seat,
+                                    AllowRecord = client.AllowRecord
                                 }
                             };
                             Multicast(replyMessage.Encode());
@@ -410,7 +412,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     Name = message.Client.Name,
                     Coalition = message.Client.Coalition,
                     Seat = message.Client.Seat,
-                    LatLngPosition = message.Client.LatLngPosition
+                    LatLngPosition = message.Client.LatLngPosition,
+                    AllowRecord = message.Client.AllowRecord
                 }
             };
 
@@ -464,7 +467,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     Name = client.Name,
                     LastUpdate = client.LastUpdate,
                     LatLngPosition = client.LatLngPosition,
-                    Seat = client.Seat
+                    Seat = client.Seat,
+                    AllowRecord = client.AllowRecord
                 }
             };
 
@@ -492,7 +496,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                         LastUpdate = client.LastUpdate,
                         RadioInfo = new DCSPlayerRadioInfo(),
                         LatLngPosition = client.LatLngPosition,
-                        Seat = client.Seat
+                        Seat = client.Seat,
+                        AllowRecord = client.AllowRecord
                     }
                 };
 
