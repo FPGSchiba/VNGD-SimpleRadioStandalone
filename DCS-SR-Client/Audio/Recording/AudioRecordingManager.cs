@@ -1,7 +1,5 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using NLog;
 using System;
 using System.Collections.Concurrent;

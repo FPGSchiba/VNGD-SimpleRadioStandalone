@@ -56,7 +56,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             new Guid("204303eb-0000-0000-0000-504944564944"), // VPC Stick
             new Guid("205403eb-0000-0000-0000-504944564944"), // VPC Throttle
             new Guid("205603eb-0000-0000-0000-504944564944"), // VPC Throttle
-            new Guid("205503eb-0000-0000-0000-504944564944")  // VPC Throttle
+            new Guid("205503eb-0000-0000-0000-504944564944"),  // VPC Throttle
+            new Guid("82c43344-0000-0000-0000-504944564944"),  //  LEFT VPC Rotor TCS
+            new Guid("c2ab046d-0000-0000-0000-504944564944")  // Logitech G13 Joystick
+            
 
         };
 
@@ -617,6 +620,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             });
         }
 
+        private void PollDevices(List<InputBindState> states)
+        {
+            //generate a unique list of devices - only poll once around the loop - not for each keybind
+            var uniqueDevices = new HashSet<Guid>();
+
+            foreach (var inputBindState in states)
+            {
+                if (inputBindState.MainDevice != null)
+                {
+                    uniqueDevices.Add(inputBindState.MainDevice.InstanceGuid);
+                }
+                if (inputBindState.ModifierDevice != null)
+                {
+                    uniqueDevices.Add(inputBindState.ModifierDevice.InstanceGuid);
+                }
+            }
+
+            foreach (var deviceGuid in uniqueDevices)
+            {
+                foreach (var kpDevice in _inputDevices)
+                {
+                    var device = kpDevice.Value;
+                    if (device == null ||
+                        device.IsDisposed ||
+                        !device.Information.InstanceGuid.Equals(deviceGuid))
+                    {
+                        continue;
+                    }
+                    //poll the device as it has a bind
+                    device.Poll();
+                }
+            }
+
+        }
+
         public void StartDetectPtt(DetectPttCallback callback)
         {
             _detectPtt = true;
@@ -626,6 +664,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             while (_detectPtt)
             {
                 var bindStates = GenerateBindStateList();
+
+                //Poll devices
+                PollDevices(bindStates);
+
 
                 for (var i = 0; i < bindStates.Count; i++)
                 {
@@ -972,7 +1014,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 {
                     if (device is Joystick)
                     {
-                        device.Poll();
+                        //device.Poll();
                         var state = (device as Joystick).GetCurrentState();
 
                         if (inputDeviceBinding.Button >= 128) //its a POV!
@@ -989,14 +1031,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     else if (device is Keyboard)
                     {
                         var keyboard = device as Keyboard;
-                        keyboard.Poll();
+                        //keyboard.Poll();
                         var state = keyboard.GetCurrentState();
                         return
                             state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
                     }
                     else if (device is Mouse)
                     {
-                        device.Poll();
+                        //device.Poll();
                         var state = (device as Mouse).GetCurrentState();
 
                         //just incase mouse changes number of buttons, like logitech can?
@@ -1043,7 +1085,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 {
                     if (device is Joystick)
                     {
-                        device.Poll();
+                        //device.Poll();
                         var state = (device as Joystick).GetCurrentState();
                         int value;
                         if (inputDeviceBinding.Axis.Contains("Slider"))

@@ -51,7 +51,7 @@ local _listMessages = {} -- data
 
 
 local WIDTH = 420
-local HEIGHT = 160
+local HEIGHT = 190
 
 local _lastReceived = 0
 

@@ -386,7 +386,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 
                             }
 
-                            AddClientAudio(clientAudio); // Hacky way to get own transmissions with the necessary effects and into recording queues
+                            if (clientAudio != null)
+                            {
+                                // TODO check this? 
+                                AddClientAudio(clientAudio); // Hacky way to get own transmissions with the necessary effects and into recording queues
+                            }
                         }
                         else
                         {

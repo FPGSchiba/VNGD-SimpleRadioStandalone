@@ -7,7 +7,7 @@
       
                       Title="Radio Capabilities"
                       Width="400"
-                      Height="250"
+                      Height="280"
                       ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
@@ -87,13 +87,17 @@
               
                Content="Not Available - SRS Overlay Controls Only" />
 
-        <Label Name="Desc"
+        <TextBox Name="Desc"
                Grid.Row="4"
                Grid.Column="0"
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center"
-                Grid.ColumnSpan="2"
-               Content="Unknown" />
+               Grid.ColumnSpan="2"
+               TextWrapping="Wrap"
+               BorderThickness="0"
+               HorizontalScrollBarVisibility="Disabled"
+               VerticalScrollBarVisibility="Disabled"
+               Text="Unknown" />
 
         <Button Grid.Row="5"
                 Grid.Column="0"
