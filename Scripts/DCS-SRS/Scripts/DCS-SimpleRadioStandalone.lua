@@ -83,6 +83,39 @@ local _tNextSRS = 0
 
 SR.exporters = {}   -- exporter table. Initialized at the end
 
+-- Function to load mods' SRS plugin script
+function SR.LoadModsPlugins()
+    local mode, errmsg
+
+    -- Mod folder's path
+    local modsPath = lfs.writedir() .. [[Mods\Aircraft]]
+   
+    mode, errmsg = lfs.attributes (modsPath, "mode")
+   
+    -- Check that Mod folder actually exists, if not then do nothing
+    if mode == nil or mode ~= "directory" then
+        return
+    end
+
+    -- Process each available Mod
+    for modFolder in lfs.dir(modsPath) do
+        modAutoloadPath = modsPath..[[\]]..modFolder..[[\SRS\autoload.lua]]
+
+        -- If the Mod declares an SRS autoload file we process it
+        mode, errmsg = lfs.attributes (modAutoloadPath, "mode")
+        if mode ~= nil and mode == "file" then
+            -- Try to load the Mod's script through a protected environment to avoid to invalidate SRS entirely if the script contains any error
+            local status, error = pcall(function () loadfile(modAutoloadPath)().register(SR) end)
+            
+            if error then
+                SR.log("Failed loading SRS Mod plugin due to an error in '"..modAutoloadPath.."'")
+            else
+                SR.log("Loaded SRS Mod plugin '"..modAutoloadPath.."'")
+            end
+        end
+    end
+end
+
 function SR.exporter()
     local _update
     local _data = LoGetSelfData()
@@ -4790,5 +4823,7 @@ LuaExportBeforeNextFrame = function()
     end
 end
 
+-- Load mods' SRS plugins
+SR.LoadModsPlugins()
 
 SR.log("Loaded SimpleRadio Standalone Export version: 2.0.1.0")
