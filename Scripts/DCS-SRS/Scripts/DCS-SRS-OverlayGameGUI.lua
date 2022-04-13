@@ -51,7 +51,7 @@ local _listMessages = {} -- data
 
 
 local WIDTH = 420
-local HEIGHT = 190
+local HEIGHT = 200
 
 local _lastReceived = 0
 
@@ -449,7 +449,7 @@ function srsOverlay.createWindow()
     
     _listStatics = {}
     
-    for i = 1, 6 do
+    for i = 1, 8 do
         local staticNew = Static.new()
         table.insert(_listStatics, staticNew)
         box:insertWidget(staticNew)

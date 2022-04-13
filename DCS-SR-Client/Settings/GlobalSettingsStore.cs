@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -259,6 +260,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private  ProfileSettingsStore _profileSettingsStore;
         public ProfileSettingsStore ProfileSettingsStore => _profileSettingsStore;
 
+        //cache all the settings in their correct types for speed
+        //fixes issue where we access settings a lot and have issues
+        private ConcurrentDictionary<string, object> _settingsCache = new ConcurrentDictionary<string, object>();
+
         public string Path { get; } = "";
 
         private GlobalSettingsStore()
@@ -499,17 +504,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetPositionSetting(GlobalSettingsKeys key, double value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
         public bool GetClientSettingBool(GlobalSettingsKeys key)
         {
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (bool)val;
+            }
+
             var setting = GetSetting("Client Settings", key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 return false;
             }
-
+            _settingsCache[key.ToString()] = setting.BoolValue;
             return setting.BoolValue;
         }
 
@@ -520,11 +531,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetClientSetting(GlobalSettingsKeys key, string value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, bool value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);
         }
 

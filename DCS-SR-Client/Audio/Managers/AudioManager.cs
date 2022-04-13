@@ -386,7 +386,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 
                             }
 
-                            if (clientAudio != null)
+                            if (clientAudio != null && (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)))
                             {
                                 // TODO check this? 
                                 AddClientAudio(clientAudio); // Hacky way to get own transmissions with the necessary effects and into recording queues
@@ -506,8 +506,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
 
             var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
+            if (transmitOnRadio == 0)
+            {
+                _effectsBuffer.VolumeSampleProvider.Volume = volume;
 
-            if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
+                if (effect.Loaded)
+                {
+                    _effectsBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
+            }
+            else if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
             {
                 _effectsBuffer.VolumeSampleProvider.Volume = volume;
 
@@ -543,8 +554,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 
             bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
+            if (transmitOnRadio == 0)
+            {
+                _effectBuffer.VolumeSampleProvider.Volume = volume;
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
+                if (effect.Loaded)
+                {
+                    _effectBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
+            }
+            else if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
             {
                 _effectBuffer.VolumeSampleProvider.Volume = volume;
                 var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
@@ -590,7 +611,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
 
-            if (modulation == Modulation.MIDS && midsTone)
+            if (transmitOnRadio == 0)
+            {
+                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
+                effectsBuffer.VolumeSampleProvider.Volume = volume;
+
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
+            }
+            else if (modulation == Modulation.MIDS && midsTone)
             {
                 //end receive tone for MIDS
                 var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
@@ -630,7 +664,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
             var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
 
-            if (modulation == Modulation.MIDS && midsTone)
+            if (transmitOnRadio == 0)
+            {
+                _effectBuffer.VolumeSampleProvider.Volume = volume;
+
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
+                if (effect.Loaded)
+                {
+                    _effectBuffer.AddAudioSamples(
+                        effect.AudioEffectBytes,
+                        transmitOnRadio);
+                }
+            }
+            else if (modulation == Modulation.MIDS && midsTone)
             {
                 _effectBuffer.VolumeSampleProvider.Volume = volume;
                 var effect = _cachedAudioEffectsProvider.MIDSEndTone;

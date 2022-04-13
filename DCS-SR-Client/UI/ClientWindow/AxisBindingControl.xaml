@@ -48,6 +48,7 @@
                 Grid.Row="0"
                 Grid.Column="4"
                 Click="DeviceClear_Click"
+                Style="{DynamicResource SquareButtonStyle}"
                 Content="Clear"/>
 
         <Expander Grid.Row="1" Grid.ColumnSpan="5"  Name="TuningExpander"

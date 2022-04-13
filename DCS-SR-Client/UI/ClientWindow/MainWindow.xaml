@@ -618,7 +618,7 @@
 
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox x:Name="AxisControlsGroupBox" Header="Axis Controls">
+                    <GroupBox x:Name="AxisControlsGroupBox" Header="Axis Controls" Visibility="Hidden">
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -1701,6 +1701,9 @@
                                         <RowDefinition />
                                         <RowDefinition />
                                         <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
 
 
@@ -1843,10 +1846,36 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
+                                           Content="Intercom Transmit Start Effect" />
+
+                                    <ComboBox x:Name="IntercomStartTransmitEffect"
+                                              Grid.Row="4"
+                                              Grid.Column="1"
+                                              Width="215"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Top" />
+
+                                    <Label Grid.Row="5"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="Intercom Transmit End Effect" />
+
+                                    <ComboBox x:Name="IntercomEndTransmitEffect"
+                                              Grid.Row="5"
+                                              Grid.Column="1"
+                                              Width="215"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Top" />
+
+                                    <Label Grid.Row="6"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
                                            Content="Radio Encryption Effects &#xD;&#xA;Requires Tx or Rx Effects On" />
 
                                     <ToggleButton Name="RadioEncryptionEffectsToggle"
-                                                  Grid.Row="4"
+                                                  Grid.Row="6"
                                                   Grid.Column="1"
                                                   HorizontalContentAlignment="Center"
                                                   VerticalContentAlignment="Center"
@@ -1866,14 +1895,14 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
-                                    <Label Grid.Row="5"
+                                    <Label Grid.Row="7"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="MIDS Tx &amp; Rx Effect &#xD;&#xA;Requires Tx or Rx Effects On" />
 
                                     <ToggleButton Name="RadioMIDSToggle"
-                                                  Grid.Row="5"
+                                                  Grid.Row="7"
                                                   Grid.Column="1"
                                                   HorizontalContentAlignment="Center"
                                                   VerticalContentAlignment="Center"
@@ -1893,14 +1922,14 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
-                                    <Label Grid.Row="6"
+                                    <Label Grid.Row="8"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable Radio Voice Effect" />
 
                                     <ToggleButton Name="RadioSoundEffects"
-                                                  Grid.Row="6"
+                                                  Grid.Row="8"
                                                   Grid.Column="1"
                                                   HorizontalContentAlignment="Center"
                                                   VerticalContentAlignment="Center"
@@ -1922,14 +1951,14 @@
 
 
 
-                                    <Label Grid.Row="7"
+                                    <Label Grid.Row="9"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable Clipping Effect (Requires Radio effects on!)" />
 
                                     <ToggleButton Name="RadioSoundEffectsClipping"
-                                                  Grid.Row="7"
+                                                  Grid.Row="9"
                                                   Grid.Column="1"
                                                   HorizontalContentAlignment="Center"
                                                   VerticalContentAlignment="Center"
@@ -1950,13 +1979,13 @@
                                     </ToggleButton>
 
 
-                                    <Label Grid.Row="8"
+                                    <Label Grid.Row="10"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable FM Radio Tone" />
 
-                                    <StackPanel Grid.Row="8"
+                                    <StackPanel Grid.Row="10"
                                                 Grid.Column="1" Margin="10">
 
                                         <ToggleButton Name="NATORadioToneToggle"
@@ -2005,13 +2034,13 @@
 
                                     </StackPanel>
 
-                                    <Label Grid.Row="9"
+                                    <Label Grid.Row="11"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable HAVEQUICK Effect" />
 
-                                    <StackPanel Grid.Row="9"
+                                    <StackPanel Grid.Row="11"
                                                 Grid.Column="1" Margin="10">
 
                                         <ToggleButton Name="HQEffectToggle"
@@ -2060,14 +2089,14 @@
 
                                     </StackPanel>
 
-                                    <Label Grid.Row="10"
+                                    <Label Grid.Row="12"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Enable Background Radio Effects &#xD;&#xA;(UHF/VHF/HF/FM) " />
 
                                     <ToggleButton Name="BackgroundRadioNoiseToggle"
-                                                  Grid.Row="10"
+                                                  Grid.Row="12"
                                                   Grid.Column="1"
                                                   HorizontalContentAlignment="Center"
                                                   VerticalContentAlignment="Center"
@@ -2087,88 +2116,16 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
-                                    <Label Grid.Row="11"
+                                    <Label Grid.Row="13"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="UHF Effect Volume" />
 
-                                    <StackPanel Grid.Row="11"
-                                                Grid.Column="1" Margin="10">
-
-                                        <Slider x:Name="UHFEffectVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="5"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="10"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                            <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                            <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                        </Grid>
-
-                                    </StackPanel>
-
-                                    <Label Grid.Row="12"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="VHF Effect Volume" />
-
-                                    <StackPanel Grid.Row="12"
-                                                Grid.Column="1" Margin="10">
-
-                                        <Slider x:Name="VHFEffectVolume"
-                                                TickPlacement="BottomRight"
-                                                SmallChange="5"
-                                                LargeChange="10"
-                                                IsSnapToTickEnabled="True"
-                                                TickFrequency="10"
-                                                VerticalAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Maximum="200"
-                                                Value="100"
-                                                Minimum="0"
-                                                IsEnabled="False" />
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
-                                            <Label Grid.Column="1" FontSize="10" Content="100%"
-                                                   HorizontalAlignment="Center" />
-                                            <Label Grid.Column="2" FontSize="10" Content="200%"
-                                                   HorizontalAlignment="Right" />
-                                        </Grid>
-
-                                    </StackPanel>
-
-                                    <Label Grid.Row="13"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="HF Effect Volume" />
-
                                     <StackPanel Grid.Row="13"
                                                 Grid.Column="1" Margin="10">
 
-                                        <Slider x:Name="HFEffectVolume"
+                                        <Slider x:Name="UHFEffectVolume"
                                                 TickPlacement="BottomRight"
                                                 SmallChange="5"
                                                 LargeChange="10"
@@ -2199,9 +2156,81 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="FM Effect Volume" />
+                                           Content="VHF Effect Volume" />
 
                                     <StackPanel Grid.Row="14"
+                                                Grid.Column="1" Margin="10">
+
+                                        <Slider x:Name="VHFEffectVolume"
+                                                TickPlacement="BottomRight"
+                                                SmallChange="5"
+                                                LargeChange="10"
+                                                IsSnapToTickEnabled="True"
+                                                TickFrequency="10"
+                                                VerticalAlignment="Center"
+                                                VerticalContentAlignment="Center"
+                                                Maximum="200"
+                                                Value="100"
+                                                Minimum="0"
+                                                IsEnabled="False" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
+                                            <Label Grid.Column="1" FontSize="10" Content="100%"
+                                                   HorizontalAlignment="Center" />
+                                            <Label Grid.Column="2" FontSize="10" Content="200%"
+                                                   HorizontalAlignment="Right" />
+                                        </Grid>
+
+                                    </StackPanel>
+
+                                    <Label Grid.Row="15"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="HF Effect Volume" />
+
+                                    <StackPanel Grid.Row="15"
+                                                Grid.Column="1" Margin="10">
+
+                                        <Slider x:Name="HFEffectVolume"
+                                                TickPlacement="BottomRight"
+                                                SmallChange="5"
+                                                LargeChange="10"
+                                                IsSnapToTickEnabled="True"
+                                                TickFrequency="10"
+                                                VerticalAlignment="Center"
+                                                VerticalContentAlignment="Center"
+                                                Maximum="200"
+                                                Value="100"
+                                                Minimum="0"
+                                                IsEnabled="False" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" FontSize="10" Content="0%" HorizontalAlignment="Left" />
+                                            <Label Grid.Column="1" FontSize="10" Content="100%"
+                                                   HorizontalAlignment="Center" />
+                                            <Label Grid.Column="2" FontSize="10" Content="200%"
+                                                   HorizontalAlignment="Right" />
+                                        </Grid>
+
+                                    </StackPanel>
+
+                                    <Label Grid.Row="16"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="FM Effect Volume" />
+
+                                    <StackPanel Grid.Row="16"
                                                 Grid.Column="1" Margin="10">
 
                                         <Slider x:Name="FMEffectVolume"

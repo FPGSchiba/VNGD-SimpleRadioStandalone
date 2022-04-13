@@ -238,6 +238,8 @@ function SR.exporter()
         _lastUnitType = ""
     end
 
+    _update.seat = SR.lastKnownSeat
+
     if SR.unicast then
         socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.0.0.1", SR.RADIO_SEND_TO_PORT))
     else

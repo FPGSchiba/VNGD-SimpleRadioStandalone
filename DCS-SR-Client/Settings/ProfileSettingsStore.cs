@@ -65,7 +65,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         PTTStartDelay,
 
-        RotaryStyleIncrement
+        RotaryStyleIncrement,
+        IntercomTransmissionStartSelection,
+        IntercomTransmissionEndSelection,
     }
 
     public class ProfileSettingsStore
@@ -104,6 +106,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_START+".wav"},
             {ProfileSettingsKeys.RadioTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END+".wav"},
+
+
+            {ProfileSettingsKeys.IntercomTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START+".wav"},
+            {ProfileSettingsKeys.IntercomTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END+".wav"},
 
 
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
