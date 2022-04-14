@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private volatile bool _stop;
 
-        public delegate void NewAircraft(string name);
+        public delegate void NewAircraft(string name, int seat);
 
         private readonly NewAircraft _newAircraftCallback;
 
@@ -253,19 +253,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             var overrideFreqAndVol = false;
 
-            var newAircraft = playerRadioInfo.unitId != message.unitId || !playerRadioInfo.IsCurrent();
+            var newAircraft = playerRadioInfo.unitId != message.unitId || playerRadioInfo.seat != message.seat || !playerRadioInfo.IsCurrent();
 
             overrideFreqAndVol = playerRadioInfo.unitId != message.unitId;
             
             //save unit id
             playerRadioInfo.unitId = message.unitId;
+            playerRadioInfo.seat = message.seat;
             
 
             if (newAircraft)
             {
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoSelectSettingsProfile))
                 {
-                    _newAircraftCallback(message.unit);
+                    _newAircraftCallback(message.unit, message.seat);
                 }
 
                 playerRadioInfo.iff = message.iff;

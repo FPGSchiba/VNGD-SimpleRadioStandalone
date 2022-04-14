@@ -8,10 +8,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 {
     public class InputBindState
     {
-        public InputDevice MainDevice { get; set; }
+        public InputDeviceBase MainDevice { get; set; }
         public bool MainDeviceState { get; set; }
 
-        public InputDevice ModifierDevice { get; set; }
+        public InputDeviceBase ModifierDevice { get; set; }
 
         public bool ModifierState { get; set; }
 

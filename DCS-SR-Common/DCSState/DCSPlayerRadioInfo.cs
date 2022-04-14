@@ -44,6 +44,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         
         public uint unitId;
 
+        [JsonNetworkIgnoreSerialization] [JsonDCSIgnoreSerialization]
+        public int seat = 0;
+
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
         public bool intercomHotMic = false; //if true switch to intercom and transmit
@@ -92,6 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             simultaneousTransmission = false;
             simultaneousTransmissionControl = SimultaneousTransmissionControl.EXTERNAL_DCS_CONTROL;
             LastUpdate = 0;
+            seat = 0;
 
             for (var i = 0; i < 11; i++)
             {

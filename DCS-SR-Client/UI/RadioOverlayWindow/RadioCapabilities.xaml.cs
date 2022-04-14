@@ -51,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 if (radioInfo.IsCurrent())
                 {
 
-                    Desc.Content = radioInfo.capabilities.desc;
+                    Desc.Text = radioInfo.capabilities.desc;
 
                     if (radioInfo.capabilities.dcsPtt)
                     {
@@ -116,7 +116,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
                 }
                 else
                 {
-                    Desc.Content = "";
+                    Desc.Text = "";
                     DCSPTT.Content = "Unknown";
                     DCSRadioSwitch.Content = "Unknown";
                     DCSIFF.Content = "Unknown";

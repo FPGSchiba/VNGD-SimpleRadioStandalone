@@ -55,6 +55,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             HF_NOISE = 9,
             UHF_NOISE = 10,
             FM_NOISE = 11,
+            INTERCOM_TRANS_START = 12,
+            INTERCOM_TRANS_END = 13,
         }
 
         public CachedAudioEffect(AudioEffectTypes audioEffect): this(audioEffect, audioEffect.ToString() + ".wav", AppDomain.CurrentDomain.BaseDirectory + "\\AudioEffects\\"+ audioEffect.ToString() + ".wav") { }

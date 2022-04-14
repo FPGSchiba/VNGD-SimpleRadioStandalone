@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -86,7 +87,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ShowTransmitterName,
 
         IdleTimeOut,
-        AutoConnect
+        AutoConnect,
+
+        AllowRecording,
+        RecordAudio,
+        SingleFileMixdown,
+        RecordingQuality,
+        DisallowedAudioTone
     }
 
     public enum InputBinding
@@ -201,6 +208,39 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         IntercomPTT = 136,
         ModifierIntercomPTT = 236,
+
+        IntercomVolume = 300,
+        Radio1Volume = 301,
+        Radio2Volume = 302,
+        Radio3Volume = 303,
+        Radio4Volume = 304,
+        Radio5Volume = 305,
+        Radio6Volume = 306,
+        Radio7Volume = 307,
+        Radio8Volume = 308,
+        Radio9Volume = 309,
+        Radio10Volume = 310,
+        Radio1Frequency = 311,
+        Radio2Frequency = 312,
+        Radio3Frequency = 313,
+        Radio4Frequency = 314,
+        Radio5Frequency = 315,
+        Radio6Frequency = 316,
+        Radio7Frequency = 317,
+        Radio8Frequency = 318,
+        Radio9Frequency = 319,
+        Radio10Frequency = 320,        
+        Radio1Encryption = 321,
+        Radio2Encryption = 322,
+        Radio3Encryption = 323,
+        Radio4Encryption = 324,
+        Radio5Encryption = 325,
+        Radio6Encryption = 326,
+        Radio7Encryption = 327,
+        Radio8Encryption = 328,
+        Radio9Encryption = 329,
+        Radio10Encryption = 330,
+
     }
 
 
@@ -219,6 +259,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private  ProfileSettingsStore _profileSettingsStore;
         public ProfileSettingsStore ProfileSettingsStore => _profileSettingsStore;
+
+        //cache all the settings in their correct types for speed
+        //fixes issue where we access settings a lot and have issues
+        private ConcurrentDictionary<string, object> _settingsCache = new ConcurrentDictionary<string, object>();
 
         public string Path { get; } = "";
 
@@ -441,6 +485,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 
+            {GlobalSettingsKeys.AllowRecording.ToString(), "false" },
+            {GlobalSettingsKeys.RecordAudio.ToString(), "false" },
+            {GlobalSettingsKeys.SingleFileMixdown.ToString(), "false" },
+            {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" },
+            {GlobalSettingsKeys.DisallowedAudioTone.ToString(), "false"},
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
@@ -455,17 +504,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetPositionSetting(GlobalSettingsKeys key, double value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
         public bool GetClientSettingBool(GlobalSettingsKeys key)
         {
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (bool)val;
+            }
+
             var setting = GetSetting("Client Settings", key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 return false;
             }
-
+            _settingsCache[key.ToString()] = setting.BoolValue;
             return setting.BoolValue;
         }
 
@@ -476,11 +531,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetClientSetting(GlobalSettingsKeys key, string value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, bool value)
         {
+            _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);
         }
 

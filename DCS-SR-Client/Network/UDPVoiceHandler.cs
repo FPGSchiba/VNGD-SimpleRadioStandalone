@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -686,7 +687,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                 Encryptions = encryptions,
                 Modulations = modulations,
-                PacketNumber = udpVoicePacket.PacketNumber, 
+                PacketNumber = udpVoicePacket.PacketNumber,
                 OriginalClientGuidBytes = udpVoicePacket.OriginalClientGuidBytes,
                 RetransmissionCount = (byte)(udpVoicePacket.RetransmissionCount+1u),
             };
@@ -1016,7 +1017,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         {
                             GuidBytes = _guidAsciiBytes,
                             AudioPart1Bytes = bytes,
-                            AudioPart1Length = (ushort) bytes.Length,
+                            AudioPart1Length = (ushort)bytes.Length,
                             Frequencies = frequencies.ToArray(),
                             UnitId = _clientStateSingleton.DcsPlayerRadioInfo.unitId,
                             Encryptions = encryptions.ToArray(),
@@ -1049,15 +1050,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         };
                         var send = new ClientAudio()
                         {
-                             Frequency = frequencies[0], Modulation = modulations[0],
-                             EncodedAudio = bytes,
-                             Encryption = 0,
-                             Volume = 1,
-                             Decryptable = true,
-                             LineOfSightLoss = 0,
-                             RecevingPower = 0,
-                             ReceivedRadio = 1
+                            Frequency = frequencies[0], Modulation = modulations[0],
+                            EncodedAudio = bytes,
+                            Encryption = 0,
+                            Volume = 1,
+                            Decryptable = true,
+                            LineOfSightLoss = 0,
+                            RecevingPower = 0,
+                            ReceivedRadio = sendingOn,
+                            PacketNumber = _packetNumber,
+                            ReceiveTime = DateTime.Now.Ticks,
+                            OriginalClientGuid = _guid,
                         };
+
                         return send;
                     }
                 }

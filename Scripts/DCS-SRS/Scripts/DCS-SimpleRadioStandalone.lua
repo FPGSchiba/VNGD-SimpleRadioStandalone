@@ -83,6 +83,17 @@ local _tNextSRS = 0
 
 SR.exporters = {}   -- exporter table. Initialized at the end
 
+SR.fc3 = {}
+SR.fc3["A-10A"] = true
+SR.fc3["F-15C"] = true
+SR.fc3["MiG-29A"] = true
+SR.fc3["MiG-29S"] = true
+SR.fc3["MiG-29G"] = true
+SR.fc3["Su-27"] = true
+SR.fc3["Su-33"] = true
+SR.fc3["Su-25"] = true
+SR.fc3["Su-25T"] = true
+
 -- Function to load mods' SRS plugin script
 function SR.LoadModsPlugins()
     local mode, errmsg
@@ -120,8 +131,8 @@ function SR.exporter()
     local _update
     local _data = LoGetSelfData()
 
-    if _data ~= nil then
-        -- check for death / eject -- call below returns a number when so
+    if _data ~= nil and not SR.fc3[_data.Name] then
+        -- check for death / eject -- call below returns a number when ejected - ignore FC3
         local _device = GetDevice(0)
 
         if type(_device) == 'number' then
@@ -259,6 +270,8 @@ function SR.exporter()
         _lastUnitId = ""
         _lastUnitType = ""
     end
+
+    _update.seat = SR.lastKnownSeat
 
     if SR.unicast then
         socket.try(SR.UDPSendSocket:sendto(SR.JSON:encode(_update) .. " \n", "127.0.0.1", SR.RADIO_SEND_TO_PORT))
@@ -564,6 +577,13 @@ function SR.exportRadioSU27(_data)
     return _data
 end
 
+local  _ah64 = {}
+_ah64.cipher = {
+    key = 1,
+    enabled = false
+}
+
+
 function SR.exportRadioAH64D(_data)
     _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "Recommended: Always Allow SRS Hotkeys - OFF. Bind Intercom Select & PTT, Radio PTT and DCS RTS up down" }
 
@@ -663,8 +683,9 @@ function SR.exportRadioAH64D(_data)
         if _device then
             _device:set_argument_value(345, 1.0) -- Pilot SENS
             _device:set_argument_value(344, 1.0) -- Pilot Master
-            _device:set_argument_value(386, 1.0) -- Gunner SENS
-            _device:set_argument_value(385, 1.0) -- Gunner Master
+            -- Desyncs for some reason
+--             _device:set_argument_value(386, 1.0) -- Gunner SENS
+--             _device:set_argument_value(385, 1.0) -- Gunner Master
         end
     end
 
@@ -699,10 +720,12 @@ function SR.exportRadioAH64D(_data)
     _data.radios[6].volMode = 0
 
     local _radioPanel = nil
+    local _cipher = nil
 
     if SR.lastKnownSeat == 0 then
 
         _radioPanel = SR.getListIndicatorValue(17)
+        _cipher = SR.getListIndicatorValue(6)
 
         local _masterVolume = SR.getRadioVolume(0, 344, { 0.0, 1.0 }, false) 
         
@@ -750,6 +773,7 @@ function SR.exportRadioAH64D(_data)
 
     else
         local _masterVolume = SR.getRadioVolume(0, 385, { 0.0, 1.0 }, false) 
+        _cipher = SR.getListIndicatorValue(10)
 
         _radioPanel = SR.getListIndicatorValue(18)
 
@@ -816,7 +840,22 @@ function SR.exportRadioAH64D(_data)
         end
     end
 
+    if _cipher then
+          -- PLAIN, CIPHER , RECEIVE
+        if _cipher["PB7_17"] then
+            _ah64.cipher.enabled = _cipher["PB7_17"] == "CIPHER"
+        end
+
+        -- KEY 1,2,3,4,5,6
+        if _cipher["PB8_21"] then
+            _ah64.cipher.key = tonumber(_cipher["PB8_21"])
+        end
+        _data.radios[3].encKey = _ah64.cipher.key
+        _data.radios[3].enc = _ah64.cipher.enabled
+    end
+
     _data.control = 1
+    _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
     
     return _data
 
@@ -2362,29 +2401,29 @@ function SR.exportRadioFA18C(_data)
     _radio.freq = SR.getRadioFrequency(39)
     _radio.modulation = SR.getRadioModulation(39)
     _radio.volume = SR.getRadioVolume(0, 123, { 0.0, 1.0 }, false)
-    _radio.encMode = 2 -- Mode 2 is set by aircraft
+-- _radio.encMode = 2 -- Mode 2 is set by aircraft
 
-    _fa18.radio2.guard = getGuardFreq(_radio.freq, _fa18.radio2.guard, _radio.modulation)
-    _radio.secFreq = _fa18.radio2.guard
+_fa18.radio2.guard = getGuardFreq(_radio.freq, _fa18.radio2.guard, _radio.modulation)
+_radio.secFreq = _fa18.radio2.guard
 
-    -- KY-58 Radio Encryption
-    local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
-    if _ky58Power == 0.1 and SR.round(SR.getButtonPosition(444), 0.1) == 0.1 then
-        -- mode switch set to C and powered on
-        -- Power on!
+-- KY-58 Radio Encryption
+local _ky58Power = SR.round(SR.getButtonPosition(447), 0.1)
+if _ky58Power == 0.1 and SR.round(SR.getButtonPosition(444), 0.1) == 0.1 then
+    -- mode switch set to C and powered on
+    -- Power on!
 
-        -- Get encryption key
-        local _channel = SR.getSelectorPosition(446, 0.1) + 1
-        if _channel > 6 then
-            _channel = 6 -- has two other options - lock to 6
-        end
-
-        -- _data.radios[2].encKey = _channel
-        -- _data.radios[2].enc = true
-
-        _data.radios[3].encKey = _channel
-        _data.radios[3].enc = true
+    -- Get encryption key
+    local _channel = SR.getSelectorPosition(446, 0.1) + 1
+    if _channel > 6 then
+        _channel = 6 -- has two other options - lock to 6
     end
+
+    _radio = _data.radios[2 + SR.getSelectorPosition(144, 0.3)]
+    _radio.encMode = 2 -- Mode 2 is set by aircraft
+    _radio.encKey = _channel
+    _radio.enc = true
+
+end
 
 
     -- MIDS
@@ -4686,6 +4725,8 @@ function SR.tableShow(tbl, loc, indent, tableshow_tbls) --based on serialize_slm
         return table.concat(tbl_str)
     end
 end
+
+
 
 ---- Exporters init ----
 SR.exporters["UH-1H"] = SR.exportRadioUH1H

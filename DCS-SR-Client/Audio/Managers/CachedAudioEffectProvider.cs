@@ -14,6 +14,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public List<CachedAudioEffect> RadioTransmissionStart { get; }
         public List<CachedAudioEffect> RadioTransmissionEnd { get; }
 
+        public List<CachedAudioEffect> IntercomTransmissionStart { get; }
+        public List<CachedAudioEffect> IntercomTransmissionEnd { get; }
+
+
+
         private static CachedAudioEffectProvider _instance;
 
         public static CachedAudioEffectProvider Instance
@@ -69,6 +74,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+        public CachedAudioEffect SelectedIntercomTransmissionStartEffect
+        {
+            get
+            {
+                var selectedTone = GlobalSettingsStore.Instance.ProfileSettingsStore
+                    .GetClientSettingString(ProfileSettingsKeys.IntercomTransmissionStartSelection).ToLowerInvariant();
+
+                foreach (var startEffect in IntercomTransmissionStart)
+                {
+                    if (startEffect.FileName.ToLowerInvariant().Equals(selectedTone))
+                    {
+                        return startEffect;
+                    }
+                }
+
+                return IntercomTransmissionStart[0];
+            }
+        }
+
+        public CachedAudioEffect SelectedIntercomTransmissionEndEffect
+        {
+            get
+            {
+                var selectedTone = GlobalSettingsStore.Instance.ProfileSettingsStore
+                    .GetClientSettingString(ProfileSettingsKeys.IntercomTransmissionEndSelection).ToLowerInvariant();
+
+                foreach (var endEffect in IntercomTransmissionEnd)
+                {
+                    if (endEffect.FileName.ToLowerInvariant().Equals(selectedTone))
+                    {
+                        return endEffect;
+                    }
+                }
+
+                return IntercomTransmissionEnd[0];
+            }
+        }
+
         public CachedAudioEffect KY58EncryptionTransmitTone { get; }
         public CachedAudioEffect KY58EncryptionEndTone { get; }
         public CachedAudioEffect NATOTone { get; }
@@ -92,7 +135,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             RadioTransmissionStart = new List<CachedAudioEffect>();
             RadioTransmissionEnd = new List<CachedAudioEffect>();
 
+            IntercomTransmissionStart = new List<CachedAudioEffect>();
+            IntercomTransmissionEnd = new List<CachedAudioEffect>();
+
             LoadRadioStartAndEndEffects();
+            LoadIntercomStartAndEndEffects();
 
             KY58EncryptionTransmitTone = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.KY_58_TX);
             KY58EncryptionEndTone = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.KY_58_RX);
@@ -177,6 +224,50 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             if (RadioTransmissionEnd.Count == 0)
             {
                 RadioTransmissionEnd.Add(new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END));
+            }
+
+        }
+
+        private void LoadIntercomStartAndEndEffects()
+        {
+            var audioEffectsList = Directory.EnumerateFiles(sourceFolder);
+
+            //might need to split the path - we'll see
+            foreach (var effectPath in audioEffectsList)
+            {
+                var effect = effectPath.Split(Path.DirectorySeparatorChar).Last();
+
+                if (effect.ToLowerInvariant().StartsWith(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START
+                    .ToString().ToLowerInvariant()))
+                {
+                    var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START, effect, effectPath);
+
+                    if (audioEffect.AudioEffectBytes != null)
+                    {
+                        IntercomTransmissionStart.Add(audioEffect);
+                    }
+
+                }
+                else if (effect.ToLowerInvariant().StartsWith(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END
+                    .ToString().ToLowerInvariant()))
+                {
+                    var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END, effect, effectPath);
+
+                    if (audioEffect.AudioEffectBytes != null)
+                    {
+                        IntercomTransmissionEnd.Add(audioEffect);
+                    }
+                }
+            }
+
+            //IF the audio folder is missing - to avoid a crash, init with a blank one
+            if (IntercomTransmissionStart.Count == 0)
+            {
+                IntercomTransmissionStart.Add(new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START));
+            }
+            if (IntercomTransmissionEnd.Count == 0)
+            {
+                IntercomTransmissionEnd.Add(new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END));
             }
 
         }
