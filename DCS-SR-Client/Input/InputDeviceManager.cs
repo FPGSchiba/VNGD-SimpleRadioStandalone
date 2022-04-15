@@ -99,6 +99,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             var deviceInstances = _directInput.GetDevices();
 
+            _inputDevices.Clear();
+
             foreach (var deviceInstance in deviceInstances)
             {
                 //Workaround for Bad Devices that pretend to be joysticks
