@@ -242,8 +242,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 if (kpDevice.Value != null)
                 {
-                    kpDevice.Value.Unacquire();
-                    kpDevice.Value.Dispose();
+                    if (!kpDevice.Value.IsDisposed)
+                    {
+                        kpDevice.Value.Unacquire();
+                        kpDevice.Value.Dispose();
+                    }
                 }
             }
         }
@@ -258,6 +261,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return _whitelistDevices.Contains(device);
         }
 
+        private void PollAllDevices()
+        {
+            var deviceList = _inputDevices.Values.ToList();
+
+            for (var i = 0; i < deviceList.Count; i++)
+            {
+                if (deviceList[i] == null || deviceList[i].IsDisposed)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    deviceList[i].Poll();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
+                                    $"(ID: {deviceList[i].Information.ProductGuid}) while assigning button, ignoring until next restart/rediscovery");
+                    try
+                    {
+                        deviceList[i].Unacquire();
+                        deviceList[i].Dispose();
+                        deviceList[i] = null;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                }
+               
+            }
+        }
+
         public void AssignButton(DetectButton callback)
         {
             //detect the state of all current buttons
@@ -266,6 +303,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 var deviceList = _inputDevices.Values.ToList();
 
                 var initial = new int[deviceList.Count, 128 + 4]; // for POV
+
+                PollAllDevices();
 
                 for (var i = 0; i < deviceList.Count; i++)
                 {
@@ -278,7 +317,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         if (deviceList[i] is Joystick)
                         {
-                            deviceList[i].Poll();
 
                             var state = (deviceList[i] as Joystick).GetCurrentState();
 
@@ -296,7 +334,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         else if (deviceList[i] is Keyboard)
                         {
                             var keyboard = deviceList[i] as Keyboard;
-                            keyboard.Poll();
                             var state = keyboard.GetCurrentState();
 
                             for (var j = 0; j < 128; j++)
@@ -307,7 +344,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         else if (deviceList[i] is Mouse)
                         {
                             var mouse = deviceList[i] as Mouse;
-                            mouse.Poll();
 
                             var state = mouse.GetCurrentState();
 
@@ -338,6 +374,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     Thread.Sleep(100);
 
+                    PollAllDevices();
+
                     for (var i = 0; i < _inputDevices.Count; i++)
                     {
                         if (deviceList[i] == null || deviceList[i].IsDisposed)
@@ -349,7 +387,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         {
                             if (deviceList[i] is Joystick)
                             {
-                                deviceList[i].Poll();
 
                                 var state = (deviceList[i] as Joystick).GetCurrentState();
 
@@ -406,7 +443,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             else if (deviceList[i] is Keyboard)
                             {
                                 var keyboard = deviceList[i] as Keyboard;
-                                keyboard.Poll();
                                 var state = keyboard.GetCurrentState();
 
                                 for (var j = 0; j < 128; j++)
@@ -440,8 +476,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             }
                             else if (deviceList[i] is Mouse)
                             {
-                                deviceList[i].Poll();
-
                                 var state = (deviceList[i] as Mouse).GetCurrentState();
 
                                 //skip left mouse button - start at 1 with j 0 is left, 1 is right, 2 is middle
@@ -517,9 +551,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         //poll the device as it has a bind
                         device.Poll();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         // ignored
+                        DeviceError(device,e);
                     }
                 }
             }
@@ -780,22 +815,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
-                        $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
-
-                    MessageBox.Show(
-                        $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
-                        $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
-                        "Input device error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-
-                    device.Unacquire();
-                    device.Dispose();
+                   DeviceError(device, e);
                 }
 
             }
             return false;
+        }
+
+        private void DeviceError(Device device, Exception e)
+        {
+            Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
+                            $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
+
+            MessageBox.Show(
+                $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
+                $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
+                "Input device error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            try
+            {
+                device.Unacquire();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            try
+            {
+                device.Dispose();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         public List<InputBindState> GenerateBindStateList()
