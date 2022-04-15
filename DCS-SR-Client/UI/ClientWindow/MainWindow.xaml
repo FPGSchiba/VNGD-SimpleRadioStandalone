@@ -326,9 +326,9 @@
         </TabItem>
 
         <TabItem Header="Controls">
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                <StackPanel>
                     <GroupBox x:Name="ControlsGroupBox" Header="Controls">
+
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                         <StackPanel>
                             <Button Width="150px" Content="Rescan Input Devices" Click="RescanInputDevices" />
                             <Grid>
@@ -617,195 +617,10 @@
                             </Grid>
 
                         </StackPanel>
-                    </GroupBox>
-                    <GroupBox x:Name="AxisControlsGroupBox" Header="Axis Controls" Visibility="Hidden">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="1*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>                                    
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>                                    
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Label x:Name="AxisDeviceLabel"
-                                   Grid.Row="0"
-                                   Grid.Column="1"
-                                   HorizontalContentAlignment="Center"
-                                   VerticalContentAlignment="Center"
-                                   Content="Device" />
-                                <Label x:Name="AxisButtonLabel"
-                                   Grid.Row="0"
-                                   Grid.Column="2"
-                                   HorizontalContentAlignment="Center"
-                                   VerticalContentAlignment="Center"
-                                   Content="Button" />
-                                <local:AxisBindingControl x:Name="IntercomVolume"
-                                                       Grid.Row="1"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.IntercomVolume}"/>
-                                <local:AxisBindingControl x:Name="Radio1Volume"
-                                                       Grid.Row="2"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio1Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio2Volume"
-                                                       Grid.Row="3"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio2Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio3Volume"
-                                                       Grid.Row="4"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio3Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio4Volume"
-                                                       Grid.Row="5"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio4Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio5Volume"
-                                                       Grid.Row="6"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio5Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio6Volume"
-                                                       Grid.Row="7"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio6Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio7Volume"
-                                                       Grid.Row="8"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio7Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio8Volume"
-                                                       Grid.Row="9"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio8Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio9Volume"
-                                                       Grid.Row="10"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio9Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio10Volume"
-                                                       Grid.Row="11"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio10Volume}"/>
-                                <local:AxisBindingControl x:Name="Radio1Frequency"
-                                                       Grid.Row="12"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio1Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio2Frequency"
-                                                       Grid.Row="13"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio2Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio3Frequency"
-                                                       Grid.Row="14"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio3Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio4Frequency"
-                                                       Grid.Row="15"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio4Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio5Frequency"
-                                                       Grid.Row="16"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio5Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio6Frequency"
-                                                       Grid.Row="17"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio6Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio7Frequency"
-                                                       Grid.Row="18"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio7Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio8Frequency"
-                                                       Grid.Row="19"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio8Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio9Frequency"
-                                                       Grid.Row="20"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio9Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio10Frequency"
-                                                       Grid.Row="21"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio10Frequency}"/>
-                                <local:AxisBindingControl x:Name="Radio1Encryption"
-                                                       Grid.Row="22"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio10Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio2Encryption"
-                                                       Grid.Row="23"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio2Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio3Encryption"
-                                                       Grid.Row="24"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio3Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio4Encryption"
-                                                       Grid.Row="25"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio4Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio5Encryption"
-                                                       Grid.Row="26"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio5Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio6Encryption"
-                                                       Grid.Row="27"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio6Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio7Encryption"
-                                                       Grid.Row="28"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio7Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio8Encryption"
-                                                       Grid.Row="29"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio8Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio9Encryption"
-                                                       Grid.Row="30"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio9Encryption}"/>
-                                <local:AxisBindingControl x:Name="Radio10Encryption"
-                                                       Grid.Row="31"
-                                                       Grid.ColumnSpan="5"
-                                                       ControlInputBinding="{x:Static settings:InputBinding.Radio10Encryption}"/>
+                </ScrollViewer>
 
-                            </Grid>
-                        </StackPanel>
                     </GroupBox>
-                </StackPanel>
-            </ScrollViewer>
+
         </TabItem>
 
         <TabItem x:Name="FavouritesSeversTab" Header="Favourites">

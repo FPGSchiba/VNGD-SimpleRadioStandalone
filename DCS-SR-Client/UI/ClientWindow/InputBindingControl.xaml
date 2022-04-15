@@ -47,7 +47,7 @@
         <Button x:Name="DeviceButton"
                 Grid.Row="0"
                 Grid.Column="3"
-                Click="DeviceButton_Click"
+                Click="Device_Click"
                 Content="Set "
                 Style="{DynamicResource SquareButtonStyle}" />
         <Button x:Name="DeviceClear"
@@ -79,7 +79,7 @@
         <Button x:Name="ModifierButton"
                 Grid.Row="1"
                 Grid.Column="3"
-                Click="ModifierButton_Click"
+                Click="Modifier_Click"
                 Content="Set "
                 Style="{DynamicResource SquareButtonStyle}" />
         <Button x:Name="ModifierButtonClear"

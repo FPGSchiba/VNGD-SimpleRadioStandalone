@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Microsoft.Win32;
 using NLog;
@@ -108,10 +107,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.RadioTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END+".wav"},
 
 
-            {ProfileSettingsKeys.IntercomTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START+".wav"},
-            {ProfileSettingsKeys.IntercomTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END+".wav"},
-
-
             {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
@@ -150,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             
         }
 
-        public Dictionary<InputBinding, InputDeviceBase> GetCurrentInputProfile()
+        public Dictionary<InputBinding, InputDevice> GetCurrentInputProfile()
         {
             return InputProfiles[GetProfileName(CurrentProfileName)];
         }
@@ -159,7 +154,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         {
             return InputConfigs[GetProfileCfgFileName(CurrentProfileName)];
         }
-        public Dictionary<string, Dictionary<InputBinding, InputDeviceBase>> InputProfiles { get; set; } = new Dictionary<string, Dictionary<InputBinding, InputDeviceBase>>();
+        public Dictionary<string, Dictionary<InputBinding, InputDevice>> InputProfiles { get; set; } = new Dictionary<string, Dictionary<InputBinding, InputDevice>>();
 
         private Dictionary<string, Configuration> InputConfigs = new Dictionary<string, Configuration>();
 
@@ -188,7 +183,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
                     InputConfigs[GetProfileCfgFileName(profile)] = _configuration;
 
-                    var inputProfile = new Dictionary<InputBinding, InputDeviceBase>();
+                    var inputProfile = new Dictionary<InputBinding, InputDevice>();
                     InputProfiles[GetProfileName(profile)] = inputProfile;
 
                     foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
@@ -218,7 +213,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 if (_configuration == null)
                 {
                     _configuration = new Configuration();
-                    var inputProfile = new Dictionary<InputBinding, InputDeviceBase>();
+                    var inputProfile = new Dictionary<InputBinding, InputDevice>();
                     InputProfiles[GetProfileName(profile)] = inputProfile;
                     InputConfigs[GetProfileCfgFileName(profile)] = new Configuration();
                     _configuration.SaveToFile(Path+GetProfileCfgFileName(profile), Encoding.UTF8);
@@ -231,7 +226,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 InputConfigs[GetProfileCfgFileName("default")] = new Configuration();
 
-                var inputProfile = new Dictionary<InputBinding, InputDeviceBase>();
+                var inputProfile = new Dictionary<InputBinding, InputDevice>();
                 InputProfiles[GetProfileName("default")] = inputProfile;
 
                 InputConfigs[GetProfileCfgFileName("default")].SaveToFile(GetProfileCfgFileName("default"));
@@ -290,7 +285,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             InputConfigs[GetProfileCfgFileName(profileName)] = new Configuration();
 
-            var inputProfile = new Dictionary<InputBinding, InputDeviceBase>();
+            var inputProfile = new Dictionary<InputBinding, InputDevice>();
             InputProfiles[GetProfileName(profileName)] = inputProfile;
         }
 
@@ -314,7 +309,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return cfg;
         }
 
-        public InputDeviceBase GetControlSetting(InputBinding key, Configuration configuration)
+        public InputDevice GetControlSetting(InputBinding key, Configuration configuration)
         {
             if (!configuration.Contains(key.ToString()))
             {
@@ -323,32 +318,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             try
             {
-                bool isAxis = configuration[key.ToString()]["type"].StringValue == "axis";
-                InputDeviceBase device;
-
-                if (isAxis)
-                {
-                    InputAxisDevice axisDevice = new InputAxisDevice();
-                    axisDevice.Axis = configuration[key.ToString()]["axis"].StringValue;
-                    axisDevice.AxisCenterValue = configuration[key.ToString()]["value"].IntValue;
-                    axisDevice.Invert = configuration[key.ToString()]["invert"].BoolValue;
-                    axisDevice.Curvature = configuration[key.ToString()]["curvature"].DoubleValue;
-                    device = axisDevice;
-                }
-                else
-                {
-                    InputButtonDevice buttonDevice = new InputButtonDevice();
-                    buttonDevice.Button = configuration[key.ToString()]["button"].IntValue;
-                    buttonDevice.ButtonValue = configuration[key.ToString()]["value"].IntValue;       
-                    device = buttonDevice;
-                }
-
+                var device = new InputDevice();
                 device.DeviceName = configuration[key.ToString()]["name"].StringValue;
 
-
+                device.Button = configuration[key.ToString()]["button"].IntValue;
                 device.InstanceGuid =
                     Guid.Parse(configuration[key.ToString()]["guid"].RawValue);
                 device.InputBind = key;
+
+                device.ButtonValue = configuration[key.ToString()]["value"].IntValue;
 
                 return device;
             }
@@ -360,8 +338,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             return null;
         }
-
-        public void SetControlSetting(InputDeviceBase device)
+        public void SetControlSetting(InputDevice device)
         {
             RemoveControlSetting(device.InputBind);
 
@@ -373,24 +350,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             var section = configuration[device.InputBind.ToString()];
 
             section.Add(new Setting("name", device.DeviceName.Replace("\0", "")));
-            string bindType;
-            if (device is InputAxisDevice axisDevice)
-            {
-                section.Add(new Setting("axis", axisDevice.Axis));
-                section.Add(new Setting("value", axisDevice.AxisCenterValue));
-                section.Add(new Setting("invert", axisDevice.Invert));
-                section.Add(new Setting("curvature", axisDevice.Curvature));
-                bindType = "axis";
-            }
-            else
-            {
-                InputButtonDevice buttonDevice = device as InputButtonDevice;
-                section.Add(new Setting("button", buttonDevice.Button));
-                section.Add(new Setting("value", buttonDevice.ButtonValue));
-                bindType = "button";
-            }
+            section.Add(new Setting("button", device.Button));
+            section.Add(new Setting("value", device.ButtonValue));
             section.Add(new Setting("guid", device.InstanceGuid.ToString()));
-            section.Add(new Setting("type", bindType));
 
             var inputDevices = GetCurrentInputProfile();
 
@@ -639,7 +601,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             var config = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profileToCopy));
             InputConfigs[GetProfileCfgFileName(profileName)] = config;
 
-            var inputProfile = new Dictionary<InputBinding, InputDeviceBase>();
+            var inputProfile = new Dictionary<InputBinding, InputDevice>();
             InputProfiles[GetProfileName(profileName)] = inputProfile;
 
             foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))

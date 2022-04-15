@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
@@ -44,15 +43,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 var devices = currentInputProfile;
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
-                    if (devices[ControlInputBinding] is InputAxisDevice axisDevice)
-                    {
-                        DeviceText.Text = axisDevice.Axis + " Axis";
-                    }
-                    else
-                    {
-                        var button = (devices[ControlInputBinding] as InputButtonDevice).Button;
-                        DeviceText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info}
-                    }
+                    var button = devices[ControlInputBinding].Button;
+                    DeviceText.Text = button < 128 ? (button+1).ToString() : "POV " + (button - 127); //output POV info
                     Device.Text = devices[ControlInputBinding].DeviceName;
                 }
                 else
@@ -63,8 +55,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
                 {
-
-                        var button = (devices[ModifierBinding] as InputButtonDevice).Button;
+                    var button = devices[ModifierBinding].Button;
                         ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
 
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
@@ -77,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void DeviceButton_Click(object sender, RoutedEventArgs e)
+        private void Device_Click(object sender, RoutedEventArgs e)
         {
             DeviceClear.IsEnabled = false;
             DeviceButton.IsEnabled = false;
@@ -104,7 +95,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Device.Text = "None";
             DeviceText.Text = "None";
         }
-        private void ModifierButton_Click(object sender, RoutedEventArgs e)
+
+        private void Modifier_Click(object sender, RoutedEventArgs e)
         {
             ModifierButtonClear.IsEnabled = false;
             ModifierButton.IsEnabled = false;

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -16,13 +15,11 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 {
     public class InputDeviceManager : IDisposable
     {
-        public delegate void DetectButtonInput(InputButtonDevice inputDevice);
-
-        public delegate void DetectAxisInput(InputAxisDevice inputDevice);
+        public delegate void DetectButton(InputDevice inputDevice);
 
         public delegate void DetectPttCallback(List<InputBindState> buttonStates);
 
@@ -66,7 +63,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
         private readonly DirectInput _directInput;
         private readonly Dictionary<Guid, Device> _inputDevices = new Dictionary<Guid, Device>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
-        private readonly string[] propertyList = new[] { "X", "Y", "Z", "RotationX", "RotationY", "RotationZ" };
 
         private volatile bool _detectPtt;
 
@@ -262,7 +258,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             return _whitelistDevices.Contains(device);
         }
 
-        public void AssignButton(DetectButtonInput callback)
+        public void AssignButton(DetectButton callback)
         {
             //detect the state of all current buttons
             Task.Run(() =>
@@ -368,7 +364,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                         {
                                             found = true;
 
-                                            var inputDevice = new InputButtonDevice
+                                            var inputDevice = new InputDevice
                                             {
                                                 DeviceName =
                                                     deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -389,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                         {
                                             found = true;
 
-                                            var inputDevice = new InputButtonDevice
+                                            var inputDevice = new InputDevice
                                             {
                                                 DeviceName =
                                                     deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -419,7 +415,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                     {
                                         found = true;
 
-                                        var inputDevice = new InputButtonDevice
+                                        var inputDevice = new InputDevice
                                         {
                                             DeviceName =
                                                 deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -457,7 +453,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                                     {
                                         found = true;
 
-                                        var inputDevice = new InputButtonDevice
+                                        var inputDevice = new InputDevice
                                         {
                                             DeviceName =
                                                 deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
@@ -486,139 +482,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                 }
             });
         }
-
-        public void AssignAxis(DetectAxisInput callback)
-        {
-            Task.Run(() =>
-            {
-                var deviceList = _inputDevices.Values.ToList();
-                Dictionary<string, int> initialAxisState = new Dictionary<string, int>();
-
-                for (int i = 0; i < deviceList.Count; i++)
-                {
-                    if (deviceList[i] == null || deviceList[i].IsDisposed)
-                    {
-                        continue;
-                    }
-                    try
-                    {
-                        if (deviceList[i] is Joystick)
-                        {
-                            deviceList[i].Poll();
-                            JoystickState state = (deviceList[i] as Joystick).GetCurrentState();
-
-                            foreach (string property in propertyList)
-                            {
-                                initialAxisState.Add(i.ToString() + property, (int)state.GetType().GetProperty(property).GetValue(state));
-                            }
-
-                            var z = deviceList[i];
-                            var sliders = state.Sliders;
-                            for (int j = 0; j < sliders.Length; j++)
-                            {
-                                initialAxisState.Add(i.ToString() + "Sliders" + j.ToString(), sliders[j]);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
-                            $"(ID: {deviceList[i].Information.ProductGuid}) while assigning axis, ignoring until next restart/rediscovery");
-
-                        deviceList[i].Unacquire();
-                        deviceList[i].Dispose();
-                        deviceList[i] = null;
-                    }
-                }
-
-                bool found = false;
-
-                while (!found)
-                {
-                    Thread.Sleep(100);
-
-                    for (var i = 0; i < _inputDevices.Count; i++)
-                    {
-                        if (deviceList[i] == null || deviceList[i].IsDisposed)
-                        {
-                            continue;
-                        }
-
-                        try
-                        {
-                            if (deviceList[i] is Joystick)
-                            {
-                                deviceList[i].Poll();
-
-                                var state = (deviceList[i] as Joystick).GetCurrentState();
-
-                                foreach (string property in propertyList)
-                                {
-                                    int current = (int)state.GetType().GetProperty(property).GetValue(state);
-
-                                    if (AxisDifference(initialAxisState[i.ToString() + property], current))
-                                    {
-                                        found = true;
-
-                                        InputAxisDevice axisDevice = new InputAxisDevice()
-                                        {
-                                            DeviceName =
-                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
-                                            Axis = property,
-                                            Invert = false,
-                                            Curvature = 0,
-                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
-                                            AxisCenterValue = initialAxisState[i.ToString() + property] // Assume the initial state of an axis ~centered
-                                        };
-
-                                        Application.Current.Dispatcher.Invoke(
-                                            () => { callback(axisDevice); });
-                                        return;
-                                    }
-                                }
-
-                                var sliders = state.Sliders;
-                                for (int j = 0; j < sliders.Length; j++)
-                                {
-                                    var d = deviceList[i].Capabilities;
-
-                                    int current = sliders[j];
-
-                                    if (AxisDifference(initialAxisState[i.ToString() + "Sliders" + j.ToString()], current))
-                                    {
-                                        found = true;
-
-                                        InputAxisDevice axisDevice = new InputAxisDevice()
-                                        {
-                                            DeviceName =
-                                                deviceList[i].Information.ProductName.Trim().Replace("\0", ""),
-                                            Axis = "Slider" + j.ToString(),
-                                            Invert = false,
-                                            Curvature = 0,
-                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
-                                            AxisCenterValue = initialAxisState[i.ToString() + "Sliders" + j.ToString()] // Assume the initial state of an axis ~centered
-                                        };
-
-                                        Application.Current.Dispatcher.Invoke(
-                                            () => { callback(axisDevice); });
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, $"Failed to get current state of input device {deviceList[i].Information.ProductName.Trim().Replace("\0", "")} " +
-                                $"(ID: {deviceList[i].Information.ProductGuid}) while discovering button press while assigning, ignoring until next restart/rediscovery");
-
-                            deviceList[i].Unacquire();
-                            deviceList[i].Dispose();
-                            deviceList[i] = null;
-                        }
-                    }
-                }
-            });
-        }
+        
 
         private void PollDevices(List<InputBindState> states)
         {
@@ -648,8 +512,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     {
                         continue;
                     }
-                    //poll the device as it has a bind
-                    device.Poll();
+
+                    try {
+                        //poll the device as it has a bind
+                        device.Poll();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
                 }
             }
 
@@ -665,7 +536,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             {
                 var bindStates = GenerateBindStateList();
 
-                //Poll devices
+                //Poll devices with all current binds
                 PollDevices(bindStates);
 
 
@@ -674,18 +545,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     //contains main binding and optional modifier binding + states of each
                     var bindState = bindStates[i];
 
-                    if (bindState.MainDevice is InputAxisDevice)
-                    {
-                        bindState.MainDeviceState = GetAxisState(bindState.MainDevice as InputAxisDevice);
-                    }
-                    else
-                    {
-                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice as InputButtonDevice);
-                    }
+                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
 
                     if (bindState.ModifierDevice != null)
                     {
-                        bindState.ModifierState = GetButtonState(bindState.ModifierDevice as InputButtonDevice);
+                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+
                         bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
                     }
                     else
@@ -695,7 +560,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                     //now check this is the best binding and no previous ones are better
                     //Means you can have better binds like PTT  = Space and Radio 1 is Space +1 - holding space +1 will actually trigger radio 1 not PTT
-                    if (bindState.IsActive && !(bindState.MainDevice is InputAxisDevice))
+                        if (bindState.IsActive)
                     {
                         for (int j = 0; j < i; j++)
                         {
@@ -740,7 +605,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                 callback(bindStates);
                 //handle overlay
-                var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
+
                 foreach (var bindState in bindStates)
                 {
                     if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.OverlayToggle)
@@ -763,7 +628,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                         {
                             _lastActiveBinding = bindState.MainDevice.InputBind;
 
-
+                                var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
                             if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                             {
@@ -849,145 +714,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                             break;
                         }
                     }
-
-                    if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.IntercomVolume)
-                    {
-                        switch (bindState.MainDevice.InputBind)
-                        {
-                            case InputBinding.IntercomVolume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 0);
-                                break;
-                            case InputBinding.Radio1Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 1);
-                                break;
-                            case InputBinding.Radio2Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 2);
-                                break;
-                            case InputBinding.Radio3Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 3);
-                                break;
-                            case InputBinding.Radio4Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 4);
-                                break;
-                            case InputBinding.Radio5Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 5);
-                                break;
-                            case InputBinding.Radio6Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 6);
-                                break;
-                            case InputBinding.Radio7Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 7);
-                                break;
-                            case InputBinding.Radio8Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 8);
-                                break;
-                            case InputBinding.Radio9Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 9);
-                                break;
-                            case InputBinding.Radio10Volume:
-                                RadioHelper.SetRadioVolume((float)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (float)UInt16.MaxValue, 10);
-                                break;
-                            case InputBinding.Radio1Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    1, false, false, true);
-                                break;
-                            case InputBinding.Radio2Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    2, false, false, true);
-                                break;
-                            case InputBinding.Radio3Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    3, false, false, true);
-                                break;
-                            case InputBinding.Radio4Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    4, false, false, true);
-                                break;
-                            case InputBinding.Radio5Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    5, false, false, true);
-                                break;
-                            case InputBinding.Radio6Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    6, false, false, true);
-                                break;
-                            case InputBinding.Radio7Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    7, false, false, true);
-                                break;
-                            case InputBinding.Radio8Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    8, false, false, true);
-                                break;
-                            case InputBinding.Radio9Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    9, false, false, true);
-                                break;
-                            case InputBinding.Radio10Frequency:
-                                RadioHelper.UpdateRadioFrequency(
-                                    (double)GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue,
-                                    10, false, false, true);
-                                break;
-                            case InputBinding.Radio1Encryption:
-                                RadioHelper.SetEncryptionKey(1,
-                                    (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio2Encryption:
-                                    RadioHelper.SetEncryptionKey(2,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio3Encryption:
-                                    RadioHelper.SetEncryptionKey(3,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio4Encryption:
-                                    RadioHelper.SetEncryptionKey(4,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio5Encryption:
-                                    RadioHelper.SetEncryptionKey(5,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio6Encryption:
-                                    RadioHelper.SetEncryptionKey(6,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio7Encryption:
-                                    RadioHelper.SetEncryptionKey(7,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio8Encryption:
-                                    RadioHelper.SetEncryptionKey(8,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio9Encryption:
-                                    RadioHelper.SetEncryptionKey(9,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-                                case InputBinding.Radio10Encryption:
-                                    RadioHelper.SetEncryptionKey(10,
-                                        (int)Math.Round(GetAxisValue(bindState.MainDevice as InputAxisDevice) / (double)UInt16.MaxValue * 254));
-                                    break;
-
-                                default:
-                                    break;
-
-
-                            }
-
-                            Thread.Sleep(40);
-                        }
-                    }
                 }
+
+                Thread.Sleep(40);
+            }
             });
             pttInputThread.Start();
         }
@@ -998,7 +728,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             _detectPtt = false;
         }
 
-        private bool GetButtonState(InputButtonDevice inputDeviceBinding)
+        private bool GetButtonState(InputDevice inputDeviceBinding)
         {
             foreach (var kpDevice in _inputDevices)
             {
@@ -1031,14 +761,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     else if (device is Keyboard)
                     {
                         var keyboard = device as Keyboard;
-                        //keyboard.Poll();
+                       // keyboard.Poll();
                         var state = keyboard.GetCurrentState();
                         return
                             state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
                     }
                     else if (device is Mouse)
                     {
-                        //device.Poll();
+                       // device.Poll();
                         var state = (device as Mouse).GetCurrentState();
 
                         //just incase mouse changes number of buttons, like logitech can?
@@ -1064,76 +794,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     device.Dispose();
                 }
 
-            }
-            return false;
-        }
-
-        private int GetAxisValue(InputAxisDevice inputDeviceBinding)
-        {
-            // TODO: This loop is repeated in GetAxisState simplify so only one is required
-            foreach (var kpDevice in _inputDevices)
-            {
-                var device = kpDevice.Value;
-                if (device == null ||
-                    device.IsDisposed ||
-                    !device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
-                {
-                    //TODO: Store the previous axis value and return true if not same
-                    continue;
-                }
-                try
-                {
-                    if (device is Joystick)
-                    {
-                        //device.Poll();
-                        var state = (device as Joystick).GetCurrentState();
-                        int value;
-                        if (inputDeviceBinding.Axis.Contains("Slider"))
-                        {
-                            int[] sliders = (int[])state.GetType().GetProperty("Sliders").GetValue(state);
-
-                            value = sliders[int.Parse(inputDeviceBinding.Axis.Substring(inputDeviceBinding.Axis.Length - 1))];
-                        }
-                        else
-                        {
-                            value = (int)state.GetType().GetProperty(inputDeviceBinding.Axis).GetValue(state);
-                        }
-
-                        AxisTuningHelper.GetCurvaturePointValue(value / (double)ushort.MaxValue, inputDeviceBinding.Curvature, inputDeviceBinding.Invert);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
-                        $"(ID: {device.Information.ProductGuid}) while retrieving axis state, ignoring until next restart/rediscovery");
-
-                    MessageBox.Show(
-                        $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
-                        $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
-                        "Input device error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-
-                    device.Unacquire();
-                    device.Dispose();
-                }
-            }
-            return -1;
-        }
-
-        private bool GetAxisState(InputAxisDevice inputDeviceBinding)
-        {
-            foreach (var kpDevice in _inputDevices)
-            {
-                var device = kpDevice.Value;
-                if (device == null ||
-                    device.IsDisposed ||
-                    !device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
-                {
-                    continue;
-                }
-
-                return true;
             }
             return false;
         }
@@ -1171,41 +831,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
                 bindStates.Add(bindState);
             }
-            for (int i = (int)InputBinding.IntercomVolume; i <= (int)InputBinding.Radio10Encryption; i++)
-            {
-                if (!currentInputProfile.ContainsKey((InputBinding)i))
-                {
-                    continue;
-                }
-                var input = currentInputProfile[(InputBinding)i];
-
-                var bindState = new InputBindState()
-                {
-                    IsActive = false,
-                    MainDevice = input,
-                    MainDeviceState = false,
-                    ModifierDevice = null,
-                    ModifierState = false
-                };
-
-                bindStates.Add(bindState);
-            }
 
             return bindStates;
-        }
-
-        private bool AxisDifference(int initial, int current)
-        {
-            return current != 0 ? Math.Abs(initial - current) > 10000 : Math.Abs(current - initial) > 10000;
-        }
-
-        public void UpdateAxisTune(InputBinding binding, double curvature, bool inverted)
-        {
-            InputAxisDevice inputAxisDevice = _globalSettings.ProfileSettingsStore.GetCurrentInputProfile()[binding] as InputAxisDevice;
-            inputAxisDevice.Curvature = curvature;
-            inputAxisDevice.Invert = inverted;
-
-            _globalSettings.ProfileSettingsStore.SetControlSetting(inputAxisDevice);
         }
     }
 }

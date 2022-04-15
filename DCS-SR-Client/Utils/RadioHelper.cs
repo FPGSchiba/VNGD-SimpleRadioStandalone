@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             }
         }
 
-        public static bool UpdateRadioFrequency(double frequency, int radioId, bool delta = true, bool inMHz = true, bool normalised=false)
+        public static bool UpdateRadioFrequency(double frequency, int radioId, bool delta = true, bool inMHz = true)
         {
             bool inLimit = true;
             const double MHz = 1000000;
@@ -104,15 +104,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                         
                         radio.freq = (int)Math.Round(radio.freq + frequency);
                     }
-                    else if(!normalised)
-                    {
-                        radio.freq = (int)Math.Round(frequency);
-                    }
                     else
                     {
-                        // get current radios maximum number of steps that could be applied at 0.001Mhz
-                        double radioRange = (radio.freqMax - radio.freqMin)/1000;
-                        radio.freq = (int)Math.Round(radio.freqMin + (radioRange*frequency)*1000);
+                        radio.freq = (int)Math.Round(frequency);
                     }
 
                     //make sure we're not over or under a limit
