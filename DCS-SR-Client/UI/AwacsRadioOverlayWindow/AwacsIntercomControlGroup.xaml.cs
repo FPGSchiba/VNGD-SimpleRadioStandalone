@@ -81,28 +81,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 var transmitting = _clientStateSingleton.RadioSendingState;
                 var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
 
+                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 if ((receiveState != null) && receiveState.IsReceiving)
                 {
-                    RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
                 }
-                else if (RadioId == dcsPlayerRadioInfo.selected)
+                else if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
                 {
+
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
                     {
-                        RadioActive.Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else
                     {
                         RadioActive.Fill = new SolidColorBrush(Colors.Green);
                     }
                 }
-
                 else
                 {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    if (currentRadio.simul && dcsPlayerRadioInfo.simultaneousTransmission)
+                    {
+                        // if (transmitting.IsSending)
+                        // {
+                        //     RadioActive.Fill = new SolidColorBrush(Colors.LightBlue);
+                        // }
+                        // else
+                        // {
+                        RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
+                        // }
+
+                    }
+                    else
+                    {
+                        RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                    }
+
                 }
 
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
+
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {

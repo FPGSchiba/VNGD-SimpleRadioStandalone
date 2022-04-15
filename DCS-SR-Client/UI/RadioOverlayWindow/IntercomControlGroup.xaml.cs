@@ -76,7 +76,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
-                if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
+                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+                if ((receiveState != null) && receiveState.IsReceiving)
+                {
+                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                }
+                else if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
                 {
 
                     if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
