@@ -1496,87 +1496,101 @@ end
 
 function SR.exportRadioSA342(_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+        _data.radios[1].name = "Intercom"
+        _data.radios[1].freq = 100.0
+        _data.radios[1].modulation = 2 --Special intercom modulation
+        _data.radios[1].volume = 1.0
+        _data.radios[1].volMode = 1
+        _data.radios[1].simul = true
 
-    _data.radios[1].name = "Intercom"
-    _data.radios[1].freq = 100.0
-    _data.radios[1].modulation = 2 --Special intercom modulation
-    _data.radios[1].volume = 1.0
-    _data.radios[1].volMode = 1
-    _data.radios[1].simul = true
+        _data.radios[2].name = "TRAP 138A"
+        local MHZ = 1000000
+        local _hundreds = SR.round(SR.getKnobPosition(0, 133, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100 * MHZ
+        local _tens = SR.round(SR.getKnobPosition(0, 134, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10 * MHZ
+        local _ones = SR.round(SR.getKnobPosition(0, 136, { 0.0, 0.9 }, { 0, 9 }), 0.1) * MHZ
+        local _tenth = SR.round(SR.getKnobPosition(0, 138, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100000
+        local _hundreth = SR.round(SR.getKnobPosition(0, 139, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10000
 
-    _data.radios[2].name = "TRAP 138A"
-    local MHZ = 1000000
-    local _hundreds = SR.round(SR.getKnobPosition(0, 133, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100 * MHZ
-    local _tens = SR.round(SR.getKnobPosition(0, 134, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10 * MHZ
-    local _ones = SR.round(SR.getKnobPosition(0, 136, { 0.0, 0.9 }, { 0, 9 }), 0.1) * MHZ
-    local _tenth = SR.round(SR.getKnobPosition(0, 138, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 100000
-    local _hundreth = SR.round(SR.getKnobPosition(0, 139, { 0.0, 0.9 }, { 0, 9 }), 0.1) * 10000
-
-    if SR.getSelectorPosition(128, 0.33) > 0.65 then -- Check VHF ON?
-        _data.radios[2].freq = _hundreds + _tens + _ones + _tenth + _hundreth
-    else
-        _data.radios[2].freq = 1
-    end
-    _data.radios[2].modulation = 0
-    _data.radios[2].volume = SR.getRadioVolume(0, 68, { 1.0, 0.0 }, true)
-    _data.radios[2].rtMode = 1
+        if SR.getSelectorPosition(128, 0.33) > 0.65 then -- Check VHF ON?
+            _data.radios[2].freq = _hundreds + _tens + _ones + _tenth + _hundreth
+        else
+            _data.radios[2].freq = 1
+        end
+        _data.radios[2].modulation = 0
+        _data.radios[2].volume = SR.getRadioVolume(0, 68, { 1.0, 0.0 }, true)
+        _data.radios[2].rtMode = 1
     
-    _data.radios[3].name = "UHF TRA 6031"
+        _data.radios[3].name = "UHF TRA 6031"
 
-    -- deal with odd radio tune & rounding issue... BUG you cannot set frequency 243.000 ever again
-    local freq = SR.getRadioFrequency(31, 500)
-    freq = (math.floor(freq / 1000) * 1000)
+        -- deal with odd radio tune & rounding issue... BUG you cannot set frequency 243.000 ever again
+        local freq = SR.getRadioFrequency(31, 500)
+        freq = (math.floor(freq / 1000) * 1000)
 
-    _data.radios[3].freq = freq
+        _data.radios[3].freq = freq
 
-    _data.radios[3].modulation = 0
-    _data.radios[3].volume = SR.getRadioVolume(0, 69, { 0.0, 1.0 }, false)
+        _data.radios[3].modulation = 0
+        _data.radios[3].volume = SR.getRadioVolume(0, 69, { 0.0, 1.0 }, false)
 
-    _data.radios[3].encKey = 1
-    _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
-    _data.radios[3].rtMode = 1
+        _data.radios[3].encKey = 1
+        _data.radios[3].encMode = 3 -- 3 is Incockpit toggle + Gui Enc Key setting
+        _data.radios[3].rtMode = 1
 
-    _data.radios[4].name = "TRC 9600 PR4G"
-    _data.radios[4].freq = SR.getRadioFrequency(28)
-    _data.radios[4].modulation = 1
-    _data.radios[4].volume = SR.getRadioVolume(0, 70, { 0.0, 1.0 }, false)
+        _data.radios[4].name = "TRC 9600 PR4G"
+        _data.radios[4].freq = SR.getRadioFrequency(28)
+        _data.radios[4].modulation = 1
+        _data.radios[4].volume = SR.getRadioVolume(0, 70, { 0.0, 1.0 }, false)
 
-    _data.radios[4].encKey = 1
-    _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
-    _data.radios[4].rtMode = 1
+        _data.radios[4].encKey = 1
+        _data.radios[4].encMode = 3 -- Variable Enc key but turned on by sim
+        _data.radios[4].rtMode = 1
 
-    --- is UHF ON?
-    if SR.getSelectorPosition(383, 0.167) == 0 then
-        _data.radios[3].freq = 1
-    elseif SR.getSelectorPosition(383, 0.167) == 2 then
-        --check UHF encryption
-        _data.radios[3].enc = true
+        --- is UHF ON?
+        if SR.getSelectorPosition(383, 0.167) == 0 then
+            _data.radios[3].freq = 1
+        elseif SR.getSelectorPosition(383, 0.167) == 2 then
+            --check UHF encryption
+            _data.radios[3].enc = true
+        end
+
+        --guard mode for UHF Radio
+        local uhfModeKnob = SR.getSelectorPosition(383, 0.167)
+        if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
+            _data.radios[3].secFreq = 243.0 * 1000000
+        end
+
+        --- is FM ON?
+        if SR.getSelectorPosition(272, 0.25) == 0 then
+            _data.radios[4].freq = 1
+        elseif SR.getSelectorPosition(272, 0.25) == 2 then
+            --check FM encryption
+            _data.radios[4].enc = true
+        end
+
+    local _seat = SR.lastKnownSeat
+
+    if _seat == 0 then 
+        _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+
+        if SR.getButtonPosition(452) > 0.5 then
+            _data.selected = 1
+        elseif SR.getButtonPosition(454) > 0.5 then
+            _data.selected = 2
+        elseif SR.getButtonPosition(453) > 0.5 then
+            _data.selected = 3
+        end
+        _data.control = 1; -- COCKPIT Controls
+    
+    else
+        _data.control = 0; -- no copilot  radio controls - allow them to switch
+        
+        _data.radios[1].volMode = 1 
+        _data.radios[2].volMode = 1 
+        _data.radios[3].volMode = 1 
+        _data.radios[4].volMode = 1
+
+        _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
     end
 
-    --guard mode for UHF Radio
-    local uhfModeKnob = SR.getSelectorPosition(383, 0.167)
-    if uhfModeKnob == 5 and _data.radios[3].freq > 1000 then
-        _data.radios[3].secFreq = 243.0 * 1000000
-    end
-
-    --- is FM ON?
-    if SR.getSelectorPosition(272, 0.25) == 0 then
-        _data.radios[4].freq = 1
-    elseif SR.getSelectorPosition(272, 0.25) == 2 then
-        --check FM encryption
-        _data.radios[4].enc = true
-    end
-
-    if SR.getButtonPosition(452) > 0.5 then
-        _data.selected = 1
-    elseif SR.getButtonPosition(454) > 0.5 then
-        _data.selected = 2
-    elseif SR.getButtonPosition(453) > 0.5 then
-        _data.selected = 3
-    end
-
-    _data.control = 1; -- COCKPIT Controls
     _data.intercomHotMic = true
 
     return _data
