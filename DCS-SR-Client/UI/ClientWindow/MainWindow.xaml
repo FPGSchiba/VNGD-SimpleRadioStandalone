@@ -330,7 +330,7 @@
 
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                         <StackPanel>
-                            <Button Width="150px" Content="Rescan Input Devices" Click="RescanInputDevices" />
+                            <Button Width="150px" Content="Rescan Controller Input Devices" Click="RescanInputDevices" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*" />
@@ -836,7 +836,7 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
-                                   Content="Allow More Input Devices" />
+                                   Content="Allow More Controller Input Devices" />
 
                             <ToggleButton Name="ExpandInputDevices"
                                           Grid.Row="6"
