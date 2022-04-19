@@ -17,6 +17,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using WebRtcVadSharp;
 using WPFCustomMessageBox;
 using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
@@ -68,6 +69,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
         private readonly AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
+
+        private WebRtcVad _voxDectection;
 
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
@@ -125,6 +128,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _micInputQueue.Clear();
 
                 InitMixers();
+
+                InitVox();
 
                 InitAudioBuffers();
 
@@ -283,6 +288,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
             Logger.Error("Recording Stopped");
@@ -324,6 +330,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                     try
                     {
+
+                        var pcmBytes = new byte[pcmShort.Length * 2];
+                        Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+
+                        //check for voice before any pre-processing
+                        bool voice = DoesFrameContainSpeech(pcmBytes);
+
                         //volume boost pre
                         for (var i = 0; i < pcmShort.Length; i++)
                         {
@@ -346,8 +359,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         //convert to dB
                         MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
 
-                        var pcmBytes = new byte[pcmShort.Length * 2];
+                        //copy and overwrite with new PCM data post processing
                         Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+
 
                         //encode as opus bytes
                         int len;
@@ -361,7 +375,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            var clientAudio = _udpVoiceHandler.Send(encoded, len);                         
+                            var clientAudio = _udpVoiceHandler.Send(encoded, len, voice);                         
 
                             // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
 
@@ -470,6 +484,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         {
             _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
             _clientAudioMixer.ReadFully = true;
+        }
+
+        private void InitVox()
+        {
+            //TODO make the operating mode configurable
+            _voxDectection = new WebRtcVad
+            {
+                SampleRate = SampleRate.Is16kHz,
+                FrameLength = FrameLength.Is20ms,
+                OperatingMode = OperatingMode.VeryAggressive
+            };
         }
 
         private void InitAudioBuffers()
@@ -708,6 +733,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _wasapiCapture?.Dispose();
                 _wasapiCapture = null;
 
+                _voxDectection?.Dispose();
+                _voxDectection = null;
+
                 _resampler?.Dispose(true);
                 _resampler = null;
 
@@ -793,6 +821,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 Logger.Error(ex, "Error removing client input");
             }
+        }
+
+        bool DoesFrameContainSpeech(byte[] audioFrame)
+        {
+            byte[] first = new byte[audioFrame.Length / 2];
+            byte[] second = new byte[audioFrame.Length / 2];
+
+            Buffer.BlockCopy(audioFrame,0,first,0,first.Length);
+            Buffer.BlockCopy(audioFrame, first.Length, second, 0, first.Length);
+
+            //frame size is 40 - this only supports 20
+            return _voxDectection.HasSpeech(first) || _voxDectection.HasSpeech(second);
         }
     }
 }

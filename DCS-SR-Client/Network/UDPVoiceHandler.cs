@@ -870,7 +870,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
-        private List<RadioInformation> PTTPressed(out int sendingOn)
+        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice)
         {
             sendingOn = -1;
             if (_clientStateSingleton.InhibitTX.InhibitTX)
@@ -960,7 +960,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return transmittingRadios;
         }
 
-        public ClientAudio Send(byte[] bytes, int len)
+        public ClientAudio Send(byte[] bytes, int len, bool voice)
         {
             // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
             List<RadioInformation> transmittingRadios;
@@ -971,7 +971,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
                 && _audioInputSingleton.MicrophoneAvailable
                 && (bytes != null)
-                && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
+                && (transmittingRadios = PTTPressed(out sendingOn, voice)).Count >0 )
                 //can only send if DCS is connected
             {
                 try
@@ -1026,8 +1026,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
 
-                        _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
+                        if (transmittingRadios.Count == 1 && sendingOn == 0)
+                        {
+                            var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
+                            if (radioInfo.intercomHotMic && voice) //check for PTT ?
+                            {
+                                //only send if PTT is held or (hotmic is true AND voice) or (hotmic is true and 
+                            }
+                        }
+                        else
+                        {
+                            //if we're hot hot mic dont send?
+                            _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
+                        }
+                        
                         var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
 
                         //not sending or really quickly switched sending
@@ -1046,6 +1059,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             LastSentAt = DateTime.Now.Ticks,
                             SendingOn = sendingOn
                         };
+
                         var send = new ClientAudio()
                         {
                             Frequency = frequencies[0], Modulation = modulations[0],
