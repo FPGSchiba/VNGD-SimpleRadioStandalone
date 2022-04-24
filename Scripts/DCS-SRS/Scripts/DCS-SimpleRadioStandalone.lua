@@ -681,11 +681,21 @@ function SR.exportRadioAH64D(_data)
         local _device = GetDevice(0)
 
         if _device then
+            -- Desyncs for some reason - only turn up SENS
+            
             _device:set_argument_value(345, 1.0) -- Pilot SENS
-            _device:set_argument_value(344, 1.0) -- Pilot Master
-            -- Desyncs for some reason
---             _device:set_argument_value(386, 1.0) -- Gunner SENS
+           -- _device:set_argument_value(344, 1.0) -- Pilot Master
+
+
+ 
+             _device:set_argument_value(386, 1.0) -- Gunner SENS
 --             _device:set_argument_value(385, 1.0) -- Gunner Master
+
+         --   GetDevice(62):performClickableAction(11, 1)
+         --   GetDevice(62):performClickableAction(12, 1)
+         --   GetDevice(63):performClickableAction(11, 1)
+         --   GetDevice(63):performClickableAction(12, 1)
+
         end
     end
 
