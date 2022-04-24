@@ -1534,7 +1534,6 @@ function SR.exportRadioSA342(_data)
         _data.radios[1].modulation = 2 --Special intercom modulation
         _data.radios[1].volume = 1.0
         _data.radios[1].volMode = 1
-        _data.radios[1].simul = true
 
         _data.radios[2].name = "TRAP 138A"
         local MHZ = 1000000
@@ -4388,13 +4387,37 @@ function SR.exportRadioF14(_data)
     _data.radios[3].enc = ICS_device:is_arc182_encrypted()
     _data.radios[3].encMode = 2
 
+    local _seat = SR.lastKnownSeat
+
+ --   RADIO_ICS_Func_RIO = 402,
+--   RADIO_ICS_Func_Pilot = 2044,
+    
+    local _hotMic = false
+    if _seat == 0 then
+        if SR.getButtonPosition(2044) > -1 then
+            _hotMic = true
+        end
+
+    else
+        if SR.getButtonPosition(402) > -1 then
+            _hotMic = true
+        end
+     end
+
+    _data.intercomHotMic = _hotMic 
+
     if (ARC182_ptt) then
         _data.selected = 2 -- radios[3] ARC-182
         _data.ptt = true
     elseif (ARC159_ptt) then
         _data.selected = 1 -- radios[2] ARC-159
         _data.ptt = true
-    elseif (intercom_transmit) then
+    elseif (intercom_transmit and not _hotMic) then
+
+        -- CHECK ICS Function Selector
+        -- If not set to HOT MIC - switch radios and PTT
+        -- if set to hot mic - dont switch and ignore
+        
         _data.selected = 0 -- radios[1] intercom
         _data.ptt = true
     else
@@ -4413,8 +4436,6 @@ function SR.exportRadioF14(_data)
 
     end
 
-
-    -- _data.intercomHotMic = true  --402 for the hotmic switch
     _data.control = 1 -- full radio
 
     -- Handle transponder
