@@ -93,7 +93,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RecordAudio,
         SingleFileMixdown,
         RecordingQuality,
-        DisallowedAudioTone
+        DisallowedAudioTone,
+        VOX,
+        VOXMode,
+        VOXMinimumTime,
     }
 
     public enum InputBinding
@@ -457,6 +460,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.SingleFileMixdown.ToString(), "false" },
             {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" },
             {GlobalSettingsKeys.DisallowedAudioTone.ToString(), "false"},
+
+            //TODO expose these
+            {GlobalSettingsKeys.VOX.ToString(), "true" },
+            {GlobalSettingsKeys.VOXMode.ToString(), "0" },
+            {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
+
         };
 
         private readonly Dictionary<string, string[]> defaultArraySettings = new Dictionary<string, string[]>()
@@ -475,6 +484,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public int GetClientSettingInt(GlobalSettingsKeys key)
+        {
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (int)val;
+            }
+
+            var setting = GetSetting("Client Settings", key.ToString());
+            if (setting.RawValue.Length == 0)
+            {
+                return 0;
+            }
+            _settingsCache[key.ToString()] = setting.IntValue;
+            return setting.IntValue;
+        }
         public bool GetClientSettingBool(GlobalSettingsKeys key)
         {
             if (_settingsCache.TryGetValue(key.ToString(), out var val))
@@ -503,6 +527,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, bool value)
+        {
+            _settingsCache.TryRemove(key.ToString(), out _);
+            SetSetting("Client Settings", key.ToString(), value);
+        }
+
+        public void SetClientSetting(GlobalSettingsKeys key, int value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);

@@ -55,6 +55,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private readonly Queue<short> _micInputQueue = new Queue<short>(MIC_SEGMENT_FRAMES * 3);
 
+        //buffers intialised once for use repeatedly
+        short[] _pcmShort = new short[AudioManager.MIC_SEGMENT_FRAMES];
+        byte[] _pcmBytes = new byte[AudioManager.MIC_SEGMENT_FRAMES * 2];
+
         private float _speakerBoost = 1.0f;
         private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
@@ -296,6 +300,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         Stopwatch _stopwatch = new Stopwatch();
         // private WaveFileWriter _beforeWaveFile;
         // private WaveFileWriter _afterFileWriter;
+
+
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
         {
             if (_resampler == null)
@@ -321,51 +327,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //read out the queue
                 while (_micInputQueue.Count >= AudioManager.MIC_SEGMENT_FRAMES)
                 {
-                    short[] pcmShort  = new short[AudioManager.MIC_SEGMENT_FRAMES];
 
                     for (var i = 0; i < AudioManager.MIC_SEGMENT_FRAMES; i++)
                     {
-                        pcmShort[i] = _micInputQueue.Dequeue();
+                        _pcmShort[i] = _micInputQueue.Dequeue();
                     }
 
                     try
                     {
-
-                        var pcmBytes = new byte[pcmShort.Length * 2];
-                        Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+                        //ready for the buffer shortly
+                        
 
                         //check for voice before any pre-processing
-                        bool voice = DoesFrameContainSpeech(pcmBytes);
+                        bool voice = true;
 
+                        if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
+                        {
+                            Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
+                            voice = DoesFrameContainSpeech(_pcmBytes);
+                        }
+                        
                         //volume boost pre
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        for (var i = 0; i < _pcmShort.Length; i++)
                         {
                             // n.b. no clipping test going on here
-                            pcmShort[i] = (short)(pcmShort[i] * MicBoost);
+                            _pcmShort[i] = (short)(_pcmShort[i] * MicBoost);
                         }
 
                         //process with Speex
-                        _speex.Process(new ArraySegment<short>(pcmShort));
+                        _speex.Process(new ArraySegment<short>(_pcmShort));
 
                         float max = 0;
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        for (var i = 0; i < _pcmShort.Length; i++)
                         {
                             //determine peak
-                            if (pcmShort[i] > max)
+                            if (_pcmShort[i] > max)
                             {
-                                max = pcmShort[i];
+                                max = _pcmShort[i];
                             }
                         }
                         //convert to dB
                         MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
 
                         //copy and overwrite with new PCM data post processing
-                        Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+                        Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
 
 
                         //encode as opus bytes
                         int len;
-                        var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
+                        var buff = _encoder.Encode(_pcmBytes, _pcmBytes.Length, out len);
 
                         if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                         {
@@ -402,7 +412,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         }
                         else
                         {
-                            Logger.Error($"Invalid Bytes for Encoding - {pcmShort.Length} should be {MIC_SEGMENT_FRAMES} ");
+                            Logger.Error($"Invalid Bytes for Encoding - {_pcmShort.Length} should be {MIC_SEGMENT_FRAMES} ");
                         }
 
                         _errorCount = 0;
@@ -488,12 +498,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void InitVox()
         {
-            //TODO make the operating mode configurable
             _voxDectection = new WebRtcVad
             {
                 SampleRate = SampleRate.Is16kHz,
                 FrameLength = FrameLength.Is20ms,
-                OperatingMode = OperatingMode.VeryAggressive
+                OperatingMode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode)
             };
         }
 
@@ -831,8 +840,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             Buffer.BlockCopy(audioFrame,0,first,0,first.Length);
             Buffer.BlockCopy(audioFrame, first.Length, second, 0, first.Length);
 
+            _voxDectection.OperatingMode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode); 
+
             //frame size is 40 - this only supports 20
             return _voxDectection.HasSpeech(first) || _voxDectection.HasSpeech(second);
+
+            //TODO Expose VOX, VOXMode and VOXMinimumTime in SRS settings
         }
     }
 }

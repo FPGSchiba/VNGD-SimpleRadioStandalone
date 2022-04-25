@@ -61,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastPTTPress; // to handle dodgy PTT - release time
         private long _firstPTTPress; // to delay start PTT time
 
+        private long _lastVOXSend;
+
         private volatile bool _intercomPtt;
 
         private volatile bool _ready;
@@ -889,16 +891,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
             if ((radioInfo.intercomHotMic
-                && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT
-                && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
+                 && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
                 || _intercomPtt)
             {
                 if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
                 {
+
                     var intercom = new List<RadioInformation>();
                     intercom.Add(radioInfo.radios[0]);
                     sendingOn = 0;
-                    return intercom;
+
+                    //check if hot mic ONLY activation
+                    if (radioInfo.intercomHotMic && voice)
+                    {
+                        //only send on hotmic and voice 
+                        //voice is always true is voice detection is disabled
+                        //now check for lastHotmicVoice
+                        _lastVOXSend = DateTime.Now.Ticks;
+
+                    }
+                    else if (radioInfo.intercomHotMic && !voice)
+                    {
+                        TimeSpan lastVOXSendDiff = new TimeSpan(DateTime.Now.Ticks - _lastVOXSend);
+                        if (lastVOXSendDiff.TotalMilliseconds < _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime))
+                        {
+                            return intercom;
+                        }
+
+                        //VOX no longer detected
+                        return null;
+
+                    }
+                    else
+                    {
+                        return intercom;
+                    }
                 }
             }
 
@@ -1025,21 +1052,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         };
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
-
-                        if (transmittingRadios.Count == 1 && sendingOn == 0)
-                        {
-                            var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-                            if (radioInfo.intercomHotMic && voice) //check for PTT ?
-                            {
-                                //only send if PTT is held or (hotmic is true AND voice) or (hotmic is true and 
-                            }
-                        }
-                        else
-                        {
-                            //if we're hot hot mic dont send?
-                            _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
-                        }
+                        _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
                         
                         var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
 
