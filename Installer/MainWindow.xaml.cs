@@ -1156,11 +1156,6 @@ namespace Installer
         {
             if (!Directory.Exists(path))
             {
-                var sid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
-
-                // Create the rules
-                var writerule = new FileSystemAccessRule(sid, FileSystemRights.Write, AccessControlType.Allow);
-
                 var dir = Directory.CreateDirectory(path);
 
                 dir.Refresh();
@@ -1168,12 +1163,21 @@ namespace Installer
                 Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
 
                 var dSecurity = dir.GetAccessControl();
-                dSecurity.AddAccessRule(new FileSystemAccessRule(
-                    new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl,
-                    InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
-                    PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                if (WindowsIdentity.GetCurrent().Owner != null)
+                {
+                    dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Owner, FileSystemRights.Modify,
+                        InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                        PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                }
+                if (WindowsIdentity.GetCurrent().User != null)
+                {
+                    dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().User, FileSystemRights.Modify,
+                        InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                        PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                }
                 dir.SetAccessControl(dSecurity);
                 dir.Refresh();
+
             }
 
             //sometimes it says directory created and its not!
