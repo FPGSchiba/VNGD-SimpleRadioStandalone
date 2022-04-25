@@ -1756,8 +1756,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             InputManager.InitDevices();
             MessageBox.Show(this,
-                "Input Devices Rescanned",
-                "New input devices can now be used.",
+                "Controller Input Devices Rescanned",
+                "New controller input devices can now be used.",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
