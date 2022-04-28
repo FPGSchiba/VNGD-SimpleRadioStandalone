@@ -908,7 +908,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         //voice is always true is voice detection is disabled
                         //now check for lastHotmicVoice
                         _lastVOXSend = DateTime.Now.Ticks;
-
+                        return intercom;
                     }
                     else if (radioInfo.intercomHotMic && !voice)
                     {
@@ -919,7 +919,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         }
 
                         //VOX no longer detected
-                        return null;
+                        return new List<RadioInformation>();
 
                     }
                     else

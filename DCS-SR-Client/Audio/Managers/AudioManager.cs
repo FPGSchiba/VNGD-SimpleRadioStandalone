@@ -498,6 +498,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void InitVox()
         {
+            if (_voxDectection != null)
+            {
+                _voxDectection.Dispose();
+                _voxDectection = null;
+            }
+
             _voxDectection = new WebRtcVad
             {
                 SampleRate = SampleRate.Is16kHz,
@@ -839,11 +845,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         byte[] tempBuffferSecond20ms = new byte[MIC_SEGMENT_FRAMES];
         bool DoesFrameContainSpeech(byte[] audioFrame)
         {
-            Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0,tempBuffferFirst20ms.Length);
-            Buffer.BlockCopy(audioFrame, tempBuffferFirst20ms.Length, tempBuffferSecond20ms, 0, tempBuffferFirst20ms.Length);
+            Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0, MIC_SEGMENT_FRAMES);
+            Buffer.BlockCopy(audioFrame, MIC_SEGMENT_FRAMES, tempBuffferSecond20ms, 0, MIC_SEGMENT_FRAMES);
 
-            _voxDectection.OperatingMode =
-                (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
+            OperatingMode mode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
+
+            if (_voxDectection.OperatingMode != mode)
+            {
+                InitVox();
+            }
 
             //frame size is 40 - this only supports 20
             return _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
