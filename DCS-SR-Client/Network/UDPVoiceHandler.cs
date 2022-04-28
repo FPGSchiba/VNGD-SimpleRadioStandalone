@@ -61,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastPTTPress; // to handle dodgy PTT - release time
         private long _firstPTTPress; // to delay start PTT time
 
+        private long _lastVOXSend;
+
         private volatile bool _intercomPtt;
 
         private volatile bool _ready;
@@ -870,7 +872,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
-        private List<RadioInformation> PTTPressed(out int sendingOn)
+        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice)
         {
             sendingOn = -1;
             if (_clientStateSingleton.InhibitTX.InhibitTX)
@@ -889,16 +891,41 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
             if ((radioInfo.intercomHotMic
-                && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT
-                && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
+                 && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
                 || _intercomPtt)
             {
                 if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
                 {
+
                     var intercom = new List<RadioInformation>();
                     intercom.Add(radioInfo.radios[0]);
                     sendingOn = 0;
-                    return intercom;
+
+                    //check if hot mic ONLY activation
+                    if (radioInfo.intercomHotMic && voice)
+                    {
+                        //only send on hotmic and voice 
+                        //voice is always true is voice detection is disabled
+                        //now check for lastHotmicVoice
+                        _lastVOXSend = DateTime.Now.Ticks;
+                        return intercom;
+                    }
+                    else if (radioInfo.intercomHotMic && !voice)
+                    {
+                        TimeSpan lastVOXSendDiff = new TimeSpan(DateTime.Now.Ticks - _lastVOXSend);
+                        if (lastVOXSendDiff.TotalMilliseconds < _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime))
+                        {
+                            return intercom;
+                        }
+
+                        //VOX no longer detected
+                        return new List<RadioInformation>();
+
+                    }
+                    else
+                    {
+                        return intercom;
+                    }
                 }
             }
 
@@ -960,7 +987,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return transmittingRadios;
         }
 
-        public ClientAudio Send(byte[] bytes, int len)
+        public ClientAudio Send(byte[] bytes, int len, bool voice)
         {
             // List of radios the transmission is sent to (can me multiple if simultaneous transmission is enabled)
             List<RadioInformation> transmittingRadios;
@@ -971,7 +998,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()
                 && _audioInputSingleton.MicrophoneAvailable
                 && (bytes != null)
-                && (transmittingRadios = PTTPressed(out sendingOn)).Count >0 )
+                && (transmittingRadios = PTTPressed(out sendingOn, voice)).Count >0 )
                 //can only send if DCS is connected
             {
                 try
@@ -1025,9 +1052,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         };
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
-
                         _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
-
+                        
                         var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
 
                         //not sending or really quickly switched sending
@@ -1046,6 +1072,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             LastSentAt = DateTime.Now.Ticks,
                             SendingOn = sendingOn
                         };
+
                         var send = new ClientAudio()
                         {
                             Frequency = frequencies[0], Modulation = modulations[0],

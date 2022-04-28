@@ -17,6 +17,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using WebRtcVadSharp;
 using WPFCustomMessageBox;
 using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
@@ -54,6 +55,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private readonly Queue<short> _micInputQueue = new Queue<short>(MIC_SEGMENT_FRAMES * 3);
 
+        //buffers intialised once for use repeatedly
+        short[] _pcmShort = new short[AudioManager.MIC_SEGMENT_FRAMES];
+        byte[] _pcmBytes = new byte[AudioManager.MIC_SEGMENT_FRAMES * 2];
+
         private float _speakerBoost = 1.0f;
         private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
@@ -68,6 +73,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
         private readonly AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
+
+        private WebRtcVad _voxDectection;
 
         private WasapiOut _micWaveOut;
         private BufferedWaveProvider _micWaveOutBuffer;
@@ -125,6 +132,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _micInputQueue.Clear();
 
                 InitMixers();
+
+                InitVox();
 
                 InitAudioBuffers();
 
@@ -283,6 +292,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
             Logger.Error("Recording Stopped");
@@ -290,6 +300,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         Stopwatch _stopwatch = new Stopwatch();
         // private WaveFileWriter _beforeWaveFile;
         // private WaveFileWriter _afterFileWriter;
+
+
         private void WasapiCaptureOnDataAvailable(object sender, WaveInEventArgs e)
         {
             if (_resampler == null)
@@ -315,43 +327,55 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //read out the queue
                 while (_micInputQueue.Count >= AudioManager.MIC_SEGMENT_FRAMES)
                 {
-                    short[] pcmShort  = new short[AudioManager.MIC_SEGMENT_FRAMES];
 
                     for (var i = 0; i < AudioManager.MIC_SEGMENT_FRAMES; i++)
                     {
-                        pcmShort[i] = _micInputQueue.Dequeue();
+                        _pcmShort[i] = _micInputQueue.Dequeue();
                     }
 
                     try
                     {
+                        //ready for the buffer shortly
+                        
+
+                        //check for voice before any pre-processing
+                        bool voice = true;
+
+                        if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
+                        {
+                            Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
+                            voice = DoesFrameContainSpeech(_pcmBytes);
+                        }
+                        
                         //volume boost pre
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        for (var i = 0; i < _pcmShort.Length; i++)
                         {
                             // n.b. no clipping test going on here
-                            pcmShort[i] = (short)(pcmShort[i] * MicBoost);
+                            _pcmShort[i] = (short)(_pcmShort[i] * MicBoost);
                         }
 
                         //process with Speex
-                        _speex.Process(new ArraySegment<short>(pcmShort));
+                        _speex.Process(new ArraySegment<short>(_pcmShort));
 
                         float max = 0;
-                        for (var i = 0; i < pcmShort.Length; i++)
+                        for (var i = 0; i < _pcmShort.Length; i++)
                         {
                             //determine peak
-                            if (pcmShort[i] > max)
+                            if (_pcmShort[i] > max)
                             {
-                                max = pcmShort[i];
+                                max = _pcmShort[i];
                             }
                         }
                         //convert to dB
                         MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
 
-                        var pcmBytes = new byte[pcmShort.Length * 2];
-                        Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);
+                        //copy and overwrite with new PCM data post processing
+                        Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
+
 
                         //encode as opus bytes
                         int len;
-                        var buff = _encoder.Encode(pcmBytes, pcmBytes.Length, out len);
+                        var buff = _encoder.Encode(_pcmBytes, _pcmBytes.Length, out len);
 
                         if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                         {
@@ -361,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                             Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            var clientAudio = _udpVoiceHandler.Send(encoded, len);                         
+                            var clientAudio = _udpVoiceHandler.Send(encoded, len, voice);                         
 
                             // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
 
@@ -388,7 +412,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                         }
                         else
                         {
-                            Logger.Error($"Invalid Bytes for Encoding - {pcmShort.Length} should be {MIC_SEGMENT_FRAMES} ");
+                            Logger.Error($"Invalid Bytes for Encoding - {_pcmShort.Length} should be {MIC_SEGMENT_FRAMES} ");
                         }
 
                         _errorCount = 0;
@@ -470,6 +494,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         {
             _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
             _clientAudioMixer.ReadFully = true;
+        }
+
+        private void InitVox()
+        {
+            if (_voxDectection != null)
+            {
+                _voxDectection.Dispose();
+                _voxDectection = null;
+            }
+
+            _voxDectection = new WebRtcVad
+            {
+                SampleRate = SampleRate.Is16kHz,
+                FrameLength = FrameLength.Is20ms,
+                OperatingMode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode)
+            };
         }
 
         private void InitAudioBuffers()
@@ -708,6 +748,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _wasapiCapture?.Dispose();
                 _wasapiCapture = null;
 
+                _voxDectection?.Dispose();
+                _voxDectection = null;
+
                 _resampler?.Dispose(true);
                 _resampler = null;
 
@@ -793,6 +836,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 Logger.Error(ex, "Error removing client input");
             }
+        }
+
+        //MIC SEGMENT FRAMES IS SHORTS not bytes - which is two bytes
+        //however we only want half of a frame IN BYTES not short - so its MIC_SEGMENT_FRAMES *2 (for bytes) then / 2 for bytes again
+        //declare here to save on garbage collection
+        byte[] tempBuffferFirst20ms = new byte[MIC_SEGMENT_FRAMES];
+        byte[] tempBuffferSecond20ms = new byte[MIC_SEGMENT_FRAMES];
+        bool DoesFrameContainSpeech(byte[] audioFrame)
+        {
+            Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0, MIC_SEGMENT_FRAMES);
+            Buffer.BlockCopy(audioFrame, MIC_SEGMENT_FRAMES, tempBuffferSecond20ms, 0, MIC_SEGMENT_FRAMES);
+
+            OperatingMode mode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
+
+            if (_voxDectection.OperatingMode != mode)
+            {
+                InitVox();
+            }
+
+            //frame size is 40 - this only supports 20
+            return _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
         }
     }
 }

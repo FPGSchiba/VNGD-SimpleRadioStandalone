@@ -218,8 +218,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             if(audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
             {
-                // catch own transmissions and prevent them from being added to JitterBuffer
-                return null;
+                // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough
+                if (passThrough)
+                {
+                    //return MONO PCM 16 as bytes
+                    return ConversionHelpers.ShortArrayToByteArray(audio.PcmAudioShort);
+                }
+                else
+                {
+                    return null;
+                }
+
             }
             else if (!passThrough)
             {

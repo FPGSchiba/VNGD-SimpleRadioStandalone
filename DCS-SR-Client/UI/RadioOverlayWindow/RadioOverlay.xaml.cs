@@ -38,6 +38,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly double _radioHeight;
 
+        private long _lastUnitId;
+
 
         public RadioOverlayWindow()
         {
@@ -100,13 +102,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
             Intercom.RepaintRadioStatus();
-
             TransponderPanel.RepaintTransponderStatus();
 
-           
-         
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
+                //reset when we switch planes
+                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
+                {
+                    _lastUnitId = dcsPlayerRadioInfo.unitId;
+                    ResetHeight();
+                }
+
                 var availableRadios = 0;
 
                 for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)

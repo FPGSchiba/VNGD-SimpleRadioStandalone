@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using SharpDX.DirectInput;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -44,7 +45,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
                     var button = devices[ControlInputBinding].Button;
-                    DeviceText.Text = button < 128 ? (button+1).ToString() : "POV " + (button - 127); //output POV info
+                    DeviceText.Text =
+                        GetDeviceText(button, devices[ControlInputBinding].DeviceName);
                     Device.Text = devices[ControlInputBinding].DeviceName;
                 }
                 else
@@ -56,8 +58,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (currentInputProfile.ContainsKey(ModifierBinding))
                 {
                     var button = devices[ModifierBinding].Button;
-                        ModifierText.Text = button < 128 ? (button + 1).ToString() : "POV " + (button - 127); //output POV info
-
+                    ModifierText.Text =
+                        GetDeviceText(button, devices[ModifierBinding].DeviceName);
                     ModifierDevice.Text = devices[ModifierBinding].DeviceName;
                 }
                 else
@@ -79,13 +81,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 DeviceButton.IsEnabled = true;
 
                 Device.Text = device.DeviceName;
-                DeviceText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
-                //output POV info;
+                DeviceText.Text = GetDeviceText(device.Button, device.DeviceName);
 
                 device.InputBind = ControlInputBinding;
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });
+        }
+
+        private string GetDeviceText(int button, string name)
+        {
+            if (name.ToLowerInvariant() == "keyboard")
+            {
+                try
+                {
+                    var key = (Key)button;
+                    return key.ToString();
+                }
+                catch { }
+
+            }
+            return button < 128 ? (button + 1).ToString() : "POV " + (button - 127);
         }
 
         private void DeviceClear_Click(object sender, RoutedEventArgs e)
@@ -107,9 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ModifierButton.IsEnabled = true;
 
                 ModifierDevice.Text = device.DeviceName;
-                ModifierText.Text = device.Button < 128 ? (device.Button + 1).ToString() : "POV " + (device.Button - 127);
-                //output POV info;
-
+                ModifierText.Text = GetDeviceText(device.Button, device.DeviceName);
                 device.InputBind = ModifierBinding;
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
