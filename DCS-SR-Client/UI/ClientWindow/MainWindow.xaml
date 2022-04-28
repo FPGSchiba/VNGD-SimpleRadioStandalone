@@ -1063,7 +1063,7 @@
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Voice Detection Sensitivity (recommended low)" />
+                                           Content="Voice Detection Sensitivity" />
 
                                     <StackPanel Grid.Row="5"
                                                 Grid.Column="1" Margin="10">
@@ -1079,6 +1079,7 @@
                                                 Maximum="3"
                                                 Value="0"
                                                 Minimum="0"
+                                                ToolTip="The higher the sensitivity the less likely voice will be missed, but the higher the chance of a false positive "
                                                 IsEnabled="False" />
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -1087,10 +1088,8 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" FontSize="10" Content="Low" HorizontalAlignment="Left" />
-                                            <Label Grid.Column="1" FontSize="10" Content="Medium" HorizontalAlignment="Center" />
-                                            <Label Grid.Column="2" FontSize="10" Content="High" HorizontalAlignment="Center" />
-                                            <Label Grid.Column="3" FontSize="10" Content="Very High" HorizontalAlignment="Right" />
+                                            <Label Grid.Column="0" FontSize="10" Content="Higher" HorizontalAlignment="Left" />
+                                            <Label Grid.Column="3" FontSize="10" Content="Lower" HorizontalAlignment="Right" />
                                         </Grid>
 
                                     </StackPanel>

@@ -462,7 +462,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.DisallowedAudioTone.ToString(), "false"},
 
             {GlobalSettingsKeys.VOX.ToString(), "false" },
-            {GlobalSettingsKeys.VOXMode.ToString(), "0" },
+            {GlobalSettingsKeys.VOXMode.ToString(), "3" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
 
         };
