@@ -205,6 +205,7 @@ namespace Installer
         {
             return File.Exists(_currentDirectory + "\\opus.dll") 
                    && File.Exists(_currentDirectory + "\\speexdsp.dll")
+                   && File.Exists(_currentDirectory + "\\WebRtcVad.dll")
                    && File.Exists(_currentDirectory + "\\libmp3lame.64.dll")
                    && File.Exists(_currentDirectory + "\\libmp3lame.32.dll")
                    && File.Exists(_currentDirectory + "\\awacs-radios.json")
@@ -524,8 +525,9 @@ namespace Installer
             if (Directory.Exists(programPath) && File.Exists(programPath + "\\SR-ClientRadio.exe"))
             {
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
-                DeleteFileIfExists(programPath + "\\opus.dll");
+                DeleteFileIfExists(programPath + "\\opus.dll"); 
                 DeleteFileIfExists(programPath + "\\speexdsp.dll");
+                DeleteFileIfExists(programPath + "\\WebRtcVad.dll");
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
                 DeleteFileIfExists(programPath + "\\SRS-AutoUpdater.exe");
                 DeleteFileIfExists(programPath + "\\SR-Server.exe");
@@ -565,6 +567,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\grpc_csharp_ext.x64.dll");
+                DeleteFileIfExists(programPath + "\\WebRtcVad.dll");
                 DeleteFileIfExists(programPath + "\\libmp3lame.32.dll");
                 DeleteFileIfExists(programPath + "\\libmp3lame.64.dll");
                 DeleteFileIfExists(programPath + "\\opus.dll");
@@ -644,6 +647,7 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\grpc_csharp_ext.x64.dll");
+                DeleteFileIfExists(programPath + "\\WebRtcVad.dll");
                 DeleteFileIfExists(programPath + "\\libmp3lame.32.dll");
                 DeleteFileIfExists(programPath + "\\libmp3lame.64.dll");
                 DeleteFileIfExists(programPath + "\\opus.dll");
@@ -928,6 +932,8 @@ namespace Installer
 
             File.Copy(_currentDirectory + "\\libmp3lame.32.dll", path + "\\libmp3lame.32.dll", true);
             File.Copy(_currentDirectory + "\\libmp3lame.64.dll", path + "\\libmp3lame.64.dll", true);
+
+            File.Copy(_currentDirectory + "\\libmp3lame.64.dll", path + "\\WebRtcVad.dll", true);
 
             Logger.Info($"Copying directories");
             DirectoryCopy(_currentDirectory+"\\AudioEffects", path+"\\AudioEffects");
