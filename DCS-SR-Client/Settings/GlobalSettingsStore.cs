@@ -461,8 +461,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RecordingQuality.ToString(), "V3" },
             {GlobalSettingsKeys.DisallowedAudioTone.ToString(), "false"},
 
-            //TODO expose these
-            {GlobalSettingsKeys.VOX.ToString(), "true" },
+            {GlobalSettingsKeys.VOX.ToString(), "false" },
             {GlobalSettingsKeys.VOXMode.ToString(), "0" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
 
@@ -621,6 +620,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 else if(setting is string[])
                 {
                     _configuration[section][key].StringValueArray = setting as string[];
+                }
+                else if (setting is int)
+                {
+                    _configuration[section][key].IntValue = (int)setting;
                 }
                 else
                 {

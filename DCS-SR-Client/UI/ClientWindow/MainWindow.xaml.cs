@@ -691,9 +691,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             DisallowedAudioTone.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone);
             RecordTransmissions_IsEnabled();
 
+            RecordingQuality.IsEnabled = false;
             RecordingQuality.ValueChanged += RecordingQuality_ValueChanged;
             RecordingQuality.Value = double.Parse(
                 _globalSettings.GetClientSetting(GlobalSettingsKeys.RecordingQuality).StringValue[1].ToString());
+            RecordingQuality.IsEnabled = true;
 
             var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
             if (objValue == null || (string)objValue == "TRUE")
@@ -704,6 +706,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 AllowAnonymousUsage.IsChecked = true;
             }
+
+            VOXEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX);
+
+            VOXMode.IsEnabled = false;
+            VOXMode.Value =
+                _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
+            VOXMode.ValueChanged += VOXMode_ValueChanged;
+            VOXMode.IsEnabled = true;
+
+            VOXMinimimumTXTime.IsEnabled = false;
+            VOXMinimimumTXTime.Value =
+                _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
+            VOXMinimimumTXTime.ValueChanged += VOXMinimumTime_ValueChanged;
+            VOXMinimimumTXTime.IsEnabled = true;
         }
 
         private void ReloadProfileSettings()
@@ -870,7 +886,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             HFEffectVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.HFNoiseVolume)
                                     / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             HFEffectVolume.IsEnabled = true;
-
         }
 
         private void Connect()
@@ -2021,5 +2036,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.DisallowedAudioTone, (bool)DisallowedAudioTone.IsChecked);
         }
+
+        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, (bool)VOXEnabled.IsChecked);
+        }
+
+        private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if(VOXMode.IsEnabled)
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMode, (int)e.NewValue);
+        }
+
+        private void VOXMinimumTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (VOXMinimimumTXTime.IsEnabled)
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
+        }
+
     }
 }

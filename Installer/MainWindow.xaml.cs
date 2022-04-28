@@ -205,8 +205,11 @@ namespace Installer
         {
             return File.Exists(_currentDirectory + "\\opus.dll") 
                    && File.Exists(_currentDirectory + "\\speexdsp.dll")
+                   && File.Exists(_currentDirectory + "\\libmp3lame.64.dll")
+                   && File.Exists(_currentDirectory + "\\libmp3lame.32.dll")
                    && File.Exists(_currentDirectory + "\\awacs-radios.json")
-                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")&& File.Exists(_currentDirectory + "\\Scripts\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua");
+                   && File.Exists(_currentDirectory + "\\SR-ClientRadio.exe")
+                   && File.Exists(_currentDirectory + "\\Scripts\\DCS-SRS\\Scripts\\DCS-SimpleRadioStandalone.lua");
         }
 
 
@@ -528,6 +531,8 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\SR-Server.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\grpc_csharp_ext.x64.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.32.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.64.dll");
                 DeleteFileIfExists(programPath + "\\DCS-SimpleRadioStandalone.lua");
                 DeleteFileIfExists(programPath + "\\DCS-SRSGameGUI.lua");
                 DeleteFileIfExists(programPath + "\\DCS-SRS-AutoConnectGameGUI.lua");
@@ -560,6 +565,8 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\grpc_csharp_ext.x64.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.32.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.64.dll");
                 DeleteFileIfExists(programPath + "\\opus.dll");
                 DeleteFileIfExists(programPath + "\\speexdsp.dll");
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
@@ -637,6 +644,8 @@ namespace Installer
                 DeleteFileIfExists(programPath + "\\SR-ClientRadio.exe");
                 DeleteFileIfExists(programPath + "\\DCS-SR-ExternalAudio.exe");
                 DeleteFileIfExists(programPath + "\\grpc_csharp_ext.x64.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.32.dll");
+                DeleteFileIfExists(programPath + "\\libmp3lame.64.dll");
                 DeleteFileIfExists(programPath + "\\opus.dll");
                 DeleteFileIfExists(programPath + "\\speexdsp.dll");
                 DeleteFileIfExists(programPath + "\\awacs-radios.json");
@@ -916,7 +925,9 @@ namespace Installer
             File.Copy(_currentDirectory + "\\SR-Server.exe", path + "\\SR-Server.exe", true);
             File.Copy(_currentDirectory + "\\SRS-AutoUpdater.exe", path + "\\SRS-AutoUpdater.exe", true);
             File.Copy(_currentDirectory + "\\DCS-SR-ExternalAudio.exe", path + "\\DCS-SR-ExternalAudio.exe", true);
-            File.Copy(_currentDirectory + "\\grpc_csharp_ext.x64.dll", path + "\\grpc_csharp_ext.x64.dll", true);
+
+            File.Copy(_currentDirectory + "\\libmp3lame.32.dll", path + "\\libmp3lame.32.dll", true);
+            File.Copy(_currentDirectory + "\\libmp3lame.64.dll", path + "\\libmp3lame.64.dll", true);
 
             Logger.Info($"Copying directories");
             DirectoryCopy(_currentDirectory+"\\AudioEffects", path+"\\AudioEffects");

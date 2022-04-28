@@ -832,20 +832,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
+        //MIC SEGMENT FRAMES IS SHORTS not bytes - which is two bytes
+        //however we only want half of a frame IN BYTES not short - so its MIC_SEGMENT_FRAMES *2 (for bytes) then / 2 for bytes again
+        //declare here to save on garbage collection
+        byte[] tempBuffferFirst20ms = new byte[MIC_SEGMENT_FRAMES];
+        byte[] tempBuffferSecond20ms = new byte[MIC_SEGMENT_FRAMES];
         bool DoesFrameContainSpeech(byte[] audioFrame)
         {
-            byte[] first = new byte[audioFrame.Length / 2];
-            byte[] second = new byte[audioFrame.Length / 2];
+            Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0,tempBuffferFirst20ms.Length);
+            Buffer.BlockCopy(audioFrame, tempBuffferFirst20ms.Length, tempBuffferSecond20ms, 0, tempBuffferFirst20ms.Length);
 
-            Buffer.BlockCopy(audioFrame,0,first,0,first.Length);
-            Buffer.BlockCopy(audioFrame, first.Length, second, 0, first.Length);
-
-            _voxDectection.OperatingMode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode); 
+            _voxDectection.OperatingMode =
+                (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
 
             //frame size is 40 - this only supports 20
-            return _voxDectection.HasSpeech(first) || _voxDectection.HasSpeech(second);
-
-            //TODO Expose VOX, VOXMode and VOXMinimumTime in SRS settings
+            return _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
         }
     }
 }
