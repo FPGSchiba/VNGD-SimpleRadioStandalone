@@ -891,7 +891,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
             if ((radioInfo.intercomHotMic
-                 && radioInfo.selected != 0 && !_ptt && !radioInfo.ptt)
+                 && radioInfo.selected != 0 
+                 && !_ptt 
+                 && !radioInfo.ptt
+                 && radioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.IN_COCKPIT)
                 || _intercomPtt)
             {
                 if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)

@@ -1099,7 +1099,7 @@
                                    Grid.Column="0"
                                    HorizontalContentAlignment="Center"
                                    VerticalContentAlignment="Center"
-                                   Content="Use Voice Detection (VOX) on Hot Mic" />
+                                   Content="Use Voice Detection (VOX) on Intercom Hot Mic" />
 
                                     <ToggleButton Name="VOXEnabled"
                                           Grid.Row="6"
