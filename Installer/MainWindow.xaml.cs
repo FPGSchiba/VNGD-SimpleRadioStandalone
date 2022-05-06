@@ -933,6 +933,9 @@ namespace Installer
             File.Copy(_currentDirectory + "\\libmp3lame.32.dll", path + "\\libmp3lame.32.dll", true);
             File.Copy(_currentDirectory + "\\libmp3lame.64.dll", path + "\\libmp3lame.64.dll", true);
 
+            File.Copy(_currentDirectory + "\\grpc_csharp_ext.x64.dlll", path + "\\grpc_csharp_ext.x64.dll", true);
+            
+
             File.Copy(_currentDirectory + "\\WebRtcVad.dll", path + "\\WebRtcVad.dll", true);
 
             Logger.Info($"Copying directories");
