@@ -678,25 +678,13 @@ function SR.exportRadioAH64D(_data)
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
         -- New aircraft; SENS volume is at 0
-        local _device = GetDevice(0)
+        
+            -- source https://github.com/DCSFlightpanels/dcs-bios/blob/master/Scripts/DCS-BIOS/lib/AH-64D.lua
+            GetDevice(63):performClickableAction(3011, 1) -- Pilot Master
+            GetDevice(63):performClickableAction(3012, 1) -- Pilot SENS
 
-        if _device then
-            -- Desyncs for some reason - only turn up SENS
-            
-            _device:set_argument_value(345, 1.0) -- Pilot SENS
-           -- _device:set_argument_value(344, 1.0) -- Pilot Master
-
-
- 
-             _device:set_argument_value(386, 1.0) -- Gunner SENS
---             _device:set_argument_value(385, 1.0) -- Gunner Master
-
-         --   GetDevice(62):performClickableAction(11, 1)
-         --   GetDevice(62):performClickableAction(12, 1)
-         --   GetDevice(63):performClickableAction(11, 1)
-         --   GetDevice(63):performClickableAction(12, 1)
-
-        end
+            GetDevice(62):performClickableAction(3011, 1) -- CoPilot Master
+            GetDevice(62):performClickableAction(3012, 1) -- CoPilot SENS
     end
 
     _data.radios[1].name = "Intercom"
