@@ -55,7 +55,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             new Guid("205603eb-0000-0000-0000-504944564944"), // VPC Throttle
             new Guid("205503eb-0000-0000-0000-504944564944"),  // VPC Throttle
             new Guid("82c43344-0000-0000-0000-504944564944"),  //  LEFT VPC Rotor TCS
-            new Guid("c2ab046d-0000-0000-0000-504944564944")  // Logitech G13 Joystick
+            new Guid("c2ab046d-0000-0000-0000-504944564944"),  // Logitech G13 Joystick
+            new Guid("aaaa3344-0000-0000-0000-504944564944") //K51, it uses VPC board
             
 
         };
@@ -649,11 +650,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         //run on main
                         Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false); });
+                            () => { _toggleOverlayCallback(false,false); });
+                        break;
+                    }
+                    else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.AwacsOverlayToggle)
+                    {
+                        //run on main
+                        Application.Current.Dispatcher.Invoke(
+                            () => { _toggleOverlayCallback(false, true); });
                         break;
                     }
                     else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                             (int)bindState.MainDevice.InputBind <= (int)InputBinding.IntercomPTT)
+                             (int)bindState.MainDevice.InputBind <= (int)InputBinding.AwacsOverlayToggle)
                     {
                         if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
                         {
@@ -862,7 +870,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.IntercomPTT; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.AwacsOverlayToggle; i++)
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {

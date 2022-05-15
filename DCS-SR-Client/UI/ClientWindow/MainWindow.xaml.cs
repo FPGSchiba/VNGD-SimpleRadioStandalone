@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         public delegate void ReceivedAutoConnect(string address, int port);
 
-        public delegate void ToggleOverlayCallback(bool uiButton);
+        public delegate void ToggleOverlayCallback(bool uiButton, bool awacs);
 
         private readonly AudioManager _audioManager;
 
@@ -377,6 +377,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
 
+            AwacsOverlayToggle.InputName = "Awacs Toggle";
+            AwacsOverlayToggle.ControlInputBinding = InputBinding.AwacsOverlayToggle;
+            AwacsOverlayToggle.InputDeviceManager = InputManager;
+
             Radio4.InputName = "Radio 4";
             Radio4.ControlInputBinding = InputBinding.Switch4;
             Radio4.InputDeviceManager = InputManager;
@@ -523,7 +527,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void OnIntercomStartTransmitEffectChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (RadioStartTransmitEffect.IsEnabled)
+            if (IntercomStartTransmitEffect.IsEnabled)
             {
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.IntercomTransmissionStartSelection, ((CachedAudioEffect)IntercomStartTransmitEffect.SelectedItem).FileName);
             }
@@ -531,7 +535,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void OnIntercomEndTransmitEffectChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (RadioEndTransmitEffect.IsEnabled)
+            if (IntercomEndTransmitEffect.IsEnabled)
             {
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.IntercomTransmissionEndSelection, ((CachedAudioEffect)IntercomEndTransmitEffect.SelectedItem).FileName);
             }
@@ -575,6 +579,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.LoadInputSettings();
             RadioVolumeUp.LoadInputSettings();
             RadioVolumeDown.LoadInputSettings();
+            AwacsOverlayToggle.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -720,6 +725,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
             VOXMinimimumTXTime.ValueChanged += VOXMinimumTime_ValueChanged;
             VOXMinimimumTXTime.IsEnabled = true;
+
+            VOXMinimumRMS.IsEnabled = false;
+            VOXMinimumRMS.Value =
+                _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
+            VOXMinimumRMS.ValueChanged += VOXMinimumRMS_ValueChanged;
+            VOXMinimumRMS.IsEnabled = true;
         }
 
         private void ReloadProfileSettings()
@@ -1332,36 +1343,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true);
+            ToggleOverlay(true, false);
         }
 
-        private void ToggleOverlay(bool uiButton)
+        private void ToggleOverlay(bool uiButton, bool awacs)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
             if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
             {
                 _toggleShowHide = DateTime.Now.Ticks;
-                if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
-                    (_radioOverlayWindow.WindowState == WindowState.Minimized))
+
+                if (awacs)
                 {
-                    //hide awacs panel
-                    _awacsRadioOverlay?.Close();
-                    _awacsRadioOverlay = null;
-
-                    _radioOverlayWindow?.Close();
-
-                    _radioOverlayWindow = new Overlay.RadioOverlayWindow();
-
-
-                    _radioOverlayWindow.ShowInTaskbar =
-                        !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                    _radioOverlayWindow.Show();
+                    ShowAwacsOverlay_OnClick(null, null);
                 }
                 else
                 {
-                    _radioOverlayWindow?.Close();
-                    _radioOverlayWindow = null;
+                    if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
+                        (_radioOverlayWindow.WindowState == WindowState.Minimized))
+                    {
+                        //hide awacs panel
+                        _awacsRadioOverlay?.Close();
+                        _awacsRadioOverlay = null;
+
+                        _radioOverlayWindow?.Close();
+
+                        _radioOverlayWindow = new Overlay.RadioOverlayWindow();
+
+
+                        _radioOverlayWindow.ShowInTaskbar =
+                            !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                        _radioOverlayWindow.Show();
+                    }
+                    else
+                    {
+                        _radioOverlayWindow?.Close();
+                        _radioOverlayWindow = null;
+                    }
                 }
+                
             }
         }
 
@@ -1618,7 +1638,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but may cause issues with other devices being detected",
+                "You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but WILL LIKELY cause issues with other devices being detected. \n\nUse SRS Device Listing (see Discord) instead to enable the missing device\n\nDo not turn on unless you know what you're doing :) ",
                 "Restart SimpleRadio Standalone", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
@@ -2052,6 +2072,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (VOXMinimimumTXTime.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
+        }
+
+        private void VOXMinimumRMS_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (VOXMinimumRMS.IsEnabled)
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
         }
 
     }

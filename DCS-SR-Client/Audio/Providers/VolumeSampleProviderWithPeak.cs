@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using NAudio.Wave;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
@@ -36,9 +37,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
             get { return source.WaveFormat; }
         }
 
-        private int count = 0;
-        private float lastPeak = 0;
-
         /// <summary>
         /// Reads samples from this sample provider
         /// </summary>
@@ -66,24 +64,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 }
 
                 buffer[offset + n] = sample;
-
-                if (sample > lastPeak)
-                {
-                    lastPeak = sample;
-                }
             }
 
-            if (count > 8)
-            {
-                _samplePeak(lastPeak);
-                count = 0;
-                lastPeak = 0;
-            }
-            else
-            {
-                count++;
-            }
-
+            _samplePeak((float)VolumeConversionHelper.CalculateRMS(buffer, offset, sampleCount));
 
             return samplesRead;
         }

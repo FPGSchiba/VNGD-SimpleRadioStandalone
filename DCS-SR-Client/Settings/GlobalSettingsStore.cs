@@ -97,6 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         VOX,
         VOXMode,
         VOXMinimumTime,
+        VOXMinimumDB
     }
 
     public enum InputBinding
@@ -211,6 +212,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         IntercomPTT = 136,
         ModifierIntercomPTT = 236,
+
+        AwacsOverlayToggle = 137,
+        ModifierAwacsOverlayToggle = 237
     }
 
 
@@ -464,6 +468,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.VOX.ToString(), "false" },
             {GlobalSettingsKeys.VOXMode.ToString(), "3" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
+            {GlobalSettingsKeys.VOXMinimumDB.ToString(), "-59.0" },
 
         };
 
@@ -497,6 +502,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             _settingsCache[key.ToString()] = setting.IntValue;
             return setting.IntValue;
+        }
+
+        public double GetClientSettingDouble(GlobalSettingsKeys key)
+        {
+            if (_settingsCache.TryGetValue(key.ToString(), out var val))
+            {
+                return (double)val;
+            }
+
+            var setting = GetSetting("Client Settings", key.ToString());
+            if (setting.RawValue.Length == 0)
+            {
+                return 0D;
+            }
+            _settingsCache[key.ToString()] = setting.DoubleValue;
+            return setting.DoubleValue;
         }
         public bool GetClientSettingBool(GlobalSettingsKeys key)
         {
@@ -532,6 +553,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, int value)
+        {
+            _settingsCache.TryRemove(key.ToString(), out _);
+            SetSetting("Client Settings", key.ToString(), value);
+        }
+
+        public void SetClientSetting(GlobalSettingsKeys key, double value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
             SetSetting("Client Settings", key.ToString(), value);
@@ -624,6 +651,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 else if (setting is int)
                 {
                     _configuration[section][key].IntValue = (int)setting;
+                }
+                else if (setting is double)
+                {
+                    _configuration[section][key].DoubleValue = (double)setting;
                 }
                 else
                 {

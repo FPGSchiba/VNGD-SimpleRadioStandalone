@@ -43,9 +43,9 @@
                                      Width="150"
                                      Height="20"
                                      Margin="10,10,0,0"
-                                     Value="-100"
-                                     Maximum="18"
-                                     Minimum="-100"
+                                     Value="-96.6"
+                                     Maximum="0"
+                                     Minimum="-96.6"
                                      ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
                     </StackPanel>
 
@@ -103,9 +103,9 @@
                                      Width="150"
                                      Height="20"
                                      Margin="10,10,0,0"
-                                     Value="-100"
-                                     Maximum="18"
-                                     Minimum="-100" />
+                                     Value="-96.6"
+                                     Maximum="0"
+                                     Minimum="-96.6" />
                     </StackPanel>
 
                     <StackPanel Margin="0"
@@ -340,6 +340,7 @@
                                     <ColumnDefinition Width="1*" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
@@ -613,8 +614,14 @@
                                                        ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
                                                        InputName="Radio Volume Down" />
 
+                            <local:InputBindingControl x:Name="AwacsOverlayToggle"
+                                                           Grid.Row="38"
+                                                           Grid.ColumnSpan="5"
+                                                           ControlInputBinding="{x:Static settings:InputBinding.AwacsOverlayToggle}"
+                                                           InputName="AWACS Overlay Toggle" />
 
-                            </Grid>
+
+                        </Grid>
 
                         </StackPanel>
                 </ScrollViewer>
@@ -898,7 +905,7 @@
                                 </Grid>
                             </GroupBox>
                            
-                            <GroupBox Header="Audio &amp; Input Devices">
+                            <GroupBox Header="Microphone">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="2*" />
@@ -915,34 +922,6 @@
                                         <RowDefinition />
 
                                     </Grid.RowDefinitions>
-
-                                    <Label Grid.Row="0"
-                                           Grid.Column="0"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Content="Allow More Controller Input Devices" />
-
-                                    <ToggleButton Name="ExpandInputDevices"
-                                          Grid.Row="0"
-                                          Grid.Column="1"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center"
-                                          Click="ExpandInputDevices_OnClick_Click">
-                                        <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}">
-                                                <Setter Property="Content" Value="ON" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter Property="Content" Value="ON" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsChecked" Value="False">
-                                                        <Setter Property="Content" Value="OFF" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
-                                    </ToggleButton>
-
 
                                     <Label Grid.Row="1"
                                    Grid.Column="0"
@@ -999,18 +978,41 @@
                                         </ToggleButton.Style>
                                     </ToggleButton>
 
-                                    <Label Grid.Row="3"
+                                    
+
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Header="Intercom Hot Mic Voice Detection">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="2*" />
+
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+
+                                    </Grid.RowDefinitions>
+                                    
+                                    <Label Grid.Row="0"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
-                                           Content="Play connection sounds" />
+                                           Content="Use Voice Detection (VOX) on Intercom Hot Mic" />
 
-                                    <ToggleButton Name="PlayConnectionSounds"
-                                                  Grid.Row="3"
-                                                  Grid.Column="1"
-                                                  HorizontalContentAlignment="Center"
-                                                  VerticalContentAlignment="Center"
-                                                  Click="PlayConnectionSounds_OnClick">
+                                    <ToggleButton Name="VOXEnabled"
+                                          Grid.Row="0"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="VoxEnabled_OnClick"
+                                          ToolTip="Enables Voice Detection if Hot Mic on intercom is used"
+                                          ToolTipService.ShowOnDisabled="True"
+                                          >
                                         <ToggleButton.Style>
                                             <Style TargetType="{x:Type ToggleButton}">
                                                 <Setter Property="Content" Value="ON" />
@@ -1025,13 +1027,14 @@
                                             </Style>
                                         </ToggleButton.Style>
                                     </ToggleButton>
-                                    <Label Grid.Row="4"
+
+                                    <Label Grid.Row="1"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Voice Detection minimum transmission length (ms)" />
 
-                                    <StackPanel Grid.Row="4"
+                                    <StackPanel Grid.Row="1"
                                                 Grid.Column="1" Margin="10">
 
                                         <Slider x:Name="VOXMinimimumTXTime"
@@ -1059,13 +1062,13 @@
                                         </Grid>
                                     </StackPanel>
 
-                                    <Label Grid.Row="5"
+                                    <Label Grid.Row="2"
                                            Grid.Column="0"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Center"
                                            Content="Voice Detection Sensitivity" />
 
-                                    <StackPanel Grid.Row="5"
+                                    <StackPanel Grid.Row="2"
                                                 Grid.Column="1" Margin="10">
 
                                         <Slider x:Name="VOXMode"
@@ -1094,39 +1097,42 @@
 
                                     </StackPanel>
 
+                                    <Label Grid.Row="3"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="Voice Detection Threshold" />
 
-                                    <Label Grid.Row="6"
-                                   Grid.Column="0"
-                                   HorizontalContentAlignment="Center"
-                                   VerticalContentAlignment="Center"
-                                   Content="Use Voice Detection (VOX) on Intercom Hot Mic" />
+                                    <StackPanel Grid.Row="3"
+                                                Grid.Column="1" Margin="10">
 
-                                    <ToggleButton Name="VOXEnabled"
-                                          Grid.Row="6"
-                                          Grid.Column="1"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center"
-                                          Click="VoxEnabled_OnClick"
-                                          ToolTip="Enables Voice Detection if Hot Mic on intercom is used"
-                                          ToolTipService.ShowOnDisabled="True"
-                                          >
-                                        <ToggleButton.Style>
-                                            <Style TargetType="{x:Type ToggleButton}">
-                                                <Setter Property="Content" Value="ON" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter Property="Content" Value="ON" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsChecked" Value="False">
-                                                        <Setter Property="Content" Value="OFF" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
-                                    </ToggleButton>
+                                        <Slider x:Name="VOXMinimumRMS"
+                                                TickPlacement="BottomRight"
+                                                SmallChange="2"
+                                                LargeChange="4"
+                                                IsSnapToTickEnabled="True"
+                                                TickFrequency="4"
+                                                VerticalAlignment="Center"
+                                                VerticalContentAlignment="Center"
+                                                Maximum="0"
+                                                Value="-50"
+                                                Minimum="-96"
+                                                IsEnabled="False" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" FontSize="10" Content="Lower" HorizontalAlignment="Left" />
+                                            <Label Grid.Column="2" FontSize="10" Content="Higher"
+                                                   HorizontalAlignment="Right" />
+                                        </Grid>
+                                    </StackPanel>
 
                                 </Grid>
                             </GroupBox>
+
                             <GroupBox Header="Recording">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -1489,10 +1495,62 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                        </Grid>
-                            
-                    </GroupBox>
-                          
+
+                                    <Label Grid.Row="6"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="Allow More Controller Input Devices" />
+
+                                    <ToggleButton Name="ExpandInputDevices"
+                                          Grid.Row="6"
+                                          Grid.Column="1"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          Click="ExpandInputDevices_OnClick_Click">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="{x:Type ToggleButton}">
+                                                <Setter Property="Content" Value="ON" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Content" Value="ON" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="False">
+                                                        <Setter Property="Content" Value="OFF" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
+
+                                    <Label Grid.Row="7"
+                                           Grid.Column="0"
+                                           HorizontalContentAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                           Content="Play connection sounds" />
+
+                                    <ToggleButton Name="PlayConnectionSounds"
+                                                  Grid.Row="7"
+                                                  Grid.Column="1"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Click="PlayConnectionSounds_OnClick">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="{x:Type ToggleButton}">
+                                                <Setter Property="Content" Value="ON" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Content" Value="ON" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="False">
+                                                        <Setter Property="Content" Value="OFF" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
+                                </Grid>
+                            </GroupBox>
 
                             <GroupBox Header="Template" Visibility="Collapsed">
                                 <Grid>

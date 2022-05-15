@@ -92,8 +92,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             _cachedAudioEffectsProvider = CachedAudioEffectProvider.Instance;
         }
 
-        public float MicBoost { get; set; } = 1.0f;
-
         public float SpeakerBoost
         {
             get { return _speakerBoost; }
@@ -144,7 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,
-                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
+                    (peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -337,23 +335,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     {
                         //ready for the buffer shortly
                         
-
                         //check for voice before any pre-processing
                         bool voice = true;
 
                         if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
                         {
                             Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
-                            voice = DoesFrameContainSpeech(_pcmBytes);
+                            voice = DoesFrameContainSpeech(_pcmBytes, _pcmShort);
                         }
                         
-                        //volume boost pre
-                        for (var i = 0; i < _pcmShort.Length; i++)
-                        {
-                            // n.b. no clipping test going on here
-                            _pcmShort[i] = (short)(_pcmShort[i] * MicBoost);
-                        }
-
                         //process with Speex
                         _speex.Process(new ArraySegment<short>(_pcmShort));
 
@@ -366,12 +356,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 max = _pcmShort[i];
                             }
                         }
+
                         //convert to dB
-                        MicMax = (float)VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
+                        MicMax = (float)VolumeConversionHelper.CalculateRMS(_pcmShort);
 
                         //copy and overwrite with new PCM data post processing
                         Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
-
 
                         //encode as opus bytes
                         int len;
@@ -843,7 +833,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         //declare here to save on garbage collection
         byte[] tempBuffferFirst20ms = new byte[MIC_SEGMENT_FRAMES];
         byte[] tempBuffferSecond20ms = new byte[MIC_SEGMENT_FRAMES];
-        bool DoesFrameContainSpeech(byte[] audioFrame)
+        bool DoesFrameContainSpeech(byte[] audioFrame, short[] pcmShort)
         {
             Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0, MIC_SEGMENT_FRAMES);
             Buffer.BlockCopy(audioFrame, MIC_SEGMENT_FRAMES, tempBuffferSecond20ms, 0, MIC_SEGMENT_FRAMES);
@@ -856,7 +846,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
 
             //frame size is 40 - this only supports 20
-            return _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
+            bool voice = _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
+
+            if (voice)
+            {
+                //calculate the RMS and see if we're over it
+                //voice run first as it ignores background hums very well
+                double rms = VolumeConversionHelper.CalculateRMS(pcmShort);
+                double min = _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
+
+                return rms > min;
+            }
+            //no voice so dont bother with RMS
+            return false;
         }
     }
 }

@@ -1181,22 +1181,28 @@ namespace Installer
                 dir.Refresh();
                 //sleep! WTF directory is lagging behind state here...
                 Task.Delay(TimeSpan.FromMilliseconds(200)).Wait();
-
-                var dSecurity = dir.GetAccessControl();
-                if (WindowsIdentity.GetCurrent().Owner != null)
+                try
                 {
-                    dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Owner, FileSystemRights.Modify,
-                        InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
-                        PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                    var dSecurity = dir.GetAccessControl();
+                    if (WindowsIdentity.GetCurrent().Owner != null)
+                    {
+                        dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().Owner, FileSystemRights.Modify,
+                            InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                            PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                    }
+                    if (WindowsIdentity.GetCurrent().User != null)
+                    {
+                        dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().User, FileSystemRights.Modify,
+                            InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                            PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                    }
+                    dir.SetAccessControl(dSecurity);
+                    dir.Refresh();
                 }
-                if (WindowsIdentity.GetCurrent().User != null)
-                {
-                    dSecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().User, FileSystemRights.Modify,
-                        InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
-                        PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                catch(Exception ex){
+                    Logger.Warn($"Unable to set permissions on path ${path}",ex);
                 }
-                dir.SetAccessControl(dSecurity);
-                dir.Refresh();
+                
 
             }
 

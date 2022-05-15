@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 //add final volume boost to all mixed audio
                 _volumeSampleProvider = new VolumeSampleProviderWithPeak(filter,
-                    (peak => SpeakerMax = (float) VolumeConversionHelper.ConvertFloatToDB(peak)));
+                    (peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
                 if (speakers.AudioClient.MixFormat.Channels == 1)
@@ -276,22 +276,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                         //process with Speex
                         _speex.Process(new ArraySegment<short>(pcmShort));
 
-                        float max = 0;
-                        for (var i = 0; i < pcmShort.Length; i++)
-                        {
-
-
-                            //determine peak
-                            if (pcmShort[i] > max)
-                            {
-
-                                max = pcmShort[i];
-
-                            }
-                        }
+                        double rms = VolumeConversionHelper.CalculateRMS(pcmShort);
 
                         //convert to dB
-                        MicMax = (float) VolumeConversionHelper.ConvertFloatToDB(max / 32768F);
+                        MicMax = (float)rms;
 
                         var pcmBytes = new byte[pcmShort.Length * 2];
                         Buffer.BlockCopy(pcmShort, 0, pcmBytes, 0, pcmBytes.Length);

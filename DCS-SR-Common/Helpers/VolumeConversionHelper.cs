@@ -62,5 +62,64 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
             var db = (-30) + (28 - (-30)) * volume;
             return (float) Math.Exp(db / 20 * Math.Log(10));
         }
+
+        // https://electronics.stackexchange.com/questions/85435/why-do-16-bit-systems-have-a-minimum-dbfs-of-96
+        //https://stackoverflow.com/questions/4152201/calculate-decibels
+        public static double CalculateRMS(short[] pcmShort, int offset = 0, int limit = 0)
+        {
+            if (limit == 0)
+            {
+                limit = pcmShort.Length;
+            }
+
+            //convert diff into db
+            double sum = 0;
+            for (var i = offset; i < limit+offset; i++ )
+            {
+                if (pcmShort[i] != 0)
+                {
+                    double sample = pcmShort[i] / 32768.0;
+                    sum += (sample * sample);
+                }
+            }
+
+            if (sum == 0)
+            {
+                return -96.6d;
+            }
+            double rms = Math.Sqrt(sum / (limit));
+
+            if (rms == 0)
+            {
+                return 0d;
+            }
+
+            return 20 * Math.Log10(rms);
+        }
+
+        public static double CalculateRMS(float[] buffer, int offset, int sampleCount)
+        {
+            //convert diff into db
+
+            double sum = 0;
+            for (var i = offset; i < sampleCount+offset; i++)
+            {
+                double sample = buffer[i];
+                sum += (sample * sample);
+            }
+
+            if (sum == 0)
+            {
+                return -96.6d;
+            }
+            double rms = Math.Sqrt(sum / (sampleCount));
+
+            if (rms == 0)
+            {
+                return 0d;
+            }
+
+            return 20 * Math.Log10(rms);
+        }
     }
 }

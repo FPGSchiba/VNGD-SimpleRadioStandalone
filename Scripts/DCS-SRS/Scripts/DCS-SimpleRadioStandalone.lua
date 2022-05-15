@@ -678,13 +678,14 @@ function SR.exportRadioAH64D(_data)
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then
         -- New aircraft; SENS volume is at 0
-        
-            -- source https://github.com/DCSFlightpanels/dcs-bios/blob/master/Scripts/DCS-BIOS/lib/AH-64D.lua
-            GetDevice(63):performClickableAction(3011, 1) -- Pilot Master
-            GetDevice(63):performClickableAction(3012, 1) -- Pilot SENS
+            pcall(function()
+                 -- source https://github.com/DCSFlightpanels/dcs-bios/blob/master/Scripts/DCS-BIOS/lib/AH-64D.lua
+                GetDevice(63):performClickableAction(3011, 1) -- Pilot Master
+                GetDevice(63):performClickableAction(3012, 1) -- Pilot SENS
 
-            GetDevice(62):performClickableAction(3011, 1) -- CoPilot Master
-            GetDevice(62):performClickableAction(3012, 1) -- CoPilot SENS
+                GetDevice(62):performClickableAction(3011, 1) -- CoPilot Master
+                GetDevice(62):performClickableAction(3012, 1) -- CoPilot SENS
+            end)
     end
 
     _data.radios[1].name = "Intercom"
@@ -706,11 +707,15 @@ function SR.exportRadioAH64D(_data)
     _data.radios[4].freq = SR.getRadioFrequency(59)
     _data.radios[4].modulation = SR.getRadioModulation(59)
     _data.radios[4].volMode = 0
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[5].name = "FM2-ARC-201D"
     _data.radios[5].freq = SR.getRadioFrequency(60)
     _data.radios[5].modulation = SR.getRadioModulation(60)
     _data.radios[5].volMode = 0
+    _data.radios[5].encKey = 1
+    _data.radios[5].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.radios[6].name = "HF-ARC-220"
     _data.radios[6].freq = SR.getRadioFrequency(61)
@@ -2065,7 +2070,7 @@ end
 --for A10C
 function SR.exportRadioA10C(_data)
 
-    _data.capabilities = { dcsPtt = true, dcsIFF = true, dcsRadioSwitch = true, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     -- Check if player is in a new aircraft
     if _lastUnitId ~= _data.unitId then

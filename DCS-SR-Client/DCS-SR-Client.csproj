@@ -477,6 +477,9 @@
     <Content Include="AudioEffects\RADIO_TRANS_START_ALTERNATE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START_APACHE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="AudioEffects\UHF_NOISE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
