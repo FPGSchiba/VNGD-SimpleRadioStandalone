@@ -1523,9 +1523,6 @@ function SR.exportRadioUH1H(_data)
         _data.iff.mode4 = false
     end
 
-    --temporary hot mic
-    _data.intercomHotMic = true
-
     return _data
 
 end
@@ -1623,7 +1620,7 @@ function SR.exportRadioSA342(_data)
         _data.radios[3].volMode = 1 
         _data.radios[4].volMode = 1
 
-        _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = true, intercomHotMic = true, desc = "" }
+        _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
     end
 
     _data.intercomHotMic = true
