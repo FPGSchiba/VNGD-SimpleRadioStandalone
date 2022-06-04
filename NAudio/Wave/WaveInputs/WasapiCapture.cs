@@ -250,7 +250,8 @@ namespace NAudio.CoreAudioApi
                 client.Stop();
                 // don't dispose - the AudioClient only gets disposed when WasapiCapture is disposed
             }
-            captureThread = null;
+            // dont nuke our captureThread reference here, dispose also checks it
+            // captureThread = null;
             captureState = CaptureState.Stopped;
             RaiseRecordingStopped(exception);
         }
@@ -356,7 +357,11 @@ namespace NAudio.CoreAudioApi
             StopRecording();
             if (captureThread != null)
             {
-                captureThread.Join();
+                if (captureThread.IsAlive)
+                {
+                    captureThread.Abort();
+                    captureThread.Join();
+                }
                 captureThread = null;
             }
             if (audioClient != null)
