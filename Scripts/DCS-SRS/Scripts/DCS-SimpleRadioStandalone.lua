@@ -3917,11 +3917,16 @@ function SR.exportRadioM2000C(_data)
     
     local RED_ptt = false
     local GREEN_ptt = false
+    local GREEN_guard = 0
     
     pcall(function() 
         RED_ptt = RED_device:is_ptt_pressed()
         GREEN_ptt = GREEN_device:is_ptt_pressed()
         has_cockpit_ptt = true
+        end)
+        
+    pcall(function() 
+        GREEN_guard = tonumber(GREEN_device:guard_standby_freq())
         end)
         
     _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
@@ -3951,6 +3956,11 @@ function SR.exportRadioM2000C(_data)
     _data.radios[2].modulation = 0
     _data.radios[2].volume = SR.getRadioVolume(0, 707, { 0.0, 1.0 }, false)
 
+    --guard mode for V/UHF Radio
+    if GREEN_guard>0 then
+        _data.radios[2].secFreq = GREEN_guard
+    end
+    
 
     -- get channel selector
     local _selector = SR.getSelectorPosition(448, 0.50)
@@ -3975,11 +3985,7 @@ function SR.exportRadioM2000C(_data)
     --     _data.selected = 1
     -- end
 
-    --guard mode for V/UHF Radio
-    local uhfModeKnob = SR.getSelectorPosition(446, 0.25) -- TODO!
-    if uhfModeKnob == 2 and _data.radios[2].freq > 1000 then
-        _data.radios[2].secFreq = 243.0 * 1000000
-    end
+
 
     -- reset state on aircraft switch
     if _lastUnitId ~= _data.unitId then
