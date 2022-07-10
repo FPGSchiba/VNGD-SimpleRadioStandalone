@@ -90,6 +90,7 @@ SR.fc3["MiG-29A"] = true
 SR.fc3["MiG-29S"] = true
 SR.fc3["MiG-29G"] = true
 SR.fc3["Su-27"] = true
+SR.fc3["J-11A"] = true
 SR.fc3["Su-33"] = true
 SR.fc3["Su-25"] = true
 SR.fc3["Su-25T"] = true
@@ -130,6 +131,9 @@ end
 function SR.exporter()
     local _update
     local _data = LoGetSelfData()
+
+    -- REMOVE
+    -- SR.log(SR.debugDump(_data).."\n\n")
 
     if _data ~= nil and not SR.fc3[_data.Name] then
         -- check for death / eject -- call below returns a number when ejected - ignore FC3
@@ -4806,6 +4810,7 @@ SR.exporters["MiG-29A"] = SR.exportRadioMiG29
 SR.exporters["MiG-29S"] = SR.exportRadioMiG29
 SR.exporters["MiG-29G"] = SR.exportRadioMiG29
 SR.exporters["Su-27"] = SR.exportRadioSU27
+SR.exporters["J-11A"] = SR.exportRadioSU27
 SR.exporters["Su-33"] = SR.exportRadioSU27
 SR.exporters["Su-25"] = SR.exportRadioSU25
 SR.exporters["Su-25T"] = SR.exportRadioSU25
