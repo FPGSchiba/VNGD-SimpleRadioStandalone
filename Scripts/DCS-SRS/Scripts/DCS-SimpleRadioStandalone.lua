@@ -3947,12 +3947,11 @@ end
 
 function SR.exportRadioF1CE(_data)
 
-    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
 
     _data.radios[2].name = "V/UHF TRAP-136"
     _data.radios[2].freq = SR.getRadioFrequency(6)
     _data.radios[2].modulation = 0
-
     _data.radios[2].volume = SR.getRadioVolume(0, 311,{0.0,1.0},false)
     _data.radios[2].volMode = 0
 
@@ -3960,57 +3959,58 @@ function SR.exportRadioF1CE(_data)
         _data.radios[2].secFreq = 121.5 * 1000000
     end
 
+    if SR.getSelectorPosition(282,0.5) == 1 then
+        _data.radios[2].channel = SR.getNonStandardSpinner(283, {[0.750]= "1",[0.800]= "2",[0.850]= "3",[0.900]= "4",[0.950]= "5",[0.000]= "6", [0.050]= "7",[0.100]= "8",[0.150]= "9",[0.200]= "10",[0.250]= "11",[0.300]= "12",[0.350]= "13",[0.400]= "14",[0.450]= "15",[0.500]= "16",[0.550]= "17",[0.600]= "18",[0.650]= "19",[0.700]= "20"},0.05,3)
+    end
+
     _data.radios[3].name = "UHF TRAP-137B"
     _data.radios[3].freq = SR.getRadioFrequency(7)
     _data.radios[3].modulation = 0
     _data.radios[3].volume = SR.getRadioVolume(0, 314,{0.0,1.0},false)
     _data.radios[3].volMode = 0
-    --_data.radios[3].channel = SR.getSelectorPosition(348, 0.1) + 1 --add 1 as channel 0 is channel 1
+    _data.radios[3].channel = SR.getNonStandardSpinner(348, {[0.750]= "1",[0.800]= "2",[0.850]= "3",[0.900]= "4",[0.950]= "5",[0.000]= "6", [0.050]= "7",[0.100]= "8",[0.150]= "9",[0.200]= "10",[0.250]= "11",[0.300]= "12",[0.350]= "13",[0.400]= "14",[0.450]= "15",[0.500]= "16",[0.550]= "17",[0.600]= "18",[0.650]= "19",[0.700]= "20"},0.05,3)
 
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
 
-    -- TODO Handle transponder - not implemented in the cockpit properly
+    local iffPower =  SR.getSelectorPosition(739,0.1)
 
-    -- _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+    local iffIdent =  SR.getButtonPosition(744) -- -1 is off 0 or more is on
 
-    -- local iffPower =  SR.getSelectorPosition(739,0.1)
+    if iffPower >= 7 then
+        _data.iff.status = 1 -- NORMAL
 
-    -- local iffIdent =  SR.getButtonPosition(744) -- -1 is off 0 or more is on
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+    end
 
-    -- if iffPower >= 7 then
-    --     _data.iff.status = 1 -- NORMAL
+    local mode1On =  SR.getButtonPosition(750)
 
-    --     if iffIdent == 1 then
-    --         _data.iff.status = 2 -- IDENT (BLINKY THING)
-    --     end
-    -- end
+    local _lookupTable = {[0.000]= "0", [0.125] = "1", [0.250] = "2", [0.375] = "3", [0.500] = "4", [0.625] = "5", [0.750] = "6", [0.875] = "7", [1.000] = "0"}
+    _data.iff.mode1 = SR.getNonStandardSpinner(732,_lookupTable, 0.125,3) .. SR.getNonStandardSpinner(733,_lookupTable,0.125,3)
 
-    -- local mode1On =  SR.getButtonPosition(750)
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
 
-    -- SR.log(SR.getButtonPosition(732)..'-'..SR.getButtonPosition(733))
-    -- _data.iff.mode1 = SR.round(SR.getButtonPosition(732), 0.125)*100+SR.round(SR.getButtonPosition(733), 0.125)*10
+    local mode3On =  SR.getButtonPosition(752)
 
-    -- if mode1On ~= 0 then
-    --     _data.iff.mode1 = -1
-    -- end
+    _data.iff.mode3 = SR.getNonStandardSpinner(734,_lookupTable, 0.125,3) .. SR.getNonStandardSpinner(735,_lookupTable,0.125,3).. SR.getNonStandardSpinner(736,_lookupTable,0.125,3).. SR.getNonStandardSpinner(737,_lookupTable,0.125,3)
 
-    -- local mode3On =  SR.getButtonPosition(752)
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 10 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
 
-    -- _data.iff.mode3 = SR.round(SR.getButtonPosition(734), 0.125) * 10000 + SR.round(SR.getButtonPosition(735), 0.125) * 1000 + SR.round(SR.getButtonPosition(736), 0.125)* 100 + SR.round(SR.getButtonPosition(737), 0.125) * 10
+    local mode4On =  SR.getButtonPosition(745)
 
-    -- if mode3On ~= 0 then
-    --     _data.iff.mode3 = -1
-    -- elseif iffPower == 10 then
-    --     -- EMERG SETTING 7770
-    --     _data.iff.mode3 = 7700
-    -- end
-
-    -- local mode4On =  SR.getButtonPosition(745)
-
-    -- if mode4On ~= 0 then
-    --     _data.iff.mode4 = true
-    -- else
-    --     _data.iff.mode4 = false
-    -- end
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+        _data.iff.mode4 = false
+    end
 
     _data.control = 0;
 
@@ -4523,6 +4523,26 @@ function SR.getButtonPosition(_args)
 
 end
 
+function SR.getNonStandardSpinner(_deviceId, _range, _step, _round)
+    local _value = GetDevice(0):get_argument_value(_deviceId)
+    -- round to x decimal places
+    _value = SR.advRound(_value,_round)
+
+    -- round to nearest step
+    -- then round again to X decimal places
+    _value = SR.advRound(SR.round(_value, _step),_round)
+
+    --round to the step of the values
+    local _res = _range[_value]
+
+    if not _res then
+        return 0
+    end
+
+    return _res
+
+end
+
 function SR.getRadioFrequency(_deviceId, _roundTo, _ignoreIsOn)
     local _device = GetDevice(_deviceId)
 
@@ -4565,6 +4585,23 @@ function SR.round(number, step)
         return 0
     else
         return math.floor((number + step / 2) / step) * step
+    end
+end
+
+
+function SR.advRound(number, decimals, method)
+    if string.find(number, "%p" ) ~= nil then
+        decimals = decimals or 0
+        local lFactor = 10 ^ decimals
+        if (method == "ceil" or method == "floor") then
+            -- ceil: Returns the smallest integer larger than or equal to number
+            -- floor: Returns the smallest integer smaller than or equal to number
+            return math[method](number * lFactor) / lFactor
+        else
+            return tonumber(("%."..decimals.."f"):format(number))
+        end
+    else
+        return number
     end
 end
 
