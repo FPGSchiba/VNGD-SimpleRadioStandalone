@@ -152,8 +152,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 _udpCommandListener?.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                //IGNORE
             }
         }
     }

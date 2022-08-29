@@ -254,8 +254,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC
             {
                 _lotATCPositionListener?.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                //IGNORE
             }
         }
     }

@@ -109,7 +109,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 {
                     LaunchUpdater(beta);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     MessageBox.Show($"Unable to Auto Update - please download latest version manually",
                         "Auto Update Error", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
@@ -151,7 +151,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                     {
                         Process p = Process.Start(startInfo);
                     }
-                    catch (System.ComponentModel.Win32Exception ex)
+                    catch (System.ComponentModel.Win32Exception)
                     {
                         MessageBox.Show(
                             "SRS Auto Update Requires Admin Rights",

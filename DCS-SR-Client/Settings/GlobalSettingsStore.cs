@@ -272,7 +272,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
                 _configuration = Configuration.LoadFromFile(ConfigFileName);
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 Logger.Info($"Did not find client config file at path ${Path}/${ConfigFileName}, initialising with default config");
 
@@ -676,7 +676,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     _configuration.SaveToFile(Path + ConfigFileName);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Logger.Error("Unable to save settings!");
                 }

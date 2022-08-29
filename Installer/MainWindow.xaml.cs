@@ -736,7 +736,7 @@ namespace Installer
                     "ScriptsPath",
                     "");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
@@ -748,7 +748,7 @@ namespace Installer
                     key.DeleteSubKeyTree("DCS-SR-Standalone", false);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -896,7 +896,7 @@ namespace Installer
                 {
                     File.Delete(path);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
             }
@@ -1038,7 +1038,7 @@ namespace Installer
 
                 DirectoryCopy(_currentDirectory + "\\Scripts\\DCS-SRS",path+"\\Mods\\Services\\DCS-SRS");
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 MessageBox.Show(
                     "Install files not found - Unable to install! \n\nMake sure you extract all the files in the zip then run the Installer",

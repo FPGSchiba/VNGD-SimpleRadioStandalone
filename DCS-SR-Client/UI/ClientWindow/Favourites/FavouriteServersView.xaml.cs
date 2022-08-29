@@ -58,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
                     }
                     
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     // catches any out of bounds movements, should probably be replaced with validation at some point
                 }                              
