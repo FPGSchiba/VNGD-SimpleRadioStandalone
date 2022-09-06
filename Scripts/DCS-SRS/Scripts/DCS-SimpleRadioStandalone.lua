@@ -4011,6 +4011,20 @@ function SR.exportRadioF1CE(_data)
     else
         _data.iff.mode4 = false
     end
+    
+     -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-210"
+    _data.radios[4].freq = 251.0 * 1000000 --10-399.975 MHZ
+    _data.radios[4].modulation = 0
+    _data.radios[4].secFreq = 243.0 * 1000000
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 110 * 1000000
+    _data.radios[4].freqMax = 399.975 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+    _data.radios[4].encKey = 1
+    _data.radios[4].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
 
     _data.control = 0;
 
