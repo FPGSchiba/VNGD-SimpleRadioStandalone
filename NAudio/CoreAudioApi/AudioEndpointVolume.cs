@@ -32,10 +32,10 @@ namespace NAudio.CoreAudioApi
     public class AudioEndpointVolume : IDisposable
     {
         private readonly IAudioEndpointVolume audioEndPointVolume;
-        private readonly AudioEndpointVolumeChannels channels;
-        private readonly AudioEndpointVolumeStepInformation stepInformation;
+        // private readonly AudioEndpointVolumeChannels channels;
+        // private readonly AudioEndpointVolumeStepInformation stepInformation;
         private readonly AudioEndpointVolumeVolumeRange volumeRange;
-        private readonly EEndpointHardwareSupport hardwareSupport;
+        // private readonly EEndpointHardwareSupport hardwareSupport;
         private AudioEndpointVolumeCallback callBack;
 
         private Guid notificationGuid = Guid.Empty;
@@ -65,26 +65,26 @@ namespace NAudio.CoreAudioApi
         /// <summary>
         /// Hardware Support
         /// </summary>
-        public EEndpointHardwareSupport HardwareSupport
-        {
-            get { return hardwareSupport; }
-        }
+        // public EEndpointHardwareSupport HardwareSupport
+        // {
+        //     get { return hardwareSupport; }
+        // }
 
         /// <summary>
         /// Step Information
         /// </summary>
-        public AudioEndpointVolumeStepInformation StepInformation
-        {
-            get { return stepInformation; }
-        }
+        // public AudioEndpointVolumeStepInformation StepInformation
+        // {
+        //     get { return stepInformation; }
+        // }
 
         /// <summary>
         /// Channels
         /// </summary>
-        public AudioEndpointVolumeChannels Channels
-        {
-            get { return channels; }
-        }
+        // public AudioEndpointVolumeChannels Channels
+        // {
+        //     get { return channels; }
+        // }
 
         /// <summary>
         /// Master Volume Level
@@ -156,11 +156,12 @@ namespace NAudio.CoreAudioApi
         {
             uint hardwareSupp;
 
+            // REMOVED to add support for WINE https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/621
             audioEndPointVolume = realEndpointVolume;
-            channels = new AudioEndpointVolumeChannels(audioEndPointVolume);
-            stepInformation = new AudioEndpointVolumeStepInformation(audioEndPointVolume);
-            Marshal.ThrowExceptionForHR(audioEndPointVolume.QueryHardwareSupport(out hardwareSupp));
-            hardwareSupport = (EEndpointHardwareSupport) hardwareSupp;
+            //channels = new AudioEndpointVolumeChannels(audioEndPointVolume);
+            //stepInformation = new AudioEndpointVolumeStepInformation(audioEndPointVolume);
+            //Marshal.ThrowExceptionForHR(audioEndPointVolume.QueryHardwareSupport(out hardwareSupp));
+            //hardwareSupport = (EEndpointHardwareSupport) hardwareSupp;
             volumeRange = new AudioEndpointVolumeVolumeRange(audioEndPointVolume);
             callBack = new AudioEndpointVolumeCallback(this);
             Marshal.ThrowExceptionForHR(audioEndPointVolume.RegisterControlChangeNotify(callBack));

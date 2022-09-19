@@ -75,9 +75,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
             _stop = true;
             try
             {
-                _listener.Close();
+                _listener?.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 

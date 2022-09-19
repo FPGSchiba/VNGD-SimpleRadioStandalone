@@ -576,7 +576,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 _dcsUdpListener?.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
@@ -584,8 +584,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 _dcsRadioUpdateSender?.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                //IGNORE
             }
 
             _clientStateSingleton.DcsExportLastReceived = -1;

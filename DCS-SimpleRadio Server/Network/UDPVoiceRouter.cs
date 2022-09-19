@@ -141,7 +141,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 _listener.Send(rawBytes, rawBytes.Length, groupEP);
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             //dont log because it slows down thread too much...
                         }
@@ -163,7 +163,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 _listener.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
         }
@@ -175,7 +175,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 _listener.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 
@@ -288,7 +288,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                             {
                                 _listener.Send(bytes, bytesLength, outgoingEndPoint);
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 //dont log, slows down too much...
                             }

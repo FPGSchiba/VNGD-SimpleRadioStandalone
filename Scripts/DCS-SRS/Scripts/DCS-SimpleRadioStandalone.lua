@@ -1,4 +1,4 @@
--- Version 2.0.6.0
+-- Version 2.0.7.0
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -3987,7 +3987,7 @@ function SR.exportRadioF1CE(_data)
     local mode1On =  SR.getButtonPosition(750)
 
     local _lookupTable = {[0.000]= "0", [0.125] = "1", [0.250] = "2", [0.375] = "3", [0.500] = "4", [0.625] = "5", [0.750] = "6", [0.875] = "7", [1.000] = "0"}
-    _data.iff.mode1 = SR.getNonStandardSpinner(732,_lookupTable, 0.125,3) .. SR.getNonStandardSpinner(733,_lookupTable,0.125,3)
+    _data.iff.mode1 = SR.getNonStandardSpinner(732,_lookupTable, 0.125,3) .. SR.getNonStandardSpinner(733,{[0.000]= "0", [0.125] = "1", [0.250] = "2", [0.375] = "3", [0.500] = "0", [0.625] = "1", [0.750] = "2", [0.875] = "3", [1.000] = "0"},0.125,3)
 
     if mode1On ~= 0 then
         _data.iff.mode1 = -1
@@ -4895,4 +4895,4 @@ end
 -- Load mods' SRS plugins
 SR.LoadModsPlugins()
 
-SR.log("Loaded SimpleRadio Standalone Export version: 2.0.6.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 2.0.7.0")

@@ -240,7 +240,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
                     MessageHub.Instance.Publish(new DisconnectedMessage());
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageHub.Instance.Publish(new DisconnectedMessage());
             }

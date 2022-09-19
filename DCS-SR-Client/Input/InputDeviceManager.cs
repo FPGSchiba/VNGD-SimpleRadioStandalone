@@ -228,7 +228,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         _hashSet.Add(new Guid(trimmed));
                         Logger.Info("Added " + trimmed);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                     }
                 }

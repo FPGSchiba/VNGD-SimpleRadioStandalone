@@ -294,7 +294,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
                     new ThreadStart(delegate { _externalAWACSModeCallback(result, coalition); }));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
@@ -306,8 +306,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
                     new ThreadStart(delegate { _updateUICallback(); }));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                //IGNORE
             }
         }
 
@@ -619,7 +620,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     _tcpClient.Close(); // this'll stop the socket blocking
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
