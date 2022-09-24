@@ -163,7 +163,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             CreateAudioEffectDouble(UHFNoise);
             CreateAudioEffectDouble(VHFNoise);
             CreateAudioEffectDouble(HFNoise);
+
+            AMCollision = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.AM_COLLISION);
+            CreateAudioEffectDouble(AMCollision);
         }
+
+        public CachedAudioEffect AMCollision { get; set; }
 
         private void CreateAudioEffectDouble(CachedAudioEffect effect)
         {

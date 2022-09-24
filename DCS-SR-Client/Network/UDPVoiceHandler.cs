@@ -519,7 +519,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                     destinationRadio
                                                         .LineOfSightLoss, // Loss of 1.0 or greater is total loss
                                                 PacketNumber = udpVoicePacket.PacketNumber,
-                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid
+                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid,
+                                                IsSecondary = destinationRadio.ReceivingState.IsSecondary
                                             };
 
 

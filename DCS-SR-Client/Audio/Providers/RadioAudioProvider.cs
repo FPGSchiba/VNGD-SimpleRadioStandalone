@@ -23,15 +23,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public void AddAudioSamples(byte[] pcmAudio, int radioId, bool isStereo = false)
         {
-            if (isStereo)
-            {
-                BufferedWaveProvider.AddSamples(pcmAudio, 0, pcmAudio.Length);
-            }
-            else
-            {
-                var seperatedAudio = SeperateAudio(pcmAudio, radioId);
-                BufferedWaveProvider.AddSamples(seperatedAudio, 0, seperatedAudio.Length);
-            }
+            //TODO FIX
+            // if (isStereo)
+            // {
+            //     BufferedWaveProvider.AddSamples(pcmAudio, 0, pcmAudio.Length);
+            // }
+            // else
+            // {
+            //     var seperatedAudio = SeperateAudio(pcmAudio, radioId);
+            //     BufferedWaveProvider.AddSamples(seperatedAudio, 0, seperatedAudio.Length);
+            // }
         }
     }
 }

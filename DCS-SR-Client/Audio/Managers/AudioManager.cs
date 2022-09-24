@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -45,7 +46,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
             new ConcurrentDictionary<string, ClientAudioProvider>();
 
-        private MixingSampleProvider _clientAudioMixer;
+        //TEMP
+        private List<RadioMixingProvider> _radioMixingProvider;
+
+        private MixingSampleProvider _finalMixdown;
 
         //buffer for effects
         //plays in parallel with radio output buffer
@@ -141,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _waveOut = new WasapiOut(speakers, AudioClientShareMode.Shared, true, 40,windowsN);
 
                 //add final volume boost to all mixed audio
-                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_clientAudioMixer,
+                _volumeSampleProvider = new VolumeSampleProviderWithPeak(_finalMixdown,
                     (peak => SpeakerMax = peak));
                 _volumeSampleProvider.Volume = SpeakerBoost;
 
@@ -385,12 +389,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 //send audio so play over local too
                                 var processedAudioBytes = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
                                 
-                                //process bytes and add effects
-                                if (processedAudioBytes?.Length > 0)
-                                {
-                                     // _afterFileWriter.Write(processedAudioBytes, 0, processedAudioBytes.Length);
-                                    _micWaveOutBuffer?.AddSamples(processedAudioBytes, 0, processedAudioBytes.Length);
-                                }
+                                //TODO fix
+                                // //process bytes and add effects
+                                // if (processedAudioBytes?.Length > 0)
+                                // {
+                                //      // _afterFileWriter.Write(processedAudioBytes, 0, processedAudioBytes.Length);
+                                //     _micWaveOutBuffer?.AddSamples(processedAudioBytes, 0, processedAudioBytes.Length);
+                                // }
                                 
                             }
 
@@ -482,8 +487,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void InitMixers()
         {
-            _clientAudioMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
-            _clientAudioMixer.ReadFully = true;
+            _finalMixdown = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
+            _finalMixdown.ReadFully = true;
+
+            _radioMixingProvider = new List<RadioMixingProvider>();
+            for (int i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
+            {
+                var mix = new RadioMixingProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2), i);
+                _radioMixingProvider.Add(mix);
+                _finalMixdown.AddMixerInput(mix);
+            }
         }
 
         private void InitVox()
@@ -509,7 +522,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             for (var i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
             {
                 _effectsOutputBuffer[i] = new RadioAudioProvider(OUTPUT_SAMPLE_RATE);
-                _clientAudioMixer.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);
+                _finalMixdown.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);
             }
         }
 
@@ -759,8 +772,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 _micWaveOut = null;
 
                 _volumeSampleProvider = null;
-                _clientAudioMixer?.RemoveAllMixerInputs();
-                _clientAudioMixer = null;
+
+                foreach (var mixer in _radioMixingProvider)
+                {
+                    mixer.RemoveAllMixerInputs();
+                }
+
+                _radioMixingProvider = new List<RadioMixingProvider>();
+
+                _finalMixdown?.RemoveAllMixerInputs();
+                _finalMixdown = null;
 
                 _clientsBufferedAudio.Clear();
 
@@ -802,7 +823,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 client = new ClientAudioProvider();
                 _clientsBufferedAudio[audio.OriginalClientGuid] = client;
 
-                _clientAudioMixer.AddMixerInput(client.SampleProvider);
+                foreach (var mixer in _radioMixingProvider)
+                {
+                    mixer.AddMixerInput(client);
+                }
+               
             }
 
             client.AddClientAudioSamples(audio, skipEffects);
@@ -820,7 +845,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             try
             {
-                _clientAudioMixer.RemoveMixerInput(clientAudio.SampleProvider);
+                foreach (var mixer in _radioMixingProvider)
+                {
+                    mixer.RemoveMixerInput(clientAudio);
+                }
             }
             catch (Exception ex)
             {

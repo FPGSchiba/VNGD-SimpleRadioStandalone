@@ -79,20 +79,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
             else if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone))
             {
-                finalAudio = new ClientAudio
-                {
-                    PcmAudioShort = AudioManipulationHelper.SineWaveOut(audio.PcmAudioShort.Length, _sampleRate, 0.25),
-                    ReceivedRadio = audio.ReceivedRadio,
-                    ReceiveTime = audio.ReceiveTime,
-                    PacketNumber = audio.PacketNumber,
-                    OriginalClientGuid = audio.OriginalClientGuid,
-                };
+                //TODO FIX
+                // finalAudio = new ClientAudio
+                // {
+                //     PcmAudioShort = AudioManipulationHelper.SineWaveOut(audio.PcmAudioShort.Length, _sampleRate, 0.25),
+                //     ReceivedRadio = audio.ReceivedRadio,
+                //     ReceiveTime = audio.ReceiveTime,
+                //     PacketNumber = audio.PacketNumber,
+                //     OriginalClientGuid = audio.OriginalClientGuid,
+                // };
             }
             else
             {
                 return;
             }
-            _clientAudioQueues[audio.ReceivedRadio].Enqueue(finalAudio);
+            //TODO FIX
+            //_clientAudioQueues[audio.ReceivedRadio].Enqueue(finalAudio);
         }
 
         public void Start()

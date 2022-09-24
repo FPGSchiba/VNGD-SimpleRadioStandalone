@@ -5,7 +5,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
     public class ClientAudio
     {
         public byte[] EncodedAudio { get; set; }
-        public short[] PcmAudioShort { get; set; }
+        public float[] PcmAudioFloat { get; set; }
         public string ClientGuid { get; set; }
         public long ReceiveTime { get; set; }
         public int ReceivedRadio { get; set; }
@@ -20,5 +20,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public float LineOfSightLoss { get; set; }
         public ulong PacketNumber { get; set; }
         public string OriginalClientGuid { get; internal set; }
+        public bool IsSecondary { get; set; }
     }
 }

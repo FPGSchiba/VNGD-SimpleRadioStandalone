@@ -2,8 +2,17 @@
 {
     public class JitterBufferAudio
     {
-        public byte[] Audio { get; set; }
+        public float[] Audio { get; set; }
 
         public ulong PacketNumber { get; set; }
+
+        public int ReceivedRadio { get; set; }
+
+        public short Modulation { get; internal set; }
+
+        public bool Decryptable { get; internal set; }
+
+        public float Volume { get; internal set; }
+        public bool IsSecondary { get; set; }
     }
 }
