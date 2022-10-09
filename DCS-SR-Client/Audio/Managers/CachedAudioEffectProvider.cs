@@ -125,6 +125,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public CachedAudioEffect VHFNoise { get; }
         public CachedAudioEffect HFNoise { get; }
 
+        public CachedAudioEffect AMCollision { get; set; }
+
         private readonly string sourceFolder;
 
         private CachedAudioEffectProvider()
@@ -168,8 +170,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             CreateAudioEffectDouble(AMCollision);
         }
 
-        public CachedAudioEffect AMCollision { get; set; }
-
         private void CreateAudioEffectDouble(CachedAudioEffect effect)
         {
 
@@ -177,13 +177,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
 
                 var effectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
-                var effectDouble = new double[effectShort.Length];
+                var effectDouble = new float[effectShort.Length];
 
                 for (int i = 0; i < effectShort.Length; i++)
                 {
                     effectDouble[i] = ((effectShort[i]/ 32768f));
                 }
-                effect.AudioEffectDouble = effectDouble;
+                effect.AudioEffectFloat = effectDouble;
 
             }
 

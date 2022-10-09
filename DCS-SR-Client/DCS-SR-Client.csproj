@@ -236,6 +236,7 @@
     </ApplicationDefinition>
     <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
     <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
+    <Compile Include="Audio\Models\DeJitteredTransmission.cs" />
     <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
     <Compile Include="Audio\Providers\ClientEffectsPipeline.cs" />
     <Compile Include="Audio\Providers\RadioMixingProvider.cs" />

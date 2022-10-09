@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using NAudio.Dsp;
 using NAudio.Utils;
 using NAudio.Wave;
@@ -14,24 +17,25 @@ using NAudio.Wave.SampleProviders;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 {
-    public class RadioMixingProvider: ISampleProvider
+    public class RadioMixingProvider : ISampleProvider
     {
         private readonly int radioId;
         private readonly List<ClientAudioProvider> sources;
-        private float[] sourceBuffer;
-        private const int MaxInputs = 1024; // protect ourselves against doing something silly
-        private readonly int radioCount;
-        private CachedAudioEffect amEffect;
+        private CachedAudioEffect amCollisionEffect;
         private int amEffectPosition = 0;
-
-        private readonly CachedAudioEffectProvider effectProvider = CachedAudioEffectProvider.Instance;
+        private float amCollisionVol = 1.0f;
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
-        protected readonly Settings.ProfileSettingsStore profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
-     //   private readonly WaveFileWriter waveWriterMono;
-        private readonly WaveFileWriter waveWriterStereo;
+        private readonly Settings.ProfileSettingsStore profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
         private float[] mixBuffer;
+        private float[] secondaryMixBuffer;
+        private readonly SyncedServerSettings serverSettings = SyncedServerSettings.Instance;
+        private List<DeJitteredTransmission> _mainAudio = new List<DeJitteredTransmission>();
+        private List<DeJitteredTransmission> _secondaryAudio = new List<DeJitteredTransmission>();
+
+        private Random random = new Random();
+      //  private readonly WaveFileWriter waveWriter;
 
         public RadioMixingProvider(WaveFormat waveFormat, int radioId)
         {
@@ -43,14 +47,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             this.radioId = radioId;
             sources = new List<ClientAudioProvider>();
             WaveFormat = waveFormat;
-            radioCount = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios.Length;
 
             //load AM interference effect
-            amEffect = CachedAudioEffectProvider.Instance.AMCollision;
+            amCollisionEffect = CachedAudioEffectProvider.Instance.AMCollision;
+            amCollisionVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.AMCollisionVolume);
 
-     //       waveWriterMono = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\outputmono{radioId}.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
-            //waveWriterStereo = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\outputstereo{radioId}.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 2));
-
+         //   waveWriter = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\output{Guid.NewGuid()}.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 2));
         }
 
         /// <summary>
@@ -96,6 +98,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         /// </summary>
         public WaveFormat WaveFormat { get; private set; }
 
+        public float[] ClearArray(float[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = 0;
+            }
+
+            return buffer;
+        }
+
         /// <summary>
         /// Reads samples from this sample provider
         /// </summary>
@@ -105,14 +117,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         /// <returns>Number of samples read</returns>
         public int Read(float[] buffer, int offset, int count)
         {
-            int outputSamples = 0;
-            bool multipleTranmissions = false;
-            sourceBuffer = BufferHelpers.Ensure(sourceBuffer, count);
+            _mainAudio.Clear();
+            _secondaryAudio.Clear();
+            int primarySamples = 0;
+            int secondarySamples = 0;
+
             mixBuffer = BufferHelpers.Ensure(mixBuffer, count);
-            bool audio = false;
-            RadioInformation.Modulation modulation = RadioInformation.Modulation.AM;
-            float volume = 1.0f;
-            double frequency = 1d;
+            secondaryMixBuffer = BufferHelpers.Ensure(secondaryMixBuffer, count);
+
+            ClearArray(mixBuffer);
+            ClearArray(secondaryMixBuffer);
+  
             lock (sources)
             {
                 int index = sources.Count - 1;
@@ -121,93 +136,151 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                     var source = sources[index];
 
                     //ask for count/2 as the source is MONO but the request for this is STEREO
-                    int samplesRead = source.JitterBufferProviderInterface[radioId].Read(sourceBuffer, 0, count /2 );
-                    modulation = source.Modulation;
-                    frequency = source.Frequency;
+                    var transmission = source.JitterBufferProviderInterface[radioId].Read(count / 2);
 
-                    volume = source.Volume;
-                    //TODO somehow check if its secondary (somehow)
-                    //TODO this is a hack - as if its a simultaneous transmission its possible to avoid the AM effect but edge case?
-                    if (outputSamples > 0 && samplesRead > 0 )
+                    if (transmission.count > 0)
                     {
-                        multipleTranmissions = true;
-                    }
-
-                    int outIndex = 0;
-                    for (int n = 0; n < samplesRead; n++)
-                    {
-                        if (n >= outputSamples)
+                        if (transmission.IsSecondary)
                         {
-                            mixBuffer[outIndex++] = sourceBuffer[n];
+                            _secondaryAudio.Add(transmission);
                         }
                         else
                         {
-                            mixBuffer[outIndex++] += sourceBuffer[n];
+                            _mainAudio.Add(transmission);
                         }
                     }
-                    outputSamples = Math.Max(samplesRead, outputSamples);
+
                     index--;
                 }
             }
 
-            //if there is audio
-            if (outputSamples > 0)
+            //TODO
+            //copy to the recording service - as we have everything we need to know about the audio
+            //at this point
+
+            if (_mainAudio.Count > 0)
             {
-                //TODO take info account server setting AND volume of this radio AND if its AM or FM
-                //We loaded a MONO audio - but need to convert to stereo and also apply the correct balance (left/right) as per the radio config
-                //Why is it double too? Can it be float?
-                //Can this pipeline also contain the Start & End PTT tones and also the Encryption tones (which would simplify logic)
-                //Can the NATO tone + Background tone be mixed in here rather than on the client?
-                //Can we simply the client audio - and make it in effect just a jitter buffer
-                //Audio seperation we can do in bulk for all the mixed down audio - rather than per user, along with the audio volume too
-                if (radioId != 0 && multipleTranmissions && this.amEffect.Loaded)
-                {
-                    //replace the buffer with our own
-                    int outIndex = 0;
-                    while (outIndex < count)
-                    {
-                        var amByte = (float)this.amEffect.AudioEffectDouble[amEffectPosition++];
+                mixBuffer = ProcessClientTransmissions(mixBuffer, _mainAudio, out primarySamples);
+            }
+                
 
-                        mixBuffer[outIndex++] = amByte;
-
-                        if (amEffectPosition == amEffect.AudioEffectDouble.Length)
-                        {
-                            amEffectPosition = 0;
-                        }
-                    }
-                }
-
-                //run through pipeline
-                //TODO figure out how to handle the secondary receiver - so AM doesnt block it too
-                mixBuffer = pipeline.AddClientAudioSamples(mixBuffer, outputSamples, 0, modulation, volume, frequency);
-
-
-                //   waveWriterMono.WriteSamples(buffer, 0, outputSamples);
-
-                //convert to stereo
-                buffer = SeperateAudio(mixBuffer, outputSamples, 0,buffer, offset,radioId);
-
-                //waveWriterStereo.WriteSamples(buffer,offset,outputSamples*2);
-                //its stereo now!
-                outputSamples = outputSamples * 2;
+            //handle guard
+            if (_secondaryAudio.Count > 0)
+            {
+                secondaryMixBuffer = ProcessClientTransmissions(secondaryMixBuffer, _secondaryAudio, out secondarySamples);
             }
 
-            // ensure we return a full buffer of STEREO
-            if (outputSamples < count)
-            {
-                int outputIndex = offset + outputSamples;
-                while (outputIndex < offset + count)
-                {
-                    buffer[outputIndex++] = 0;
-                }
-                outputSamples = count;
-            }
+            //reuse mix buffer
+            mixBuffer = MixArrays(mixBuffer,primarySamples, secondaryMixBuffer, secondarySamples, out int outputSamples);
 
-            return outputSamples;
+            buffer = SeparateAudio(mixBuffer, outputSamples, 0, buffer, offset, radioId);
+
+            //we're now stereo - double the samples
+            outputSamples = outputSamples * 2;
+
+        //    waveWriter.WriteSamples(buffer,offset, outputSamples);
+
+            //clear
+            _mainAudio.Clear();
+            _secondaryAudio.Clear();
+            return EnsureFullBuffer(buffer, outputSamples, offset, count);
         }
 
+        private float[] MixArrays(float[] array1, int array1Length, float[] array2, int array2Length, out int count)
+        {
+            if (array1Length > array2Length)
+            {
+                for (int i = 0; i < array2Length; i++)
+                {
+                    array1[i] += array2[i];
+                }
 
-        public float[] SeperateAudio(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat,  int dstOffset, int radioId)
+                count = array1Length;
+                return array1;
+            }
+            else
+            {
+                for (int i = 0; i < array1Length; i++)
+                {
+                    array2[i] += array1[i];
+                }
+
+                count = array2Length;
+                return array2;
+            }
+        }
+
+        private float[] ProcessClientTransmissions(float[] tempBuffer, List<DeJitteredTransmission> transmissions, out int clientTransmissionLength)
+        {
+            DeJitteredTransmission lastTransmission = transmissions[0];
+
+            clientTransmissionLength = 0;
+            foreach (var transmission in transmissions)
+            {
+                for (int i = 0; i < transmission.pcmAudio.Length; i++)
+                {
+                    tempBuffer[i] += transmission.pcmAudio[i];
+                }
+
+                clientTransmissionLength = Math.Max(clientTransmissionLength, transmission.pcmAudio.Length);
+            }
+
+            bool process = true;
+
+            //TODO take info account server setting AND volume of this radio AND if its AM or FM
+            if (radioId != 0 
+                && !lastTransmission.NoAudioEffects
+                && (lastTransmission.Modulation == RadioInformation.Modulation.AM 
+                    || lastTransmission.Modulation == RadioInformation.Modulation.FM)
+                             && serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
+            {
+                if (transmissions.Count > 1)
+                {
+                    if (lastTransmission.Modulation == RadioInformation.Modulation.AM && amCollisionEffect.Loaded)
+                    {
+                        //replace the buffer with our own
+                        int outIndex = 0;
+                        while (outIndex < clientTransmissionLength)
+                        {
+                            var amByte = this.amCollisionEffect.AudioEffectFloat[amEffectPosition++];
+
+                            tempBuffer[outIndex++] = amByte * lastTransmission.Volume;
+
+                            if (amEffectPosition == amCollisionEffect.AudioEffectFloat.Length)
+                            {
+                                amEffectPosition = 0;
+                            }
+                        }
+
+                        process = false;
+                    }
+                    else
+                    {
+                        //FM picketing / picket fencing - pick one transmission at random
+                        //TODO improve this to pick the stronger frequency?
+
+                        int index = random.Next(transmissions.Count);
+                        var transmission = transmissions[index];
+    
+                        for (int i = 0; i < transmission.pcmAudio.Length; i++)
+                        {
+                            tempBuffer[i] = transmission.pcmAudio[i];
+                        }
+
+                        clientTransmissionLength = transmission.pcmAudio.Length;
+                    }
+                }
+            }
+
+            //TODO only apply pipeline if AM or FM affect doesnt apply?
+            if (process)
+                tempBuffer = pipeline.ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
+
+
+            return tempBuffer;
+        }
+
+        private float[] SeparateAudio(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset, int radioId)
         {
             var settingType = ProfileSettingsKeys.Radio1Channel;
 
@@ -257,7 +330,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             }
             else
             {
-                return CreateBalancedMix(srcFloat,  srcCount,  srcOffset, dstFloat, dstOffset, 0);
+                return CreateBalancedMix(srcFloat, srcCount, srcOffset, dstFloat, dstOffset, 0);
             }
 
             float balance = 0;
@@ -276,56 +349,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         public static float[] CreateBalancedMix(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset, float balance)
         {
-            float left = 1.0f;
-            float right = 1.0f;
+            float left = (1.0f - balance) / 2.0f;
+            float right = 1.0f - left;
 
-            //right
-            if (balance > 0)
-            {
-                var leftBias = 1 - Math.Abs(balance);
-                var rightBias = Math.Abs(balance);
-                //right
-                left = left * leftBias;
-                right = right * rightBias;
-            }
-            else if (balance < 0)
-            {
-                var leftBias = Math.Abs(balance);
-                var rightBias = 1 - Math.Abs(balance);
-                //left
-                left = left * leftBias;
-                right = right * rightBias;
-            }
-            else
-            {
-                //equal balance
-                left = 0.5f;
-                right = 0.5f;
-            }
-
-            if (left > 1f)
-            {
-                left = 1f;
-            }
-            if (right > 1f)
-            {
-                right = 1f;
-            }
-
-         
             //temp set of mono floats
-          
-
             int monoBufferPosition = 0;
             for (int i = 0; i < srcCount * 2; i += 2)
             {
-                dstFloat[i + dstOffset] = srcFloat[monoBufferPosition+ srcOffset] * left;
-                dstFloat[i + dstOffset + 1] = srcFloat[monoBufferPosition +srcOffset] * right;
+                dstFloat[i + dstOffset] = srcFloat[monoBufferPosition + srcOffset] * left;
+                dstFloat[i + dstOffset + 1] = srcFloat[monoBufferPosition + srcOffset] * right;
                 monoBufferPosition++;
             }
 
             return dstFloat;
         }
+
+        private int EnsureFullBuffer(float[] buffer, int samplesCount,  int offset, int count)
+        {
+            // ensure we return a full buffer of STEREO
+            if (samplesCount < count)
+            {
+                int outputIndex = offset + samplesCount;
+                while (outputIndex < offset + count)
+                {
+                    buffer[outputIndex++] = 0;
+                }
+                samplesCount = count;
+            }
+
+            return samplesCount;
+        }
     }
 }
-

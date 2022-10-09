@@ -67,6 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RotaryStyleIncrement,
         IntercomTransmissionStartSelection,
         IntercomTransmissionEndSelection,
+        AMCollisionVolume,
     }
 
     public class ProfileSettingsStore
@@ -131,6 +132,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.HFNoiseVolume.ToString(), "0.15"},
             {ProfileSettingsKeys.UHFNoiseVolume.ToString(), "0.15"},
             {ProfileSettingsKeys.FMNoiseVolume.ToString(), "0.4"},
+
+            {ProfileSettingsKeys.AMCollisionVolume.ToString(), "1.0"},
 
             {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), "false"},
         };

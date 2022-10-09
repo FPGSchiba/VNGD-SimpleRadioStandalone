@@ -21,5 +21,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         public ulong PacketNumber { get; set; }
         public string OriginalClientGuid { get; internal set; }
         public bool IsSecondary { get; set; }
+        public bool NoAudioEffects { get; set; }
     }
 }

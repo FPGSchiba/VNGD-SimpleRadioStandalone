@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Utils;
 using NAudio.Wave;
@@ -8,7 +9,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
-    public class JitterBufferProviderInterface : ISampleProvider
+    public class JitterBufferProviderInterface 
     {
         private readonly CircularFloatBuffer _circularBuffer;
 
@@ -27,6 +28,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         //  private const int INITIAL_DELAY_MS = 200;
         //   private long _delayedUntil = -1; //holds audio for a period of time
 
+        private DeJitteredTransmission lastTransmission;
+
+        private float[] returnBuffer;
+
         public JitterBufferProviderInterface(WaveFormat waveFormat)
         {
             WaveFormat = waveFormat;
@@ -38,16 +43,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public WaveFormat WaveFormat { get; }
 
-        public int Read(float[] buffer, int offset, int count)
+        public DeJitteredTransmission Read(int count)
         {
-            int now = Environment.TickCount;
+          //  int now = Environment.TickCount;
+
+            returnBuffer = BufferHelpers.Ensure(returnBuffer, count);
 
             //other implementation of waiting
-//            if(_delayedUntil > now)
-//            {
-//                //wait
-//                return 0;
-//            }
+            //            if(_delayedUntil > now)
+            //            {
+            //                //wait
+            //                return 0;
+            //            }
 
             var read = 0;
             lock (_lock)
@@ -61,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 do
                 {
-                    read = read + _circularBuffer.Read(buffer, offset + read, count - read);
+                    read = read + _circularBuffer.Read(returnBuffer,  read, count - read);
 
                     if (read < count)
                     {
@@ -83,6 +90,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                             //no Pop?
                             _bufferedAudio.RemoveFirst();
 
+                            lastTransmission = new DeJitteredTransmission()
+                            {
+                                Modulation = audio.Modulation,
+                                Frequency = audio.Frequency,
+                                Decryptable = audio.Decryptable,
+                                IsSecondary = audio.IsSecondary,
+                                ReceivedRadio = audio.ReceivedRadio,
+                                Volume = audio.Volume,
+                                NoAudioEffects = audio.NoAudioEffects
+                            };
+
                             if (_lastRead == 0)
                                 _lastRead = audio.PacketNumber;
                             else
@@ -102,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                                         for (var i = 0; i < (int)fill; i++)
                                         {
-                                           // _circularBuffer.Write(_silence, 0, _silence.Length);
+                                            _circularBuffer.Write(_silence, 0, _silence.Length);
                                         }
                                     }
                                   
@@ -122,7 +140,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 //                }
             }
 
-            return read;
+            lastTransmission.count = read;
+
+            if (read > 0)
+            {
+                lastTransmission.pcmAudio = returnBuffer;
+            }
+            else
+            {
+                lastTransmission.pcmAudio = null;
+            }
+          
+            return lastTransmission;
         }
 
         public void AddSamples(JitterBufferAudio jitterBufferAudio)

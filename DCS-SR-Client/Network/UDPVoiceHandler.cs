@@ -524,6 +524,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             };
 
 
+                                            //TODO move this into the mixdown radio pipeline
                                             //handle effects
                                             var radioState = _radioReceivingState[audio.ReceivedRadio];
 
@@ -569,18 +570,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                             _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
 
-                                            if (i == 0)
+                                        
+                                            //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
+                                            //this is a nice optimisation to save duplicated audio on servers without that setting 
+                                            if (i == 0 || _serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
                                             {
-
-                                                bool overrideEffects = false;
-
                                                 if (_serverSettings.GetSettingAsBool(ServerSettingsKeys
                                                     .RADIO_EFFECT_OVERRIDE))
                                                 {
-                                                    overrideEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
+                                                    audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency); ;
                                                 }
 
-                                                _audioManager.AddClientAudio(audio, overrideEffects);
+                                                _audioManager.AddClientAudio(audio);
                                             }
                                         }
 

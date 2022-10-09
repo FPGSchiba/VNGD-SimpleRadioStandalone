@@ -773,10 +773,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 _volumeSampleProvider = null;
 
-                foreach (var mixer in _radioMixingProvider)
-                {
-                    mixer.RemoveAllMixerInputs();
-                }
+                if(_radioMixingProvider!=null)
+                    foreach (var mixer in _radioMixingProvider)
+                    {
+                        mixer.RemoveAllMixerInputs();
+                    }
 
                 _radioMixingProvider = new List<RadioMixingProvider>();
 
@@ -806,7 +807,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void AddClientAudio(ClientAudio audio, bool skipEffects = false)
+        public void AddClientAudio(ClientAudio audio)
         {
             //sort out effects!
 
@@ -830,7 +831,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                
             }
 
-            client.AddClientAudioSamples(audio, skipEffects);
+            client.AddClientAudioSamples(audio);
         }
 
         private void RemoveClientBuffer(SRClient srClient)

@@ -27,10 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private bool passThrough;
-        //private readonly WaveFileWriter waveWriter;
-
-        public bool IsSecondary { get; set; }
-
+       // private readonly WaveFileWriter waveWriter;
         public ClientAudioProvider(bool passThrough = false)
         {
             this.passThrough = passThrough;
@@ -50,6 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 
             }
            // waveWriter = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\output{RandomFloat()}.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
+            
             _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
             _decoder.ForwardErrorCorrection = false;
             _decoder.MaxDataBytes = AudioManager.OUTPUT_SAMPLE_RATE * 4;
@@ -77,13 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return false;
         }
 
-        public float[] AddClientAudioSamples(ClientAudio audio, bool skipEffects = false)
+        public float[] AddClientAudioSamples(ClientAudio audio)
         {
-            //TODO this is a hack
-            IsSecondary = audio.IsSecondary;
-            Volume = audio.Volume;
-            Modulation = (Modulation)audio.Modulation;
-            Frequency = audio.Frequency;
 
             //sort out volume
             //            var timer = new Stopwatch();
@@ -110,11 +103,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //convert the byte buffer to a wave buffer
          //   var waveBuffer = new WaveBuffer(tmp);
 
-            var floatBuffer = tmp;
-
-         //   waveWriter.WriteSamples(floatBuffer,0,floatBuffer.Length);
+       
             
-            audio.PcmAudioFloat = floatBuffer;
+            audio.PcmAudioFloat = tmp;
 
             var decrytable = audio.Decryptable /* || (audio.Encryption == 0) <--- this test has already been performed by all callers and would require another call to check for STRICT_AUDIO_ENCRYPTION */;
 
@@ -140,12 +131,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             LastUpdate = DateTime.Now.Ticks;
 
-            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
-            {
-                AudioRecordingManager.Instance.AppendClientAudio(audio);
-            }
+            //TODO handle recording
+            // if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            // {
+            //     AudioRecordingManager.Instance.AppendClientAudio(audio);
+            // }
 
-            if(audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
+    //        waveWriter.WriteSamples(audio.PcmAudioFloat, 0,audio.PcmAudioFloat.Length);
+
+            if (audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
             {
                 // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough
                 if (passThrough)
@@ -163,14 +157,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 JitterBufferProviderInterface[audio.ReceivedRadio].AddSamples(new JitterBufferAudio
                 {
-                    //TODO dont seperate audio here - do it at the mixdown radio mixing provider
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.PacketNumber,
                     Decryptable = decrytable,
-                    Modulation = audio.Modulation,
+                    Modulation = (Modulation) audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
-                    IsSecondary = audio.IsSecondary
+                    IsSecondary = audio.IsSecondary,
+                    Frequency = audio.Frequency,
+                    NoAudioEffects = audio.NoAudioEffects,
                 });
 
                 return null;
@@ -184,10 +179,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             //timer.Stop();
         }
 
-        public float Volume { get; set; }
-        public Modulation Modulation { get; private set; }
-        public double Frequency { get; set; }
-
         private void AdjustVolumeForLoss(ClientAudio clientAudio)
         {
             if (clientAudio.Modulation == (short)Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
@@ -198,23 +189,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             var audio = clientAudio.PcmAudioFloat;
             for (var i = 0; i < audio.Length; i++)
             {
-                var speaker1Short = audio[i];
+                var audioFloat = audio[i];
 
                 //add in radio loss
                 //if less than loss reduce volume
                 if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
                 {
                     //gives linear signal loss from 15% down to 0%
-                    speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.RecevingPower));
+                    audioFloat = (float)(audioFloat * (1.0f - clientAudio.RecevingPower));
                 }
 
                 //0 is no loss so if more than 0 reduce volume
                 if (clientAudio.LineOfSightLoss > 0)
                 {
-                    speaker1Short = (short)(speaker1Short * (1.0f - clientAudio.LineOfSightLoss));
+                    audioFloat = (audioFloat * (1.0f - clientAudio.LineOfSightLoss));
                 }
 
-                audio[i] = speaker1Short;
+                audio[i] = audioFloat;
             }
         }
         private void AddEncryptionFailureEffect(ClientAudio clientAudio)
@@ -244,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         {
             // waveWriter.Flush();
             // waveWriter.Dispose();
-            _decoder.Dispose();
+            _decoder?.Dispose();
             _decoder = null;
         }
 
