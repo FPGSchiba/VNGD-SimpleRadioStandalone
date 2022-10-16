@@ -19,5 +19,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public double Frequency { get; set; }
         public bool NoAudioEffects { get; set; }
+
+        public string Guid { get; set; }
+        public string OriginalClientGuid { get; set; }
     }
 }

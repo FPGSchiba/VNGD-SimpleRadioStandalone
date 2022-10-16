@@ -5,9 +5,11 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
@@ -15,6 +17,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
+using NAudio.Utils;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
@@ -63,6 +66,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         short[] _pcmShort = new short[AudioManager.MIC_SEGMENT_FRAMES];
         byte[] _pcmBytes = new byte[AudioManager.MIC_SEGMENT_FRAMES * 2];
 
+        private byte[] _tempMicOutputBuffer = null;
+
         private float _speakerBoost = 1.0f;
         private UdpVoiceHandler _udpVoiceHandler;
         private VolumeSampleProviderWithPeak _volumeSampleProvider;
@@ -89,11 +94,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private ClientAudioProvider _passThroughAudioProvider;
 
+        private ClientEffectsPipeline _clientEffectsPipeline;
+
+        private string _guid;
+
         public AudioManager(bool windowsN)
         {
             this.windowsN = windowsN;
 
             _cachedAudioEffectsProvider = CachedAudioEffectProvider.Instance;
+            _clientEffectsPipeline = new ClientEffectsPipeline();
+
+            //_beforeWaveFile = new WaveFileWriter(@"C:\Temp\Test-Preview-Before.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 32, 1));
         }
 
         public float SpeakerBoost
@@ -112,6 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public void StartEncoding(string guid, InputDeviceManager inputManager,
             IPAddress ipAddress, int port)
         {
+            guid = ClientStateSingleton.Instance.ShortGUID;
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
@@ -202,7 +215,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     _passThroughAudioProvider = new ClientAudioProvider(true);
                     _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40,windowsN);
 
-                    _micWaveOutBuffer = new BufferedWaveProvider(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
+                    _micWaveOutBuffer = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 1));
                     _micWaveOutBuffer.ReadFully = true;
                     _micWaveOutBuffer.DiscardOnBufferOverflow = true;
 
@@ -310,7 +323,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             {
                 //create and use in the same thread or COM issues
                 _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
-                // _beforeWaveFile = new WaveFileWriter(@"C:\Temp\Test-Preview-Before.wav", new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
+                 
                 // _afterFileWriter = new WaveFileWriter(@"C:\Temp\Test-Preview-after.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
             }
 
@@ -383,27 +396,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                             // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
 
-                            if (clientAudio != null && _micWaveOutBuffer != null)
+                            if (clientAudio != null && (_micWaveOutBuffer != null 
+                                                        || GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)))
                             {
+
                                 //todo see if we can fix the resample / opus decode
                                 //send audio so play over local too
-                                var processedAudioBytes = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
+                                var jitterBufferAudio = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
                                 
                                 //TODO fix
                                 // //process bytes and add effects
-                                // if (processedAudioBytes?.Length > 0)
-                                // {
-                                //      // _afterFileWriter.Write(processedAudioBytes, 0, processedAudioBytes.Length);
-                                //     _micWaveOutBuffer?.AddSamples(processedAudioBytes, 0, processedAudioBytes.Length);
-                                // }
-                                
-                            }
+                                if (jitterBufferAudio!=null)
+                                {
+                                    DeJitteredTransmission deJittered =  new DeJitteredTransmission()
+                                    {
+                                        PCMAudioLength = jitterBufferAudio.Audio.Length,
+                                        Modulation = jitterBufferAudio.Modulation,
+                                        Volume = jitterBufferAudio.Volume,
+                                        Decryptable = true,
+                                        Frequency = jitterBufferAudio.Frequency,
+                                        IsSecondary = jitterBufferAudio.IsSecondary,
+                                        NoAudioEffects = jitterBufferAudio.NoAudioEffects,
+                                        ReceivedRadio = jitterBufferAudio.ReceivedRadio,
+                                        PCMMonoAudio = jitterBufferAudio.Audio,
+                                        Guid = _guid,
+                                        OriginalClientGuid = _guid
+                                    };
 
-                            if (clientAudio != null && (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)))
-                            {
-                                // TODO check this? 
-                                AddClientAudio(clientAudio); // Hacky way to get own transmissions with the necessary effects and into recording queues
+                                    //process audio
+                                    float[] tempFloat = _clientEffectsPipeline.ProcessClientAudioSamples(jitterBufferAudio.Audio,
+                                        jitterBufferAudio.Audio.Length, 0, deJittered);
+
+                                    if (_micWaveOut != null)
+                                    {
+                                       
+                                        //now its a processed Mono audio
+                                        //TODO reuse this buffer
+                                        _tempMicOutputBuffer = BufferHelpers.Ensure(_tempMicOutputBuffer, tempFloat.Length * 4);
+                                        Buffer.BlockCopy(tempFloat, 0, _tempMicOutputBuffer, 0, tempFloat.Length * 4);
+
+                                        //_beforeWaveFile?.WriteSamples(jitterBufferAudio.Audio,0,jitterBufferAudio.Audio.Length);
+                                        //_beforeWaveFile?.Write(pcm32, 0, pcm32.Length);
+                                        //_beforeWaveFile?.Flush();
+
+                                        _micWaveOutBuffer.AddSamples(_tempMicOutputBuffer, 0, tempFloat.Length * 4);
+                                    }
+
+                                    if (GlobalSettingsStore.Instance.GetClientSettingBool(
+                                        GlobalSettingsKeys.RecordAudio))
+                                    {
+                                        ///TODO cache this to avoid the contant lookup
+                                       // AudioRecordingManager.Instance.AppendClientAudio(deJittered);
+                                    }
+                                   
+                                }
                             }
+                         
                         }
                         else
                         {
@@ -428,7 +476,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 }
             }
         }
-
         private void ShowInputError(string message)
         {
             if (Environment.OSVersion.Version.Major == 10)

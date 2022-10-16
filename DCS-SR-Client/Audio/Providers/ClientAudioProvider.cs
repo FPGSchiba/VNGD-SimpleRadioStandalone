@@ -75,7 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             return false;
         }
 
-        public float[] AddClientAudioSamples(ClientAudio audio)
+        public JitterBufferAudio AddClientAudioSamples(ClientAudio audio)
         {
 
             //sort out volume
@@ -97,6 +97,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             // for some reason if this is removed then it lags?!
             //guess it makes a giant buffer and only uses a little?
             //Answer: makes a buffer of 4000 bytes - so throw away most of it
+
+            //TODO reuse this buffer
             var tmp = new float[decodedLength/4];
             Buffer.BlockCopy(decoded, 0, tmp, 0, decodedLength);
 
@@ -145,7 +147,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 if (passThrough)
                 {
                     //return MONO PCM 16 as bytes
-                    return audio.PcmAudioFloat;
+                    return new JitterBufferAudio
+                    {
+                        Audio = audio.PcmAudioFloat,
+                        PacketNumber = audio.PacketNumber,
+                        Decryptable = decrytable,
+                        Modulation = (Modulation)audio.Modulation,
+                        ReceivedRadio = audio.ReceivedRadio,
+                        Volume = audio.Volume,
+                        IsSecondary = audio.IsSecondary,
+                        Frequency = audio.Frequency,
+                        NoAudioEffects = audio.NoAudioEffects,
+                        Guid = audio.ClientGuid,
+                        OriginalClientGuid = audio.OriginalClientGuid
+                    };
                 }
                 else
                 {
@@ -166,6 +181,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     IsSecondary = audio.IsSecondary,
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
+                    Guid = audio.ClientGuid,
+                    OriginalClientGuid = audio.OriginalClientGuid
                 });
 
                 return null;
@@ -173,7 +190,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             else
             {
                 //return MONO PCM 32 as bytes
-                return audio.PcmAudioFloat;
+                return new JitterBufferAudio
+                {
+                    Audio = audio.PcmAudioFloat,
+                    PacketNumber = audio.PacketNumber,
+                    Decryptable = decrytable,
+                    Modulation = (Modulation)audio.Modulation,
+                    ReceivedRadio = audio.ReceivedRadio,
+                    Volume = audio.Volume,
+                    IsSecondary = audio.IsSecondary,
+                    Frequency = audio.Frequency,
+                    NoAudioEffects = audio.NoAudioEffects,
+                    Guid = audio.ClientGuid,
+                    OriginalClientGuid = audio.OriginalClientGuid
+                };
             }
 
             //timer.Stop();

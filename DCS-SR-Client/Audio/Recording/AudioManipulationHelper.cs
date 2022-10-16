@@ -54,14 +54,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             return (toWrite, remainder);
         }
 
-        public static short[] SineWaveOut(int sampleLength, int sampleRate, double volume)
+        public static float[] SineWaveOut(int sampleLength, int sampleRate, double volume)
         {
-            short[] sineBuffer = new short[sampleLength];
+            float[] sineBuffer = new float[sampleLength];
             double amplitude = volume * short.MaxValue;
 
             for (int i = 0; i < sineBuffer.Length; i++)
             {
-                sineBuffer[i] = (short)(amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate));
+                sineBuffer[i] =(float) (amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate))/ 32768.0f;
             }
             return sineBuffer;
         }
@@ -73,6 +73,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             // prevent any potential issues due to a negative time being returned
             return necessarySamples >= 0 ? necessarySamples : 0;
             //return necessarySamples
+        }
+
+        public static float[] MixArraysClipped(float[] array1, int array1Length, float[] array2, int array2Length, out int count)
+        {
+            if (array1Length > array2Length)
+            {
+                for (int i = 0; i < array2Length; i++)
+                {
+                    array1[i] += array2[i];
+
+                    //clip
+                    if (array1[i] > 1f)
+                    {
+                        array1[i] = 1.0f;
+                    }
+                }
+
+                count = array1Length;
+                return array1;
+            }
+            else
+            {
+                for (int i = 0; i < array1Length; i++)
+                {
+                    array2[i] += array1[i];
+
+                    //clip
+                    if (array2[i] > 1f)
+                    {
+                        array2[i] = 1.0f;
+                    }
+                }
+
+               
+
+                count = array2Length;
+                return array2;
+            }
         }
     }
 }

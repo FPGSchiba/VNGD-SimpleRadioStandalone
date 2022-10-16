@@ -8,6 +8,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using MathNet.Filtering;
 using NAudio.Dsp;
 
@@ -52,10 +53,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         private bool radioEffects;
         private bool radioBackgroundNoiseEffect;
 
+        private CachedAudioEffect amCollisionEffect;
+        private int amEffectPosition = 0;
+        private float amCollisionVol = 1.0f;
+
+        private readonly SyncedServerSettings serverSettings;
+
 
         public ClientEffectsPipeline()
         {
             profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+            serverSettings =  SyncedServerSettings.Instance;
 
             _filters = new OnlineFilter[2];
             _filters[0] =
@@ -66,11 +74,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             _highPassFilter = BiQuadFilter.HighPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 520, 0.97f);
             _lowPassFilter = BiQuadFilter.LowPassFilter(AudioManager.OUTPUT_SAMPLE_RATE, 4130, 2.0f);
             RefreshSettings();
+
+            amCollisionEffect = CachedAudioEffectProvider.Instance.AMCollision;
+            amCollisionVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.AMCollisionVolume);
         }
 
         private void RefreshSettings()
         {
             //only get settings every 3 seconds - and cache them - issues with performance
+            //TODO cache SERVER SETTINGS here too
             long now = DateTime.Now.Ticks;
 
             if (TimeSpan.FromTicks(now - lastRefresh).TotalSeconds > 3) //3 seconds since last refresh
@@ -93,6 +105,82 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
                 radioBackgroundNoiseEffect = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect) ;
             }
+        }
+
+        public float[] ProcessClientTransmissions(float[] tempBuffer, List<DeJitteredTransmission> transmissions, out int clientTransmissionLength)
+        {
+            DeJitteredTransmission lastTransmission = transmissions[0];
+
+            clientTransmissionLength = 0;
+            foreach (var transmission in transmissions)
+            {
+                for (int i = 0; i < transmission.PCMAudioLength; i++)
+                {
+                    tempBuffer[i] += transmission.PCMMonoAudio[i];
+                }
+
+                clientTransmissionLength = Math.Max(clientTransmissionLength, transmission.PCMAudioLength);
+            }
+
+            bool process = true;
+
+            //TODO take info account server setting AND volume of this radio AND if its AM or FM
+            // FOR HAVEQUICK - only if its MORE THAN TWO
+            if (lastTransmission.ReceivedRadio != 0
+                && !lastTransmission.NoAudioEffects
+                && (lastTransmission.Modulation == RadioInformation.Modulation.AM
+                    || lastTransmission.Modulation == RadioInformation.Modulation.FM
+                    || lastTransmission.Modulation == RadioInformation.Modulation.HAVEQUICK)
+                && serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
+            {
+                if (transmissions.Count > 1)
+                {
+                    //All AM is wrecked if more than one transmission
+                    //For HQ - only if more than TWO transmissions
+                    if (lastTransmission.Modulation == RadioInformation.Modulation.AM && amCollisionEffect.Loaded
+                    || lastTransmission.Modulation == RadioInformation.Modulation.HAVEQUICK && transmissions.Count > 2)
+                    {
+                        //replace the buffer with our own
+                        int outIndex = 0;
+                        while (outIndex < clientTransmissionLength)
+                        {
+                            var amByte = this.amCollisionEffect.AudioEffectFloat[amEffectPosition++];
+
+                            tempBuffer[outIndex++] = amByte * lastTransmission.Volume;
+
+                            if (amEffectPosition == amCollisionEffect.AudioEffectFloat.Length)
+                            {
+                                amEffectPosition = 0;
+                            }
+                        }
+
+                        process = false;
+                    }
+                    else if (lastTransmission.Modulation == RadioInformation.Modulation.FM)
+                    {
+                        //FM picketing / picket fencing - pick one transmission at random
+                        //TODO improve this to pick the stronger frequency?
+
+                        int index = _random.Next(transmissions.Count);
+                        var transmission = transmissions[index];
+
+                        for (int i = 0; i < transmission.PCMAudioLength; i++)
+                        {
+                            tempBuffer[i] = transmission.PCMMonoAudio[i];
+                        }
+
+                        clientTransmissionLength = transmission.PCMMonoAudio.Length;
+                    }
+
+                }
+            }
+
+            //TODO only apply pipeline if AM or FM affect doesnt apply?
+            if (process)
+                tempBuffer = ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
+
+
+            return tempBuffer;
         }
 
         public float[] ProcessClientAudioSamples(float[] buffer, int count, int offset, DeJitteredTransmission transmission)

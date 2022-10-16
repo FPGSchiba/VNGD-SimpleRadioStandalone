@@ -293,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             while (!_stop)
             {
                if(_ready)
-                {
+               {
                     try
                     {
                         var groupEp = new IPEndPoint(IPAddress.Any, _port);

@@ -98,7 +98,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                                 IsSecondary = audio.IsSecondary,
                                 ReceivedRadio = audio.ReceivedRadio,
                                 Volume = audio.Volume,
-                                NoAudioEffects = audio.NoAudioEffects
+                                NoAudioEffects = audio.NoAudioEffects,
+                                Guid = audio.Guid,
+                                OriginalClientGuid = audio.OriginalClientGuid
                             };
 
                             if (_lastRead == 0)
@@ -140,15 +142,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 //                }
             }
 
-            lastTransmission.count = read;
+            lastTransmission.PCMAudioLength = read;
 
             if (read > 0)
             {
-                lastTransmission.pcmAudio = returnBuffer;
+                lastTransmission.PCMMonoAudio = returnBuffer;
             }
             else
             {
-                lastTransmission.pcmAudio = null;
+                lastTransmission.PCMMonoAudio = null;
             }
           
             return lastTransmission;

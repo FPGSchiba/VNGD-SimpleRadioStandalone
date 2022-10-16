@@ -21,9 +21,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models
 
         public double Frequency { get; set; }
 
-        public float[] pcmAudio { get; set; }
+        public float[] PCMMonoAudio { get; set; }
 
-        public int count { get; set; }
+        public int PCMAudioLength { get; set; }
         public bool NoAudioEffects { get; set; }
+
+        public string Guid { get; set; }
+
+        public string OriginalClientGuid { get; set; }
     }
 }
