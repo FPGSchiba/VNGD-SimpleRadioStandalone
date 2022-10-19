@@ -51,9 +51,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
                 
                 try 
                 {
-                    DragDrop.DoDragDrop(FavouritesGrid, serverAddress, DragDropEffects.Move);
+                    //if we're editing it gets stuck editing if we trigger drag drop
+                    if (!selectedRow.IsEditing)
+                    {
+                        DragDrop.DoDragDrop(FavouritesGrid, serverAddress, DragDropEffects.Move);
+                    }
+                    
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     // catches any out of bounds movements, should probably be replaced with validation at some point
                 }                              

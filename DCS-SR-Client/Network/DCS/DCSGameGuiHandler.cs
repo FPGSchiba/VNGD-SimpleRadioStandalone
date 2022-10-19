@@ -129,8 +129,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             {
                 _dcsGameGuiUdpListener?.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
 
             _clientStateSingleton.DcsGameGuiLastReceived = -1;

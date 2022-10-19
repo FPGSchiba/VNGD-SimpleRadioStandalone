@@ -152,7 +152,7 @@ namespace DCS_SR_Client
                             Environment.Exit(0);
                         }));
                     }
-                    catch (System.ComponentModel.Win32Exception ex)
+                    catch (System.ComponentModel.Win32Exception)
                     {
                         MessageBox.Show(
                                 "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds for SRS and want to stop this message - Disable Require Admin Rights in SRS Settings\n\nSRS will continue without admin rights but keyboard binds will not work!",

@@ -56,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 //Doesnt clear mappings on Shutdown - not sure why? The async deletes also dont work on application close but DO work on start / stop button press.
                 //Maybe background threads are terminated?
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
 
            
 

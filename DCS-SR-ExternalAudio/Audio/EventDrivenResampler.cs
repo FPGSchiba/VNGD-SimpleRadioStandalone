@@ -16,7 +16,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
 
         private WaveFormat input;
         private WaveFormat output;
-        private WdlResampler resampler;
         private WdlResamplingSampleProvider mediaFoundationResampler;
         private BufferedWaveProvider buf;
         private IWaveProvider waveOut;

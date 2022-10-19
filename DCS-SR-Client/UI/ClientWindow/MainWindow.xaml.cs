@@ -958,7 +958,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                                     }));
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                             }
 
@@ -1068,7 +1068,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _audioManager.StopEncoding();
                 AudioRecordingManager.Instance.Stop();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
@@ -1981,7 +1981,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Process.Start(
                     "https://www.patreon.com/ciribob");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }

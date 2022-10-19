@@ -63,7 +63,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
                                 Value = frequency * MHz,
                             });
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Logger.Log(LogLevel.Info, "Error parsing frequency  "+trimmed);
                         }

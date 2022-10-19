@@ -521,7 +521,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 Stop();
                 _clients.Clear();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }

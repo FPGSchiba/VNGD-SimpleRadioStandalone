@@ -47,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     var button = devices[ControlInputBinding].Button;
                     DeviceText.Text =
                         GetDeviceText(button, devices[ControlInputBinding].DeviceName);
-                    Device.Text = devices[ControlInputBinding].DeviceName;
+                    Device.Text = GetDeviceName(devices[ControlInputBinding].DeviceName);
                 }
                 else
                 {
@@ -60,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     var button = devices[ModifierBinding].Button;
                     ModifierText.Text =
                         GetDeviceText(button, devices[ModifierBinding].DeviceName);
-                    ModifierDevice.Text = devices[ModifierBinding].DeviceName;
+                    ModifierDevice.Text = GetDeviceName(devices[ModifierBinding].DeviceName);
                 }
                 else
                 {
@@ -80,13 +80,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 DeviceClear.IsEnabled = true;
                 DeviceButton.IsEnabled = true;
 
-                Device.Text = device.DeviceName;
+                Device.Text = GetDeviceName(device.DeviceName);
                 DeviceText.Text = GetDeviceText(device.Button, device.DeviceName);
 
                 device.InputBind = ControlInputBinding;
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });
+        }
+
+        private string GetDeviceName(string name)
+        {
+            //fix crazy long WINWING names
+            if (name.Length > 30)
+            {
+                return name.Trim().Substring(0, 30);
+            }
+
+            return name;
         }
 
         private string GetDeviceText(int button, string name)
