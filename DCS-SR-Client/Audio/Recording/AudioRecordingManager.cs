@@ -27,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         private readonly int _sampleRate;
         private readonly List<CircularFloatBuffer> _clientMixDownQueue;
+        private readonly List<CircularFloatBuffer> _playerMixDownQueue;
         private readonly ConcurrentQueue<AudioRecordingSample>[] _playerAudioSampleQueue;
 
         //create 2 sets of queues with 10 each
@@ -40,20 +41,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         private AudioRecordingManager()
         {
             _sampleRate = 48000;
-            //TODO change that hardcoded 11 to run off number of radios
-            //TODO get proper format for MP3
-         //   _clientSampleQueue = new ConcurrentQueue<AudioRecordingSample>[11];
-
-    
+        
             _stop = true;
 
             _clientMixDownQueue = new List<CircularFloatBuffer>();
+            //TODO change that hardcoded 11 to run off number of radios
             for (int i = 0; i < 11; i++)
             {
                 //TODO check size
                 //5 seconds of audio
                 _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE*5));
-            //    _clientSampleQueue[i] = new ConcurrentQueue<AudioRecordingSample>();
             }
 
         }
@@ -98,7 +95,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        private float[] SingleRadioMixDown(AudioRecordingSample sample, out int count)
+        private float[] SingleRadioMixDown(List<DeJitteredTransmission> mainAudio, List<DeJitteredTransmission> secondaryAudio, int radio, out int count)
         {
 
             //should be no more than 80 ms of audio
@@ -109,72 +106,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
             int primarySamples = 0;
             int secondarySamples = 0;
+            int outputSamples = 0;
 
             //run this sample through - mix down all the audio for now PER radio 
             //we can then decide what to do with it later
             //same pipeline (ish) as RadioMixingProvider
 
-            if (sample.MainRadioClientTransmissions?.Count > 0)
+            if (mainAudio?.Count > 0)
             {
-                mixBuffer = pipeline.ProcessClientTransmissions(mixBuffer, sample.MainRadioClientTransmissions,
+                mixBuffer = pipeline.ProcessClientTransmissions(mixBuffer, mainAudio,
                     out primarySamples);
             }
 
             //handle guard
-            if (sample.SecondaryRadioClientTransmissions?.Count > 0)
+            if (secondaryAudio?.Count > 0)
             {
                 secondaryMixBuffer =  new float[AudioManager.OUTPUT_SEGMENT_FRAMES * 10];
-                secondaryMixBuffer = pipeline.ProcessClientTransmissions(secondaryMixBuffer, sample.SecondaryRadioClientTransmissions, out  secondarySamples);
+                secondaryMixBuffer = pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out  secondarySamples);
             }
 
-            mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer, primarySamples, secondaryMixBuffer, secondarySamples, out int outputSamples);
+            if(primarySamples>0 || secondarySamples>0)
+                mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer, primarySamples, secondaryMixBuffer, secondarySamples, out outputSamples);
 
             count = outputSamples;
 
             return mixBuffer;
-        }
-
-      
-        public void AppendClientAudio(DeJitteredTransmission audio)
-        {
-            if (_stop)
-            {
-                Start();
-            }
-            
-            DeJitteredTransmission finalAudio;
-            
-            //TODO fix with the allowrecord enable
-            //TODO audio is now dejittered - so we dont need another degitter - just straight to a recording - or SINE wave if recording isnt allowed
-            // if(true)
-            
-            
-            
-            if(!_connectedClientsSingleton.TryGetValue(audio.OriginalClientGuid, out SRClient client))
-                return;
-            
-            //todo undo
-            if (true || client.AllowRecord 
-                || audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
-            {
-                finalAudio = audio;
-            }
-            else if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone))
-            {
-                //TODO TEST
-                //replace their audio with 
-                finalAudio = new DeJitteredTransmission
-                {
-                    PCMMonoAudio = AudioManipulationHelper.SineWaveOut(audio.PCMMonoAudio.Length, _sampleRate, 0.25),
-                    ReceivedRadio = audio.ReceivedRadio,
-                };
-            }
-            else
-            {
-                return;
-            }
-            //TODO FIX
-           // _clientAudioQueues[audio.ReceivedRadio].Enqueue(finalAudio);
         }
 
         public void Start()
@@ -219,7 +175,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         }
 
-        internal void AppendClientAudio(List<DeJitteredTransmission> mainAudio, List<DeJitteredTransmission> secondaryAudio, int radioId)
+        public void AppendPlayerAudio(DeJitteredTransmission transmission)
+        {
+            if (_stop)
+            {
+                Start();
+            }
+
+            //only record if we need too
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            {
+                ///TODO use this for the player mic transmission
+                /// append to a circular buffer and mix in with the other audio at the final mixdown
+                pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out secondarySamples);
+            }
+        }
+
+        public void AppendClientAudio(List<DeJitteredTransmission> mainAudio, List<DeJitteredTransmission> secondaryAudio, int radioId)
         {
             if (_stop)
             {
@@ -233,17 +205,59 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 //represents a moment in time
                 //should I include time so we can line up correctly?
 
-                float[] buf = SingleRadioMixDown(new AudioRecordingSample()
-                {
-                    MainRadioClientTransmissions = mainAudio,
-                    SecondaryRadioClientTransmissions = secondaryAudio,
-                    RadioId = radioId
-                }, out int count);
+                mainAudio = FilterTransmisions(mainAudio);
+                secondaryAudio = FilterTransmisions(secondaryAudio);
+
+                float[] buf = SingleRadioMixDown( mainAudio,secondaryAudio,radioId, out int count);
                 if (count > 0)
                 {
                     _clientMixDownQueue[radioId].Write(buf, 0, count);
                 }
             }
+        }
+
+        private List<DeJitteredTransmission> FilterTransmisions(List<DeJitteredTransmission> originalTransmissions)
+        {
+            if (originalTransmissions == null || originalTransmissions.Count == 0)
+            {
+                return new List<DeJitteredTransmission>();
+            }
+
+            List<DeJitteredTransmission> filteredTransmisions = new List<DeJitteredTransmission>();
+
+            foreach (var transmission in originalTransmissions)
+            {
+                if (_connectedClientsSingleton.TryGetValue(transmission.OriginalClientGuid, out SRClient client))
+                {
+
+                    if (client.AllowRecord
+                             || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
+                    {
+                        filteredTransmisions.Add(transmission);
+                    }
+                    else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone))
+                    {
+                        //TODO TEST
+                        //replace their audio with 
+                        DeJitteredTransmission toneTransmission = new DeJitteredTransmission
+                        {
+                            PCMMonoAudio = AudioManipulationHelper.SineWaveOut(transmission.PCMAudioLength, _sampleRate, 0.25),
+                            ReceivedRadio = transmission.ReceivedRadio,
+                            PCMAudioLength = transmission.PCMAudioLength,
+                            Decryptable = transmission.Decryptable,
+                            Frequency = transmission.Frequency,
+                            Guid = transmission.Guid,
+                            IsSecondary = transmission.IsSecondary,
+                            Modulation = transmission.Modulation,
+                            NoAudioEffects = transmission.NoAudioEffects,
+                            OriginalClientGuid = transmission.OriginalClientGuid,
+                            Volume = transmission.Volume
+                        };
+                    }
+                }
+            }
+
+            return filteredTransmisions;
         }
     }
 }
