@@ -187,7 +187,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             {
                 ///TODO use this for the player mic transmission
                 /// append to a circular buffer and mix in with the other audio at the final mixdown
-                pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out secondarySamples);
+               // pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out secondarySamples);
             }
         }
 

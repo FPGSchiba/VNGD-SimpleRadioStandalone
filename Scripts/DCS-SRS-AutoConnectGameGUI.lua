@@ -1,4 +1,4 @@
--- Version 2.0.7.0
+-- Version 2.0.8.0
 -- ONLY COPY THIS WHOLE FILE IS YOU ARE GOING TO HOST A SERVER!
 -- The file must be in Saved Games\DCS\Scripts\Hooks or Saved Games\DCS.openalpha\Scripts\Hooks
 -- Make sure you enter the correct address into SERVER_SRS_HOST and SERVER_SRS_PORT (5002 by default) below.
@@ -50,7 +50,7 @@ local JSON = loadfile("Scripts\\JSON.lua")()
 SRSAuto.JSON = JSON
 
 local socket = require("socket")
-local DcsWeb = require('DcsWeb')
+-- local DcsWeb = require('DcsWeb')
 
 SRSAuto.UDPSendSocket = socket.udp()
 SRSAuto.UDPSendSocket:settimeout(0)
@@ -118,8 +118,8 @@ local _lastSent = 0
 SRSAuto.onMissionLoadBegin = function()
 
 	if SRSAuto.SERVER_SRS_HOST_AUTO then
-		SRSAuto.SERVER_SRS_HOST = DcsWeb.get_data('dcs:whatsmyip')
-		SRSAuto.log("SET IP automatically to "..SRSAuto.SERVER_SRS_HOST)
+		--SRSAuto.SERVER_SRS_HOST = DcsWeb.get_data('dcs:whatsmyip')
+		--SRSAuto.log("SET IP automatically to "..SRSAuto.SERVER_SRS_HOST)
 	end
 
 end
@@ -225,4 +225,4 @@ SRSAuto.sendMessage = function(msg, showTime, gid)
 end
 
 DCS.setUserCallbacks(SRSAuto)
-net.log("Loaded - DCS-SRS-AutoConnect 2.0.7.0")
+net.log("Loaded - DCS-SRS-AutoConnect 2.0.8.0")
