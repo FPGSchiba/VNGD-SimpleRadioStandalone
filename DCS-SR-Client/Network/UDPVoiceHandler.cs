@@ -48,8 +48,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private readonly int UDP_VOIP_TIMEOUT = 42; // seconds for timeout before redoing VoIP
 
-        private readonly int JITTER_BUFFER = 50; //in milliseconds
-
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
@@ -71,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private volatile bool _stop;
 
-        private Timer _timer;
+      //  private Timer _timer;
 
         private long _udpLastReceived = 0;
         private DispatcherTimer _updateTimer;
@@ -116,29 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
-        private void AudioEffectCheckTick()
-        {
-
-
-            for (var i = 0; i < _radioReceivingState.Length; i++)
-            {
-                //Nothing on this radio!
-                //play out if nothing after 200ms
-                //and Audio hasn't been played already
-                var radioState = _radioReceivingState[i];
-                if ((radioState != null) && !radioState.PlayedEndOfTransmission && !radioState.IsReceiving)
-                {
-                    radioState.PlayedEndOfTransmission = true;
-
-                    var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-                    if (!radioState.IsSimultaneous)
-                    {
-                        _audioManager.PlaySoundEffectEndReceive(i, radioInfo.radios[i].volume, radioInfo.radios[i].modulation);
-                    }
-                }
-            }
-        }
+      
 
         public void Listen()
         {
@@ -284,8 +260,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _ptt = ptt;
             });
 
-            StartTimer();
-
             StartPing();
 
             _packetNumber = 1; //reset packet number
@@ -293,7 +267,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             while (!_stop)
             {
                if(_ready)
-                {
+               {
                     try
                     {
                         var groupEp = new IPEndPoint(IPAddress.Any, _port);
@@ -327,26 +301,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _clientStateSingleton.IsVoipConnected = false;
         }
-
-        public void StartTimer()
-        {
-            StopTimer();
-
-            // _jitterBuffer.Clear();
-            _timer = new Timer(AudioEffectCheckTick, TimeSpan.FromMilliseconds(JITTER_BUFFER));
-            _timer.Start();
-        }
-
-        public void StopTimer()
-        {
-            if (_timer != null)
-            {
-                //    _jitterBuffer.Clear();
-                _timer.Stop();
-                _timer = null;
-            }
-        }
-
         public void RequestStop()
         {
             _stop = true;
@@ -363,7 +317,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             _inputManager.StopPtt();
 
-            StopTimer();
         }
 
         private SRClient IsClientMetaDataValid(string clientGuid)
@@ -519,33 +472,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                     destinationRadio
                                                         .LineOfSightLoss, // Loss of 1.0 or greater is total loss
                                                 PacketNumber = udpVoicePacket.PacketNumber,
-                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid
+                                                OriginalClientGuid = udpVoicePacket.OriginalClientGuid,
+                                                IsSecondary = destinationRadio.ReceivingState.IsSecondary
                                             };
-
-
-                                            //handle effects
-                                            var radioState = _radioReceivingState[audio.ReceivedRadio];
-
-                                            if (!isSimultaneousTransmission &&
-                                                (radioState == null || radioState.PlayedEndOfTransmission ||
-                                                 !radioState.IsReceiving))
-                                            {
-                                                var audioDecryptable = audio.Decryptable /* || (audio.Encryption == 0) <--- this has already been tested above */;
-
-                                                //mark that we have decrypted encrypted audio for sound effects
-                                                if (audioDecryptable && (audio.Encryption > 0))
-                                                {
-                                                    _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
-                                                        true,
-                                                        audio.Volume, (Modulation) audio.Modulation);
-                                                }
-                                                else
-                                                {
-                                                    _audioManager.PlaySoundEffectStartReceive(audio.ReceivedRadio,
-                                                        false,
-                                                        audio.Volume,(Modulation) audio.Modulation);
-                                                }
-                                            }
 
                                             var transmitterName = "";
                                             if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
@@ -561,25 +490,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 IsSecondary = destinationRadio.ReceivingState.IsSecondary,
                                                 IsSimultaneous = isSimultaneousTransmission,
                                                 LastReceviedAt = DateTime.Now.Ticks,
-                                                PlayedEndOfTransmission = false,
                                                 ReceivedOn = destinationRadio.ReceivingState.ReceivedOn,
                                                 SentBy = transmitterName
                                             };
 
                                             _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
 
-                                            if (i == 0)
+                                        
+                                            //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
+                                            //this is a nice optimisation to save duplicated audio on servers without that setting 
+                                            if (i == 0 || _serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
                                             {
-
-                                                bool overrideEffects = false;
-
                                                 if (_serverSettings.GetSettingAsBool(ServerSettingsKeys
                                                     .RADIO_EFFECT_OVERRIDE))
                                                 {
-                                                    overrideEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
+                                                    audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency); ;
                                                 }
 
-                                                _audioManager.AddClientAudio(audio, overrideEffects);
+                                                _audioManager.AddClientAudio(audio);
                                             }
                                         }
 

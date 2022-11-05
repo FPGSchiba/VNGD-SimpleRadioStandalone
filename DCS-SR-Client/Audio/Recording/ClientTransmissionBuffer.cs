@@ -78,10 +78,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                     }
                 }
 
-                lastAccess = transmission.Last.Value.ReceiveTime + (transmission.Last.Value.PcmAudioShort.LongLength / _sampleRate) * TimeSpan.TicksPerSecond;
+                //TODO FIX
+           //     lastAccess = transmission.Last.Value.ReceiveTime + (transmission.Last.Value.PcmAudioShort.LongLength / _sampleRate) * TimeSpan.TicksPerSecond;
 
-                var fulltransmission = transmission.SelectMany(x => x.PcmAudioShort).ToArray();
-                assembledOut.Add(fulltransmission);
+              //  var fulltransmission = transmission.SelectMany(x => x.PcmAudioShort).ToArray();
+                //assembledOut.Add(fulltransmission);
             }
 
             _clientAudioSamples.Clear();

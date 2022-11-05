@@ -22,7 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         {
 
             this.WaveFormat = waveFormat;
-            var effectDouble = CachedAudioEffectProvider.Instance.NATOTone.AudioEffectDouble;
+            var effectDouble = CachedAudioEffectProvider.Instance.NATOTone.AudioEffectFloat;
 
             _audioEffectShort = new short[effectDouble.Length];
             for (int i = 0; i < effectDouble.Length; i++)

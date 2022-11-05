@@ -15,8 +15,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public bool IsSimultaneous { get; set; }
         public int ReceivedOn { get; set; }
 
-        public bool PlayedEndOfTransmission { get; set; }
-
         public string SentBy { get; set; }
 
         public bool IsReceiving
