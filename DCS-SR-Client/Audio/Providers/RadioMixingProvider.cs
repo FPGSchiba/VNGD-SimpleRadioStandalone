@@ -19,7 +19,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
-        private readonly Settings.ProfileSettingsStore profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+        private readonly Settings.ProfileSettingsStore profileSettings =
+            Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+
         private float[] mixBuffer;
         private float[] secondaryMixBuffer;
         private List<DeJitteredTransmission> _mainAudio = new List<DeJitteredTransmission>();
@@ -134,7 +136,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
             //
             bool ky58Tone = false;
-        
+
             lock (sources)
             {
                 int index = sources.Count - 1;
@@ -160,6 +162,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                         {
                             ky58Tone = true;
                         }
+
                         lastModulation = transmission.Modulation;
                         lastVolume = transmission.Volume;
                     }
@@ -187,15 +190,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             //handle guard
             if (_secondaryAudio.Count > 0)
             {
-                secondaryMixBuffer = pipeline.ProcessClientTransmissions(secondaryMixBuffer, _secondaryAudio, out secondarySamples);
+                secondaryMixBuffer =
+                    pipeline.ProcessClientTransmissions(secondaryMixBuffer, _secondaryAudio, out secondarySamples);
             }
 
             //reuse mix buffer
             //Should we not clip here?
-            mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer,primarySamples, secondaryMixBuffer, secondarySamples, out int outputSamples);
+            mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer, primarySamples, secondaryMixBuffer,
+                secondarySamples, out int outputSamples);
 
             //Now mix in start and end tones, Beeps etc
-            mixBuffer = HandleStartEndTones(mixBuffer,count/2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,lastModulation,ky58Tone, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
+            mixBuffer = HandleStartEndTones(mixBuffer, count / 2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,
+                lastModulation, ky58Tone, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
 
             //figure out number of samples to return
             outputSamples = Math.Max(outputSamples, effectOutputSamples);
@@ -219,18 +225,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 hasPlayedTransmissionStart = true;
                 hasPlayedTransmissionEnd = false;
 
-                // var radio = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios[radioId];
-
-                //TODO not sure about simultaneous
-                //if (!radioReceivingState.IsSimultaneous)
-                {
-                    PlaySoundEffectStartReceive(encryption, modulation);
-                }
+                PlaySoundEffectStartReceive(encryption, modulation);
             }
             else if (!transmisson && !hasPlayedTransmissionEnd && IsEndOfTransmission)
             {
                 hasPlayedTransmissionStart = false;
                 hasPlayedTransmissionEnd = true;
+
+                //TODO not sure about simultaneous
+                //We used to have this logic https://github.com/ciribob/DCS-SimpleRadioStandalone/blob/cd8fcbf7e2b2fafcf30875fc958276e3083e0ebb/DCS-SR-Client/Network/UDPVoiceHandler.cs#L135
+                //if (!radioReceivingState.IsSimultaneous)
                 PlaySoundEffectEndReceive(modulation);
             }
 
@@ -249,7 +253,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 }
 
                 outputSamples = count;
-
             }
             else
             {
@@ -296,7 +299,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         }
 
 
-        public float[] SeparateAudio(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset, int radioId)
+        public float[] SeparateAudio(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset,
+            int radioId)
         {
             var settingType = ProfileSettingsKeys.Radio1Channel;
 
@@ -363,7 +367,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             return CreateBalancedMix(srcFloat, srcCount, srcOffset, dstFloat, dstOffset, balance);
         }
 
-        public static float[] CreateBalancedMix(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset, float balance)
+        public static float[] CreateBalancedMix(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat,
+            int dstOffset, float balance)
         {
             float left = (1.0f - balance) / 2.0f;
             float right = 1.0f - left;
@@ -380,7 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             return dstFloat;
         }
 
-        private int EnsureFullBuffer(float[] buffer, int samplesCount,  int offset, int count)
+        private int EnsureFullBuffer(float[] buffer, int samplesCount, int offset, int count)
         {
             // ensure we return a full buffer of STEREO
             if (samplesCount < count)
@@ -390,6 +395,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 {
                     buffer[outputIndex++] = 0;
                 }
+
                 samplesCount = count;
             }
 
@@ -402,7 +408,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             return samplesCount;
         }
 
-        public void PlaySoundEffectStartReceive(bool encrypted,  RadioInformation.Modulation modulation)
+        public void PlaySoundEffectStartReceive(bool encrypted, RadioInformation.Modulation modulation)
         {
             if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
             {
@@ -417,7 +423,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 return;
             }
 
-           
+
             if (radioId == 0)
             {
                 var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
@@ -456,6 +462,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             {
                 return;
             }
+
             bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
 
             if (radioId == 0)
@@ -485,7 +492,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             else
             {
                 var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
-               
+
                 if (effect.Loaded)
                 {
                     effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
@@ -530,10 +537,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         public bool IsEndOfTransmission
         {
-            get
-            {
-                return (DateTime.Now.Ticks - lastReceivedAt) < 3500000;
-            }
+            get { return (DateTime.Now.Ticks - lastReceivedAt) < 3500000; }
         }
     }
 }
