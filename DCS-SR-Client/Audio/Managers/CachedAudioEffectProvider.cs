@@ -159,34 +159,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             HFNoise = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.HF_NOISE);
 
             //sort out volume (if needed)
-            CreateAudioEffectDouble(HAVEQUICKTone);
-            CreateAudioEffectDouble(NATOTone);
-            CreateAudioEffectDouble(FMNoise);
-            CreateAudioEffectDouble(UHFNoise);
-            CreateAudioEffectDouble(VHFNoise);
-            CreateAudioEffectDouble(HFNoise);
+            // CreateAudioEffectDouble(HAVEQUICKTone);
+            // CreateAudioEffectDouble(NATOTone);
+            // CreateAudioEffectDouble(FMNoise);
+            // CreateAudioEffectDouble(UHFNoise);
+            // CreateAudioEffectDouble(VHFNoise);
+            // CreateAudioEffectDouble(HFNoise);
 
             AMCollision = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.AM_COLLISION);
-            CreateAudioEffectDouble(AMCollision);
-        }
-
-        private void CreateAudioEffectDouble(CachedAudioEffect effect)
-        {
-
-            if (effect.Loaded)
-            {
-
-                var effectShort = ConversionHelpers.ByteArrayToShortArray(effect.AudioEffectBytes);
-                var effectDouble = new float[effectShort.Length];
-
-                for (int i = 0; i < effectShort.Length; i++)
-                {
-                    effectDouble[i] = ((effectShort[i]/ 32768f));
-                }
-                effect.AudioEffectFloat = effectDouble;
-
-            }
-
+            // CreateAudioEffectDouble(AMCollision);
         }
 
         private void LoadRadioStartAndEndEffects()
@@ -203,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_START, effect, effectPath);
 
-                    if (audioEffect.AudioEffectBytes != null)
+                    if (audioEffect.AudioEffectFloat != null)
                     {
                         RadioTransmissionStart.Add(audioEffect);
                     }
@@ -214,7 +195,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END, effect,effectPath);
 
-                    if (audioEffect.AudioEffectBytes != null)
+                    if (audioEffect.AudioEffectFloat != null)
                     {
                         RadioTransmissionEnd.Add(audioEffect);
                     }
@@ -247,7 +228,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_START, effect, effectPath);
 
-                    if (audioEffect.AudioEffectBytes != null)
+                    if (audioEffect.AudioEffectFloat != null)
                     {
                         IntercomTransmissionStart.Add(audioEffect);
                     }
@@ -258,7 +239,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 {
                     var audioEffect = new CachedAudioEffect(CachedAudioEffect.AudioEffectTypes.INTERCOM_TRANS_END, effect, effectPath);
 
-                    if (audioEffect.AudioEffectBytes != null)
+                    if (audioEffect.AudioEffectFloat != null)
                     {
                         IntercomTransmissionEnd.Add(audioEffect);
                     }

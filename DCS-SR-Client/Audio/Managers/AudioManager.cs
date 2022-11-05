@@ -49,9 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private MixingSampleProvider _finalMixdown;
 
-        //buffer for effects
-        //plays in parallel with radio output buffer
-        private RadioAudioProvider[] _effectsOutputBuffer;
 
         private OpusEncoder _encoder;
 
@@ -144,8 +141,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 InitMixers();
 
                 InitVox();
-
-                InitAudioBuffers();
 
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
@@ -557,230 +552,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             };
         }
 
-        private void InitAudioBuffers()
-        {
-            _effectsOutputBuffer = new RadioAudioProvider[_clientStateSingleton.DcsPlayerRadioInfo.radios.Length];
-
-            for (var i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
-            {
-                _effectsOutputBuffer[i] = new RadioAudioProvider(OUTPUT_SAMPLE_RATE);
-                _finalMixdown.AddMixerInput(_effectsOutputBuffer[i].VolumeSampleProvider);
-            }
-        }
-
-
-        public void PlaySoundEffectStartReceive(int transmitOnRadio, bool encrypted, float volume, Modulation modulation)
-        {
-            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
-            {
-                return;
-            }
-
-            bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (modulation == Modulation.MIDS && midsTone)
-            {
-                //no tone for MIDS
-                return;
-            }
-
-            var _effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
-            if (transmitOnRadio == 0)
-            {
-                _effectsBuffer.VolumeSampleProvider.Volume = volume;
-
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    _effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
-            {
-                _effectsBuffer.VolumeSampleProvider.Volume = volume;
-
-                var effect = _cachedAudioEffectsProvider.KY58EncryptionEndTone;
-                if (effect.Loaded)
-                {
-                    _effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else
-            {
-                _effectsBuffer.VolumeSampleProvider.Volume = volume;
-
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    _effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-        }
-
-        public void PlaySoundEffectStartTransmit(int transmitOnRadio, bool encrypted, float volume, Modulation modulation)
-        {
-            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start))
-            {
-                return;
-            }
-
-            var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
-
-            bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-            if (transmitOnRadio == 0)
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else if (encrypted && (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else if (modulation == Modulation.MIDS && midsTone)
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.MIDSTransmitTone;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-        }
-
-
-        public void PlaySoundEffectEndReceive(int transmitOnRadio, float volume, Modulation modulation)
-        {
-            
-            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End))
-            {
-                return;
-            }
-
-            bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (transmitOnRadio == 0)
-            {
-                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
-                effectsBuffer.VolumeSampleProvider.Volume = volume;
-
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else if (modulation == Modulation.MIDS && midsTone)
-            {
-                //end receive tone for MIDS
-                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
-
-                effectsBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.MIDSEndTone;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else
-            {
-                var effectsBuffer = _effectsOutputBuffer[transmitOnRadio];
-
-                effectsBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-
-        }
-
-        public void PlaySoundEffectEndTransmit(int transmitOnRadio, float volume, Modulation modulation)
-        {
-            if (!_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End))
-            {
-                return;
-            }
-
-            bool midsTone = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-            var _effectBuffer = _effectsOutputBuffer[transmitOnRadio];
-
-            if (transmitOnRadio == 0)
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else if (modulation == Modulation.MIDS && midsTone)
-            {
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.MIDSEndTone;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-            else{
-
-                _effectBuffer.VolumeSampleProvider.Volume = volume;
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    _effectBuffer.AddAudioSamples(
-                        effect.AudioEffectBytes,
-                        transmitOnRadio);
-                }
-            }
-
-         
-        }
-
         private int _errorCount = 0;
         //Stopwatch _stopwatch = new Stopwatch();
 
@@ -843,7 +614,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 SpeakerMax = -100;
                 MicMax = -100;
 
-                _effectsOutputBuffer = null;
 
                 MessageHub.Instance.ClearSubscriptions();
             }
@@ -930,6 +700,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
             //no voice so dont bother with RMS
             return false;
+        }
+
+        public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, Modulation modulation)
+        {
+            _radioMixingProvider[sendingOn].PlaySoundEffectStartTransmit(enc,volume,modulation);
+        }
+
+        public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, Modulation radioModulation)
+        {
+            _radioMixingProvider[sendingOn].PlaySoundEffectEndTransmit(radioVolume,radioModulation);
         }
     }
 }

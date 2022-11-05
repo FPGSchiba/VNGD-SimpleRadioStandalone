@@ -2,6 +2,7 @@
 using System.IO;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Properties;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Wave;
 using NLog;
 
@@ -69,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             var file = path;
 
-            AudioEffectBytes = new byte[0];
+            AudioEffectFloat = null;
 
             if (File.Exists(file))
             {
@@ -78,9 +79,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     //    Assert.AreEqual(16, reader.WaveFormat.BitsPerSample, "Only works with 16 bit audio");
                     if (reader.WaveFormat.BitsPerSample == RequiredFormat.BitsPerSample && reader.WaveFormat.SampleRate == reader.WaveFormat.SampleRate && reader.WaveFormat.Channels == 1)
                     {
-                        AudioEffectBytes = new byte[reader.Length];
-                        var read = reader.Read(AudioEffectBytes, 0, AudioEffectBytes.Length);
+                        var tmpBytes = new byte[reader.Length];
+                        var read = reader.Read(tmpBytes, 0, tmpBytes.Length);
                         Logger.Info($"Read Effect {audioEffect} from {file} Successfully - Format {reader.WaveFormat}");
+
+                        //convert to short  - 16 - then to float 32
+                        var tmpShort = ConversionHelpers.ByteArrayToShortArray(tmpBytes);
+
+                        //now to float
+                        AudioEffectFloat = ConversionHelpers.ShortPCM16ArrayToFloat32Array(tmpShort);
 
                         Loaded = true;
                     }
@@ -99,7 +106,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public AudioEffectTypes AudioEffectType { get; }
 
-        public byte[] AudioEffectBytes { get; }
         //TODO rename to float
         public float[] AudioEffectFloat { get; set; }
     }
