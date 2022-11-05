@@ -27,23 +27,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         private AudioRecordingManager _audioRecordingManager = AudioRecordingManager.Instance;
 
-        private CircularFloatBuffer floatBuffer;
+        private CircularFloatBuffer effectsBuffer;
 
         private readonly CachedAudioEffectProvider _cachedAudioEffectsProvider;
 
-        bool lastEncrypted = false;
         RadioInformation.Modulation lastModulation = RadioInformation.Modulation.DISABLED;
 
         //TODO put these in a struct
         private bool hasPlayedTransmissionEnd = true;
         private long lastReceivedAt = 0;
         private bool hasPlayedTransmissionStart = false;
-        private bool wasEncrypted = false;
         private float lastVolume = 1;
-
-
-        
-
 
         //  private readonly WaveFileWriter waveWriter;
         public RadioMixingProvider(WaveFormat waveFormat, int radioId)
@@ -58,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             WaveFormat = waveFormat;
 
             //5 seconds worth of buffer
-            floatBuffer = new CircularFloatBuffer(WaveFormat.SampleRate * 5);
+            effectsBuffer = new CircularFloatBuffer(WaveFormat.SampleRate * 5);
             _cachedAudioEffectsProvider = CachedAudioEffectProvider.Instance;
             ;
 
@@ -138,6 +132,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             ClearArray(mixBuffer);
             ClearArray(secondaryMixBuffer);
 
+            //
+            bool ky58Tone = false;
         
             lock (sources)
             {
@@ -160,10 +156,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                             _mainAudio.Add(transmission);
                         }
 
-                        //TODO fix this - need to know if there was encryption
-                        if (transmission.Decryptable)
+                        if (transmission.Decryptable && transmission.Encryption > 0)
                         {
-                            lastEncrypted = transmission.Decryptable;
+                            ky58Tone = true;
                         }
                         lastModulation = transmission.Modulation;
                         lastVolume = transmission.Volume;
@@ -183,13 +178,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 hasPlayedTransmissionEnd = false;
                 _audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
             }
-            
 
             if (_mainAudio.Count > 0)
             {
                 mixBuffer = pipeline.ProcessClientTransmissions(mixBuffer, _mainAudio, out primarySamples);
             }
-                
 
             //handle guard
             if (_secondaryAudio.Count > 0)
@@ -202,10 +195,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer,primarySamples, secondaryMixBuffer, secondarySamples, out int outputSamples);
 
             //Now mix in start and end tones, Beeps etc
-            //TODO fix modulation & encryption
-            mixBuffer = HandleStartEndTones(mixBuffer,count/2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,lastModulation,lastEncrypted, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
+            mixBuffer = HandleStartEndTones(mixBuffer,count/2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,lastModulation,ky58Tone, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
 
-            //end effect
+            //figure out number of samples to return
             outputSamples = Math.Max(outputSamples, effectOutputSamples);
 
             buffer = SeparateAudio(mixBuffer, outputSamples, 0, buffer, offset, radioId);
@@ -213,11 +205,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             //we're now stereo - double the samples
             outputSamples = outputSamples * 2;
 
-        //    waveWriter.WriteSamples(buffer,offset, outputSamples);
-
-            //clear
-           // _mainAudio.Clear();
-            //_secondaryAudio.Clear();
             return EnsureFullBuffer(buffer, outputSamples, offset, count);
         }
 
@@ -231,29 +218,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             {
                 hasPlayedTransmissionStart = true;
                 hasPlayedTransmissionEnd = false;
-                wasEncrypted = encryption;
 
-               // var radio = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios[radioId];
+                // var radio = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios[radioId];
 
                 //TODO not sure about simultaneous
                 //if (!radioReceivingState.IsSimultaneous)
                 {
-                    PlaySoundEffectStartReceive(wasEncrypted, modulation);
+                    PlaySoundEffectStartReceive(encryption, modulation);
                 }
             }
             else if (!transmisson && !hasPlayedTransmissionEnd && IsEndOfTransmission)
             {
                 hasPlayedTransmissionStart = false;
                 hasPlayedTransmissionEnd = true;
-                PlaySoundEffectEndReceive(modulation, wasEncrypted);
+                PlaySoundEffectEndReceive(modulation);
             }
 
             //read
-            if (floatBuffer.Count > 0)
+            if (effectsBuffer.Count > 0)
             {
                 float[] tempBuffer = new float[count];
 
-                floatBuffer.Read(tempBuffer, 0, count);
+                effectsBuffer.Read(tempBuffer, 0, count);
 
                 for (int i = 0; i < count; i++)
                 {
@@ -273,7 +259,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             return mixBuffer;
         }
 
-        private void PlaySoundEffectEndReceive(RadioInformation.Modulation modulation, bool encryption)
+        private void PlaySoundEffectEndReceive(RadioInformation.Modulation modulation)
         {
             if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End))
             {
@@ -287,7 +273,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
@@ -296,7 +282,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.MIDSEndTone;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else
@@ -304,7 +290,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
         }
@@ -437,7 +423,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else if (encrypted &&
@@ -447,7 +433,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.KY58EncryptionEndTone;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else
@@ -455,15 +441,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
-        }
-
-        public void PlayEffect(float[] effect, float volume)
-        {
-            lastVolume = volume;
-            floatBuffer.Write(effect, 0, effect.Length);
         }
 
         public void PlaySoundEffectStartTransmit(bool encrypted, float volume, RadioInformation.Modulation modulation)
@@ -471,7 +451,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             //TODO check this
             lastModulation = modulation;
             lastVolume = volume;
-            lastEncrypted = encrypted;
 
             if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start))
             {
@@ -481,11 +460,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
             if (radioId == 0)
             {
-
                 var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else if (encrypted && (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
@@ -493,7 +471,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
@@ -501,7 +479,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.MIDSTransmitTone;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else
@@ -510,7 +488,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
         }
@@ -529,7 +507,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
@@ -537,7 +515,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.MIDSEndTone;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
             else
@@ -545,7 +523,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
                 if (effect.Loaded)
                 {
-                    floatBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
                 }
             }
         }

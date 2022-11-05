@@ -100,7 +100,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                                 Volume = audio.Volume,
                                 NoAudioEffects = audio.NoAudioEffects,
                                 Guid = audio.Guid,
-                                OriginalClientGuid = audio.OriginalClientGuid
+                                OriginalClientGuid = audio.OriginalClientGuid,
+                                Encryption = audio.Encryption
+
+
                             };
 
                             if (_lastRead == 0)

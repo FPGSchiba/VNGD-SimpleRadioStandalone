@@ -159,7 +159,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         Frequency = audio.Frequency,
                         NoAudioEffects = audio.NoAudioEffects,
                         Guid = audio.ClientGuid,
-                        OriginalClientGuid = audio.OriginalClientGuid
+                        OriginalClientGuid = audio.OriginalClientGuid,
+                        Encryption = audio.Encryption
                     };
                 }
                 else
@@ -182,7 +183,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
                     Guid = audio.ClientGuid,
-                    OriginalClientGuid = audio.OriginalClientGuid
+                    OriginalClientGuid = audio.OriginalClientGuid,
+                    Encryption = audio.Encryption
                 });
 
                 return null;
@@ -202,7 +204,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
                     Guid = audio.ClientGuid,
-                    OriginalClientGuid = audio.OriginalClientGuid
+                    OriginalClientGuid = audio.OriginalClientGuid,
+                    Encryption = audio.Encryption
                 };
             }
 

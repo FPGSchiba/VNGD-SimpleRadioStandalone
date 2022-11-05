@@ -15,6 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models
         public RadioInformation.Modulation Modulation { get; internal set; }
 
         public bool Decryptable { get; internal set; }
+        public short Encryption { get; internal set; }
 
         public float Volume { get; internal set; }
         public bool IsSecondary { get; set; }

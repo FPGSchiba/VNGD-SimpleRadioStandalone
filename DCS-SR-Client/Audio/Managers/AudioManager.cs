@@ -704,12 +704,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, Modulation modulation)
         {
-            _radioMixingProvider[sendingOn].PlaySoundEffectStartTransmit(enc,volume,modulation);
+            _radioMixingProvider[sendingOn]?.PlaySoundEffectStartTransmit(enc,volume,modulation);
         }
 
         public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, Modulation radioModulation)
         {
-            _radioMixingProvider[sendingOn].PlaySoundEffectEndTransmit(radioVolume,radioModulation);
+            _radioMixingProvider[sendingOn]?.PlaySoundEffectEndTransmit(radioVolume,radioModulation);
         }
     }
 }
