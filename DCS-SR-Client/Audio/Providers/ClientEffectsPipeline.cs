@@ -57,6 +57,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         private int amEffectPosition = 0;
         private float amCollisionVol = 1.0f;
 
+        private bool irlRadioRXInterference = false;
+
         private readonly SyncedServerSettings serverSettings;
 
 
@@ -76,13 +78,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             RefreshSettings();
 
             amCollisionEffect = CachedAudioEffectProvider.Instance.AMCollision;
-            amCollisionVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.AMCollisionVolume);
+           
         }
 
         private void RefreshSettings()
         {
             //only get settings every 3 seconds - and cache them - issues with performance
-            //TODO cache SERVER SETTINGS here too
             long now = DateTime.Now.Ticks;
 
             if (TimeSpan.FromTicks(now - lastRefresh).TotalSeconds > 3) //3 seconds since last refresh
@@ -95,6 +96,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 clippingEnabled = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping);
                 hqToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HQToneVolume);
                 natoToneVolume = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume);
+                amCollisionVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.AMCollisionVolume);
 
                 fmVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.FMNoiseVolume);
                 hfVol = profileSettings.GetClientSettingFloat(ProfileSettingsKeys.HFNoiseVolume);
@@ -104,11 +106,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 radioEffects = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEffects);
 
                 radioBackgroundNoiseEffect = profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect) ;
+
+                irlRadioRXInterference = serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE);
             }
         }
 
         public float[] ProcessClientTransmissions(float[] tempBuffer, List<DeJitteredTransmission> transmissions, out int clientTransmissionLength)
         {
+            RefreshSettings();
             DeJitteredTransmission lastTransmission = transmissions[0];
 
             clientTransmissionLength = 0;
@@ -124,14 +129,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
             bool process = true;
 
-            //TODO take info account server setting AND volume of this radio AND if its AM or FM
+            // take info account server setting AND volume of this radio AND if its AM or FM
             // FOR HAVEQUICK - only if its MORE THAN TWO
             if (lastTransmission.ReceivedRadio != 0
                 && !lastTransmission.NoAudioEffects
                 && (lastTransmission.Modulation == RadioInformation.Modulation.AM
                     || lastTransmission.Modulation == RadioInformation.Modulation.FM
                     || lastTransmission.Modulation == RadioInformation.Modulation.HAVEQUICK)
-                && serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
+                && irlRadioRXInterference)
             {
                 if (transmissions.Count > 1)
                 {
@@ -146,7 +151,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                         {
                             var amByte = this.amCollisionEffect.AudioEffectFloat[amEffectPosition++];
 
-                            tempBuffer[outIndex++] = amByte * lastTransmission.Volume;
+                            tempBuffer[outIndex++] = (amByte *amCollisionVol) * lastTransmission.Volume;
 
                             if (amEffectPosition == amCollisionEffect.AudioEffectFloat.Length)
                             {
@@ -175,7 +180,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 }
             }
 
-            //TODO only apply pipeline if AM or FM affect doesnt apply?
+            //only process if AM effect doesnt apply
             if (process)
                 tempBuffer = ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
 
@@ -185,8 +190,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         public float[] ProcessClientAudioSamples(float[] buffer, int count, int offset, DeJitteredTransmission transmission)
         {
-            RefreshSettings();
-
             if (!transmission.NoAudioEffects)
             {
                 if (transmission.Modulation == RadioInformation.Modulation.MIDS

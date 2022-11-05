@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         RadioInformation.Modulation lastModulation = RadioInformation.Modulation.DISABLED;
 
-        //TODO put these in a struct
+        // put these in a struct? 
         private bool hasPlayedTransmissionEnd = true;
         private long lastReceivedAt = 0;
         private bool hasPlayedTransmissionStart = false;
@@ -134,7 +134,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             ClearArray(mixBuffer);
             ClearArray(secondaryMixBuffer);
 
-            //
             bool ky58Tone = false;
 
             lock (sources)
@@ -171,15 +170,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 }
             }
 
-            //TODO
             //copy to the recording service - as we have everything we need to know about the audio
             //at this point
-
             if (_mainAudio.Count > 0 || _secondaryAudio.Count > 0)
             {
                 lastReceivedAt = DateTime.Now.Ticks;
                 hasPlayedTransmissionEnd = false;
-                _audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
+                //TODO enable recording again
+                //_audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
             }
 
             if (_mainAudio.Count > 0)
@@ -215,10 +213,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
         }
 
         private float[] HandleStartEndTones(float[] mixBuffer, int count, bool transmisson,
-            RadioInformation.Modulation modulation, bool encryption, out int outputSamples)
+          RadioInformation.Modulation modulation, bool encryption, out int outputSamples)
         {
-            //TODO cache instance
-            var radioReceivingState = ClientStateSingleton.Instance.RadioReceivingState[radioId];
             //enqueue
             if (transmisson && !hasPlayedTransmissionStart)
             {
@@ -247,9 +243,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
                 for (int i = 0; i < count; i++)
                 {
-                    //todo change volume
                     mixBuffer[i] += (tempBuffer[i] * lastVolume);
-                    ///TODO should we clip here?
+                    /// should we clip here?
                 }
 
                 outputSamples = count;
@@ -297,6 +292,136 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 }
             }
         }
+
+        public void PlaySoundEffectStartReceive(bool encrypted, RadioInformation.Modulation modulation)
+        {
+            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
+            {
+                return;
+            }
+
+            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
+
+            if (modulation == RadioInformation.Modulation.MIDS && midsTone)
+            {
+                //no tone for MIDS
+                return;
+            }
+
+
+            if (radioId == 0)
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else if (encrypted &&
+                     profileSettings.GetClientSettingBool(ProfileSettingsKeys
+                         .RadioEncryptionEffects))
+            {
+                var effect = _cachedAudioEffectsProvider.KY58EncryptionEndTone;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+        }
+
+        public void PlaySoundEffectStartTransmit(bool encrypted, float volume, RadioInformation.Modulation modulation)
+        {
+            lastModulation = modulation;
+            lastVolume = volume;
+
+            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start))
+            {
+                return;
+            }
+
+            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
+
+            if (radioId == 0)
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else if (encrypted && (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
+            {
+                var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
+            {
+                var effect = _cachedAudioEffectsProvider.MIDSTransmitTone;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
+
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+        }
+
+        public void PlaySoundEffectEndTransmit(float volume, RadioInformation.Modulation modulation)
+        {
+            lastModulation = modulation;
+            lastVolume = volume;
+
+            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End))
+            {
+                return;
+            }
+
+            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
+
+            if (radioId == 0)
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
+            {
+                var effect = _cachedAudioEffectsProvider.MIDSEndTone;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+            else
+            {
+                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
+                if (effect.Loaded)
+                {
+                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
+                }
+            }
+        }
+
 
 
         public float[] SeparateAudio(float[] srcFloat, int srcCount, int srcOffset, float[] dstFloat, int dstOffset,
@@ -356,7 +481,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             float balance = 0;
             try
             {
-                //TODO cache this
                 balance = profileSettings.GetClientSettingFloat(settingType);
             }
             catch (Exception)
@@ -406,133 +530,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             }
 
             return samplesCount;
-        }
-
-        public void PlaySoundEffectStartReceive(bool encrypted, RadioInformation.Modulation modulation)
-        {
-            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start))
-            {
-                return;
-            }
-
-            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (modulation == RadioInformation.Modulation.MIDS && midsTone)
-            {
-                //no tone for MIDS
-                return;
-            }
-
-
-            if (radioId == 0)
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else if (encrypted &&
-                     profileSettings.GetClientSettingBool(ProfileSettingsKeys
-                         .RadioEncryptionEffects))
-            {
-                var effect = _cachedAudioEffectsProvider.KY58EncryptionEndTone;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-        }
-
-        public void PlaySoundEffectStartTransmit(bool encrypted, float volume, RadioInformation.Modulation modulation)
-        {
-            //TODO check this
-            lastModulation = modulation;
-            lastVolume = volume;
-
-            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start))
-            {
-                return;
-            }
-
-            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (radioId == 0)
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionStartEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else if (encrypted && (profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioEncryptionEffects)))
-            {
-                var effect = _cachedAudioEffectsProvider.KY58EncryptionTransmitTone;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
-            {
-                var effect = _cachedAudioEffectsProvider.MIDSTransmitTone;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionStartEffect;
-
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-        }
-
-        public void PlaySoundEffectEndTransmit(float volume, RadioInformation.Modulation modulation)
-        {
-            if (!profileSettings.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End))
-            {
-                return;
-            }
-
-            bool midsTone = profileSettings.GetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect);
-
-            if (radioId == 0)
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedIntercomTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else if (modulation == RadioInformation.Modulation.MIDS && midsTone)
-            {
-                var effect = _cachedAudioEffectsProvider.MIDSEndTone;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
-            else
-            {
-                var effect = _cachedAudioEffectsProvider.SelectedRadioTransmissionEndEffect;
-                if (effect.Loaded)
-                {
-                    effectsBuffer.Write(effect.AudioEffectFloat, 0, effect.AudioEffectFloat.Length);
-                }
-            }
         }
 
         public bool IsEndOfTransmission

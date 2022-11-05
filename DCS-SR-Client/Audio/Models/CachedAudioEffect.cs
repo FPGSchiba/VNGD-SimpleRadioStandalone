@@ -106,7 +106,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         public AudioEffectTypes AudioEffectType { get; }
 
-        //TODO rename to float
         public float[] AudioEffectFloat { get; set; }
     }
 }

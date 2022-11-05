@@ -85,7 +85,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Network
 
 
             //disconnect callback
-            //TODO send disconnect
             MessageHub.Instance.Publish(new DisconnectedMessage());
         }
 

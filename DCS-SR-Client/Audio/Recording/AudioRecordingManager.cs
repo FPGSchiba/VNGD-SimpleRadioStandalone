@@ -135,6 +135,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public void Start()
         {
+
+
             _logger.Debug("Transmission recording started.");
             // if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
             // {

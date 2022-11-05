@@ -198,8 +198,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
             if (micOutput != null) // && micOutput !=speakers
             {
-                //TODO handle case when they're the same?
-
                 try
                 {
                     _passThroughAudioProvider = new ClientAudioProvider(true);
@@ -394,7 +392,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                 //send audio so play over local too
                                 var jitterBufferAudio = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
                                 
-                                //TODO fix
                                 // //process bytes and add effects
                                 if (jitterBufferAudio!=null)
                                 {
@@ -421,7 +418,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                     {
                                        
                                         //now its a processed Mono audio
-                                        //TODO reuse this buffer
                                         _tempMicOutputBuffer = BufferHelpers.Ensure(_tempMicOutputBuffer, tempFloat.Length * 4);
                                         Buffer.BlockCopy(tempFloat, 0, _tempMicOutputBuffer, 0, tempFloat.Length * 4);
 
@@ -436,7 +432,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                         GlobalSettingsKeys.RecordAudio))
                                     {
                                         ///TODO cache this to avoid the contant lookup
-                                        AudioRecordingManager.Instance.AppendPlayerAudio(deJittered);
+                                       // AudioRecordingManager.Instance.AppendPlayerAudio(deJittered);
                                     }
                                    
                                 }

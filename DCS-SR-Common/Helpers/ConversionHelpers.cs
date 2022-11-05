@@ -23,7 +23,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return (short) ((byte2 << 8) | byte1);
         }
 
-        //TODO add short to float here - converts pcm 16 to float 32
         public static float[] ShortPCM16ArrayToFloat32Array(short[] shortArray)
         {
             var floatArray = new float[shortArray.Length];

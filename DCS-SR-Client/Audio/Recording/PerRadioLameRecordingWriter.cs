@@ -29,7 +29,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         private void OutputToFile(int radio, float[] floatArray)
         {
-            //TODO convert floatArray to bytes
             try
             {
                 if (_mp3FileWriters[radio] != null)

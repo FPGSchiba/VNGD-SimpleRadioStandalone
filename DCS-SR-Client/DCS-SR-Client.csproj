@@ -320,7 +320,6 @@
     <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
       <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Audio\Providers\RadioAudioProvider.cs" />
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml.cs">
       <DependentUpon>AwacsIntercomControlGroup.xaml</DependentUpon>
     </Compile>
