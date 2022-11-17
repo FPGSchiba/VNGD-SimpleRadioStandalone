@@ -421,7 +421,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     {
                                         var buttonState = state.Buttons[j] ? 1 : 0;
 
-                                        if (buttonState != initial[i, j])
+                                        if (buttonState == 1 && buttonState != initial[i, j])
                                         {
                                             found = true;
 
