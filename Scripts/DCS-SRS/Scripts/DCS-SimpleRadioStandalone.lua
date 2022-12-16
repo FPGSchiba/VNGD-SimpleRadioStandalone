@@ -1,4 +1,4 @@
--- Version 2.0.7.0
+-- Version 2.0.7.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -4754,6 +4754,7 @@ end
 ---- Exporters init ----
 SR.exporters["UH-1H"] = SR.exportRadioUH1H
 SR.exporters["Ka-50"] = SR.exportRadioKA50
+SR.exporters["Ka-50_3"] = SR.exportRadioKA50
 SR.exporters["Mi-8MT"] = SR.exportRadioMI8
 SR.exporters["Mi-24P"] = SR.exportRadioMI24P
 SR.exporters["Yak-52"] = SR.exportRadioYak52
@@ -4895,4 +4896,4 @@ end
 -- Load mods' SRS plugins
 SR.LoadModsPlugins()
 
-SR.log("Loaded SimpleRadio Standalone Export version: 2.0.7.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 2.0.7.1")
