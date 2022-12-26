@@ -112,6 +112,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 catch { }
 
             }
+            else if (name.ToLowerInvariant() == "xinputcontroller")
+            {
+                try
+                {
+                    var buttonFlag = (SharpDX.XInput.GamepadButtonFlags)button;
+                    return buttonFlag.ToString("G");
+                }
+                catch { }
+            }
             return button < 128 ? (button + 1).ToString() : "POV " + (button - 127);
         }
 

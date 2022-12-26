@@ -731,6 +731,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
             VOXMinimumRMS.ValueChanged += VOXMinimumRMS_ValueChanged;
             VOXMinimumRMS.IsEnabled = true;
+
+            AllowXInputController.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AllowXInputController);
         }
 
         private void ReloadProfileSettings()
@@ -1643,6 +1645,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 MessageBoxImage.Warning);
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool)ExpandInputDevices.IsChecked);
+        }
+
+        private void AllowXInputController_OnClick_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "You must restart SRS for this setting to take effect.",
+                "Restart SimpleRadio Standalone", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowXInputController, (bool)AllowXInputController.IsChecked);
         }
 
         private void LaunchAddressTab(object sender, RoutedEventArgs e)
