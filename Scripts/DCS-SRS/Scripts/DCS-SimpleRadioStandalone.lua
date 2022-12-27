@@ -1,4 +1,4 @@
--- Version 2.0.8.0
+-- Version 2.0.8.1
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -1076,6 +1076,53 @@ function SR.exportRadioA4E(_data)
 
     return _data
 end
+
+function SR.exportRadioSK60(_data)
+
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    _data.radios[1].name = "Intercom"
+    _data.radios[1].freq = 100.0
+    _data.radios[1].modulation = 2 --Special intercom modulation
+    _data.radios[1].volume = 1.0
+    _data.radios[1].volMode = 1
+
+    _data.radios[2].name = "UHF Radio AN/ARC-164"
+    _data.radios[2].freq = SR.getRadioFrequency(6)
+    _data.radios[2].modulation = 1
+    _data.radios[2].volume = 1.0
+    _data.radios[2].volMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8 * 1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5 * 1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116 * 1000000
+    _data.radios[3].freqMax = 151.975 * 1000000
+    _data.radios[3].expansion = true
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[4].name = "AN/ARC-186(V)FM"
+    _data.radios[4].freq = 30.0 * 1000000 
+    _data.radios[4].modulation = 1
+    _data.radios[4].volume = 1.0
+    _data.radios[4].freqMin = 30 * 1000000
+    _data.radios[4].freqMax = 76 * 1000000
+    _data.radios[4].volMode = 1
+    _data.radios[4].freqMode = 1
+    _data.radios[4].expansion = true
+
+    _data.control = 0;
+    _data.selected = 1
+
+    return _data
+
+end
+
 
 
 function SR.exportRadioT45(_data)
@@ -4785,6 +4832,7 @@ SR.exporters["A-10A"] = SR.exportRadioA10A
 SR.exporters["UH-60L"] = SR.exportRadioUH60L
 SR.exporters["AH-64D_BLK_II"] = SR.exportRadioAH64D
 SR.exporters["A-4E-C"] = SR.exportRadioA4E
+SR.exporters["SK-60"] = SR.exportRadioSK60
 SR.exporters["PUCARA"] = SR.exportRadioPUCARA
 SR.exporters["T-45"] = SR.exportRadioT45
 SR.exporters["A-29B"] = SR.exportRadioA29B
@@ -4896,4 +4944,4 @@ end
 -- Load mods' SRS plugins
 SR.LoadModsPlugins()
 
-SR.log("Loaded SimpleRadio Standalone Export version: 2.0.8.0")
+SR.log("Loaded SimpleRadio Standalone Export version: 2.0.8.1")
