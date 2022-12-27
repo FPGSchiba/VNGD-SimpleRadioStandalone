@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         };
 
         private readonly DirectInput _directInput;
-        private readonly Dictionary<Guid, Device> _inputDevices = new Dictionary<Guid, Device>();
+        private readonly Dictionary<Guid, dynamic> _inputDevices = new Dictionary<Guid, dynamic>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
 
         private volatile bool _detectPtt;
@@ -95,12 +95,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void InitDevices()
         {
+            var allowXInput = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AllowXInputController);
             Logger.Info("Starting Device Search. Expand Search: " +
-            (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls)));
+            (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.ExpandControls)) +
+            ". Use XInput (for Xbox controllers): " + allowXInput);
+
 
             var deviceInstances = _directInput.GetDevices();
 
             _inputDevices.Clear();
+
+            if (allowXInput)
+            {
+                _inputDevices.Add(XInputController.DeviceGuid, new XInputController());
+            }
+            
 
             foreach (var deviceInstance in deviceInstances)
             {
@@ -294,7 +303,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     }
 
                 }
-               
             }
         }
 
@@ -318,7 +326,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     try
                     {
-                        if (deviceList[i] is Joystick)
+                        if (deviceList[i] is XInputController)
+                        {
+                            var state = (deviceList[i] as XInputController).GetCurrentState();
+                            var values = (SharpDX.XInput.GamepadButtonFlags[])Enum.GetValues(typeof(SharpDX.XInput.GamepadButtonFlags));
+                            for (var j = 0; j < values.Length; j++)
+                            {
+                                initial[i, j] = state.HasFlag(values[j]) ? 1 : 0;
+                            }
+                        }
+                        else if (deviceList[i] is Joystick)
                         {
 
                             var state = (deviceList[i] as Joystick).GetCurrentState();
@@ -388,9 +405,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                         try
                         {
-                            if (deviceList[i] is Joystick)
+                            if (deviceList[i] is XInputController)
                             {
+                                var state = (deviceList[i] as XInputController).GetCurrentState();
+                                var values = (SharpDX.XInput.GamepadButtonFlags[])Enum.GetValues(typeof(SharpDX.XInput.GamepadButtonFlags));
+                                for (var j = 0; j < values.Length; j++)
+                                {
+                                    var buttonState = state.HasFlag(values[j]) ? 1 : 0;
+                                    if (buttonState != initial[i, j])
+                                    {
+                                        found = true;
+                                        var inputDevice = new InputDevice
+                                        {
+                                            DeviceName = "XInputController",
+                                            Button = (int)values[j],
+                                            InstanceGuid = deviceList[i].Information.InstanceGuid,
+                                            ButtonValue = buttonState
+                                        };
 
+                                        Application.Current.Dispatcher.Invoke(
+                                            () => { callback(inputDevice); });
+
+                                        return;
+                                    }
+                                }
+                            }
+                            else if (deviceList[i] is Joystick)
+                            {
                                 var state = (deviceList[i] as Joystick).GetCurrentState();
 
                                 for (var j = 0; j < 128 + 4; j++)
@@ -421,7 +462,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     {
                                         var buttonState = state.Buttons[j] ? 1 : 0;
 
-                                        if (buttonState != initial[i, j])
+                                        if (buttonState == 1 && buttonState != initial[i, j])
                                         {
                                             found = true;
 
@@ -561,7 +602,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     }
                 }
             }
-
         }
 
         public void StartDetectPtt(DetectPttCallback callback)
@@ -787,7 +827,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 try
                 {
-                    if (device is Joystick)
+                    if (device is XInputController)
+                    {
+                        var state = (device as XInputController).GetCurrentState();
+                        return state.HasFlag((SharpDX.XInput.GamepadButtonFlags)inputDeviceBinding.Button);
+                    }
+                    else if (device is Joystick)
                     {
                         //device.Poll();
                         var state = (device as Joystick).GetCurrentState();

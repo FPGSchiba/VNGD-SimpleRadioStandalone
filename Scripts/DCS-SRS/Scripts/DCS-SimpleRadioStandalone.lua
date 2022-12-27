@@ -4754,6 +4754,7 @@ end
 ---- Exporters init ----
 SR.exporters["UH-1H"] = SR.exportRadioUH1H
 SR.exporters["Ka-50"] = SR.exportRadioKA50
+SR.exporters["Ka-50_3"] = SR.exportRadioKA50
 SR.exporters["Mi-8MT"] = SR.exportRadioMI8
 SR.exporters["Mi-24P"] = SR.exportRadioMI24P
 SR.exporters["Yak-52"] = SR.exportRadioYak52
