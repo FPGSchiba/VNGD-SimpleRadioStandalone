@@ -161,18 +161,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public void Start()
         {
-
-
             _logger.Debug("Transmission recording started.");
-            // if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
-            // {
-            //     _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
-            // }
-            // else
+            if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
+            {
+                _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
+            }
+            else
             {
                 _audioRecordingWriter = new PerRadioLameRecordingWriter(_sampleRate);
             }
-            _audioRecordingWriter.Start();
+         
             _stop = false;
 
             _clientMixDownQueue.Clear();
@@ -189,6 +187,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
                 _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
             }
+
+            _audioRecordingWriter.Start();
 
             var processingThread = new Thread(ProcessQueues);
             processingThread.Start();
@@ -212,7 +212,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
             //only record if we need too
             //TEST TODO
-            if (true ||GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
             {
                 
                 _playerMixDownQueue[radioId]?.Write(transmission, 0, transmission.Length);
@@ -257,16 +257,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             {
                 if (_connectedClientsSingleton.TryGetValue(transmission.OriginalClientGuid, out SRClient client))
                 {
-                    //TODO
-                    if (true|| client.AllowRecord
-                             || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
+                    if (client.AllowRecord
+                        || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
                     {
                         filteredTransmisions.Add(transmission);
                     }
                     else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.DisallowedAudioTone))
                     {
-                        //TODO TEST
-                        //replace their audio with 
                         DeJitteredTransmission toneTransmission = new DeJitteredTransmission
                         {
                             PCMMonoAudio = AudioManipulationHelper.SineWaveOut(transmission.PCMAudioLength, _sampleRate, 0.25),

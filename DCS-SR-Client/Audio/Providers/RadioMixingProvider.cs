@@ -193,13 +193,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
             }
 
             //reuse mix buffer
-            //Should we not clip here?
-            mixBuffer = AudioManipulationHelper.MixArraysClipped(mixBuffer, primarySamples, secondaryMixBuffer,
+            mixBuffer = AudioManipulationHelper.MixArraysNoClipping(mixBuffer, primarySamples, secondaryMixBuffer,
                 secondarySamples, out int outputSamples);
 
             //Now mix in start and end tones, Beeps etc
             mixBuffer = HandleStartEndTones(mixBuffer, count / 2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,
                 lastModulation, ky58Tone, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
+
+            //now clip post all mixing
+            mixBuffer = AudioManipulationHelper.ClipArray(mixBuffer, count/2);
 
             //figure out number of samples to return
             outputSamples = Math.Max(outputSamples, effectOutputSamples);

@@ -54,6 +54,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         public bool AllowRecord { get; set; }
 
         [JsonIgnore]
+        public string AllowRecordingStatus {
+            get
+            {
+
+                return AllowRecord ? "R" : "-";
+            }
+        }
+
+        [JsonIgnore]
         public SolidColorBrush ClientCoalitionColour
         {
             get
