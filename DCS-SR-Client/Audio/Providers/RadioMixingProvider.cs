@@ -177,7 +177,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
                 lastReceivedAt = DateTime.Now.Ticks;
                 hasPlayedTransmissionEnd = false;
                 //TODO enable recording again
-                //_audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
+                _audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
             }
 
             if (_mainAudio.Count > 0)

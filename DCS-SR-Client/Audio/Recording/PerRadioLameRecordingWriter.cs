@@ -54,16 +54,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        public override void ProcessAudio(List<CircularFloatBuffer> perRadioAudio)
+        public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
             
-            for (int i = 0; i < perRadioAudio.Count; i++)
+            for (int i = 0; i < perRadioClientAudio.Count; i++)
             {
-                if (perRadioAudio[i].Count > 0)
+                if (perRadioClientAudio[i].Count > 0)
                 {
-                    float[] floatArrray = new float[perRadioAudio[i].Count];
+                    float[] floatArrray = new float[perRadioClientAudio[i].Count];
 
-                    perRadioAudio[i].Read(floatArrray, 0, floatArrray.Length);
+                    perRadioClientAudio[i].Read(floatArrray, 0, floatArrray.Length);
                     OutputToFile(i, floatArrray);
                 }
             }

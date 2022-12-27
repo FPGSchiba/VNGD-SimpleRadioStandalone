@@ -196,11 +196,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 Environment.Exit(1);
             }
 
+            _passThroughAudioProvider = new ClientAudioProvider(true);
+
             if (micOutput != null) // && micOutput !=speakers
             {
                 try
                 {
-                    _passThroughAudioProvider = new ClientAudioProvider(true);
                     _micWaveOut = new WasapiOut(micOutput, AudioClientShareMode.Shared, true, 40,windowsN);
 
                     _micWaveOutBuffer = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 1));
@@ -432,7 +433,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                         GlobalSettingsKeys.RecordAudio))
                                     {
                                         ///TODO cache this to avoid the contant lookup
-                                       // AudioRecordingManager.Instance.AppendPlayerAudio(deJittered);
+                                        AudioRecordingManager.Instance.AppendPlayerAudio(tempFloat, jitterBufferAudio.ReceivedRadio);
                                     }
                                    
                                 }

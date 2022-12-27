@@ -58,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             return $"Recordings\\{sanitisedDate}-{sanitisedTime}";
         }
 
-        public abstract void ProcessAudio(List<CircularFloatBuffer> perRadioAudio);
+        public abstract void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio);
         public abstract void Start();
         public abstract void Stop();
     }

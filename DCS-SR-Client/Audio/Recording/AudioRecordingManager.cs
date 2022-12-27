@@ -28,7 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         private readonly int _sampleRate;
         private readonly List<CircularFloatBuffer> _clientMixDownQueue;
         private readonly List<CircularFloatBuffer> _playerMixDownQueue;
-        private readonly ConcurrentQueue<AudioRecordingSample>[] _playerAudioSampleQueue;
+        private readonly List<CircularFloatBuffer> _finalMixDownQueue;
+
 
         //create 2 sets of queues with 10 each
 
@@ -45,14 +46,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             _stop = true;
 
             _clientMixDownQueue = new List<CircularFloatBuffer>();
+            _playerMixDownQueue = new List<CircularFloatBuffer>();
+            _finalMixDownQueue = new List<CircularFloatBuffer>();
             //TODO change that hardcoded 11 to run off number of radios
             for (int i = 0; i < 11; i++)
             {
                 //TODO check size
                 //5 seconds of audio
                 _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE*5));
+                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
+                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
             }
-
         }
 
         public static AudioRecordingManager Instance
@@ -81,12 +85,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                     _stop = true;
                 }
 
-                Thread.Sleep(2000);
+                Thread.Sleep(500);
                 try
                 {
+                    //mix two queues
+                   
                     //we now have mixdown audio per queue
-                    //im worried it'll always be off by 2 seconds though
-                    _audioRecordingWriter.ProcessAudio(_clientMixDownQueue);
+                    //it'll always be off by 500  milliseconds though - as this is a lazy way of mixing
+
+                    //two seconds of buffer - but runs every 500 milliseconds
+                    float[] clientBuffer = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
+                    float[] playerBuffer = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
+                    for (var i=0;i< _finalMixDownQueue.Count; i++)
+                    {
+                        //find longest queue
+                        int playerAudioLength = _playerMixDownQueue[i].Count;
+                        int clientAudioLength = _clientMixDownQueue[i].Count;
+
+
+                        _playerMixDownQueue[i].Read(playerBuffer, 0, playerAudioLength);
+                        _clientMixDownQueue[i].Read(clientBuffer,0, clientAudioLength);
+
+                        float[] mixDown = AudioManipulationHelper.MixArraysClipped(playerBuffer, playerAudioLength, clientBuffer,
+                            clientAudioLength, out int count);
+
+                        _finalMixDownQueue[i].Write(mixDown, 0, count);
+                    }
+
+                    _audioRecordingWriter.ProcessAudio(_finalMixDownQueue);
                 }
                 catch (Exception ex)
                 {
@@ -150,16 +176,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             _stop = false;
 
             _clientMixDownQueue.Clear();
+            _playerMixDownQueue.Clear();
+            _finalMixDownQueue.Clear();
+
+            //TODO race condition here - we can start recording and get an out of range (temporarily) while we clear and re-initialise queues
+
             for (int i = 0; i < 11; i++)
             {
                 //TODO check size
                 //5 seconds of audio
                 _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
-                //    _clientSampleQueue[i] = new ConcurrentQueue<AudioRecordingSample>();
+                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
+                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
             }
-
-            //waveWriter = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\output{Guid.NewGuid()}.wav", WaveFormat.CreateIeeeFloatWaveFormat(_sampleRate, 1));
-
 
             var processingThread = new Thread(ProcessQueues);
             processingThread.Start();
@@ -172,12 +201,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             _audioRecordingWriter.Stop();
             _logger.Debug("Transmission recording stopped.");
 
-            //waveWriter.Flush();
-            //waveWriter.Dispose();
-
         }
 
-        public void AppendPlayerAudio(DeJitteredTransmission transmission)
+        public void AppendPlayerAudio(float[] transmission, int radioId)
         {
             if (_stop)
             {
@@ -185,11 +211,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
 
             //only record if we need too
-            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            //TEST TODO
+            if (true ||GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
             {
-                ///TODO use this for the player mic transmission
-                /// append to a circular buffer and mix in with the other audio at the final mixdown
-               // pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out secondarySamples);
+                
+                _playerMixDownQueue[radioId]?.Write(transmission, 0, transmission.Length);
             }
         }
 
@@ -231,8 +257,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             {
                 if (_connectedClientsSingleton.TryGetValue(transmission.OriginalClientGuid, out SRClient client))
                 {
-
-                    if (client.AllowRecord
+                    //TODO
+                    if (true|| client.AllowRecord
                              || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
                     {
                         filteredTransmisions.Add(transmission);
@@ -255,6 +281,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                             OriginalClientGuid = transmission.OriginalClientGuid,
                             Volume = transmission.Volume
                         };
+                        filteredTransmisions.Add(toneTransmission);
                     }
                 }
             }

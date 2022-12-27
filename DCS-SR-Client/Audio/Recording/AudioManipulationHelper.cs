@@ -57,11 +57,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         public static float[] SineWaveOut(int sampleLength, int sampleRate, double volume)
         {
             float[] sineBuffer = new float[sampleLength];
-            double amplitude = volume * short.MaxValue;
+            double amplitude = volume;
 
             for (int i = 0; i < sineBuffer.Length; i++)
             {
-                sineBuffer[i] =(float) (amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate))/ 32768.0f;
+                sineBuffer[i] =(float) (amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate));
             }
             return sineBuffer;
         }
