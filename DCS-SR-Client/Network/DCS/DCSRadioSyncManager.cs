@@ -24,6 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         private readonly SendRadioUpdate _clientRadioUpdate;
         private readonly ClientSideUpdate _clientSideUpdate;
         public static readonly string AWACS_RADIOS_FILE = "awacs-radios.json";
+        public static readonly string AWACS_RADIOS_CUSTOM_FILE = "awacs-radios-custom.json";
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
@@ -86,9 +87,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _stopExternalAWACSMode = false;
 
             RadioInformation[] awacsRadios;
+
             try
             {
-                string radioJson = File.ReadAllText(AWACS_RADIOS_FILE);
+                string radioJson;
+                if (File.Exists(AWACS_RADIOS_CUSTOM_FILE))
+                {
+                    try
+                    {
+                        radioJson = File.ReadAllText(AWACS_RADIOS_CUSTOM_FILE);
+                        awacsRadios = JsonConvert.DeserializeObject<RadioInformation[]>(radioJson);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, $"Failed to load custom {AWACS_RADIOS_CUSTOM_FILE} radio file - loading standard file");
+                    }
+                }
+                else
+                {
+                    Logger.Info($"No Custom {AWACS_RADIOS_CUSTOM_FILE} present - Loading {AWACS_RADIOS_FILE}");
+                }
+
+                radioJson = File.ReadAllText(AWACS_RADIOS_FILE);
                 awacsRadios = JsonConvert.DeserializeObject<RadioInformation[]>(radioJson);
             }
             catch (Exception ex)

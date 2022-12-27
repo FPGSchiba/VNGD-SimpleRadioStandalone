@@ -133,14 +133,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             LastUpdate = DateTime.Now.Ticks;
 
-            //TODO handle recording
-            // if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
-            // {
-            //     AudioRecordingManager.Instance.AppendClientAudio(audio);
-            // }
-
-    //        waveWriter.WriteSamples(audio.PcmAudioFloat, 0,audio.PcmAudioFloat.Length);
-
             if (audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
             {
                 // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough

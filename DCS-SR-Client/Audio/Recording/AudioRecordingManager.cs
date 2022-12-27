@@ -30,8 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         private readonly List<CircularFloatBuffer> _playerMixDownQueue;
         private readonly List<CircularFloatBuffer> _finalMixDownQueue;
 
-
-        //create 2 sets of queues with 10 each
+        private static readonly int MAX_BUFFER_SECONDS = 3;
 
         private bool _stop;
         private AudioRecordingLameWriterBase _audioRecordingWriter;
@@ -51,11 +50,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             //TODO change that hardcoded 11 to run off number of radios
             for (int i = 0; i < 11; i++)
             {
-                //TODO check size
-                //5 seconds of audio
-                _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE*5));
-                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
-                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
+                // seconds of audio
+                _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE* MAX_BUFFER_SECONDS));
+                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
+                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
             }
         }
 
@@ -79,24 +77,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         {
             while (!_stop)
             {
-                //todo leave the thread running but paused if you dont opt in to recording
-                if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
-                {
-                    _stop = true;
-                }
-
                 Thread.Sleep(500);
+
+                //leave the thread running but paused if you dont opt in to recording
+                if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)) continue;
+                
                 try
                 {
                     //mix two queues
-                   
+
                     //we now have mixdown audio per queue
                     //it'll always be off by 500  milliseconds though - as this is a lazy way of mixing
 
                     //two seconds of buffer - but runs every 500 milliseconds
                     float[] clientBuffer = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
                     float[] playerBuffer = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
-                    for (var i=0;i< _finalMixDownQueue.Count; i++)
+                    for (var i = 0; i < _finalMixDownQueue.Count; i++)
                     {
                         //find longest queue
                         int playerAudioLength = _playerMixDownQueue[i].Count;
@@ -104,7 +100,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
 
                         _playerMixDownQueue[i].Read(playerBuffer, 0, playerAudioLength);
-                        _clientMixDownQueue[i].Read(clientBuffer,0, clientAudioLength);
+                        _clientMixDownQueue[i].Read(clientBuffer, 0, clientAudioLength);
 
                         float[] mixDown = AudioManipulationHelper.MixArraysClipped(playerBuffer, playerAudioLength, clientBuffer,
                             clientAudioLength, out int count);
@@ -118,6 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 {
                     _logger.Error($"Recording process failed: {ex}");
                 }
+
             }
         }
 
@@ -127,7 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             //should be no more than 80 ms of audio
             //should really be 40 but just in case
             //TODO reuse this but return a new array of the right length
-            float[] mixBuffer = new float[AudioManager.OUTPUT_SEGMENT_FRAMES * 10];
+            float[] mixBuffer = new float[AudioManager.OUTPUT_SEGMENT_FRAMES * 2];
             float[] secondaryMixBuffer = new float[0];
 
             int primarySamples = 0;
@@ -147,7 +144,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             //handle guard
             if (secondaryAudio?.Count > 0)
             {
-                secondaryMixBuffer =  new float[AudioManager.OUTPUT_SEGMENT_FRAMES * 10];
+                secondaryMixBuffer =  new float[AudioManager.OUTPUT_SEGMENT_FRAMES * 2];
                 secondaryMixBuffer = pipeline.ProcessClientTransmissions(secondaryMixBuffer, secondaryAudio, out  secondarySamples);
             }
 
@@ -177,15 +174,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             _playerMixDownQueue.Clear();
             _finalMixDownQueue.Clear();
 
-            //TODO race condition here - we can start recording and get an out of range (temporarily) while we clear and re-initialise queues
-
             for (int i = 0; i < 11; i++)
             {
                 //TODO check size
                 //5 seconds of audio
-                _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
-                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
-                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 5));
+                _clientMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
+                _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
+                _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
             }
 
             _audioRecordingWriter.Start();
@@ -211,7 +206,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
 
             //only record if we need too
-            //TEST TODO
             if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
             {
                 

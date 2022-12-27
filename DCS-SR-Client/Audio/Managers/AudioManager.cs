@@ -74,6 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
         private readonly AudioOutputSingleton _audioOutputSingleton = AudioOutputSingleton.Instance;
+        private readonly AudioRecordingManager _audioRecordingManager = AudioRecordingManager.Instance;
 
         private WebRtcVad _voxDectection;
 
@@ -433,7 +434,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                                         GlobalSettingsKeys.RecordAudio))
                                     {
                                         ///TODO cache this to avoid the contant lookup
-                                        AudioRecordingManager.Instance.AppendPlayerAudio(tempFloat, jitterBufferAudio.ReceivedRadio);
+                                        _audioRecordingManager.AppendPlayerAudio(tempFloat, jitterBufferAudio.ReceivedRadio);
                                     }
                                    
                                 }

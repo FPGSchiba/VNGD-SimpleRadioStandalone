@@ -195,7 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _vaicomSync.Stop();
             _idleTimeout?.Stop();
 
-            //TODO renable
             AudioRecordingManager.Instance.Stop();
 
             //disconnect callback
