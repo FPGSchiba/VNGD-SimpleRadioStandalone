@@ -80,7 +80,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 Thread.Sleep(500);
 
                 //leave the thread running but paused if you dont opt in to recording
-                if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)) continue;
+                if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+                {
+                    _logger.Info("Recording disabled");
+                    _stop = true;
+                    break;
+                }
                 
                 try
                 {
@@ -114,8 +119,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 {
                     _logger.Error($"Recording process failed: {ex}");
                 }
-
             }
+
+            _logger.Info("Stop recording thread");
         }
 
         private float[] SingleRadioMixDown(List<DeJitteredTransmission> mainAudio, List<DeJitteredTransmission> secondaryAudio, int radio, out int count)
