@@ -22,6 +22,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         private void OutputToFile(float[] floatArray, int count)
         {
+            if (_mp3FileWriter == null)
+            {
+                Start();
+            }
             try
             {
                 if (_mp3FileWriter != null)
@@ -41,11 +45,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
-            if (_mp3FileWriter == null)
-            {
-                Start();
-            }
-
             //2 seconds at worse
             float[] mixdown = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
             int count = 0;

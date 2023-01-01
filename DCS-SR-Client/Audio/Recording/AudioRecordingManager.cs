@@ -82,9 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 //leave the thread running but paused if you dont opt in to recording
                 if (!GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
                 {
-                    _logger.Info("Recording disabled");
-                    _stop = true;
-                    break;
+                    continue;
                 }
                 
                 try
@@ -191,8 +189,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 _playerMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
                 _finalMixDownQueue.Add(new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * MAX_BUFFER_SECONDS));
             }
-
-            _audioRecordingWriter.Start();
 
             new Thread(ProcessQueues).Start();
         }

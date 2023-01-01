@@ -25,6 +25,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         private void OutputToFile(int radio, float[] floatArray)
         {
+            if (_mp3FileWriters.Count == 0)
+            {
+                Start();
+            }
+
             try
             {
                 if (_mp3FileWriters[radio] != null)
@@ -44,10 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
-            if (_mp3FileWriters.Count == 0)
-            {
-                Start();
-            }
             
             for (int i = 0; i < perRadioClientAudio.Count; i++)
             {
