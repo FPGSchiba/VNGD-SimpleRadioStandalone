@@ -5,3 +5,5 @@ Bimbac (Discord) PTT tones and effects
 Nato Tones: https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/236
 
 Nicholas Landolfi - Have Quick info
+
+AM frq collision - @Jester - https://discord.com/channels/298054423656005632/473947464349646848/683052151555096664

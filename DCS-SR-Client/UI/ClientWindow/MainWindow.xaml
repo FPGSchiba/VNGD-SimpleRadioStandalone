@@ -1133,7 +1133,7 @@
                                 </Grid>
                             </GroupBox>
 
-                            <GroupBox Header="Recording">
+                            <GroupBox Header="Recording" Visibility="Visible">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="2*"/>

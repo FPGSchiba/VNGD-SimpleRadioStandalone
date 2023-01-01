@@ -26,16 +26,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             return mixedDown;
         }
 
-        public static short[] MixSamplesWithHeadroom(List<short[]> samplesToMixdown, int samplesLength)
+        public static float[] MixSamplesWithHeadroom(List<float[]> samplesToMixdown, int samplesLength)
         {
-            short[] mixedDown = new short[samplesLength];
+            float[] mixedDown = new float[samplesLength];
 
-            foreach(short[] sample in samplesToMixdown)
-            { 
-                for(int i = 0; i < samplesLength; i++)
+            foreach (float[] sample in samplesToMixdown)
+            {
+                for (int i = 0; i < samplesLength; i++)
                 {
                     // Unlikely to have duplicate signals across n radios, can use sqrt to find a sensible headroom level
-                    mixedDown[i] += (short)(sample[i] / Math.Sqrt(samplesToMixdown.Count));
+                    // FIXME: Users likely want a consistent mixdown regardless of radios in airframe, just hardcode a constant term?
+                    mixedDown[i] += (float)(sample[i] / Math.Sqrt(samplesToMixdown.Count));
                 }
             }
 
@@ -54,14 +55,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             return (toWrite, remainder);
         }
 
-        public static short[] SineWaveOut(int sampleLength, int sampleRate, double volume)
+        public static float[] SineWaveOut(int sampleLength, int sampleRate, double volume)
         {
-            short[] sineBuffer = new short[sampleLength];
-            double amplitude = volume * short.MaxValue;
+            float[] sineBuffer = new float[sampleLength];
+            double amplitude = volume;
 
             for (int i = 0; i < sineBuffer.Length; i++)
             {
-                sineBuffer[i] = (short)(amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate));
+                sineBuffer[i] =(float) (amplitude * Math.Sin((2 * Math.PI * i * 175) / sampleRate));
             }
             return sineBuffer;
         }
@@ -73,6 +74,90 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             // prevent any potential issues due to a negative time being returned
             return necessarySamples >= 0 ? necessarySamples : 0;
             //return necessarySamples
+        }
+
+        public static float[] MixArraysClipped(float[] array1, int array1Length, float[] array2, int array2Length, out int count)
+        {
+            if (array1Length > array2Length)
+            {
+                for (int i = 0; i < array2Length; i++)
+                {
+                    array1[i] += array2[i];
+
+                    //clip
+                    if (array1[i] > 1f)
+                    {
+                        array1[i] = 1.0f;
+                    }
+                    else if (array1[i] < -1f)
+                    {
+                        array1[i] = -1.0f;
+                    }
+                }
+
+                count = array1Length;
+                return array1;
+            }
+            else
+            {
+                for (int i = 0; i < array1Length; i++)
+                {
+                    array2[i] += array1[i];
+
+                    //clip
+                    if (array2[i] > 1f)
+                    {
+                        array2[i] = 1.0f;
+                    }
+                    else if(array2[i] < -1.0f)
+                    {
+                        array2[i] = -1.0f;
+                    }
+                }
+
+                count = array2Length;
+                return array2;
+            }
+        }
+
+        public static float[] MixArraysNoClipping(float[] array1, int array1Length, float[] array2, int array2Length, out int count)
+        {
+            if (array1Length > array2Length)
+            {
+                for (int i = 0; i < array2Length; i++)
+                {
+                    array1[i] += array2[i];
+                }
+
+                count = array1Length;
+                return array1;
+            }
+            else
+            {
+                for (int i = 0; i < array1Length; i++)
+                {
+                    array2[i] += array1[i];
+                }
+
+                count = array2Length;
+                return array2;
+            }
+        }
+
+        public static float[] ClipArray(float[] array, int arrayLength)
+        {
+            for (int i = 0; i < arrayLength; i++)
+            {
+                if (array[i] > 1f)
+                {
+                    array[i] = 1.0f;
+                }
+                else if (array[i] < -1.0f)
+                {
+                    array[i] = -1.0f;
+                }
+            }
+            return array;
         }
     }
 }

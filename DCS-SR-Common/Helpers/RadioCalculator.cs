@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                    );
         }
 
-        // TODO - this equation will be used to mix in static audio to the transmission audio
+        //  - this equation could be used to mix in static audio to the transmission audio
         // static will creep in in the last 20 % and be ramped up in volume based on distance
         public static double FriisMaximumTransmissionRange(double frequency)
         {

@@ -300,7 +300,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.ExternalAudioClient.Audio
                 }
                 else
                 {
-                    //TODO fix gender
                     resampledBytes = LocalTTS(msg);
                 }
             }

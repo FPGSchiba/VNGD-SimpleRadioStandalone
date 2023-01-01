@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NAudio.Utils;
 using NAudio.Wave;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 {
-    public class JitterBufferProviderInterface : IWaveProvider
+    public class JitterBufferProviderInterface 
     {
-        private readonly CircularBuffer _circularBuffer;
+        private readonly CircularFloatBuffer _circularBuffer;
 
         public static readonly int MAXIMUM_BUFFER_SIZE_MS = 2500;
 
-        private readonly byte[] _silence = new byte[AudioManager.OUTPUT_SEGMENT_FRAMES * 2]; //*2 for stereo
+        private readonly float[] _silence = new float[AudioManager.OUTPUT_SEGMENT_FRAMES]; 
 
         private readonly LinkedList<JitterBufferAudio> _bufferedAudio = new LinkedList<JitterBufferAudio>();
 
-        private ulong _lastRead; // gives current index
+        private ulong _lastRead; // gives current index - unsigned as it'll loops eventually
 
         private readonly object _lock = new object();
 
@@ -26,27 +28,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
         //  private const int INITIAL_DELAY_MS = 200;
         //   private long _delayedUntil = -1; //holds audio for a period of time
 
+        private DeJitteredTransmission lastTransmission;
+
+        private float[] returnBuffer;
+
         public JitterBufferProviderInterface(WaveFormat waveFormat)
         {
             WaveFormat = waveFormat;
 
-            _circularBuffer = new CircularBuffer(WaveFormat.AverageBytesPerSecond * 1); //was 3 
+            _circularBuffer = new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 3);//3 seconds worth of audio
 
             Array.Clear(_silence, 0, _silence.Length);
         }
 
         public WaveFormat WaveFormat { get; }
 
-        public int Read(byte[] buffer, int offset, int count)
+        public DeJitteredTransmission Read(int count)
         {
-            int now = Environment.TickCount;
+          //  int now = Environment.TickCount;
+
+            returnBuffer = BufferHelpers.Ensure(returnBuffer, count);
 
             //other implementation of waiting
-//            if(_delayedUntil > now)
-//            {
-//                //wait
-//                return 0;
-//            }
+            //            if(_delayedUntil > now)
+            //            {
+            //                //wait
+            //                return 0;
+            //            }
 
             var read = 0;
             lock (_lock)
@@ -60,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
                 do
                 {
-                    read = read + _circularBuffer.Read(buffer, offset + read, count - read);
+                    read = read + _circularBuffer.Read(returnBuffer,  read, count - read);
 
                     if (read < count)
                     {
@@ -81,6 +89,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                             var audio = _bufferedAudio.First.Value;
                             //no Pop?
                             _bufferedAudio.RemoveFirst();
+
+                            lastTransmission = new DeJitteredTransmission()
+                            {
+                                Modulation = audio.Modulation,
+                                Frequency = audio.Frequency,
+                                Decryptable = audio.Decryptable,
+                                IsSecondary = audio.IsSecondary,
+                                ReceivedRadio = audio.ReceivedRadio,
+                                Volume = audio.Volume,
+                                NoAudioEffects = audio.NoAudioEffects,
+                                Guid = audio.Guid,
+                                OriginalClientGuid = audio.OriginalClientGuid,
+                                Encryption = audio.Encryption
+
+
+                            };
 
                             if (_lastRead == 0)
                                 _lastRead = audio.PacketNumber;
@@ -121,7 +145,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 //                }
             }
 
-            return read;
+            lastTransmission.PCMAudioLength = read;
+
+            if (read > 0)
+            {
+                lastTransmission.PCMMonoAudio = returnBuffer;
+            }
+            else
+            {
+                lastTransmission.PCMMonoAudio = null;
+            }
+          
+            return lastTransmission;
         }
 
         public void AddSamples(JitterBufferAudio jitterBufferAudio)
@@ -138,6 +173,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
                 }
                 else if (jitterBufferAudio.PacketNumber > _lastRead)
                 { 
+                    //TODO CHECK THIS
                     var time = _bufferedAudio.Count * AudioManager.OUTPUT_AUDIO_LENGTH_MS; // this isnt quite true as there can be padding audio but good enough
 
                     if (time > MAXIMUM_BUFFER_SIZE_MS)

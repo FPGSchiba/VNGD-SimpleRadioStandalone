@@ -8,24 +8,32 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 {
     internal class MixDownLameRecordingWriter : AudioRecordingLameWriterBase
     {
         private LameMP3FileWriter _mp3FileWriter;
-        private List<short[]> _processedAudio;
-
         public MixDownLameRecordingWriter(int sampleRate) : base(sampleRate)
         {
         }
 
-        private void OutputToFile(byte[] byteArray)
+        private void OutputToFile(float[] floatArray, int count)
         {
+            if (_mp3FileWriter == null)
+            {
+                Start();
+            }
             try
             {
                 if (_mp3FileWriter != null)
                 {
+                    // create a byte array and copy the floats into it...
+                    var byteArray = new byte[count * 4];
+                    Buffer.BlockCopy(floatArray, 0, byteArray, 0, byteArray.Length);
+
                     _mp3FileWriter.Write(byteArray, 0, byteArray.Length);
                 }
             }
@@ -35,37 +43,48 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        public override void ProcessAudio(ConcurrentQueue<ClientAudio>[] queues)
+        public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
-            for (int i = 0; i < 11; i++)
+            //2 seconds at worse
+            float[] mixdown = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
+            int count = 0;
+            for (int i = 0; i < perRadioClientAudio.Count; i++)
             {
-                short[] shortArray = base.ProcessRadioAudio(queues, i);
+                CircularFloatBuffer buf = perRadioClientAudio[i];
+                int length = buf.Count;
 
-                _processedAudio.Add(shortArray);
+                if (length > 0)
+                {
+                    float[] client = new float[length];
+                    int read = buf.Read(client, 0, length);
+                    //mix without clipping
+                    //may not clip later on
+                    AudioManipulationHelper.MixArraysNoClipping(mixdown, mixdown.Length, client, read, out int mixLength);
+                    count = Math.Max(count, length);
+                }
             }
-            short[] finalShortArray = AudioManipulationHelper.MixSamplesWithHeadroom(_processedAudio, _sampleRate * 2);
-            _lastWrite += TimeSpan.TicksPerSecond * 2;
-            OutputToFile(ConversionHelpers.ShortArrayToByteArray(finalShortArray));
-            _processedAudio.Clear();
+
+            if (count > 0)
+            {
+                mixdown = AudioManipulationHelper.ClipArray(mixdown, count);
+                OutputToFile(mixdown, count);
+            }
         }
 
-        public override void Start()
+        protected override void Start()
         {
             string partialFilePath = base.CreateFilePath();
-
-            _lastWrite = DateTime.Now.Ticks;
 
             string _filePath = $"{partialFilePath}.mp3";
 
             _mp3FileWriter = new LameMP3FileWriter(_filePath, _waveFormat,
                     (LAMEPreset)Enum.Parse(typeof(LAMEPreset),
                     GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.RecordingQuality).RawValue));
-            _processedAudio = new List<short[]>();
         }
 
         public override void Stop()
         {
-            _mp3FileWriter.Dispose();
+            _mp3FileWriter?.Dispose();
             _mp3FileWriter = null;          
         }
     }

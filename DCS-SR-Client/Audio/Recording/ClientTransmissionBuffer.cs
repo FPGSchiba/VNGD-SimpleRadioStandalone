@@ -73,15 +73,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                     // assume all gaps smaller than 45ms aren't actually gaps, is this necessary?
                     if (timeBetween / TimeSpan.TicksPerMillisecond > 45)
                     {
-                        Console.WriteLine($"Big Gap - {DateTime.Now.Second}");
+                        //Console.WriteLine($"Big Gap - {DateTime.Now.Second}");
                         assembledOut.Add(new short[(timeBetween / TimeSpan.TicksPerSecond) * _sampleRate]);
                     }
                 }
 
-                lastAccess = transmission.Last.Value.ReceiveTime + (transmission.Last.Value.PcmAudioShort.LongLength / _sampleRate) * TimeSpan.TicksPerSecond;
+                //TODO FIX
+           //     lastAccess = transmission.Last.Value.ReceiveTime + (transmission.Last.Value.PcmAudioShort.LongLength / _sampleRate) * TimeSpan.TicksPerSecond;
 
-                var fulltransmission = transmission.SelectMany(x => x.PcmAudioShort).ToArray();
-                assembledOut.Add(fulltransmission);
+              //  var fulltransmission = transmission.SelectMany(x => x.PcmAudioShort).ToArray();
+                //assembledOut.Add(fulltransmission);
             }
 
             _clientAudioSamples.Clear();

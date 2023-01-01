@@ -167,7 +167,7 @@ namespace FragLabs.Audio.Codecs
                 else
                     length = API.opus_decode_float(_decoder, null, 0, decodedPtr, FrameCount(dataLength), 0);
             }
-            decodedLength = length * 2;
+            decodedLength = length * 4;
             if (length < 0)
                 throw new Exception("Decoding failed - " + (Errors)length);
 
