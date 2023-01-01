@@ -164,7 +164,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public void Start()
         {
-            _logger.Debug("Transmission recording started.");
+            _logger.Info("Transmission recording started.");
+
+            _audioRecordingWriter?.Stop();
+
             if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
             {
                 _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
@@ -191,43 +194,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
             _audioRecordingWriter.Start();
 
-            var processingThread = new Thread(ProcessQueues);
-            processingThread.Start();
+            new Thread(ProcessQueues).Start();
         }
 
         public void Stop()
         {
             if (_stop) { return; }
             _stop = true;
-            _audioRecordingWriter.Stop();
-            _logger.Debug("Transmission recording stopped.");
-
+            _audioRecordingWriter?.Stop();
+            _audioRecordingWriter = null;
+            _logger.Info("Transmission recording stopped.");
         }
 
         public void AppendPlayerAudio(float[] transmission, int radioId)
         {
-            if (_stop)
-            {
-                Start();
-            }
-
             //only record if we need too
-            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio) && !_stop)
             {
-                
                 _playerMixDownQueue[radioId]?.Write(transmission, 0, transmission.Length);
             }
         }
 
         public void AppendClientAudio(List<DeJitteredTransmission> mainAudio, List<DeJitteredTransmission> secondaryAudio, int radioId)
         {
-            if (_stop)
-            {
-                Start();
-            }
-
             //only record if we need too
-            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio) && !_stop)
             {
                 //TODO
                 //represents a moment in time

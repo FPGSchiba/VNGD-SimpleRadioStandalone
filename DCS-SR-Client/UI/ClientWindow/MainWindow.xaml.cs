@@ -1068,7 +1068,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             try
             {
                 _audioManager.StopEncoding();
-                AudioRecordingManager.Instance.Stop();
             }
             catch (Exception)
             {

@@ -143,6 +143,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 InitVox();
 
+                AudioRecordingManager.Instance.Start();
+
                 //Audio manager should start / stop and cleanup based on connection successfull and disconnect
                 //Should use listeners to synchronise all the state
 
@@ -612,6 +614,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 SpeakerMax = -100;
                 MicMax = -100;
 
+                AudioRecordingManager.Instance.Stop();
 
                 MessageHub.Instance.ClearSubscriptions();
             }

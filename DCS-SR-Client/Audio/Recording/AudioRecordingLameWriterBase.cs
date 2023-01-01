@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         }
 
         public abstract void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio);
-        public abstract void Start();
+        protected abstract void Start();
         public abstract void Stop();
     }
 }

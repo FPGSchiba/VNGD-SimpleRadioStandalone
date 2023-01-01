@@ -15,12 +15,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
     internal class PerRadioLameRecordingWriter : AudioRecordingLameWriterBase
     {
         private readonly Dictionary<int, string> _filePaths;
-        private readonly LameMP3FileWriter[] _mp3FileWriters;
+        private readonly List<LameMP3FileWriter> _mp3FileWriters;
 
         public PerRadioLameRecordingWriter(int sampleRate) : base(sampleRate)
         {
             _filePaths = new Dictionary<int, string>();
-            _mp3FileWriters = new LameMP3FileWriter[11];
+            _mp3FileWriters = new List<LameMP3FileWriter>();
         }
 
         private void OutputToFile(int radio, float[] floatArray)
@@ -44,6 +44,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
+            if (_mp3FileWriters.Count == 0)
+            {
+                Start();
+            }
             
             for (int i = 0; i < perRadioClientAudio.Count; i++)
             {
@@ -57,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        public override void Start()
+        protected override void Start()
         {
             string partialFilePath = base.CreateFilePath();
 
@@ -67,17 +71,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             {
                 _filePaths.Add(i, $"{partialFilePath}-Radio{i}.mp3");
 
-                _mp3FileWriters[i] = new LameMP3FileWriter(_filePaths[i], _waveFormat, lamePreset);
+                _mp3FileWriters.Add(new LameMP3FileWriter(_filePaths[i], _waveFormat, lamePreset));
             }
         }
 
         public override void Stop()
         {
             _filePaths.Clear();
-            for (int i = 0; i < 11; i++)
+            foreach (var writer in _mp3FileWriters)
             {
-                _mp3FileWriters[i].Dispose();
-                _mp3FileWriters[i] = null;
+                writer.Dispose();
             }
         }
     }

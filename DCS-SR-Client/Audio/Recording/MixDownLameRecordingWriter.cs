@@ -16,7 +16,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
     internal class MixDownLameRecordingWriter : AudioRecordingLameWriterBase
     {
         private LameMP3FileWriter _mp3FileWriter;
-
         public MixDownLameRecordingWriter(int sampleRate) : base(sampleRate)
         {
         }
@@ -42,6 +41,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public override void ProcessAudio(List<CircularFloatBuffer> perRadioClientAudio)
         {
+            if (_mp3FileWriter == null)
+            {
+                Start();
+            }
+
             //2 seconds at worse
             float[] mixdown = new float[AudioManager.OUTPUT_SAMPLE_RATE * 2];
             int count = 0;
@@ -68,7 +72,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             }
         }
 
-        public override void Start()
+        protected override void Start()
         {
             string partialFilePath = base.CreateFilePath();
 
@@ -81,7 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
 
         public override void Stop()
         {
-            _mp3FileWriter.Dispose();
+            _mp3FileWriter?.Dispose();
             _mp3FileWriter = null;          
         }
     }
