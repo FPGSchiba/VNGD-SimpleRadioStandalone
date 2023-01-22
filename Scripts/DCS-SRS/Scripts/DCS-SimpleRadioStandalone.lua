@@ -4806,6 +4806,9 @@ SR.exporters["Mi-8MT"] = SR.exportRadioMI8
 SR.exporters["Mi-24P"] = SR.exportRadioMI24P
 SR.exporters["Yak-52"] = SR.exportRadioYak52
 SR.exporters["FA-18C_hornet"] = SR.exportRadioFA18C
+SR.exporters["FA-18E"] = SR.exportRadioFA18C
+SR.exporters["FA-18F"] = SR.exportRadioFA18C
+SR.exporters["EA-18G"] = SR.exportRadioFA18C
 SR.exporters["F-86F Sabre"] = SR.exportRadioF86Sabre
 SR.exporters["MiG-15bis"] = SR.exportRadioMIG15
 SR.exporters["MiG-19P"] = SR.exportRadioMIG19
@@ -4830,6 +4833,7 @@ SR.exporters["AV8BNA"] = SR.exportRadioAV8BNA
 SR.exporters["AJS37"] = SR.exportRadioAJS37
 SR.exporters["A-10A"] = SR.exportRadioA10A
 SR.exporters["UH-60L"] = SR.exportRadioUH60L
+SR.exporters["MH-60R"] = SR.exportRadioUH60L
 SR.exporters["AH-64D_BLK_II"] = SR.exportRadioAH64D
 SR.exporters["A-4E-C"] = SR.exportRadioA4E
 SR.exporters["SK-60"] = SR.exportRadioSK60
@@ -4923,7 +4927,10 @@ LuaExportBeforeNextFrame = function()
     end
 
     -- Check F/A-18C ENT keypress (needs to be checked in LuaExportBeforeNextFrame not to be missed)
-    if _lastUnitType == "FA-18C_hornet" then
+    if _lastUnitType == "FA-18C_hornet" 
+        or _lastUnitType == "FA-18E"
+        or _lastUnitType == "FA-18F"
+        or _lastUnitType == "EA-18G" then
         if not _fa18ent then
             local st, rv = pcall(SR.getButtonPosition, 122)     -- pcall to prevent dcs.log error after ejection
             if st and rv > 0 then
