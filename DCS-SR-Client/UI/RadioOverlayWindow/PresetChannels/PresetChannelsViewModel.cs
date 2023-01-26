@@ -79,8 +79,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
             int i = 1;
             foreach (var channel in _channelsStore.LoadFromStore(radio.name))
             {
-                if (((double) channel.Value) < Max
-                    && ((double) channel.Value) > Min)
+                if (((double) channel.Value) <= Max
+                    && ((double) channel.Value) >= Min)
                 {
                     channel.Channel = i++;
                     PresetChannels.Add(channel);
