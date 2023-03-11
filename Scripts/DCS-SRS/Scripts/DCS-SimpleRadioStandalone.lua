@@ -1,4 +1,4 @@
--- Version 2.0.8.3
+-- Version 2.0.8.4
 -- Special thanks to Cap. Zeen, Tarres and Splash for all the help
 -- with getting the radio information :)
 -- Run the installer to correctly install this file
@@ -1370,6 +1370,40 @@ function SR.exportRadioA29B(_data)
     return _data
 end
 
+
+function SR.exportRadioVSNF4(_data)
+    _data.capabilities = { dcsPtt = false, dcsIFF = false, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+   
+    _data.radios[2].name = "AN/ARC-164 UHF"
+    _data.radios[2].freq = SR.getRadioFrequency(2)
+    _data.radios[2].modulation = 0
+    _data.radios[2].secFreq = 0
+    _data.radios[2].volume = 1.0
+    _data.radios[2].volMode = 1
+    _data.radios[2].freqMode = 0
+
+
+    -- Expansion Radio - Server Side Controlled
+    _data.radios[3].name = "AN/ARC-186(V)"
+    _data.radios[3].freq = 124.8 * 1000000 --116,00-151,975 MHz
+    _data.radios[3].modulation = 0
+    _data.radios[3].secFreq = 121.5 * 1000000
+    _data.radios[3].volume = 1.0
+    _data.radios[3].freqMin = 116 * 1000000
+    _data.radios[3].freqMax = 151.975 * 1000000
+    _data.radios[3].expansion = true
+    _data.radios[3].volMode = 1
+    _data.radios[3].freqMode = 1
+
+    _data.radios[2].encKey = 1
+    _data.radios[2].encMode = 1 -- FC3 Gui Toggle + Gui Enc key setting
+
+    _data.control = 0;
+    _data.selected = 1
+
+    return _data
+end
+
 function SR.exportRadioF15C(_data)
 
     _data.radios[2].name = "AN/ARC-164 UHF-1"
@@ -1414,6 +1448,8 @@ function SR.exportRadioF15C(_data)
 
     return _data
 end
+
+
 
 function SR.exportRadioUH1H(_data)
 
@@ -2246,6 +2282,210 @@ function SR.exportRadioA10C(_data)
     --     _data.selected = -1
     --     _data.ptt = false
     -- end
+
+    _data.control = 0 -- Overlay  
+
+    -- Handle transponder
+
+    _data.iff = {status=0,mode1=0,mode3=0,mode4=false,control=0,expansion=false}
+
+    local iffPower =  SR.getSelectorPosition(200,0.1)
+
+    local iffIdent =  SR.getButtonPosition(207) -- -1 is off 0 or more is on
+
+    if iffPower >= 2 then
+        _data.iff.status = 1 -- NORMAL
+
+        if iffIdent == 1 then
+            _data.iff.status = 2 -- IDENT (BLINKY THING)
+        end
+
+        -- SR.log("IFF iffIdent"..iffIdent.."\n\n")
+        -- MIC mode switch - if you transmit on UHF then also IDENT
+        -- https://github.com/ciribob/DCS-SimpleRadioStandalone/issues/408
+        if iffIdent == -1 then
+
+            _data.iff.mic = 2
+
+            if _data.ptt and _data.selected == 2 then
+                _data.iff.status = 2 -- IDENT (BLINKY THING)
+            end
+        end
+    end
+
+    local mode1On =  SR.getButtonPosition(202)
+
+    _data.iff.mode1 = SR.round(SR.getButtonPosition(209), 0.1)*100+SR.round(SR.getButtonPosition(210), 0.1)*10
+
+    if mode1On ~= 0 then
+        _data.iff.mode1 = -1
+    end
+
+    local mode3On =  SR.getButtonPosition(204)
+
+    _data.iff.mode3 = SR.round(SR.getButtonPosition(211), 0.1) * 10000 + SR.round(SR.getButtonPosition(212), 0.1) * 1000 + SR.round(SR.getButtonPosition(213), 0.1)* 100 + SR.round(SR.getButtonPosition(214), 0.1) * 10
+
+    if mode3On ~= 0 then
+        _data.iff.mode3 = -1
+    elseif iffPower == 4 then
+        -- EMERG SETTING 7770
+        _data.iff.mode3 = 7700
+    end
+
+    local mode4On =  SR.getButtonPosition(208)
+
+    if mode4On ~= 0 then
+        _data.iff.mode4 = true
+    else
+        _data.iff.mode4 = false
+    end
+
+    -- SR.log("IFF STATUS"..SR.JSON:encode(_data.iff).."\n\n")
+    return _data
+end
+
+
+--for A10C2
+
+local _a10c2 = {}
+_a10c2.enc = false
+_a10c2.encKey = 1
+
+function SR.exportRadioA10C2(_data)
+
+    _data.capabilities = { dcsPtt = false, dcsIFF = true, dcsRadioSwitch = false, intercomHotMic = false, desc = "" }
+
+    -- Check if player is in a new aircraft
+    if _lastUnitId ~= _data.unitId then
+        -- New aircraft; Reset volumes to 100%
+        local _device = GetDevice(0)
+
+        if _device then
+            _device:set_argument_value(133, 1.0) -- VHF AM
+            _device:set_argument_value(171, 1.0) -- UHF
+            _device:set_argument_value(147, 1.0) -- VHF FM
+            _a10c2.enc = false
+            _a10c2.encKey = 1
+        end
+    end
+
+    -- VHF AM
+    -- Set radio data
+    _data.radios[2].name = "AN/ARC-210 VHF/UHF"
+    _data.radios[2].freq = SR.getRadioFrequency(55)
+    _data.radios[2].modulation = SR.getRadioModulation(55)
+    _data.radios[2].volume = SR.getRadioVolume(0, 133, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 238, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 225, { 0.0, 1.0 }, false) * SR.getButtonPosition(226)
+    _data.radios[2].encMode = 2 -- Mode 2 is set by aircraft
+
+    --18 : {"PREV":"PREV","comsec_mode":"KY-58 VOICE","comsec_submode":"CT","dot_mark":".","freq_label_khz":"000","freq_label_mhz":"124","ky_submode_label":"1","lower_left_corner_arc210":"","modulation_label":"AM","prev_manual_freq":"---.---","txt_RT":"RT1"}
+    -- 18 : {"PREV":"PREV","comsec_mode":"KY-58 VOICE","comsec_submode":"CT-TD","dot_mark":".","freq_label_khz":"000","freq_label_mhz":"124","ky_submode_label":"4","lower_left_corner_arc210":"","modulation_label":"AM","prev_manual_freq":"---.---","txt_RT":"RT1"}
+    local _radioDisplay = SR.getListIndicatorValue(18)
+
+    if _radioDisplay.comsec_submode and _radioDisplay.comsec_submode == "PT" then
+        
+        _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
+        _a10c2.enc = false
+
+    elseif _radioDisplay.comsec_submode and (_radioDisplay.comsec_submode == "CT-TD" or _radioDisplay.comsec_submode == "CT") then
+
+        _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
+        _a10c2.enc = true
+     
+    end
+
+    _data.radios[2].encKey = _a10c2.encKey
+    _data.radios[2].enc = _a10c2.enc
+
+    -- CREDIT: Recoil - thank you!
+    -- Check ARC-210 function mode (0 = OFF, 1 = TR+G, 2 = TR, 3 = ADF, 4 = CHG PRST, 5 = TEST, 6 = ZERO)
+    local arc210ModeKnob = SR.getSelectorPosition(551, 0.1)
+    if arc210ModeKnob == 1 and _data.radios[2].freq > 1000 then
+        -- Function dial set to TR+G
+        -- Listen to Guard as well as designated frequency
+        if (_data.radios[2].freq >= (108.0 * 1000000)) and (_data.radios[2].freq < (156.0 * 1000000)) then
+            -- Frequency between 108.0 and 156.0 MHz, using VHF Guard
+            _data.radios[2].secFreq = 121.5 * 1000000
+        else
+            -- Other frequency, using UHF Guard
+            _data.radios[2].secFreq = 243.0 * 1000000
+        end
+    else
+        -- Function dial set to OFF, TR, ADF, CHG PRST, TEST or ZERO
+        -- Not listening to Guard secondarily
+        _data.radios[2].secFreq = 0
+    end
+
+    -- UHF
+    -- Set radio data
+    _data.radios[3].name = "AN/ARC-164 UHF"
+    _data.radios[3].freq = SR.getRadioFrequency(54)
+    
+    local modulation = SR.getSelectorPosition(162, 0.1)
+
+    --is HQ selected (A on the Radio)
+    if modulation == 2 then
+        _data.radios[3].modulation = 4
+    else
+        _data.radios[3].modulation = 0
+    end
+
+    _data.radios[3].volume = SR.getRadioVolume(0, 171, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 238, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 227, { 0.0, 1.0 }, false) * SR.getButtonPosition(228)
+    _data.radios[3].encMode = 2 -- Mode 2 is set by aircraft
+
+    -- Check UHF frequency mode (0 = MNL, 1 = PRESET, 2 = GRD)
+    local _selector = SR.getSelectorPosition(167, 0.1)
+    if _selector == 1 then
+        -- Using UHF preset channels
+        local _channel = SR.getSelectorPosition(161, 0.05) + 1 --add 1 as channel 0 is channel 1
+        _data.radios[3].channel = _channel
+    end
+
+    -- Check UHF function mode (0 = OFF, 1 = MAIN, 2 = BOTH, 3 = ADF)
+    local uhfModeKnob = SR.getSelectorPosition(168, 0.1)
+    if uhfModeKnob == 2 and _data.radios[3].freq > 1000 then
+        -- Function dial set to BOTH
+        -- Listen to Guard as well as designated frequency
+        _data.radios[3].secFreq = 243.0 * 1000000
+    else
+        -- Function dial set to OFF, MAIN, or ADF
+        -- Not listening to Guard secondarily
+        _data.radios[3].secFreq = 0
+    end
+
+    -- VHF FM
+    -- Set radio data
+    _data.radios[4].name = "AN/ARC-186(V)FM"
+    _data.radios[4].freq = SR.getRadioFrequency(56)
+    _data.radios[4].modulation = 1
+    _data.radios[4].volume = SR.getRadioVolume(0, 147, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 238, { 0.0, 1.0 }, false) * SR.getRadioVolume(0, 223, { 0.0, 1.0 }, false) * SR.getButtonPosition(224)
+    _data.radios[4].encMode = 2 -- mode 2 enc is set by aircraft & turned on by aircraft
+
+
+    -- KY-58 Radio Encryption
+    -- Check if encryption is being used
+    local _ky58Power = SR.getButtonPosition(784)
+    if _ky58Power > 0.5 and SR.getButtonPosition(783) == 0 then
+        -- mode switch set to OP and powered on
+        -- Power on!
+
+        local _radio = nil
+        if SR.round(SR.getButtonPosition(781), 0.1) == 0.2 and SR.getSelectorPosition(149, 0.1) >= 2 then -- encryption disabled when EMER AM/FM selected
+            --crad/2 vhf - FM
+            _radio = _data.radios[4]
+        elseif SR.getButtonPosition(781) == 0 and _selector ~= 2 then -- encryption disabled when GRD selected
+            --crad/1 uhf
+            _radio = _data.radios[3]
+        end
+
+        -- Get encryption key
+        local _channel = SR.getSelectorPosition(782, 0.1) + 1
+
+        if _radio ~= nil and _channel ~= nil then
+            -- Set encryption key for selected radio
+            _radio.encKey = _channel
+            _radio.enc = true
+        end
+    end
 
     _data.control = 0 -- Overlay  
 
@@ -4840,6 +5080,8 @@ SR.exporters["SK-60"] = SR.exportRadioSK60
 SR.exporters["PUCARA"] = SR.exportRadioPUCARA
 SR.exporters["T-45"] = SR.exportRadioT45
 SR.exporters["A-29B"] = SR.exportRadioA29B
+SR.exporters["VSN_F4C"] = SR.exportRadioVSNF4
+SR.exporters["VSN_F4B"] = SR.exportRadioVSNF4
 SR.exporters["F-15C"] = SR.exportRadioF15C
 SR.exporters["MiG-29A"] = SR.exportRadioMiG29
 SR.exporters["MiG-29S"] = SR.exportRadioMiG29
@@ -4850,6 +5092,13 @@ SR.exporters["Su-33"] = SR.exportRadioSU27
 SR.exporters["Su-25"] = SR.exportRadioSU25
 SR.exporters["Su-25T"] = SR.exportRadioSU25
 SR.exporters["F-16C_50"] = SR.exportRadioF16C
+SR.exporters["F-16D_50_NS"] = SR.exportRadioF16C
+SR.exporters["F-16D_52_NS"] = SR.exportRadioF16C
+SR.exporters["F-16D_50"] = SR.exportRadioF16C
+SR.exporters["F-16D_52"] = SR.exportRadioF16C
+SR.exporters["F-16D_Barak_40"] = SR.exportRadioF16C
+SR.exporters["F-16D_Barak_30"] = SR.exportRadioF16C
+SR.exporters["F-16I"] = SR.exportRadioF16C
 SR.exporters["SA342M"] = SR.exportRadioSA342
 SR.exporters["SA342L"] = SR.exportRadioSA342
 SR.exporters["SA342Mistral"] = SR.exportRadioSA342
@@ -4859,7 +5108,7 @@ SR.exporters["L-39ZA"] = SR.exportRadioL39
 SR.exporters["F-14B"] = SR.exportRadioF14
 SR.exporters["F-14A-135-GR"] = SR.exportRadioF14
 SR.exporters["A-10C"] = SR.exportRadioA10C
-SR.exporters["A-10C_2"] = SR.exportRadioA10C
+SR.exporters["A-10C_2"] = SR.exportRadioA10C2
 SR.exporters["P-51D"] = SR.exportRadioP51
 SR.exporters["P-51D-30-NA"] = SR.exportRadioP51
 SR.exporters["TF-51D"] = SR.exportRadioP51
@@ -4951,4 +5200,4 @@ end
 -- Load mods' SRS plugins
 SR.LoadModsPlugins()
 
-SR.log("Loaded SimpleRadio Standalone Export version: 2.0.8.3")
+SR.log("Loaded SimpleRadio Standalone Export version: 2.0.8.4")
