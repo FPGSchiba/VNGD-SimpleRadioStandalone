@@ -2379,19 +2379,23 @@ function SR.exportRadioA10C2(_data)
 
     --18 : {"PREV":"PREV","comsec_mode":"KY-58 VOICE","comsec_submode":"CT","dot_mark":".","freq_label_khz":"000","freq_label_mhz":"124","ky_submode_label":"1","lower_left_corner_arc210":"","modulation_label":"AM","prev_manual_freq":"---.---","txt_RT":"RT1"}
     -- 18 : {"PREV":"PREV","comsec_mode":"KY-58 VOICE","comsec_submode":"CT-TD","dot_mark":".","freq_label_khz":"000","freq_label_mhz":"124","ky_submode_label":"4","lower_left_corner_arc210":"","modulation_label":"AM","prev_manual_freq":"---.---","txt_RT":"RT1"}
-    local _radioDisplay = SR.getListIndicatorValue(18)
+    
+    pcall(function() 
+        local _radioDisplay = SR.getListIndicatorValue(18)
 
-    if _radioDisplay.comsec_submode and _radioDisplay.comsec_submode == "PT" then
-        
-        _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
-        _a10c2.enc = false
+        if _radioDisplay.comsec_submode and _radioDisplay.comsec_submode == "PT" then
+            
+            _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
+            _a10c2.enc = false
 
-    elseif _radioDisplay.comsec_submode and (_radioDisplay.comsec_submode == "CT-TD" or _radioDisplay.comsec_submode == "CT") then
+        elseif _radioDisplay.comsec_submode and (_radioDisplay.comsec_submode == "CT-TD" or _radioDisplay.comsec_submode == "CT") then
 
-        _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
-        _a10c2.enc = true
-     
-    end
+            _a10c2.encKey = tonumber(_radioDisplay.ky_submode_label)
+            _a10c2.enc = true
+         
+        end
+    end)
+    
 
     _data.radios[2].encKey = _a10c2.encKey
     _data.radios[2].enc = _a10c2.enc
