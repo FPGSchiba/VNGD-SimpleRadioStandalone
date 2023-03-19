@@ -309,6 +309,12 @@
     <Compile Include="UI\RadioOverlayWindow\RadioCapabilities.xaml.cs">
       <DependentUpon>RadioCapabilities.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFive.xaml.cs">
+      <DependentUpon>RadioOverlayFive.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwo.xaml.cs">
+      <DependentUpon>RadioOverlayTwo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\TransponderPanel.xaml.cs">
       <DependentUpon>TransponderPanel.xaml</DependentUpon>
     </Compile>
@@ -350,9 +356,6 @@
       <DependentUpon>RadioControlGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Audio\Providers\RadioFilter.cs" />
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlay.xaml.cs">
-      <DependentUpon>RadioOverlay.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Network\Models\RadioSendingState.cs" />
     <Compile Include="Network\DCS\DCSRadioSyncManager.cs" />
     <Compile Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
@@ -378,6 +381,14 @@
     <Page Include="UI\RadioOverlayWindow\RadioCapabilities.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayFive.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\TransponderPanel.xaml">
       <SubType>Designer</SubType>
@@ -433,10 +444,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlay.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

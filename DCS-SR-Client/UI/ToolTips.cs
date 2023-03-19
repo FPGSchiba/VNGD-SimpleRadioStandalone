@@ -16,12 +16,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModeContent.Children.Add(new TextBlock
             {
-                Text = "External AWACS Mode",
+                Text = "Radio connection",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModeContent.Children.Add(new TextBlock
             {
-                Text = "External AWACS Mode (EAM) allows you to use the AWACS functionality of SRS without having to run DCS."
+                Text = "You must connect your radio in order for them to function. If your radio panel says unknown, be sure to connect your radios."
             });
             externalAWACSModeContent.Children.Add(new TextBlock
             {
@@ -36,12 +36,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "External AWACS Mode name",
+                Text = "Username",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Choose a name to display in the client list and export of the SRS server."
+                Text = "Enter your Vanguard Playername."
             });
 
             ExternalAWACSModeName.Content = externalAWACSModeNameContent;
@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModePasswordContent.Children.Add(new TextBlock
             {
-                Text = "External AWACS Mode coalition password",
+                Text = "Coalition password",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModePasswordContent.Children.Add(new TextBlock

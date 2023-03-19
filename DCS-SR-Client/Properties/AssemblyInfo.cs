@@ -6,11 +6,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("DCS-SimpleRadio Standalone Client")]
-[assembly: AssemblyDescription("Client for DCS-SimpleRadio Standalone")]
+[assembly: AssemblyTitle("SimpleRadio Standalone Client")]
+[assembly: AssemblyDescription("Client for SimpleRadio Standalone")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ciribob - GitHub.com/Ciribob")]
-[assembly: AssemblyProduct("DCS-SimpleRadio Standalone")]
+[assembly: AssemblyCompany("Modified by: Vanguard | Original: Ciribob - GitHub.com/Ciribob")]
+[assembly: AssemblyProduct("SimpleRadio Standalone")]
 [assembly: AssemblyCopyright("Copyright ©  2016 - Ciribob")]
 [assembly: AssemblyTrademark("Ciribob - GitHub.com/Ciribob")]
 [assembly: AssemblyCulture("")]
@@ -52,5 +52,5 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("2.0.8.4")]
-[assembly: AssemblyFileVersion("2.0.8.4")]
+[assembly: AssemblyVersion("1.0.0.1")]
+[assembly: AssemblyFileVersion("1.0.0.1")]

@@ -690,14 +690,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         //run on main
                         Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false,false); });
+                            () => { _toggleOverlayCallback(false,false, false); });
                         break;
                     }
                     else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.AwacsOverlayToggle)
                     {
                         //run on main
                         Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false, true); });
+                            () => { _toggleOverlayCallback(false, true, false); });
                         break;
                     }
                     else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&

@@ -125,18 +125,18 @@
 
                     <StackPanel Margin="0,10,0,0"
                                 HorizontalAlignment="Center"
-                                Orientation="Horizontal">
+                                Orientation="Horizontal" Width="440">
 
                         <TextBox x:Name="ServerIp"
-                                 Width="180"
+                                 Width="200"
                                  Height="23"
-                                 Margin="0,0,5,0"
+                                 Margin="0,0,10,0"
                                  MaxLines="1"
                                  Text="127.0.0.1:5002"
                                  TextWrapping="Wrap" />
 
                         <ComboBox x:Name="ServerAddressPicker"
-                                  Width="180"
+                                  Width="200"
                                   Height="23"
                                   DisplayMemberPath="Name"
                                   ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"
@@ -154,56 +154,11 @@
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Margin="0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <Button x:Name="StartStop"
-                                Width="125"
-                                Margin="0,10,20,0"
-                                HorizontalAlignment="Center"
-                                Command="{Binding Path=ConnectCommand}"
-                                Content="Connect"
-                                Style="{DynamicResource SquareButtonStyle}"
-                                ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
-                        <Button x:Name="ToggleServerSettings"
-                                Width="125"
-                                Margin="0,10,0,0"
-                                HorizontalAlignment="Center"
-                                Click="ToggleServerSettings_OnClick"
-                                Content="Show Server Settings"
-                                IsEnabled="False"
-                                Style="{DynamicResource SquareButtonStyle}" />
-
-                    </StackPanel>
-                    <StackPanel Margin="0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <Button x:Name="ShowOverlay"
-                                Width="125"
-                                Margin="0,15,20,0"
-                                HorizontalAlignment="Center"
-                                Click="ShowOverlay_OnClick"
-                                Content="Toggle Radio Overlay"
-                                Style="{DynamicResource SquareButtonStyle}" />
-                        <Button x:Name="ShowAwacsOverlay"
-                                Width="125"
-                                Margin="0,15,20,0"
-                                HorizontalAlignment="Center"
-                                Click="ShowAwacsOverlay_OnClick"
-                                Content="Toggle AWACS Overlay"
-                                Style="{DynamicResource SquareButtonStyle}" />
-                        <Button x:Name="ShowClientList"
-                                Width="125"
-                                Margin="0,15,0,0"
-                                HorizontalAlignment="Center"
-                                Click="ShowClientList_OnClick"
-                                Content="Toggle Client List"
-                                Style="{DynamicResource SquareButtonStyle}" />
-                    </StackPanel>
+                    <Border BorderBrush="Black" BorderThickness="1" Height="1" VerticalAlignment="Top" Margin="0,20,0,0" Width="999"/>
 
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
-                                Orientation="Horizontal">
+                                Orientation="Horizontal" Height="65">
                         <StackPanel.Resources>
                             <converters:BooleanInverterConverter x:Key="BooleanInverterConverter" />
                         </StackPanel.Resources>
@@ -214,7 +169,7 @@
                                    HorizontalAlignment="Center"
                                    HorizontalContentAlignment="Center"
                                    Margin="0,10,10,0"
-                                   Content="EAM coalition password"
+                                   Content="coalition password"
                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <PasswordBox x:Name="ExternalAWACSModePassword"
                                          Width="200"
@@ -230,29 +185,86 @@
                                    HorizontalAlignment="Center"
                                    HorizontalContentAlignment="Center"
                                    Margin="0,10,0,0"
-                                   Content="EAM name"
+                                   Content="username"
                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <TextBox x:Name="ExternalAWACSModeName"
                                      Width="200"
                                      Height="23"
-                                     Margin="0,0,0,0"
+                                     Margin="0,0,28,0"
                                      MaxLines="1"
                                      TextWrapping="Wrap"
                                      HorizontalAlignment="Center"
                                      IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                         </StackPanel>
                     </StackPanel>
+
                     <StackPanel Margin="0"
                                 HorizontalAlignment="Center"
                                 Orientation="Horizontal">
-                        <Button x:Name="ConnectExternalAWACSMode"
-                                Width="220"
-                                Margin="0,10,0,0"
+                        <Button x:Name="StartStop"
+                                Width="125"
+                                Margin="0,15,20,0"
                                 HorizontalAlignment="Center"
+                                Command="{Binding Path=ConnectCommand}"
+                                Content="Connect: Server"
+                                Style="{DynamicResource AccentedSquareButtonStyle}"
+                                ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}" />
+                        <Button x:Name="ConnectExternalAWACSMode"
+                                Width="125"
+                                Margin="0,15,0,0"
                                 Click="ConnectExternalAWACSMode_OnClick"
-                                Content="Connect External AWACS Mode (EAM)"
+                                Content="Connect: Radios"
+                                IsEnabled="False"
+                                Style="{DynamicResource AccentedSquareButtonStyle}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+
+                        <Button x:Name="ShowClientList"
+                                Width="125"
+                                Margin="0,15,20,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowClientList_OnClick"
+                                Content="Toggle Client List"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                        <Button x:Name="ToggleServerSettings"
+                                Width="125"
+                                Margin="0,15,0,0"
+                                HorizontalAlignment="Center"
+                                Click="ToggleServerSettings_OnClick"
+                                Content="Show Server Settings"
                                 IsEnabled="False"
                                 Style="{DynamicResource SquareButtonStyle}" />
+
+                    </StackPanel>
+                    <StackPanel
+                        Margin="0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Button x:Name="ShowOverlayTwo"
+                                Width="125"
+                                Margin="0,10,20,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowOverlayTwo_OnClick"
+                                Content="Two Radios"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                        <Button x:Name="ShowOverlayFoive"
+                                Width="125"
+                                Margin="0,10,20,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowOverlayFive_OnClick"
+                                Content="Five Radios"
+                                Style="{DynamicResource SquareButtonStyle}" />
+                        <Button x:Name="ShowAwacsOverlay"
+                                Width="125"
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Center"
+                                Click="ShowAwacsOverlay_OnClick"
+                                Content="Ten Radios"
+                                Style="{DynamicResource SquareButtonStyle}" />
+
                     </StackPanel>
 
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,0">
@@ -300,12 +312,6 @@
                                Height="26"
                                HorizontalAlignment="Center"
                                Margin="5,0,5,0" />
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="Game" />
-                        <Image x:Name="GameConnectionStatus"
-                               Source="{Binding Path=ClientState.IsGameConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                               Height="26"
-                               HorizontalAlignment="Center"
-                               Margin="5,0,5,0" />
                         <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="LotATC" />
                         <Image x:Name="LotATCConnectionStatus"
                                Source="{Binding Path=ClientState.IsLotATCConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
@@ -314,12 +320,6 @@
                                Margin="5,0,0,0" />
 
                     </StackPanel>
-
-                    <Button Content="Please Support SRS through Patreon"
-                            Click="Donate_OnClick"
-                            Width="220"
-                            Margin="0,5,0,0" controls:ButtonHelper.PreserveTextCase="True"
-                            Style="{StaticResource AccentedSquareButtonStyle}" />
 
                 </StackPanel>
             </GroupBox>

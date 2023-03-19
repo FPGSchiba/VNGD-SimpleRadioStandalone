@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         public delegate void ReceivedAutoConnect(string address, int port);
 
-        public delegate void ToggleOverlayCallback(bool uiButton, bool awacs);
+        public delegate void ToggleOverlayCallback(bool uiButton, bool awacs, bool twoRadioOverlay);
 
         private readonly AudioManager _audioManager;
 
@@ -63,7 +63,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private Overlay.RadioOverlayWindow _radioOverlayWindow;
+        private Overlay.RadioOverlayWindowFive _radioOverlayWindowFive;
+        private Overlay.RadioOverlayWindowTwo _radioOverlayWindowTwo;
         private AwacsRadioOverlayWindow.RadioOverlayWindow _awacsRadioOverlay;
 
         private IPAddress _resolvedIp;
@@ -192,13 +193,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
-            int radioWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioX).DoubleValue;
-            int radioWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioY).DoubleValue;
+            int radioTwoWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoX).DoubleValue;
+            int radioTwoWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoY).DoubleValue;
+            int radioFiveWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
+            int radioFiveWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
             int awacsWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsX).DoubleValue;
             int awacsWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsY).DoubleValue;
 
             Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
-            Logger.Info($"Checking window visibility for radio overlay {{X={radioWindowX},Y={radioWindowY}}}");
+            Logger.Info($"Checking window visibility for two radio overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}}");
+            Logger.Info($"Checking window visibility for five radio overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}}");
             Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
@@ -210,9 +214,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(radioWindowX, radioWindowY))
+                if (screen.Bounds.Contains(radioTwoWindowX, radioTwoWindowY))
                 {
-                    Logger.Info($"Radio overlay {{X={radioWindowX},Y={radioWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"Radio Two overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioFiveWindowX, radioFiveWindowY))
+                {
+                    Logger.Info($"Radio Five overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
@@ -247,15 +256,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"Radio overlay window outside visible area of monitors, resetting position ({radioWindowX},{radioWindowY}) to defaults");
+                Logger.Warn($"Radio Two overlay window outside visible area of monitors, resetting position ({radioTwoWindowX},{radioTwoWindowY}) to defaults");
+                Logger.Warn($"Radio Five overlay window outside visible area of monitors, resetting position ({radioFiveWindowX},{radioFiveWindowY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
 
-                if (_radioOverlayWindow != null)
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
+
+                if (_radioOverlayWindowTwo != null)
                 {
-                    _radioOverlayWindow.Left = 300;
-                    _radioOverlayWindow.Top = 300;
+                    _radioOverlayWindowTwo.Left = 300;
+                    _radioOverlayWindowTwo.Top = 300;
+                }
+
+                if (_radioOverlayWindowFive != null)
+                {
+                    _radioOverlayWindowFive.Left = 300;
+                    _radioOverlayWindowFive.Top = 300;
                 }
             }
 
@@ -1047,7 +1066,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ClientState.IsConnectionErrored = connectionError;
 
-            StartStop.Content = "Connect";
+            StartStop.Content = "Connect: Server";
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
@@ -1057,7 +1076,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ToggleServerSettings.IsEnabled = false;
 
             ConnectExternalAWACSMode.IsEnabled = false;
-            ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+            ConnectExternalAWACSMode.Content = "Connect: Radios";
 
             if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
                 _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
@@ -1149,7 +1168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     try
                     {
-                        StartStop.Content = "Disconnect";
+                        StartStop.Content = "Disconnect: Server";
                         StartStop.IsEnabled = true;
 
                         ClientState.IsConnected = true;
@@ -1227,8 +1246,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioPreview?.StopEncoding();
             _audioPreview = null;
 
-            _radioOverlayWindow?.Close();
-            _radioOverlayWindow = null;
+            _radioOverlayWindowTwo?.Close();
+            _radioOverlayWindowTwo = null;
+
+            _radioOverlayWindowFive?.Close();
+            _radioOverlayWindowFive = null;
 
             _awacsRadioOverlay?.Close();
             _awacsRadioOverlay = null;
@@ -1292,13 +1314,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
-                ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect External AWACS MODE (EAM)" : "Connect External AWACS MODE (EAM)";
+                ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect: Radios" : "Connect: Radios";
             }
             else
             {
                 ToggleServerSettings.IsEnabled = false;
                 ConnectExternalAWACSMode.IsEnabled = false;
-                ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+                ConnectExternalAWACSMode.Content = "Connect: Radios";
             }
         }
 
@@ -1342,12 +1364,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT, (bool)RadioSwitchIsPTT.IsChecked);
         }
 
-        private void ShowOverlay_OnClick(object sender, RoutedEventArgs e)
+        private void ShowOverlayFive_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, false);
+            ToggleOverlay(true, false, false);
         }
 
-        private void ToggleOverlay(bool uiButton, bool awacs)
+        private void ShowOverlayTwo_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, false, true);
+        }
+
+        private void ToggleOverlay(bool uiButton, bool awacs, bool twoRadioOverlay)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
             if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
@@ -1360,26 +1387,66 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 else
                 {
-                    if ((_radioOverlayWindow == null) || !_radioOverlayWindow.IsVisible ||
-                        (_radioOverlayWindow.WindowState == WindowState.Minimized))
+                    if (!twoRadioOverlay)
                     {
-                        //hide awacs panel
-                        _awacsRadioOverlay?.Close();
-                        _awacsRadioOverlay = null;
+                        if ((_radioOverlayWindowFive == null) || !_radioOverlayWindowFive.IsVisible ||
+                        (_radioOverlayWindowFive.WindowState == WindowState.Minimized))
+                        {
+                            //hide awacs panel
+                            _awacsRadioOverlay?.Close();
+                            _awacsRadioOverlay = null;
 
-                        _radioOverlayWindow?.Close();
+                            //hide Two Overlay
+                            if (_radioOverlayWindowTwo != null)
+                            {
+                                _radioOverlayWindowTwo.Close();
+                                _radioOverlayWindowTwo = null;
+                            }
 
-                        _radioOverlayWindow = new Overlay.RadioOverlayWindow();
+                            _radioOverlayWindowFive?.Close();
+
+                            _radioOverlayWindowFive = new Overlay.RadioOverlayWindowFive();
 
 
-                        _radioOverlayWindow.ShowInTaskbar =
-                            !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                        _radioOverlayWindow.Show();
-                    }
-                    else
+                            _radioOverlayWindowFive.ShowInTaskbar =
+                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                            _radioOverlayWindowFive.Show();
+                        }
+                        else
+                        {
+                            _radioOverlayWindowFive?.Close();
+                            _radioOverlayWindowFive = null;
+                        }
+                    } else
                     {
-                        _radioOverlayWindow?.Close();
-                        _radioOverlayWindow = null;
+                        if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
+                        (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
+                        {
+                            //hide awacs panel
+                            _awacsRadioOverlay?.Close();
+                            _awacsRadioOverlay = null;
+
+                            //hide Five Overlay
+                            if (_radioOverlayWindowFive != null)
+                            {
+                                _radioOverlayWindowFive.Close();
+                                _radioOverlayWindowFive = null;
+                            }
+
+                            _radioOverlayWindowTwo?.Close();
+
+                            _radioOverlayWindowTwo = new Overlay.RadioOverlayWindowTwo();
+
+
+                            _radioOverlayWindowTwo.ShowInTaskbar =
+                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                            _radioOverlayWindowTwo.Show();
+                        }
+                        else
+                        {
+                            _radioOverlayWindowTwo?.Close();
+                            _radioOverlayWindowTwo = null;
+                        }
                     }
                 }
                 
@@ -1392,8 +1459,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 (_awacsRadioOverlay.WindowState == WindowState.Minimized))
             {
                 //close normal overlay
-                _radioOverlayWindow?.Close();
-                _radioOverlayWindow = null;
+                _radioOverlayWindowTwo?.Close();
+                _radioOverlayWindowTwo = null;
+
+                _radioOverlayWindowFive?.Close();
+                _radioOverlayWindowFive = null;
 
                 _awacsRadioOverlay?.Close();
 
@@ -1525,7 +1595,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
 
-                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect");
+                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect: server");
                 }
 
                 if (connectToServer)
@@ -1574,16 +1644,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
-            _radioOverlayWindow?.Close();
-            _radioOverlayWindow = null;
+            _radioOverlayWindowTwo?.Close();
+            _radioOverlayWindowTwo = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioY, 300);
+            _radioOverlayWindowFive?.Close();
+            _radioOverlayWindowFive = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioWidth, 122);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioHeight, 270);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoWidth, 122);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHeight, 270);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity, 1.0);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveWidth, 122);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHeight, 270);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveOpacity, 1.0);
         }
 
         private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
@@ -1626,8 +1707,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
 
-            if (_radioOverlayWindow != null)
-                _radioOverlayWindow.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            if (_radioOverlayWindowTwo != null)
+                _radioOverlayWindowTwo.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            else if (_radioOverlayWindowFive != null)
+                _radioOverlayWindowFive.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
             else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
         }
 
@@ -1781,7 +1864,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
-                ConnectExternalAWACSMode.Content = "Disconnect External AWACS MODE (EAM)";
+                ConnectExternalAWACSMode.Content = "Disconnect: Radios";
             }
             else
             {
@@ -1792,7 +1875,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
                 ClientState.LastSent = 0;
 
-                ConnectExternalAWACSMode.Content = "Connect External AWACS MODE (EAM)";
+                ConnectExternalAWACSMode.Content = "Connect: Radios";
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
             }

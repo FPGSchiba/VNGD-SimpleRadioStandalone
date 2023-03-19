@@ -50,14 +50,35 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
-                       Width="660"
-                       Height="15"
+                       Width="665"
+                       Height="16"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
                        FontSize="13"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="AWACS / GCI Panel" />
+                       Text="10 Radio Panel" />
+            <TextBlock Name="ControlSubText"
+                       Width="100"
+                       Text="VNGD is best"
+                       FontSize="11"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#E7E7E7"
+                       >
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter Property="Opacity" Value="0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
