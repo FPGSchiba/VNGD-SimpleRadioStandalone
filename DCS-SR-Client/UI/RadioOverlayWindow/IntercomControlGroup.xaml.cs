@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 
@@ -14,6 +15,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     {
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public IntercomControlGroup()
         {
@@ -132,6 +134,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
+        }
+
+        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
         }
     }
 }

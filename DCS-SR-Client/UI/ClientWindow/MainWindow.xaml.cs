@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
 
-            Title = Title + " - " + UpdaterChecker.VERSION;
+            Title = Title + " - " + "1.0.0.2"; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -130,11 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION + " minimized");
+                Logger.Info("Started DCS-SimpleRadio Client " + "1.0.0.2" + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + UpdaterChecker.VERSION);
+                Logger.Info("Started DCS-SimpleRadio Client " + "1.0.0.2"); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -167,7 +167,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
             }
 
-            UpdaterChecker.CheckForUpdate(_globalSettings.GetClientSettingBool(GlobalSettingsKeys.CheckForBetaUpdates));
+            // TODO: Use this for Vanguard
+            // UpdaterChecker.CheckForUpdate(_globalSettings.GetClientSettingBool(GlobalSettingsKeys.CheckForBetaUpdates));
 
             InitFlowDocument();
 

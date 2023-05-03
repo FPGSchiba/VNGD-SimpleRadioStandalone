@@ -107,7 +107,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent() 
                                                       && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
                 {
-                    ToggleGlobalSimultaneousTransmissionButton.IsEnabled = true;
 
                     var avalilableRadios = 0;
 
@@ -118,12 +117,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                             avalilableRadios++;
                         }
                     }
-                }
-                else
-                {
-                    ToggleGlobalSimultaneousTransmissionButton.IsEnabled = false;
-                    ToggleGlobalSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-                    ToggleGlobalSimultaneousTransmissionButton.Content = "Simul. Transmission OFF";
                 }
             }
         }
@@ -259,16 +252,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     }
                 }
 
-                ToggleGlobalSimultaneousTransmissionButton.Content = _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission ? "Simul. Transmission ON" : "Simul. Transmission OFF";
-                ToggleGlobalSimultaneousTransmissionButton.Foreground = _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission ? new SolidColorBrush(Colors.Orange) : new SolidColorBrush(Colors.White);
-
                 foreach (var radio in radioControlGroup)
                 {
-                    if (!dcsPlayerRadioInfo.simultaneousTransmission)
-                    {
-                        radio.ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-                    }
-
                     radio.RepaintRadioStatus();
                 }
             }

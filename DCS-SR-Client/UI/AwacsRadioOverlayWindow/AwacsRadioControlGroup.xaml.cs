@@ -243,27 +243,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                             }
                         }
 
-                        if (simulTransmission < MaxSimultaneousTransmissions)
-                        {
-                            ToggleSimultaneousTransmissionButton.IsEnabled = true;
-                        }
-                        else
-                        {
-                            ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                            ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-                        }
-
                     }
-                    else
-                    {
-                        ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                        ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-                    }
-                }
-                else
-                {
-                    ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                    ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
                 }
             }
             else
@@ -280,9 +260,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 Down001.Visibility = Visibility.Hidden;
                 Down0001.Visibility = Visibility.Hidden;
 
-                ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-
                 ChannelTab.Visibility = Visibility.Collapsed;
             }
 
@@ -292,7 +269,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         internal void RepaintRadioStatus()
         {
             SetupEncryption();
-            HandleRetransmitStatus();
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
@@ -308,9 +284,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioVolume.IsEnabled = false;
 
                 ToggleButtons(false);
-
-                ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
 
                 //reset dragging just incase
                 _dragging = false;
@@ -359,8 +332,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     ToggleButtons(false);
 
-                    ToggleSimultaneousTransmissionButton.IsEnabled = false;
-                    ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
 
                     return;
                 }
@@ -463,46 +434,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (item?.Visibility != Visibility.Visible)
             {
                 TabControl.SelectedIndex = 0;
-            }
-        }
-
-
-        public void HandleRetransmitStatus()
-        {
-            var serverSettings = SyncedServerSettings.Instance;
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() && serverSettings.RetransmitNodeLimit > 0)
-            {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-                if (currentRadio.rtMode == RadioInformation.RetransmitMode.DISABLED)
-                {
-                    Retransmit.Visibility = Visibility.Hidden;
-                }
-                else if (currentRadio.rtMode == RadioInformation.RetransmitMode.COCKPIT)
-                {
-                    Retransmit.Visibility = Visibility.Visible;
-                    Retransmit.IsEnabled = false;
-                }
-                else
-                {
-                    Retransmit.Visibility = Visibility.Visible;
-                    Retransmit.IsEnabled = true;
-                }
-
-                if (currentRadio.retransmit)
-                {
-                    Retransmit.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    Retransmit.Foreground = new SolidColorBrush(Colors.White);
-                }
-            }
-            else
-            {
-                Retransmit.Visibility = Visibility.Hidden;
             }
         }
 
@@ -670,15 +601,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 if (currentRadio != null)
                 {
                     currentRadio.simul = !currentRadio.simul;
-
-                    if (currentRadio.simul)
-                    {
-                        ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.Orange);
-                    }
-                    else
-                    {
-                        ToggleSimultaneousTransmissionButton.Foreground = new SolidColorBrush(Colors.White);
-                    }
                 }
             }
         }

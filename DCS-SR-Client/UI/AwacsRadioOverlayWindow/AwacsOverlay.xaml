@@ -164,17 +164,16 @@
         <Slider x:Name="windowOpacitySlider"
                 Grid.Row="3"
                 Grid.Column="2"
-                Grid.ColumnSpan="2"
                 Width="280"
-                Margin="0,0,20,0"
-                VerticalAlignment="Center"
+                Margin="100,10,0,0"
+                VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Maximum="1.0"
                 Minimum="0.05"
                 Style="{x:Null}"
                 ToolTip="Window Opacity"
                 ValueChanged="windowOpacitySlider_ValueChanged"
-                Value="1.0" />
+                Value="1.0" Grid.ColumnSpan="3" />
 
         <local:IntercomControlGroup x:Name="intercom"
                                     Grid.Row="4"
@@ -184,12 +183,5 @@
                                     HorizontalAlignment="Left"
                                     RadioId="0" />
 
-        <Button x:Name="ToggleGlobalSimultaneousTransmissionButton"
-                Grid.Row="4"
-                Grid.Column="4"
-                Click="ToggleGlobalSimultaneousTransmissionButton_Click"
-                Content="Simul. Transmission OFF"
-                Margin="0,5,25,5"
-                Style="{StaticResource DarkStyle-Button}" />
     </Grid>
 </Window>

@@ -10,8 +10,8 @@
     <WrapPanel>
 
         <TextBlock x:Name="RadioLabel"
-                   Width="135"
-                   Margin="13,0,0,0"
+                   Width="120"
+                   Margin="5,0,0,0"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Top"
                    FontSize="10"
@@ -33,14 +33,25 @@
                  Style="{x:Null}"
                  ToolTip="Selected Radio" />
         <Slider x:Name="RadioVolume"
-                Width="115"
-                Height="15"
-                Margin="22,0,0,0"
+                Width="130"
+                Height="20"
+                Margin="10,0,0,0"
                 IsEnabled="False"
                 Maximum="100"
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted" />
+        <Button x:Name="VOXEnabled"
+                Width="26"
+                FontSize="10"
+                Height="16"
+                Margin="2,0,0,0"
+                Content="VOX"
+                IsEnabled="True"
+                Foreground="White"
+                Style="{StaticResource DarkStyle-Button}"
+                Click="VoxEnabled_OnClick"
+                ToolTip="enable / disable voice activated intercom communications" />
 
     </WrapPanel>
 </UserControl>

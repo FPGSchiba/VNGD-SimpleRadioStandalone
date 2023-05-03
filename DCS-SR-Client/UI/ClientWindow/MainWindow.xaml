@@ -10,7 +10,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
                       xmlns:converters="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters"
-                      Title="DCS-SRS Client"
+                      Title="Vanguard SRS Client"
                       Width="550"
                       Height="710"
                       d:DataContext="{d:DesignInstance local:MainWindow}"

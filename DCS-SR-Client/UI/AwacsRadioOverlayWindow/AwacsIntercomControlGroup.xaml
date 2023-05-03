@@ -12,9 +12,8 @@
     <StackPanel Orientation="Horizontal">
 
         <TextBlock x:Name="RadioLabel"
-                   Width="75"
+                   Width="57"
                    Margin="2"
-                   HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontSize="10"
                    Foreground="#E7E7E7"
@@ -22,13 +21,9 @@
                    Style="{x:Null}"
                    Text="INTERCOM"
                    TextAlignment="Center" />
-
         <Ellipse x:Name="RadioActive"
                  Width="12"
                  Height="12"
-                 Margin="2"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Center"
                  Fill="#FF9900"
                  MouseDown="RadioSelectSwitch"
                  Stroke="Black"
@@ -37,22 +32,37 @@
         <Slider x:Name="RadioVolume"
                 Width="115"
                 Height="20"
-                Margin="2"
+                Margin="2, 2, 10, 2"
                 IsEnabled="False"
                 Maximum="100"
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted" />
+        <Line
+            X1="0" Y1="0"
+            X2="0" Y2="50"
+            Stroke="#ACACAC"
+            StrokeThickness="2" />
 
-        <xctk:IntegerUpDown Name="IntercomNumberSpinner"
+        <TextBlock x:Name="ShipLabel"
+                   Width="30"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="10"
+                   Foreground="#E7E7E7"
+                   Padding="0"
+                   Margin="5,2,2,2"
+                   Style="{x:Null}"
+                   Text="SHIP"
+                   TextAlignment="Center" />
+        <xctk:IntegerUpDown x:Name="IntercomNumberSpinner"
                             Width="50"
                             Height="20"
-                            Margin="5"
-                            VerticalAlignment="Center"
-                            Maximum="30"
+                            Maximum="100"
                             Minimum="1"
                             ValueChanged="IntercomNumber_SpinnerChanged"
-                            Value="1" />
+                            Value="1"
+                            Margin="5,0,0,0"/>
 
     </StackPanel>
 </UserControl>
