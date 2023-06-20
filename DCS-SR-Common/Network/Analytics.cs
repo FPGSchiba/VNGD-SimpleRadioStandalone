@@ -13,6 +13,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
     {
         public static void Log(string eventCategory, string eventAction, string guid)
         {
+// let's not do any google analytics
+#if false
             var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut",
                 "FALSE");
             if (objValue == null || (string) objValue != "TRUE")
@@ -38,6 +40,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 }
 //#endif
             }
+#endif
         }
     }
 }
