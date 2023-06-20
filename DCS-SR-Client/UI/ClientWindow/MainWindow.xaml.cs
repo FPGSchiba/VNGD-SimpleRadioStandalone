@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
@@ -170,6 +171,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // TODO: Use this for Vanguard
             // UpdaterChecker.CheckForUpdate(_globalSettings.GetClientSettingBool(GlobalSettingsKeys.CheckForBetaUpdates));
 
+            TryRefreshChannelList();
+ 
             InitFlowDocument();
 
             _dcsAutoConnectListener = new DCSAutoConnectHandler(AutoConnect);
@@ -178,6 +181,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
 
+        }
+
+        private async void TryRefreshChannelList()
+        {
+            // TODO: put this on the website w/ management interface
+            var url = "https://gist.githubusercontent.com/ivey/483c4b7aa3ac7eb70330ce5d87d635db/raw/d8700586152655de9cd2b970245aa81bb51be3d9/vngd-channels.txt";
+            var client = new HttpClient();
+            var targetFile = RadioOverlayWindow.PresetChannels.PresetChannelsViewModel.CHANNEL_FILE_NAME;
+            var downloadFile = $"{targetFile}-download";
+
+            try
+            {
+                var stream = await client.GetStreamAsync(url);
+                var fileStream = new FileStream(downloadFile, FileMode.OpenOrCreate);
+                await stream.CopyToAsync(fileStream);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Unable to fetch updated channels list: {ex.Message}");
+            }
+            try
+            {
+                File.Delete(targetFile);
+                File.Copy(downloadFile, targetFile);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Unable to save updated channels list: {ex.Message}");
+            }
+            Logger.Info("Refreshed channels list");
         }
 
         private void CheckWindowVisibility()

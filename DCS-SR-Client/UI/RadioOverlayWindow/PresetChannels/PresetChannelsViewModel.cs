@@ -19,6 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
 
 
         private readonly object _presetChannelLock = new object();
+        public static readonly string CHANNEL_FILE_NAME = "vngd-channels";
         private ObservableCollection<PresetChannel> _presetChannels;
 
         public ObservableCollection<PresetChannel> PresetChannels
@@ -72,12 +73,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
         {
             PresetChannels.Clear();
 
-            var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios;
-
-            var radio = radios[_radioId];
-
             int i = 1;
-            foreach (var channel in _channelsStore.LoadFromStore(radio.name))
+            foreach (var channel in _channelsStore.LoadFromStore(CHANNEL_FILE_NAME))
             {
                 if (((double) channel.Value) <= Max
                     && ((double) channel.Value) >= Min)
