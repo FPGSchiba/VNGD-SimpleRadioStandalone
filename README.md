@@ -1,13 +1,12 @@
-# DCS-SimpleRadioStandalone
-An open source Stand alone Radio for DCS integrating with all clickable cockpits and FC3 Aircraft
+# VNGD-SimpleRadioStandalone
+An open source Stand alone Radio for Star Citizen used by the VNGD Organisation
 
-Read More Here: http://forums.eagle.ru/showthread.php?t=169387 
+Visit Vanguard at: https://vngd.net/
 
-Download: https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest
+Read More Here: Link:TBD
 
-Donate if you want to so I can purchase Hardware for testing :) 
+Download: Link:TBD
 
-[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JY35DDAQ938TN)
+## Build
 
-<a href="https://www.jetbrains.com/?from=DCS-SimpleRadioStandalone" >Proudly supported by JetBrains Open Source
-  <br><br><img src="https://github.com/ciribob/DCS-SimpleRadioStandalone/raw/master/jetbrains-variant-2.png" width="100" /></a>
+build.yaml: https://drive.google.com/file/d/1A-3KNGM5PTfT_hvaZoJ89wFwse6FvOQS/view?usp=drive_link 

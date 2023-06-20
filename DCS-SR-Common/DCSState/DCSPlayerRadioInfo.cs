@@ -49,7 +49,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
-        public bool intercomHotMic = true; //if true switch to intercom and transmit
+        public bool intercomHotMic = false; //if true switch to intercom and transmit
 
         public Transponder iff = new Transponder();
 
