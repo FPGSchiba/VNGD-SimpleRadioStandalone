@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using SharpDX.DirectInput;
@@ -39,6 +40,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
 
+            // TODO: Add Hardcoded default values for Keybinds here...
+            
             if (currentInputProfile != null)
             {
                 var devices = currentInputProfile;

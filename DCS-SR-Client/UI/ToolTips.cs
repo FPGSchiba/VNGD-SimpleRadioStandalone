@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Enter your Vanguard Playername."
+                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"DI FPGSchiba.\" Please reference the Vanguard SRS SOP to find the correct two-digit code"
             });
 
             ExternalAWACSModeName.Content = externalAWACSModeNameContent;

@@ -392,9 +392,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.AutoConnectMismatchPrompt.ToString(), "true"},
             {GlobalSettingsKeys.RadioOverlayTaskbarHide.ToString(), "false"},
             {GlobalSettingsKeys.RefocusDCS.ToString(), "false"},
-            {GlobalSettingsKeys.ExpandControls.ToString(), "false"},
+            {GlobalSettingsKeys.ExpandControls.ToString(), "true"},
 
-            {GlobalSettingsKeys.MinimiseToTray.ToString(), "false"},
+            {GlobalSettingsKeys.MinimiseToTray.ToString(), "true"},
             {GlobalSettingsKeys.StartMinimised.ToString(), "false"},
 
 

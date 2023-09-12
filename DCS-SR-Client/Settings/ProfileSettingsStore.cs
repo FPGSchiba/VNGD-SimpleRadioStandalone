@@ -99,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},
-            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "true"},
+            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
             {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
@@ -116,14 +116,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
             {ProfileSettingsKeys.AllowDCSPTT.ToString(),"true" },
-            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "false"},
+            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "true"},
             {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), "false"},
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
             {ProfileSettingsKeys.PTTStartDelay.ToString(), "0"},
 
-            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "true"},
+            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
 
             {ProfileSettingsKeys.NATOToneVolume.ToString(), "1.2"},
             {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},
