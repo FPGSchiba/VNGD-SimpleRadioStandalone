@@ -830,6 +830,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                     var intercom = new List<RadioInformation>();
                     intercom.Add(radioInfo.radios[0]);
+                    sendingOn = 0;
                     
                     //check if hot mic ONLY activation
                     if (radioInfo.intercomHotMic && voice)
@@ -837,13 +838,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         //only send on hotmic and voice 
                         //voice is always true is voice detection is disabled
                         //now check for lastHotmicVoice
-                        sendingOn = 0;
                         _lastVOXSend = DateTime.Now.Ticks;
                         return intercom;
                     }
                     else if (radioInfo.intercomHotMic && !voice)
                     {
-                        sendingOn = 0;
                         TimeSpan lastVOXSendDiff = new TimeSpan(DateTime.Now.Ticks - _lastVOXSend);
                         if (lastVOXSendDiff.TotalMilliseconds < _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime))
                         {

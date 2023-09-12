@@ -1,13 +1,21 @@
-# DCS-SimpleRadioStandalone
-An open source Stand alone Radio for DCS integrating with all clickable cockpits and FC3 Aircraft
+# VNGD-SimpleRadioStandalone
+An open source Stand alone Radio for Star Citizen used by the VNGD Organisation
 
-Read More Here: http://forums.eagle.ru/showthread.php?t=169387 
+Visit Vanguard at: https://vngd.net/
 
-Download: https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest
+Read More Here: Link:TBD
 
-Donate if you want to so I can purchase Hardware for testing :) 
+Download: Link:TBD
 
-[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JY35DDAQ938TN)
+## Tagging / Release Guidelines
+Releases are named with [Semantic Versioning](https://devconnected.com/how-to-create-git-tags/#:~:text=In%20order%20to%20create%20a,that%20you%20want%20to%20create.&text=As%20an%20example%2C%20let's%20say,command%20and%20specify%20the%20tagname)
 
-<a href="https://www.jetbrains.com/?from=DCS-SimpleRadioStandalone" >Proudly supported by JetBrains Open Source
-  <br><br><img src="https://github.com/ciribob/DCS-SimpleRadioStandalone/raw/master/jetbrains-variant-2.png" width="100" /></a>
+That means following features may change with each Verison:
+* **major** : is a version number where you introduced breaking modifications (modifications of your new version are NOT compatible with previous versions);
+* **minor** : is a version number that is compatible with previous versions;
+* **patch** : is an increment for a bug fix or a patch fix done on your software.
+
+Following is the Structure of a release name: `v{major}.{minor}.{patch}` for example: `v1.0.0` or `v2.2.1`
+## Build
+
+build.yaml: https://drive.google.com/file/d/1A-3KNGM5PTfT_hvaZoJ89wFwse6FvOQS/view?usp=drive_link 

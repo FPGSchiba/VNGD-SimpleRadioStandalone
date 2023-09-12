@@ -312,12 +312,6 @@
                                Height="26"
                                HorizontalAlignment="Center"
                                Margin="5,0,5,0" />
-                        <Label HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="LotATC" />
-                        <Image x:Name="LotATCConnectionStatus"
-                               Source="{Binding Path=ClientState.IsLotATCConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                               Height="26"
-                               HorizontalAlignment="Center"
-                               Margin="5,0,0,0" />
 
                     </StackPanel>
 
@@ -2542,7 +2536,8 @@
                                     <local:RadioChannelConfigUi x:Name="Radio1Config"
                                                                 Grid.Row="0"
                                                                 Grid.Column="1"
-                                                                ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Channel}" />
+                                                                ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Channel}"
+                                                                DefaultValue="-0.2"/>
 
                                     <Label Grid.Row="1"
                                            Grid.Column="0"
@@ -2552,7 +2547,8 @@
                                     <local:RadioChannelConfigUi x:Name="Radio2Config"
                                                                 Grid.Row="1"
                                                                 Grid.Column="1"
-                                                                ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio2Channel}" />
+                                                                ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio2Channel}" 
+                                                                DefaultValue="0.2"/>
 
                                     <Label Grid.Row="2"
                                            Grid.Column="0"
@@ -2651,12 +2647,24 @@
                     <FlowDocument Name="AboutFlowDocument">
 
                         <Paragraph>
-                            <Run FontSize="16" FontWeight="Bold">DCS In-game SRS Overlay</Run>
+                            <Run FontSize="16" FontWeight="Bold">Star Citizen In-Game Radio Panel</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            SRS has an optional DCS in-game overlay - to toggle use
-                            <Run FontSize="16" FontWeight="Bold">Left Ctrl + Left Shift + ESC.</Run>
-                            This will toggle through various states including hidden. The position and visibility state are automatically saved
+                            Star Citizen does not allow any windows to appear on top of it when in Full Screen Mode. We recommend that you run the game in WINDOWED mode to get around this limitation.
+                        </Paragraph>
+
+                        <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">SRS Standard Operating Procedures (SOP)</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            The Vanguard SRS SOP can be found at vngd.net under the Command Library section. <!-- (<Hyperlink NavigateUri="https://example.com">SRS SOP</Hyperlink>) -->
+                        </Paragraph>
+
+                        <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">Vanguard SRS Server Information</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel "SRS Server Status"
                         </Paragraph>
 
                         <Paragraph>
@@ -2693,43 +2701,35 @@
                             <Hyperlink NavigateUri="https://discord.gg/baw7g3t">Discord Channel</Hyperlink> in order for me to help you add the device to the whitelist.
                         </Paragraph>
 
-
-                        <Paragraph>
-                            <Run FontSize="16" FontWeight="Bold">Fixed Channels</Run>
-                        </Paragraph>
-                        <Paragraph FontSize="14">
-                            To create a fixed channel list to be used on FC3 aircraft radios and expansion radios, simply create a text file with the frequencies
-                            you want, with a new frequency on each line, named after the radio you want the fixed channels for in the SimpleRadio Folder where the radio is installed.
-                            Special characters (-,/ etc) can be ignored as can the case.
-                            <LineBreak />
-                            <LineBreak />
-
-                            <Hyperlink
-                                NavigateUri="https://docs.google.com/spreadsheets/d/1tzd996zJ1t0heZ-t1PpL7vNUIZbXl7pI6De0GThN1Qw/edit#gid=1869108790">
-                                Full list of Frequencies &amp; Radio Names
-                            </Hyperlink>
-                            For example, for the FC3 F15C Radio, AN/ARC-164 UHF 1, create a text file called &quot;ANARC-164 UHF1.txt&quot; or &quot;anarc164 uhf1.txt&quot;
-                            <LineBreak />
-                            <LineBreak />
-                            Add the frequencies within the supported ranges (check the link above for ranges) and save the file.
-                            The file will be automatically loaded for that radio when you jump into that aircraft or manually reloaded with the Reload button on the channel tab on the overlay
-                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases">here</Hyperlink>
-
-                        </Paragraph>
-
                         <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Latest Version &amp; Updates</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            You can always get the latest version from GitHubs Release section for SRS:
+                            You can always get the latest version from GitHubs Release section for VNGD-SRS:
+                            <LineBreak />
                             <Hyperlink
-                                NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest">
-                                https://github.com/ciribob/DCS-SimpleRadioStandalone/releases/latest
+                                NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest">
+                                https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest
                             </Hyperlink>
                             <LineBreak />
-                            <LineBreak />
                             Older versions are
-                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone/releases">here</Hyperlink>
+                            <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/">here</Hyperlink>
+
+                        </Paragraph>
+
+                        <Paragraph>
+                            <Run FontSize="16" FontWeight="Bold">Development &amp; Credit</Run>
+                        </Paragraph>
+                        <Paragraph FontSize="14">
+                            This software was originally developed by Ciribob (which can be found
+                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
+                            <LineBreak />
+                            <LineBreak />
+                            If you are interested in assisting with the continued development of this SRS for Vanguard, please do not hesitate to reach out the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.
+                            <LineBreak />
+                            <LineBreak />
+                            SRS Development Team Members
+                            Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist
 
                         </Paragraph>
 
