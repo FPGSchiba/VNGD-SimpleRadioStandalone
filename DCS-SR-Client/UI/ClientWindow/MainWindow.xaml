@@ -169,7 +169,7 @@
                                    HorizontalAlignment="Center"
                                    HorizontalContentAlignment="Center"
                                    Margin="0,10,10,0"
-                                   Content="coalition password"
+                                   Content="Coalition Password"
                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <PasswordBox x:Name="ExternalAWACSModePassword"
                                          Width="200"
@@ -185,12 +185,12 @@
                                    HorizontalAlignment="Center"
                                    HorizontalContentAlignment="Center"
                                    Margin="0,10,0,0"
-                                   Content="username"
+                                   Content="Username"
                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}" />
                             <TextBox x:Name="ExternalAWACSModeName"
                                      Width="200"
                                      Height="23"
-                                     Margin="0,0,28,0"
+                                     Margin="10,0,0,0"
                                      MaxLines="1"
                                      TextWrapping="Wrap"
                                      HorizontalAlignment="Center"
@@ -2685,9 +2685,8 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                            If you have any issues with the SRS please get help on the dedicated Discord channel
-                            <Hyperlink NavigateUri="https://discord.gg/baw7g3t">here</Hyperlink>
-                            and make sure to follow the information in #common-issues first before asking for help in #support
+                            If you have any issues with the SRS please get help on the #srs-support channel on the Vanguard Discord
+                            <Hyperlink NavigateUri="https://discord.gg/GDadyHz">here</Hyperlink>
                         </Paragraph>
 
                         <Paragraph>
@@ -2695,10 +2694,6 @@
                         </Paragraph>
                         <Paragraph FontSize="14">
                             If your input device isn't detected - try enabling "Allow more input devices" and restart the client.
-                            <LineBreak />
-                            <LineBreak />
-                            If ALL devices then stop working - turn the setting off and please post you clientlog.txt on the dedicated SRS
-                            <Hyperlink NavigateUri="https://discord.gg/baw7g3t">Discord Channel</Hyperlink> in order for me to help you add the device to the whitelist.
                         </Paragraph>
 
                         <Paragraph>
@@ -2725,10 +2720,11 @@
                             <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
                             <LineBreak />
                             <LineBreak />
-                            If you are interested in assisting with the continued development of this SRS for Vanguard, please do not hesitate to reach out the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.
+                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.
                             <LineBreak />
                             <LineBreak />
-                            SRS Development Team Members
+                            SRS Development Team Members:
+                            <LineBreak />
                             Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist
 
                         </Paragraph>
