@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
 
-            Title = Title + " - " + "v1.0.1"; //UpdaterChecker.VERSION
+            Title = Title + " - " + "v1.0.2"; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -130,11 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.1" + " minimized"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.2" + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.1"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.2"); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -671,13 +671,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Mic_VU.Value = -100;
                 Speaker_VU.Value = -100;
             }
-
-            try
-            {
-                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
-                CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
-            }
-            catch { }
 
             ConnectedClientsSingleton.Instance.NotifyAll();
 
