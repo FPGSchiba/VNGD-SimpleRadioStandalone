@@ -801,7 +801,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
-        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice)
+        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice) // voice -> Is bound to setting GlobalSettingsKeys.VOX and detecting voice
         {
             sendingOn = -1;
             if (_clientStateSingleton.InhibitTX.InhibitTX)
@@ -819,13 +819,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //If its a hot intercom and thats not the currently selected radio
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
-            if ((radioInfo.intercomHotMic
-                 && radioInfo.selected != 0 
+            if ((radioInfo.intercomHotMic // Hotmic Option is here
+                 // && radioInfo.selected != 0 
                  && !_ptt 
                  && !radioInfo.ptt)
                 || _intercomPtt)
             {
-                if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM)
+                if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM) // Could be used to enable vox only for Intercom
                 {
 
                     var intercom = new List<RadioInformation>();
@@ -934,9 +934,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 try
                 {
-
                     if (transmittingRadios.Count > 0)
                     {
+                        
                         List<double> frequencies = new List<double>(transmittingRadios.Count);
                         List<byte> encryptions = new List<byte>(transmittingRadios.Count);
                         List<byte> modulations = new List<byte>(transmittingRadios.Count);
