@@ -801,6 +801,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             return yScore - xScore;
         }
 
+        private int getCurrentSelected()
+        {
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC)) //If both are active Intercome gets preferred, but UI does not allow this.
+            {
+                return 0;
+            }
+            else if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+            {
+                return 1;
+            }
+            else { return -1; }
+        }
+
         private List<RadioInformation> PTTPressed(out int sendingOn, bool voice) // voice -> Is bound to setting GlobalSettingsKeys.VOX and detecting voice
         {
             sendingOn = -1;
@@ -825,12 +838,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                  && !radioInfo.ptt)
                 || _intercomPtt)
             {
-                if (radioInfo.radios[0].modulation == RadioInformation.Modulation.INTERCOM) // Could be used to enable vox only for Intercom
+                // Use this for VOX into the selected Channel: _clientStateSingleton.DcsPlayerRadioInfo.selected
+                var currentSelected = getCurrentSelected(); // Change this -> If setting for specific Flick-Back Radio 
+                if (currentSelected >= 0) // Could be used to enable vox not only for Intercom
                 {
+                    var selectedRadios = new List<RadioInformation>();
+                    Console.WriteLine(currentSelected);
+                    // TODO: Check if radio is disabled or anything else is amiss
+                    var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
 
-                    var intercom = new List<RadioInformation>();
-                    intercom.Add(radioInfo.radios[0]);
-                    sendingOn = 0;
+                    if (currentlySelectedRadio != null && currentlySelectedRadio.modulation !=
+                                                       RadioInformation.Modulation.DISABLED
+                                                       && (currentlySelectedRadio.freq > 100 ||
+                                                           currentlySelectedRadio.modulation ==
+                                                           RadioInformation.Modulation.INTERCOM))
+                    {
+                        selectedRadios.Add(currentlySelectedRadio); // Return not only Intercom as transmitting radio
+                        sendingOn = currentSelected;
+                    }
                     
                     //check if hot mic ONLY activation
                     if (radioInfo.intercomHotMic && voice)
@@ -839,14 +864,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         //voice is always true is voice detection is disabled
                         //now check for lastHotmicVoice
                         _lastVOXSend = DateTime.Now.Ticks;
-                        return intercom;
+                        return selectedRadios;
                     }
                     else if (radioInfo.intercomHotMic && !voice)
                     {
                         TimeSpan lastVOXSendDiff = new TimeSpan(DateTime.Now.Ticks - _lastVOXSend);
                         if (lastVOXSendDiff.TotalMilliseconds < _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime))
                         {
-                            return intercom;
+                            return selectedRadios;
                         }
 
                         //VOX no longer detected
@@ -855,7 +880,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     }
                     else
                     {
-                        return intercom;
+                        return selectedRadios;
                     }
                 }
             }

@@ -6,20 +6,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="RadioControlContainer"
-             Width="310"
+             Width="495"
              Height="35">
 
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
 
         <TextBlock x:Name="RadioLabel"
                    Width="58"
                    Margin="2"
                    VerticalAlignment="Center"
-                   FontSize="8"
+                   FontSize="12"
                    Foreground="#E7E7E7"
                    Padding="0"
                    Style="{x:Null}"
-                   Text="VOX/INTERCOM"
+                   Text="INTERCOM"
                    TextAlignment="Center" />
         <Ellipse x:Name="RadioActive"
                  Width="12"
@@ -32,51 +32,74 @@
         <Slider x:Name="RadioVolume"
                 Width="115"
                 Height="20"
-                Margin="2, 2, 4, 2"
+                Margin="2, 2, 0, 2"
                 IsEnabled="False"
                 Maximum="100"
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted" />
-        
-        <Button x:Name="VOXEnabled"
-            Width="26"
-            FontSize="10"
-            Height="16"
-            Margin="2,0,0,0"
-            Content="VOX"
-            IsEnabled="True"
-            Foreground="Black"
-            Style="{StaticResource DarkStyle-Button}"
-            Click="VoxEnabled_OnClick"
-            ToolTip="enable / disable voice activated intercom communications"
-            Background="Green"/>
-        
+
         <TextBlock x:Name="ShipLabel"
-                Width="30"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontSize="10"
-                Foreground="#E7E7E7"
-                Padding="0"
-                Margin="5,2,2,2"
-                Style="{x:Null}"
-                Text="SHIP"
-                TextAlignment="Center" />
+            Width="45"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="9"
+            Foreground="#E7E7E7"
+            Padding="0"
+            Margin="2,2,2,2"
+            Style="{x:Null}"
+            Text="CHANNEL"
+            TextAlignment="Center" />
         <xctk:IntegerUpDown x:Name="IntercomNumberSpinner"
-                Width="50"
-                Height="20"
-                Maximum="100"
-                Minimum="1"
-                ValueChanged="IntercomNumber_SpinnerChanged"
-                Value="1"
-                Margin="5,0,16,0"/>
+            Width="50"
+            Height="20"
+            Maximum="100"
+            Minimum="1"
+            ValueChanged="IntercomNumber_SpinnerChanged"
+            Value="1"
+            Margin="5,0,8,0"/>
 
         <Line
                 X1="0" Y1="0"
                 X2="0" Y2="50"
                 Stroke="#ACACAC"
-                StrokeThickness="2" />
+                StrokeThickness="2"
+            Margin="0,0,5,0"/>
+
+        <TextBlock x:Name="VOXLabel"
+           Width="85"
+           Margin="2,2,5,2"
+           VerticalAlignment="Center"
+           FontSize="12"
+           Foreground="#E7E7E7"
+           Padding="0"
+           Style="{x:Null}"
+           Text="VOX SELECTION"
+           TextAlignment="Center"/>
+
+        <Button x:Name="Radio1Enabled"
+            Width="40"
+            FontSize="9"
+            Height="18"
+            Margin="2,0,2,0"
+            Content="R1"
+            IsEnabled="True"
+            Foreground="Black"
+            Style="{StaticResource DarkStyle-Button}"
+            Click="VoxR1Enabled_OnClick"
+            ToolTip="enable / disable voice activated communications for Radio 1"/>
+
+        <Button x:Name="IntercomEnabled"
+            Width="40"
+            FontSize="9"
+            Height="18"
+            Margin="2,0,2,0"
+            Content="IC"
+            IsEnabled="True"
+            Foreground="Black"
+            Style="{StaticResource DarkStyle-Button}"
+            Click="VoxICEnabled_OnClick"
+            ToolTip="enable / disable voice activated communications for Intercom"/>
 
     </StackPanel>
 </UserControl>

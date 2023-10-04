@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -25,7 +26,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             InitializeComponent();
 
-            VOXEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -129,7 +131,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    RadioLabel.Text = "VOX/INTERCOM";
+                    RadioLabel.Text = "INTERCOM";
 
                     RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
 
@@ -147,7 +149,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    RadioLabel.Text = "NO VOX/INTERCOM";
+                    RadioLabel.Text = "NO INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
                     RadioVolume.IsEnabled = false;
                     IntercomNumberSpinner.Value = 1;
@@ -182,17 +184,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
         }
 
-        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
+        private void VoxR1Enabled_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
+            Console.WriteLine("Pushed VoxR1 Button.");
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
 
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
             {
-                VOXEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
+                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                }
             }
             else
             {
-                VOXEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+            }
+        }
+
+        private void VoxICEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+            {
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
+                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                }
+            }
+            else
+            {
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
             }
         }
     }
