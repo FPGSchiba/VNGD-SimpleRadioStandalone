@@ -123,7 +123,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    RadioLabel.Text = "INTERCOM";
+                    RadioLabel.Text = "VOX/INTERCOM";
 
                     RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
 
@@ -141,7 +141,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    RadioLabel.Text = "NO INTERCOM";
+                    RadioLabel.Text = "NO VOX/INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
                     RadioVolume.IsEnabled = false;
                     IntercomNumberSpinner.Value = 1;

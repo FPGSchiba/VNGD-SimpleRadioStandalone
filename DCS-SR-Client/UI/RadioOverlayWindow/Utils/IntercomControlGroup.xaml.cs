@@ -14,6 +14,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class IntercomControlGroup : UserControl
     {
         private bool _dragging;
+
+        private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -73,6 +75,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 //reset dragging just incase
                 _dragging = false;
+
+                IntercomNumberSpinner.IsEnabled = false;
             }
             else
             {
@@ -118,15 +122,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    RadioLabel.Text = "INTERCOM";
+                    RadioLabel.Text = "VOX/INTERCOM";
 
-                    RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
+
+                    if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+                    {
+                        IntercomNumberSpinner.IsEnabled = true;
+                        IntercomNumberSpinner.Value = _clientStateSingleton.IntercomOffset;
+                    }
+                    else
+                    {
+                        IntercomNumberSpinner.IsEnabled = false;
+                        IntercomNumberSpinner.Value = 1;
+                        _clientStateSingleton.IntercomOffset = 1;
+                    }
                 }
                 else
                 {
-                    RadioLabel.Text = "NO INTERCOM";
+                    RadioLabel.Text = "NO VOX/INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    VOXEnabled.IsEnabled = false;
                     RadioVolume.IsEnabled = false;
+                    IntercomNumberSpinner.Value = 1;
+                    IntercomNumberSpinner.IsEnabled = false;
+                    _clientStateSingleton.IntercomOffset = 1;
                 }
 
                 if (_dragging == false)
@@ -139,6 +158,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
+
+
+        }
+
+        private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (_init)
+            {
+                //ignore
+                _init = false;
+                return;
+            }
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
+                (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+            {
+                _clientStateSingleton.IntercomOffset = (int)IntercomNumberSpinner.Value;
+                dcsPlayerRadioInfo.unitId =
+                    (uint)(DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
+                _clientStateSingleton.LastSent = 0; //force refresh
+            }
         }
     }
 }
