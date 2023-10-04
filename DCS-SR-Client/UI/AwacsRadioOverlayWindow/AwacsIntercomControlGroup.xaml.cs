@@ -2,8 +2,10 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -16,10 +18,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+
+            VOXEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -173,6 +179,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 dcsPlayerRadioInfo.unitId =
                     (uint) (DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
                 _clientStateSingleton.LastSent = 0; //force refresh
+            }
+        }
+
+        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
+            {
+                VOXEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+            }
+            else
+            {
+                VOXEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
             }
         }
     }

@@ -18,10 +18,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        // Color for Vox Button
+        public static Brush voxEnabled = Brushes.MediumSeaGreen;
+        public static Brush voxDisabled = Brushes.IndianRed;
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+
+            VOXEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX) ? voxEnabled : voxDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -159,7 +164,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
 
-
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX))
+            {
+                VOXEnabled.Background = voxEnabled;
+            } else
+            {
+                VOXEnabled.Background = voxDisabled;
+            }
         }
 
         private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

@@ -39,6 +39,19 @@
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted" />
         
+        <Button x:Name="VOXEnabled"
+            Width="26"
+            FontSize="10"
+            Height="16"
+            Margin="2,0,0,0"
+            Content="VOX"
+            IsEnabled="True"
+            Foreground="Black"
+            Style="{StaticResource DarkStyle-Button}"
+            Click="VoxEnabled_OnClick"
+            ToolTip="enable / disable voice activated intercom communications"
+            Background="Green"/>
+        
         <TextBlock x:Name="ShipLabel"
                 Width="30"
                 HorizontalAlignment="Center"
