@@ -34,7 +34,7 @@ jobs:
         uses: nuget/setup-nuget@v1
 
       - name: Build & Package
-        run: ./build.bat
+        run: ./build.bat ".\SRS-Radio-Presets" ${{inputs.Version}}
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
