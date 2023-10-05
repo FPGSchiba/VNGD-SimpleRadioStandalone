@@ -2,10 +2,14 @@
 nuget restore
 msbuild /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false
 
-set clientReleasesFolder=%1
-set releasesFolder=%2
-set presetsFolder=%3
-set version=%4
+set presetsFolder=%1
+set version=%2
+
+set clientReleasesFolder=.\SRS-Client
+set releasesFolder=.
+
+mkdir %clientReleaseFolder%
+mkdir %releaseFolder%
 
 DEL /F .\install-build\DCS-SR-ExternalAudio.exe .\install-build\Installer.exe .\install-build\SRS-AutoUpdater.exe .\install-build\SR-Server.exe
 echo Removed not needed executables

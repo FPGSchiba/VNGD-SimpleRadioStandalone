@@ -161,25 +161,41 @@
                                  Grid.Column="4"
                                  RadioId="10" />
 
+        <TextBlock x:Name="TrancparencyLabel"
+           Grid.Row="3"
+           Grid.Column="3"
+           Grid.ColumnSpan="2"
+           Width="130"
+           Margin="10,0,140,0"
+           VerticalAlignment="Center"
+           HorizontalAlignment="Right"
+           FontSize="12"
+           Foreground="#E7E7E7"
+           Padding="0"
+           Style="{x:Null}"
+           Text="PANEL TRANSPARENCY"
+           TextAlignment="Center"/>
+
         <Slider x:Name="windowOpacitySlider"
                 Grid.Row="3"
-                Grid.Column="2"
-                Width="280"
-                Margin="100,10,0,0"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Left"
+                Grid.Column="3"
+                Width="120"
+                Margin="150,0,20,0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
                 Maximum="1.0"
                 Minimum="0.05"
                 Style="{x:Null}"
                 ToolTip="Window Opacity"
+                Opacity="0.6"
                 ValueChanged="windowOpacitySlider_ValueChanged"
                 Value="1.0" Grid.ColumnSpan="3" />
 
         <local:IntercomControlGroup x:Name="intercom"
                                     Grid.Row="4"
                                     Grid.Column="0"
-                                    Grid.ColumnSpan="3"
-                                    Margin="10,0,0,0"
+                                    Grid.ColumnSpan="4"
+                                    Margin="0,0,0,0"
                                     HorizontalAlignment="Left"
                                     RadioId="0" />
 

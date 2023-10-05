@@ -1095,6 +1095,7 @@
 
                                     </Grid.RowDefinitions>
 
+                                    <!--
                                     <Label
                                         Content="Use Voice Detection (VOX) on Intercom Hot Mic"
                                         Grid.Column="0"
@@ -1125,6 +1126,7 @@
                                             </Style>
                                         </ToggleButton.Style>
                                     </ToggleButton>
+                                    -->
 
                                     <Label
                                         Content="Voice Detection minimum transmission length (ms)"

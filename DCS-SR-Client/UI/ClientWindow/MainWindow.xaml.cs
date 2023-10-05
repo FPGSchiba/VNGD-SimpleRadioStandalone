@@ -121,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
 
-            Title = Title + " - " + "v1.0.2"; //UpdaterChecker.VERSION
+            Title = Title + " - " + "v1.1.0"; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -130,11 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.2" + " minimized"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.0" + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.2"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.0"); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -724,8 +724,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 AllowAnonymousUsage.IsChecked = true;
             }
-
-            VOXEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX);
 
             VOXMode.IsEnabled = false;
             VOXMode.Value =
@@ -2143,11 +2141,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void DisallowedAudioTone_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.DisallowedAudioTone, (bool)DisallowedAudioTone.IsChecked);
-        }
-
-        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, (bool)VOXEnabled.IsChecked);
         }
 
         private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
