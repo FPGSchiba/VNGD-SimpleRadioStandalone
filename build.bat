@@ -16,6 +16,8 @@ echo Removed not needed executables
 
 set clientArchiveName=Vanguard-SRS-Client-%version%.zip
 
+dir
+
 tar.exe -a -c -f %clientArchiveName% .\install-build
 MOVE /Y .\%clientArchiveName%  %clientReleasesFolder%\%clientArchiveName%
 echo Copied client-archive to client Release folder
