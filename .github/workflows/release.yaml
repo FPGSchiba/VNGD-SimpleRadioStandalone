@@ -1,0 +1,54 @@
+name: Release new Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      Version:
+        description: "New Version to release."
+        required: true
+        default: "v0.0.0"
+        type: string
+      ReleaseName:
+        description: "The name of the release"
+        required: true
+        type: string
+      ReleaseNotes:
+        description: "Notes to add to the Release."
+        required: true
+        type: string
+      IsLatest:
+        description: "If the Release is the Latest release"
+        type: boolean
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+
+      - name: Build & Package
+        run: ./build.bat
+
+      - name: Setup VSTest
+        uses: Malcolmnixon/Setup-VSTest@v3
+
+      - name: VSTest DCS-SR-CommonTests
+        run: VSTest.Console DCS-SR-CommonTests\bin\x64\Release\DCS-SR-CommonTests.dll
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ inputs.ReleaseName }}
+          artifacts: "Vanguard-SRS-${{inputs.Version}}.zip"
+          tag: ${{inputs.Version}}
+          body: ${{ inputs.ReleaseNotes }}
+          makeLatest: ${{ inputs.IsLatest }}
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
