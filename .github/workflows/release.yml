@@ -8,11 +8,6 @@ on:
         required: true
         default: "v0.0.0"
         type: string
-      ReleaseNotes:
-        description: "The Text to show under the Release to let the Folks know, whats new."
-        required: true
-        default: "Nothing here..."
-        type: string
       IsLatest:
         description: "Should this be the latest version?"
         type: boolean
@@ -54,9 +49,10 @@ jobs:
         with:
           tag: ${{ inputs.Version }}
           name: Release ${{ inputs.Version }}
-          body: ${{ inputs.ReleaseNotes }}
+          body: "Please update Release notes"
           makeLatest: ${{ inputs.IsLatest }}
           artifacts: "Vanguard-SRS-${{inputs.Version}}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
