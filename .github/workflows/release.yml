@@ -1,6 +1,8 @@
 name: Release new Version
 
 on:
+  push:
+    branches: ["master"]
   workflow_dispatch:
     inputs:
       Version:
@@ -19,6 +21,7 @@ on:
       IsLatest:
         description: "If the Release is the Latest release"
         type: boolean
+
 jobs:
   build:
     name: Build
