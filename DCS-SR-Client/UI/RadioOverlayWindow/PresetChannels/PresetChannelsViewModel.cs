@@ -74,10 +74,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
 
             var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios;
 
-            var radio = radios[_radioId];
+            string vngdFileName = "vngd-channels";
 
             int i = 1;
-            foreach (var channel in _channelsStore.LoadFromStore(radio.name))
+            foreach (var channel in _channelsStore.LoadFromStore(vngdFileName))
             {
                 if (((double) channel.Value) <= Max
                     && ((double) channel.Value) >= Min)
