@@ -59,7 +59,7 @@
             <TextBlock Grid.Column="0"
                        Margin="0,0,5,0"
                        VerticalAlignment="Center"
-                       Text="EAM coalition password" />
+                       Text="Operation Password" />
             <TextBox Grid.Column="1" Text="{Binding Path=NewEAMCoalitionPassword}" />
             <Button Grid.Column="2"
                     Height="23"
@@ -106,7 +106,7 @@
                 <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name">
                 </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Path=Address}" Header="ServerAddress/port" />
-                <DataGridTextColumn Binding="{Binding Path=EAMCoalitionPassword}" Header="EAM coal. pass" />
+                <DataGridTextColumn Binding="{Binding Path=EAMCoalitionPassword}" Header="Op. Password" />
                 <DataGridTemplateColumn Header="Is Default">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="ui:ServerAddress">
