@@ -20,13 +20,15 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v1
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
+        with:
+          vs-version: "[17.7,17.7)"
 
       - name: Setup NuGet
         uses: nuget/setup-nuget@v1
