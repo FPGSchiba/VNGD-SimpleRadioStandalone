@@ -1,9 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -16,10 +19,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -173,6 +181,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 dcsPlayerRadioInfo.unitId =
                     (uint) (DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
                 _clientStateSingleton.LastSent = 0; //force refresh
+            }
+        }
+
+        private void VoxR1Enabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Pushed VoxR1 Button.");
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+            {
+                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
+                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                }
+            }
+            else
+            {
+                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+            }
+        }
+
+        private void VoxICEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+            {
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
+                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                }
+            }
+            else
+            {
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
             }
         }
     }

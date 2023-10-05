@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -14,12 +15,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class IntercomControlGroup : UserControl
     {
         private bool _dragging;
+
+        private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        // Color for Vox Button
+        public static Brush voxEnabled = Brushes.MediumSeaGreen;
+        public static Brush voxDisabled = Brushes.IndianRed;
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? voxEnabled : voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? voxEnabled : voxDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -73,6 +82,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 //reset dragging just incase
                 _dragging = false;
+
+                IntercomNumberSpinner.IsEnabled = false;
             }
             else
             {
@@ -118,15 +129,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
                 {
-                    RadioLabel.Text = "INTERCOM";
+                    RadioLabel.Text = "VOX / INTERCOM";
 
-                    RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
+
+                    if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
+                    {
+                        IntercomNumberSpinner.IsEnabled = true;
+                        IntercomNumberSpinner.Value = _clientStateSingleton.IntercomOffset;
+                    }
+                    else
+                    {
+                        IntercomNumberSpinner.IsEnabled = false;
+                        IntercomNumberSpinner.Value = 1;
+                        _clientStateSingleton.IntercomOffset = 1;
+                    }
                 }
                 else
                 {
-                    RadioLabel.Text = "NO INTERCOM";
+                    RadioLabel.Text = "NO VOX / INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    Radio1Enabled.IsEnabled = false;
+                    IntercomEnabled.IsEnabled = false;
                     RadioVolume.IsEnabled = false;
+                    IntercomNumberSpinner.Value = 1;
+                    IntercomNumberSpinner.IsEnabled = false;
+                    _clientStateSingleton.IntercomOffset = 1;
                 }
 
                 if (_dragging == false)
@@ -136,9 +163,62 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
         }
 
-        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
+        private void VoxR1Enabled_OnClick(object sender, RoutedEventArgs e)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX));
+            Console.WriteLine("Pushed VoxR1 Button.");
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+            {
+                Radio1Enabled.Background = voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
+                    IntercomEnabled.Background = voxDisabled;
+                }
+            } else
+            {
+                Radio1Enabled.Background = voxDisabled;
+            }
+        }
+
+        private void VoxICEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+            {
+                IntercomEnabled.Background = voxEnabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
+                    Radio1Enabled.Background = voxDisabled;
+                }
+            }
+            else
+            {
+                IntercomEnabled.Background = voxDisabled;
+            }
+        }
+
+        private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (_init)
+            {
+                //ignore
+                _init = false;
+                return;
+            }
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
+                (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
+            {
+                _clientStateSingleton.IntercomOffset = (int)IntercomNumberSpinner.Value;
+                dcsPlayerRadioInfo.unitId =
+                    (uint)(DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
+                _clientStateSingleton.LastSent = 0; //force refresh
+            }
         }
     }
 }
