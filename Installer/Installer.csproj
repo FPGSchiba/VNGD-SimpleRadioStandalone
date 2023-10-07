@@ -250,6 +250,7 @@ copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\SR-ClientRadio.exe" "$(Solu
 copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\opus.dll" "$(SolutionDir)install-build\opus.dll"
 copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\speexdsp.dll" "$(SolutionDir)install-build\speexdsp.dll"
 copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\awacs-radios.json" "$(SolutionDir)install-build\awacs-radios.json"
+copy /Y "$(SolutionDir)DCS-SR-Client\bin\x64\Release\vngd-channels.txt" "$(SolutionDir)install-build\vngd-channels.txt"
 xcopy /Y /e "$(SolutionDir)DCS-SR-Client\AudioEffects" "$(SolutionDir)install-build\AudioEffects"
 copy /Y "$(SolutionDir)Installer\bin\x64\Release\Installer.exe" "$(SolutionDir)install-build\Installer.exe"
 copy /Y "$(SolutionDir)AutoUpdater\bin\Release\SRS-AutoUpdater.exe" "$(SolutionDir)install-build\SRS-AutoUpdater.exe" 
