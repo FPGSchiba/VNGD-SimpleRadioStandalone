@@ -7,9 +7,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="170"
-        Height="340"
+        Height="494"
         MinWidth="170"
-        MinHeight="340"
+        MinHeight="494"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -93,9 +93,9 @@
 
         <awacsOverlayWindow:RadioControlGroup x:Name="Radio3" RadioId="3" />
 
-        <awacsOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" Visibility="Collapsed" />
+        <awacsOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" />
 
-        <awacsOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" Visibility="Collapsed" />
+        <awacsOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" />
 
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
         <Separator Width="170" Margin="0 2" />

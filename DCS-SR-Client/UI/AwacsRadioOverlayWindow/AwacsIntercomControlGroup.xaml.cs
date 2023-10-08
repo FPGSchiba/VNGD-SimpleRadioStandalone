@@ -21,6 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         
+        
 
         public IntercomControlGroup()
         {
