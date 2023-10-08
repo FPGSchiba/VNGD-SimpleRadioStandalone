@@ -137,6 +137,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     IntercomEnabled.IsEnabled = true;
                     RadioVolume.IsEnabled = true;
 
+                    Radio1Enabled.IsEnabled = true;
+                    IntercomEnabled.IsEnabled = true;
+                    IntercomNumberSpinner.IsEnabled = true;
+
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
                     {
                         IntercomNumberSpinner.IsEnabled = true;
@@ -159,6 +163,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     IntercomNumberSpinner.Value = 1;
                     IntercomNumberSpinner.IsEnabled = false;
                     _clientStateSingleton.IntercomOffset = 1;
+
+                    Radio1Enabled.Background = voxDisabled;
+                    IntercomEnabled.Background = voxicDisabled;
                 }
 
                 if (_dragging == false)

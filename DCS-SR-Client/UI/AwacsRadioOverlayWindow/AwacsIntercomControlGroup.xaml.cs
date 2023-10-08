@@ -156,6 +156,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     IntercomNumberSpinner.Value = 1;
                     IntercomNumberSpinner.IsEnabled = false;
                     _clientStateSingleton.IntercomOffset = 1;
+
+
+                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
                 }
 
                 if (_dragging == false)
