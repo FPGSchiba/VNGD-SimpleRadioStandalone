@@ -127,9 +127,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     }
                 }
 
-                
-
-
                 if (availableRadios > 1)
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
@@ -154,7 +151,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             FocusDCS();
         }
-
 
         private void Recalculate()
         {
