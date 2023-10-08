@@ -185,7 +185,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void VoxICEnabled_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-
             
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
