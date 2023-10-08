@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -81,6 +82,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
+        
+        private string version = "loading";
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -123,8 +126,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
+            Assembly assembly = Assembly.GetExecutingAssembly();
 
-            Title = Title + " - " + "v1.1.1"; //UpdaterChecker.VERSION
+            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+
+            Title = Title + " - " + version; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -133,11 +139,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.1" + " minimized"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.1"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
