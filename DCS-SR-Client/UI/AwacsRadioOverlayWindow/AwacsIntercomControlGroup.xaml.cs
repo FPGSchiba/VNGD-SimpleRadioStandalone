@@ -135,6 +135,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
 
+
+                    Radio1Enabled.IsEnabled = true;
+                    IntercomEnabled.IsEnabled = true;
+                    IntercomNumberSpinner.IsEnabled = true;
+
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
                     {
                         IntercomNumberSpinner.IsEnabled = true;
@@ -151,6 +156,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     RadioLabel.Text = "NO INTERCOM";
                     RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    Radio1Enabled.IsEnabled = false;
+                    IntercomEnabled.IsEnabled = false;
                     RadioVolume.IsEnabled = false;
                     IntercomNumberSpinner.Value = 1;
                     IntercomNumberSpinner.IsEnabled = false;

@@ -132,7 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     RadioLabel.Text = "VOX / INTERCOM";
 
-
                     Radio1Enabled.IsEnabled = true;
                     IntercomEnabled.IsEnabled = true;
                     IntercomNumberSpinner.IsEnabled = true;

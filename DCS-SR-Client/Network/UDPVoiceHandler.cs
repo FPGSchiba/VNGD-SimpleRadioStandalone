@@ -843,7 +843,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 if (currentSelected >= 0) // Could be used to enable vox not only for Intercom
                 {
                     var selectedRadios = new List<RadioInformation>();
-                    Console.WriteLine(currentSelected);
                     // TODO: Check if radio is disabled or anything else is amiss
                     var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
 
