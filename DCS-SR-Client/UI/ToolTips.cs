@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"[DI] FPGSchiba.\" Please reference the Vanguard SRS SOP to find the correct two-digit code"
+                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"[DI] FPGSchiba.\" \n\n First Fleet ID Codes as follows: \n Atlas = [AT] \n Benevolence = [BE] \n Chaos = [CH] \n Command= CO \n Defiant = [DF] \n Discovery = [DI] \n Fleet Services = [FS] \n Kraken Trading Company = [KT] \n Mako Media = [MM] \n Nighthawks = [NH] \n Obsidian = [OB] \n Rock Raiders = [RR] \n Rogue Racing = [RG] \n Shinobi = [SH] \n Taccom = [TC] \n Vice = [VC] \n Witcher = [WT] \n\n See Vanguard SRS SOP for more details "
             });
 
             ExternalAWACSModeName.Content = externalAWACSModeNameContent;
