@@ -1829,6 +1829,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
         {
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+            {
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+            }
+
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+            {
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+            }
+
             if (_client == null ||
                 !ClientState.IsConnected ||
                 !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||

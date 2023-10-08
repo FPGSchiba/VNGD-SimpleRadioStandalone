@@ -27,7 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             InitializeComponent();
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
-            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxicDisabled;
         }
 
         public int RadioId { private get; set; }
@@ -173,6 +173,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 return;
             }
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            int? spinnervalue = IntercomNumberSpinner.Value;
+            int isone = spinnervalue ?? default(int);
+
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+            {
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+            }
+
+
+            if (isone == 1)
+            {
+                IntercomEnabled.IsEnabled = false;
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
+            }
+            else
+            {
+                IntercomEnabled.IsEnabled = true;
+                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+            }
 
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
                 (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))

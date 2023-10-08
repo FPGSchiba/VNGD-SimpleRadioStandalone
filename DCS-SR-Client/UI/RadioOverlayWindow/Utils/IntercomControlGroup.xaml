@@ -53,7 +53,7 @@
                  ToolTip="Selected Radio" />
 
         </WrapPanel>
-        <WrapPanel HorizontalAlignment="Center" Width="170" ToolTip="Select the VOX Input mode you want to use.">
+        <WrapPanel HorizontalAlignment="Center" Width="170" ToolTip="Select the VOX Input mode you want to use. (Intercom Channel 1 Disabled)">
             <TextBlock x:Name="VOXLabel"
                Margin="2,0,8,0"
                Width="70"
@@ -84,11 +84,11 @@
                 Height="18"
                 Margin="2,0,0,0"
                 Content="IC"
-                IsEnabled="True"
+                IsEnabled="False"
                 Foreground="Black"
                 Style="{StaticResource DarkStyle-Button}"
                 Click="VoxICEnabled_OnClick"
-                ToolTip="enable / disable voice activated communications for Intercom"/>
+                ToolTip="enable / disable voice activated communications for Intercom (Channel 1 Disabled)"/>
         </WrapPanel>
     </StackPanel>
 </UserControl>
