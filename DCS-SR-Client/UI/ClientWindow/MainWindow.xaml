@@ -19,15 +19,27 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <TabControl x:Name="TabControl">
+        
+        <TabControl.Background>
+            <ImageBrush AlignmentX="Center" AlignmentY="Center" ImageSource="/UI/ClientWindow/vanguardsrsback.png" />
+        </TabControl.Background>
+        
+        
         <TabControl.Resources>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
         </TabControl.Resources>
+        
         <TabItem Header="General">
+            <TabItem.Background>
+                <SolidColorBrush Color="WhiteSmoke"/>
+            </TabItem.Background>
+
             <GroupBox
                 Header="Setup"
                 Margin="5"
                 x:Name="GroupBox"
                 >
+
                 <StackPanel Margin="0">
                     <Label
                         Content="Microphone"
@@ -154,7 +166,7 @@
                             Height="23"
                             Margin="0,0,10,0"
                             MaxLines="1"
-                            Text="127.0.0.1:5002"
+                            Text="3.219.75.115"
                             TextWrapping="Wrap"
                             Width="200"
                             x:Name="ServerIp" />
@@ -363,6 +375,10 @@
         </TabItem>
 
         <TabItem Header="Controls">
+            <TabItem.Background>
+                <SolidColorBrush Color="WhiteSmoke"/>
+            </TabItem.Background>
+
             <GroupBox Header="Controls" x:Name="ControlsGroupBox">
 
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
@@ -711,14 +727,23 @@
         </TabItem>
 
         <TabItem Header="Favourites" x:Name="FavouritesSeversTab">
+            <TabItem.Background>
+                <SolidColorBrush Color="WhiteSmoke"/>
+            </TabItem.Background>
+
             <GroupBox Header="Favourites">
                 <clientWindow:FavouriteServersView DataContext="{Binding Path=FavouriteServersViewModel}" />
             </GroupBox>
         </TabItem>
 
         <TabItem Header="Settings">
+            <TabItem.Background>
+                <SolidColorBrush Color="WhiteSmoke"/>
+            </TabItem.Background>
+
             <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                 <StackPanel>
+                    
                     <GroupBox Header="Global Settings">
                         <StackPanel>
                             <GroupBox Header="Auto Connect">
@@ -3046,7 +3071,12 @@
         </TabItem>
 
         <TabItem Header="Help">
+            <TabItem.Background>
+                <SolidColorBrush Color="WhiteSmoke"/>
+            </TabItem.Background>
+            
             <GroupBox Header="Help &amp; About">
+                
                 <FlowDocumentScrollViewer>
                     <FlowDocument Name="AboutFlowDocument">
 
