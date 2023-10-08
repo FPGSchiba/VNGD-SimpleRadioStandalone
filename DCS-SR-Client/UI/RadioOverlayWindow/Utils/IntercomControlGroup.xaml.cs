@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 if (_clientStateSingleton.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                 {
-                    _clientStateSingleton.DcsPlayerRadioInfo.selected = (short) RadioId;
+                    _clientStateSingleton.DcsPlayerRadioInfo.selected = (short)RadioId;
                 }
             }
         }
@@ -64,7 +64,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
 
-                    clientRadio.volume = (float) RadioVolume.Value / 100.0f;
+                    clientRadio.volume = (float)RadioVolume.Value / 100.0f;
                 }
             }
 
@@ -132,11 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     RadioLabel.Text = "VOX / INTERCOM";
 
-                    IntercomNumberSpinner.IsEnabled = true;
-                    Radio1Enabled.IsEnabled = true;
-                    IntercomEnabled.IsEnabled = true;
-                    RadioVolume.IsEnabled = true;
-
                     Radio1Enabled.IsEnabled = true;
                     IntercomEnabled.IsEnabled = true;
                     IntercomNumberSpinner.IsEnabled = true;
@@ -187,7 +182,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
                     IntercomEnabled.Background = voxDisabled;
                 }
-            } else
+            }
+            else
             {
                 Radio1Enabled.Background = voxDisabled;
             }
@@ -196,7 +192,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void VoxICEnabled_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-            
+
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 IntercomEnabled.Background = voxEnabled;
@@ -241,7 +237,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 IntercomEnabled.IsEnabled = true;
                 IntercomEnabled.Background = voxDisabled;
             }
-            
+
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
