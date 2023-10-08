@@ -19,11 +19,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <TabControl x:Name="TabControl">
-        
+        <!--
         <TabControl.Background>
             <ImageBrush AlignmentX="Center" AlignmentY="Center" ImageSource="/UI/ClientWindow/vanguardsrsback.png" />
         </TabControl.Background>
-        
+        -->
         
         <TabControl.Resources>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
