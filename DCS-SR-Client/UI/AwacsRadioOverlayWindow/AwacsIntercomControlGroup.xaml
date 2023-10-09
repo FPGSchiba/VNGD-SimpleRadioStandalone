@@ -95,7 +95,7 @@
             Height="18"
             Margin="2,0,2,0"
             Content="IC"
-            IsEnabled="True"
+            IsEnabled="False"
             Foreground="Black"
             Style="{StaticResource DarkStyle-Button}"
             Click="VoxICEnabled_OnClick"
