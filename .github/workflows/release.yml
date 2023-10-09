@@ -27,7 +27,7 @@ jobs:
         uses: nuget/setup-nuget@v1
 
       - name: Build & Package
-        run: ./build.bat ".\SRS-Radio-Presets" ${{ tag.semver_tag }}
+        run: ./build.bat ".\SRS-Radio-Presets" ${{ steps.tag.outputs.semver_tag }}
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
@@ -41,9 +41,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ tag.semver_tag }}
-          name: Release ${{ tag.semver_tag }}
+          tag: ${{ steps.tag.outputs.semver_tag }}
+          name: Release ${{ steps.tag.outputs.semver_tag }}
           body: "Please update Release notes"
-          artifacts: "Vanguard-SRS-${{tag.semver_tag}}.zip"
+          artifacts: "Vanguard-SRS-${{ steps.tag.outputs.semver_tag }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
