@@ -127,7 +127,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     }
                 }
 
-                
+                if (availableRadios == 6
+                    || dcsPlayerRadioInfo.radios.Length >= 6
+                    && dcsPlayerRadioInfo.radios[5].modulation != RadioInformation.Modulation.DISABLED)
+                {
+                    Radio5.Visibility = Visibility.Visible;
+                    Radio4.Visibility = Visibility.Visible;
+
+                    if (MinHeight != _originalMinHeight + (_radioHeight * 2))
+                    {
+                        MinHeight = (_originalMinHeight + (_radioHeight * 2));
+                        Recalculate();
+                    }
+                }
+                else if (availableRadios == 5
+                         || dcsPlayerRadioInfo.radios.Length >= 5
+                         && dcsPlayerRadioInfo.radios[4].modulation != RadioInformation.Modulation.DISABLED)
+                {
+                    Radio5.Visibility = Visibility.Collapsed;
+                    Radio4.Visibility = Visibility.Visible;
+                    if (MinHeight != _originalMinHeight + _radioHeight)
+                    {
+                        MinHeight = _originalMinHeight + _radioHeight;
+                        Recalculate();
+                    }
+                }
+                else
+                {
+                    ResetHeight();
+                }
 
 
                 if (availableRadios > 1)
@@ -155,6 +183,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             FocusDCS();
         }
 
+        private void ResetHeight()
+        {
+
+            Radio4.Visibility = Visibility.Collapsed;
+            Radio5.Visibility = Visibility.Collapsed;
+            if (MinHeight != _originalMinHeight)
+            {
+                MinHeight = _originalMinHeight;
+                Recalculate();
+            }
+        }
 
         private void Recalculate()
         {
