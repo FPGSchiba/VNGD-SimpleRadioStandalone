@@ -136,10 +136,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
 
-
                     Radio1Enabled.IsEnabled = true;
-                    IntercomEnabled.IsEnabled = true;
-                    IntercomNumberSpinner.IsEnabled = true;
 
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
                     {
