@@ -14,9 +14,9 @@ jobs:
         uses: actions/checkout@v1
 
       - id: tag
-        uses: gandarez/semver-action@v1.0.1
+        uses: K-Phoen/semver-release-action@master
         with:
-          base_version: v1.2.0
+          release_strategy: tag
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
@@ -27,7 +27,7 @@ jobs:
         uses: nuget/setup-nuget@v1
 
       - name: Build & Package
-        run: ./build.bat ".\SRS-Radio-Presets" ${{ steps.tag.outputs.semver_tag }}
+        run: ./build.bat ".\SRS-Radio-Presets" ${{ steps.tag.outputs.tag }}
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
@@ -41,9 +41,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag.outputs.semver_tag }}
-          name: Release ${{ steps.tag.outputs.semver_tag }}
+          tag: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
           body: "Please update Release notes"
-          artifacts: "Vanguard-SRS-${{ steps.tag.outputs.semver_tag }}.zip"
+          artifacts: "Vanguard-SRS-${{ steps.tag.outputs.tag }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
