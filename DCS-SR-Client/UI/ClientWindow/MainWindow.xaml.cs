@@ -82,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
-        
+
         private string version = "loading";
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
@@ -953,7 +953,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                                         //Handle Aircraft Name - find matching profile and select if you can
                                         name = Regex.Replace(name.Trim().ToLower(), "[^a-zA-Z0-9]", "");
                                         //add one to seat so seat_2 is copilot
-                                        var nameSeat = $"_{seat+1}";
+                                        var nameSeat = $"_{seat + 1}";
 
                                         foreach (var profileName in _globalSettings.ProfileSettingsStore.ProfileNames)
                                         {
@@ -1418,7 +1418,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             _radioOverlayWindowFive?.Close();
                             _radioOverlayWindowFive = null;
                         }
-                    } else
+                    }
+                    else
                     {
                         if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
                         (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
@@ -1450,7 +1451,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         }
                     }
                 }
-                
+
             }
         }
 
@@ -2165,7 +2166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(VOXMode.IsEnabled)
+            if (VOXMode.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMode, (int)e.NewValue);
         }
 
