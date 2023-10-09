@@ -1,24 +1,22 @@
 name: Release new Version
 
 on:
-  workflow_dispatch:
-    inputs:
-      Version:
-        description: "New Version to release."
-        required: true
-        default: "v0.0.0"
-        type: string
-      IsLatest:
-        description: "Should this be the latest version?"
-        type: boolean
+  pull_request:
+    types: [closed]
 
 jobs:
   build:
     name: Build
     runs-on: windows-2022
+    if: github.event.pull_request.merged
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - id: tag
+        uses: gandarez/semver-action@v1.0.1
+        with:
+          base_version: v1.2.0
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
@@ -29,30 +27,23 @@ jobs:
         uses: nuget/setup-nuget@v1
 
       - name: Build & Package
-        run: ./build.bat ".\SRS-Radio-Presets" ${{inputs.Version}}
+        run: ./build.bat ".\SRS-Radio-Presets" ${{ tag.semver_tag }}
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
 
       - name: VSTest DCS-SR-CommonTests
         run: VSTest.Console DCS-SR-CommonTests\bin\x64\Release\DCS-SR-CommonTests.dll
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ inputs.version }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: Create a GitHub release
+        if: github.ref == 'refs/heads/master'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ inputs.Version }}
-          name: Release ${{ inputs.Version }}
+          tag: ${{ tag.semver_tag }}
+          name: Release ${{ tag.semver_tag }}
           body: "Please update Release notes"
-          makeLatest: ${{ inputs.IsLatest }}
-          artifacts: "Vanguard-SRS-${{inputs.Version}}.zip"
+          artifacts: "Vanguard-SRS-${{tag.semver_tag}}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
