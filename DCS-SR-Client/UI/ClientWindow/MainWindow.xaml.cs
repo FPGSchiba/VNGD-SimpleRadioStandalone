@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,6 +83,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
 
+        private string version = "loading";
+
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
@@ -123,8 +126,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
+            Assembly assembly = Assembly.GetExecutingAssembly();
 
-            Title = Title + " - " + "v1.2.0"; //UpdaterChecker.VERSION
+            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+
+            Title = Title + " - " + version; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -133,11 +139,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.1" + " minimized"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.1.1"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -947,7 +953,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                                         //Handle Aircraft Name - find matching profile and select if you can
                                         name = Regex.Replace(name.Trim().ToLower(), "[^a-zA-Z0-9]", "");
                                         //add one to seat so seat_2 is copilot
-                                        var nameSeat = $"_{seat+1}";
+                                        var nameSeat = $"_{seat + 1}";
 
                                         foreach (var profileName in _globalSettings.ProfileSettingsStore.ProfileNames)
                                         {
@@ -1412,7 +1418,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             _radioOverlayWindowFive?.Close();
                             _radioOverlayWindowFive = null;
                         }
-                    } else
+                    }
+                    else
                     {
                         if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
                         (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
@@ -1444,7 +1451,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         }
                     }
                 }
-                
+
             }
         }
 
@@ -2159,7 +2166,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(VOXMode.IsEnabled)
+            if (VOXMode.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMode, (int)e.NewValue);
         }
 
