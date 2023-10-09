@@ -1,9 +1,10 @@
 @echo off
 nuget restore
-msbuild /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false
 
 set presetsFolder=%1
 set version=%2
+
+msbuild /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false /p:Version=%version%
 
 set clientReleasesFolder=.\SRS-Client
 set releasesFolder=.
