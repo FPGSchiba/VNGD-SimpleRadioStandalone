@@ -2181,6 +2181,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (VOXMinimumRMS.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
         }
-
     }
 }

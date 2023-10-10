@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public static readonly Dictionary<string, string> DefaultSettingsProfileSettings = new Dictionary<string, string>()
         {
-            {ProfileSettingsKeys.RadioEffects.ToString(), "true"},
+            {ProfileSettingsKeys.RadioEffects.ToString(), "false"},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
 
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
@@ -112,7 +112,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
             {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
 
-            {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), "true"},
+            {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), "false"},
 
             {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
             {ProfileSettingsKeys.AllowDCSPTT.ToString(),"true" },
@@ -120,7 +120,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), "false"},
             {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
 
-            {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "0"},
+            {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "100"},
             {ProfileSettingsKeys.PTTStartDelay.ToString(), "0"},
 
             {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
