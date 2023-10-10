@@ -71,13 +71,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels
                 }
             }
 
-            int i = 1;
-            foreach (var channel in channels)
-            {
-                channel.Text = i + " - " + channel.Text;
-                i++;
-            }
-
             return channels;
         }
 

@@ -1,0 +1,52 @@
+name: Release new Version
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+    if: github.event.pull_request.merged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Application Version
+        id: version
+        uses: PaulHatch/semantic-version@v5.3.0
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1
+        with:
+          vs-version: "17.7"
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+
+      - name: Build & Package
+        run: ./build.bat ".\SRS-Radio-Presets" ${{ steps.version.outputs.version_tag }}
+
+      - name: Setup VSTest
+        uses: Malcolmnixon/Setup-VSTest@v3
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - name: VSTest DCS-SR-CommonTests
+        run: VSTest.Console DCS-SR-CommonTests\bin\x64\Release\DCS-SR-CommonTests.dll
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - name: Create a GitHub release
+        if: github.ref == 'refs/heads/master'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.version.outputs.version_tag }}
+          name: Release ${{ steps.version.outputs.version_tag }}
+          body: "Please update Release notes"
+          artifacts: "Vanguard-SRS-${{ steps.version.outputs.version_tag }}.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true

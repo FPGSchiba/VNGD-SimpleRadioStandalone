@@ -229,7 +229,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             //update common parts
             playerRadioInfo.name = message.name;
             playerRadioInfo.inAircraft = message.inAircraft;
-            playerRadioInfo.intercomHotMic = message.intercomHotMic;
+            playerRadioInfo.intercomHotMic = message.intercomHotMic; // This setting Comes via -> UDP Connection Socket with DCS (Backtrace function)
             playerRadioInfo.capabilities = message.capabilities;
 
             if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))

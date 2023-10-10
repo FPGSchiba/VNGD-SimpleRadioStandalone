@@ -11,11 +11,14 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
@@ -42,6 +45,7 @@ using NAudio.Wave;
 using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
+using System.Windows.Navigation;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -63,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        
+
         private Overlay.RadioOverlayWindowTwoV _radioOverlayWindowTwoV;
         private Overlay.RadioOverlayWindowTwoH _radioOverlayWindowTwoH;
         private Overlay.RadioOverlayWindowThreeV _radioOverlayWindowThreeV;
@@ -84,6 +88,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
         private readonly DelegateCommand _connectCommand;
+
+        private string version = "loading";
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -126,8 +132,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
+            Assembly assembly = Assembly.GetExecutingAssembly();
 
-            Title = Title + " - " + "v1.0.1"; //UpdaterChecker.VERSION
+            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+
+            Title = Title + " - " + version; //UpdaterChecker.VERSION
 
             CheckWindowVisibility();
 
@@ -136,11 +145,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.1" + " minimized"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + "v1.0.1"); //UpdaterChecker.VERSION
+                Logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -761,13 +770,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Speaker_VU.Value = -100;
             }
 
-            try
-            {
-                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
-                CurrentPosition.Text = $"Lat/Lng: {pos.lat:0.###},{pos.lng:0.###} - Alt: {pos.alt:0}";
-            }
-            catch { }
-
             ConnectedClientsSingleton.Instance.NotifyAll();
 
         }
@@ -820,8 +822,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 AllowAnonymousUsage.IsChecked = true;
             }
-
-            VOXEnabled.IsChecked = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOX);
 
             VOXMode.IsEnabled = false;
             VOXMode.Value =
@@ -1042,7 +1042,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                                         //Handle Aircraft Name - find matching profile and select if you can
                                         name = Regex.Replace(name.Trim().ToLower(), "[^a-zA-Z0-9]", "");
                                         //add one to seat so seat_2 is copilot
-                                        var nameSeat = $"_{seat+1}";
+                                        var nameSeat = $"_{seat + 1}";
 
                                         foreach (var profileName in _globalSettings.ProfileSettingsStore.ProfileNames)
                                         {
@@ -1511,7 +1511,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private bool IsOverlayClosed(int overlayId)
         {
-            switch(overlayId)
+            switch (overlayId)
             {
                 case 0:
                     return (_radioOverlayWindowTwoV == null) || !_radioOverlayWindowTwoV.IsVisible || (_radioOverlayWindowTwoV.WindowState == WindowState.Minimized);
@@ -1541,7 +1541,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _toggleShowHide = DateTime.Now.Ticks;
 
-                switch(overlayId)
+                switch (overlayId)
                 {
                     case 0: // Two Vertical
                         if (IsOverlayClosed(overlayId))
@@ -1653,959 +1653,829 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             _radioOverlayWindowThreeV?.Close();
                             _radioOverlayWindowThreeV = null;
                         }
-                        break;
-                    case 3: // Three Horizontal
-                        if (IsOverlayClosed(overlayId))
+                } else
+                {
+                    if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
+                    (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
+                    {
+                        //hide awacs panel
+                        _awacsRadioOverlay?.Close();
+                        _awacsRadioOverlay = null;
+
+                        //hide Five Overlay
+                        if (_radioOverlayWindowFive != null)
                         {
-                            // Close all other windows
-                            _radioOverlayWindowTwoV?.Close();
-                            _radioOverlayWindowTwoV = null;
-
-                            _radioOverlayWindowTwoH?.Close();
-                            _radioOverlayWindowTwoH = null;
-
-                            _radioOverlayWindowThreeV?.Close();
-                            _radioOverlayWindowThreeV = null;
-
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = null;
-
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = null;
-
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = null;
-
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = null;
-
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = new Overlay.RadioOverlayWindowThreeH();
-                            _radioOverlayWindowThreeH.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowThreeH.Show();
+                            _radioOverlayWindowFive.Close();
+                            _radioOverlayWindowFive = null;
                         }
-                        else
-                        {
-                            // Close self
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = null;
-                        }
-                        break;
-                    case 4: // Five Vertical
-                        if (IsOverlayClosed(overlayId))
-                        {
-                            // Close all other windows
-                            _radioOverlayWindowTwoV?.Close();
-                            _radioOverlayWindowTwoV = null;
 
-                            _radioOverlayWindowTwoH?.Close();
-                            _radioOverlayWindowTwoH = null;
+                        _radioOverlayWindowTwo?.Close();
 
-                            _radioOverlayWindowThreeV?.Close();
-                            _radioOverlayWindowThreeV = null;
+                        _radioOverlayWindowTwo = new Overlay.RadioOverlayWindowTwo();
 
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = null;
 
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = null;
-
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = null;
-
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = null;
-
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = new Overlay.RadioOverlayWindowFiveV();
-                            _radioOverlayWindowFiveV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowFiveV.Show();
-                        }
-                        else
-                        {
-                            // Close self
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = null;
-                        }
-                        break;
-                    case 5: // Five Horizontal
-                        if (IsOverlayClosed(overlayId))
-                        {
-                            // Close all other windows
-                            _radioOverlayWindowTwoV?.Close();
-                            _radioOverlayWindowTwoV = null;
-
-                            _radioOverlayWindowTwoH?.Close();
-                            _radioOverlayWindowTwoH = null;
-
-                            _radioOverlayWindowThreeV?.Close();
-                            _radioOverlayWindowThreeV = null;
-
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = null;
-
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = null;
-
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = null;
-
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = null;
-
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = new Overlay.RadioOverlayWindowFiveH();
-                            _radioOverlayWindowFiveH.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowFiveH.Show();
-                        }
-                        else
-                        {
-                            // Close self
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = null;
-                        }
-                        break;
-                    case 6: // Ten Vertical
-                        if (IsOverlayClosed(overlayId))
-                        {
-                            // Close all other windows
-                            _radioOverlayWindowTwoV?.Close();
-                            _radioOverlayWindowTwoV = null;
-
-                            _radioOverlayWindowTwoH?.Close();
-                            _radioOverlayWindowTwoH = null;
-
-                            _radioOverlayWindowThreeV?.Close();
-                            _radioOverlayWindowThreeV = null;
-
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = null;
-
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = null;
-
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = null;
-
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = null;
-
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = new Overlay.RadioOverlayTenV();
-                            _radioOverlayWindowTenV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowTenV.Show();
-                        }
-                        else
-                        {
-                            // Close self
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = null;
-                        }
-                        break;
-                    case 7: // Ten Horizontal
-                        if (IsOverlayClosed(overlayId))
-                        {
-                            // Close all other windows
-                            _radioOverlayWindowTwoV?.Close();
-                            _radioOverlayWindowTwoV = null;
-
-                            _radioOverlayWindowTwoH?.Close();
-                            _radioOverlayWindowTwoH = null;
-
-                            _radioOverlayWindowThreeV?.Close();
-                            _radioOverlayWindowThreeV = null;
-
-                            _radioOverlayWindowThreeH?.Close();
-                            _radioOverlayWindowThreeH = null;
-
-                            _radioOverlayWindowFiveV?.Close();
-                            _radioOverlayWindowFiveV = null;
-
-                            _radioOverlayWindowFiveH?.Close();
-                            _radioOverlayWindowFiveH = null;
-
-                            _radioOverlayWindowTenV?.Close();
-                            _radioOverlayWindowTenV = null;
-
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = new Overlay.RadioOverlayTenH();
-                            _radioOverlayWindowTenH.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowTenH.Show();
-                        }
-                        else
-                        {
-                            // Close self
-                            _radioOverlayWindowTenH?.Close();
-                            _radioOverlayWindowTenH = null;
-                        }
-                        break;
-                    default:
-                        return;
-
+                        _radioOverlayWindowTwo.ShowInTaskbar =
+                            !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                        _radioOverlayWindowTwo.Show();
+                    }
+                    else
+                    {
+                        _radioOverlayWindowTwo?.Close();
+                        _radioOverlayWindowTwo = null;
+                    }
                 }
             }
+
+        }
+    }
+
+    private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
+    {
+        if ((_awacsRadioOverlay == null) || !_awacsRadioOverlay.IsVisible ||
+            (_awacsRadioOverlay.WindowState == WindowState.Minimized))
+        {
+            //close normal overlay
+            _radioOverlayWindowTwo?.Close();
+            _radioOverlayWindowTwo = null;
+
+            _radioOverlayWindowFive?.Close();
+            _radioOverlayWindowFive = null;
+
+            _awacsRadioOverlay?.Close();
+
+            _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
+            _awacsRadioOverlay.ShowInTaskbar =
+                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            _awacsRadioOverlay.Show();
+        }
+        else
+        {
+            _awacsRadioOverlay?.Close();
+            _awacsRadioOverlay = null;
+        }
+    }
+
+    private void AutoConnect(string address, int port)
+    {
+        string connection = $"{address}:{port}";
+
+        Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
+
+        var enabled = _globalSettings.GetClientSetting(GlobalSettingsKeys.AutoConnect).BoolValue;
+
+        if (!enabled)
+        {
+            Logger.Info($"Ignored Autoconnect - not Enabled");
         }
 
-        private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
+        if (ClientState.IsConnected)
         {
-            ToggleOverlay(true, 7);
-        }
-
-        private void AutoConnect(string address, int port)
-        {
-            string connection = $"{address}:{port}";
-
-            Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
-
-            var enabled = _globalSettings.GetClientSetting(GlobalSettingsKeys.AutoConnect).BoolValue;
-
-            if (!enabled)
+            // Always show prompt about active/advertised SRS connection mismatch if client is already connected
+            string[] currentConnectionParts = ServerIp.Text.Trim().Split(':');
+            string currentAddress = currentConnectionParts[0];
+            int currentPort = 5002;
+            if (currentConnectionParts.Length >= 2)
             {
-                Logger.Info($"Ignored Autoconnect - not Enabled");
+                if (!int.TryParse(currentConnectionParts[1], out currentPort))
+                {
+                    Logger.Warn($"Failed to parse port {currentConnectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
+                    currentPort = 5002;
+                }
+            }
+            string currentConnection = $"{currentAddress}:{currentPort}";
+
+            if (string.Equals(address, currentAddress, StringComparison.OrdinalIgnoreCase) && port == currentPort)
+            {
+                // Current connection matches SRS server advertised by DCS, all good
+                Logger.Info($"Current SRS connection {currentConnection} matches advertised server {connection}, ignoring autoconnect");
+                return;
+            }
+            else if (port != currentPort)
+            {
+                // Port mismatch, will always be a different server, no need to perform hostname lookups
+                HandleAutoConnectMismatch(currentConnection, connection);
+                return;
             }
 
-            if (ClientState.IsConnected)
+            // Perform DNS lookup of advertised and current hostnames to find hostname/resolved IP matches
+            List<string> currentIPs = new List<string>();
+
+            if (IPAddress.TryParse(currentAddress, out IPAddress currentIP))
             {
-                // Always show prompt about active/advertised SRS connection mismatch if client is already connected
-                string[] currentConnectionParts = ServerIp.Text.Trim().Split(':');
-                string currentAddress = currentConnectionParts[0];
-                int currentPort = 5002;
-                if (currentConnectionParts.Length >= 2)
-                {
-                    if (!int.TryParse(currentConnectionParts[1], out currentPort))
-                    {
-                        Logger.Warn($"Failed to parse port {currentConnectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
-                        currentPort = 5002;
-                    }
-                }
-                string currentConnection = $"{currentAddress}:{currentPort}";
-
-                if (string.Equals(address, currentAddress, StringComparison.OrdinalIgnoreCase) && port == currentPort)
-                {
-                    // Current connection matches SRS server advertised by DCS, all good
-                    Logger.Info($"Current SRS connection {currentConnection} matches advertised server {connection}, ignoring autoconnect");
-                    return;
-                }
-                else if (port != currentPort)
-                {
-                    // Port mismatch, will always be a different server, no need to perform hostname lookups
-                    HandleAutoConnectMismatch(currentConnection, connection);
-                    return;
-                }
-
-                // Perform DNS lookup of advertised and current hostnames to find hostname/resolved IP matches
-                List<string> currentIPs = new List<string>();
-
-                if (IPAddress.TryParse(currentAddress, out IPAddress currentIP))
-                {
-                    currentIPs.Add(currentIP.ToString());
-                }
-                else
-                {
-                    try
-                    {
-                        foreach (IPAddress ip in Dns.GetHostAddresses(currentConnectionParts[0]))
-                        {
-                            // SRS currently only supports IPv4 (due to address/port parsing)
-                            if (ip.AddressFamily == AddressFamily.InterNetwork)
-                            {
-                                currentIPs.Add(ip.ToString());
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Warn(e, $"Failed to resolve current SRS host {currentConnectionParts[0]} to IP addresses, ignoring autoconnect advertisement");
-                        return;
-                    }
-                }
-
-                List<string> advertisedIPs = new List<string>();
-
-                if (IPAddress.TryParse(address, out IPAddress advertisedIP))
-                {
-                    advertisedIPs.Add(advertisedIP.ToString());
-                }
-                else
-                {
-                    try
-                    {
-                        foreach (IPAddress ip in Dns.GetHostAddresses(connection))
-                        {
-                            // SRS currently only supports IPv4 (due to address/port parsing)
-                            if (ip.AddressFamily == AddressFamily.InterNetwork)
-                            {
-                                advertisedIPs.Add(ip.ToString());
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Warn(e, $"Failed to resolve advertised SRS host {address} to IP addresses, ignoring autoconnect advertisement");
-                        return;
-                    }
-                }
-
-                if (!currentIPs.Intersect(advertisedIPs).Any())
-                {
-                    // No resolved IPs match, display mismatch warning
-                    HandleAutoConnectMismatch(currentConnection, connection);
-                }
+                currentIPs.Add(currentIP.ToString());
             }
             else
             {
-                // Show auto connect prompt if client is not connected yet and setting has been enabled, otherwise automatically connect
-                bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
-
-                bool connectToServer = !showPrompt;
-                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt))
+                try
                 {
-                    WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
-
-                    var result = MessageBox.Show(this,
-                        $"Would you like to try to auto-connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-
-                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect: server");
+                    foreach (IPAddress ip in Dns.GetHostAddresses(currentConnectionParts[0]))
+                    {
+                        // SRS currently only supports IPv4 (due to address/port parsing)
+                        if (ip.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            currentIPs.Add(ip.ToString());
+                        }
+                    }
                 }
-
-                if (connectToServer)
+                catch (Exception e)
                 {
-                    ServerIp.Text = connection;
-                    Connect();
+                    Logger.Warn(e, $"Failed to resolve current SRS host {currentConnectionParts[0]} to IP addresses, ignoring autoconnect advertisement");
+                    return;
                 }
             }
+
+            List<string> advertisedIPs = new List<string>();
+
+            if (IPAddress.TryParse(address, out IPAddress advertisedIP))
+            {
+                advertisedIPs.Add(advertisedIP.ToString());
+            }
+            else
+            {
+                try
+                {
+                    foreach (IPAddress ip in Dns.GetHostAddresses(connection))
+                    {
+                        // SRS currently only supports IPv4 (due to address/port parsing)
+                        if (ip.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            advertisedIPs.Add(ip.ToString());
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(e, $"Failed to resolve advertised SRS host {address} to IP addresses, ignoring autoconnect advertisement");
+                    return;
+                }
+            }
+
+            if (!currentIPs.Intersect(advertisedIPs).Any())
+            {
+                // No resolved IPs match, display mismatch warning
+                HandleAutoConnectMismatch(currentConnection, connection);
+            }
         }
-
-        private async void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
+        else
         {
-            // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
-            bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
+            // Show auto connect prompt if client is not connected yet and setting has been enabled, otherwise automatically connect
+            bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
 
-            Logger.Info($"Current SRS connection {currentConnection} does not match advertised server {advertisedConnection}, {(showPrompt ? "displaying mismatch prompt" : "automatically switching server")}");
-
-            bool switchServer = !showPrompt;
-            if (showPrompt)
+            bool connectToServer = !showPrompt;
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt))
             {
                 WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
                 var result = MessageBox.Show(this,
-                    $"The SRS server advertised by DCS @ {advertisedConnection} does not match the SRS server @ {currentConnection} you are currently connected to.\n\n" +
-                    $"Would you like to connect to the advertised SRS server?",
-                    "Auto Connect Mismatch",
+                    $"Would you like to try to auto-connect to DCS-SRS @ {address}:{port}? ", "Auto Connect",
                     MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
+                    MessageBoxImage.Question);
 
-                switchServer = result == MessageBoxResult.Yes;
+                connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect: server");
             }
 
-            if (switchServer)
+            if (connectToServer)
             {
-                Stop();
-
-                StartStop.IsEnabled = false;
-                StartStop.Content = "Connecting...";
-                await Task.Delay(2000);
-                StartStop.IsEnabled = true;
-                ServerIp.Text = advertisedConnection;
+                ServerIp.Text = connection;
                 Connect();
             }
         }
+    }
 
-        private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
+    private async void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
+    {
+        // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
+        bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
+
+        Logger.Info($"Current SRS connection {currentConnection} does not match advertised server {advertisedConnection}, {(showPrompt ? "displaying mismatch prompt" : "automatically switching server")}");
+
+        bool switchServer = !showPrompt;
+        if (showPrompt)
         {
-            //close overlays
-            _radioOverlayWindowTwoV?.Close();
-            _radioOverlayWindowTwoV = null;
+            WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
 
-            _radioOverlayWindowTwoH?.Close();
-            _radioOverlayWindowTwoH = null;
-
-            _radioOverlayWindowThreeV?.Close();
-            _radioOverlayWindowThreeV = null;
-
-            _radioOverlayWindowThreeH?.Close();
-            _radioOverlayWindowThreeH = null;
-
-            _radioOverlayWindowFiveV?.Close();
-            _radioOverlayWindowFiveV = null;
-
-            _radioOverlayWindowFiveH?.Close();
-            _radioOverlayWindowFiveH = null;
-
-            _radioOverlayWindowTenV?.Close();
-            _radioOverlayWindowTenV = null;
-
-            _radioOverlayWindowTenH?.Close();
-            _radioOverlayWindowTenH = null;
-
-            // Reset settings
-            // 2V
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVWidth, 170);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVHeight, 250);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVOpacity, 1.0);
-
-            // 2H
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHWidth, 335);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHHeight, 165);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHOpacity, 1.0);
-
-            // 3V
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVWidth, 170);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVHeight, 340);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVOpacity, 1.0);
-
-            // 3H
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHWidth, 495);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHHeight, 165);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHOpacity, 1.0);
-
-            // 5V
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVWidth, 170);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVHeight, 325);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVOpacity, 1.0);
-
-            // 5H
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHOpacity, 1.0);
-
-            // 10s
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHY, 300);
-
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVY, 300);
-        }
-
-        private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
-        {
-            if ((_serverSettingsWindow == null) || !_serverSettingsWindow.IsVisible ||
-                (_serverSettingsWindow.WindowState == WindowState.Minimized))
-            {
-                _serverSettingsWindow?.Close();
-
-                _serverSettingsWindow = new ServerSettingsWindow();
-                _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                _serverSettingsWindow.Owner = this;
-                _serverSettingsWindow.Show();
-            }
-            else
-            {
-                _serverSettingsWindow?.Close();
-                _serverSettingsWindow = null;
-            }
-        }
-
-
-
-        private void AutoConnectToggle_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnect, (bool)AutoConnectEnabledToggle.IsChecked);
-        }
-
-        private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectPrompt, (bool)AutoConnectPromptToggle.IsChecked);
-        }
-
-        private void AutoConnectMismatchPromptToggle_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectMismatchPrompt, (bool)AutoConnectMismatchPromptToggle.IsChecked);
-        }
-
-        private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
-
-            if (_radioOverlayWindowTwoV != null)
-                _radioOverlayWindowTwoV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_radioOverlayWindowFiveV != null)
-                _radioOverlayWindowFiveV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_radioOverlayWindowTenH != null) _radioOverlayWindowTenH.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-        }
-
-        private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RefocusDCS, (bool)RefocusDCS.IsChecked);
-        }
-
-        private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(
-                "You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but WILL LIKELY cause issues with other devices being detected. \n\nUse SRS Device Listing (see Discord) instead to enable the missing device\n\nDo not turn on unless you know what you're doing :) ",
-                "Restart SimpleRadio Standalone", MessageBoxButton.OK,
+            var result = MessageBox.Show(this,
+                $"The SRS server advertised by DCS @ {advertisedConnection} does not match the SRS server @ {currentConnection} you are currently connected to.\n\n" +
+                $"Would you like to connect to the advertised SRS server?",
+                "Auto Connect Mismatch",
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool)ExpandInputDevices.IsChecked);
+            switchServer = result == MessageBoxResult.Yes;
         }
 
-        private void AllowXInputController_OnClick_Click(object sender, RoutedEventArgs e)
+        if (switchServer)
         {
-            MessageBox.Show(
-                "You must restart SRS for this setting to take effect.",
-                "Restart SimpleRadio Standalone", MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            Stop();
 
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowXInputController, (bool)AllowXInputController.IsChecked);
+            StartStop.IsEnabled = false;
+            StartStop.Content = "Connecting...";
+            await Task.Delay(2000);
+            StartStop.IsEnabled = true;
+            ServerIp.Text = advertisedConnection;
+            Connect();
+        }
+    }
+
+    private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
+    {
+        //close overlays
+        _radioOverlayWindowTwoV?.Close();
+        _radioOverlayWindowTwoV = null;
+
+        _radioOverlayWindowTwoH?.Close();
+        _radioOverlayWindowTwoH = null;
+
+        _radioOverlayWindowThreeV?.Close();
+        _radioOverlayWindowThreeV = null;
+
+        _radioOverlayWindowThreeH?.Close();
+        _radioOverlayWindowThreeH = null;
+
+        _radioOverlayWindowFiveV?.Close();
+        _radioOverlayWindowFiveV = null;
+
+        _radioOverlayWindowFiveH?.Close();
+        _radioOverlayWindowFiveH = null;
+
+        _radioOverlayWindowTenV?.Close();
+        _radioOverlayWindowTenV = null;
+
+        _radioOverlayWindowTenH?.Close();
+        _radioOverlayWindowTenH = null;
+
+        // Reset settings
+        // 2V
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVWidth, 170);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVHeight, 250);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVOpacity, 1.0);
+
+        // 2H
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHWidth, 335);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHHeight, 165);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHOpacity, 1.0);
+
+        // 3V
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVWidth, 170);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVHeight, 340);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVOpacity, 1.0);
+
+        // 3H
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHWidth, 495);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHHeight, 165);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHOpacity, 1.0);
+
+        // 5V
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVWidth, 170);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVHeight, 325);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveVOpacity, 1.0);
+
+        // 5H
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHOpacity, 1.0);
+
+        // 10s
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHY, 300);
+
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVX, 300);
+        _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVY, 300);
+    }
+
+    private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
+    {
+        if ((_serverSettingsWindow == null) || !_serverSettingsWindow.IsVisible ||
+            (_serverSettingsWindow.WindowState == WindowState.Minimized))
+        {
+            _serverSettingsWindow?.Close();
+
+            _serverSettingsWindow = new ServerSettingsWindow();
+            _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            _serverSettingsWindow.Owner = this;
+            _serverSettingsWindow.Show();
+        }
+        else
+        {
+            _serverSettingsWindow?.Close();
+            _serverSettingsWindow = null;
+        }
+    }
+
+
+
+    private void AutoConnectToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnect, (bool)AutoConnectEnabledToggle.IsChecked);
+    }
+
+    private void AutoConnectPromptToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectPrompt, (bool)AutoConnectPromptToggle.IsChecked);
+    }
+
+    private void AutoConnectMismatchPromptToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoConnectMismatchPrompt, (bool)AutoConnectMismatchPromptToggle.IsChecked);
+    }
+
+    private void RadioOverlayTaskbarItem_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
+
+        if (_radioOverlayWindowTwoV != null)
+            _radioOverlayWindowTwoV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+        else if (_radioOverlayWindowFiveV != null)
+            _radioOverlayWindowFiveV.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+        else if (_radioOverlayWindowTenH != null) _radioOverlayWindowTenH.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+    }
+
+    private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.RefocusDCS, (bool)RefocusDCS.IsChecked);
+    }
+
+    private void ExpandInputDevices_OnClick_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(
+            "You must restart SRS for this setting to take effect.\n\nTurning this on will allow almost any DirectX device to be used as input expect a Mouse but WILL LIKELY cause issues with other devices being detected. \n\nUse SRS Device Listing (see Discord) instead to enable the missing device\n\nDo not turn on unless you know what you're doing :) ",
+            "Restart SimpleRadio Standalone", MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.ExpandControls, (bool)ExpandInputDevices.IsChecked);
+    }
+
+    private void AllowXInputController_OnClick_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(
+            "You must restart SRS for this setting to take effect.",
+            "Restart SimpleRadio Standalone", MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowXInputController, (bool)AllowXInputController.IsChecked);
+    }
+
+    private void LaunchAddressTab(object sender, RoutedEventArgs e)
+    {
+        TabControl.SelectedItem = FavouritesSeversTab;
+    }
+
+    private void MicAGC_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AGC, (bool)MicAGC.IsChecked);
+    }
+
+    private void MicDenoise_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.Denoise, (bool)MicDenoise.IsChecked);
+    }
+
+    private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffects,
+            (bool)RadioSoundEffects.IsChecked);
+    }
+
+    private void RadioTxStart_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start, (bool)RadioTxStartToggle.IsChecked);
+    }
+
+    private void RadioTxEnd_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End, (bool)RadioTxEndToggle.IsChecked);
+    }
+
+    private void RadioRxStart_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start, (bool)RadioRxStartToggle.IsChecked);
+    }
+
+    private void RadioRxEnd_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End, (bool)RadioRxEndToggle.IsChecked);
+    }
+
+    private void RadioMIDS_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect, (bool)RadioMIDSToggle.IsChecked);
+    }
+
+    private void AudioSelectChannel_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel, (bool)AutoSelectChannel.IsChecked);
+    }
+
+    private void RadioSoundEffectsClipping_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping,
+            (bool)RadioSoundEffectsClipping.IsChecked);
+
+    }
+
+    private void MinimiseToTray_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.MinimiseToTray, (bool)MinimiseToTray.IsChecked);
+    }
+
+    private void StartMinimised_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.StartMinimised, (bool)StartMinimised.IsChecked);
+    }
+
+    private void AllowDCSPTT_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT, (bool)AllowDCSPTT.IsChecked);
+    }
+
+    private void AllowRotaryIncrement_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement, (bool)AllowRotaryIncrement.IsChecked);
+    }
+
+    private void AlwaysAllowHotas_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls, (bool)AlwaysAllowHotas.IsChecked);
+    }
+
+    private void CheckForBetaUpdates_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.CheckForBetaUpdates, (bool)CheckForBetaUpdates.IsChecked);
+    }
+
+    private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
+    }
+
+    private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+        {
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
         }
 
-        private void LaunchAddressTab(object sender, RoutedEventArgs e)
+
+        if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
         {
-            TabControl.SelectedItem = FavouritesSeversTab;
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
         }
 
-        private void MicAGC_OnClick(object sender, RoutedEventArgs e)
+        if (_client == null ||
+            !ClientState.IsConnected ||
+            !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
+            (!ClientState.ExternalAWACSModelSelected &&
+            string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Password)))
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AGC, (bool)MicAGC.IsChecked);
+            return;
         }
 
-        private void MicDenoise_OnClick(object sender, RoutedEventArgs e)
+        // Already connected, disconnect
+        if (ClientState.ExternalAWACSModelSelected)
         {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.Denoise, (bool)MicDenoise.IsChecked);
+            _client.DisconnectExternalAWACSMode();
         }
-
-        private void RadioSoundEffects_OnClick(object sender, RoutedEventArgs e)
+        else if (!ClientState.IsGameExportConnected) //only if we're not in game
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffects,
-                (bool)RadioSoundEffects.IsChecked);
+            ClientState.LastSeenName = ExternalAWACSModeName.Text;
+            _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
         }
+    }
 
-        private void RadioTxStart_Click(object sender, RoutedEventArgs e)
+    private void ExternalAWACSModeConnectionChanged(bool result, int coalition)
+    {
+        if (result)
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start, (bool)RadioTxStartToggle.IsChecked);
+            ClientState.ExternalAWACSModelSelected = true;
+            ClientState.PlayerCoaltionLocationMetadata.side = coalition;
+            ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
+            ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
+
+            ConnectExternalAWACSMode.Content = "Disconnect: Radios";
         }
-
-        private void RadioTxEnd_Click(object sender, RoutedEventArgs e)
+        else
         {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End, (bool)RadioTxEndToggle.IsChecked);
+            ClientState.ExternalAWACSModelSelected = false;
+            ClientState.PlayerCoaltionLocationMetadata.side = 0;
+            ClientState.PlayerCoaltionLocationMetadata.name = "";
+            ClientState.DcsPlayerRadioInfo.name = "";
+            ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
+            ClientState.LastSent = 0;
+
+            ConnectExternalAWACSMode.Content = "Connect: Radios";
+            ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+            ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
         }
+    }
 
-        private void RadioRxStart_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start, (bool)RadioRxStartToggle.IsChecked);
-        }
+    private void RescanInputDevices(object sender, RoutedEventArgs e)
+    {
+        InputManager.InitDevices();
+        MessageBox.Show(this,
+            "Controller Input Devices Rescanned",
+            "New controller input devices can now be used.",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
 
-        private void RadioRxEnd_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End, (bool)RadioRxEndToggle.IsChecked);
-        }
+    private void SetSRSPath_Click(object sender, RoutedEventArgs e)
+    {
+        Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRPathStandalone", Directory.GetCurrentDirectory());
 
-        private void RadioMIDS_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.MIDSRadioEffect, (bool)RadioMIDSToggle.IsChecked);
-        }
+        MessageBox.Show(this,
+            "SRS Path set to: " + Directory.GetCurrentDirectory(),
+            "SRS Client Path",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
 
-        private void AudioSelectChannel_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel, (bool)AutoSelectChannel.IsChecked);
-        }
+    private void RequireAdminToggle_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.RequireAdmin, (bool)RequireAdminToggle.IsChecked);
+        MessageBox.Show(this,
+            "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds you can disable SRS Admin Privileges. \n\nFor this setting to take effect SRS must be restarted",
+            "SRS Admin Privileges", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-        private void RadioSoundEffectsClipping_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioEffectsClipping,
-                (bool)RadioSoundEffectsClipping.IsChecked);
+    }
 
-        }
-
-        private void MinimiseToTray_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.MinimiseToTray, (bool)MinimiseToTray.IsChecked);
-        }
-
-        private void StartMinimised_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.StartMinimised, (bool)StartMinimised.IsChecked);
-        }
-
-        private void AllowDCSPTT_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT, (bool)AllowDCSPTT.IsChecked);
-        }
-
-        private void AllowRotaryIncrement_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement, (bool)AllowRotaryIncrement.IsChecked);
-        }
-
-        private void AlwaysAllowHotas_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls, (bool)AlwaysAllowHotas.IsChecked);
-        }
-
-        private void CheckForBetaUpdates_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.CheckForBetaUpdates, (bool)CheckForBetaUpdates.IsChecked);
-        }
-
-        private void PlayConnectionSounds_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
-        }
-
-        private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (_client == null ||
-                !ClientState.IsConnected ||
-                !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
-                (!ClientState.ExternalAWACSModelSelected &&
-                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Password)))
+    private void CreateProfile(object sender, RoutedEventArgs e)
+    {
+        var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
             {
-                return;
-            }
-
-            // Already connected, disconnect
-            if (ClientState.ExternalAWACSModelSelected)
-            {
-                _client.DisconnectExternalAWACSMode();
-            }
-            else if (!ClientState.IsGameExportConnected) //only if we're not in game
-            {
-                ClientState.LastSeenName = ExternalAWACSModeName.Text;
-                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
-            }
-        }
-
-        private void ExternalAWACSModeConnectionChanged(bool result, int coalition)
-        {
-            if (result)
-            {
-                ClientState.ExternalAWACSModelSelected = true;
-                ClientState.PlayerCoaltionLocationMetadata.side = coalition;
-                ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
-                ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
-
-                ConnectExternalAWACSMode.Content = "Disconnect: Radios";
-            }
-            else
-            {
-                ClientState.ExternalAWACSModelSelected = false;
-                ClientState.PlayerCoaltionLocationMetadata.side = 0;
-                ClientState.PlayerCoaltionLocationMetadata.name = "";
-                ClientState.DcsPlayerRadioInfo.name = "";
-                ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
-                ClientState.LastSent = 0;
-
-                ConnectExternalAWACSMode.Content = "Connect: Radios";
-                ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-                ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-            }
-        }
-
-        private void RescanInputDevices(object sender, RoutedEventArgs e)
-        {
-            InputManager.InitDevices();
-            MessageBox.Show(this,
-                "Controller Input Devices Rescanned",
-                "New controller input devices can now be used.",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-
-        private void SetSRSPath_Click(object sender, RoutedEventArgs e)
-        {
-            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRPathStandalone", Directory.GetCurrentDirectory());
-
-            MessageBox.Show(this,
-                "SRS Path set to: " + Directory.GetCurrentDirectory(),
-                "SRS Client Path",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-
-        private void RequireAdminToggle_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RequireAdmin, (bool)RequireAdminToggle.IsChecked);
-            MessageBox.Show(this,
-                "SRS Requires admin rights to be able to read keyboard input in the background. \n\nIf you do not use any keyboard binds you can disable SRS Admin Privileges. \n\nFor this setting to take effect SRS must be restarted",
-                "SRS Admin Privileges", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-        }
-
-        private void CreateProfile(object sender, RoutedEventArgs e)
-        {
-            var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+                if (name.Trim().Length > 0)
                 {
-                    if (name.Trim().Length > 0)
-                    {
-                        _globalSettings.ProfileSettingsStore.AddNewProfile(name);
-                        InitSettingsProfiles();
-
-                    }
-                });
-            inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            inputProfileWindow.Owner = this;
-            inputProfileWindow.ShowDialog();
-        }
-
-        private void DeleteProfile(object sender, RoutedEventArgs e)
-        {
-            var current = ControlsProfile.SelectedValue as string;
-
-            if (current.Equals("default"))
-            {
-                MessageBox.Show(this,
-                    "Cannot delete the default input!",
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else
-            {
-                var result = MessageBox.Show(this,
-                    $"Are you sure you want to delete {current} ?",
-                    "Confirmation",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    ControlsProfile.SelectedIndex = 0;
-                    _globalSettings.ProfileSettingsStore.RemoveProfile(current);
+                    _globalSettings.ProfileSettingsStore.AddNewProfile(name);
                     InitSettingsProfiles();
+
                 }
+            });
+        inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        inputProfileWindow.Owner = this;
+        inputProfileWindow.ShowDialog();
+    }
 
-            }
+    private void DeleteProfile(object sender, RoutedEventArgs e)
+    {
+        var current = ControlsProfile.SelectedValue as string;
 
-        }
-
-        private void RenameProfile(object sender, RoutedEventArgs e)
+        if (current.Equals("default"))
         {
+            MessageBox.Show(this,
+                "Cannot delete the default input!",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else
+        {
+            var result = MessageBox.Show(this,
+                $"Are you sure you want to delete {current} ?",
+                "Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
-            var current = ControlsProfile.SelectedValue as string;
-            if (current.Equals("default"))
+            if (result == MessageBoxResult.Yes)
             {
-                MessageBox.Show(this,
-                    "Cannot rename the default input!",
-                    "Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else
-            {
-                var oldName = current;
-                var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
-                {
-                    if (name.Trim().Length > 0)
-                    {
-                        _globalSettings.ProfileSettingsStore.RenameProfile(oldName, name);
-                        InitSettingsProfiles();
-                    }
-                }, true, oldName);
-                inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                inputProfileWindow.Owner = this;
-                inputProfileWindow.ShowDialog();
+                ControlsProfile.SelectedIndex = 0;
+                _globalSettings.ProfileSettingsStore.RemoveProfile(current);
+                InitSettingsProfiles();
             }
 
         }
 
-        private void AutoSelectInputProfile_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile, ((bool)AutoSelectInputProfile.IsChecked).ToString());
-        }
+    }
 
-        private void CopyProfile(object sender, RoutedEventArgs e)
+    private void RenameProfile(object sender, RoutedEventArgs e)
+    {
+
+        var current = ControlsProfile.SelectedValue as string;
+        if (current.Equals("default"))
         {
-            var current = ControlsProfile.SelectedValue as string;
+            MessageBox.Show(this,
+                "Cannot rename the default input!",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else
+        {
+            var oldName = current;
             var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
             {
                 if (name.Trim().Length > 0)
                 {
-                    _globalSettings.ProfileSettingsStore.CopyProfile(current, name);
+                    _globalSettings.ProfileSettingsStore.RenameProfile(oldName, name);
                     InitSettingsProfiles();
                 }
-            });
+            }, true, oldName);
             inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             inputProfileWindow.Owner = this;
             inputProfileWindow.ShowDialog();
         }
 
-        private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
-        }
+    }
 
-        private void AlwaysAllowTransponderOverlay_OnClick(object sender, RoutedEventArgs e)
-        {
+    private void AutoSelectInputProfile_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AutoSelectSettingsProfile, ((bool)AutoSelectInputProfile.IsChecked).ToString());
+    }
 
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay, (bool)AlwaysAllowTransponderOverlay.IsChecked);
-        }
-
-        private void CurrentPosition_OnClick(object sender, MouseButtonEventArgs e)
+    private void CopyProfile(object sender, RoutedEventArgs e)
+    {
+        var current = ControlsProfile.SelectedValue as string;
+        var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
         {
-            try
+            if (name.Trim().Length > 0)
             {
-                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
-
-                Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
+                _globalSettings.ProfileSettingsStore.CopyProfile(current, name);
+                InitSettingsProfiles();
             }
-            catch { }
+        });
+        inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        inputProfileWindow.Owner = this;
+        inputProfileWindow.ShowDialog();
+    }
 
-        }
+    private void VAICOMTXInhibit_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.VAICOMTXInhibitEnabled, ((bool)VAICOMTXInhibitEnabled.IsChecked).ToString());
+    }
 
-        private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
+    private void AlwaysAllowTransponderOverlay_OnClick(object sender, RoutedEventArgs e)
+    {
+
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay, (bool)AlwaysAllowTransponderOverlay.IsChecked);
+    }
+
+    private void CurrentPosition_OnClick(object sender, MouseButtonEventArgs e)
+    {
+        try
         {
-            if ((_clientListWindow == null) || !_clientListWindow.IsVisible ||
-                (_clientListWindow.WindowState == WindowState.Minimized))
-            {
-                _clientListWindow?.Close();
+            var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
 
-                _clientListWindow = new ClientListWindow();
-                _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                _clientListWindow.Owner = this;
-                _clientListWindow.Show();
-            }
-            else
-            {
-                _clientListWindow?.Close();
-                _clientListWindow = null;
-            }
+            Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
         }
-
-        private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
-        }
-
-        private void PushToTalkReleaseDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (PTTReleaseDelay.IsEnabled)
-                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay, (float)e.NewValue);
-        }
-
-        private void PushToTalkStartDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (PTTStartDelay.IsEnabled)
-                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay, (float)e.NewValue);
-        }
-
-        private void Donate_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Process.Start(
-                    "https://www.patreon.com/ciribob");
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private void BackgroundRadioNoiseToggle_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect, (bool)BackgroundRadioNoiseToggle.IsChecked);
-        }
-
-        private void HQEffect_Click(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone, (bool)HQEffectToggle.IsChecked);
-        }
-
-        private void AllowAnonymousUsage_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (!(bool)AllowAnonymousUsage.IsChecked)
-            {
-                MessageBox.Show(
-                    "Please leave this ticked - SRS logging is extremely minimal (you can verify by looking at the source) - and limited to: Country & SRS Version on startup.\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
-                    "Please leave this ticked", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "TRUE");
-            }
-            else
-            {
-                MessageBox.Show(
-                    "Thank you for enabling this!\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
-                    "Thank You!", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
-            }
-        }
-
-        private void AllowTransmissionsRecord_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowRecording, (bool)AllowTransmissionsRecord.IsChecked);
-        }
-
-        private void RecordTransmissions_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordAudio, (bool)RecordTransmissions.IsChecked);
-            RecordTransmissions_IsEnabled();
-        }
-
-        private void RecordTransmissions_IsEnabled()
-        {
-            if ((bool)RecordTransmissions.IsChecked)
-            {
-                SingleFileMixdown.IsEnabled = false;
-                RecordingQuality.IsEnabled = false;
-            }
-            else
-            {
-                SingleFileMixdown.IsEnabled = true;
-                RecordingQuality.IsEnabled = true;
-            }
-        }
-
-        private void SingleFileMixdown_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.SingleFileMixdown, (bool)SingleFileMixdown.IsChecked);
-        }
-
-        private void RecordingQuality_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordingQuality, $"V{(int)e.NewValue}");
-        }
-
-        private void DisallowedAudioTone_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.DisallowedAudioTone, (bool)DisallowedAudioTone.IsChecked);
-        }
-
-        private void VoxEnabled_OnClick(object sender, RoutedEventArgs e)
-        {
-            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOX, (bool)VOXEnabled.IsChecked);
-        }
-
-        private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if(VOXMode.IsEnabled)
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMode, (int)e.NewValue);
-        }
-
-        private void VOXMinimumTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (VOXMinimimumTXTime.IsEnabled)
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
-        }
-
-        private void VOXMinimumRMS_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (VOXMinimumRMS.IsEnabled)
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
-        }
+        catch { }
 
     }
+
+    private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
+    {
+        if ((_clientListWindow == null) || !_clientListWindow.IsVisible ||
+            (_clientListWindow.WindowState == WindowState.Minimized))
+        {
+            _clientListWindow?.Close();
+
+            _clientListWindow = new ClientListWindow();
+            _clientListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            _clientListWindow.Owner = this;
+            _clientListWindow.Show();
+        }
+        else
+        {
+            _clientListWindow?.Close();
+            _clientListWindow = null;
+        }
+    }
+
+    private void ShowTransmitterName_OnClick_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.ShowTransmitterName, ((bool)ShowTransmitterName.IsChecked).ToString());
+    }
+
+    private void PushToTalkReleaseDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (PTTReleaseDelay.IsEnabled)
+            _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay, (float)e.NewValue);
+    }
+
+    private void PushToTalkStartDelay_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (PTTStartDelay.IsEnabled)
+            _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay, (float)e.NewValue);
+    }
+
+    private void Donate_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(
+                "https://www.patreon.com/ciribob");
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void BackgroundRadioNoiseToggle_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect, (bool)BackgroundRadioNoiseToggle.IsChecked);
+    }
+
+    private void HQEffect_Click(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.HAVEQUICKTone, (bool)HQEffectToggle.IsChecked);
+    }
+
+    private void AllowAnonymousUsage_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (!(bool)AllowAnonymousUsage.IsChecked)
+        {
+            MessageBox.Show(
+                "Please leave this ticked - SRS logging is extremely minimal (you can verify by looking at the source) - and limited to: Country & SRS Version on startup.\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                "Please leave this ticked", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "TRUE");
+        }
+        else
+        {
+            MessageBox.Show(
+                "Thank you for enabling this!\n\nBy keeping this enabled I can judge the usage of SRS, and which versions are still in use for support.",
+                "Thank You!", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");
+        }
+    }
+
+    private void AllowTransmissionsRecord_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.AllowRecording, (bool)AllowTransmissionsRecord.IsChecked);
+    }
+
+    private void RecordTransmissions_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordAudio, (bool)RecordTransmissions.IsChecked);
+        RecordTransmissions_IsEnabled();
+    }
+
+    private void RecordTransmissions_IsEnabled()
+    {
+        if ((bool)RecordTransmissions.IsChecked)
+        {
+            SingleFileMixdown.IsEnabled = false;
+            RecordingQuality.IsEnabled = false;
+        }
+        else
+        {
+            SingleFileMixdown.IsEnabled = true;
+            RecordingQuality.IsEnabled = true;
+        }
+    }
+
+    private void SingleFileMixdown_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.SingleFileMixdown, (bool)SingleFileMixdown.IsChecked);
+    }
+
+    private void RecordingQuality_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.RecordingQuality, $"V{(int)e.NewValue}");
+    }
+
+    private void DisallowedAudioTone_OnClick(object sender, RoutedEventArgs e)
+    {
+        _globalSettings.SetClientSetting(GlobalSettingsKeys.DisallowedAudioTone, (bool)DisallowedAudioTone.IsChecked);
+    }
+
+    private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VOXMode.IsEnabled)
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMode, (int)e.NewValue);
+    }
+
+    private void VOXMinimumTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VOXMinimimumTXTime.IsEnabled)
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
+    }
+
+    private void VOXMinimumRMS_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VOXMinimumRMS.IsEnabled)
+            _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
+    }
+
+}
 }

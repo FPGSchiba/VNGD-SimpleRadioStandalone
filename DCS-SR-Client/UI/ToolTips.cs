@@ -16,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModeContent.Children.Add(new TextBlock
             {
-                Text = "Radio connection",
+                Text = "Radio Connection",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModeContent.Children.Add(new TextBlock
@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
             externalAWACSModeContent.Children.Add(new TextBlock
             {
-                Text = "Enter the side password provided to you by the SRS server admin to confirm a side selection."
+                Text = "Enter the operation password provided to you by the SRS server admin to confirm your operation."
             });
 
             ExternalAWACSMode.Content = externalAWACSModeContent;
@@ -36,12 +36,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Username",
+                Text = "[FFID] Player Name",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"DI FPGSchiba.\" Please reference the Vanguard SRS SOP to find the correct two-digit code"
+                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"[DI] FPGSchiba.\" \n\n First Fleet ID Codes as follows: \n Atlas = [AT] \n Benevolence = [BE] \n Chaos = [CH] \n Command= CO \n Defiant = [DF] \n Discovery = [DI] \n Fleet Services = [FS] \n Kraken Trading Company = [KT] \n Mako Media = [MM] \n Nighthawks = [NH] \n Obsidian = [OB] \n Rock Raiders = [RR] \n Rogue Racing = [RG] \n Shinobi = [SH] \n Taccom = [TC] \n Vice = [VC] \n Witcher = [WT] \n\n See Vanguard SRS SOP for more details "
             });
 
             ExternalAWACSModeName.Content = externalAWACSModeNameContent;
@@ -52,16 +52,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             externalAWACSModePasswordContent.Children.Add(new TextBlock
             {
-                Text = "Coalition password",
+                Text = "Operation Password",
                 FontWeight = FontWeights.Bold
             });
             externalAWACSModePasswordContent.Children.Add(new TextBlock
             {
-                Text = "The coalition password is provided to you by the SRS server admin."
+                Text = "The Operation password is provided to you by the SRS server admin."
             });
             externalAWACSModePasswordContent.Children.Add(new TextBlock
             {
-                Text = "Entering the correct password for a coalitions allows you to access that side's comms."
+                Text = "Entering the correct password for an operation allows you to access that operation's comms."
             });
 
             ExternalAWACSModePassword.Content = externalAWACSModePasswordContent;

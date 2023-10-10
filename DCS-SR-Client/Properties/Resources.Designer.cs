@@ -19,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -107,6 +107,47 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
             get {
                 object obj = ResourceManager.GetObject("status_disconnected_game", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Party|118.500
+        ///CAS|123.450
+        ///A/A|124.00
+        ///LogiReq|133.00
+        ///MedEvac|134.00
+        ///Refuel|136.00
+        ///COMMAND|118.000
+        ///ALPHA|126.000
+        ///BRAVO|127.000
+        ///CHARLIE|128.000
+        ///DELTA|129.000
+        ///AIR|120.00
+        ///GROUND|125.00
+        ///LOGISTICS|130.00
+        ///UTILITY|131.00
+        ///INDUSTRY|135.00
+        ///Vice|120.10
+        ///Chaos|120.30
+        ///Nighthawks|120.50
+        ///Defiant|120.60
+        ///Phoenix|120.70
+        ///Witcher|125.10
+        ///Moon|125.30
+        ///Cerberus|131.10
+        ///Magellan|131.200
+        ///Meridian|131.30
+        ///Rogue|131.40
+        ///Shinobi|131.50
+        ///Cosmo|131.60
+        ///Atlas|130.10
+        ///Benevolence|130.50
+        ///Fleet Svc|130.60
+        ///RockRaid|135. [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string vngd_channels {
+            get {
+                return ResourceManager.GetString("vngd_channels", resourceCulture);
             }
         }
     }

@@ -1,0 +1,101 @@
+How to use...
+
+1) Simply follow the structure [Name] + "|" + [Desired Frequency]
+2) Ensure that the file is named "vngd-channels.txt"
+3) Click RELOAD on the channel dropdown section to refresh the list.
+
+
+---- Current Operation Frequencies ----|1.0
+Open the vngd-channels.txt file to edit|1.0
+
+
+---- Request Frequencies ----|1.0
+Party Request      118.50|118.50
+CAS Request        123.45|123.45
+A/A Request        124.00|124.00
+Logistics Request  133.00|133.00
+MedEvac Request    134.00|134.00
+Refuel Request     136.00|136.00
+
+
+---- Command Frequencies ----|1.0
+Operation Command    118.00|118.00
+Air Command          120.00|120.00
+Ground Command       125.00|125.00
+Logistics Command    130.00|130.00
+Utility Command      131.00|131.00
+Industry Command     135.00|135.00
+
+---- Task Force Command Frequencies ----|1.0
+Task Force Alpha Command     126.00|126.00
+Task Force Bravo Command     127.00|127.00
+Task Force Charlie Command   128.00|128.00
+Task Force Delta Command     129.00|129.00
+
+---- Task Force Alpha Sub-Command Frequencies ----|1.0
+TF Alpha Group 1  126.10|126.10
+TF Alpha Group 2  126.20|126.20
+TF Alpha Group 3  126.30|126.30
+TF Alpha Group 4  126.40|126.40
+TF Alpha Group 5  126.50|126.50
+TF Alpha Group 6  126.60|126.60
+TF Alpha Group 7  126.70|126.70
+TF Alpha Group 8  126.80|126.80
+TF Alpha Group 9  126.90|126.90
+
+
+---- Task Force Bravo Sub-Command Frequencies ----|1.0
+TF Bravo Group 1   127.10|127.10
+TF Bravo Group 2   127.20|127.20
+TF Bravo Group 3   127.30|127.30
+TF Bravo Group 4   127.40|127.40
+TF Bravo Group 5   127.50|127.50
+TF Bravo Group 6   127.60|127.60
+TF Bravo Group 7   127.70|127.70
+TF Bravo Group 8   127.80|127.80
+TF Bravo Group 9   127.90|127.90
+
+---- Task Force Charlie Sub-Command Frequencies ----|1.0
+TF Charlie Group 1   128.10|128.10
+TF Charlie Group 2   128.20|128.20
+TF Charlie Group 3   128.30|128.30
+TF Charlie Group 4   128.40|128.40
+TF Charlie Group 5   128.50|128.50
+TF Charlie Group 6   128.60|128.60
+TF Charlie Group 7   128.70|128.70
+TF Charlie Group 8   128.80|128.80
+TF Charlie Group 9   128.90|128.90
+
+
+---- Task Force Delta Sub-Command Frequencies ----|1.0
+TF Delta Group 1     129.10|129.10
+TF Delta Group 2     129.20|129.20
+TF Delta Group 3     129.30|129.30
+TF Delta Group 4     129.40|129.40
+TF Delta Group 5     129.50|129.50
+TF Delta Group 6     129.60|129.60
+TF Delta Group 7     129.70|129.70
+TF Delta Group 8     129.80|129.80
+TF Delta Group 9     129.90|129.90
+
+
+---- Unit Frequencies ----|1.0
+Vice            120.10|120.10
+Chaos           120.30|120.30
+Nighthawks      120.50|120.50
+Defiant         120.60|120.60
+Witcher         125.10|125.10
+Obsidian        125.50|125.50
+Discovery       131.20|131.20
+Meridian        131.30|131.30
+Rogue           131.40|131.40
+Shinobi         131.50|131.50
+Cosmo Knights   131.60|131.60
+Atlas           130.10|130.10
+Benevolence     130.50|130.50
+Fleet Services  130.60|130.60
+Rock Raiders    135.10|135.10
+Kraken          135.50|135.50
+
+---- Special Use Frequencies ----|1.0
+Guard       121.50|121.50

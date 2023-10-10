@@ -6,9 +6,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="170"
-        Height="325"
+        Height="494"
         MinWidth="170"
-        MinHeight="325"
+        MinHeight="494"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -92,24 +92,35 @@
 
         <awacsOverlayWindow:RadioControlGroup x:Name="Radio3" RadioId="3" Margin="5,5,0,0" />
 
-        <awacsOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" Visibility="Collapsed" Margin="5,5,0,0" />
+        <awacsOverlayWindow:RadioControlGroup x:Name="Radio4" RadioId="4" />
 
-        <awacsOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" Visibility="Collapsed" Margin="5,5,0,0" />
+        <awacsOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" />
 
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
 
-        <Separator Width="170" Margin="5, 5, 5, 5" />
+        <TextBlock x:Name="RadioLabel"
+           Margin="5,0,0,0"
+           Width="60"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center"
+           FontSize="10"
+           Foreground="#E7E7E7"
+           Padding="0,0,0,0"
+           Style="{x:Null}"
+           Text="Transparency"
+           TextAlignment="Center" />
 
         <Slider x:Name="WindowOpacitySlider"
-                Width="130"
-                Margin="10,2,0,0"
-                VerticalAlignment="Center"
-                Maximum="1.0"
-                Minimum="0.05"
-                Style="{x:Null}"
-                ToolTip="Window Opacity"
-                ValueChanged="windowOpacitySlider_ValueChanged"
-                Value="1.0" />
+        Width="80"
+        Margin="2,2,0,0"
+        VerticalAlignment="Center"
+        Maximum="1.0"
+        Minimum="0.05"
+        ToolTip="Panel Opacity"
+        Style="{x:Null}"
+        Opacity="0.6"
+        ValueChanged="windowOpacitySlider_ValueChanged"
+        Value="1.0" />
 
     </WrapPanel>
 </Window>
