@@ -30,3 +30,6 @@ That means following features may change with each Verison:
 * **patch** : is an increment for a bug fix or a patch fix done on your software.
 
 Following is the Structure of a release name: `v{major}.{minor}.{patch}` for example: `v1.0.0` or `v2.2.1`
+
+## Version getting right ;)
+This is only to be removed :D
