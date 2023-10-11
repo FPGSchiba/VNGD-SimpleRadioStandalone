@@ -176,9 +176,8 @@
                             Height="23"
                             SelectedItem="{Binding Path=ServerAddress}"
                             Width="200"
-                            x:Name="ServerAddressPicker" >
-                            <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}"/>
-                        </ComboBox>
+                            x:Name="ServerAddressPicker"
+                            ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"/>
 
                         <Button
                             Click="LaunchAddressTab"
