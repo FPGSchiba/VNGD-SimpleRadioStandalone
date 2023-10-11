@@ -18,6 +18,9 @@ jobs:
       - name: Application Version
         id: version
         uses: PaulHatch/semantic-version@v5.3.0
+        with:
+          major_pattern: "[MAJOR]"
+          minor_pattern: "[MINOR]"
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
@@ -32,8 +35,6 @@ jobs:
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: VSTest DCS-SR-CommonTests
         run: VSTest.Console DCS-SR-CommonTests\bin\x64\Release\DCS-SR-CommonTests.dll
