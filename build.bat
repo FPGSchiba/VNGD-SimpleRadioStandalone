@@ -8,7 +8,7 @@ set version=%2
 
 ::Release
 set "releasesFolderName=Vanguard-SRS-%version%"
-set "releasesFolder=%releasesFolderName%\"
+set "releasesFolder=%releasesFolderName%"
 
 ::Client Release
 set clientReleasesFolder=.\SRS-Client
@@ -42,7 +42,7 @@ echo msbuild completed with no error level
 ::   .\Vanguard-SRS-%version%\radio-client   -- SRS Client
 ::   
 
-mkdir %releasesFolder%
+mkdir %releasesFolder%\
 mkdir %releasesFolder%\%clientReleasesFolder%
 mkdir %releasesFolder%\%presetsFolder%
 ::mkdir %releasesFolderName%
@@ -55,16 +55,15 @@ echo Removed unneeded files
 
 :: Move the build into the client fold
 
-XCOPY .\install-build\ "%releasesFolder%\%clientReleasesFolder%" /Y /q /e
+XCOPY .\install-build\ %releasesFolder%\%clientReleasesFolder% /Y /q /e
 echo Copied Client to Release 
 
-
-XCOPY %presetsFolder% %releasesFolder%\%presetsFolder%\ /q /e /k /h /i /y 
+XCOPY %presetsFolder% .\%releasesFolder%\%presetsFolderName%\ /q /e /k /h /i /y 
 echo Copied Presets to Release
 
 
 :: Final release archive
-tar.exe -a -c -f "%releasesArchiveName%" "%releasesFolderName%"
+tar -acf %releasesArchiveName% %releasesFolderName%
 if %errorlevel% neq 0 then goto tarerror
 
 ::Cleanup - when I know what to clean up
