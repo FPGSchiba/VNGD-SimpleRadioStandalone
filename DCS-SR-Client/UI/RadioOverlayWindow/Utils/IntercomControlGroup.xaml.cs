@@ -30,6 +30,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? voxEnabled : voxDisabled;
             IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? voxEnabled : voxicDisabled;
+            IntercomEnabled.IsEnabled = IntercomNumberSpinner.Value != 1;
         }
 
         public int RadioId { private get; set; }
@@ -133,7 +134,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     RadioLabel.Text = "VOX / INTERCOM";
 
                     Radio1Enabled.IsEnabled = true;
-                    IntercomEnabled.IsEnabled = true;
+                    if (IntercomNumberSpinner.Value != 1)
+                    {
+                        IntercomEnabled.IsEnabled = true;
+                    }
                     IntercomNumberSpinner.IsEnabled = true;
 
                     if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
@@ -159,7 +163,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     IntercomNumberSpinner.IsEnabled = false;
                     _clientStateSingleton.IntercomOffset = 1;
 
-                    Radio1Enabled.Background = voxDisabled;
+                    Radio1Enabled.Background = voxicDisabled;
                     IntercomEnabled.Background = voxicDisabled;
                 }
 
@@ -217,8 +221,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 return;
             }
 
-            int? spinnervalue = IntercomNumberSpinner.Value;
-            int isone = spinnervalue ?? default(int);
+            int spinnervalue = (int)IntercomNumberSpinner.Value;
+            bool isone = (int)spinnervalue == 1;
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
@@ -227,7 +231,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
 
-            if (isone == 1)
+            if (isone)
             {
                 IntercomEnabled.IsEnabled = false;
                 IntercomEnabled.Background = voxicDisabled;

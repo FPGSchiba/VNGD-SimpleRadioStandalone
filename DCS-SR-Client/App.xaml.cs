@@ -306,6 +306,8 @@ namespace DCS_SR_Client
 
         private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
+            MessageBox.Show("This is a sample and can be expanded ;)\n If you see this, please let FPGSchiba know how you did it :D");
+
             if (loggingReady)
             {
                 Logger logger = LogManager.GetCurrentClassLogger();
