@@ -10,8 +10,8 @@ Following Workflow is used within this Project:
  1. Developer creates a new Branch
  2. One commit at least determines the increase in Versioning
     1. For `patch` increase Commit without any syntax
-    2. For `minor` increase add `(MINOR)` to one Commit message for your Pull Request (See Point: **TBD**)
-    3. For `major` increase add `(MAJOR)` to one Commit message for yor Pull Request (See Point: **TBD**)
+    2. For `minor` increase add `[MINOR]` to one Commit message for your Pull Request (See Point: **4.**)
+    3. For `major` increase add `[MAJOR]` to one Commit message for yor Pull Request (See Point: **4.**)
 3. Commit your code with the guidelines above like you would
 4. Create a Pull Request to merge into the `master` branch
 5. Wait until a Contributor has Approved your Pull Request
