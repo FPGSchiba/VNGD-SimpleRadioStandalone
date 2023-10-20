@@ -23,13 +23,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
     /// </summary>
-    public partial class RadioOverlayWindowTwo : Window
+    public partial class RadioOverlayWindowThreeVertical : Window
     {
         private  double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[] radioControlGroup =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[2];
+            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[3];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -44,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private long _lastUnitId;
 
 
-        public RadioOverlayWindowTwo()
+        public RadioOverlayWindowThreeVertical()
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
@@ -66,6 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             radioControlGroup[0] = Radio1;
             radioControlGroup[1] = Radio2;
+            radioControlGroup[2] = Radio3;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -125,43 +126,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     }
                 }
 
-                if (availableRadios == 2
-                         || dcsPlayerRadioInfo.radios.Length >= 2
-                         && dcsPlayerRadioInfo.radios[1].modulation != RadioInformation.Modulation.DISABLED)
-                {
-                    if (MinHeight != _originalMinHeight)
-                    {
-                        MinHeight = _originalMinHeight;
-                        Recalculate();
-                    }
-                }
-                else
-                {
-                    ResetHeight();
-                }
-
-
                 if (availableRadios > 1)
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "Two Radio Panel";
+                        ControlText.Text = "Three Radio Panel";
                     }
                     else
                     {
-                        ControlText.Text = "Two Radio Panel";
+                        ControlText.Text = "Three Radio Panel";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "Two Radio Panel (Disconnected)";
+                    ControlText.Text = "Three Radio Panel (Disconnected)";
                     
                 }
             }
             else
             {
                 ResetHeight();
-                ControlText.Text = "Two Radio Panel (Disconnected)";
+                ControlText.Text = "Three Radio Panel (Disconnected)";
             }
 
             FocusDCS();
@@ -308,13 +293,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
 
         public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
-            typeof(double), typeof(RadioOverlayWindowTwo),
+            typeof(double), typeof(RadioOverlayWindowThreeVertical),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
-            var mainWindow = o as RadioOverlayWindowTwo;
+            var mainWindow = o as RadioOverlayWindowThreeVertical;
             if (mainWindow != null)
                 return mainWindow.OnCoerceScaleValue((double) value);
             return value;
@@ -322,7 +307,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private static void OnScaleValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            var mainWindow = o as RadioOverlayWindowTwo;
+            var mainWindow = o as RadioOverlayWindowThreeVertical;
             if (mainWindow != null)
                 mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
         }

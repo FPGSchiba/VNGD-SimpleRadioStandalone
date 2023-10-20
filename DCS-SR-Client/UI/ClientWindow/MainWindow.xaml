@@ -301,34 +301,84 @@
 
                     </StackPanel>
                     <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <Button
-                            Click="ShowOverlayTwo_OnClick"
-                            Content="Two Radios"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical">
+                        <StackPanel
                             HorizontalAlignment="Center"
-                            Margin="0,10,20,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowOverlayTwo" />
-                        <Button
-                            Click="ShowOverlayFive_OnClick"
-                            Content="Five Radios"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,20,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowOverlayFoive" />
-                        <Button
-                            Click="ShowAwacsOverlay_OnClick"
-                            Content="Ten Radios"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowAwacsOverlay" />
+                            Margin="0"
+                            Orientation="Horizontal">
+                            <Button
+                                Click="ShowOverlayTwoVertical_OnClick"
+                                Content="2 Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayVerticalTwo" />
+                            <Button 
+                                Click="ShowOverlayThreeVertical_OnClick"
+                                Content="3 Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayThreeVertical" />
+                            <Button
+                                Click="ShowOverlayFiveVertical_OnClick"
+                                Content="5 Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayFiveVertical" />
+                            <Button
+                                Click="ShowOverlayTenVertical_OnClick"
+                                Content="10 Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,0,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayTenVertical" />
 
+                        </StackPanel>
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Margin="0"
+                            Orientation="Horizontal">
+                            <Button
+                                Click="ShowOverlayHorizontalTwo_OnClick"
+                                Content="2 Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayHorizontalTwo" />
+                            <Button 
+                                Click="ShowOverlayThreeHorizontal_OnClick"
+                                Content="3 Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayThreeHorizontal" />
+                            <Button
+                                Click="ShowOverlayFiveHorizontal_OnClick"
+                                Content="5 Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayFiveHorizontal" />
+                            <Button
+                                Click="ShowOverlayTenHorizontal_OnClick"
+                                Content="10 Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,0,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowOverlayTenHorizontal" />
+
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel
