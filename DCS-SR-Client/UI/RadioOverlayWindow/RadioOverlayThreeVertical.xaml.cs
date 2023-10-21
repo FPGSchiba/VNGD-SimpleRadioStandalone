@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             MaxHeight = screen.Bounds.Height;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity).DoubleValue;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
 
             radioControlGroup[0] = Radio1;
@@ -71,11 +71,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalHeight).DoubleValue;
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -130,23 +130,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "Three Radio Panel";
+                        ControlText.Text = "3 Vertical";
                     }
                     else
                     {
-                        ControlText.Text = "Three Radio Panel";
+                        ControlText.Text = "3 Vertical";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "Three Radio Panel (Disconnected)";
+                    ControlText.Text = "3 Vertical (Disconnected)";
                     
                 }
             }
             else
             {
                 ResetHeight();
-                ControlText.Text = "Three Radio Panel (Disconnected)";
+                ControlText.Text = "3 Vertical (Disconnected)";
             }
 
             FocusDCS();
@@ -206,11 +206,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHeight,Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity,Opacity);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX,Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalHeight,Height);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalOpacity,Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX,Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY, Top);
             base.OnClosing(e);
 
             _updateTimer.Stop();

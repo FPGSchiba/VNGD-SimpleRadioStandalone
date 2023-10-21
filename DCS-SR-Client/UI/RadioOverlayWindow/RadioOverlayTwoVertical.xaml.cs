@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             MaxHeight = screen.Bounds.Height;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity).DoubleValue;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
 
             radioControlGroup[0] = Radio1;
@@ -70,11 +70,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight).DoubleValue;
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -145,23 +145,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "Two Radio Panel";
+                        ControlText.Text = "2 Vertical";
                     }
                     else
                     {
-                        ControlText.Text = "Two Radio Panel";
+                        ControlText.Text = "2 Vertical";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "Two Radio Panel (Disconnected)";
+                    ControlText.Text = "2 Vertical (Disconnected)";
                     
                 }
             }
             else
             {
                 ResetHeight();
-                ControlText.Text = "Two Radio Panel (Disconnected)";
+                ControlText.Text = "2 Vertical (Disconnected)";
             }
 
             FocusDCS();
@@ -221,11 +221,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHeight,Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity,Opacity);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX,Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight,Height);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity,Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX,Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, Top);
             base.OnClosing(e);
 
             _updateTimer.Stop();
@@ -288,7 +288,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void CalculateScale()
         {
-            var yScale = ActualHeight / RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight / RadioOverlayWin.MinHeight;
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
