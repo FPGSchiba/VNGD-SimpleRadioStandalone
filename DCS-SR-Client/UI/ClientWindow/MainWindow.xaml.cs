@@ -56,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         public delegate void ReceivedAutoConnect(string address, int port);
 
-        public delegate void ToggleOverlayCallback(bool uiButton, bool awacs, bool twoRadioOverlay);
+        public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
 
         private readonly AudioManager _audioManager;
 
@@ -67,9 +67,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private Overlay.RadioOverlayWindowFive _radioOverlayWindowFive;
-        private Overlay.RadioOverlayWindowTwo _radioOverlayWindowTwo;
-        private AwacsRadioOverlayWindow.RadioOverlayWindow _awacsRadioOverlay;
+        private int _windowOpen = 8;
+
+        // Vertical Radio-Overlays 
+        private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
+        private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
+        private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
+        private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
+
+        // Horizontal Radio-Overlays
+        private RadioOverlayWindowTwoHorizontal _radioOverlayWindowTwoHorizontal;
+        private RadioOverlayWindowThreeHorizontal _radioOverlayWindowThreeHorizontal;
+        private RadioOverlayWindowFiveHorizontal _radioOverlayWindowFiveHorizontal;
+        private RadioOverlayWindowTenHorizontal _radioOverlayWindowTenHorizontal;
+
+        // Windows array
+        private Window[] windows = new Window[8];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -120,6 +133,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitToolTips();
 
             DataContext = this;
+
+            windows[0] = _radioOverlayWindowTwoVertical;
+            windows[1] = _radioOverlayWindowThreeVertical;
+            windows[2] = _radioOverlayWindowFiveVertical;
+            windows[3] = _radioOverlayWindowTenVertical;
+            windows[4] = _radioOverlayWindowTwoHorizontal;
+            windows[5] = _radioOverlayWindowThreeHorizontal;
+            windows[6] = _radioOverlayWindowFiveHorizontal;
+            windows[7] = _radioOverlayWindowTenHorizontal;
 
             var client = ClientStateSingleton.Instance;
 
@@ -203,17 +225,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
-            int radioTwoWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoX).DoubleValue;
-            int radioTwoWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoY).DoubleValue;
-            int radioFiveWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
-            int radioFiveWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
-            int awacsWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsX).DoubleValue;
-            int awacsWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsY).DoubleValue;
+            int radioTwoVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
+            int radioTwoVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
+            int radioFiveVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
+            int radioFiveVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
+            int radioTenHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX).DoubleValue;
+            int radioTenHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY).DoubleValue;
 
             Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
-            Logger.Info($"Checking window visibility for two radio overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}}");
-            Logger.Info($"Checking window visibility for five radio overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}}");
-            Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
+            Logger.Info($"Checking window visibility for two radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
+            Logger.Info($"Checking window visibility for five radio overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
+            Logger.Info($"Checking window visibility for AWACS overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
@@ -224,19 +246,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(radioTwoWindowX, radioTwoWindowY))
+                if (screen.Bounds.Contains(radioTwoVerticalX, radioTwoVerticalY))
                 {
-                    Logger.Info($"Radio Two overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"Radio Two overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(radioFiveWindowX, radioFiveWindowY))
+                if (screen.Bounds.Contains(radioFiveVerticalX, radioFiveVerticalY))
                 {
-                    Logger.Info($"Radio Five overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"Radio Five overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
+                if (screen.Bounds.Contains(radioTenHorizontalX, radioTenHorizontalY))
                 {
-                    Logger.Info($"AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"AWACS overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     awacsWindowVisible = true;
                 }
             }
@@ -266,25 +288,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"Radio Two overlay window outside visible area of monitors, resetting position ({radioTwoWindowX},{radioTwoWindowY}) to defaults");
-                Logger.Warn($"Radio Five overlay window outside visible area of monitors, resetting position ({radioFiveWindowX},{radioFiveWindowY}) to defaults");
+                Logger.Warn($"Radio Two overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
+                Logger.Warn($"Radio Five overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, 300);
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
 
-                if (_radioOverlayWindowTwo != null)
+                if (_radioOverlayWindowTwoVertical != null)
                 {
-                    _radioOverlayWindowTwo.Left = 300;
-                    _radioOverlayWindowTwo.Top = 300;
+                    _radioOverlayWindowTwoVertical.Left = 300;
+                    _radioOverlayWindowTwoVertical.Top = 300;
                 }
 
-                if (_radioOverlayWindowFive != null)
+                if (_radioOverlayWindowFiveVertical != null)
                 {
-                    _radioOverlayWindowFive.Left = 300;
-                    _radioOverlayWindowFive.Top = 300;
+                    _radioOverlayWindowFiveVertical.Left = 300;
+                    _radioOverlayWindowFiveVertical.Top = 300;
                 }
             }
 
@@ -296,15 +318,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
+                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY, 300);
 
-                if (_awacsRadioOverlay != null)
+                if (_radioOverlayWindowTenHorizontal != null)
                 {
-                    _awacsRadioOverlay.Left = 300;
-                    _awacsRadioOverlay.Top = 300;
+                    _radioOverlayWindowTenHorizontal.Left = 300;
+                    _radioOverlayWindowTenHorizontal.Top = 300;
                 }
             }
         }
@@ -1247,14 +1269,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioPreview?.StopEncoding();
             _audioPreview = null;
 
-            _radioOverlayWindowTwo?.Close();
-            _radioOverlayWindowTwo = null;
+            _radioOverlayWindowTwoVertical?.Close();
+            _radioOverlayWindowTwoVertical = null;
 
-            _radioOverlayWindowFive?.Close();
-            _radioOverlayWindowFive = null;
+            _radioOverlayWindowFiveVertical?.Close();
+            _radioOverlayWindowFiveVertical = null;
 
-            _awacsRadioOverlay?.Close();
-            _awacsRadioOverlay = null;
+            _radioOverlayWindowTenHorizontal?.Close();
+            _radioOverlayWindowTenHorizontal = null;
 
             _dcsAutoConnectListener?.Stop();
             _dcsAutoConnectListener = null;
@@ -1365,120 +1387,141 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT, (bool)RadioSwitchIsPTT.IsChecked);
         }
 
-        private void ShowOverlayFive_OnClick(object sender, RoutedEventArgs e)
+        private void ShowOverlayTwoVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, false, false);
+            ToggleOverlay(true, 0);
         }
 
-        private void ShowOverlayTwo_OnClick(object sender, RoutedEventArgs e)
+        private void ShowOverlayThreeVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, false, true);
+            ToggleOverlay(true, 1);
         }
 
-        private void ToggleOverlay(bool uiButton, bool awacs, bool twoRadioOverlay)
+        private void ShowOverlayFiveVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 2);
+        }
+
+        private void ShowOverlayTenVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 3);
+        }
+
+        private void ShowOverlayHorizontalTwo_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 4);
+        }
+
+        private void ShowOverlayThreeHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 5);
+        }
+
+        private void ShowOverlayFiveHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 6);
+        }
+
+        private void ShowOverlayTenHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 7);
+        }
+
+        private void ToggleOverlay(bool uiButton, int switchTo)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
             if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
             {
                 _toggleShowHide = DateTime.Now.Ticks;
-
-                if (awacs)
+                // Catching out of bounds switch to.
+                // TODO: Maybe take switchTo = 8 to close all windows.
+                if (switchTo < 0 || switchTo > windows.Count() - 1)
                 {
-                    ShowAwacsOverlay_OnClick(null, null);
+                    Logger.Error($"Could not switch to RadioWindow-{switchTo}.");
+                    return;
+                }
+
+                // This can be expanded or smallered quite easily, not like the last bit of code
+                int openWindow = _windowOpen;
+                for (int i = 0; i < windows.Count(); i++)
+                {
+                    if (windows[i] != null)
+                    {
+                        windows[i].Close();
+                        windows[i] = null;
+                        openWindow = i;
+                    }
+                }
+
+                // Check if we want to toggle or open another window
+                if (switchTo != openWindow)
+                {
+                    // Open new Window
+                    // Only needed to select right instance of the Radio panel Overlay
+                    switch (switchTo)
+                    {
+                        case 0:
+                            windows[switchTo] = new RadioOverlayWindowTwoVertical();
+                            break;
+                        case 1:
+                            windows[switchTo] = new RadioOverlayWindowThreeVertical();
+                            break;
+                        case 2:
+                            windows[switchTo] = new RadioOverlayWindowFiveVertical();
+                            break;
+                        case 3:
+                            windows[switchTo] = new RadioOverlayWindowTenVertical();
+                            break;
+                        case 4:
+                            windows[switchTo] = new RadioOverlayWindowTwoHorizontal();
+                            break;
+                        case 5:
+                            windows[switchTo] = new RadioOverlayWindowThreeHorizontal();
+                            break;
+                        case 6:
+                            windows[switchTo] = new RadioOverlayWindowFiveHorizontal();
+                            break;
+                        case 7:
+                            windows[switchTo] = new RadioOverlayWindowTenHorizontal();
+                            break;
+                    }
+                    try
+                    {
+                        windows[switchTo].ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                        windows[switchTo].Show();
+                        windows[switchTo].Closed += PanelWindow_Closed;
+                    }
+                    catch
+                    {
+                        Logger.Error($"Could not open Window with ID: {switchTo}.");
+                        MessageBox.Show($"Window could not Open (Window-ID: {switchTo}).\nPlease give this Information to the SRS Development Team!", "Error Opening Panel", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 }
                 else
                 {
-                    if (!twoRadioOverlay)
-                    {
-                        if ((_radioOverlayWindowFive == null) || !_radioOverlayWindowFive.IsVisible ||
-                        (_radioOverlayWindowFive.WindowState == WindowState.Minimized))
-                        {
-                            //hide awacs panel
-                            _awacsRadioOverlay?.Close();
-                            _awacsRadioOverlay = null;
-
-                            //hide Two Overlay
-                            if (_radioOverlayWindowTwo != null)
-                            {
-                                _radioOverlayWindowTwo.Close();
-                                _radioOverlayWindowTwo = null;
-                            }
-
-                            _radioOverlayWindowFive?.Close();
-
-                            _radioOverlayWindowFive = new Overlay.RadioOverlayWindowFive();
-
-
-                            _radioOverlayWindowFive.ShowInTaskbar =
-                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowFive.Show();
-                        }
-                        else
-                        {
-                            _radioOverlayWindowFive?.Close();
-                            _radioOverlayWindowFive = null;
-                        }
-                    }
-                    else
-                    {
-                        if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
-                        (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
-                        {
-                            //hide awacs panel
-                            _awacsRadioOverlay?.Close();
-                            _awacsRadioOverlay = null;
-
-                            //hide Five Overlay
-                            if (_radioOverlayWindowFive != null)
-                            {
-                                _radioOverlayWindowFive.Close();
-                                _radioOverlayWindowFive = null;
-                            }
-
-                            _radioOverlayWindowTwo?.Close();
-
-                            _radioOverlayWindowTwo = new Overlay.RadioOverlayWindowTwo();
-
-
-                            _radioOverlayWindowTwo.ShowInTaskbar =
-                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowTwo.Show();
-                        }
-                        else
-                        {
-                            _radioOverlayWindowTwo?.Close();
-                            _radioOverlayWindowTwo = null;
-                        }
-                    }
+                    // No Panel window is open
+                    _windowOpen = 8;
                 }
-
             }
         }
 
-        private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
+        // This needs to listen on every window[switchTo].Closed Event.
+        private void PanelWindow_Closed(object sender, EventArgs e)
         {
-            if ((_awacsRadioOverlay == null) || !_awacsRadioOverlay.IsVisible ||
-                (_awacsRadioOverlay.WindowState == WindowState.Minimized))
+            // No window open -> A window was closed and Only 1 Window can be active
+            _windowOpen = 8;
+
+            // Erase window from windows array to clean up everything
+            for (int i = 0; i < windows.Count(); i++)
             {
-                //close normal overlay
-                _radioOverlayWindowTwo?.Close();
-                _radioOverlayWindowTwo = null;
-
-                _radioOverlayWindowFive?.Close();
-                _radioOverlayWindowFive = null;
-
-                _awacsRadioOverlay?.Close();
-
-                _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
-                _awacsRadioOverlay.ShowInTaskbar =
-                    !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                _awacsRadioOverlay.Show();
+                if (windows[i] != null)
+                {
+                    windows[i].Close();
+                    windows[i] = null;
+                }
             }
-            else
-            {
-                _awacsRadioOverlay?.Close();
-                _awacsRadioOverlay = null;
-            }
+
         }
 
         private void AutoConnect(string address, int port)
@@ -1646,19 +1689,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
-            _radioOverlayWindowTwo?.Close();
-            _radioOverlayWindowTwo = null;
+            _radioOverlayWindowTwoVertical?.Close();
+            _radioOverlayWindowTwoVertical = null;
 
-            _radioOverlayWindowFive?.Close();
-            _radioOverlayWindowFive = null;
+            _radioOverlayWindowFiveVertical?.Close();
+            _radioOverlayWindowFiveVertical = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, 300);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoWidth, 122);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHeight, 270);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth, 122);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight, 270);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity, 1.0);
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
@@ -1709,11 +1752,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
 
-            if (_radioOverlayWindowTwo != null)
-                _radioOverlayWindowTwo.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_radioOverlayWindowFive != null)
-                _radioOverlayWindowFive.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            if (_radioOverlayWindowTwoVertical != null)
+                _radioOverlayWindowTwoVertical.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            else if (_radioOverlayWindowFiveVertical != null)
+                _radioOverlayWindowFiveVertical.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            else if (_radioOverlayWindowTenHorizontal != null) _radioOverlayWindowTenHorizontal.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
         }
 
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)

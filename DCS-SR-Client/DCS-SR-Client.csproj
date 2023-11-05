@@ -317,14 +317,29 @@
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml.cs">
+      <DependentUpon>RadioOverlayTwoHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml.cs">
+      <DependentUpon>RadioOverlayThreeHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml.cs">
+      <DependentUpon>RadioOverlayFiveHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml.cs">
+      <DependentUpon>RadioOverlayTenVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml.cs">
+      <DependentUpon>RadioOverlayThreeVertical.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml.cs">
       <DependentUpon>RadioCapabilities.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFive.xaml.cs">
-      <DependentUpon>RadioOverlayFive.xaml</DependentUpon>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml.cs">
+      <DependentUpon>RadioOverlayFiveVertical.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwo.xaml.cs">
-      <DependentUpon>RadioOverlayTwo.xaml</DependentUpon>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml.cs">
+      <DependentUpon>RadioOverlayTwoVertical.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\TransponderPanel.xaml.cs">
       <DependentUpon>TransponderPanel.xaml</DependentUpon>
@@ -352,8 +367,8 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroup.xaml.cs">
       <DependentUpon>AwacsRadioControlGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\RadioOverlayWindow\AwacsOverlay.xaml.cs">
-      <DependentUpon>AwacsOverlay.xaml</DependentUpon>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml.cs">
+      <DependentUpon>RadioOverlayTenHorizontal.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\Favourites\ServerAddress.cs" />
     <Compile Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml.cs">
@@ -389,15 +404,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayFive.xaml">
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwo.xaml">
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -442,7 +477,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\RadioOverlayWindow\AwacsOverlay.xaml">
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -652,14 +687,12 @@
       <Using Namespace="System" />
       <Using Namespace="System.IO" />
       <Using Namespace="System.Text.RegularExpressions" />
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
+      <Code Type="Fragment" Language="cs"><![CDATA[
             File.WriteAllText(
                 OutputFilename,
                 Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
                 );
-          ]]>
-      </Code>
+          ]]></Code>
     </Task>
   </UsingTask>
   <Target Name="BeforeBuild">
@@ -673,8 +706,7 @@
       <AssemblyInfoContent>$([System.IO.File]::ReadAllText($(AssemblyInfo)))</AssemblyInfoContent>
       <VersionRegex>(\[\s*assembly\s*:\s*AssemblyVersion\(\s*"(\d+)\.(\d+)\.(\d+)(\.)(\d+)("\)\s*\]))</VersionRegex>
     </PropertyGroup>
-
-    <ReplaceFileText InputFilename="$(AssemblyInfo)" OutputFilename="$(AssemblyInfo)" MatchExpression="(\d\.\d\.\d|\d\.\d\.\d\.\d)" ReplacementText="@(Version->Replace('v', ''))" />
+    <ReplaceFileText InputFilename="$(AssemblyInfo)" OutputFilename="$(AssemblyInfo)" MatchExpression="(\d\.\d\.\d|\d\.\d\.\d\.\d)" ReplacementText="@(Version-&gt;Replace('v', ''))" />
     <Warning Text="Assembly-Client-Version: $(AssemblyVersion)" />
   </Target>
   <Target Name="AfterBuild">
