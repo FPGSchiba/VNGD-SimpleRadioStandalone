@@ -803,7 +803,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private int getCurrentSelected()
         {
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC)) //If both are active Intercome gets preferred, but UI does not allow this.
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC)) //If both are active Intercom gets preferred, but UI does not allow this.
             {
                 return 0;
             }
@@ -960,7 +960,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     if (transmittingRadios.Count > 0)
                     {
-                        
                         List<double> frequencies = new List<double>(transmittingRadios.Count);
                         List<byte> encryptions = new List<byte>(transmittingRadios.Count);
                         List<byte> modulations = new List<byte>(transmittingRadios.Count);

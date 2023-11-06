@@ -6,6 +6,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Newtonsoft.Json.Linq;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -221,9 +222,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 return;
             }
 
-            int spinnervalue = (int)IntercomNumberSpinner.Value;
-            bool isone = (int)spinnervalue == 1;
-
+            int spinnervalue;
+            if (!int.TryParse(IntercomNumberSpinner.Value.ToString(), out spinnervalue))
+            {
+                return;
+            }
+            
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
@@ -231,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
 
-            if (isone)
+            if (spinnervalue == 1)
             {
                 IntercomEnabled.IsEnabled = false;
                 IntercomEnabled.Background = voxicDisabled;
@@ -239,7 +243,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
             {
                 IntercomEnabled.IsEnabled = true;
-                IntercomEnabled.Background = voxDisabled;
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                {
+                    IntercomEnabled.Background = voxEnabled;
+                }
+                else
+                {
+                    IntercomEnabled.Background = voxDisabled;
+                }
             }
 
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
