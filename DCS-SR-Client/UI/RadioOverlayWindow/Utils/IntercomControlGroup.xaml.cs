@@ -23,6 +23,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         public static Brush voxEnabled = Brushes.MediumSeaGreen;
         public static Brush voxDisabled = Brushes.IndianRed;
         public static Brush voxicDisabled = Brushes.Gray;
+        private RadioInformation _inercomRadioInfo;
 
         public IntercomControlGroup()
         {
@@ -30,15 +31,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? voxEnabled : voxDisabled;
             IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? voxEnabled : voxicDisabled;
+            _inercomRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
+            IntercomNumberSpinner.Maximum = (int)Math.Round(_inercomRadioInfo.freqMax, 0);
+            IntercomNumberSpinner.Minimum = 1;
         }
 
         public int RadioId { private get; set; }
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
+            if (_inercomRadioInfo.modulation != RadioInformation.Modulation.DISABLED)
             {
                 if (_clientStateSingleton.DcsPlayerRadioInfo.control ==
                     DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
