@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 {
     public static class RadioHelper
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public static void ToggleGuard(int radioId)
         {
             var radio = GetRadio(radioId);
@@ -153,8 +156,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
         {
             var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                radio < dcsPlayerRadioInfo.radios.Length && (radio >= 0))
+            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent() && radio < dcsPlayerRadioInfo.radios.Length && radio >= 0)
             {
                 return dcsPlayerRadioInfo.radios[radio];
             }
@@ -485,6 +487,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
                 currentRadio.volume = volume;
             }
+        }
+
+        public static void SetRadioModulation(int RadioId, RadioInformation.Modulation modulation)
+        {
+            var radio = GetRadio(RadioId);
+            radio.modulation = modulation;
+            Logger.Trace("Radio " + radio.name + " was set to Modulation: " + modulation + " and has Modulation: " + ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios[RadioId].modulation);
+
+            //make radio data stale to force resysnc
+            ClientStateSingleton.Instance.LastSent = 0;
+            Thread.Sleep(200);
+            Logger.Trace("Radio " + radio.name + " was set to Modulation: " + modulation + " and has Modulation: " + ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios[RadioId].modulation);
         }
     }
 }

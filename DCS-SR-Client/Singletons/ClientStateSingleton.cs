@@ -41,7 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public long LastSent { get; set; }
 
-        public long LastPostionCoalitionSent { get; set; }
+        public long LastPositionCoalitionSent { get; set; }
 
         private static readonly DispatcherTimer _timer = new DispatcherTimer();
 
@@ -208,8 +208,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         {
             PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
             DcsPlayerRadioInfo.latLng = latLngPosition;
-            
         }
-
     }
 }
