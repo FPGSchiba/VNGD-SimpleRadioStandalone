@@ -163,6 +163,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.7.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
@@ -217,6 +220,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Wpf.Ui, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPF-UI.2.1.0\lib\net472\Wpf.Ui.dll</HintPath>
+    </Reference>
     <Reference Include="WPFCustomMessageBox, Version=1.0.7.39267, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WPFCustomMessageBox.1.0.7\lib\WPFCustomMessageBox.dll</HintPath>
     </Reference>

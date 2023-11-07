@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -26,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
@@ -195,6 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void ToggleButtons(bool enable)
         {
+            RadioEnabled.IsChecked = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED;
             if (enable)
             {
                 Up10.Visibility = Visibility.Visible;
@@ -284,6 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioVolume.IsEnabled = false;
 
                 ToggleButtons(false);
+                RadioEnabled.IsEnabled = false;
 
                 //reset dragging just incase
                 _dragging = false;
@@ -331,7 +335,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioVolume.IsEnabled = false;
 
                     ToggleButtons(false);
-
+                    RadioEnabled.IsEnabled = true;
 
                     return;
                 }
@@ -422,6 +426,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
 
                 ToggleButtons(currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY);
+                RadioEnabled.IsEnabled = currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY;
 
                 if (_dragging == false)
                 {
@@ -592,22 +597,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
         }
 
-        private void ToggleSimultaneousTransmissionButton_Click(object sender, RoutedEventArgs e)
+        private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            if (_clientStateSingleton.DcsPlayerRadioInfo != null && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+            // Radio is disabled and exists
+            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
             {
-                var currentRadio = RadioHelper.GetRadio(RadioId);
-
-                if (currentRadio != null)
-                {
-                    currentRadio.simul = !currentRadio.simul;
-                }
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
             }
-        }
-
-        private void RetransmitClick(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.ToggleRetransmit(RadioId);
+            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
+            {
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
+            }
         }
     }
 }

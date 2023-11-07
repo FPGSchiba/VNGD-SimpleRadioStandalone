@@ -231,6 +231,19 @@ namespace DCS_SR_Client
             }
 
             var config = new LoggingConfiguration();
+            var consoleTarget = new ConsoleTarget
+            {
+                Encoding = Encoding.UTF8,
+                WriteBuffer = false,
+                DetectConsoleAvailable = true,
+                Name = "consoleTarget",
+                StdErr = false,
+                Layout = @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+            };
+            var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            config.AddTarget("asyncConsoleTarget", consoleWrapper);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, consoleWrapper));
+
             var fileTarget = new FileTarget
             {
                 FileName = "clientlog.txt",
@@ -238,12 +251,12 @@ namespace DCS_SR_Client
                 MaxArchiveFiles = 1,
                 ArchiveAboveSize = 104857600,
                 Layout =
-                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+                @"${longdate} | ${logger} (${level}) | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
             };
 
-            var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
-            config.AddTarget("asyncFileTarget", wrapper);
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, wrapper));
+            var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            config.AddTarget("asyncFileTarget", fileWrapper);
+            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileWrapper));
 
             LogManager.Configuration = config;
             loggingReady = true;
