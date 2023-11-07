@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -55,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
         private ulong _packetNumber = 1;
 
-        private volatile bool _ptt;
+        public volatile bool _ptt;
         private long _lastPTTPress; // to handle dodgy PTT - release time
         private long _firstPTTPress; // to delay start PTT time
 
@@ -814,7 +815,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             else { return -1; }
         }
 
-        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice) // voice -> Is bound to setting GlobalSettingsKeys.VOX and detecting voice
+        private List<RadioInformation> CheckVOXActivation(out int sendingOn, bool voice)
         {
             sendingOn = -1;
             if (_clientStateSingleton.InhibitTX.InhibitTX)
@@ -827,16 +828,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     return new List<RadioInformation>();
                 }
             }
-
+            
             var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             //If its a hot intercom and thats not the currently selected radio
             //this is special logic currently for the gazelle as it has a hot mic, but no way of knowing if you're transmitting from the module itself
             //so we have to figure out what you're transmitting on in SRS
-            if ((radioInfo.intercomHotMic // Hotmic Option is here
-                 // && radioInfo.selected != 0 
-                 && !_ptt 
-                 && !radioInfo.ptt)
-                || _intercomPtt)
+            if (!_ptt && !radioInfo.ptt && !_intercomPtt && (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) || _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC)))
             {
                 // Use this for VOX into the selected Channel: _clientStateSingleton.DcsPlayerRadioInfo.selected
                 var currentSelected = getCurrentSelected(); // Change this -> If setting for specific Flick-Back Radio 
@@ -847,10 +844,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[currentSelected];
 
                     if (currentlySelectedRadio != null && currentlySelectedRadio.modulation !=
-                                                       RadioInformation.Modulation.DISABLED
-                                                       && (currentlySelectedRadio.freq > 100 ||
-                                                           currentlySelectedRadio.modulation ==
-                                                           RadioInformation.Modulation.INTERCOM))
+                                                       RadioInformation.Modulation.DISABLED)
                     {
                         selectedRadios.Add(currentlySelectedRadio); // Return not only Intercom as transmitting radio
                         sendingOn = currentSelected;
@@ -865,7 +859,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         _lastVOXSend = DateTime.Now.Ticks;
                         return selectedRadios;
                     }
-                    else if (radioInfo.intercomHotMic && !voice)
+                    if (radioInfo.intercomHotMic && !voice)
                     {
                         TimeSpan lastVOXSendDiff = new TimeSpan(DateTime.Now.Ticks - _lastVOXSend);
                         if (lastVOXSendDiff.TotalMilliseconds < _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime))
@@ -877,13 +871,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         return new List<RadioInformation>();
 
                     }
-                    else
-                    {
-                        return selectedRadios;
-                    }
+                    
+                    return selectedRadios;
                 }
             }
 
+            return new List<RadioInformation>();
+        }
+
+        private List<RadioInformation> CheckPTTActivation(out int sendingOn)
+        {
+            sendingOn = -1;
+            
+            var radioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             var transmittingRadios = new List<RadioInformation>();
             if (_ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt)
             {
@@ -940,6 +940,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             return transmittingRadios;
+        }
+        
+        
+
+        private List<RadioInformation> PTTPressed(out int sendingOn, bool voice)
+        {
+            sendingOn = -1;
+            List<RadioInformation> pttRadios = CheckPTTActivation(out sendingOn);
+            if (pttRadios.Count > 0)
+            {
+                return pttRadios;
+            }
+            
+            List<RadioInformation> voxRadios = CheckVOXActivation(out sendingOn, voice);
+            
+            return voxRadios;
         }
 
         public ClientAudio Send(byte[] bytes, int len, bool voice)
@@ -1006,6 +1022,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         };
 
                         var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
+                        // sending UDP Package here:
                         _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
                         
                         var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
@@ -1014,6 +1031,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         if (currentlySelectedRadio != null &&
                             (!_clientStateSingleton.RadioSendingState.IsSending || _clientStateSingleton.RadioSendingState.SendingOn != sendingOn))
                         {
+                            // Transmission sound again here:
                             _audioManager.PlaySoundEffectStartTransmit(sendingOn,
                                 currentlySelectedRadio.enc && (currentlySelectedRadio.encKey > 0),
                                 currentlySelectedRadio.volume, currentlySelectedRadio.modulation);
@@ -1029,7 +1047,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                         var send = new ClientAudio()
                         {
-                            Frequency = frequencies[0], Modulation = modulations[0],
+                            Frequency = frequencies[0],
+                            Modulation = modulations[0],
                             EncodedAudio = bytes,
                             Encryption = 0,
                             Volume = 1,
@@ -1059,7 +1078,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     if (_clientStateSingleton.RadioSendingState.SendingOn >= 0)
                     {
                         var radio = _clientStateSingleton.DcsPlayerRadioInfo.radios[_clientStateSingleton.RadioSendingState.SendingOn];
-
+                        // Transmitting sound is here:
                         _audioManager.PlaySoundEffectEndTransmit(_clientStateSingleton.RadioSendingState.SendingOn, radio.volume, radio.modulation);
                     }
                 }

@@ -22,7 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
     public partial class RadioControlGroup : UserControl
     {
         private const double MHz = 1000000;
-        private const int MaxSimultaneousTransmissions = 3;
+        private const int MaxSimultaneousTransmissions = 1;
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
@@ -295,6 +295,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (transmitting.IsSending)
                 {
+                    Console.WriteLine(currentRadio.name + " (" + RadioId + ") Sending On: " +  transmitting.SendingOn);
                     if (transmitting.SendingOn == RadioId)
                     {
                         RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
@@ -302,6 +303,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     else if (currentRadio != null && currentRadio.simul)
                     {
                         RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4F86FF"));
+                    }
+                    else
+                    {
+                        RadioActive.Fill = RadioId == dcsPlayerRadioInfo.selected ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Orange);
                     }
                 }
                 else
@@ -590,24 +595,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             if (EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
-        }
-
-        private void ToggleSimultaneousTransmissionButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_clientStateSingleton.DcsPlayerRadioInfo != null && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
-            {
-                var currentRadio = RadioHelper.GetRadio(RadioId);
-
-                if (currentRadio != null)
-                {
-                    currentRadio.simul = !currentRadio.simul;
-                }
-            }
-        }
-
-        private void RetransmitClick(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.ToggleRetransmit(RadioId);
         }
     }
 }
