@@ -232,6 +232,21 @@
                         x:Name="Down0001" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
+                    <Button
+                        Background="IndianRed"
+                        Click="ToggleSwitch_Click"
+                        Content="Off"
+                        FontSize="5"
+                        Foreground="Black"
+                        Height="10"
+                        HorizontalAlignment="Center"
+                        IsEnabled="False"
+                        Margin="0,0,2,0"
+                        Name="RadioEnabled"
+                        Padding="0"
+                        Style="{StaticResource DarkStyle-Button}"
+                        Width="15" />
+
                     <Slider
                         Height="20"
                         IsEnabled="False"
@@ -240,15 +255,9 @@
                         Style="{x:Null}"
                         Thumb.DragCompleted="RadioVolume_DragCompleted"
                         Thumb.DragStarted="RadioVolume_DragStarted"
-                        Width="90"
+                        Width="80"
                         x:Name="RadioVolume" />
-                    <ui:ToggleSwitch
-                        Background="DarkGray"
-                        Click="ToggleSwitch_Click"
-                        Height="20"
-                        Margin="10,0,0,0"
-                        Name="RadioEnabled"
-                        Width="40" />
+
 
                 </StackPanel>
             </StackPanel>

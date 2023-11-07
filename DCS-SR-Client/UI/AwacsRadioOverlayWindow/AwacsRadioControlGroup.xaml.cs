@@ -28,6 +28,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
+        private static Brush radioOff = Brushes.IndianRed;
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
@@ -197,7 +199,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void ToggleButtons(bool enable)
         {
-            RadioEnabled.IsChecked = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED;
+
+            if (_clientStateSingleton.IsConnected)
+            {
+                RadioEnabled.Background =
+                    RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
+                        ? radioOn
+                        : radioOff;
+                RadioEnabled.Content = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
+                    ? "On"
+                    : "Off";
+            }
+            else
+            {
+                RadioEnabled.Background = radioOff;
+                RadioEnabled.Content = "Off";
+            }
+            
             if (enable)
             {
                 Up10.Visibility = Visibility.Visible;
@@ -299,7 +317,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (transmitting.IsSending)
                 {
-                    Console.WriteLine(currentRadio.name + " (" + RadioId + ") Sending On: " +  transmitting.SendingOn);
                     if (transmitting.SendingOn == RadioId)
                     {
                         RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
@@ -331,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                    RadioActive.Fill = radioOff;
                     RadioLabel.Text = "No Radio";
                     RadioFrequency.Text = "Unknown";
                     RadioMetaData.Text = "";
@@ -609,10 +626,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+                RadioEnabled.Background = radioOn;
+                RadioEnabled.Content = "On";
+
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
+                RadioEnabled.Background = radioOff;
+                RadioEnabled.Content = "Off";
             }
         }
     }
