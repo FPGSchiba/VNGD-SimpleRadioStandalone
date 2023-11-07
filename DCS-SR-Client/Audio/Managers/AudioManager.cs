@@ -343,11 +343,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     try
                     {
                         //ready for the buffer shortly
-                        
                         //check for voice before any pre-processing
                         bool voice = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) || _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC);
 
-                        if (voice) // VOX Setting here
+                        if (voice && !_udpVoiceHandler._ptt) // VOX Setting here
                         {
                             Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
                             voice = DoesFrameContainSpeech(_pcmBytes, _pcmShort);
