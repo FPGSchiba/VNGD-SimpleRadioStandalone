@@ -11,8 +11,7 @@
     xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:converters="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:devices="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client"
-    xmlns:input="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
+    xmlns:gauge="clr-namespace:CircularGauge;assembly=CircularGauge"
     xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
@@ -24,21 +23,20 @@
             <ImageBrush AlignmentX="Center" AlignmentY="Center" ImageSource="/UI/ClientWindow/vanguardsrsback.png" />
         </TabControl.Background>
         -->
-        
+
         <TabControl.Resources>
             <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
         </TabControl.Resources>
-        
+
         <TabItem Header="General">
             <TabItem.Background>
-                <SolidColorBrush Color="WhiteSmoke"/>
+                <SolidColorBrush Color="WhiteSmoke" />
             </TabItem.Background>
 
             <GroupBox
                 Header="Setup"
                 Margin="5"
-                x:Name="GroupBox"
-                >
+                x:Name="GroupBox">
 
                 <StackPanel Margin="0">
                     <Label
@@ -174,10 +172,10 @@
                         <ComboBox
                             DisplayMemberPath="Name"
                             Height="23"
+                            ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"
                             SelectedItem="{Binding Path=ServerAddress}"
                             Width="200"
-                            x:Name="ServerAddressPicker"
-                            ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"/>
+                            x:Name="ServerAddressPicker" />
 
                         <Button
                             Click="LaunchAddressTab"
@@ -301,9 +299,9 @@
 
                     </StackPanel>
                     <StackPanel
-                        VerticalAlignment="Center"
+                        Margin="0,0,0,0"
                         Orientation="Vertical"
-                        Margin="0,0,0,0">
+                        VerticalAlignment="Center">
                         <StackPanel
                             HorizontalAlignment="Center"
                             Margin="0"
@@ -316,7 +314,7 @@
                                 Style="{DynamicResource SquareButtonStyle}"
                                 Width="80"
                                 x:Name="ShowOverlayVerticalTwo" />
-                            <Button 
+                            <Button
                                 Click="ShowOverlayThreeVertical_OnClick"
                                 Content="3 Vertical"
                                 HorizontalAlignment="Center"
@@ -354,7 +352,7 @@
                                 Style="{DynamicResource SquareButtonStyle}"
                                 Width="80"
                                 x:Name="ShowOverlayHorizontalTwo" />
-                            <Button 
+                            <Button
                                 Click="ShowOverlayThreeHorizontal_OnClick"
                                 Content="3 Horizontal"
                                 HorizontalAlignment="Center"
@@ -419,14 +417,13 @@
                             x:Name="VOIPConnectionStatus" />
 
                     </StackPanel>
-
                 </StackPanel>
             </GroupBox>
         </TabItem>
 
         <TabItem Header="Controls">
             <TabItem.Background>
-                <SolidColorBrush Color="WhiteSmoke"/>
+                <SolidColorBrush Color="WhiteSmoke" />
             </TabItem.Background>
 
             <GroupBox Header="Controls" x:Name="ControlsGroupBox">
@@ -778,7 +775,7 @@
 
         <TabItem Header="Favourites" x:Name="FavouritesSeversTab">
             <TabItem.Background>
-                <SolidColorBrush Color="WhiteSmoke"/>
+                <SolidColorBrush Color="WhiteSmoke" />
             </TabItem.Background>
 
             <GroupBox Header="Favourites">
@@ -788,12 +785,12 @@
 
         <TabItem Header="Settings">
             <TabItem.Background>
-                <SolidColorBrush Color="WhiteSmoke"/>
+                <SolidColorBrush Color="WhiteSmoke" />
             </TabItem.Background>
 
             <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                 <StackPanel>
-                    
+
                     <GroupBox Header="Global Settings">
                         <StackPanel>
                             <GroupBox Header="Auto Connect">
@@ -1172,9 +1169,7 @@
 
                                     </Grid.RowDefinitions>
 
-                                    <StackPanel
-                                        Grid.Row="0"
-                                        >
+                                    <StackPanel Grid.Row="0">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="2*" />
@@ -1220,16 +1215,16 @@
                                             </Style>
                                         </ToggleButton.Style>
                                     </ToggleButton>
-                                    -->
+                                            -->
 
 
-                                            <Label x:Name="VoiceLength"
+                                            <Label
                                                 Content="Voice Detection minimum &#10; transmission length (ms)"
                                                 Grid.Column="0"
                                                 Grid.Row="1"
                                                 HorizontalContentAlignment="Center"
-                                                VerticalContentAlignment="Center" 
-                                            />
+                                                VerticalContentAlignment="Center"
+                                                x:Name="VoiceLength" />
 
                                             <StackPanel
                                                 Grid.Column="2"
@@ -1256,50 +1251,49 @@
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     <Label
-                                                                Content="0"
-                                                                FontSize="10"
-                                                                Grid.Column="0"
-                                                                HorizontalAlignment="Left" />
+                                                        Content="0"
+                                                        FontSize="10"
+                                                        Grid.Column="0"
+                                                        HorizontalAlignment="Left" />
                                                     <Label
-                                                                Content="1000"
-                                                                FontSize="10"
-                                                                Grid.Column="1"
-                                                                HorizontalAlignment="Center" />
+                                                        Content="1000"
+                                                        FontSize="10"
+                                                        Grid.Column="1"
+                                                        HorizontalAlignment="Center" />
                                                     <Label
-                                                                Content="2000"
-                                                                FontSize="10"
-                                                                Grid.Column="2"
-                                                                HorizontalAlignment="Right" />
+                                                        Content="2000"
+                                                        FontSize="10"
+                                                        Grid.Column="2"
+                                                        HorizontalAlignment="Right" />
                                                 </Grid>
                                             </StackPanel>
 
                                             <Label
-                                                        Content="Noise Cancellation"
-                                                        Grid.Column="0"
-                                                        Grid.Row="2"
-                                                        HorizontalContentAlignment="Center"
-                                                        VerticalContentAlignment="Center" 
-                                                    />
+                                                Content="Noise Cancellation"
+                                                Grid.Column="0"
+                                                Grid.Row="2"
+                                                HorizontalContentAlignment="Center"
+                                                VerticalContentAlignment="Center" />
 
                                             <StackPanel
-                                                        Grid.Column="2"
-                                                        Grid.Row="2"
-                                                        Margin="10">
+                                                Grid.Column="2"
+                                                Grid.Row="2"
+                                                Margin="10">
 
                                                 <Slider
-                                                            IsEnabled="False"
-                                                            IsSnapToTickEnabled="True"
-                                                            LargeChange="1"
-                                                            Maximum="3"
-                                                            Minimum="0"
-                                                            SmallChange="1"
-                                                            TickFrequency="1"
-                                                            TickPlacement="BottomRight"
-                                                            ToolTip="Less noise cancellation will make your voice more likely to be heard, but will have a higher chance of a false positive"
-                                                            Value="0"
-                                                            VerticalAlignment="Center"
-                                                            VerticalContentAlignment="Center"
-                                                            x:Name="VOXMode" />
+                                                    IsEnabled="False"
+                                                    IsSnapToTickEnabled="True"
+                                                    LargeChange="1"
+                                                    Maximum="3"
+                                                    Minimum="0"
+                                                    SmallChange="1"
+                                                    TickFrequency="1"
+                                                    TickPlacement="BottomRight"
+                                                    ToolTip="Less noise cancellation will make your voice more likely to be heard, but will have a higher chance of a false positive"
+                                                    Value="0"
+                                                    VerticalAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    x:Name="VOXMode" />
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
@@ -1308,44 +1302,44 @@
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     <Label
-                                                                Content="Less"
-                                                                FontSize="10"
-                                                                Grid.Column="0"
-                                                                HorizontalAlignment="Left" />
+                                                        Content="Less"
+                                                        FontSize="10"
+                                                        Grid.Column="0"
+                                                        HorizontalAlignment="Left" />
                                                     <Label
-                                                                Content="More"
-                                                                FontSize="10"
-                                                                Grid.Column="3"
-                                                                HorizontalAlignment="Right" />
+                                                        Content="More"
+                                                        FontSize="10"
+                                                        Grid.Column="3"
+                                                        HorizontalAlignment="Right" />
                                                 </Grid>
 
                                             </StackPanel>
 
                                             <Label
-                                                        Content="Voice Detection Threshold"
-                                                        Grid.Column="0"
-                                                        Grid.Row="3"
-                                                        HorizontalContentAlignment="Center"
-                                                        VerticalContentAlignment="Center" />
+                                                Content="Voice Detection Threshold"
+                                                Grid.Column="0"
+                                                Grid.Row="3"
+                                                HorizontalContentAlignment="Center"
+                                                VerticalContentAlignment="Center" />
 
                                             <StackPanel
-                                                        Grid.Column="2"
-                                                        Grid.Row="3"
-                                                        Margin="10">
+                                                Grid.Column="2"
+                                                Grid.Row="3"
+                                                Margin="10">
 
                                                 <Slider
-                                                            IsEnabled="False"
-                                                            IsSnapToTickEnabled="True"
-                                                            LargeChange="4"
-                                                            Maximum="0"
-                                                            Minimum="-96"
-                                                            SmallChange="2"
-                                                            TickFrequency="4"
-                                                            TickPlacement="BottomRight"
-                                                            Value="-50"
-                                                            VerticalAlignment="Center"
-                                                            VerticalContentAlignment="Center"
-                                                            x:Name="VOXMinimumRMS" />
+                                                    IsEnabled="False"
+                                                    IsSnapToTickEnabled="True"
+                                                    LargeChange="4"
+                                                    Maximum="0"
+                                                    Minimum="-96"
+                                                    SmallChange="2"
+                                                    TickFrequency="4"
+                                                    TickPlacement="BottomRight"
+                                                    Value="-50"
+                                                    VerticalAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    x:Name="VOXMinimumRMS" />
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
@@ -1353,15 +1347,15 @@
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     <Label
-                                                                Content="Lower"
-                                                                FontSize="10"
-                                                                Grid.Column="0"
-                                                                HorizontalAlignment="Left" />
+                                                        Content="Lower"
+                                                        FontSize="10"
+                                                        Grid.Column="0"
+                                                        HorizontalAlignment="Left" />
                                                     <Label
-                                                                Content="Higher"
-                                                                FontSize="10"
-                                                                Grid.Column="2"
-                                                                HorizontalAlignment="Right" />
+                                                        Content="Higher"
+                                                        FontSize="10"
+                                                        Grid.Column="2"
+                                                        HorizontalAlignment="Right" />
                                                 </Grid>
                                             </StackPanel>
 
@@ -3122,11 +3116,11 @@
 
         <TabItem Header="Help">
             <TabItem.Background>
-                <SolidColorBrush Color="WhiteSmoke"/>
+                <SolidColorBrush Color="WhiteSmoke" />
             </TabItem.Background>
-            
+
             <GroupBox Header="Help &amp; About">
-                
+
                 <FlowDocumentScrollViewer>
                     <FlowDocument Name="AboutFlowDocument">
 
@@ -3158,8 +3152,7 @@
 
                         <Paragraph FontSize="14">
                             <Run FontSize="14" FontWeight="Bold">Please preview your audio first</Run>
-                            using the preview option to make sure that your microphone and speakers are configured correctly.
-                        </Paragraph>
+                            using the preview option to make sure that your microphone and speakers are configured correctly.</Paragraph>
 
                         <Paragraph FontSize="14">
                             Speaker boost can be set higher to counteract the volume reduction caused by clipping and the radio effects. If speaker boost is too high - you may have issues where other windows sounds are too loud. Reduce the boost to fix this.
@@ -3170,14 +3163,10 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                            If you have any issues with the SRS please get help on the
-                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>
-                            channel under the
-                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151277018516832337">SRS Support</Hyperlink>
-                            and
-                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151275589437763594">SRS Support FAQ</Hyperlink>
-                            Threads on the Vanguard Discord
-                            <Hyperlink NavigateUri="https://discord.gg/GDadyHz">here</Hyperlink>
+                            If you have any issues with the SRS please get help on the<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>
+                            channel under the<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151277018516832337">SRS Support</Hyperlink>
+                            and<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151275589437763594">SRS Support FAQ</Hyperlink>
+                            Threads on the Vanguard Discord<Hyperlink NavigateUri="https://discord.gg/GDadyHz">here</Hyperlink>
                         </Paragraph>
 
                         <Paragraph>
@@ -3191,14 +3180,12 @@
                             <Run FontSize="16" FontWeight="Bold">Latest Version &amp; Updates</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            You can always get the latest version from GitHubs Release section for VNGD-SRS:
-                            <LineBreak />
+                            You can always get the latest version from GitHubs Release section for VNGD-SRS:<LineBreak />
                             <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest">
                                 https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest
                             </Hyperlink>
                             <LineBreak />
-                            Older versions are
-                            <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/">here</Hyperlink>
+                            Older versions are<Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/">here</Hyperlink>
 
                         </Paragraph>
 
@@ -3206,23 +3193,17 @@
                             <Run FontSize="16" FontWeight="Bold">Development &amp; Credit</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            This software was originally developed by Ciribob (which can be found
-                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>
-                            ), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
+                            This software was originally developed by Ciribob (which can be found<Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>
+                            ), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.<LineBreak />
                             <LineBreak />
+                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.<LineBreak />
                             <LineBreak />
-                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.
-                            <LineBreak />
-                            <LineBreak />
-                            SRS Development Team Members:
-                            <LineBreak />
-                            Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist
-                        </Paragraph>
+                            SRS Development Team Members:<LineBreak />
+                            Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist</Paragraph>
 
                     </FlowDocument>
                 </FlowDocumentScrollViewer>
             </GroupBox>
         </TabItem>
-
     </TabControl>
 </controls:MetroWindow>

@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private int _port = 5002;
 
         private int _windowOpen = 8;
-
+        
         // Vertical Radio-Overlays 
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
         private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
@@ -208,7 +208,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
-
         }
 
         private void CheckWindowVisibility()
