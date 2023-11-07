@@ -347,9 +347,6 @@
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml.cs">
       <DependentUpon>RadioOverlayTwoVertical.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\TransponderPanel.xaml.cs">
-      <DependentUpon>TransponderPanel.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
       <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
@@ -383,9 +380,6 @@
     <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
     <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml.cs">
       <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\RadioControlGroup.xaml.cs">
-      <DependentUpon>RadioControlGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Audio\Providers\RadioFilter.cs" />
     <Compile Include="Network\Models\RadioSendingState.cs" />
@@ -442,10 +436,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\TransponderPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\ClientWindow\InputBindingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -492,10 +482,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\RadioControlGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
