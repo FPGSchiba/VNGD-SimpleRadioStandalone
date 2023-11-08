@@ -86,9 +86,8 @@ Nighthawks      120.50|120.50
 Defiant         120.60|120.60
 Witcher         125.10|125.10
 Obsidian        125.50|125.50
-Discovery       131.20|131.20
-Meridian        131.30|131.30
-Rogue           131.40|131.40
+Discovery       131.10|131.10
+Rogue Racing    131.40|131.40
 Shinobi         131.50|131.50
 Cosmo Knights   131.60|131.60
 Atlas           130.10|130.10
@@ -96,6 +95,84 @@ Benevolence     130.50|130.50
 Fleet Services  130.60|130.60
 Rock Raiders    135.10|135.10
 Kraken          135.50|135.50
+
+
+---- Discovery Unit Wide Frequencies ----|1.0
+Main Net: 131.10|131.10
+Traffic Marshal: 131.105|131.105
+Science Dept: 131.12|131.12
+Security Dept: 131.17|131.17
+Medical Dept: 131.19|131.19
+
+---- Discovery - Magellan Ship Frequencies ----|1.0
+Magellan Flight: 131.20|131.20
+Magellan Landing: 131.205|131.205
+Magellan Social: 131.209|131.209
+
+---- Discovery - Elcano Ship Frequencies ----|1.0
+Elcano Flight: 131.21|131.21
+Elcano Landing: 131.215|131.215
+Elcano Social: 131.219|131.219
+
+---- Discovery - Pegasus Ship Frequencies ----|1.0
+Pegasus Flight: 131.22|131.22
+Pegasus Landing: 131.225|131.225
+Pegasus Social: 131.229|131.229
+
+
+
+---- Social Frequencies ----|1.0
+Social #1     300.00|300.00
+Social #2     301.00|301.00
+Social #3     302.00|302.00
+Social #4     303.00|303.00
+Social #5     304.00|304.00
+Social #6     305.00|305.00
+Social #7     306.00|306.00
+Social #8     307.00|307.00
+Social #9     308.00|308.00
+Social #10    309.00|309.00
+Social #11    310.00|310.00
+Social #12    311.00|311.00
+Social #13    312.00|312.00
+Social #14    313.00|313.00
+Social #15    314.00|314.00
+Social #16    315.00|315.00
+Social #17    316.00|316.00
+Social #18    317.00|317.00
+Social #19    318.00|318.00
+Social #20    319.00|319.00
+Social #21    320.00|320.00
+Social #22    321.00|321.00
+Social #23    322.00|322.00
+Social #24    323.00|323.00
+Social #25    324.00|324.00
+Social #26    325.00|325.00
+Social #27    326.00|326.00
+Social #28    327.00|327.00
+Social #29    328.00|328.00
+Social #30    329.00|329.00
+Social #31    330.00|330.00
+Social #32    331.00|331.00
+Social #33    332.00|332.00
+Social #34    333.00|333.00
+Social #35    334.00|334.00
+Social #36    335.00|335.00
+Social #37    336.00|336.00
+Social #38    337.00|337.00
+Social #39    338.00|338.00
+Social #40    339.00|339.00
+Social #41    340.00|340.00
+Social #42    341.00|341.00
+Social #43    342.00|342.00
+Social #44    343.00|343.00
+Social #45    344.00|344.00
+Social #46    345.00|345.00
+Social #47    346.00|346.00
+Social #48    347.00|347.00
+Social #49    348.00|348.00
+Social #50    349.00|349.00
+
 
 ---- Special Use Frequencies ----|1.0
 Guard       121.50|121.50
