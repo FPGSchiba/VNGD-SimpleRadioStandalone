@@ -560,6 +560,9 @@
     <Content Include="AudioEffects\RADIO_TRANS_END_ALTERNATE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_END_SILENT.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -567,6 +570,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START_APACHE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START_SILENT.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\UHF_NOISE.wav">
