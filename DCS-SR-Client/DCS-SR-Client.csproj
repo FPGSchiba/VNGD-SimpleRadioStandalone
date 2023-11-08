@@ -533,6 +533,9 @@
     <Content Include="AudioEffects\RADIO_TRANS_END_ALTERNATE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_END_SILENT.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -540,6 +543,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START_APACHE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START_SILENT.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\UHF_NOISE.wav">
@@ -652,14 +658,12 @@
       <Using Namespace="System" />
       <Using Namespace="System.IO" />
       <Using Namespace="System.Text.RegularExpressions" />
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
+      <Code Type="Fragment" Language="cs"><![CDATA[
             File.WriteAllText(
                 OutputFilename,
                 Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
                 );
-          ]]>
-      </Code>
+          ]]></Code>
     </Task>
   </UsingTask>
   <Target Name="BeforeBuild">
@@ -673,8 +677,7 @@
       <AssemblyInfoContent>$([System.IO.File]::ReadAllText($(AssemblyInfo)))</AssemblyInfoContent>
       <VersionRegex>(\[\s*assembly\s*:\s*AssemblyVersion\(\s*"(\d+)\.(\d+)\.(\d+)(\.)(\d+)("\)\s*\]))</VersionRegex>
     </PropertyGroup>
-
-    <ReplaceFileText InputFilename="$(AssemblyInfo)" OutputFilename="$(AssemblyInfo)" MatchExpression="(\d\.\d\.\d|\d\.\d\.\d\.\d)" ReplacementText="@(Version->Replace('v', ''))" />
+    <ReplaceFileText InputFilename="$(AssemblyInfo)" OutputFilename="$(AssemblyInfo)" MatchExpression="(\d\.\d\.\d|\d\.\d\.\d\.\d)" ReplacementText="@(Version-&gt;Replace('v', ''))" />
     <Warning Text="Assembly-Client-Version: $(AssemblyVersion)" />
   </Target>
   <Target Name="AfterBuild">
