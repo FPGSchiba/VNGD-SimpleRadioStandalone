@@ -97,9 +97,6 @@ Rock Raiders    135.10|135.10
 Kraken          135.50|135.50
 
 
----- Special Use Frequencies ----|1.0
-Guard       121.50|121.50
-
 ---- Discovery Unit Wide Frequencies ----|1.0
 Main Net: 131.10|131.10
 Traffic Marshal: 131.105|131.105
@@ -175,3 +172,7 @@ Social #47    346.00|346.00
 Social #48    347.00|347.00
 Social #49    348.00|348.00
 Social #50    349.00|349.00
+
+
+---- Special Use Frequencies ----|1.0
+Guard       121.50|121.50
