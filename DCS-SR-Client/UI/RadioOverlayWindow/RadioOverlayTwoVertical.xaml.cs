@@ -370,9 +370,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _lastFocus = DateTime.Now.Ticks;
         }
 
-        private void Radio1_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

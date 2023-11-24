@@ -96,7 +96,7 @@
         </Button>
 
 
-        <awacsOverlayWindow:RadioControlGroup Margin="5,0,0,0" x:Name="Radio1" RadioId="1" Loaded="Radio1_Loaded" />
+        <awacsOverlayWindow:RadioControlGroup Margin="5,0,0,0" x:Name="Radio1" RadioId="1" />
 
         <awacsOverlayWindow:RadioControlGroup Margin="5,5,0,5" x:Name="Radio2" RadioId="2" />
 
