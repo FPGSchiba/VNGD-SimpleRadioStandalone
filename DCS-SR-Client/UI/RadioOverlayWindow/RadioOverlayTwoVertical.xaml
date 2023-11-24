@@ -33,14 +33,23 @@
         </WrapPanel.LayoutTransform>
 
         <TextBlock Name="ControlText"
-                   Width="118"
+                   Width="70"
                    Height="12"
                    Margin="5,0,0,0"
-                   VerticalAlignment="Top"
+                   VerticalAlignment="Center"
                    FontSize="8"
                    Foreground="#E7E7E7"
                    Padding="0"
-                   Text="" />
+                   Text="2 Radio Panel" />
+        <TextBlock Name="Orientation"
+                   Width="28"
+                   Height="12"
+                   Margin="5,0,0,0"
+                   VerticalAlignment="Center"
+                   FontSize="8"
+                   Foreground="#E7E7E7"
+                   Padding="0"
+                   Text="Vertical" />
         <Button Margin="0,0,0,0"
                 Click="Button_Swap_Orientation"
                 Style="{StaticResource DarkStyle-Button}"
