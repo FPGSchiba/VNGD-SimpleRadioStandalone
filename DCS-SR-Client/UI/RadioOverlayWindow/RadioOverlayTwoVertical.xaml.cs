@@ -272,6 +272,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Close();
         }
 
+        private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
+        {
+            Close();
+            var twoHorizontalRadioOverlay = new RadioOverlayWindowTwoHorizontal();
+            try
+            {
+                twoHorizontalRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                twoHorizontalRadioOverlay.Show();
+            }
+            catch
+            {
+                Logger.Error("Could not to swap radio orientation from 2 vertical to 2 horizontal.");
+            }
+
+        }
+        
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
@@ -352,6 +368,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             //reset last focus so we dont switch back to dcs while dragging
             _lastFocus = DateTime.Now.Ticks;
+        }
+
+        private void Radio1_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

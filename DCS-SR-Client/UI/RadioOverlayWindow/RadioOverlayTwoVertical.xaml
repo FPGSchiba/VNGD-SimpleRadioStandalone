@@ -42,16 +42,26 @@
                    Padding="0"
                    Text="" />
         <Button Margin="0,0,0,0"
+                Click="Button_Swap_Orientation"
+                Style="{StaticResource DarkStyle-Button}"
+                ToolTip="Swap to horizon orientation">
+            <Button.Content>
+                <Grid Width="10" Height="10">
+                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                </Grid>
+            </Button.Content>
+        </Button>
+        <Button Margin="0,0,0,0"
                 Click="Button_About"
                 Style="{StaticResource DarkStyle-Button}">
             <Button.Content>
                 <Grid Width="10" Height="10">
-                    <TextBlock HorizontalAlignment="Center"
+                    <TextBlock HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                               FontWeight="Bold"
                                FontSize="10"
                                Padding="0"
-                               Text="?" />
+                               Text="?" Margin="0,0,3,0" />
                 </Grid>
             </Button.Content>
         </Button>
@@ -86,7 +96,7 @@
         </Button>
 
 
-        <awacsOverlayWindow:RadioControlGroup Margin="5,0,0,0" x:Name="Radio1" RadioId="1" />
+        <awacsOverlayWindow:RadioControlGroup Margin="5,0,0,0" x:Name="Radio1" RadioId="1" Loaded="Radio1_Loaded" />
 
         <awacsOverlayWindow:RadioControlGroup Margin="5,5,0,5" x:Name="Radio2" RadioId="2" />
 

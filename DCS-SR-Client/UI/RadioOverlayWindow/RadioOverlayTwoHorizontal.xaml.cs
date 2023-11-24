@@ -166,6 +166,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Close();
         }
 
+        private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
+        {
+            Close();
+            var twoVerticalRadioOverlay = new RadioOverlayWindowTwoVertical();
+            try
+            {
+                twoVerticalRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                twoVerticalRadioOverlay.Show();
+            }
+            catch
+            {
+                Logger.Error("Could not to swap radio orientation from 2 vertical to 2 horizontal.");
+            }
+
+        }
+
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;

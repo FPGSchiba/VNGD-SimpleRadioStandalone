@@ -76,6 +76,15 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <Button Height="15" Margin="0,0,2,0" ToolTip="Swap to vertical orientation"
+                Click="Button_Swap_Orientation"
+                Style="{StaticResource DarkStyle-Button}">
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <Image Source="../../SRS_Orientation_Toggle.png" />
+                    </Grid>
+                </Button.Content>
+            </Button>
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
