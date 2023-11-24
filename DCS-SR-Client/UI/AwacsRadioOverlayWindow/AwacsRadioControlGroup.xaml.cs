@@ -392,7 +392,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     if (currentRadio.modulation == RadioInformation.Modulation.AM)
                     {
-                        RadioMetaData.Text = "AM";
+                        //Dabble updated this
+                        //Changed Text to remove AM from here as AM is the default Modulation.
+                        //We are keeping the other modulations for better troubleshooting should anyone
+                        //change the modulation in the future
+                        RadioMetaData.Text = "";
                     }
                     else if (currentRadio.modulation == RadioInformation.Modulation.FM)
                     {
@@ -409,7 +413,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     if (currentRadio.secFreq > 100)
                     {
-                        RadioMetaData.Text += " G";
+                        //Dabble updated this
+                        //Because are not using the secondary radios, we don't need to identify "Guard".
+                        //Original text here " G"
+                        RadioMetaData.Text += "";
                     }
 
                     if (currentRadio.channel > -1)
