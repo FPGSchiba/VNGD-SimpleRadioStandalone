@@ -44,7 +44,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             AllowsTransparency = true;
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
-            
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
 
