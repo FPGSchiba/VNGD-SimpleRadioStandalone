@@ -31,6 +31,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         #region Radio panel settings
 
+        // Radio 1V
+        RadioOneVerticalX,
+        RadioOneVerticalY,
+        RadioOneVerticalSize,
+        RadioOneVerticalOpacity,
+        RadioOneVerticalWidth,
+        RadioOneVerticalHeight,
+
         // Radio 2V
         RadioTwoVerticalX,
         RadioTwoVerticalY,
@@ -63,6 +71,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenVerticalWidth,
         RadioTenVerticalHeight,
 
+        // Radio 10VL
+        RadioTenLongVerticalX,
+        RadioTenLongVerticalY,
+        RadioTenLongVerticalSize,
+        RadioTenLongVerticalOpacity,
+        RadioTenLongVerticalWidth,
+        RadioTenLongVerticalHeight,
+
+        // Radio 1H
+        RadioOneHorizontalX,
+        RadioOneHorizontalY,
+        RadioOneHorizontalSize,
+        RadioOneHorizontalOpacity,
+        RadioOneHorizontalWidth,
+        RadioOneHorizontalHeight,
 
         // Radio 2H
         RadioTwoHorizontalX,
@@ -95,7 +118,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenHorizontalOpacity,
         RadioTenHorizontalWidth,
         RadioTenHorizontalHeight,
-        
+
+        // Radio 10HW
+        RadioTenWideHorizontalX,
+        RadioTenWideHorizontalY,
+        RadioTenWideHorizontalSize,
+        RadioTenWideHorizontalOpacity,
+        RadioTenWideHorizontalWidth,
+        RadioTenWideHorizontalHeight,
+
         // Client Window
         ClientX,
         ClientY,

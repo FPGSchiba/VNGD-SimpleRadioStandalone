@@ -326,6 +326,12 @@
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
       <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml.cs">
+      <DependentUpon>RadioOverlayTenHorizontalWide.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml.cs">
+      <DependentUpon>RadioOverlayTenVerticalLong.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml.cs">
       <DependentUpon>RadioOverlayTwoHorizontal.xaml</DependentUpon>
     </Compile>
@@ -411,6 +417,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -67,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private int _windowOpen = 8;
+        private int _windowOpen = 12;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -75,6 +75,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
         private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
         private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
+        private RadioOverlayWindowTenVerticalLong _radioOverlayWindowTenVerticalLong;
 
         // Horizontal Radio-Overlays
         private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
@@ -82,9 +83,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowThreeHorizontal _radioOverlayWindowThreeHorizontal;
         private RadioOverlayWindowFiveHorizontal _radioOverlayWindowFiveHorizontal;
         private RadioOverlayWindowTenHorizontal _radioOverlayWindowTenHorizontal;
+        private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
 
         // Windows array
-        private Window[] windows = new Window[8];
+        private Window[] windows = new Window[12];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -144,6 +146,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[5] = _radioOverlayWindowThreeHorizontal;
             windows[6] = _radioOverlayWindowFiveHorizontal;
             windows[7] = _radioOverlayWindowTenHorizontal;
+            windows[8] = _radioOverlayWindowOneVertical;
+            windows[9] = _radioOverlayWindowOneHorizontal;
+            windows[10] = _radioOverlayWindowTenVerticalLong;
+            windows[11] = _radioOverlayWindowTenHorizontalWide;
 
             var client = ClientStateSingleton.Instance;
 
@@ -1436,6 +1442,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ToggleOverlay(true, 9);
         }
+        private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 10);
+        }
+        private void ShowOverlayTenHorizontalWide_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 11);
+        }
+
 
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
@@ -1444,7 +1459,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _toggleShowHide = DateTime.Now.Ticks;
                 // Catching out of bounds switch to.
-                // TODO: Maybe take switchTo = 8 to close all windows.
+                // TODO: Maybe take switchTo = 12 to close all windows.
                 if (switchTo < 0 || switchTo > windows.Count() - 1)
                 {
                     Logger.Error($"Could not switch to RadioWindow-{switchTo}.");
@@ -1500,6 +1515,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         case 9:
                             windows[switchTo] = new RadioOverlayWindowOneHorizontal();
                             break;
+                        case 10:
+                            windows[switchTo] = new RadioOverlayWindowTenVerticalLong();
+                            break;
+                        case 11:
+                            windows[switchTo] = new RadioOverlayWindowTenHorizontalWide();
+                            break;
                     }
                     try
                     {
@@ -1517,7 +1538,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 else
                 {
                     // No Panel window is open
-                    _windowOpen = 8;
+                    _windowOpen = 12;
                 }
             }
         }
@@ -1526,7 +1547,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
-            _windowOpen = 8;
+            _windowOpen = 12;
 
             // Erase window from windows array to clean up everything
             for (int i = 0; i < windows.Count(); i++)

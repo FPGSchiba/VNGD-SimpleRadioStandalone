@@ -16,23 +16,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
     /// </summary>
-    public partial class RadioOverlayWindowOneHorizontal : Window
+    public partial class RadioOverlayWindowTenVerticalLong : Window
     {
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[1];
+        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[10];
 
         private readonly DispatcherTimer _updateTimer;
 
-        private long _lastUnitId;
+        public static bool AwacsActive = false
+            ; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
-        public RadioOverlayWindowOneHorizontal()
+        public RadioOverlayWindowTenVerticalLong()
         {
+            //load opacity before the intialising as the slider changed
+            //method fires after initialisation
+            //     var opacity = AppConfiguration.Instance.RadioOpacity;
+            AwacsActive = true;
+
             InitializeComponent();
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -40,24 +46,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalOpacity).DoubleValue;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalHeight).DoubleValue;
             
             radioControlGroup[0] = radio1;
+            radioControlGroup[1] = radio2;
+            radioControlGroup[2] = radio3;
+            radioControlGroup[3] = radio4;
+            radioControlGroup[4] = radio5;
+            radioControlGroup[5] = radio6;
+            radioControlGroup[6] = radio7;
+            radioControlGroup[7] = radio8;
+            radioControlGroup[8] = radio9;
+            radioControlGroup[9] = radio10;
 
 
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
             CalculateScale();
-
-            LocationChanged += Location_Changed;
 
             RadioRefresh(null, null);
 
@@ -67,16 +80,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _updateTimer.Start();
         }
 
-        private void Location_Changed(object sender, EventArgs e)
-        {
-            //   AppConfiguration.Instance.RadioX = Top;
-            //  AppConfiguration.Instance.RadioY = Left;
-        }
-
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioStatus();
@@ -85,45 +90,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+            if (dcsPlayerRadioInfo != null)
             {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
+                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent() 
+                                                      && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
                 {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
 
-                var availableRadios = 0;
+                    var avalilableRadios = 0;
 
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
+                    for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
                     {
-                        availableRadios++;
-
+                        if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
+                        {
+                            avalilableRadios++;
+                        }
                     }
                 }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "1 Horizontal";
-                    }
-                    else
-                    {
-                        ControlText.Text = "1 Horizontal";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "1 Horizontal (Disconnected)";
-
-                }
-            }
-            else
-            {
-                ControlText.Text = "1 Horizontal (Disconnected)";
             }
         }
 
@@ -134,14 +117,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY, Top);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight, Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalOpacity, Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX, Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalHeight, Height);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalOpacity, Opacity);
 
             base.OnClosing(e);
 
+            AwacsActive = false;
             _updateTimer.Stop();
         }
 
@@ -204,14 +188,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
 
         public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
-            typeof(double), typeof(RadioOverlayWindowOneHorizontal),
+            typeof(double), typeof(RadioOverlayWindowTenVerticalLong),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
-            var mainWindow = o as RadioOverlayWindowOneHorizontal;
+            var mainWindow = o as RadioOverlayWindowTenVerticalLong;
             if (mainWindow != null)
                 return mainWindow.OnCoerceScaleValue((double) value);
             return value;
@@ -219,7 +203,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private static void OnScaleValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            var mainWindow = o as RadioOverlayWindowOneHorizontal;
+            var mainWindow = o as RadioOverlayWindowTenVerticalLong;
             if (mainWindow != null)
                 mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
         }

@@ -29,7 +29,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[] radioControlGroup =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[2];
+            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[1];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -70,11 +70,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalHeight).DoubleValue;
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -124,44 +124,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                     }
                 }
-
-                if (availableRadios == 2
-                         || dcsPlayerRadioInfo.radios.Length >= 2
-                         && dcsPlayerRadioInfo.radios[1].modulation != RadioInformation.Modulation.DISABLED)
-                {
-                    if (MinHeight != _originalMinHeight)
-                    {
-                        MinHeight = _originalMinHeight;
-                        Recalculate();
-                    }
-                }
-                else
-                {
-                    ResetHeight();
-                }
-
-
                 if (availableRadios > 1)
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "2 Vertical";
+                        ControlText.Text = "1 Vertical";
                     }
                     else
                     {
-                        ControlText.Text = "2 Vertical";
+                        ControlText.Text = "1 Vertical";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "2 Vertical (Disconnected)";
+                    ControlText.Text = "1 Vertical (Disconnected)";
                     
                 }
             }
             else
             {
                 ResetHeight();
-                ControlText.Text = "2 Vertical (Disconnected)";
+                ControlText.Text = "1 Vertical (Disconnected)";
             }
 
             FocusDCS();
@@ -221,11 +204,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight,Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity,Opacity);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX,Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalHeight,Height);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalOpacity,Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX,Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY, Top);
             base.OnClosing(e);
 
             _updateTimer.Stop();
