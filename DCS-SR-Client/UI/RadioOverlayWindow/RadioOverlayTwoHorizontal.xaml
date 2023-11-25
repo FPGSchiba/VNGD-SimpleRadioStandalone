@@ -6,9 +6,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="340"
-        Height="160"
+        Height="135"
         MinWidth="340"
-        MinHeight="160"
+        MinHeight="135"
         AllowsTransparency="True"
         Background="#444"
         Opacity="1.0"
@@ -36,8 +36,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
-            <RowDefinition />
-            <RowDefinition Height="55" />
+            <RowDefinition Height="85"/>
+            <RowDefinition Height="25" />
 
         </Grid.RowDefinitions>
 
@@ -127,27 +127,28 @@
             Orientation="Horizontal"
             VerticalAlignment="Center">
 
-            <local:IntercomControlGroup x:Name="intercom"
+            <local:IntercomControlGroup2Horizontal x:Name="intercom"
                                     Margin="0,0,0,0"
-                                    RadioId="0" Width="170" />
+                                    RadioId="0" Width="260" />
             <StackPanel
                 Orientation="Vertical"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
                 <TextBlock x:Name="TrancparencyLabel"
-                       Width="130"
-                       Margin="10,0,10,0"
+                       Width="60"
+                       Margin="5,0,0,0"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Right"
-                       FontSize="12"
+                       FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
                        Style="{x:Null}"
-                       Text="PANEL TRANSPARENCY"
+                       Text="TRANSPARENCY"
                        TextAlignment="Center"/>
 
                 <Slider x:Name="windowOpacitySlider"
-                        Width="120"
-                        Margin="0,0,20,0"
+                        Width="60"
+                        Margin="5,0,0,0"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
                         Maximum="1.0"

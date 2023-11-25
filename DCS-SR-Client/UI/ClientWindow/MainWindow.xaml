@@ -3135,15 +3135,18 @@
                             <Run FontSize="16" FontWeight="Bold">SRS Standard Operating Procedures (SOP)</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            The Vanguard SRS SOP can be found at vngd.net under the Command Library section.
-                            <!-- (<Hyperlink NavigateUri="https://example.com">SRS SOP</Hyperlink>) -->
+                            The Vanguard SRS SOP can be found 
+                            <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual">here,</Hyperlink>
+                             as well as on the vngd.net website under the Command Library section.
+                            
                         </Paragraph>
 
                         <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Vanguard SRS Server Information</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel "SRS Server Status"
+                            The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel
+                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>.
                         </Paragraph>
 
                         <Paragraph>
@@ -3163,10 +3166,12 @@
                         </Paragraph>
 
                         <Paragraph FontSize="14">
-                            If you have any issues with the SRS please get help on the<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>
-                            channel under the<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151277018516832337">SRS Support</Hyperlink>
-                            and<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151275589437763594">SRS Support FAQ</Hyperlink>
-                            Threads on the Vanguard Discord<Hyperlink NavigateUri="https://discord.gg/GDadyHz">here</Hyperlink>
+                            If you have any issues with the SRS please get help on the
+                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>
+                            channel under the
+                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1153198228607610981">SRS Training &amp; Support</Hyperlink>
+                            thread on the 
+                            <Hyperlink NavigateUri="https://discord.gg/GDadyHz">Vanguard discord server.</Hyperlink>
                         </Paragraph>
 
                         <Paragraph>
@@ -3193,13 +3198,42 @@
                             <Run FontSize="16" FontWeight="Bold">Development &amp; Credit</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            This software was originally developed by Ciribob (which can be found<Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>
-                            ), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.<LineBreak />
+                            This software was originally developed by Ciribob (which can be found
+                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">here</Hyperlink>),
+                            who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
                             <LineBreak />
                             If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.<LineBreak />
                             <LineBreak />
-                            SRS Development Team Members:<LineBreak />
-                            Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist</Paragraph>
+                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Archangel-93, AdamCelestial, Gweezlebur, and Dabble1.
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Current SRS Development Team Members:</Run>
+                            <LineBreak />
+                            Dabble1, FPGSchiba, Gweezlebur, Archangel-93, AdamCelestial
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Current Graphic Design Team Members:</Run>
+                            <LineBreak />
+                            Cheekermonkey, FPGElphi
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Youtube Video Tutorials - created by Vanguard's Mako Media</Run>
+                            <LineBreak />
+                            AdamCelestial, Archangel-93
+                            <LineBreak />
+                            <LineBreak />
+                            Check the videos out here:
+                            <Hyperlink NavigateUri="https://www.youtube.com/playlist?list=PLASyrT-hJCl5kpukDXbit5DU0NOcGryO9">Vanguard SRS Tutorial Videos</Hyperlink>
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Honorable Mentions</Run>
+                            <LineBreak />
+                            Quantum-Physicist, Esdin, TheAlexi, ZZGooch, Hohh2O, and SpaceHarvest for believing in the project. Without their support, we would not be where we are today.
+                            Additionally, we would like to thank Krehl and Cold_Kill for playing an intregal part initially getting the Vanguard SRS server setup.
+                            <LineBreak />
+                            <LineBreak />
+                            Finally, thank you to everyone of you who has helped provide guidance, feedback, and support for the project. None of this would be important without all of you. On behalf of the entire development team, thank you!
+                        </Paragraph>
 
                     </FlowDocument>
                 </FlowDocumentScrollViewer>

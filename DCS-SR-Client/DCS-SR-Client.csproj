@@ -341,6 +341,12 @@
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml.cs">
       <DependentUpon>RadioOverlayThreeVertical.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
+      <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml.cs">
+      <DependentUpon>IntercomControlGroup3Horizontal.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml.cs">
       <DependentUpon>RadioCapabilities.xaml</DependentUpon>
     </Compile>
@@ -424,6 +430,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -563,6 +577,9 @@
     <Content Include="AudioEffects\RADIO_TRANS_END_ALTERNATE.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_END_SILENT.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -570,6 +587,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\RADIO_TRANS_START_APACHE.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AudioEffects\RADIO_TRANS_START_SILENT.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="AudioEffects\UHF_NOISE.wav">
