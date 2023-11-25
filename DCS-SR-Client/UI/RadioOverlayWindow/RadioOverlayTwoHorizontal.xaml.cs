@@ -174,7 +174,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             Close();
             _toggleOverlay(true, 0); // index 0 is the vertical orientation
-
         }
 
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

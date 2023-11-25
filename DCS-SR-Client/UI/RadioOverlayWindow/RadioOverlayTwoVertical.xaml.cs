@@ -361,6 +361,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //reset last focus so we dont switch back to dcs while dragging
             _lastFocus = DateTime.Now.Ticks;
         }
-
     }
 }
