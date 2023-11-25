@@ -8,7 +8,7 @@
         Width="1650"
         Height="127"
         MinWidth="1650"
-        MinHeight="120"
+        MinHeight="127"
         AllowsTransparency="True"
         Background="#444"
         Opacity="1.0"
