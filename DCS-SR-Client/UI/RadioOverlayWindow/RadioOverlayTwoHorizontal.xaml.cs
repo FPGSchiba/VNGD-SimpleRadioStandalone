@@ -31,7 +31,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
-        public RadioOverlayWindowTwoHorizontal()
+        private Action<bool, int> _toggleOverlay;
+
+        public RadioOverlayWindowTwoHorizontal(Action<bool, int> ToggleOverlay)
         {
             InitializeComponent();
 
@@ -42,7 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             AllowsTransparency = true;
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
-
+            
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
 
@@ -66,6 +68,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
+
+            this._toggleOverlay = ToggleOverlay;
         }
 
         private void Location_Changed(object sender, EventArgs e)
@@ -169,16 +173,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
         {
             Close();
-            var twoVerticalRadioOverlay = new RadioOverlayWindowTwoVertical();
-            try
-            {
-                twoVerticalRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                twoVerticalRadioOverlay.Show();
-            }
-            catch
-            {
-                Logger.Error("Could not to swap radio orientation from 2 vertical to 2 horizontal.");
-            }
+            _toggleOverlay(true, 0); // index 0 is the vertical orientation
 
         }
 
