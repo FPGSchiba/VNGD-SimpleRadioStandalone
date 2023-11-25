@@ -70,12 +70,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private int _windowOpen = 8;
 
         // Vertical Radio-Overlays 
+        private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
         private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
         private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
         private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
 
         // Horizontal Radio-Overlays
+        private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
         private RadioOverlayWindowTwoHorizontal _radioOverlayWindowTwoHorizontal;
         private RadioOverlayWindowThreeHorizontal _radioOverlayWindowThreeHorizontal;
         private RadioOverlayWindowFiveHorizontal _radioOverlayWindowFiveHorizontal;
@@ -1426,6 +1428,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ToggleOverlay(true, 7);
         }
+        private void ShowOverlayOneVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 8);
+        }
+        private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 9);
+        }
 
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
@@ -1483,6 +1493,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             break;
                         case 7:
                             windows[switchTo] = new RadioOverlayWindowTenHorizontal();
+                            break;
+                        case 8:
+                            windows[switchTo] = new RadioOverlayWindowOneVertical();
+                            break;
+                        case 9:
+                            windows[switchTo] = new RadioOverlayWindowOneHorizontal();
                             break;
                     }
                     try
