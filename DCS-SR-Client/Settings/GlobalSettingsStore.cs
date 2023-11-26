@@ -500,6 +500,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             #region Radio Panel settings
 
+            // Raio 1V
+            {GlobalSettingsKeys.RadioOneVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioOneVerticalHeight.ToString(), "270"},
+
             // Radio 2V
             {GlobalSettingsKeys.RadioTwoVerticalX.ToString(), "300"},
             {GlobalSettingsKeys.RadioTwoVerticalY.ToString(), "300"},
@@ -531,6 +539,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioTenVerticalOpacity.ToString(), "1.0"},
             {GlobalSettingsKeys.RadioTenVerticalWidth.ToString(), "122"},
             {GlobalSettingsKeys.RadioTenVerticalHeight.ToString(), "270"},
+            
+            // Radio 10VL
+            {GlobalSettingsKeys.RadioTenLongVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenLongVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenLongVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenLongVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenLongVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenLongVerticalHeight.ToString(), "270"},
+            
+            // Radio 1H
+            {GlobalSettingsKeys.RadioOneHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioOneHorizontalHeight.ToString(), "270"},
 
             // Radio 2H
             {GlobalSettingsKeys.RadioTwoHorizontalX.ToString(), "300"},
@@ -563,7 +587,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioTenHorizontalOpacity.ToString(), "1.0"},
             {GlobalSettingsKeys.RadioTenHorizontalWidth.ToString(), "122"},
             {GlobalSettingsKeys.RadioTenHorizontalHeight.ToString(), "270"},
-
+            
+            // Radio 10HW
+            {GlobalSettingsKeys.RadioTenWideHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalHeight.ToString(), "270"},
+            
+            // Client Window
             {GlobalSettingsKeys.ClientX.ToString(), "200"},
             {GlobalSettingsKeys.ClientY.ToString(), "200"},
 

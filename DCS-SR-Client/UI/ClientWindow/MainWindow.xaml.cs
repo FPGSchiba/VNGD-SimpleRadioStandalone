@@ -1664,24 +1664,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ToggleOverlay(true, 7);
         }
+
         private void ShowOverlayOneVertical_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, 8);
         }
+
         private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, 9);
-            Logger.Info("1H Panel Button Clicked");
         }
+
         private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, 10);
         }
+
         private void ShowOverlayTenHorizontalWide_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, 11);
         }
-
 
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
@@ -1741,16 +1743,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             windows[switchTo] = new RadioOverlayWindowTenHorizontal(ToggleOverlay);
                             break;
                         case 8:
+                            // TODO: Add Toggle Overlay for Horizontal Swap
                             windows[switchTo] = new RadioOverlayWindowOneVertical();
                             break;
                         case 9:
+                            // TODO: Add Toggle Overlay for Horizontal Swap
                             windows[switchTo] = new RadioOverlayWindowOneHorizontal();
-                            Logger.Info($"Overlay switched to Case {switchTo}");
                             break;
                         case 10:
+                            // TODO: Add Toggle Overlay for Horizontal Swap
                             windows[switchTo] = new RadioOverlayWindowTenVerticalLong();
                             break;
                         case 11:
+                            // TODO: Add Toggle Overlay for Horizontal Swap
                             windows[switchTo] = new RadioOverlayWindowTenHorizontalWide();
                             break;
                     }
