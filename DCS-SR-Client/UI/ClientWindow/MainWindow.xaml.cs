@@ -1671,6 +1671,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, 9);
+            Logger.Info("1H Panel Button Clicked");
         }
         private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
         {
@@ -1744,6 +1745,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             break;
                         case 9:
                             windows[switchTo] = new RadioOverlayWindowOneHorizontal();
+                            Logger.Info($"Overlay switched to Case {switchTo}");
                             break;
                         case 10:
                             windows[switchTo] = new RadioOverlayWindowTenVerticalLong();

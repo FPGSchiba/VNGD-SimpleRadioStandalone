@@ -27,6 +27,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class RadioOverlayWindowOneHorizontal : Window
     {
         private  double _aspectRatio;  //originally readonly - dabble removed to match 1V panel
+        
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[1];
@@ -43,6 +44,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private long _lastUnitId;
 
+        
        
         public RadioOverlayWindowOneHorizontal()
         {
@@ -223,10 +225,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide))
             {
                 Close();
+                Logger.Info("1H Panel Closed due RadioOverlayTaskbar Hide setting");
             }
             else
             {
                 WindowState = WindowState.Minimized;
+                Logger.Info("1H Panel Minimized");
             }
         }
 
@@ -234,12 +238,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Button_Close(object sender, RoutedEventArgs e)
         {
             Close();
+            Logger.Info("1H Panel Closed");
         }
 
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
             //AppConfiguration.Instance.RadioOpacity = Opacity;
+            Logger.Info($"1H Panel Opacity Set - {Opacity}");
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -257,6 +263,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
+            Logger.Info($"1H Panel Scale Set - Value= {value}");
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
