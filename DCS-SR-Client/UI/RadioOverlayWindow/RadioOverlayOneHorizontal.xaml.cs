@@ -1,15 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using NLog;
+using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using System.Windows.Forms;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -18,42 +26,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class RadioOverlayWindowOneHorizontal : Window
     {
-        private readonly double _aspectRatio;
+        private  double _aspectRatio;  //originally readonly - dabble removed to match 1V panel
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[1];
 
         private readonly DispatcherTimer _updateTimer;
 
-        private long _lastUnitId;
-
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
-        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
+        private readonly double _originalMinHeight;
+
+        private readonly double _radioHeight;
+
+        private long _lastUnitId;
+
+       
         public RadioOverlayWindowOneHorizontal()
         {
+            //load opacity before the intialising as the slider changed
+            //method fires after initialisation
             InitializeComponent();
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
             _aspectRatio = MinWidth / MinHeight;
 
+            _originalMinHeight = MinHeight;
+            _radioHeight = radio1.Height;
+            WindowInteropHelper windowInteropHelper = new WindowInteropHelper(MainWindow.GetWindow(this));
+            Screen screen = System.Windows.Forms.Screen.FromHandle(windowInteropHelper.Handle);
+            MaxHeight = screen.Bounds.Height;
+
             AllowsTransparency = true;
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
-
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
-
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight).DoubleValue;
             
             radioControlGroup[0] = radio1;
 
 
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
+
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
+
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight).DoubleValue;
+
 
             CalculateScale();
 
@@ -123,7 +145,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
             else
             {
+                ResetHeight();
                 ControlText.Text = "1 Horizontal (Disconnected)";
+            }
+
+            FocusDCS();
+        }
+
+        private void ResetHeight()
+        {
+
+            if (MinHeight != _originalMinHeight)
+            {
+                MinHeight = _originalMinHeight;
+                Recalculate();
+            }
+        }
+        
+        private void Recalculate()
+        {
+            _aspectRatio = MinWidth / MinHeight;
+            containerPanel_SizeChanged(null, null);
+            Height = Height+1;
+        }
+
+        private long _lastFocus;
+        private RadioCapabilities _radioCapabilitiesWindow;
+
+        private void FocusDCS()
+        {
+            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusDCS))
+            {
+                var overlayWindow = new WindowInteropHelper(this).Handle;
+
+                //focus DCS if needed
+                var foreGround = WindowHelper.GetForegroundWindow();
+
+                Process[] localByName = Process.GetProcessesByName("dcs");
+
+                if (localByName != null && localByName.Length > 0)
+                {
+                    //either DCS is in focus OR Overlay window is not in focus
+                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
+                        this.IsMouseOver)
+                    {
+                        _lastFocus = DateTime.Now.Ticks;
+                    }
+                    else if (DateTime.Now.Ticks > _lastFocus + 20000000 && overlayWindow == foreGround)
+                    {
+                        WindowHelper.BringProcessToFront(localByName[0]);
+                    }
+                }
             }
         }
 
@@ -134,12 +206,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY, Top);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight, Height);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalOpacity, Opacity);
-
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY, Top);
             base.OnClosing(e);
 
             _updateTimer.Stop();
@@ -179,13 +250,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             WindowState = WindowState.Normal;
         }
 
-//
-//
+
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
-            var value = Math.Max(xScale, yScale);
+            var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
 

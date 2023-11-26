@@ -98,6 +98,7 @@
         <awacsOverlayWindow:RadioControlGroup x:Name="Radio5" RadioId="5" />
 
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
+        
         <Separator Width="170" Margin="0 2" />
 
         <TextBlock x:Name="RadioLabel"

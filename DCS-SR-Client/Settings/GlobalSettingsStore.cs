@@ -31,6 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         #region Radio panel settings
 
+        // --------- Vertical Panels --------------
         // Radio 1V
         RadioOneVerticalX,
         RadioOneVerticalY,
@@ -79,6 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenLongVerticalWidth,
         RadioTenLongVerticalHeight,
 
+        // --------- Horizontal Panels --------------
         // Radio 1H
         RadioOneHorizontalX,
         RadioOneHorizontalY,
