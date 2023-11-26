@@ -6,9 +6,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="510"
-        Height="160"
+        Height="130"
         MinWidth="510"
-        MinHeight="160"
+        MinHeight="130"
         AllowsTransparency="True"
         Background="#444"
         Opacity="1.0"
@@ -38,7 +38,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
             <RowDefinition />
-            <RowDefinition Height="55" />
+            <RowDefinition Height="25" />
 
         </Grid.RowDefinitions>
 
@@ -146,31 +146,31 @@
             Orientation="Horizontal"
             VerticalAlignment="Center">
 
-            <local:IntercomControlGroup x:Name="intercom"
+            <local:IntercomControlGroup3Horizontal x:Name="intercom"
                                     Margin="0,0,0,0"
-                                    RadioId="0" Width="250" />
+                                    RadioId="0" Width="360" />
             <StackPanel
-                Orientation="Vertical"
+                Orientation="Horizontal"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Top"
-                Margin="80,10,0,0">
+                VerticalAlignment="Center"
+                Margin="0,0,0,0">
                 <TextBlock x:Name="TrancparencyLabel"
-                   Width="130"
-                   Margin="10,0,10,0"
+                   Width="60"
+                   Margin="0,0,0,0"
                    VerticalAlignment="Center"
-                   HorizontalAlignment="Right"
-                   FontSize="12"
+                   HorizontalAlignment="Center"
+                   FontSize="8"
                    Foreground="#E7E7E7"
                    Padding="0"
                    Style="{x:Null}"
-                   Text="PANEL TRANSPARENCY"
+                   Text="TRANSPARENCY"
                    TextAlignment="Center"/>
 
                 <Slider x:Name="windowOpacitySlider"
-                    Width="120"
-                    Margin="0,0,20,0"
+                    Width="70"
+                    Margin="3,0,3,0"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Right"
+                    HorizontalAlignment="Center"
                     Maximum="1.0"
                     Minimum="0.05"
                     Style="{x:Null}"
