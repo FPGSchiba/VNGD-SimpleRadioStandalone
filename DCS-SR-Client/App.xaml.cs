@@ -2,8 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -16,6 +15,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Sentry;
+using static Standard.NtDll;
 
 namespace DCS_SR_Client
 {
@@ -62,6 +62,8 @@ namespace DCS_SR_Client
             ListArgs();
 
 #if !DEBUG
+            FreeConsole();
+
             if (IsClientRunning())
             {
                 //check environment flag
@@ -327,5 +329,8 @@ namespace DCS_SR_Client
                 logger.Error((Exception) e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
             }
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern int FreeConsole();
     }
 }
