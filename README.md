@@ -33,7 +33,11 @@ If those changes are small and only adjust some configuration, those can be done
     - Commits should have a 'header' message in which the changes are condensed in words within a 50 character limie
     - After the header there is a more complete message describing the changes done
     - For Example:
-    > asfd
+    > #63 | Added new Settings
+    > 
+    > \* Added functionality to have multiple settings for Client Window Positions
+    >
+    > \* Added Settings to accomodate resizing of the Main Window
 3. Pull Requests
     - No specific Naming Convention
 
