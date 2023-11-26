@@ -200,7 +200,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void ToggleButtons(bool enable)
         {
 
-            if (_clientStateSingleton.IsConnected)
+            if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
             {
                 RadioEnabled.Background =
                     RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
