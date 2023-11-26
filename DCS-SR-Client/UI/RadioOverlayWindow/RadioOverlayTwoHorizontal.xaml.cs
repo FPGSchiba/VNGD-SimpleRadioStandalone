@@ -172,7 +172,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
         {
             Close();
-            _toggleOverlay(true, 1); // index 1 is the vertical orientation
+            _toggleOverlay(true, 0); // index 0 is the vertical orientation
         }
 
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
