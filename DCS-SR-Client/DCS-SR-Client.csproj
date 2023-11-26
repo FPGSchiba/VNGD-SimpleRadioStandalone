@@ -349,6 +349,7 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
       <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
       <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
     </Compile>
@@ -454,6 +455,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
