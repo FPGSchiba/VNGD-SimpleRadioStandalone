@@ -135,22 +135,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "5 Vertical";
+                        ControlText.Text = "5 Radio Panel";
                     }
                     else
                     {
-                        ControlText.Text = "5 Vertical";
+                        ControlText.Text = "5 Radio Panel";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "5 Vertical (Disconnected)";
+                    ControlText.Text = "5 Radio Panel (Disconnected)";
 
                 }
             }
             else
             {
-                ControlText.Text = "5 Vertical (Disconnected)";
+                ControlText.Text = "5 Radio Panel (Disconnected)";
             }
 
             FocusDCS();

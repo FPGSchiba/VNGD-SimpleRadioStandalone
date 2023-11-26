@@ -26,6 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class RadioOverlayWindowOneVertical : Window
     {
         private  double _aspectRatio;
+        
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[] radioControlGroup =
@@ -128,23 +129,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "1 Vertical";
+                        ControlText.Text = "1 Radio Panel";
                     }
                     else
                     {
-                        ControlText.Text = "1 Vertical";
+                        ControlText.Text = "1 Radio Panel";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "1 Vertical (Disconnected)";
+                    ControlText.Text = "1 Radio Panel (Disconnected)";
                     
                 }
             }
             else
             {
                 ResetHeight();
-                ControlText.Text = "1 Vertical (Disconnected)";
+                ControlText.Text = "1 Radio Panel (Disconnected)";
             }
 
             FocusDCS();

@@ -19,7 +19,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     public partial class RadioOverlayWindowTenVerticalLong : Window
     {
         private readonly double _aspectRatio;
+        
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private long _lastUnitId;
 
         private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[10];
 
@@ -82,6 +85,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioStatus();
@@ -90,23 +95,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             intercom.RepaintRadioStatus();
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo != null)
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
-                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent() 
-                                                      && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
+                //reset when we switch planes
+                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
                 {
+                    _lastUnitId = dcsPlayerRadioInfo.unitId;
+                }
 
-                    var avalilableRadios = 0;
+                var availableRadios = 0;
 
-                    for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
+                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
+                {
+                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
                     {
-                        if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                        {
-                            avalilableRadios++;
-                        }
+                        availableRadios++;
+
                     }
                 }
+
+                if (availableRadios > 1)
+                {
+                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                    {
+                        ControlText.Text = "10 Radio Panel";
+                    }
+                    else
+                    {
+                        ControlText.Text = "10 Radio Panel";
+                    }
+                }
+                else
+                {
+                    ControlText.Text = "10 Radio Panel (Disconnected)";
+
+                }
+            }
+            else
+            {
+                ControlText.Text = "10 Radio Panel (Disconnected)";
             }
         }
 
