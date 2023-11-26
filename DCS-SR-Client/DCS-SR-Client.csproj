@@ -349,6 +349,11 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
       <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
+    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
+      <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml.cs">
+      <DependentUpon>IntercomControlGroup3Horizontal.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml.cs">
       <DependentUpon>RadioCapabilities.xaml</DependentUpon>
@@ -449,6 +454,11 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
+    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -531,6 +541,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="SRS_Orientation_Toggle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="UI\ClientWindow\vanguardsrsback.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

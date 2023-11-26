@@ -41,8 +41,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private long _lastUnitId;
 
+        private Action<bool, int> _toggleOverlay;
 
-        public RadioOverlayWindowFiveVertical()
+
+        public RadioOverlayWindowFiveVertical(Action<bool, int> ToggleOverlay)
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
@@ -90,6 +92,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(80) };
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
+
+            this._toggleOverlay = ToggleOverlay;
         }
 
         private void Location_Changed(object sender, EventArgs e)
@@ -245,6 +249,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Button_Close(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 6); // index 6 is the horizontal orientation
         }
 
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

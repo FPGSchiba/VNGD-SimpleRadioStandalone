@@ -51,7 +51,7 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
-                       Width="300"
+                       Width="250"
                        Height="16"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
@@ -59,6 +59,25 @@
                        Foreground="#E7E7E7"
                        Padding="0"
                        Text="10 Vertical" />
+            <TextBlock Name="Orientation"
+                  Width="28"
+                  Height="12"
+                  Margin="5,0,0,0"
+                  VerticalAlignment="Center"
+                  FontSize="8"
+                  Foreground="#E7E7E7"
+                  Padding="0"
+                  Text="Vertical" />
+            <Button Margin="0,0,0,0"
+               Click="Button_Swap_Orientation"
+               Style="{StaticResource DarkStyle-Button}"
+               ToolTip="Swap to horizon orientation">
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <Image Source="../../SRS_Orientation_Toggle.png" />
+                    </Grid>
+                </Button.Content>
+            </Button>
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
