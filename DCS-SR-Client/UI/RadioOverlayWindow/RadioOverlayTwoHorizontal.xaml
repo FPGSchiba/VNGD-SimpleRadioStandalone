@@ -6,9 +6,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="340"
-        Height="135"
+        Height="150"
         MinWidth="340"
-        MinHeight="135"
+        MinHeight="150"
         AllowsTransparency="True"
         Background="#444"
         Opacity="1.0"
@@ -19,7 +19,7 @@
 
     <Grid Name="containerPanel"
           SizeChanged="containerPanel_SizeChanged"
-          Style="{x:Null}">
+          Style="{x:Null}" HorizontalAlignment="Left" Width="340">
 
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="ApplicationScaleTransform"
@@ -35,9 +35,9 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
-            <RowDefinition Height="85"/>
-            <RowDefinition Height="25" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="55" />
 
         </Grid.RowDefinitions>
 
@@ -46,19 +46,17 @@
                     Grid.ColumnSpan="5"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-            <TextBlock Name="ControlText"
-                       Width="200"
-                       Height="16"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       FontSize="13"
+            <TextBlock x:Name="ControlText"
+                       Width="160"
+                       Height="12"
+                       FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="2 Radio Panel Horizontal" />
-            <TextBlock Name="ControlSubText"
-                       Width="100"
+                       Text="2 Radio Panel" />
+            <TextBlock x:Name="ControlSubText"
+                       Width="80"
                        Text="VNGD is best"
-                       FontSize="11"
+                       FontSize="8"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"
@@ -76,21 +74,35 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <TextBlock Name="Orientation"
+                       Width="38"
+                       Height="12"
+                       Margin="5,0,0,0"
+                       VerticalAlignment="Center"
+                       FontSize="8"
+                       Foreground="#E7E7E7"
+                       Padding="0"
+                       Text="Horizontal" />
+            <Button Height="15" Margin="0,0,2,0" ToolTip="Swap to vertical orientation"
+                Click="Button_Swap_Orientation"
+                Style="{StaticResource DarkStyle-Button}">
+                <Grid Width="10" Height="10">
+                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                </Grid>
+            </Button>
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
                     Click="Button_Minimise"
                     Style="{StaticResource DarkStyle-Button}">
-                <Button.Content>
-                    <Grid Width="10" Height="10">
-                        <TextBlock HorizontalAlignment="Center"
+                <Grid Width="10" Height="10">
+                    <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    FontFamily="Marlett"
                                    FontSize="14"
                                    Padding="3.5,0,0,3"
                                    Text="0" />
-                    </Grid>
-                </Button.Content>
+                </Grid>
             </Button>
 
             <Button Height="15"
@@ -98,16 +110,14 @@
                     VerticalAlignment="Center"
                     Click="Button_Close"
                     Style="{StaticResource DarkStyle-Button}">
-                <Button.Content>
-                    <Grid Width="10" Height="10">
-                        <TextBlock HorizontalAlignment="Center"
+                <Grid Width="10" Height="10">
+                    <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    FontFamily="Marlett"
                                    FontSize="14"
                                    Padding="0,0,0,1"
                                    Text="r" />
-                    </Grid>
-                </Button.Content>
+                </Grid>
             </Button>
 
         </StackPanel>
