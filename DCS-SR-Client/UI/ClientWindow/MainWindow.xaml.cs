@@ -1464,25 +1464,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
                             break;
                         case 1:
-                            windows[switchTo] = new RadioOverlayWindowThreeVertical();
+                            windows[switchTo] = new RadioOverlayWindowThreeVertical(ToggleOverlay);
                             break;
                         case 2:
-                            windows[switchTo] = new RadioOverlayWindowFiveVertical();
+                            windows[switchTo] = new RadioOverlayWindowFiveVertical(ToggleOverlay);
                             break;
                         case 3:
-                            windows[switchTo] = new RadioOverlayWindowTenVertical();
+                            windows[switchTo] = new RadioOverlayWindowTenVertical(ToggleOverlay);
                             break;
                         case 4:
                             windows[switchTo] = new RadioOverlayWindowTwoHorizontal(ToggleOverlay);
                             break;
                         case 5:
-                            windows[switchTo] = new RadioOverlayWindowThreeHorizontal();
+                            windows[switchTo] = new RadioOverlayWindowThreeHorizontal(ToggleOverlay);
                             break;
                         case 6:
-                            windows[switchTo] = new RadioOverlayWindowFiveHorizontal();
+                            windows[switchTo] = new RadioOverlayWindowFiveHorizontal(ToggleOverlay);
                             break;
                         case 7:
-                            windows[switchTo] = new RadioOverlayWindowTenHorizontal();
+                            windows[switchTo] = new RadioOverlayWindowTenHorizontal(ToggleOverlay);
                             break;
                     }
                     try
