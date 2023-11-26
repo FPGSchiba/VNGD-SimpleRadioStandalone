@@ -224,13 +224,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             // Since controls are unusable, but a very small portion of the always-on-top window still showing, we're closing it instead, similar to toggling the overlay
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide))
             {
-                Close();
-                Logger.Info("1H Panel Closed due RadioOverlayTaskbar Hide setting");
+                Close()
             }
             else
             {
                 WindowState = WindowState.Minimized;
-                Logger.Info("1H Panel Minimized");
             }
         }
 
@@ -238,14 +236,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void Button_Close(object sender, RoutedEventArgs e)
         {
             Close();
-            Logger.Info("1H Panel Closed");
         }
 
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
             //AppConfiguration.Instance.RadioOpacity = Opacity;
-            Logger.Info($"1H Panel Opacity Set - {Opacity}");
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -263,7 +259,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
-            Logger.Info($"1H Panel Scale Set - Value= {value}");
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
