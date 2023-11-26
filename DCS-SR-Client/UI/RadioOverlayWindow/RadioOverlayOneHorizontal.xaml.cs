@@ -224,7 +224,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             // Since controls are unusable, but a very small portion of the always-on-top window still showing, we're closing it instead, similar to toggling the overlay
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide))
             {
-                Close()
+                Close();
             }
             else
             {
