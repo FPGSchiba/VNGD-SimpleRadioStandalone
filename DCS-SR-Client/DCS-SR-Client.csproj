@@ -323,6 +323,15 @@
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
+      <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml.cs">
+      <DependentUpon>RadioOverlayTenHorizontalWide.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml.cs">
+      <DependentUpon>RadioOverlayTenVerticalLong.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml.cs">
       <DependentUpon>RadioOverlayTwoHorizontal.xaml</DependentUpon>
     </Compile>
@@ -337,6 +346,9 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml.cs">
       <DependentUpon>RadioOverlayThreeVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
+      <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
       <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
@@ -410,6 +422,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -427,6 +451,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
