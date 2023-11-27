@@ -80,14 +80,14 @@
                 </TextBlock.Style>
             </TextBlock>
             <TextBlock Name="Orientation"
-           Width="38"
-           Height="12"
-           Margin="5,0,0,0"
-           VerticalAlignment="Center"
-           FontSize="8"
-           Foreground="#E7E7E7"
-           Padding="0"
-           Text="Horizontal" />
+                Width="38"
+                Height="12"
+                Margin="5,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="8"
+                Foreground="#E7E7E7"
+                 Padding="0"
+                Text="Horizontal" />
             <Button 
                 Height="15" 
                 Margin="0,0,2,0" 
