@@ -268,7 +268,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // 10 Radio Transparent
             int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
             int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten vertical long radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
+            Logger.Info($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
