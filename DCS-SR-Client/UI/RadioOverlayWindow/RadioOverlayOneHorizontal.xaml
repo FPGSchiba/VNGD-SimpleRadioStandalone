@@ -54,11 +54,11 @@
                        FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="1 Radio Panel Horizontal" />
+                       Text="1 Radio Panel" />
             <TextBlock Name="ControlSubText"
                        Width="100"
                        Text="VNGD is best"
-                       FontSize="11"
+                       FontSize="8"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"

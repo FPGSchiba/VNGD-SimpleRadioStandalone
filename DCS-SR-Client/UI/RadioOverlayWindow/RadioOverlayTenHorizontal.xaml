@@ -38,7 +38,7 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="16" />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition Height="35" />
@@ -52,17 +52,17 @@
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
                        Width="608"
-                       Height="16"
+                       Height="12"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
-                       FontSize="13"
+                       FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="10 Horizontal" />
+                       Text="10 Radio Panel" />
             <TextBlock Name="ControlSubText"
                        Width="100"
                        Text="VNGD is best"
-                       FontSize="11"
+                       FontSize="8"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"

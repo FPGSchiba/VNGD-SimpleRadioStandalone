@@ -56,17 +56,17 @@
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
                        Width="1510"
-                       Height="16"
+                       Height="12"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
-                       FontSize="13"
+                       FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
                        Text="10 Radio Panel - Ultrawide" />
             <TextBlock Name="ControlSubText"
                        Width="100"
                        Text="VNGD is best"
-                       FontSize="11"
+                       FontSize="8"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"
@@ -177,7 +177,7 @@
 
             <awacsOverlayWindow:IntercomControlGroup x:Name="intercom"
                             Margin="0,0,0,0"
-                            HorizontalAlignment="Left"
+                            HorizontalAlignment="Center"
                             RadioId="0" />
 
             <StackPanel

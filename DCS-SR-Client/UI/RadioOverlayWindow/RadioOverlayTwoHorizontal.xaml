@@ -57,6 +57,7 @@
                        Width="80"
                        Text="VNGD is best"
                        FontSize="8"
+                       Height="12"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"

@@ -67,7 +67,7 @@
                 <Grid Width="10" Height="10">
                     <TextBlock HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                              FontWeight="Bold"
+                               FontWeight="Bold"
                                FontSize="10"
                                Padding="0"
                                Text="?" />
