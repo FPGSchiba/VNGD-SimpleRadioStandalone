@@ -172,7 +172,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
 
         private long _lastFocus;
-        private RadioCapabilities _radioCapabilitiesWindow;
+        private SRSHelp _srsHelpWindow;
 
         private void FocusDCS()
         {
