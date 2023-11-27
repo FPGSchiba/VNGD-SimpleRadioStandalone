@@ -68,7 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private int _windowOpen = 12;
+        private int _windowOpen = 13;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;

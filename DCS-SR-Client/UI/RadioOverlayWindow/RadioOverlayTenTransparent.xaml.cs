@@ -262,7 +262,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
         {
-            foreach (var visibility in radioControlGroupTransparent)
+            foreach (var Visibility in radioControlGroupTransparent)
             {
                 //TODO: Add set all radio groups to visible
             }
