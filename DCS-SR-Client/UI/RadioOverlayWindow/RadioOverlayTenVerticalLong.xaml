@@ -35,7 +35,7 @@
 
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="12" />
+            <RowDefinition Height="16" />
             <RowDefinition Height="80"/>
             <RowDefinition Height="80"/>
             <RowDefinition Height="80"/>
@@ -63,7 +63,7 @@
                        FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="10 Vertical" />
+                       Text="10 Radio Panel" />
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"

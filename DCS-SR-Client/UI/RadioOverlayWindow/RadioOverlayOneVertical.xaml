@@ -36,11 +36,11 @@
                    Width="118"
                    Height="12"
                    Margin="5,0,0,0"
-                   VerticalAlignment="Top"
+                   VerticalAlignment="Center"
                    FontSize="8"
                    Foreground="#E7E7E7"
                    Padding="0"
-                   Text="" />
+                   Text="1 Radio Panel" />
         <Button Margin="0,0,0,0"
                 Click="Button_About"
                 Style="{StaticResource DarkStyle-Button}">
@@ -48,7 +48,7 @@
                 <Grid Width="10" Height="10">
                     <TextBlock HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                              FontWeight="Bold"
+                               FontWeight="Bold"
                                FontSize="10"
                                Padding="0"
                                Text="?" />
