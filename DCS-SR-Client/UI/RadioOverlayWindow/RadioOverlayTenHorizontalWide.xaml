@@ -84,6 +84,25 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <TextBlock Name="Orientation"
+                Width="38"
+                Height="12"
+                Margin="5,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="8"
+                Foreground="#E7E7E7"
+                Padding="0"
+                Text="Horizontal" />
+            <Button 
+                Height="15" 
+                Margin="0,0,2,0" 
+                ToolTip="Swap to vertical orientation"
+                Click="Button_Swap_Orientation"
+                Style="{StaticResource DarkStyle-Button}">
+                <Grid Width="10" Height="10">
+                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                </Grid>
+            </Button>
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"
