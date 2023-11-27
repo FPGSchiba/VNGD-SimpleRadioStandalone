@@ -414,5 +414,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Content = "Off";
             }
         }
+
+        private void HideRadio_Click(object sender, RoutedEventArgs e)
+        {
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+            // Radio is disabled and exists
+            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+            {
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+                RadioMetaData.Visibility = Visibility.Collapsed;
+                RadioEnabled.Visibility = Visibility.Collapsed;
+                RadioFrequency.Visibility = Visibility.Collapsed;
+                RadioActive.Visibility = Visibility.Collapsed;
+                RadioVolume.Visibility = Visibility.Collapsed;
+                RadioEnabled.Background = radioOn;
+                RadioEnabled.Content = "On";
+
+            }
+            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
+            {
+                return;
+            }
+        }
     }
 }

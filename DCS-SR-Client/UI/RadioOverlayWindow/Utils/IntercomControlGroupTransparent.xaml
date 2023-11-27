@@ -6,12 +6,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="RadioControlContainer"
-             Width="260"
-             Height="18">
-    <StackPanel Margin="3,0,3,0" Orientation="Horizontal">
+             Width="140"
+             Height="30">
+    <StackPanel Margin="2,0,2,0" Orientation="Vertical">
         <WrapPanel HorizontalAlignment="Left">
             <TextBlock x:Name="RadioLabel"
                        Width="15"
+                       Height="14"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        FontSize="10"
@@ -21,23 +22,39 @@
                        Text="I/C"
                        TextAlignment="Center" />
 
-            <Slider x:Name="RadioVolume"
-                    Width="60"
-                    Height="20"
+            <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                     Height="12"
+                     Width="57"
+                     VerticalAlignment="Center"
+                     Margin="3,0,3,0" >
+                <Slider x:Name="RadioVolume"
+                    Width="100"
+                    Height="18"
                     IsEnabled="True"
-                    Margin="3,0,3,0"
+                    Margin="0,0,0,0"
                     VerticalAlignment="Center"
                     Maximum="100"
                     Style="{x:Null}"
                     Thumb.DragCompleted="RadioVolume_DragCompleted"
                     Thumb.DragStarted="RadioVolume_DragStarted" />
+            </Viewbox>
 
-            <xctk:IntegerUpDown x:Name="IntercomNumberSpinner"
-                VerticalAlignment="Center"
-                Width="40"
-                Height="18"
-                ValueChanged="IntercomNumber_SpinnerChanged"
-                Value="1"/>
+            <Viewbox Stretch="Fill" 
+                     DockPanel.Dock="Right"
+                     Height="12"
+                     Width="30"
+                     VerticalAlignment="Center"
+                     Margin="3,0,3,0" > 
+                <xctk:IntegerUpDown 
+                    x:Name="IntercomNumberSpinner"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="50"
+                    FontSize="16"
+                    Height="25"
+                    ValueChanged="IntercomNumber_SpinnerChanged"
+                    Value="1" />
+            </Viewbox>
 
             <Ellipse x:Name="RadioActive"
                  Width="12"
@@ -52,36 +69,31 @@
                  ToolTip="Selected Radio" />
 
         </WrapPanel>
-
-        <Line
-             X1="0" Y1="0"
-             X2="0" Y2="50"
-             Stroke="#ACACAC"
-             StrokeThickness="2"
-             Margin="5,0,2,0"/>
+   
 
         <WrapPanel 
-            Width="138"
+            Width="110"
             Margin="2,0,0,0"
             ToolTip="Select the VOX Input mode you want to use. (Intercom Channel 1 Disabled)">
             <TextBlock x:Name="VOXLabel"
                Margin="2,0,2,0"
-               Width="20"
+               Width="40"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
-               FontSize="9"
+               FontSize="8"
                Foreground="#E7E7E7"
                Padding="0,0,0,0"
                Style="{x:Null}"
-               Text="VOX"
+               Text="VOX SEL"
                TextAlignment="Center" />
 
             <Button x:Name="Radio1Enabled"
-                Width="40"
-                FontSize="9"
-                Height="18"
-                Margin="0,0,2,0"
+                Width="30"
+                FontSize="8"
+                Height="12"
+                Margin="0,0,0,0"
                 VerticalAlignment="Center"
+                Padding="0,0,0,0"
                 Content="R1"
                 IsEnabled="True"
                 Foreground="Black"
@@ -90,11 +102,12 @@
                 ToolTip="enable / disable voice activated communications for Radio 1"/>
 
             <Button x:Name="IntercomEnabled"
-                Width="40"
-                FontSize="9"
-                Height="18"
+                Width="30"
+                FontSize="8"
+                Height="12"
                 Margin="2,0,0,0"
                 VerticalAlignment="Center"
+                Padding="0"
                 Content="IC"
                 IsEnabled="False"
                 Foreground="Black"

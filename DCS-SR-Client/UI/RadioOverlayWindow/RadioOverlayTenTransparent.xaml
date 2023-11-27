@@ -5,12 +5,12 @@
         xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="170"
-        Height="355"
-        MinWidth="170"
-        MinHeight="355"
+        Width="165"
+        Height="168"
+        MinWidth="165"
+        MinHeight="100"
         AllowsTransparency="True"
-        Background="Transparent"
+        Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
         Opacity="1.0"
         ResizeMode="CanResizeWithGrip"
@@ -19,6 +19,7 @@
         WindowStyle="None">
 
     <WrapPanel Name="ContainerPanel"
+               HorizontalAlignment="Center"
                SizeChanged="containerPanel_SizeChanged"
                Style="{x:Null}" Margin="0,0,0,0">
 
@@ -33,7 +34,7 @@
         </WrapPanel.LayoutTransform>
 
         <TextBlock Name="ControlText"
-                   Width="70"
+                   Width="68"
                    Height="12"
                    Margin="5,0,0,0"
                    VerticalAlignment="Center"
@@ -47,12 +48,14 @@
                    Width="28"
                    Height="12"
                    Margin="5,0,0,0"
+                   TextWrapping="NoWrap"
                    VerticalAlignment="Center"
                    FontSize="8"
                    Foreground="#E7E7E7"
                    Padding="0"
                    Text="Vertical" />
         <Button Margin="0,0,0,0"
+                Visibility="Hidden"
                 Click="Button_Swap_Orientation"
                 Style="{StaticResource DarkStyle-Button}"
                 ToolTip="Swap to horizon orientation">
@@ -106,44 +109,70 @@
             </Button.Content>
         </Button>
 
+        <StackPanel
+            Orientation="Vertical"
+            Margin="5,2,5,2">
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio3"  RadioId="3"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio4"  RadioId="4"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio5"  RadioId="5"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio6"  RadioId="6"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio7"  RadioId="7"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio8"  RadioId="8"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio9"  RadioId="9"  Visibility="Visible" />
+            <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio10" RadioId="10" Visibility="Visible"/>
+            <local:IntercomControlGroupTransparent Margin="0,0,0,0" x:Name="Intercom" RadioId="0" />
+        </StackPanel>
+    
+        <Separator Width="170" Margin="0,0,0,0" />
 
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio1"  RadioId="1"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio2"  RadioId="2"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio3"  RadioId="3"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio4"  RadioId="4"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio5"  RadioId="5"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio6"  RadioId="6"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio7"  RadioId="7"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio8"  RadioId="8"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio9"  RadioId="9"  />
-        <awacsOverlayWindow:RadioControlGroupTransparent Margin="5,0,0,0" x:Name="Radio10" RadioId="10" />
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Margin="5,2,5,0">
+            <Button Margin="0,0,0,0"
+                    Click="Button_ShowAllRadios"
+                    Style="{StaticResource DarkStyle-Button}">
+                <Button.Content>
+                    <Grid Width="25" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontWeight="Bold"
+                           FontSize="8"
+                           Padding="0"
+                           Text="show" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+            <TextBlock x:Name="RadioLabel"
+               Margin="2,0,0,0"
+               Width="50"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="8"
+               Foreground="#E7E7E7"
+               Padding="0,0,0,0"
+               Style="{x:Null}"
+               Text="Transparency"
+               TextAlignment="Center" />
 
-        <local:IntercomControlGroupTransparent x:Name="Intercom" RadioId="0" />
-        
-        <Separator Width="170" Margin="0 2" />
-
-        <TextBlock x:Name="RadioLabel"
-           Margin="5,0,0,0"
-           Width="60"
-           HorizontalAlignment="Center"
-           VerticalAlignment="Center"
-           FontSize="10"
-           Foreground="#E7E7E7"
-           Padding="0,0,0,0"
-           Style="{x:Null}"
-           Text="Transparency"
-           TextAlignment="Center" />
-
-        <Slider x:Name="WindowOpacitySlider"
-                Width="80"
-                Margin="2,2,0,0"
-                VerticalAlignment="Center"
-                Maximum="1.0"
-                Minimum="0.05"
-                ToolTip="Panel Opacity"
-                Style="{x:Null}"
-                Opacity="0.6"
-                ValueChanged="windowOpacitySlider_ValueChanged"
-                Value="1.0" />
+            <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                     Height="12"
+                     Width="50"
+                     VerticalAlignment="Center">    
+                <Slider x:Name="WindowOpacitySlider"
+                    Width="80"
+                    Margin="2,0,0,0"
+                    VerticalAlignment="Center"
+                    Maximum="1.0"
+                    Minimum="0.00"
+                    ToolTip="Panel Opacity"
+                    Style="{x:Null}"
+                    Opacity="0.6"
+                    ValueChanged="windowOpacitySlider_ValueChanged"
+                    Value="0.1" />
+            </Viewbox>
+        </StackPanel>
     </WrapPanel>
 </Window>

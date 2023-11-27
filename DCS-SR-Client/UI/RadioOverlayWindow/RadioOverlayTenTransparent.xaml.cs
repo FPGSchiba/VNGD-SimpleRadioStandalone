@@ -29,7 +29,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[] radioControlGroupTransparent =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[3];
+            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[10];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             MaxHeight = screen.Bounds.Height;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalOpacity).DoubleValue;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
 
             radioControlGroupTransparent[0] = Radio1;
@@ -79,11 +79,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight).DoubleValue;
 
             //  Window_Loaded(null, null);
             CalculateScale();
@@ -260,7 +260,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
         }
-
+        private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
+        {
+            foreach (var visibility in radioControlGroupTransparent)
+            {
+                //TODO: Add set all radio groups to visible
+            }
+        }
 
         private void Button_Close(object sender, RoutedEventArgs e)
         {
