@@ -432,35 +432,61 @@
 
                             </StackPanel>
                             <StackPanel
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Margin="0"
-                                Orientation="Horizontal">
-                                <TextBlock
-                                    Height="15"
-                                    Margin="0,20,50,0"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
+                                    Margin="0"
+                                    Orientation="Horizontal">
+                                <StackPanel
                                     HorizontalAlignment="Center"
-                                    Width="130"
-                                    Text="Ultrawide Panel Variants"
-                                    />
+                                    VerticalAlignment="Top"
+                                    Margin="0,20,0,0">
+                                    <TextBlock
+                                        Height="15"
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Width="150"
+                                        Text="Ultrawide Panel Variants"
+                                        />
 
-                                <Button
-                                    Click="ShowOverlayTenVerticalLong_OnClick"
-                                    Content="10 Vertical Long"
+                                    <Button
+                                        Click="ShowOverlayTenVerticalLong_OnClick"
+                                        Content="10 Vertical Long"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenVerticalLong" />
+                                    <Button
+                                        Click="ShowOverlayTenHorizontalWide_OnClick"
+                                        Content="10 Horizontal Wide"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenHorizontalWide" />
+                                </StackPanel>
+                                <StackPanel
                                     HorizontalAlignment="Center"
-                                    Margin="0,20,20,0"
-                                    Style="{DynamicResource SquareButtonStyle}"
-                                    Width="110"
-                                    x:Name="ShowOverlayTenVerticalLong" />
-                                <Button
-                                    Click="ShowOverlayTenHorizontalWide_OnClick"
-                                    Content="10 Horizontal Wide"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,20,0,0"
-                                    Style="{DynamicResource SquareButtonStyle}"
-                                    Width="110"
-                                    x:Name="ShowOverlayTenHorizontalWide" />
+                                    VerticalAlignment="Top"
+                                    Margin="20,20,0,0">
+                                    <TextBlock
+                                        Height="15"
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Width="150"
+                                        Text="Transparent Radio Panels"
+                                        />
+                                    <Button
+                                        Click="ShowOverlayTenTransparent_OnClick"
+                                        Content="10 Transparent"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenTransparent" />
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
 

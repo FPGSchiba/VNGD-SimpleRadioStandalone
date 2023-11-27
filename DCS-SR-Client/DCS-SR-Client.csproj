@@ -319,6 +319,9 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
+      <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
@@ -349,6 +352,12 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
       <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml.cs">
+      <DependentUpon>RadioOverlayTenTransparent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml.cs">
+      <DependentUpon>IntercomControlGroupTransparent.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
       <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
@@ -418,6 +427,10 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -455,6 +468,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

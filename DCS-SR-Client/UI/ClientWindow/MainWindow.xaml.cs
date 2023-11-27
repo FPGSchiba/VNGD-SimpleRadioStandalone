@@ -46,6 +46,7 @@ using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 using System.Windows.Navigation;
+using System.Security.Cryptography;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -76,6 +77,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
         private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
         private RadioOverlayWindowTenVerticalLong _radioOverlayWindowTenVerticalLong;
+        private RadioOverlayWindowTenTransparent _radioOverlayWindowTenTransparent;
 
         // Horizontal Radio-Overlays
         private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
@@ -150,6 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[9] = _radioOverlayWindowOneHorizontal;
             windows[10] = _radioOverlayWindowTenVerticalLong;
             windows[11] = _radioOverlayWindowTenHorizontalWide;
+            windows[12] = _radioOverlayWindowTenTransparent;
 
             var client = ClientStateSingleton.Instance;
 
@@ -262,6 +265,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             int radioTenLongVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX).DoubleValue;
             int radioTenLongVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY).DoubleValue;
             Logger.Info($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
+            // 10 Radio Transparent
+            int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
+            int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten vertical long radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
@@ -332,6 +339,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Logger.Info($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
+                if (screen.Bounds.Contains(radioTenTransparentX, radioTenTransparentY))
+                {
+                    Logger.Info($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+
                 // -------- Horizontal Panels -----------
                 if (screen.Bounds.Contains(radioOneHorizontalX, radioOneHorizontalY))
                 {
@@ -397,6 +410,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
                 Logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
                 Logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
+                Logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
 
                 // ------- Horizontal Panels ----------
                 Logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
@@ -425,6 +439,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, 300);
 
                 // ------ Horizontal ------
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);
@@ -481,6 +498,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     _radioOverlayWindowTenVerticalLong.Left = 300;
                     _radioOverlayWindowTenVerticalLong.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenTransparent != null)
+                {
+                    _radioOverlayWindowTenTransparent.Left = 300;
+                    _radioOverlayWindowTenTransparent.Top = 300;
                 }
 
                 // ------- Horizontal Panels ---------
@@ -1685,6 +1708,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ToggleOverlay(true, 11);
         }
 
+        private void ShowOverlayTenTransparent_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 12);
+        }
+
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
@@ -1692,7 +1720,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _toggleShowHide = DateTime.Now.Ticks;
                 // Catching out of bounds switch to.
-                // TODO: Maybe take switchTo = 12 to close all windows.
+                // TODO: Maybe take switchTo = 13 to close all windows.
                 if (switchTo < 0 || switchTo > windows.Count() - 1)
                 {
                     Logger.Error($"Could not switch to RadioWindow-{switchTo}.");
@@ -1758,6 +1786,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             // TODO: Add Toggle Overlay for Horizontal Swap
                             windows[switchTo] = new RadioOverlayWindowTenHorizontalWide();
                             break;
+                        case 12:
+                            windows[switchTo] = new RadioOverlayWindowTenTransparent(ToggleOverlay);
+                            break;
                     }
                     try
                     {
@@ -1775,7 +1806,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 else
                 {
                     // No Panel window is open
-                    _windowOpen = 12;
+                    _windowOpen = 13;
                 }
             }
         }
@@ -1784,7 +1815,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
-            _windowOpen = 12;
+            _windowOpen = 13;
 
             // Erase window from windows array to clean up everything
             for (int i = 0; i < windows.Count(); i++)
@@ -1981,6 +2012,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindowTenVerticalLong?.Close();
             _radioOverlayWindowTenVerticalLong = null;
 
+            _radioOverlayWindowTenTransparent?.Close();
+            _radioOverlayWindowTenTransparent = null;
+
             _radioOverlayWindowOneHorizontal?.Close();
             _radioOverlayWindowOneHorizontal = null;
 
@@ -2053,6 +2087,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalHeight, 905);
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalOpacity, 1.0);
+
+            // 10 Transparent
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, 905);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentOpacity, 0.0);
 
             // 1 Horizontal
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);
@@ -2610,5 +2653,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (VOXMinimumRMS.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
         }
+
+        
     }
 }
