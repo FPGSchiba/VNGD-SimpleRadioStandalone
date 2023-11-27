@@ -55,14 +55,14 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
-                       Width="1510"
+                       Width="1450"
                        Height="12"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
                        FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0"
-                       Text="10 Radio Panel - Ultrawide" />
+                       Text="10 Radio Panel" />
             <TextBlock Name="ControlSubText"
                        Width="100"
                        Text="VNGD is best"
