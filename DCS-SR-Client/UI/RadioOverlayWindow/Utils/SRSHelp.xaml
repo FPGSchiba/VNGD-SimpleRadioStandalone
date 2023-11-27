@@ -8,7 +8,7 @@
                       Title="Vanguard SRS Common Questions"
                       TitleAlignment="Center"
                       Width="400"
-                      Height="280"
+                      Height="300"
                       ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
