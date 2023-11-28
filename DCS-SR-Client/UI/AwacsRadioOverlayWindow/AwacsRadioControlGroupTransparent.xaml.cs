@@ -184,6 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (!_clientStateSingleton.IsConnected || (dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
                 RadioId > dcsPlayerRadioInfo.radios.Length - 1)
             {
+                //Color and settings for disconnected radio
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
                 RadioFrequency.Text = "Unknown";
@@ -207,14 +208,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     if (transmitting.SendingOn == RadioId)
                     {
+                        //Color for user transmitting - dabble
                         RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
                     }
                     else if (currentRadio != null && currentRadio.simul)
                     {
+                        //Color for simultaneous transmissions - dabble
                         RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4F86FF"));
                     }
                     else
                     {
+                        //unknown purposes yet - dabble
                         RadioActive.Fill = RadioId == dcsPlayerRadioInfo.selected ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Orange);
                     }
                 }
@@ -222,14 +226,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     if (RadioId == dcsPlayerRadioInfo.selected)
                     {
+                        //Color for selected radio, not transmitting - dabble
                         RadioActive.Fill = new SolidColorBrush(Colors.Green);
                     }
                     else if (currentRadio != null && currentRadio.simul)
                     {
+                        //Color for deselected radio that is setup for simultaneous transmissions - dabble
                         RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
                     }
                     else
                     {
+                        //Color for unselected radio that is powered on - dabble
                         RadioActive.Fill = new SolidColorBrush(Colors.Orange);
                     }
                 }
