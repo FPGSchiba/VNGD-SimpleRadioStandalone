@@ -112,7 +112,7 @@
         <local:IntercomControlGroup x:Name="Intercom" RadioId="0" />
         <Separator Width="170" Margin="0 2" />
 
-        <TextBlock x:Name="RadioLabel"
+        <TextBlock
            Margin="5,0,0,0"
            Width="60"
            HorizontalAlignment="Center"

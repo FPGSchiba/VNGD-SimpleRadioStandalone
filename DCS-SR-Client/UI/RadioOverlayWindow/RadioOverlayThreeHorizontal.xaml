@@ -6,9 +6,9 @@
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="510"
-        Height="130"
+        Height="117"
         MinWidth="510"
-        MinHeight="130"
+        MinHeight="117"
         AllowsTransparency="True"
         Background="#444"
         Opacity="1.0"
@@ -36,9 +36,9 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="16" />
+            <RowDefinition Height="80" />
             <RowDefinition Height="20" />
-            <RowDefinition />
-            <RowDefinition Height="25" />
 
         </Grid.RowDefinitions>
 
@@ -57,7 +57,7 @@
             <TextBlock Name="ControlSubText"
                        Width="100"
                        Text="VNGD is best"
-                       FontSize="11"
+                       FontSize="8"
                        TextAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="#E7E7E7"
