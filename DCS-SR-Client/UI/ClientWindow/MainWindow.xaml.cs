@@ -88,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
 
         // Windows array
-        private Window[] windows = new Window[12];
+        private Window[] windows = new Window[13];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
