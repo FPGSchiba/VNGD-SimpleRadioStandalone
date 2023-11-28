@@ -15,6 +15,7 @@
                 Background="Transparent">
         <Button
             Background="#444"
+            Visibility="Collapsed"
             Click="HideRadio_Click"
             Content="Hide"
             Opacity="1"
@@ -47,7 +48,7 @@
             Foreground="#00FF00"
             Background="Black"
             Height="10"
-            Width="33"
+            Width="43"
             Style="{x:Null}"
             Margin="1,0,0,0"
             Padding="0"

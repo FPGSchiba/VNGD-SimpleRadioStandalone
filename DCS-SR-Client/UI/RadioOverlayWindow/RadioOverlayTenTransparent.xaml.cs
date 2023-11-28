@@ -17,6 +17,8 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using System.Windows.Forms;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using MessageBox = System.Windows.Forms.MessageBox;
+using System.Reflection.Metadata;
+using Xamarin.Forms.Shapes;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -263,10 +265,97 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         }
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
         {
-            foreach (var Visibility in radioControlGroupTransparent)
-            {
-                //TODO: Add set all radio groups to visible
-            }
+            //Radio 1
+            //Radio1.HideRadio.Visibility = Visibility.Visible;
+            Radio1.RadioEnabled.Visibility = Visibility.Visible;
+            Radio1.RadioLabel.Visibility = Visibility.Visible;
+            Radio1.RadioFrequency.Visibility = Visibility.Visible;
+            Radio1.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio1.TransmitterName.Visibility = Visibility.Visible;
+            Radio1.RadioActive.Visibility = Visibility.Visible;
+            Radio1.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 2
+            //Radio2.HideRadio.Visibility = Visibility.Visible;
+            Radio2.RadioEnabled.Visibility = Visibility.Visible;
+            Radio2.RadioLabel.Visibility = Visibility.Visible;
+            Radio2.RadioFrequency.Visibility = Visibility.Visible;
+            Radio2.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio2.TransmitterName.Visibility = Visibility.Visible;
+            Radio2.RadioActive.Visibility = Visibility.Visible;
+            Radio2.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 3
+            //Radio3.HideRadio.Visibility = Visibility.Visible;
+            Radio3.RadioEnabled.Visibility = Visibility.Visible;
+            Radio3.RadioLabel.Visibility = Visibility.Visible;
+            Radio3.RadioFrequency.Visibility = Visibility.Visible;
+            Radio3.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio3.TransmitterName.Visibility = Visibility.Visible;
+            Radio3.RadioActive.Visibility = Visibility.Visible;
+            Radio3.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 4
+            //Radio4.HideRadio.Visibility = Visibility.Visible;
+            Radio4.RadioEnabled.Visibility = Visibility.Visible;
+            Radio4.RadioLabel.Visibility = Visibility.Visible;
+            Radio4.RadioFrequency.Visibility = Visibility.Visible;
+            Radio4.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio4.TransmitterName.Visibility = Visibility.Visible;
+            Radio4.RadioActive.Visibility = Visibility.Visible;
+            Radio4.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 5
+            //Radio5.HideRadio.Visibility = Visibility.Visible;
+            Radio5.RadioEnabled.Visibility = Visibility.Visible;
+            Radio5.RadioLabel.Visibility = Visibility.Visible;
+            Radio5.RadioFrequency.Visibility = Visibility.Visible;
+            Radio5.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio5.TransmitterName.Visibility = Visibility.Visible;
+            Radio5.RadioActive.Visibility = Visibility.Visible;
+            Radio5.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 6
+            //Radio6.HideRadio.Visibility = Visibility.Visible;
+            Radio6.RadioEnabled.Visibility = Visibility.Visible;
+            Radio6.RadioLabel.Visibility = Visibility.Visible;
+            Radio6.RadioFrequency.Visibility = Visibility.Visible;
+            Radio6.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio6.TransmitterName.Visibility = Visibility.Visible;
+            Radio6.RadioActive.Visibility = Visibility.Visible;
+            Radio6.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 7
+            //Radio7.HideRadio.Visibility = Visibility.Visible;
+            Radio7.RadioEnabled.Visibility = Visibility.Visible;
+            Radio7.RadioLabel.Visibility = Visibility.Visible;
+            Radio7.RadioFrequency.Visibility = Visibility.Visible;
+            Radio7.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio7.TransmitterName.Visibility = Visibility.Visible;
+            Radio7.RadioActive.Visibility = Visibility.Visible;
+            Radio7.RadioVolume.Visibility = Visibility.Visible;
+            //Radio8
+            //Radio8.HideRadio.Visibility = Visibility.Visible;
+            Radio8.RadioEnabled.Visibility = Visibility.Visible;
+            Radio8.RadioLabel.Visibility = Visibility.Visible;
+            Radio8.RadioFrequency.Visibility = Visibility.Visible;
+            Radio8.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio8.TransmitterName.Visibility = Visibility.Visible;
+            Radio8.RadioActive.Visibility = Visibility.Visible;
+            Radio8.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 9
+            //Radio9.HideRadio.Visibility = Visibility.Visible;
+            Radio9.RadioEnabled.Visibility = Visibility.Visible;
+            Radio9.RadioLabel.Visibility = Visibility.Visible;
+            Radio9.RadioFrequency.Visibility = Visibility.Visible;
+            Radio9.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio9.TransmitterName.Visibility = Visibility.Visible;
+            Radio9.RadioActive.Visibility = Visibility.Visible;
+            Radio9.RadioVolume.Visibility = Visibility.Visible;
+            //Radio 10
+            //Radio10.HideRadio.Visibility = Visibility.Visible;
+            Radio10.RadioEnabled.Visibility = Visibility.Visible;
+            Radio10.RadioLabel.Visibility = Visibility.Visible;
+            Radio10.RadioFrequency.Visibility = Visibility.Visible;
+            Radio10.RadioMetaData.Visibility = Visibility.Visible;
+            //Radio10.TransmitterName.Visibility = Visibility.Visible;
+            Radio10.RadioActive.Visibility = Visibility.Visible;
+            Radio10.RadioVolume.Visibility = Visibility.Visible;
+
         }
 
         private void Button_Close(object sender, RoutedEventArgs e)

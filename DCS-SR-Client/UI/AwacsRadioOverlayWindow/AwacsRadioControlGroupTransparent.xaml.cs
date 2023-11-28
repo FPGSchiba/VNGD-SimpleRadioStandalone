@@ -440,29 +440,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
                 RadioEnabled.Background = radioOff;
                 RadioEnabled.Content = "Off";
+
+                //added code to simplify panel
+                HideRadio.Visibility = Visibility.Collapsed;
+                RadioEnabled.Visibility = Visibility.Collapsed;
+                RadioLabel.Visibility = Visibility.Collapsed;
+                RadioFrequency.Visibility = Visibility.Collapsed;
+                RadioMetaData.Visibility = Visibility.Collapsed;
+                TransmitterName.Visibility = Visibility.Collapsed;
+                RadioActive.Visibility = Visibility.Collapsed;
+                RadioVolume.Visibility = Visibility.Collapsed;
             }
         }
 
         private void HideRadio_Click(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioHelper.GetRadio(RadioId);
-            // Radio is disabled and exists
-            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-            {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioMetaData.Visibility = Visibility.Collapsed;
-                RadioEnabled.Visibility = Visibility.Collapsed;
-                RadioFrequency.Visibility = Visibility.Collapsed;
-                RadioActive.Visibility = Visibility.Collapsed;
-                RadioVolume.Visibility = Visibility.Collapsed;
-                RadioEnabled.Background = radioOn;
-                RadioEnabled.Content = "On";
+            //moved to ToggleSwitch_Click action
 
-            }
-            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                return;
-            }
+
         }
     }
 }
