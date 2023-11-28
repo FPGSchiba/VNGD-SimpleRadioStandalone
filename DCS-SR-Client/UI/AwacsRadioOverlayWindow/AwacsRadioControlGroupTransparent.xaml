@@ -1,14 +1,14 @@
 ﻿<UserControl
     Height="10"
     Name="RadioControlContainerTransparent"
-    Width="160"
+    Width="168"
     x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
-    
+
     <StackPanel Orientation="Horizontal"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
@@ -38,7 +38,7 @@
             Height="10"
             HorizontalAlignment="Center"
             IsEnabled="False"
-            Margin="2,0,0,0"
+            Margin="1,0,0,0"
             Name="RadioEnabled"
             Padding="0"
             Style="{StaticResource DarkStyle-Button}"
@@ -46,19 +46,31 @@
         <TextBlock
             Foreground="#00FF00"
             Background="Black"
-            Margin="3,0,0,0"
+            Height="10"
+            Width="33"
+            Style="{x:Null}"
+            Margin="1,0,0,0"
             Padding="0"
             FontSize="8"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            Text="Radio"
-            x:Name="RadioLabel" />
+            TextWrapping="NoWrap"
+            Text="Radio 10"
+            x:Name="RadioLabel">
+                <Border
+                    BorderBrush="Transparent"
+                    BorderThickness="0">
+                </Border>
+            </TextBlock>
         <TextBox
             Background="Black"
             BorderThickness="0"
+            BorderBrush="Transparent"
             Foreground="#00FF00"
             Height="10"
+            Width="30"
             FontSize="8"
+            Padding="0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             PreviewMouseWheel="RadioFrequencyText_MouseWheel"
@@ -67,8 +79,8 @@
             Style="{x:Null}"
             Text="000.000"
             TextAlignment="Center"
-            TextWrapping="Wrap"
-            Width="38"
+            TextWrapping="NoWrap"
+            Visibility="Visible"
             x:Name="RadioFrequency" />
         <TextBlock
             Background="Black"
@@ -79,31 +91,39 @@
             MouseDown="RadioFrequencyText_Click"
             MouseRightButtonDown="RadioFrequencyText_RightClick"
             Style="{x:Null}"
-            Text="AM"
+            Text="AM 👤10"
+            Padding="0"
             TextAlignment="Center"
             TextWrapping="NoWrap"
             VerticalAlignment="Center"
-            Width="30"
-            x:Name="RadioMetaData" />
+            Visibility="Visible"
+            Width="35"
+            x:Name="RadioMetaData">
+            <Border
+                BorderBrush="Transparent"
+                BorderThickness="0">
+            </Border>
+
+        </TextBlock>
         <TextBlock
-            Background="Transparent"
+            Background="Black"
             Foreground="#00FF00"
-            Height="15"
+            Height="10"
+            Width="65"
+            FontSize="8"
             HorizontalAlignment="Center"
+            VerticalAlignment="Center"
             Style="{x:Null}"
             Text="USER"
             TextAlignment="Center"
             TextWrapping="NoWrap"
-            VerticalAlignment="Center"
             Visibility="Collapsed"
-            Width="140"
             x:Name="TransmitterName" />
-
         <Ellipse
             Fill="#FF9900"
             Height="10"
             HorizontalAlignment="Right"
-            Margin="0"
+            Margin="1,0,0,0"
             MouseDown="RadioSelectSwitch"
             Stroke="Black"
             Style="{x:Null}"
@@ -115,7 +135,7 @@
             <Slider
                 Height="20"
                 IsEnabled="False"
-                Margin="2,2,0,0"
+                Margin="3,2,0,0"
                 Maximum="100"
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"

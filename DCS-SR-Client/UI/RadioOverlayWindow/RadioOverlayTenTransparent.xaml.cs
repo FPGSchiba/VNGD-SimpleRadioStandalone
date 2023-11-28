@@ -62,9 +62,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             MaxHeight = screen.Bounds.Height;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentOpacity).DoubleValue;
-            WindowOpacitySlider.Value = Opacity;
-
+            BackgroundOpacitySlider.Value = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity).DoubleValue;
+            TextOpacitySlider.Value = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentTextOpacity).DoubleValue;
+            
             radioControlGroupTransparent[0] = Radio1;
             radioControlGroupTransparent[1] = Radio2;
             radioControlGroupTransparent[2] = Radio3;
@@ -218,7 +218,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentOpacity, Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity, Opacity);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentTextOpacity, Opacity);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, Top);
             base.OnClosing(e);
@@ -280,9 +281,131 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _toggleOverlay(true, 5); // index 5 is the horizontal orientation
         }
 
-        private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void textOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Opacity = e.NewValue;
+            //Header
+            ControlText.Opacity = e.NewValue;
+            Orientation.Opacity = e.NewValue;
+            buttonOrientation.Opacity = e.NewValue;
+            buttonAbout.Opacity = e.NewValue;
+            buttonMinimize.Opacity = e.NewValue;
+            buttonClose.Opacity = e.NewValue;
+
+            //Radio 1
+            Radio1.HideRadio.Opacity = e.NewValue;
+            Radio1.RadioEnabled.Opacity = e.NewValue;
+            Radio1.RadioLabel.Opacity = e.NewValue;
+            Radio1.RadioFrequency.Opacity = e.NewValue;
+            Radio1.RadioMetaData.Opacity = e.NewValue;
+            Radio1.TransmitterName.Opacity = e.NewValue;
+            Radio1.RadioActive.Opacity = e.NewValue;
+            Radio1.RadioVolume.Opacity = e.NewValue;
+            //Radio 2
+            Radio2.HideRadio.Opacity = e.NewValue;
+            Radio2.RadioEnabled.Opacity = e.NewValue;
+            Radio2.RadioLabel.Opacity = e.NewValue;
+            Radio2.RadioFrequency.Opacity = e.NewValue;
+            Radio2.RadioMetaData.Opacity = e.NewValue;
+            Radio2.TransmitterName.Opacity = e.NewValue;
+            Radio2.RadioActive.Opacity = e.NewValue;
+            Radio2.RadioVolume.Opacity = e.NewValue;
+            //Radio 3
+            Radio3.HideRadio.Opacity = e.NewValue;
+            Radio3.RadioEnabled.Opacity = e.NewValue;
+            Radio3.RadioLabel.Opacity = e.NewValue;
+            Radio3.RadioFrequency.Opacity = e.NewValue;
+            Radio3.RadioMetaData.Opacity = e.NewValue;
+            Radio3.TransmitterName.Opacity = e.NewValue;
+            Radio3.RadioActive.Opacity = e.NewValue;
+            Radio3.RadioVolume.Opacity = e.NewValue;
+            //Radio 4
+            Radio4.HideRadio.Opacity = e.NewValue;
+            Radio4.RadioEnabled.Opacity = e.NewValue;
+            Radio4.RadioLabel.Opacity = e.NewValue;
+            Radio4.RadioFrequency.Opacity = e.NewValue;
+            Radio4.RadioMetaData.Opacity = e.NewValue;
+            Radio4.TransmitterName.Opacity = e.NewValue;
+            Radio4.RadioActive.Opacity = e.NewValue;
+            Radio4.RadioVolume.Opacity = e.NewValue;
+            //Radio 5
+            Radio5.HideRadio.Opacity = e.NewValue;
+            Radio5.RadioEnabled.Opacity = e.NewValue;
+            Radio5.RadioLabel.Opacity = e.NewValue;
+            Radio5.RadioFrequency.Opacity = e.NewValue;
+            Radio5.RadioMetaData.Opacity = e.NewValue;
+            Radio5.TransmitterName.Opacity = e.NewValue;
+            Radio5.RadioActive.Opacity = e.NewValue;
+            Radio5.RadioVolume.Opacity = e.NewValue;
+            //Radio 6
+            Radio6.HideRadio.Opacity = e.NewValue;
+            Radio6.RadioEnabled.Opacity = e.NewValue;
+            Radio6.RadioLabel.Opacity = e.NewValue;
+            Radio6.RadioFrequency.Opacity = e.NewValue;
+            Radio6.RadioMetaData.Opacity = e.NewValue;
+            Radio6.TransmitterName.Opacity = e.NewValue;
+            Radio6.RadioActive.Opacity = e.NewValue;
+            Radio6.RadioVolume.Opacity = e.NewValue;
+            //Radio 7
+            Radio7.HideRadio.Opacity = e.NewValue;
+            Radio7.RadioEnabled.Opacity = e.NewValue;
+            Radio7.RadioLabel.Opacity = e.NewValue;
+            Radio7.RadioFrequency.Opacity = e.NewValue;
+            Radio7.RadioMetaData.Opacity = e.NewValue;
+            Radio7.TransmitterName.Opacity = e.NewValue;
+            Radio7.RadioActive.Opacity = e.NewValue;
+            Radio7.RadioVolume.Opacity = e.NewValue;
+            //Radio 8
+            Radio7.HideRadio.Opacity = e.NewValue;
+            Radio7.RadioEnabled.Opacity = e.NewValue;
+            Radio7.RadioLabel.Opacity = e.NewValue;
+            Radio7.RadioFrequency.Opacity = e.NewValue;
+            Radio7.RadioMetaData.Opacity = e.NewValue;
+            Radio7.TransmitterName.Opacity = e.NewValue;
+            Radio7.RadioActive.Opacity = e.NewValue;
+            Radio7.RadioVolume.Opacity = e.NewValue;
+            //Radio 8
+            Radio8.HideRadio.Opacity = e.NewValue;
+            Radio8.RadioEnabled.Opacity = e.NewValue;
+            Radio8.RadioLabel.Opacity = e.NewValue;
+            Radio8.RadioFrequency.Opacity = e.NewValue;
+            Radio8.RadioMetaData.Opacity = e.NewValue;
+            Radio8.TransmitterName.Opacity = e.NewValue;
+            Radio8.RadioActive.Opacity = e.NewValue;
+            Radio8.RadioVolume.Opacity = e.NewValue;
+            //Radio 9
+            Radio9.HideRadio.Opacity = e.NewValue;
+            Radio9.RadioEnabled.Opacity = e.NewValue;
+            Radio9.RadioLabel.Opacity = e.NewValue;
+            Radio9.RadioFrequency.Opacity = e.NewValue;
+            Radio9.RadioMetaData.Opacity = e.NewValue;
+            Radio9.TransmitterName.Opacity = e.NewValue;
+            Radio9.RadioActive.Opacity = e.NewValue;
+            Radio9.RadioVolume.Opacity = e.NewValue;
+            //Radio 10
+            Radio10.HideRadio.Opacity = e.NewValue;
+            Radio10.RadioEnabled.Opacity = e.NewValue;
+            Radio10.RadioLabel.Opacity = e.NewValue;
+            Radio10.RadioFrequency.Opacity = e.NewValue;
+            Radio10.RadioMetaData.Opacity = e.NewValue;
+            Radio10.TransmitterName.Opacity = e.NewValue;
+            Radio10.RadioActive.Opacity = e.NewValue;
+            Radio10.RadioVolume.Opacity = e.NewValue;
+            //Vox and Intercom
+            Intercom.Opacity = e.NewValue;
+            //Footer
+            buttonShow.Opacity = e.NewValue;
+            textBackground.Opacity = e.NewValue;
+            textText.Opacity = e.NewValue;
+
+
+
+        }
+
+        private void backgroundOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Background.Opacity = e.NewValue;
+            
+            //Opacity = e.NewValue;
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)

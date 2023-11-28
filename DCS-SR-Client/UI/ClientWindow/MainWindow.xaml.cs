@@ -2091,7 +2091,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, 170);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, 905);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentOpacity, 0.1);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentTextOpacity, 1.0);
 
             // 1 Horizontal
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);

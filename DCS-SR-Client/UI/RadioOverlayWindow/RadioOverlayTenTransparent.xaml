@@ -5,10 +5,10 @@
         xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="165"
-        Height="168"
-        MinWidth="165"
-        MinHeight="100"
+        Width="170"
+        Height="170"
+        MinWidth="170"
+        MinHeight="170"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -34,7 +34,7 @@
         </WrapPanel.LayoutTransform>
 
         <TextBlock Name="ControlText"
-                   Width="68"
+                   Width="103"
                    Height="12"
                    Margin="5,0,0,0"
                    VerticalAlignment="Center"
@@ -44,17 +44,18 @@
                    Padding="0"
                    Text="Transparent Radio Panel" />
         <TextBlock Name="Orientation"
-                   Visibility="Hidden"
+                   Visibility="Collapsed"
                    Width="28"
                    Height="12"
-                   Margin="5,0,0,0"
+                   Margin="0,0,0,0"
                    TextWrapping="NoWrap"
                    VerticalAlignment="Center"
                    FontSize="8"
                    Foreground="#E7E7E7"
                    Padding="0"
                    Text="Vertical" />
-        <Button Margin="0,0,0,0"
+        <Button Name="buttonOrientation"
+                Margin="0,0,0,0"
                 Visibility="Hidden"
                 Click="Button_Swap_Orientation"
                 Style="{StaticResource DarkStyle-Button}"
@@ -65,7 +66,8 @@
                 </Grid>
             </Button.Content>
         </Button>
-        <Button Margin="0,0,0,0"
+        <Button Name="buttonAbout"
+                Margin="0,0,0,0"
                 Click="Button_About"
                 Style="{StaticResource DarkStyle-Button}">
             <Button.Content>
@@ -79,7 +81,8 @@
                 </Grid>
             </Button.Content>
         </Button>
-        <Button Margin="0,0,0,0"
+        <Button Name="buttonMinimize"
+                Margin="0,0,0,0"
                 Click="Button_Minimise"
                 Style="{StaticResource DarkStyle-Button}">
             <Button.Content>
@@ -94,7 +97,8 @@
             </Button.Content>
         </Button>
 
-        <Button Margin="2,0,0,0"
+        <Button Name="buttonClose"
+                Margin="2,0,0,0"
                 Click="Button_Close"
                 Style="{StaticResource DarkStyle-Button}">
             <Button.Content>
@@ -111,7 +115,9 @@
 
         <StackPanel
             Orientation="Vertical"
-            Margin="5,2,5,2">
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center" 
+            Width="170">
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio3"  RadioId="3"  Visibility="Visible" />
@@ -131,7 +137,8 @@
             Orientation="Horizontal"
             HorizontalAlignment="Center"
             Margin="5,2,5,0">
-            <Button Margin="0,0,0,0"
+            <Button Name="buttonShow"
+                    Margin="0,0,0,0"
                     Click="Button_ShowAllRadios"
                     Style="{StaticResource DarkStyle-Button}">
                 <Button.Content>
@@ -145,34 +152,70 @@
                     </Grid>
                 </Button.Content>
             </Button>
-            <TextBlock x:Name="RadioLabel"
-               Margin="2,0,0,0"
-               Width="50"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="8"
-               Foreground="#E7E7E7"
-               Padding="0,0,0,0"
-               Style="{x:Null}"
-               Text="Transparency"
-               TextAlignment="Center" />
+            <StackPanel
+                Name="textBackground"
+                Margin="2,0,0,0">
+                <TextBlock
+                   Margin="2,0,0,0"
+                   Width="50"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="6"
+                   Foreground="#E7E7E7"
+                   Padding="0,0,0,0"
+                   Style="{x:Null}"
+                   Text="Background"
+                   TextAlignment="Center" />
 
-            <Viewbox Stretch="Fill" DockPanel.Dock="Right"
-                     Height="12"
-                     Width="50"
-                     VerticalAlignment="Center">    
-                <Slider x:Name="WindowOpacitySlider"
-                    Width="80"
+                <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                         Height="8"
+                         Width="50"
+                         VerticalAlignment="Center">    
+                    <Slider x:Name="BackgroundOpacitySlider"
+                        Width="100"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center"
+                        Maximum="1.0"
+                        Minimum="0.0"
+                        ToolTip="Panel Opacity"
+                        Style="{x:Null}"
+                        Opacity="0.6"
+                        ValueChanged="backgroundOpacitySlider_ValueChanged"
+                        Value="1" />
+                </Viewbox>
+            </StackPanel>
+            <StackPanel
+                Name="textText"
+                Margin="2,0,0,0">
+                <TextBlock
                     Margin="2,0,0,0"
+                    Width="50"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Maximum="1.0"
-                    Minimum="0.00"
-                    ToolTip="Panel Opacity"
+                    FontSize="6"
+                    Foreground="#E7E7E7"
+                    Padding="0,0,0,0"
                     Style="{x:Null}"
-                    Opacity="0.6"
-                    ValueChanged="windowOpacitySlider_ValueChanged"
-                    Value="0.1" />
-            </Viewbox>
+                    Text="Text"
+                    TextAlignment="Center" />
+
+                <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                    Height="8"
+                    Width="50"
+                    VerticalAlignment="Center">
+                    <Slider x:Name="TextOpacitySlider"
+                        Width="100"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center"
+                        Maximum="1.0"
+                        Minimum="0.20"
+                        ToolTip="Panel Opacity"
+                        Style="{x:Null}"
+                        Opacity="0.6"
+                        ValueChanged="textOpacitySlider_ValueChanged"
+                        Value="0.1" />
+                </Viewbox>
+            </StackPanel>
         </StackPanel>
     </WrapPanel>
 </Window>

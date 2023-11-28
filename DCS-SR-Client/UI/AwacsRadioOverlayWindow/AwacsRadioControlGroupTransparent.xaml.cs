@@ -14,6 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 using NLog;
+using System.Windows.Forms;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -30,7 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private static Brush radioOff = Brushes.IndianRed;
-
+        
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
 
@@ -244,8 +245,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
                     RadioActive.Fill = radioOff;
-                    RadioLabel.Text = "No Radio";
-                    RadioFrequency.Text = "Unknown";
+                    RadioLabel.Text = "OFF";
+                    RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
 
 
