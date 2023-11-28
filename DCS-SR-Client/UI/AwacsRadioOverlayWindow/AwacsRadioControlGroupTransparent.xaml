@@ -61,6 +61,7 @@
             FontSize="8"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
+            PreviewMouseWheel="RadioFrequencyText_MouseWheel"
             MouseDown="RadioFrequencyText_Click"
             MouseRightButtonDown="RadioFrequencyText_RightClick"
             Style="{x:Null}"

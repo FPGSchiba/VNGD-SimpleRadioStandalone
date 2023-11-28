@@ -76,8 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
         }
 
-        private
-            void RadioFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        private void RadioFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
             if (keyEventArgs.Key == Key.Enter)
             {
@@ -105,6 +104,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
             RadioHelper.SelectRadio(RadioId);
+        }
+
+        private void RadioFrequencyText_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // TODO functionality to use scroll wheel to change frequency using scroll wheel
+            
+
+            {if (e.Delta > 0)
+                {
+                    //TODO when mouse wheel goes up
+                    Logger.Info("MouseWheel radio frequency Up");
+                }
+
+            if (e.Delta < 0)
+                {
+                    //TODO when mouse wheel goes down
+                    Logger.Info("MouseWheel radio frequency Down");
+                }
+                e.Handled = true;
+            }
+
         }
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
