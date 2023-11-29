@@ -138,29 +138,16 @@
             HorizontalAlignment="Center"
             Margin="5,2,5,0">
             <Button Name="buttonShow"
+                    Width="25"
+                    Height="15"
                     Margin="0,0,0,0"
+                    Content="Hide"
+                    FontSize="8"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
                     Click="Button_ShowAllRadios"
                     Style="{StaticResource DarkStyle-Button}"
                     RenderTransformOrigin="0.5, 0.5">
-                    <Button.LayoutTransform>
-                        <RotateTransform CenterX="00" CenterY="0" Angle="90"/>
-                    </Button.LayoutTransform>
-                <Button.Content>
-                    <Grid Width="10" Height="10">
-                        <Viewbox Stretch="Fill" DockPanel.Dock="Right"
-                            Height="40"
-                            Width="10"
-                            VerticalAlignment="Center">
-                            <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Margin="0,0,0,6"
-                               FontWeight="Bold"
-                               FontSize="20"
-                               Padding="0"
-                               Text="«" />
-                        </Viewbox>
-                    </Grid>
-                </Button.Content>
             </Button>
             <StackPanel
                 Name="textBackground"

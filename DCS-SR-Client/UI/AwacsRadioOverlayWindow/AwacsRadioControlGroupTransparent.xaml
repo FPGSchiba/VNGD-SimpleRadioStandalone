@@ -13,23 +13,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
                 Background="Transparent">
-        <Button
-            Background="#444"
-            Visibility="Collapsed"
-            Click="HideRadio_Click"
-            Content="Hide"
-            Opacity="1"
-            FontSize="5"
-            Foreground="NavajoWhite"
-            Height="10"
-            HorizontalAlignment="Center"
-            IsEnabled="False"
-            Margin="0,0,0,0"
-            Name="HideRadio"
-            Padding="0"
-            Style="{StaticResource DarkStyle-Button}"
-            Width="15" />
-        <Button
+       <Button
             Background="IndianRed"
             Click="ToggleSwitch_Click"
             Content="Off"
@@ -59,14 +43,14 @@
             Text="Radio 10"
             x:Name="RadioLabel">
                 <Border
-                    BorderBrush="Transparent"
+                    BorderBrush="Black"
                     BorderThickness="0">
                 </Border>
             </TextBlock>
         <TextBox
             Background="Black"
             BorderThickness="0"
-            BorderBrush="Transparent"
+            BorderBrush="Black"
             Foreground="#00FF00"
             Height="10"
             Width="30"
@@ -101,7 +85,7 @@
             Width="35"
             x:Name="RadioMetaData">
             <Border
-                BorderBrush="Transparent"
+                BorderBrush="Black"
                 BorderThickness="0">
             </Border>
 

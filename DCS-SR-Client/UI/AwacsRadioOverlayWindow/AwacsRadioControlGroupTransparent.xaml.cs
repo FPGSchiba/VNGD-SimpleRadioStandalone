@@ -248,6 +248,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioLabel.Text = "OFF";
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
+                    
+                    RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
 
 
                     RadioVolume.IsEnabled = false;
@@ -434,6 +436,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Background = radioOn;
                 RadioEnabled.Content = "On";
 
+                RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
+
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
@@ -442,21 +446,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Content = "Off";
 
                 //added code to simplify panel
-                HideRadio.Visibility = Visibility.Collapsed;
-                RadioEnabled.Visibility = Visibility.Collapsed;
-                RadioLabel.Visibility = Visibility.Collapsed;
-                RadioFrequency.Visibility = Visibility.Collapsed;
-                RadioMetaData.Visibility = Visibility.Collapsed;
-                TransmitterName.Visibility = Visibility.Collapsed;
-                RadioActive.Visibility = Visibility.Collapsed;
-                RadioVolume.Visibility = Visibility.Collapsed;
+                RadioControlContainerTransparent.Visibility = Visibility.Collapsed;                
             }
         }
 
-        private void HideRadio_Click(object sender, RoutedEventArgs e)
+        private void ShowRadios_Click(object sender, RoutedEventArgs e)
         {
-            //moved to ToggleSwitch_Click action
+            
 
+
+        }
+
+        private void RadioSelectSwitch(object sender, MouseButtonEventArgs e)
+        {
 
         }
     }

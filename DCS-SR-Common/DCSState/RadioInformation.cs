@@ -184,7 +184,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 volume = this.volume,
                 retransmit = this.retransmit,
                 rtMode = this.rtMode
-
+                
             };
         }
     }
