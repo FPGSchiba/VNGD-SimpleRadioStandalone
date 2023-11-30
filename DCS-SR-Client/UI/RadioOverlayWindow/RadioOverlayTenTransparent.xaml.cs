@@ -53,6 +53,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //method fires after initialisation
             InitializeComponent();
 
+            //Used to determine if starting panel is expanded or contracted
+            //Show = Contracted
+            //Hide = Expanded
+            buttonShow.Content = "Show";
+
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
             _aspectRatio = MinWidth / MinHeight;
@@ -114,6 +119,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             {
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
+
+                if ((buttonShow.Content != null) && (buttonShow.Content == "Hide"))
+                {
+                    radio.Visibility = Visibility.Visible;
+                    Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set Visible");
+                }
+                else if (((buttonShow.Content != null) && (buttonShow.Content == "Show")) && (radio.RadioEnabled.Content == "On"))
+                {
+                    radio.Visibility = Visibility.Visible;
+                    Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set visible");
+                }
+                else
+                {
+                    radio.Visibility = Visibility.Collapsed;
+                    Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set collapsed");
+                }
+
             }
 
             Intercom.RepaintRadioStatus();
@@ -263,120 +285,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             }
 
         }
+                
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
         {
-            if (buttonShow.Content == "Show")
+            if ((buttonShow.Content == null) || (buttonShow.Content == "Hide"))
             {
-                buttonShow.Content = "Hide";
-
-                Radio1.Visibility = Visibility.Visible;
-                Radio2.Visibility = Visibility.Visible;
-                Radio3.Visibility = Visibility.Visible;
-                Radio4.Visibility = Visibility.Visible;
-                Radio5.Visibility = Visibility.Visible;
-                Radio6.Visibility = Visibility.Visible;
-                Radio7.Visibility = Visibility.Visible;
-                Radio8.Visibility = Visibility.Visible;
-                Radio9.Visibility = Visibility.Visible;
-                Radio10.Visibility = Visibility.Visible;
+                buttonShow.Content = "Show";
             }
-
             else
             {
-                
-
+                buttonShow.Content = "Hide";
             }
-            ////Radio 1
-            ////Radio1.HideRadio.Visibility = Visibility.Visible;
-            //Radio1.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio1.RadioLabel.Visibility = Visibility.Visible;
-            //Radio1.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio1.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio1.TransmitterName.Visibility = Visibility.Visible;
-            //Radio1.RadioActive.Visibility = Visibility.Visible;
-            //Radio1.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 2
-            ////Radio2.HideRadio.Visibility = Visibility.Visible;
-            //Radio2.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio2.RadioLabel.Visibility = Visibility.Visible;
-            //Radio2.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio2.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio2.TransmitterName.Visibility = Visibility.Visible;
-            //Radio2.RadioActive.Visibility = Visibility.Visible;
-            //Radio2.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 3
-            ////Radio3.HideRadio.Visibility = Visibility.Visible;
-            //Radio3.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio3.RadioLabel.Visibility = Visibility.Visible;
-            //Radio3.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio3.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio3.TransmitterName.Visibility = Visibility.Visible;
-            //Radio3.RadioActive.Visibility = Visibility.Visible;
-            //Radio3.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 4
-            ////Radio4.HideRadio.Visibility = Visibility.Visible;
-            //Radio4.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio4.RadioLabel.Visibility = Visibility.Visible;
-            //Radio4.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio4.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio4.TransmitterName.Visibility = Visibility.Visible;
-            //Radio4.RadioActive.Visibility = Visibility.Visible;
-            //Radio4.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 5
-            ////Radio5.HideRadio.Visibility = Visibility.Visible;
-            //Radio5.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio5.RadioLabel.Visibility = Visibility.Visible;
-            //Radio5.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio5.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio5.TransmitterName.Visibility = Visibility.Visible;
-            //Radio5.RadioActive.Visibility = Visibility.Visible;
-            //Radio5.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 6
-            ////Radio6.HideRadio.Visibility = Visibility.Visible;
-            //Radio6.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio6.RadioLabel.Visibility = Visibility.Visible;
-            //Radio6.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio6.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio6.TransmitterName.Visibility = Visibility.Visible;
-            //Radio6.RadioActive.Visibility = Visibility.Visible;
-            //Radio6.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 7
-            ////Radio7.HideRadio.Visibility = Visibility.Visible;
-            //Radio7.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio7.RadioLabel.Visibility = Visibility.Visible;
-            //Radio7.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio7.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio7.TransmitterName.Visibility = Visibility.Visible;
-            //Radio7.RadioActive.Visibility = Visibility.Visible;
-            //Radio7.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio8
-            ////Radio8.HideRadio.Visibility = Visibility.Visible;
-            //Radio8.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio8.RadioLabel.Visibility = Visibility.Visible;
-            //Radio8.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio8.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio8.TransmitterName.Visibility = Visibility.Visible;
-            //Radio8.RadioActive.Visibility = Visibility.Visible;
-            //Radio8.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 9
-            ////Radio9.HideRadio.Visibility = Visibility.Visible;
-            //Radio9.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio9.RadioLabel.Visibility = Visibility.Visible;
-            //Radio9.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio9.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio9.TransmitterName.Visibility = Visibility.Visible;
-            //Radio9.RadioActive.Visibility = Visibility.Visible;
-            //Radio9.RadioVolume.Visibility = Visibility.Visible;
-            ////Radio 10
-            ////Radio10.HideRadio.Visibility = Visibility.Visible;
-            //Radio10.RadioEnabled.Visibility = Visibility.Visible;
-            //Radio10.RadioLabel.Visibility = Visibility.Visible;
-            //Radio10.RadioFrequency.Visibility = Visibility.Visible;
-            //Radio10.RadioMetaData.Visibility = Visibility.Visible;
-            ////Radio10.TransmitterName.Visibility = Visibility.Visible;
-            //Radio10.RadioActive.Visibility = Visibility.Visible;
-            //Radio10.RadioVolume.Visibility = Visibility.Visible;
-
         }
 
         private void Button_Close(object sender, RoutedEventArgs e)
@@ -403,6 +322,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             //Radio 1
             Radio1.RadioEnabled.Opacity = e.NewValue;
+            Radio1.RadioTextGroup.Opacity = e.NewValue;
             Radio1.RadioLabel.Opacity = e.NewValue;
             Radio1.RadioFrequency.Opacity = e.NewValue;
             Radio1.RadioMetaData.Opacity = e.NewValue;
@@ -411,6 +331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio1.RadioVolume.Opacity = e.NewValue;
             //Radio 2
             Radio2.RadioEnabled.Opacity = e.NewValue;
+            Radio2.RadioTextGroup.Opacity = e.NewValue;
             Radio2.RadioLabel.Opacity = e.NewValue;
             Radio2.RadioFrequency.Opacity = e.NewValue;
             Radio2.RadioMetaData.Opacity = e.NewValue;
@@ -419,6 +340,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio2.RadioVolume.Opacity = e.NewValue;
             //Radio 3
             Radio3.RadioEnabled.Opacity = e.NewValue;
+            Radio3.RadioTextGroup.Opacity = e.NewValue;
             Radio3.RadioLabel.Opacity = e.NewValue;
             Radio3.RadioFrequency.Opacity = e.NewValue;
             Radio3.RadioMetaData.Opacity = e.NewValue;
@@ -427,6 +349,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio3.RadioVolume.Opacity = e.NewValue;
             //Radio 4
             Radio4.RadioEnabled.Opacity = e.NewValue;
+            Radio4.RadioTextGroup.Opacity = e.NewValue;
             Radio4.RadioLabel.Opacity = e.NewValue;
             Radio4.RadioFrequency.Opacity = e.NewValue;
             Radio4.RadioMetaData.Opacity = e.NewValue;
@@ -435,6 +358,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio4.RadioVolume.Opacity = e.NewValue;
             //Radio 5
             Radio5.RadioEnabled.Opacity = e.NewValue;
+            Radio5.RadioTextGroup.Opacity = e.NewValue;
             Radio5.RadioLabel.Opacity = e.NewValue;
             Radio5.RadioFrequency.Opacity = e.NewValue;
             Radio5.RadioMetaData.Opacity = e.NewValue;
@@ -443,6 +367,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio5.RadioVolume.Opacity = e.NewValue;
             //Radio 6
             Radio6.RadioEnabled.Opacity = e.NewValue;
+            Radio6.RadioTextGroup.Opacity = e.NewValue;
             Radio6.RadioLabel.Opacity = e.NewValue;
             Radio6.RadioFrequency.Opacity = e.NewValue;
             Radio6.RadioMetaData.Opacity = e.NewValue;
@@ -451,6 +376,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio6.RadioVolume.Opacity = e.NewValue;
             //Radio 7
             Radio7.RadioEnabled.Opacity = e.NewValue;
+            Radio7.RadioTextGroup.Opacity = e.NewValue;
             Radio7.RadioLabel.Opacity = e.NewValue;
             Radio7.RadioFrequency.Opacity = e.NewValue;
             Radio7.RadioMetaData.Opacity = e.NewValue;
@@ -459,6 +385,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio7.RadioVolume.Opacity = e.NewValue;
             //Radio 8
             Radio7.RadioEnabled.Opacity = e.NewValue;
+            Radio7.RadioTextGroup.Opacity = e.NewValue;
             Radio7.RadioLabel.Opacity = e.NewValue;
             Radio7.RadioFrequency.Opacity = e.NewValue;
             Radio7.RadioMetaData.Opacity = e.NewValue;
@@ -467,6 +394,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio7.RadioVolume.Opacity = e.NewValue;
             //Radio 8
             Radio8.RadioEnabled.Opacity = e.NewValue;
+            Radio8.RadioTextGroup.Opacity = e.NewValue;
             Radio8.RadioLabel.Opacity = e.NewValue;
             Radio8.RadioFrequency.Opacity = e.NewValue;
             Radio8.RadioMetaData.Opacity = e.NewValue;
@@ -475,6 +403,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio8.RadioVolume.Opacity = e.NewValue;
             //Radio 9
             Radio9.RadioEnabled.Opacity = e.NewValue;
+            Radio9.RadioTextGroup.Opacity = e.NewValue;
             Radio9.RadioLabel.Opacity = e.NewValue;
             Radio9.RadioFrequency.Opacity = e.NewValue;
             Radio9.RadioMetaData.Opacity = e.NewValue;
@@ -483,6 +412,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio9.RadioVolume.Opacity = e.NewValue;
             //Radio 10
             Radio10.RadioEnabled.Opacity = e.NewValue;
+            Radio10.RadioTextGroup.Opacity = e.NewValue;
             Radio10.RadioLabel.Opacity = e.NewValue;
             Radio10.RadioFrequency.Opacity = e.NewValue;
             Radio10.RadioMetaData.Opacity = e.NewValue;

@@ -12,7 +12,8 @@
     <StackPanel Orientation="Horizontal"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
-                Background="Transparent">
+                Background="Transparent"
+                SnapsToDevicePixels="True">
        <Button
             Background="IndianRed"
             Click="ToggleSwitch_Click"
@@ -28,82 +29,86 @@
             Padding="0"
             Style="{StaticResource DarkStyle-Button}"
             Width="15" />
-        <TextBlock
-            Foreground="#00FF00"
-            Background="Black"
-            Height="10"
-            Width="43"
-            Style="{x:Null}"
-            Margin="1,0,0,0"
-            Padding="0"
-            FontSize="8"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            TextWrapping="NoWrap"
-            Text="Radio 10"
-            x:Name="RadioLabel">
+        <StackPanel
+            Name="RadioTextGroup"
+            Orientation="Horizontal"
+            Background="Black">
+            <TextBlock
+                Foreground="#00FF00"
+                Background="Transparent"
+                Height="10"
+                Width="43"
+                Style="{x:Null}"
+                Margin="1,0,0,0"
+                Padding="0"
+                FontSize="8"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                TextWrapping="NoWrap"
+                Text="Radio 10"
+                x:Name="RadioLabel">
+                    <Border
+                        BorderBrush="Black"
+                        BorderThickness="0">
+                    </Border>
+                </TextBlock>
+            <TextBox
+                Background="Transparent"
+                BorderThickness="0"
+                BorderBrush="Black"
+                Foreground="#00FF00"
+                Height="10"
+                Width="30"
+                FontSize="8"
+                Padding="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                PreviewMouseWheel="RadioFrequencyText_MouseWheel"
+                MouseDown="RadioFrequencyText_Click"
+                MouseRightButtonDown="RadioFrequencyText_RightClick"
+                Style="{x:Null}"
+                Text="000.000"
+                TextAlignment="Center"
+                TextWrapping="NoWrap"
+                Visibility="Visible"
+                x:Name="RadioFrequency" />
+            <TextBlock
+                Background="Transparent"
+                Foreground="#00FF00"
+                Height="10"
+                FontSize="8"
+                HorizontalAlignment="Center"
+                MouseDown="RadioFrequencyText_Click"
+                MouseRightButtonDown="RadioFrequencyText_RightClick"
+                Style="{x:Null}"
+                Text="AM 👤10"
+                Padding="0"
+                TextAlignment="Center"
+                TextWrapping="NoWrap"
+                VerticalAlignment="Center"
+                Visibility="Visible"
+                Width="35"
+                x:Name="RadioMetaData">
                 <Border
                     BorderBrush="Black"
                     BorderThickness="0">
                 </Border>
             </TextBlock>
-        <TextBox
-            Background="Black"
-            BorderThickness="0"
-            BorderBrush="Black"
-            Foreground="#00FF00"
-            Height="10"
-            Width="30"
-            FontSize="8"
-            Padding="0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            PreviewMouseWheel="RadioFrequencyText_MouseWheel"
-            MouseDown="RadioFrequencyText_Click"
-            MouseRightButtonDown="RadioFrequencyText_RightClick"
-            Style="{x:Null}"
-            Text="000.000"
-            TextAlignment="Center"
-            TextWrapping="NoWrap"
-            Visibility="Visible"
-            x:Name="RadioFrequency" />
-        <TextBlock
-            Background="Black"
-            Foreground="#00FF00"
-            Height="10"
-            FontSize="8"
-            HorizontalAlignment="Center"
-            MouseDown="RadioFrequencyText_Click"
-            MouseRightButtonDown="RadioFrequencyText_RightClick"
-            Style="{x:Null}"
-            Text="AM 👤10"
-            Padding="0"
-            TextAlignment="Center"
-            TextWrapping="NoWrap"
-            VerticalAlignment="Center"
-            Visibility="Visible"
-            Width="35"
-            x:Name="RadioMetaData">
-            <Border
-                BorderBrush="Black"
-                BorderThickness="0">
-            </Border>
-
-        </TextBlock>
-        <TextBlock
-            Background="Black"
-            Foreground="#00FF00"
-            Height="10"
-            Width="65"
-            FontSize="8"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Style="{x:Null}"
-            Text="USER"
-            TextAlignment="Center"
-            TextWrapping="NoWrap"
-            Visibility="Collapsed"
-            x:Name="TransmitterName" />
+            <TextBlock
+                    Background="Black"
+                    Foreground="#00FF00"
+                    Height="10"
+                    Width="65"
+                    FontSize="8"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Style="{x:Null}"
+                    Text="USER"
+                    TextAlignment="Center"
+                    TextWrapping="NoWrap"
+                    Visibility="Collapsed"
+                    x:Name="TransmitterName" />
+        </StackPanel>
         <Ellipse
             Fill="#FF9900"
             Height="10"

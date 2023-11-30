@@ -15,6 +15,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 using NLog;
 using System.Windows.Forms;
+using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -29,8 +30,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
-        private static Brush radioOff = Brushes.IndianRed;
+        
+        private readonly static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
+        private readonly static Brush radioOff = Brushes.IndianRed;
+
+
         
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
@@ -204,7 +208,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
-
+                                
                 if (transmitting.IsSending)
                 {
                     if (transmitting.SendingOn == RadioId)
@@ -248,9 +252,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioLabel.Text = "OFF";
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
-                    
-                    RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
-
 
                     RadioVolume.IsEnabled = false;
 
@@ -436,7 +437,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Background = radioOn;
                 RadioEnabled.Content = "On";
 
-                RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
+                //RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
 
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
@@ -446,7 +447,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Content = "Off";
 
                 //added code to simplify panel
-                RadioControlContainerTransparent.Visibility = Visibility.Collapsed;                
+                //RadioControlContainerTransparent.Visibility = Visibility.Visible;
             }
         }
 
