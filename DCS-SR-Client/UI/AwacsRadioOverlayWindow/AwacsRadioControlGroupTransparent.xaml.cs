@@ -34,8 +34,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private readonly static Brush radioOff = Brushes.IndianRed;
 
-
         
+
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
 
@@ -460,6 +460,47 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioSelectSwitch(object sender, MouseButtonEventArgs e)
         {
+
+        }
+
+        
+        
+        private void ToggleChannel_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("toggle channel clicked");
+            
+            if (ChannelEnableText.Text != null && ChannelEnableText.Text == "»")
+            {
+                RadioLabel.Visibility = Visibility.Collapsed;
+                RadioMetaData.Visibility = Visibility.Collapsed;
+                RadioFrequency.Visibility = Visibility.Collapsed;
+                FrequencyDropDown.Visibility = Visibility.Visible;
+
+                ChannelEnableText.Text = "«";
+
+                Console.WriteLine("Channel Expanded");
+            }
+            else if (ChannelEnableText.Text != null && ChannelEnableText.Text == "«")
+            {
+                RadioLabel.Visibility = Visibility.Visible;
+                RadioMetaData.Visibility = Visibility.Visible;
+                RadioFrequency.Visibility = Visibility.Visible;
+                FrequencyDropDown.Visibility = Visibility.Collapsed;
+
+                ChannelEnableText.Text = "»";
+                Console.WriteLine("Channel Contracted");
+            }
+            else
+            {
+                RadioLabel.Visibility = Visibility.Visible;
+                RadioMetaData.Visibility = Visibility.Visible;
+                RadioFrequency.Visibility = Visibility.Visible;
+                FrequencyDropDown.Visibility = Visibility.Collapsed;
+
+                ChannelEnableText.Text = "»";
+
+                Console.WriteLine("Toggle Channel Error : Channel Contracted");
+            }
 
         }
     }

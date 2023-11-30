@@ -3,11 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
         xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
+
+        
+        
         Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="170"
+        Width="180"
         Height="170"
-        MinWidth="170"
+        MinWidth="180"
         MinHeight="170"
         AllowsTransparency="True"
         Background="#444"
@@ -117,7 +120,7 @@
             Orientation="Vertical"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" 
-            Width="170"
+            Width="180"
             SnapsToDevicePixels="True">
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
