@@ -1,5 +1,5 @@
 ﻿<controls:MetroWindow
-    Height="880"
+    Height="630"
     ResizeMode="CanMinimize"
     Title="Vanguard SRS Client"
     Width="550"
@@ -40,123 +40,7 @@
                 
                 <StackPanel>
                     
-                   <StackPanel Margin="0">
-                        <Label
-                           Content="Audio Settings"
-                           HorizontalAlignment="Center"
-                           FontWeight="Medium"
-                           FontSize="16" />
-                        <Label
-                            Content="Microphone"
-                            HorizontalAlignment="Center"
-                            x:Name="MicLabel" />
-                        <ComboBox
-                            HorizontalAlignment="Center"
-                            ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
-                            SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
-                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                            VerticalAlignment="Top"
-                            Width="250"
-                            x:Name="Mic" />
-                        <StackPanel
-                            HorizontalAlignment="Center"
-                            Margin="0"
-                            Orientation="Horizontal">
-                            <ProgressBar
-                                Height="20"
-                                Margin="10,10,0,0"
-                                Maximum="0"
-                                Minimum="-96.6"
-                                Name="Mic_VU"
-                                ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                                Value="-96.6"
-                                Width="150" />
-                        </StackPanel>
-
-                        <StackPanel
-                            HorizontalAlignment="Center"
-                            Margin="0"
-                            Orientation="Horizontal" />
-
-                        <Button
-                            Click="PreviewAudio"
-                            Content="Audio Preview"
-                            HorizontalAlignment="Center"
-                            IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
-                            Margin="0,10,0,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                            ToolTipService.ShowOnDisabled="True"
-                            VerticalAlignment="Top"
-                            x:Name="Preview" />
-
-                        <Label
-                            Content="Speakers &amp; Optional Mic Output"
-                            HorizontalAlignment="Center"
-                            x:Name="SpeakerLabel" />
-                        <StackPanel
-                            HorizontalAlignment="Center"
-                            Margin="0"
-                            Orientation="Horizontal">
-                            <ComboBox
-                                HorizontalAlignment="Center"
-                                ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
-                                Margin="0,0,5,0"
-                                SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}"
-                                VerticalAlignment="Top"
-                                Width="200"
-                                x:Name="Speakers" />
-                            <ComboBox
-                                HorizontalAlignment="Center"
-                                ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
-                                Margin="5,0,0,0"
-                                SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}"
-                                VerticalAlignment="Top"
-                                Width="200"
-                                x:Name="MicOutput" />
-                        </StackPanel>
-
-
-                        <StackPanel
-                            HorizontalAlignment="Center"
-                            Margin="0"
-                            Orientation="Horizontal">
-
-                            <Slider
-                                IsMoveToPointEnabled="true"
-                                Margin="0,10,0,0"
-                                Maximum="1.0"
-                                Minimum="0.0"
-                                ValueChanged="SpeakerBoost_ValueChanged"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                Width="150"
-                                x:Name="SpeakerBoost" />
-
-                            <ProgressBar
-                                Height="20"
-                                Margin="10,10,0,0"
-                                Maximum="0"
-                                Minimum="-96.6"
-                                Name="Speaker_VU"
-                                Value="-96.6"
-                                Width="150" />
-                        </StackPanel>
-
-                        <StackPanel
-                            HorizontalAlignment="Center"
-                            Margin="0"
-                            Orientation="Horizontal">
-                                
-                            <Label Content="Master Volume Boost:" HorizontalAlignment="Center" />
-
-                            <Label
-                                Content="+/- %"
-                                HorizontalAlignment="Center"
-                                x:Name="SpeakerBoostLabel" />
-
-                        </StackPanel>
-                    </StackPanel>
+                   
                                         
                     <Separator Height="3" Margin="0,7,0,0" Background="Black"/>
                  
@@ -910,6 +794,120 @@
                     
                     <GroupBox Header="Global Settings">
                         <StackPanel>
+                            <GroupBox Header="Audio Input Settings">
+                                <StackPanel Margin="0">
+                                    <Label
+                                        Content="Audio Settings"
+                                        HorizontalAlignment="Center"
+                                        FontWeight="Medium"
+                                        FontSize="16" />
+                                    <Label
+                                         Content="Microphone"
+                                         HorizontalAlignment="Center"
+                                         x:Name="MicLabel" />
+                                    <ComboBox
+                                         HorizontalAlignment="Center"
+                                         ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
+                                         SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
+                                         ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                         VerticalAlignment="Top"
+                                         Width="250"
+                                         x:Name="Mic" />
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        Margin="0"
+                                        Orientation="Horizontal">
+                                        <ProgressBar
+                                            Height="20"
+                                            Margin="10,10,0,0"
+                                            Maximum="0"
+                                            Minimum="-96.6"
+                                            Name="Mic_VU"
+                                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                            Value="-96.6"
+                                            Width="150" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal" />
+                                    <Button
+                                         Click="PreviewAudio"
+                                         Content="Audio Preview"
+                                         HorizontalAlignment="Center"
+                                         IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
+                                         Margin="0,10,0,0"
+                                         Style="{DynamicResource SquareButtonStyle}"
+                                         ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                         ToolTipService.ShowOnDisabled="True"
+                                         VerticalAlignment="Top"
+                                         x:Name="Preview" />
+                                    <Label
+                                         Content="Speakers &amp; Optional Mic Output"
+                                         HorizontalAlignment="Center"
+                                         x:Name="SpeakerLabel" />
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal">
+                                        <ComboBox
+                                             HorizontalAlignment="Center"
+                                             ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
+                                             Margin="0,0,5,0"
+                                             SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}"
+                                             VerticalAlignment="Top"
+                                             Width="200"
+                                             x:Name="Speakers" />
+                                        <ComboBox
+                                             HorizontalAlignment="Center"
+                                             ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
+                                             Margin="5,0,0,0"
+                                             SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}"
+                                             VerticalAlignment="Top"
+                                             Width="200"
+                                             x:Name="MicOutput" />
+                                    </StackPanel>
+
+
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        Margin="0"
+                                        Orientation="Horizontal">
+
+                                        <Slider
+                                             IsMoveToPointEnabled="true"
+                                             Margin="0,10,0,0"
+                                             Maximum="1.0"
+                                             Minimum="0.0"
+                                             ValueChanged="SpeakerBoost_ValueChanged"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             Width="150"
+                                             x:Name="SpeakerBoost" />
+
+                                        <ProgressBar
+                                             Height="20"
+                                             Margin="10,10,0,0"
+                                             Maximum="0"
+                                             Minimum="-96.6"
+                                             Name="Speaker_VU"
+                                             Value="-96.6"
+                                             Width="150" />
+                                    </StackPanel>
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal">
+                                        <Label Content="Master Volume Boost:" HorizontalAlignment="Center" />
+
+                                        <Label
+                                            Content="+/- %"
+                                            HorizontalAlignment="Center"
+                                            x:Name="SpeakerBoostLabel" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
                             <GroupBox Header="Auto Connect">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
