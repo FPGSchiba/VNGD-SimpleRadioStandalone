@@ -6,18 +6,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="RadioControlContainer"
-             Width="132"
-             Height="25">
-    <StackPanel Margin="2,0,2,0" Orientation="Vertical">
+             Width="Auto"
+             Height="Auto">
+    <StackPanel Margin="2,0,2,0" 
+                Width="Auto"
+                Orientation="Vertical">
         <WrapPanel HorizontalAlignment="Left"
                    Height="12">
             <TextBlock x:Name="RadioLabel"
                        Width="15"
                        Height="10"
-                       HorizontalAlignment="Center"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        FontSize="8"
                        Foreground="#E7E7E7"
+                       Margin="0,0,0,0"
                        Padding="0,0,0,0"
                        Style="{x:Null}"
                        Text="I/C"
@@ -25,9 +28,9 @@
 
             <Viewbox Stretch="Fill" DockPanel.Dock="Right"
                      Height="10"
-                     Width="57"
+                     Width="47"
                      VerticalAlignment="Center"
-                     Margin="3,0,3,0" >
+                     Margin="2,0,2,0" >
                 <Slider x:Name="RadioVolume"
                     Width="100"
                     Height="18"
@@ -73,14 +76,14 @@
    
 
         <WrapPanel 
-            Width="115"
+            Width="Auto"
             Height="10"
             HorizontalAlignment="Left"
-            Margin="2,2,0,0"
+            Margin="0,1,0,0"
             ToolTip="Select the VOX Input mode you want to use. (Intercom Channel 1 Disabled)">
             <TextBlock x:Name="VOXLabel"
-               Margin="1,0,10,0"
-               Width="40"
+               Margin="1,0,12,0"
+               Width="30"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
                FontSize="8"

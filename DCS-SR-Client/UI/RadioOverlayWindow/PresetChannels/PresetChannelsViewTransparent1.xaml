@@ -25,7 +25,8 @@
                   VerticalAlignment="Top"
                   DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding Path=PresetChannels}"
-                  SelectedItem="{Binding Path=SelectedPresetChannel}" />
+                  SelectedItem="{Binding Path=SelectedPresetChannel}" 
+                  ToolTip="Select a predefined radio frequency via a dropdown menu"/>
 
         <Button Name="ReloadButton"
                 Width="8"
@@ -37,7 +38,8 @@
                 HorizontalAlignment="Center"
                 Command="{Binding Path=ReloadCommand}"
                 Content="R"
-                Style="{x:Null}" />
+                Style="{x:Null}" 
+                ToolTip="Refresh the channel dropdown list"/>
 
     </WrapPanel>
 </UserControl>
