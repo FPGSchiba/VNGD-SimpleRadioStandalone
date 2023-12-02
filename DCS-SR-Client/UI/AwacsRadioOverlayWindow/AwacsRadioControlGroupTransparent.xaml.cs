@@ -28,7 +28,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        
         private readonly static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private readonly static Brush radioOff = Brushes.IndianRed;
 
