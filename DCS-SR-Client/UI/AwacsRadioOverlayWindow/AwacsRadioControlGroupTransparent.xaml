@@ -28,7 +28,7 @@
             Padding="0"
             Style="{StaticResource DarkStyle-Button}"
             Width="15" />
-        <Button
+        <!--<Button
              Background="DarkGray"
              Click="ToggleChannel_Click"
              Opacity="1"
@@ -52,15 +52,13 @@
                        Text="»" />
                 </Grid>
             </Button.Content>
-        </Button>
-        <presetChannels:PresetChannelsViewTransparent
-            x:Name="PresetChannelsViewTransparent"
+        </Button>-->
+        <presetChannels:PresetChannelsViewTransparent1
             Background="#444"
             DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
             HorizontalAlignment="Center"
-            Width="108"
-            Height="10"
-             />
+            Width="20"
+            x:Name="PresetChannelsView"  />
         <StackPanel
             Name="RadioTextGroup"
             Margin="1,0,0,0"
@@ -86,7 +84,7 @@
                     </Border>
                 </TextBlock>
             <TextBox
-                Background="Transparent"
+                Background="Black"
                 BorderThickness="0"
                 BorderBrush="Black"
                 Foreground="#00FF00"

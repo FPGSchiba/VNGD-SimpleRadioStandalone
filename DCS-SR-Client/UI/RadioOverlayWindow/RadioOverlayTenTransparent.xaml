@@ -9,9 +9,9 @@
 
     Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="168"
+        Width="178"
         Height= "155"
-        MinWidth="168"
+        MinWidth="178"
         MinHeight="155"
         AllowsTransparency="True"
         Background="#444"
@@ -39,9 +39,10 @@
 
         <StackPanel
             Name="Header"
+            Width="180"
             Orientation="Horizontal">
             <TextBlock Name="ControlText"
-                Width="107"
+                Width="117"
                 Height="12"
                 Margin="2,0,0,0"
                 VerticalAlignment="Center"
@@ -126,7 +127,7 @@
             Orientation="Vertical"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" 
-            Width="170"
+            Width="180"
             Margin="0,2,0,0"
             SnapsToDevicePixels="True">
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />

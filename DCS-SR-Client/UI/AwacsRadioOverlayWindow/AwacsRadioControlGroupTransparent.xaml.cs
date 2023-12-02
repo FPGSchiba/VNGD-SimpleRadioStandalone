@@ -14,8 +14,6 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 using NLog;
-using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -63,10 +61,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             set
             {
                 _radioId = value;
+                UpdateBinding();
             }
         }
 
-       
+        //updates the binding so the changes are picked up for the linked FixedChannelsModel
+        private void UpdateBinding()
+        {
+            ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
+
+            var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
+            bindingExpression?.UpdateTarget();
+        }
+
 
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
@@ -436,77 +443,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
                 RadioEnabled.Background = radioOn;
                 RadioEnabled.Content = "On";
-
-                //RadioControlContainerTransparent.Visibility = Visibility.Collapsed;
-
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
                 RadioEnabled.Background = radioOff;
                 RadioEnabled.Content = "Off";
-
-                //added code to simplify panel
-                //RadioControlContainerTransparent.Visibility = Visibility.Visible;
             }
-        }
-
-        private void ShowRadios_Click(object sender, RoutedEventArgs e)
-        {
-            
-
-
-        }
-
-        private void RadioSelectSwitch(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        
-        
-        private void ToggleChannel_Click(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine("toggle channel clicked");
-            
-            if (ChannelEnableText.Text != null && ChannelEnableText.Text == "»")
-            {
-                RadioLabel.Visibility = Visibility.Collapsed;
-                RadioMetaData.Visibility = Visibility.Collapsed;
-                RadioFrequency.Visibility = Visibility.Collapsed;
-                
-
-                ChannelEnableText.Text = "«";
-
-                Console.WriteLine("Channel Expanded");
-            }
-            else if (ChannelEnableText.Text != null && ChannelEnableText.Text == "«")
-            {
-                RadioLabel.Visibility = Visibility.Visible;
-                RadioMetaData.Visibility = Visibility.Visible;
-                RadioFrequency.Visibility = Visibility.Visible;
-                
-
-                ChannelEnableText.Text = "»";
-                Console.WriteLine("Channel Contracted");
-            }
-            else
-            {
-                RadioLabel.Visibility = Visibility.Visible;
-                RadioMetaData.Visibility = Visibility.Visible;
-                RadioFrequency.Visibility = Visibility.Visible;
-                
-
-                ChannelEnableText.Text = "»";
-
-                Console.WriteLine("Toggle Channel Error : Channel Contracted");
-            }
-
-        }
-
-        private void PresetChannelsView_Loaded(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

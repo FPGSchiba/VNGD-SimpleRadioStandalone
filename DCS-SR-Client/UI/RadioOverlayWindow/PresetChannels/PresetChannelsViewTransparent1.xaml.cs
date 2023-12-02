@@ -3,11 +3,11 @@
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels
 {
     /// <summary>
-    /// Interaction logic for PresetChannelsView.xaml
+    /// Interaction logic for PresetChannelsViewTransparent1.xaml
     /// </summary>
-    public partial class PresetChannelsViewTransparent : UserControl
+    public partial class PresetChannelsViewTransparent1 : UserControl
     {
-        public PresetChannelsViewTransparent()
+        public PresetChannelsViewTransparent1()
         {
             InitializeComponent();
 
