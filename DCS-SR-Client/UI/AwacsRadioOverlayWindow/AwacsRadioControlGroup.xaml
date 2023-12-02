@@ -321,7 +321,7 @@
                 DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
                 HorizontalAlignment="Center"
                 Width="120"
-                x:Name="PresetChannelsView" />
+                x:Name="PresetChannelsView" Loaded="PresetChannelsView_Loaded" />
 
         </TabItem>
     </TabControl>

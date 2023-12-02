@@ -474,7 +474,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioLabel.Visibility = Visibility.Collapsed;
                 RadioMetaData.Visibility = Visibility.Collapsed;
                 RadioFrequency.Visibility = Visibility.Collapsed;
-                FrequencyDropDown.Visibility = Visibility.Visible;
+                
 
                 ChannelEnableText.Text = "«";
 
@@ -485,7 +485,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioLabel.Visibility = Visibility.Visible;
                 RadioMetaData.Visibility = Visibility.Visible;
                 RadioFrequency.Visibility = Visibility.Visible;
-                FrequencyDropDown.Visibility = Visibility.Collapsed;
+                
 
                 ChannelEnableText.Text = "»";
                 Console.WriteLine("Channel Contracted");
@@ -495,12 +495,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioLabel.Visibility = Visibility.Visible;
                 RadioMetaData.Visibility = Visibility.Visible;
                 RadioFrequency.Visibility = Visibility.Visible;
-                FrequencyDropDown.Visibility = Visibility.Collapsed;
+                
 
                 ChannelEnableText.Text = "»";
 
                 Console.WriteLine("Toggle Channel Error : Channel Contracted");
             }
+
+        }
+
+        private void PresetChannelsView_Loaded(object sender, RoutedEventArgs e)
+        {
 
         }
     }

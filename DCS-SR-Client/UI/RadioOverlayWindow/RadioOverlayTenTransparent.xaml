@@ -3,15 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
         xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
+        xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
 
-        
-        
-        Name="RadioOverlayWin"
+
+
+    Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
-        Width="180"
-        Height="170"
-        MinWidth="180"
-        MinHeight="170"
+        Width="168"
+        Height= "155"
+        MinWidth="168"
+        MinHeight="155"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -36,91 +37,97 @@
                                              Path=ScaleValue}" />
         </WrapPanel.LayoutTransform>
 
-        <TextBlock Name="ControlText"
-                   Width="103"
-                   Height="12"
-                   Margin="5,0,0,0"
-                   VerticalAlignment="Center"
-                   TextWrapping="Wrap"
-                   FontSize="8"
-                   Foreground="#E7E7E7"
-                   Padding="0"
-                   Text="Transparent Radio Panel" />
-        <TextBlock Name="Orientation"
-                   Visibility="Collapsed"
-                   Width="28"
-                   Height="12"
-                   Margin="0,0,0,0"
-                   TextWrapping="NoWrap"
-                   VerticalAlignment="Center"
-                   FontSize="8"
-                   Foreground="#E7E7E7"
-                   Padding="0"
-                   Text="Vertical" />
-        <Button Name="buttonOrientation"
+        <StackPanel
+            Name="Header"
+            Orientation="Horizontal">
+            <TextBlock Name="ControlText"
+                Width="107"
+                Height="12"
+                Margin="2,0,0,0"
+                VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                FontSize="8"
+                Foreground="#E7E7E7"
+                Padding="0"
+                Text="Transparent Radio Panel" />
+            <TextBlock Name="Orientation"
+               Visibility="Collapsed"
+               Width="28"
+               Height="12"
+               Margin="0,0,0,0"
+               TextWrapping="NoWrap"
+               VerticalAlignment="Center"
+               FontSize="8"
+               Foreground="#E7E7E7"
+               Padding="0"
+               Text="Vertical" />
+            <Button Name="buttonOrientation"
                 Margin="0,0,0,0"
                 Visibility="Hidden"
                 Click="Button_Swap_Orientation"
                 Style="{StaticResource DarkStyle-Button}"
                 ToolTip="Swap to horizon orientation">
-            <Button.Content>
-                <Grid Width="10" Height="10">
-                    <Image Source="../../SRS_Orientation_Toggle.png" />
-                </Grid>
-            </Button.Content>
-        </Button>
-        <Button Name="buttonAbout"
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <Image Source="../../SRS_Orientation_Toggle.png" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+            <Button Name="buttonAbout"
                 Margin="0,0,0,0"
                 Click="Button_About"
                 Style="{StaticResource DarkStyle-Button}">
-            <Button.Content>
-                <Grid Width="10" Height="10">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"
-                               FontSize="10"
-                               Padding="0"
-                               Text="?" />
-                </Grid>
-            </Button.Content>
-        </Button>
-        <Button Name="buttonMinimize"
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontWeight="Bold"
+                       FontSize="10"
+                       Padding="0"
+                       Text="?" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+            <Button Name="buttonMinimize"
                 Margin="0,0,0,0"
                 Click="Button_Minimise"
                 Style="{StaticResource DarkStyle-Button}">
-            <Button.Content>
-                <Grid Width="10" Height="10">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontFamily="Marlett"
-                               FontSize="14"
-                               Padding="3.5,0,0,3"
-                               Text="0" />
-                </Grid>
-            </Button.Content>
-        </Button>
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontFamily="Marlett"
+                       FontSize="14"
+                       Padding="3.5,0,0,3"
+                       Text="0" />
+                    </Grid>
+                </Button.Content>
+            </Button>
 
-        <Button Name="buttonClose"
+            <Button Name="buttonClose"
                 Margin="2,0,0,0"
                 Click="Button_Close"
                 Style="{StaticResource DarkStyle-Button}">
-            <Button.Content>
-                <Grid Width="10" Height="10">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontFamily="Marlett"
-                               FontSize="14"
-                               Padding="0,0,0,1"
-                               Text="r" />
-                </Grid>
-            </Button.Content>
-        </Button>
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontFamily="Marlett"
+                       FontSize="14"
+                       Padding="0,0,0,1"
+                       Text="r" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+        
 
         <StackPanel
             Orientation="Vertical"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" 
-            Width="180"
+            Width="170"
+            Margin="0,2,0,0"
             SnapsToDevicePixels="True">
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
@@ -132,90 +139,143 @@
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio8"  RadioId="8"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio9"  RadioId="9"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupTransparent Margin="0,0,0,0" x:Name="Radio10" RadioId="10" Visibility="Visible"/>
-            <local:IntercomControlGroupTransparent Margin="0,0,0,0" x:Name="Intercom" RadioId="0" />
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0,2,0,0">
+                <StackPanel
+                    Orientation="Vertical"
+                    VerticalAlignment="Center">
+                    <Button Name="buttonShow"
+                        Width="25"
+                        Height="10"
+                        Margin="5,0,5,0"
+                        Click="Button_ShowAllRadios"
+                        Style="{StaticResource DarkStyle-Button}"
+                        RenderTransformOrigin="0.5, 0.5">
+                        <Button.Content>
+                            <TextBlock
+                                Name="buttonShowText"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="8"
+                                Padding="0,0,0,.5"
+                                Text="Hide" />
+                        </Button.Content>
+                    </Button>
+                    <Button 
+                        Name="buttonExpand"
+                        Width="15"
+                        Height="15"
+                        Margin="5,1,5,1"
+                        Style="{StaticResource DarkStyle-Button}"
+                        Click="Button_Expand" 
+                        Background="#FF777777">
+                        <Button.Content>
+                            <Viewbox
+                                Height="10"
+                                Width="10"
+                                Stretch="Fill"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,0">
+                                <TextBlock
+                                    Name="buttonExpandText"
+                                    Width="20"
+                                    Height="8"
+                                    FontSize="1"
+                                    Text="expand"
+                                    Foreground="Transparent">
+                                    <TextBlock.Background>
+                                        <ImageBrush
+                                            ImageSource="/ContractIcon.png" 
+                                            Stretch="Fill"/>
+                                    </TextBlock.Background>
+                                </TextBlock>
+                            </Viewbox>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+                <local:IntercomControlGroupTransparent Margin="0,0,0,0" x:Name="Intercom" RadioId="0" />
+            </StackPanel>
         </StackPanel>
-    
-        <Separator Width="170" Margin="0,0,0,0" />
 
         <StackPanel
-            Orientation="Horizontal"
-            HorizontalAlignment="Center"
-            Margin="5,2,5,0">
-            <Button Name="buttonShow"
-                    Width="25"
-                    Height="15"
+            Name="Footer"
+            Orientation="Vertical">
+            <Separator Width="170" Margin="0,0,0,0" />
+
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Left"
+                Margin="1,1,5,0">
+
+                <StackPanel
+                    Name="textBackground"
                     Margin="0,0,0,0"
-                    Content="Hide"
-                    FontSize="8"
-                    VerticalContentAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    Click="Button_ShowAllRadios"
-                    Style="{StaticResource DarkStyle-Button}"
-                    RenderTransformOrigin="0.5, 0.5">
-            </Button>
-            <StackPanel
-                Name="textBackground"
-                Margin="2,0,0,0">
-                <TextBlock
-                   Margin="2,0,0,0"
-                   Width="50"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="6"
-                   Foreground="#E7E7E7"
-                   Padding="0,0,0,0"
-                   Style="{x:Null}"
-                   Text="Background"
-                   TextAlignment="Center" />
+                    Orientation="Horizontal">
+                    <TextBlock
+                       Margin="2,0,0,0"
+                       Width="35"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="6"
+                       Foreground="#E7E7E7"
+                       Padding="0,0,0,0"
+                       Style="{x:Null}"
+                       Text="Background"
+                       TextAlignment="Center" />
 
-                <Viewbox Stretch="Fill" DockPanel.Dock="Right"
-                         Height="8"
-                         Width="50"
-                         VerticalAlignment="Center">    
-                    <Slider x:Name="BackgroundOpacitySlider"
-                        Width="100"
+                    <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                             Height="8"
+                             Width="40"
+                             VerticalAlignment="Center">
+                        <Slider x:Name="BackgroundOpacitySlider"
+                            Width="100"
+                            Margin="2,0,0,0"
+                            VerticalAlignment="Center"
+                            Maximum="1.0"
+                            Minimum="0.0"
+                            ToolTip="Panel Opacity"
+                            Style="{x:Null}"
+                            Opacity="0.6"
+                            ValueChanged="backgroundOpacitySlider_ValueChanged"
+                            Value="1" />
+                    </Viewbox>
+                </StackPanel>
+                <StackPanel
+                    Name="textText"
+                    Orientation="Horizontal"
+                    Margin="2,0,0,0">
+                    <TextBlock
                         Margin="2,0,0,0"
+                        Width="35"
+                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Maximum="1.0"
-                        Minimum="0.0"
-                        ToolTip="Panel Opacity"
+                        FontSize="6"
+                        Foreground="#E7E7E7"
+                        Padding="0,0,0,0"
                         Style="{x:Null}"
-                        Opacity="0.6"
-                        ValueChanged="backgroundOpacitySlider_ValueChanged"
-                        Value="1" />
-                </Viewbox>
-            </StackPanel>
-            <StackPanel
-                Name="textText"
-                Margin="2,0,0,0">
-                <TextBlock
-                    Margin="2,0,0,0"
-                    Width="50"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    FontSize="6"
-                    Foreground="#E7E7E7"
-                    Padding="0,0,0,0"
-                    Style="{x:Null}"
-                    Text="Text"
-                    TextAlignment="Center" />
+                        Text="Text"
+                        TextAlignment="Center" />
 
-                <Viewbox Stretch="Fill" DockPanel.Dock="Right"
-                    Height="8"
-                    Width="50"
-                    VerticalAlignment="Center">
-                    <Slider x:Name="TextOpacitySlider"
-                        Width="100"
-                        Margin="2,0,0,0"
-                        VerticalAlignment="Center"
-                        Maximum="1.0"
-                        Minimum="0.20"
-                        ToolTip="Panel Opacity"
-                        Style="{x:Null}"
-                        Opacity="0.6"
-                        ValueChanged="textOpacitySlider_ValueChanged"
-                        Value="0.1" />
-                </Viewbox>
+                    <Viewbox Stretch="Fill" DockPanel.Dock="Right"
+                        Height="8"
+                        Width="40"
+                        VerticalAlignment="Center">
+                        <Slider x:Name="TextOpacitySlider"
+                            Width="100"
+                            Margin="2,0,0,0"
+                            VerticalAlignment="Center"
+                            Maximum="1.0"
+                            Minimum="0.20"
+                            ToolTip="Panel Opacity"
+                            Style="{x:Null}"
+                            Opacity="0.6"
+                            ValueChanged="textOpacitySlider_ValueChanged"
+                            Value="0.1" />
+                    </Viewbox>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </WrapPanel>

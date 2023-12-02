@@ -6,16 +6,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="RadioControlContainer"
-             Width="140"
-             Height="30">
+             Width="132"
+             Height="25">
     <StackPanel Margin="2,0,2,0" Orientation="Vertical">
-        <WrapPanel HorizontalAlignment="Left">
+        <WrapPanel HorizontalAlignment="Left"
+                   Height="12">
             <TextBlock x:Name="RadioLabel"
                        Width="15"
-                       Height="14"
+                       Height="10"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="10"
+                       FontSize="8"
                        Foreground="#E7E7E7"
                        Padding="0,0,0,0"
                        Style="{x:Null}"
@@ -23,7 +24,7 @@
                        TextAlignment="Center" />
 
             <Viewbox Stretch="Fill" DockPanel.Dock="Right"
-                     Height="12"
+                     Height="10"
                      Width="57"
                      VerticalAlignment="Center"
                      Margin="3,0,3,0" >
@@ -42,7 +43,7 @@
             <Viewbox Stretch="Fill" 
                      DockPanel.Dock="Right"
                      Height="12"
-                     Width="30"
+                     Width="20"
                      VerticalAlignment="Center"
                      Margin="3,0,3,0" > 
                 <xctk:IntegerUpDown 
@@ -57,9 +58,9 @@
             </Viewbox>
 
             <Ellipse x:Name="RadioActive"
-                 Width="12"
-                 Height="12"
-                 Margin="2"
+                 Width="10"
+                 Height="10"
+                 Margin="2,0,2,0"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Center"
                  Fill="#FF9900"
@@ -72,11 +73,13 @@
    
 
         <WrapPanel 
-            Width="110"
-            Margin="2,0,0,0"
+            Width="115"
+            Height="10"
+            HorizontalAlignment="Left"
+            Margin="2,2,0,0"
             ToolTip="Select the VOX Input mode you want to use. (Intercom Channel 1 Disabled)">
             <TextBlock x:Name="VOXLabel"
-               Margin="2,0,2,0"
+               Margin="1,0,10,0"
                Width="40"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
@@ -85,35 +88,55 @@
                Padding="0,0,0,0"
                Style="{x:Null}"
                Text="VOX SEL"
-               TextAlignment="Center" />
+               TextAlignment="Left" />
 
             <Button x:Name="Radio1Enabled"
                 Width="30"
                 FontSize="8"
-                Height="12"
+                Height="10"
                 Margin="0,0,0,0"
                 VerticalAlignment="Center"
                 Padding="0,0,0,0"
-                Content="R1"
                 IsEnabled="True"
                 Foreground="Black"
                 Style="{StaticResource DarkStyle-Button}"
                 Click="VoxR1Enabled_OnClick"
-                ToolTip="enable / disable voice activated communications for Radio 1"/>
+                ToolTip="enable / disable voice activated communications for Radio 1">
+                <Button.Content>
+                    <Grid Width="15" Height="10">
+                        <TextBlock 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="9"
+                           Padding="2,1.5,2,4"
+                           Text="R1" />
+                    </Grid>
+                </Button.Content> 
+            </Button>
 
             <Button x:Name="IntercomEnabled"
                 Width="30"
                 FontSize="8"
-                Height="12"
+                Height="10"
                 Margin="2,0,0,0"
                 VerticalAlignment="Center"
                 Padding="0"
-                Content="IC"
                 IsEnabled="False"
                 Foreground="Black"
                 Style="{StaticResource DarkStyle-Button}"
                 Click="VoxICEnabled_OnClick"
-                ToolTip="enable / disable voice activated communications for Intercom (Channel 1 Disabled)"/>
+                ToolTip="enable / disable voice activated communications for Intercom (Channel 1 Disabled)">
+                <Button.Content>
+                <Grid Width="15" Height="10">
+                    <TextBlock 
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="9"
+                       Padding="2,1.5,2,4"
+                       Text="IC" />
+                </Grid>
+                </Button.Content> 
+            </Button>
         </WrapPanel>
     </StackPanel>
 </UserControl>

@@ -19,6 +19,8 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using MessageBox = System.Windows.Forms.MessageBox;
 using System.Reflection.Metadata;
 using Xamarin.Forms.Shapes;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -27,7 +29,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// </summary>
     public partial class RadioOverlayWindowTenTransparent : Window
     {
-        private  double _aspectRatio;
+        private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[] radioControlGroupTransparent =
@@ -47,6 +49,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly Action<bool, int> _toggleOverlay;
 
+        private readonly Action<bool, int> _ExpandPanelImageConverter;
+        
+        // BitmapImage expandimage = new BitmapImage(new Uri("/ ExpandIcon.png", UriKind.Relative));
+    
         public RadioOverlayWindowTenTransparent(Action<bool, int> ToggleOverlay)
         {
             //load opacity before the intialising as the slider changed
@@ -56,7 +62,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //Used to determine if starting panel is expanded or contracted
             //Show = Contracted
             //Hide = Expanded
-            buttonShow.Content = "Show";
+            buttonShowText.Text = "Show";
+
+            //Used to determine if starting panel is expanded or contracted
+            //expand = Contracted
+            //contract = Expanded
+            buttonExpandText.Text = "expand";
+            
+
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
@@ -120,12 +133,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
 
-                if ((buttonShow.Content != null) && (buttonShow.Content == "Hide"))
+                if ((buttonShowText.Text != null) && (buttonShowText.Text == "Hide"))
                 {
                     radio.Visibility = Visibility.Visible;
                     Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set Visible");
                 }
-                else if (((buttonShow.Content != null) && (buttonShow.Content == "Show")) && (radio.RadioEnabled.Content == "On"))
+                else if (((buttonShowText.Text != null) && (buttonShowText.Text == "Show")) && (radio.RadioEnabled.Content == "On"))
                 {
                     radio.Visibility = Visibility.Visible;
                     Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set visible");
@@ -288,15 +301,49 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
         {
-            if ((buttonShow.Content == null) || (buttonShow.Content == "Hide"))
+            if ((buttonShowText.Text == null) || (buttonShowText.Text == "Hide"))
             {
-                buttonShow.Content = "Show";
+                buttonShowText.Text = "Show";
+                 
             }
             else
             {
-                buttonShow.Content = "Hide";
+                buttonShowText.Text = "Hide";
+                
             }
         }
+
+
+        
+
+
+        private void Button_Expand(object sender, RoutedEventArgs e)
+        {
+            //var expandicon = new ImageBrush(new BitmapImage(new Uri("/ ExpandIcon.png")));
+            //var contracticon = new ImageBrush(new BitmapImage(new Uri("/ ContractIcon.png")));
+
+            var expandicon = new ImageBrush(new BitmapImage(new Uri("../../ExpandIcon.png", UriKind.Relative)));
+            var contracticon = new ImageBrush(new BitmapImage(new Uri("../../ContractIcon.png", UriKind.Relative)));
+
+            if ((buttonExpandText.Text == null) || (buttonExpandText.Text == "expand"))
+            {
+                buttonExpandText.Text = "contract";
+                buttonExpandText.Background = expandicon;
+                Header.Visibility = Visibility.Collapsed;
+                Footer.Visibility = Visibility.Collapsed;
+                
+                Console.Write("button expanded pressed - window now in contract mode");
+            }
+            else
+            {
+                buttonExpandText.Text = "expand";
+                buttonExpandText.Background = contracticon;
+                Header.Visibility = Visibility.Visible;
+                Footer.Visibility = Visibility.Visible;
+                Console.Write("button contract pressed - window now in expand mode");
+            }
+        }
+
 
         private void Button_Close(object sender, RoutedEventArgs e)
         {

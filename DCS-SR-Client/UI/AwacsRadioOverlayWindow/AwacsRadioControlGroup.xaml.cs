@@ -625,7 +625,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (EncryptionKeySpinner?.Value != null)
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
         }
-        
+
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
             var currentRadio = RadioHelper.GetRadio(RadioId);

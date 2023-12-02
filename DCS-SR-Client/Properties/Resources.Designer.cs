@@ -73,6 +73,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap ContractIcon {
+            get {
+                object obj = ResourceManager.GetObject("ContractIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap ExpandIcon {
+            get {
+                object obj = ResourceManager.GetObject("ExpandIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap status_connected {
             get {
                 object obj = ResourceManager.GetObject("status_connected", resourceCulture);
@@ -111,39 +131,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Party|118.500
-        ///CAS|123.450
-        ///A/A|124.00
-        ///LogiReq|133.00
-        ///MedEvac|134.00
-        ///Refuel|136.00
-        ///COMMAND|118.000
-        ///ALPHA|126.000
-        ///BRAVO|127.000
-        ///CHARLIE|128.000
-        ///DELTA|129.000
-        ///AIR|120.00
-        ///GROUND|125.00
-        ///LOGISTICS|130.00
-        ///UTILITY|131.00
-        ///INDUSTRY|135.00
-        ///Vice|120.10
-        ///Chaos|120.30
-        ///Nighthawks|120.50
-        ///Defiant|120.60
-        ///Phoenix|120.70
-        ///Witcher|125.10
-        ///Moon|125.30
-        ///Cerberus|131.10
-        ///Magellan|131.200
-        ///Meridian|131.30
-        ///Rogue|131.40
-        ///Shinobi|131.50
-        ///Cosmo|131.60
-        ///Atlas|130.10
-        ///Benevolence|130.50
-        ///Fleet Svc|130.60
-        ///RockRaid|135. [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to How to use...
+        ///
+        ///1) Simply follow the structure [Name] + &quot;|&quot; + [Desired Frequency]
+        ///2) Ensure that the file is named &quot;vngd-channels.txt&quot;
+        ///3) Click RELOAD on the channel dropdown section to refresh the list.
+        ///
+        ///
+        ///---- Current Operation Frequencies ----|1.0
+        ///Open the vngd-channels.txt file to edit|1.0
+        ///
+        ///
+        ///---- Request Frequencies ----|1.0
+        ///Party Request      118.50|118.50
+        ///CAS Request        123.45|123.45
+        ///A/A Request        124.00|124.00
+        ///Logistics Request  133.00|133.00
+        ///MedEvac Request    134.00|134.00
+        ///R [rest of string was truncated]&quot;;.
         /// </summary>
         public static string vngd_channels {
             get {
