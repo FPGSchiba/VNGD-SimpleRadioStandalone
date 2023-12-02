@@ -260,7 +260,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
 
-                    RadioVolume.IsEnabled = false;
+                    RadioVolume.IsEnabled = true; // volume slider works even when radio is turned off.
 
                     ToggleButtons(false);
                     RadioEnabled.IsEnabled = true;
@@ -354,7 +354,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    RadioVolume.IsEnabled = false;
+                    RadioVolume.IsEnabled = true;   // Even if radio is turned off, radio volume is adjustable
 
                     //reset dragging just incase
                     //  _dragging = false;

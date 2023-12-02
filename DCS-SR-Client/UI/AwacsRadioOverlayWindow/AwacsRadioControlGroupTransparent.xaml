@@ -166,6 +166,5 @@
                 Width="50"
                 x:Name="RadioVolume" />
         </Viewbox>
-        
     </StackPanel>
 </UserControl>

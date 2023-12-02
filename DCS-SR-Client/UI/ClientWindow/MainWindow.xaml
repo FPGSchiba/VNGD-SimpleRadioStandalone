@@ -1,5 +1,5 @@
 ﻿<controls:MetroWindow
-    Height="830"
+    Height="880"
     ResizeMode="CanMinimize"
     Title="Vanguard SRS Client"
     Width="550"
