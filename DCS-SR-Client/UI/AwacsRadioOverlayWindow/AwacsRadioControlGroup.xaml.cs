@@ -298,7 +298,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
-                RadioFrequency.Text = "Unknown";
+                RadioFrequency.Text = "Off";
 
                 RadioMetaData.Text = "";
 
@@ -350,7 +350,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 {
                     RadioActive.Fill = radioOff;
                     RadioLabel.Text = "No Radio";
-                    RadioFrequency.Text = "Unknown";
+                    RadioFrequency.Text = "Off";
                     RadioMetaData.Text = "";
 
 
