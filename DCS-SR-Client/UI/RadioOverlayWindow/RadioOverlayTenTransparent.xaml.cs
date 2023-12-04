@@ -504,7 +504,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
-            var xScale = ActualWidth / RadioOverlayWin.MinWidth;
+            var xScale = ActualWidth / RadioOverlayWin.MinHeight;
             var value = Math.Min(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
         }
