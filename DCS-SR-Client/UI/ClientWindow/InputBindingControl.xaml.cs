@@ -35,7 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public void LoadInputSettings()
         {
             DeviceLabel.Content = InputName;
-            ModifierLabel.Content = InputName + " Modifier";
+            ModifierLabel.Content = "        + Modifier";
             ModifierBinding = (InputBinding)((int)ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
