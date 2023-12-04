@@ -1521,6 +1521,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindowTenVerticalLong?.Close();
             _radioOverlayWindowTenVerticalLong = null;
 
+            _radioOverlayWindowTenTransparent?.Close();
+            _radioOverlayWindowTenTransparent = null;
+
             _radioOverlayWindowOneHorizontal?.Close();
             _radioOverlayWindowOneHorizontal = null;
 
@@ -2089,7 +2092,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, 300);
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, 170);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, 905);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, 100);
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity, 1.0);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentTextOpacity, 1.0);
