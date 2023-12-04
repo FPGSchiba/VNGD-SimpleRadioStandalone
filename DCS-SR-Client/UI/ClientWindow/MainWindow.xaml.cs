@@ -611,6 +611,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IntercomStartTransmitEffect.SelectionChanged += OnIntercomStartTransmitEffectChanged;
             IntercomEndTransmitEffect.SelectionChanged += OnIntercomEndTransmitEffectChanged;
 
+            // How to change the keybind names in the keybinds tab
+
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
@@ -635,11 +637,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IntercomPTT.ControlInputBinding = InputBinding.IntercomPTT;
             IntercomPTT.InputDeviceManager = InputManager;
 
-            RadioOverlay.InputName = "Overlay Toggle";
+            RadioOverlay.InputName = "Transparent Panel Toggle"; // TODO: Replace this with 10T panel
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
 
-            AwacsOverlayToggle.InputName = "Awacs Toggle";
+            AwacsOverlayToggle.InputName = "10 Radio Panel Toggle";
             AwacsOverlayToggle.ControlInputBinding = InputBinding.AwacsOverlayToggle;
             AwacsOverlayToggle.InputDeviceManager = InputManager;
 
