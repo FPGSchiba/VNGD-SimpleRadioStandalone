@@ -756,13 +756,13 @@
                                 ControlInputBinding="{x:Static settings:InputBinding.AwacsOverlayToggle}"
                                 Grid.ColumnSpan="5"
                                 Grid.Row="22"
-                                InputName="AWACS Overlay Toggle"
+                                InputName="10 Radio Panel Toggle"
                                 x:Name="AwacsOverlayToggle" />
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
                                 Grid.ColumnSpan="5"
                                 Grid.Row="23"
-                                InputName="Overlay Toggle"
+                                InputName="1 Radio Panel Toggle"
                                 x:Name="RadioOverlay" />
 
                             

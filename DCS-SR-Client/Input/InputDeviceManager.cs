@@ -690,15 +690,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     {
                         //run on main
                         Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false, 8); });
-                        break;
+                            () => { _toggleOverlayCallback(false, 8); }); // Change second digit to match overlay window number you want to open
+                        break;                                            // TODO Replace "8" with 10T panel ID number
                     }
                     else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.AwacsOverlayToggle)
                     {
                         //run on main
                         Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false, 7); });
-                        break;
+                            () => { _toggleOverlayCallback(false, 7); }); // Change second digit to match overlay window number you want to open
+                            break;
                     }
                     else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
                              (int)bindState.MainDevice.InputBind <= (int)InputBinding.AwacsOverlayToggle)
