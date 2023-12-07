@@ -238,6 +238,20 @@ Social #48    347.00|347.00
 Social #49    348.00|348.00
 Social #50    349.00|349.00
 
+---- Special Use Frequencies ----|1.0
+Scrimmage Coordination      100.00|100.00
+Scrimmage Announcements     100.50|100.50
+
+---- Global Frequencies ----|1.0
+Global Air Unit #1          110.00|110.00
+Global Air Unit #2          111.00|111.00
+Global Air Unit #3          112.00|112.00
+GLobal Ground Unit #1       113.00|113.00
+Global Ground Unit #2       114.00|114.00
+Global Misc. Unit #1        115.00|115.00
+Global Misc. Unit #2        116.00|116.00
+Global Misc. Unit #3        117.00|117.00
+
 
 ---- Special Use Frequencies ----|1.0
 Guard       121.50|121.50
