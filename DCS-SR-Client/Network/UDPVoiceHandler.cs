@@ -172,15 +172,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         //Store last release time
                                     }
                                 }
-                                else
-                                {
-                                    //turn on PTT even if not valid radio switch
-                                    if (radioSwitchPtt)
-                                    {
-                                        _lastPTTPress = DateTime.Now.Ticks;
-                                        ptt = true;
-                                    }
-                                }
+                                // commented out this code because we do not want to turn on PTT if radio is disabled
+                                //else
+                                //{
+                                //    //turn on PTT even if not valid radio switch
+                                //    if (radioSwitchPtt)
+                                //    {
+                                //        _lastPTTPress = DateTime.Now.Ticks;
+                                //        ptt = true;
+                                //    }
+                                //}
 
                             }
                         }
