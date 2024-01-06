@@ -80,6 +80,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenLongVerticalWidth,
         RadioTenLongVerticalHeight,
 
+        // Radio 10T
+        RadioTenTransparentX,
+        RadioTenTransparentY,
+        RadioTenTransparentSize,
+        RadioTenTransparentBackgroundOpacity,
+        RadioTenTransparentTextOpacity,
+        RadioTenTransparentWidth,
+        RadioTenTransparentHeight,
+
         // --------- Horizontal Panels --------------
         // Radio 1H
         RadioOneHorizontalX,
@@ -595,6 +604,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioTenWideHorizontalOpacity.ToString(), "1.0"},
             {GlobalSettingsKeys.RadioTenWideHorizontalWidth.ToString(), "122"},
             {GlobalSettingsKeys.RadioTenWideHorizontalHeight.ToString(), "270"},
+
+            // Radio 10T
+            {GlobalSettingsKeys.RadioTenTransparentX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenTransparentY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenTransparentSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenTransparentTextOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenTransparentWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenTransparentHeight.ToString(), "270"},
             
             // Client Window
             {GlobalSettingsKeys.ClientX.ToString(), "200"},

@@ -204,7 +204,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        public void UpdatePlayerPosition( DCSLatLngPosition latLngPosition)
+        public void UpdatePlayerPosition(DCSLatLngPosition latLngPosition)
         {
             PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
             DcsPlayerRadioInfo.latLng = latLngPosition;
