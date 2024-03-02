@@ -23,61 +23,96 @@ Operation Command    118.00|118.00
 Air Command          120.00|120.00
 Ground Command       125.00|125.00
 Logistics Command    130.00|130.00
-Utility Command      131.00|131.00
 Industry Command     135.00|135.00
+Utility Command      140.00|140.00
 
 ---- Task Force Command Frequencies ----|1.0
-Task Force Alpha Command     126.00|126.00
-Task Force Bravo Command     127.00|127.00
-Task Force Charlie Command   128.00|128.00
-Task Force Delta Command     129.00|129.00
+Task Force Alpha Command     150.00|150.00
+Task Force Bravo Command     151.00|151.00
+Task Force Charlie Command   152.00|152.00
+Task Force Delta Command     153.00|153.00
+Task Force Echo Command      154.00|154.00
+Task Force Foxtrot Command   155.00|155.00
+Task Force Golf Command      156.00|156.00
+
+
 
 ---- Task Force Alpha Sub-Command Frequencies ----|1.0
-TF Alpha Group 1  126.10|126.10
-TF Alpha Group 2  126.20|126.20
-TF Alpha Group 3  126.30|126.30
-TF Alpha Group 4  126.40|126.40
-TF Alpha Group 5  126.50|126.50
-TF Alpha Group 6  126.60|126.60
-TF Alpha Group 7  126.70|126.70
-TF Alpha Group 8  126.80|126.80
-TF Alpha Group 9  126.90|126.90
-
+TF Alpha Group 1  150.10|150.10
+TF Alpha Group 2  150.20|150.20
+TF Alpha Group 3  150.30|150.30
+TF Alpha Group 4  150.40|150.40
+TF Alpha Group 5  150.50|150.50
+TF Alpha Group 6  150.60|150.60
+TF Alpha Group 7  150.70|150.70
+TF Alpha Group 8  150.80|150.80
+TF Alpha Group 9  150.90|150.90
 
 ---- Task Force Bravo Sub-Command Frequencies ----|1.0
-TF Bravo Group 1   127.10|127.10
-TF Bravo Group 2   127.20|127.20
-TF Bravo Group 3   127.30|127.30
-TF Bravo Group 4   127.40|127.40
-TF Bravo Group 5   127.50|127.50
-TF Bravo Group 6   127.60|127.60
-TF Bravo Group 7   127.70|127.70
-TF Bravo Group 8   127.80|127.80
-TF Bravo Group 9   127.90|127.90
+TF Bravo Group 1   151.10|151.10
+TF Bravo Group 2   151.20|151.20
+TF Bravo Group 3   151.30|151.30
+TF Bravo Group 4   151.40|151.40
+TF Bravo Group 5   151.50|151.50
+TF Bravo Group 6   151.60|151.60
+TF Bravo Group 7   151.70|151.70
+TF Bravo Group 8   151.80|151.80
+TF Bravo Group 9   151.90|151.90
 
 ---- Task Force Charlie Sub-Command Frequencies ----|1.0
-TF Charlie Group 1   128.10|128.10
-TF Charlie Group 2   128.20|128.20
-TF Charlie Group 3   128.30|128.30
-TF Charlie Group 4   128.40|128.40
-TF Charlie Group 5   128.50|128.50
-TF Charlie Group 6   128.60|128.60
-TF Charlie Group 7   128.70|128.70
-TF Charlie Group 8   128.80|128.80
-TF Charlie Group 9   128.90|128.90
-
+TF Charlie Group 1   152.10|152.10
+TF Charlie Group 2   152.20|152.20
+TF Charlie Group 3   152.30|152.30
+TF Charlie Group 4   152.40|152.40
+TF Charlie Group 5   152.50|152.50
+TF Charlie Group 6   152.60|152.60
+TF Charlie Group 7   152.70|152.70
+TF Charlie Group 8   152.80|152.80
+TF Charlie Group 9   152.90|152.90
 
 ---- Task Force Delta Sub-Command Frequencies ----|1.0
-TF Delta Group 1     129.10|129.10
-TF Delta Group 2     129.20|129.20
-TF Delta Group 3     129.30|129.30
-TF Delta Group 4     129.40|129.40
-TF Delta Group 5     129.50|129.50
-TF Delta Group 6     129.60|129.60
-TF Delta Group 7     129.70|129.70
-TF Delta Group 8     129.80|129.80
-TF Delta Group 9     129.90|129.90
+TF Delta Group 1     153.10|153.10
+TF Delta Group 2     153.20|153.20
+TF Delta Group 3     153.30|153.30
+TF Delta Group 4     153.40|153.40
+TF Delta Group 5     153.50|153.50
+TF Delta Group 6     153.60|153.60
+TF Delta Group 7     153.70|153.70
+TF Delta Group 8     153.80|153.80
+TF Delta Group 9     153.90|153.90
 
+---- Task Force Echo Sub-Command Frequencies ----|1.0
+TF Echo Group 1     154.10|154.10
+TF Echo Group 2     154.20|154.20
+TF Echo Group 3     154.30|154.30
+TF Echo Group 4     154.40|154.40
+TF Echo Group 5     154.50|154.50
+TF Echo Group 6     154.60|154.60
+TF Echo Group 7     154.70|154.70
+TF Echo Group 8     154.80|154.80
+TF Echo Group 9     154.90|154.90
+
+---- Task Force Foxtrot Sub-Command Frequencies ----|1.0
+TF Foxtrot Group 1     155.10|155.10
+TF Foxtrot Group 2     155.20|155.20
+TF Foxtrot Group 3     155.30|155.30
+TF Foxtrot Group 4     155.40|155.40
+TF Foxtrot Group 5     155.50|155.50
+TF Foxtrot Group 6     155.60|155.60
+TF Foxtrot Group 7     155.70|155.70
+TF Foxtrot Group 8     155.80|155.80
+TF Foxtrot Group 9     155.90|155.90
+
+---- Task Force Golf Sub-Command Frequencies ----|1.0
+TF Golf Group 1     156.10|156.10
+TF Golf Group 2     156.20|156.20
+TF Golf Group 3     156.30|156.30
+TF Golf Group 4     156.40|156.40
+TF Golf Group 5     156.50|156.50
+TF Golf Group 6     156.60|156.60
+TF Golf Group 7     156.70|156.70
+TF Golf Group 8     156.80|156.80
+TF Golf Group 9     156.90|156.90
 
 ---- Unit Frequencies ----|1.0
 Vice            120.10|120.10
@@ -86,16 +121,137 @@ Nighthawks      120.50|120.50
 Defiant         120.60|120.60
 Witcher         125.10|125.10
 Obsidian        125.50|125.50
-Discovery       131.20|131.20
-Meridian        131.30|131.30
-Rogue           131.40|131.40
-Shinobi         131.50|131.50
-Cosmo Knights   131.60|131.60
+Discovery       140.10|140.10
+Rogue Racing    140.40|140.40
+Shinobi         140.50|140.50
+Cosmo Knights   140.60|140.60
 Atlas           130.10|130.10
 Benevolence     130.50|130.50
 Fleet Services  130.60|130.60
 Rock Raiders    135.10|135.10
 Kraken          135.50|135.50
+
+
+
+
+---- Defiant Unit Wide Frequencies ----|1.0
+Defiant Common: 120.60|120.60
+Defiant Flight Common: 120.69|120.69
+Defiant Security Common: 125.69|125.69
+
+---- Defiant Flight Primary Frequencies ----|1.0
+Flight 1:      120.61|120.61
+Flight 2:      120.62|120.62
+Flight 3:      120.63|120.63
+Flight 4:      120.64|120.64
+Flight 5:      120.65|120.65
+Flight 6:      120.66|120.66
+Flight 7:      120.67|120.67
+Flight 8:      120.68|120.68
+
+---- Defiant Ground Primary Frequencies ----|1.0
+Team 1:        125.61|125.61
+Team 2:        125.62|125.62
+Team 3:        125.63|125.63
+Team 4:        125.64|125.64
+Team 5:        125.65|125.65
+Team 6:        125.66|125.66
+Team 7:        125.67|125.67
+Team 8:        125.68|125.68
+
+
+
+
+---- Discovery Unit Wide Frequencies ----|1.0
+Main Net: 140.10|140.10
+Traffic Marshal: 140.105|140.105
+Science Dept: 140.12|140.12
+Security Dept: 140.17|140.17
+Medical Dept: 140.19|140.19
+
+---- Discovery - Magellan Ship Frequencies ----|1.0
+Magellan Flight: 140.20|140.20
+Magellan Landing: 140.205|140.205
+Magellan Social: 140.209|140.209
+
+---- Discovery - Elcano Ship Frequencies ----|1.0
+Elcano Flight: 140.21|140.21
+Elcano Landing: 140.215|140.215
+Elcano Social: 140.219|140.219
+
+---- Discovery - Pegasus Ship Frequencies ----|1.0
+Pegasus Flight: 140.22|140.22
+Pegasus Landing: 140.225|140.225
+Pegasus Social: 140.229|140.229
+
+
+
+---- Social Frequencies ----|1.0
+Social #1     300.00|300.00
+Social #2     301.00|301.00
+Social #3     302.00|302.00
+Social #4     303.00|303.00
+Social #5     304.00|304.00
+Social #6     305.00|305.00
+Social #7     306.00|306.00
+Social #8     307.00|307.00
+Social #9     308.00|308.00
+Social #10    309.00|309.00
+Social #11    310.00|310.00
+Social #12    311.00|311.00
+Social #13    312.00|312.00
+Social #14    313.00|313.00
+Social #15    314.00|314.00
+Social #16    315.00|315.00
+Social #17    316.00|316.00
+Social #18    317.00|317.00
+Social #19    318.00|318.00
+Social #20    319.00|319.00
+Social #21    320.00|320.00
+Social #22    321.00|321.00
+Social #23    322.00|322.00
+Social #24    323.00|323.00
+Social #25    324.00|324.00
+Social #26    325.00|325.00
+Social #27    326.00|326.00
+Social #28    327.00|327.00
+Social #29    328.00|328.00
+Social #30    329.00|329.00
+Social #31    330.00|330.00
+Social #32    331.00|331.00
+Social #33    332.00|332.00
+Social #34    333.00|333.00
+Social #35    334.00|334.00
+Social #36    335.00|335.00
+Social #37    336.00|336.00
+Social #38    337.00|337.00
+Social #39    338.00|338.00
+Social #40    339.00|339.00
+Social #41    340.00|340.00
+Social #42    341.00|341.00
+Social #43    342.00|342.00
+Social #44    343.00|343.00
+Social #45    344.00|344.00
+Social #46    345.00|345.00
+Social #47    346.00|346.00
+Social #48    347.00|347.00
+Social #49    348.00|348.00
+Social #50    349.00|349.00
+
+---- Special Use Frequencies ----|1.0
+Scrimmage Coordination      100.00|100.00
+Scrimmage Announcements     100.50|100.50
+
+---- Global Frequencies ----|1.0
+Global Air Unit #1          110.00|110.00
+Global Air Unit #2          111.00|111.00
+Global Air Unit #3          112.00|112.00
+GLobal Ground Unit #1       113.00|113.00
+Global Ground Unit #2       114.00|114.00
+Global Misc. Unit #1        115.00|115.00
+Global Misc. Unit #2        116.00|116.00
+Global Misc. Unit #3        117.00|117.00
+
 
 ---- Special Use Frequencies ----|1.0
 Guard       121.50|121.50

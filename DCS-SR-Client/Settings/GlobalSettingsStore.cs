@@ -28,22 +28,121 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         LastServer,
         MicBoost ,
         SpeakerBoost,
+
+        #region Radio panel settings
+
+        // --------- Vertical Panels --------------
+        // Radio 1V
+        RadioOneVerticalX,
+        RadioOneVerticalY,
+        RadioOneVerticalSize,
+        RadioOneVerticalOpacity,
+        RadioOneVerticalWidth,
+        RadioOneVerticalHeight,
+
+        // Radio 2V
+        RadioTwoVerticalX,
+        RadioTwoVerticalY,
+        RadioTwoVerticalSize,
+        RadioTwoVerticalOpacity,
+        RadioTwoVerticalWidth,
+        RadioTwoVerticalHeight,
+
+        // Radio 3V
+        RadioThreeVerticalX,
+        RadioThreeVerticalY,
+        RadioThreeVerticalSize,
+        RadioThreeVerticalOpacity,
+        RadioThreeVerticalWidth,
+        RadioThreeVerticalHeight,
+
+        // Radio 5V
         RadioFiveX,
-        RadioTwoX,
         RadioFiveY,
-        RadioTwoY,
         RadioFiveSize,
-        RadioTwoSize,
         RadioFiveOpacity,
-        RadioTwoOpacity,
         RadioFiveWidth,
-        RadioTwoWidth,
         RadioFiveHeight,
-        RadioTwoHeight,
+
+        // Radio 10V
+        RadioTenVerticalX,
+        RadioTenVerticalY,
+        RadioTenVerticalSize,
+        RadioTenVerticalOpacity,
+        RadioTenVerticalWidth,
+        RadioTenVerticalHeight,
+
+        // Radio 10VL
+        RadioTenLongVerticalX,
+        RadioTenLongVerticalY,
+        RadioTenLongVerticalSize,
+        RadioTenLongVerticalOpacity,
+        RadioTenLongVerticalWidth,
+        RadioTenLongVerticalHeight,
+
+        // Radio 10T
+        RadioTenTransparentX,
+        RadioTenTransparentY,
+        RadioTenTransparentSize,
+        RadioTenTransparentBackgroundOpacity,
+        RadioTenTransparentTextOpacity,
+        RadioTenTransparentWidth,
+        RadioTenTransparentHeight,
+
+        // --------- Horizontal Panels --------------
+        // Radio 1H
+        RadioOneHorizontalX,
+        RadioOneHorizontalY,
+        RadioOneHorizontalSize,
+        RadioOneHorizontalOpacity,
+        RadioOneHorizontalWidth,
+        RadioOneHorizontalHeight,
+
+        // Radio 2H
+        RadioTwoHorizontalX,
+        RadioTwoHorizontalY,
+        RadioTwoHorizontalSize,
+        RadioTwoHorizontalOpacity,
+        RadioTwoHorizontalWidth,
+        RadioTwoHorizontalHeight,
+
+        // Radio 3H
+        RadioThreeHorizontalX,
+        RadioThreeHorizontalY,
+        RadioThreeHorizontalSize,
+        RadioThreeHorizontalOpacity,
+        RadioThreeHorizontalWidth,
+        RadioThreeHorizontalHeight,
+
+        // Radio 5H
+        RadioFiveHorizontalX,
+        RadioFiveHorizontalY,
+        RadioFiveHorizontalSize,
+        RadioFiveHorizontalOpacity,
+        RadioFiveHorizontalWidth,
+        RadioFiveHorizontalHeight,
+
+        // Radio 10H
+        RadioTenHorizontalX,
+        RadioTenHorizontalY,
+        RadioTenHorizontalSize,
+        RadioTenHorizontalOpacity,
+        RadioTenHorizontalWidth,
+        RadioTenHorizontalHeight,
+
+        // Radio 10HW
+        RadioTenWideHorizontalX,
+        RadioTenWideHorizontalY,
+        RadioTenWideHorizontalSize,
+        RadioTenWideHorizontalOpacity,
+        RadioTenWideHorizontalWidth,
+        RadioTenWideHorizontalHeight,
+
+        // Client Window
         ClientX,
         ClientY,
-        AwacsX,
-        AwacsY,
+        #endregion
+
         MicAudioOutputDeviceId,
 
         CliendIdShort, // not used anymore
@@ -408,29 +507,120 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.MicBoost.ToString(), "0.514"},
             {GlobalSettingsKeys.SpeakerBoost.ToString(), "0.514"},
 
-            {GlobalSettingsKeys.RadioTwoX.ToString(), "300"},
-            {GlobalSettingsKeys.RadioTwoY.ToString(), "300"},
-            {GlobalSettingsKeys.RadioTwoSize.ToString(), "1.0"},
-            {GlobalSettingsKeys.RadioTwoOpacity.ToString(), "1.0"},
+            #region Radio Panel settings
 
-            {GlobalSettingsKeys.RadioTwoWidth.ToString(), "122"},
-            {GlobalSettingsKeys.RadioTwoHeight.ToString(), "270"},
+            // Raio 1V
+            {GlobalSettingsKeys.RadioOneVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioOneVerticalHeight.ToString(), "270"},
 
+            // Radio 2V
+            {GlobalSettingsKeys.RadioTwoVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTwoVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTwoVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTwoVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTwoVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTwoVerticalHeight.ToString(), "270"},
+
+            // Radio 3V
+            {GlobalSettingsKeys.RadioThreeVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioThreeVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioThreeVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioThreeVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioThreeVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioThreeVerticalHeight.ToString(), "270"},
+
+            // Radio 5V
             {GlobalSettingsKeys.RadioFiveX.ToString(), "300"},
             {GlobalSettingsKeys.RadioFiveY.ToString(), "300"},
             {GlobalSettingsKeys.RadioFiveSize.ToString(), "1.0"},
             {GlobalSettingsKeys.RadioFiveOpacity.ToString(), "1.0"},
-
             {GlobalSettingsKeys.RadioFiveWidth.ToString(), "122"},
             {GlobalSettingsKeys.RadioFiveHeight.ToString(), "270"},
 
+            // Radio 10V
+            {GlobalSettingsKeys.RadioTenVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenVerticalHeight.ToString(), "270"},
+            
+            // Radio 10VL
+            {GlobalSettingsKeys.RadioTenLongVerticalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenLongVerticalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenLongVerticalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenLongVerticalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenLongVerticalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenLongVerticalHeight.ToString(), "270"},
+            
+            // Radio 1H
+            {GlobalSettingsKeys.RadioOneHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioOneHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioOneHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioOneHorizontalHeight.ToString(), "270"},
+
+            // Radio 2H
+            {GlobalSettingsKeys.RadioTwoHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTwoHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTwoHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTwoHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTwoHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTwoHorizontalHeight.ToString(), "270"},
+
+            // Radio 3H
+            {GlobalSettingsKeys.RadioThreeHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioThreeHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioThreeHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioThreeHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioThreeHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioThreeHorizontalHeight.ToString(), "270"},
+
+            // Radio 5H
+            {GlobalSettingsKeys.RadioFiveHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioFiveHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioFiveHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioFiveHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioFiveHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioFiveHorizontalHeight.ToString(), "270"},
+
+            // Radio 10H
+            {GlobalSettingsKeys.RadioTenHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenHorizontalHeight.ToString(), "270"},
+            
+            // Radio 10HW
+            {GlobalSettingsKeys.RadioTenWideHorizontalX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenWideHorizontalHeight.ToString(), "270"},
+
+            // Radio 10T
+            {GlobalSettingsKeys.RadioTenTransparentX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenTransparentY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenTransparentSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenTransparentTextOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenTransparentWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenTransparentHeight.ToString(), "270"},
+            
+            // Client Window
             {GlobalSettingsKeys.ClientX.ToString(), "200"},
             {GlobalSettingsKeys.ClientY.ToString(), "200"},
 
-            {GlobalSettingsKeys.AwacsX.ToString(), "300"},
-            {GlobalSettingsKeys.AwacsY.ToString(), "300"},
+#endregion
 
-        //    {GlobalSettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
+            //    {GlobalSettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
             {GlobalSettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString()},
 
             {GlobalSettingsKeys.DCSLOSOutgoingUDP.ToString(), "9086"},

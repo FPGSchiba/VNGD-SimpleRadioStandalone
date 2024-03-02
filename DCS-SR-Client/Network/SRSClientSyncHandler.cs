@@ -225,6 +225,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 MsgType = NetworkMessage.MessageType.RADIO_UPDATE
             };
 
+            foreach (var radio in message.Client.RadioInfo.radios)
+            {
+                Logger.Trace(radio.name + ": " + radio.modulation);
+            }
+
             var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
 
             if (needValidPosition)

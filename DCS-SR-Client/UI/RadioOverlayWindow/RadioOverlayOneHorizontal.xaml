@@ -1,0 +1,191 @@
+﻿<Window x:Class="Ciribob.DCS.SimpleRadio.Standalone.Overlay.RadioOverlayWindowOneHorizontal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
+        xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
+        Name="RadioOverlayWin"
+        Title="DCS-SimpleRadio"
+        Width="340"
+        Height="100"
+        MinWidth="340"
+        MinHeight="100"
+        AllowsTransparency="True"
+        Background="#444"
+        Opacity="1.0"
+        ResizeMode="CanResizeWithGrip"
+        Style="{x:Null}"
+        Topmost="True"
+        WindowStyle="None">
+
+    <Grid Name="containerPanel"
+          SizeChanged="containerPanel_SizeChanged"
+          Style="{x:Null}">
+
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="ApplicationScaleTransform"
+                            CenterX="0"
+                            CenterY="0"
+                            ScaleX="{Binding ElementName=RadioOverlayWin,
+                                             Path=ScaleValue}"
+                            ScaleY="{Binding ElementName=RadioOverlayWin,
+                                             Path=ScaleValue}" />
+        </Grid.LayoutTransform>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="16" />
+            <RowDefinition Height="80" />
+
+
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="5"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <TextBlock Name="ControlText"
+                       Width="140"
+                       Height="12"
+                       Margin="5,0,0,0"
+                       VerticalAlignment="Center"
+                       FontSize="8"
+                       Foreground="#E7E7E7"
+                       Padding="0"
+                       Text="1 Radio Panel" />
+            <TextBlock Name="ControlSubText"
+                       Width="100"
+                       Text="VNGD is best"
+                       FontSize="8"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#E7E7E7"
+                       >
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter Property="Opacity" Value="0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock Name="Orientation"
+                Width="38"
+                Height="12"
+                Margin="5,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="8"
+                Foreground="#E7E7E7"
+                Padding="0"
+                Text="Horizontal" />
+            <Button 
+                Height="15" 
+                Margin="0,0,2,0" 
+                ToolTip="Swap to vertical orientation"
+                Click="Button_Swap_Orientation"
+                Style="{StaticResource DarkStyle-Button}">
+                <Grid Width="10" Height="10">
+                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                </Grid>
+            </Button>
+            <Button Height="15"
+                    Margin="0,0,0,0"
+                    VerticalAlignment="Center"
+                    Click="Button_Minimise"
+                    Style="{StaticResource DarkStyle-Button}">
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Marlett"
+                                   FontSize="14"
+                                   Padding="3.5,0,0,3"
+                                   Text="0" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+
+            <Button Height="15"
+                    Margin="2,0,5,0"
+                    VerticalAlignment="Center"
+                    Click="Button_Close"
+                    Style="{StaticResource DarkStyle-Button}">
+                <Button.Content>
+                    <Grid Width="10" Height="10">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Marlett"
+                                   FontSize="14"
+                                   Padding="0,0,0,1"
+                                   Text="r" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+
+        </StackPanel>
+
+        <awacsOverlayWindow:RadioControlGroup 
+            x:Name="radio1"
+            VerticalAlignment="Center"
+            Grid.Row="1"
+            Grid.Column="0"
+            RadioId="1" />
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Orientation="Vertical"
+            VerticalAlignment="Center"
+            Height="75" 
+            Margin="2,2,2,0"  >
+
+            <local:IntercomControlGroup x:Name="intercom"
+                            RadioId="0" 
+                            Margin="0,0,0,0" Grid.Row="1" />
+
+            <Separator Height="1" Margin="0 1" />
+
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Left"
+                Margin="0,0,10,0">
+                
+                
+                <TextBlock x:Name="TrancparencyLabel"
+                       Width="60"
+                       Margin="0,0,5,0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Foreground="#E7E7E7"
+                       Padding="0"
+                       Style="{x:Null}"
+                       Text="TRANSPARENCY"
+                       TextAlignment="Center"/>
+
+
+                <Slider x:Name="windowOpacitySlider"
+                        Width="80"
+                        Margin="0,0,20,0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Maximum="1.0"
+                        Minimum="0.05"
+                        Style="{x:Null}"
+                        ToolTip="Window Opacity"
+                        Opacity="0.6"
+                        ValueChanged="windowOpacitySlider_ValueChanged"
+                        Value="1.0" Grid.ColumnSpan="3" />
+            </StackPanel>
+        </StackPanel>
+
+
+    </Grid>
+</Window>

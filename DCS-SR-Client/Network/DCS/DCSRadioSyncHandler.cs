@@ -314,8 +314,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 var updateRadio = message.radios[i];
 
 
-                if ((updateRadio.expansion && !expansion) ||
-                    (updateRadio.modulation == RadioInformation.Modulation.DISABLED))
+                if ((updateRadio.expansion && !expansion))
                 {
                     //expansion radio, not allowed
                     clientRadio.freq = 1;
@@ -351,7 +350,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                     clientRadio.name = updateRadio.name;
 
-                    clientRadio.modulation = updateRadio.modulation;
+                    if (overrideFreqAndVol)
+                    {
+                        clientRadio.modulation = updateRadio.modulation;
+                    }
 
                     //update modes
                     clientRadio.freqMode = updateRadio.freqMode;

@@ -7,71 +7,55 @@ using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
+namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
     /// </summary>
-    public partial class RadioOverlayWindow : Window
+    public partial class RadioOverlayWindowTwoHorizontal : Window
     {
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[10];
+        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[2];
 
         private readonly DispatcherTimer _updateTimer;
 
-        public static bool AwacsActive = false
-            ; //when false and we're in spectator mode / not in an aircraft the other 7 radios will be disabled
+        private long _lastUnitId;
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
-        private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
+        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
-        public RadioOverlayWindow()
+        private Action<bool, int> _toggleOverlay;
+
+        public RadioOverlayWindowTwoHorizontal(Action<bool, int> ToggleOverlay)
         {
-            //load opacity before the intialising as the slider changed
-            //method fires after initialisation
-            //     var opacity = AppConfiguration.Instance.RadioOpacity;
-            AwacsActive = true;
-
             InitializeComponent();
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
-            this.Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsX).DoubleValue;
-            this.Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsY).DoubleValue;
 
             _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
-            //    Opacity = opacity;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
 
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalHeight).DoubleValue;
+            
             radioControlGroup[0] = radio1;
             radioControlGroup[1] = radio2;
-            radioControlGroup[2] = radio3;
-            radioControlGroup[3] = radio4;
-            radioControlGroup[4] = radio5;
-            radioControlGroup[5] = radio6;
-            radioControlGroup[6] = radio7;
-            radioControlGroup[7] = radio8;
-            radioControlGroup[8] = radio9;
-            radioControlGroup[9] = radio10;
 
 
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
-
-            //      Top = AppConfiguration.Instance.RadioX;
-            //        Left = AppConfiguration.Instance.RadioY;
-
-            //     Width = AppConfiguration.Instance.RadioWidth;
-            //      Height = AppConfiguration.Instance.RadioHeight;
-
-            //  Window_Loaded(null, null);
 
             CalculateScale();
 
@@ -83,6 +67,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
+
+            this._toggleOverlay = ToggleOverlay;
         }
 
         private void Location_Changed(object sender, EventArgs e)
@@ -93,6 +79,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioStatus();
@@ -101,23 +89,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             intercom.RepaintRadioStatus();
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo != null)
+            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
             {
-                if (_clientStateSingleton.IsConnected && dcsPlayerRadioInfo.IsCurrent() 
-                                                      && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
+                //reset when we switch planes
+                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
                 {
+                    _lastUnitId = dcsPlayerRadioInfo.unitId;
+                }
 
-                    var avalilableRadios = 0;
+                var availableRadios = 0;
 
-                    for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
+                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
+                {
+                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
                     {
-                        if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                        {
-                            avalilableRadios++;
-                        }
+                        availableRadios++;
+
                     }
                 }
+
+                if (availableRadios > 1)
+                {
+                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
+                    {
+                        ControlText.Text = "2 Radio Panel";
+                    }
+                    else
+                    {
+                        ControlText.Text = "2 Radio Panel";
+                    }
+                }
+                else
+                {
+                    ControlText.Text = "2 Radio Panel (Disconnected)";
+
+                }
+            }
+            else
+            {
+                ControlText.Text = "2 Radio Panel (Disconnected)";
             }
         }
 
@@ -128,12 +138,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX,this.Left);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, this.Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX, Left);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY, Top);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalWidth, Width);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalHeight, Height);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalOpacity, Opacity);
 
             base.OnClosing(e);
 
-            AwacsActive = false;
             _updateTimer.Stop();
         }
 
@@ -157,6 +169,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             Close();
         }
 
+        private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 0); // index 0 is the vertical orientation
+        }
+
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
@@ -175,7 +193,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 //
         private void CalculateScale()
         {
-            var yScale = ActualHeight / RadioOverlayWin.MinWidth;
+            var yScale = ActualHeight / RadioOverlayWin.MinHeight;
             var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Max(xScale, yScale);
             ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
@@ -196,14 +214,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
 
         public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
-            typeof(double), typeof(RadioOverlayWindow),
+            typeof(double), typeof(RadioOverlayWindowTwoHorizontal),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
-            var mainWindow = o as RadioOverlayWindow;
+            var mainWindow = o as RadioOverlayWindowTwoHorizontal;
             if (mainWindow != null)
                 return mainWindow.OnCoerceScaleValue((double) value);
             return value;
@@ -211,7 +229,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private static void OnScaleValueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            var mainWindow = o as RadioOverlayWindow;
+            var mainWindow = o as RadioOverlayWindowTwoHorizontal;
             if (mainWindow != null)
                 mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
         }

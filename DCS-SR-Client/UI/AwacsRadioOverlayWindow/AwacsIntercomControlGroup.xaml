@@ -53,8 +53,6 @@
         <xctk:IntegerUpDown x:Name="IntercomNumberSpinner"
             Width="50"
             Height="20"
-            Maximum="100"
-            Minimum="1"
             ValueChanged="IntercomNumber_SpinnerChanged"
             Value="1"
             Margin="5,0,8,0"/>

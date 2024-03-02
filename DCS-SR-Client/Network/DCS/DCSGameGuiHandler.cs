@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public void Start()
         {
-            _clientStateSingleton.LastPostionCoalitionSent = 0;
+            _clientStateSingleton.LastPositionCoalitionSent = 0;
 
             Task.Factory.StartNew(() =>
             {

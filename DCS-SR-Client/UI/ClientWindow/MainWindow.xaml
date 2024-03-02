@@ -1,5 +1,5 @@
 ﻿<controls:MetroWindow
-    Height="710"
+    Height="630"
     ResizeMode="CanMinimize"
     Title="Vanguard SRS Client"
     Width="550"
@@ -35,345 +35,394 @@
             </TabItem.Background>
 
             <GroupBox
-                Header="Setup"
-                Margin="5"
-                x:Name="GroupBox"
-                >
-
-                <StackPanel Margin="0">
-                    <Label
-                        Content="Microphone"
-                        HorizontalAlignment="Center"
-                        x:Name="MicLabel" />
-                    <ComboBox
-                        HorizontalAlignment="Center"
-                        ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
-                        SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
-                        ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                        VerticalAlignment="Top"
-                        Width="250"
-                        x:Name="Mic" />
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <ProgressBar
-                            Height="20"
-                            Margin="10,10,0,0"
-                            Maximum="0"
-                            Minimum="-96.6"
-                            Name="Mic_VU"
-                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                            Value="-96.6"
-                            Width="150" />
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal" />
-
-                    <Button
-                        Click="PreviewAudio"
-                        Content="Audio Preview"
-                        HorizontalAlignment="Center"
-                        IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
-                        Margin="0,10,0,0"
-                        Style="{DynamicResource SquareButtonStyle}"
-                        ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                        ToolTipService.ShowOnDisabled="True"
-                        VerticalAlignment="Top"
-                        x:Name="Preview" />
-
-                    <Label
-                        Content="Speakers &amp; Optional Mic Output"
-                        HorizontalAlignment="Center"
-                        x:Name="SpeakerLabel" />
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <ComboBox
-                            HorizontalAlignment="Center"
-                            ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
-                            Margin="0,0,5,0"
-                            SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}"
-                            VerticalAlignment="Top"
-                            Width="200"
-                            x:Name="Speakers" />
-                        <ComboBox
-                            HorizontalAlignment="Center"
-                            ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
-                            Margin="5,0,0,0"
-                            SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}"
-                            VerticalAlignment="Top"
-                            Width="200"
-                            x:Name="MicOutput" />
-                    </StackPanel>
-
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-
-                        <Slider
-                            IsMoveToPointEnabled="true"
-                            Margin="0,10,0,0"
-                            Maximum="1.0"
-                            Minimum="0.0"
-                            ValueChanged="SpeakerBoost_ValueChanged"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Width="150"
-                            x:Name="SpeakerBoost" />
-
-                        <ProgressBar
-                            Height="20"
-                            Margin="10,10,0,0"
-                            Maximum="0"
-                            Minimum="-96.6"
-                            Name="Speaker_VU"
-                            Value="-96.6"
-                            Width="150" />
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <Label Content="Speaker Boost:" HorizontalAlignment="Center" />
+                Margin="0"
+                x:Name="GroupBox">
+                
+                <StackPanel>
+                    
+                   
+                                        
+                    <Separator Height="3" Margin="0,7,0,0" Background="Black"/>
+                 
+                    <StackPanel>
 
                         <Label
-                            Content="+/- %"
+                            Content="Server Information"
+                            FontWeight="Medium"
+                            FontSize="16"
                             HorizontalAlignment="Center"
-                            x:Name="SpeakerBoostLabel" />
+                            HorizontalContentAlignment="Center" />
 
-                    </StackPanel>
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Margin="0,5,0,0"
+                            Orientation="Horizontal"
+                            Width="440">
 
-                    <Label
-                        Content="Server"
-                        HorizontalAlignment="Center"
-                        HorizontalContentAlignment="Center" />
+                            <StackPanel
+                                Orientation="Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,10,0">
 
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0,10,0,0"
-                        Orientation="Horizontal"
-                        Width="440">
+                                <Label
+                                    Content="IP Address"
+                                    HorizontalAlignment="Center"
+                                    FontSize="12"  />
 
-                        <TextBox
-                            Height="23"
-                            Margin="0,0,10,0"
-                            MaxLines="1"
-                            Text="3.219.75.115"
-                            TextWrapping="Wrap"
-                            Width="200"
-                            x:Name="ServerIp" />
+                                <TextBox
+                                    Height="23"
+                                    Margin="0,0,0,0"
+                                    MaxLines="1"
+                                    Text="3.219.75.115"
+                                    TextWrapping="Wrap"
+                                    Width="200"
+                                    x:Name="ServerIp" />
+                            </StackPanel>
 
-                        <ComboBox
-                            DisplayMemberPath="Name"
-                            Height="23"
-                            SelectedItem="{Binding Path=ServerAddress}"
-                            Width="200"
-                            x:Name="ServerAddressPicker"
-                            ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"/>
 
-                        <Button
-                            Click="LaunchAddressTab"
-                            Height="23"
-                            Margin="5,0,0,0"
-                            ToolTip="Go to saved address tab">
-                            <Path
-                                Data="F1 M 0,13.44C 1.28003,12.69 1.92004,11.61 1.92004,10.2C 1.92004,8.94998 1.28003,7.94998 0,7.19998C 0.184998,6.56003 0.45752,5.92001 0.817505,5.28C 2.00751,5.50998 3.09753,5.12253 4.08752,4.11752C 4.95251,3.24252 5.19,2.14499 4.80005,0.824982C 5.45502,0.464996 6.09503,0.190033 6.72003,3.05176e-005C 7.55505,1.28 8.68005,1.92001 10.095,1.92001C 11.47,1.92001 12.585,1.28 13.44,3.05176e-005C 14.065,0.190033 14.705,0.464996 15.36,0.824982C 14.97,2.14499 15.2001,3.24252 16.05,4.11752C 17.04,5.12253 18.1376,5.50998 19.3425,5.28C 19.6525,5.86002 19.9401,6.50003 20.205,7.19998C 18.895,7.95499 18.24,8.95627 18.24,10.2038C 18.24,11.4513 18.895,12.4525 20.205,13.2075C 19.955,13.9025 19.6675,14.54 19.3425,15.12C 18.1525,14.77 17.0551,15.09 16.05,16.08C 15.185,17.005 14.955,18.0925 15.36,19.3425C 14.705,19.7025 14.065,19.9775 13.44,20.1675C 12.605,18.8825 11.49,18.24 10.095,18.24C 8.68005,18.24 7.55505,18.8825 6.72003,20.1675C 6.09503,19.9775 5.45502,19.7025 4.80005,19.3425C 5.19,18.0925 4.95251,17.01 4.08752,16.095C 3.22253,15.24 2.13251,14.995 0.817505,15.36C 0.45752,14.72 0.184998,14.08 0,13.44 Z M 6.97504,7.04251C 6.16504,7.89749 5.76001,8.94998 5.76001,10.2C 5.76001,11.45 6.16626,12.4625 6.97876,13.2375C 7.79126,14.0125 8.83374,14.4 10.1063,14.4C 11.3788,14.4 12.4125,14.0125 13.2075,13.2375C 14.0025,12.4625 14.4,11.45 14.4,10.2C 14.4,8.94998 14.0025,7.89749 13.2075,7.04251C 12.4125,6.18753 11.3788,5.75998 10.1063,5.75998C 8.83374,5.75998 7.79004,6.18753 6.97504,7.04251 Z "
-                                Fill="Black"
-                                Stretch="Uniform"
-                                UseLayoutRounding="False" />
-                        </Button>
-                    </StackPanel>
+                            <StackPanel>
+                                <Label
+                                    Content="Select Favourite Server"
+                                    HorizontalAlignment="Center"
+                                    FontSize="12" />
+                                <ComboBox
+                                    DisplayMemberPath="Name"
+                                    Height="23"
+                                    SelectedItem="{Binding Path=ServerAddress}"
+                                    Width="200"
+                                    x:Name="ServerAddressPicker"
+                                    ItemsSource="{Binding Path=FavouriteServersViewModel.Addresses}"/>
+                            </StackPanel>
 
-                    <Border
-                        BorderBrush="Black"
-                        BorderThickness="1"
-                        Height="1"
-                        Margin="0,20,0,0"
-                        VerticalAlignment="Top"
-                        Width="999" />
+                            <StackPanel
+                            VerticalAlignment="Bottom">
+                                <Button
+                                    Click="LaunchAddressTab"
+                                    Height="23"
+                                    Margin="5,0,0,0"
+                                    ToolTip="Go to saved address tab">
+                                    <Path
+                                        Data="F1 M 0,13.44C 1.28003,12.69 1.92004,11.61 1.92004,10.2C 1.92004,8.94998 1.28003,7.94998 0,7.19998C 0.184998,6.56003 0.45752,5.92001 0.817505,5.28C 2.00751,5.50998 3.09753,5.12253 4.08752,4.11752C 4.95251,3.24252 5.19,2.14499 4.80005,0.824982C 5.45502,0.464996 6.09503,0.190033 6.72003,3.05176e-005C 7.55505,1.28 8.68005,1.92001 10.095,1.92001C 11.47,1.92001 12.585,1.28 13.44,3.05176e-005C 14.065,0.190033 14.705,0.464996 15.36,0.824982C 14.97,2.14499 15.2001,3.24252 16.05,4.11752C 17.04,5.12253 18.1376,5.50998 19.3425,5.28C 19.6525,5.86002 19.9401,6.50003 20.205,7.19998C 18.895,7.95499 18.24,8.95627 18.24,10.2038C 18.24,11.4513 18.895,12.4525 20.205,13.2075C 19.955,13.9025 19.6675,14.54 19.3425,15.12C 18.1525,14.77 17.0551,15.09 16.05,16.08C 15.185,17.005 14.955,18.0925 15.36,19.3425C 14.705,19.7025 14.065,19.9775 13.44,20.1675C 12.605,18.8825 11.49,18.24 10.095,18.24C 8.68005,18.24 7.55505,18.8825 6.72003,20.1675C 6.09503,19.9775 5.45502,19.7025 4.80005,19.3425C 5.19,18.0925 4.95251,17.01 4.08752,16.095C 3.22253,15.24 2.13251,14.995 0.817505,15.36C 0.45752,14.72 0.184998,14.08 0,13.44 Z M 6.97504,7.04251C 6.16504,7.89749 5.76001,8.94998 5.76001,10.2C 5.76001,11.45 6.16626,12.4625 6.97876,13.2375C 7.79126,14.0125 8.83374,14.4 10.1063,14.4C 11.3788,14.4 12.4125,14.0125 13.2075,13.2375C 14.0025,12.4625 14.4,11.45 14.4,10.2C 14.4,8.94998 14.0025,7.89749 13.2075,7.04251C 12.4125,6.18753 11.3788,5.75998 10.1063,5.75998C 8.83374,5.75998 7.79004,6.18753 6.97504,7.04251 Z "
+                                        Fill="Black"
+                                        Stretch="Uniform"
+                                        UseLayoutRounding="False" />
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel
-                        Height="65"
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <converters:BooleanInverterConverter x:Key="BooleanInverterConverter" />
-                        </StackPanel.Resources>
+                        <StackPanel
+                            Height="65"
+                            HorizontalAlignment="Center"
+                            Margin="0"
+                            Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <converters:BooleanInverterConverter x:Key="BooleanInverterConverter" />
+                                </StackPanel.Resources>
+
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                Margin="0"
+                                Orientation="Vertical">
+                                <Label
+                                    Content="[FFID] Player Name"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
+                                    Margin="10,10,0,0"
+                                    x:Name="ExternalAWACSModeNameLabel" />
+                                <TextBox
+                                    Height="23"
+                                    HorizontalAlignment="Center"
+                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
+                                    Margin="10,0,0,0"
+                                    MaxLines="1"
+                                    TextWrapping="Wrap"
+                                    Width="200"
+                                    x:Name="ExternalAWACSModeName" />
+                            </StackPanel>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                Margin="10,0,0,0"
+                                Orientation="Vertical">
+
+                                <Label
+                                    Content="Operation Password"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
+                                    Margin="0,10,10,0"
+                                    x:Name="ExternalAWACSModePasswordLabel" />
+
+                                <PasswordBox
+                                    Height="23"
+                                    HorizontalAlignment="Center"
+                                    IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
+                                    Margin="0,0,10,0"
+                                    Width="200"
+                                    x:Name="ExternalAWACSModePassword" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,0"
+                            Orientation="Horizontal">
+                            <Button
+                                Command="{Binding Path=ConnectCommand}"
+                                Content="Connect: Server"
+                                HorizontalAlignment="Center"
+                                Margin="0,15,20,0"
+                                Style="{DynamicResource AccentedSquareButtonStyle}"
+                                ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                Width="125"
+                                x:Name="StartStop" />
+                            <Button
+                                Click="ConnectExternalAWACSMode_OnClick"
+                                Content="Connect: Radios"
+                                IsEnabled="False"
+                                Margin="0,15,0,0"
+                                Style="{DynamicResource AccentedSquareButtonStyle}"
+                                Width="125"
+                                x:Name="ConnectExternalAWACSMode" />
+                        </StackPanel>
 
                         <StackPanel
                             HorizontalAlignment="Center"
                             Margin="0"
-                            Orientation="Vertical">
-                            <Label
-                                Content="[FFID] Player Name"
+                            Orientation="Horizontal">
+
+                            <Button
+                                Click="ShowClientList_OnClick"
+                                Content="Toggle Client List"
                                 HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
-                                Margin="10,10,0,0"
-                                x:Name="ExternalAWACSModeNameLabel" />
-                            <TextBox
-                                Height="23"
+                                Margin="0,15,20,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ShowClientList" />
+                            <Button
+                                Click="ToggleServerSettings_OnClick"
+                                Content="Show Server Settings"
                                 HorizontalAlignment="Center"
-                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
-                                Margin="10,0,0,0"
-                                MaxLines="1"
-                                TextWrapping="Wrap"
-                                Width="200"
-                                x:Name="ExternalAWACSModeName" />
+                                IsEnabled="False"
+                                Margin="0,15,0,0"
+                                Style="{DynamicResource SquareButtonStyle}"
+                                Width="125"
+                                x:Name="ToggleServerSettings" />
+
                         </StackPanel>
+                    </StackPanel>
+
+                    <Separator Height="3" Margin="0,7,0,0" Background="Black"/>
+
+                    <StackPanel>
+                        <StackPanel
+                        VerticalAlignment="Center"
+                        Orientation="Vertical"
+                        Margin="0,0,0,10">
+                            <Label
+                            Content="Radio Panel Selection"
+                            HorizontalAlignment="Center"
+                            FontWeight="Medium"
+                            FontSize="16" />
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                Margin="0"
+                                Orientation="Horizontal">
+                                <Button
+                                    Click="ShowOverlayOneVertical_OnClick"
+                                    Content="1 Vertical"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayOneVertical" />
+                                <Button
+                                    Click="ShowOverlayTwoVertical_OnClick"
+                                    Content="2 Vertical"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayVerticalTwo" />
+                                <Button 
+                                    Click="ShowOverlayThreeVertical_OnClick"
+                                    Content="3 Vertical"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayThreeVertical" />
+                                <Button
+                                    Click="ShowOverlayFiveVertical_OnClick"
+                                    Content="5 Vertical"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayFiveVertical" />
+                                <Button
+                                    Click="ShowOverlayTenVertical_OnClick"
+                                    Content="10 Vertical"
+                                    Margin="0,10,0,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayTenVertical" />
+
+                            </StackPanel>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                Margin="0"
+                                Orientation="Horizontal">
+                                <Button
+                                    Click="ShowOverlayOneHorizontal_OnClick"
+                                    Content="1 Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayOneHorizontal" />
+                                <Button
+                                    Click="ShowOverlayHorizontalTwo_OnClick"
+                                    Content="2 Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayHorizontalTwo" />
+                                <Button 
+                                    Click="ShowOverlayThreeHorizontal_OnClick"
+                                    Content="3 Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayThreeHorizontal" />
+                                <Button
+                                    Click="ShowOverlayFiveHorizontal_OnClick"
+                                    Content="5 Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayFiveHorizontal" />
+                                <Button
+                                    Click="ShowOverlayTenHorizontal_OnClick"
+                                    Content="10 Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,0,0"
+                                    Style="{DynamicResource SquareButtonStyle}"
+                                    Width="80"
+                                    x:Name="ShowOverlayTenHorizontal" />
+
+                            </StackPanel>
+                            <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Margin="0"
+                                    Orientation="Horizontal">
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Margin="0,20,0,0">
+                                    <TextBlock
+                                        Height="15"
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Width="150"
+                                        Text="Ultrawide Panel Variants"
+                                        />
+
+                                    <Button
+                                        Click="ShowOverlayTenVerticalLong_OnClick"
+                                        Content="10 Vertical Long"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenVerticalLong" />
+                                    <Button
+                                        Click="ShowOverlayTenHorizontalWide_OnClick"
+                                        Content="10 Horizontal Wide"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenHorizontalWide" />
+                                </StackPanel>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Margin="20,20,0,0">
+                                    <TextBlock
+                                        Height="15"
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Width="150"
+                                        Text="Transparent Radio Panels"
+                                        />
+                                    <Button
+                                        Click="ShowOverlayTenTransparent_OnClick"
+                                        Content="10 Transparent"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenTransparent" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!--Dabble removed selected profile for GUI cleanup-->
+                        <!--Not sure the code ramifications of completely removing it, thus the mere collapse-->
+
                         <StackPanel
                             HorizontalAlignment="Center"
-                            Margin="10,0,0,0"
-                            Orientation="Vertical">
+                            Visibility="Collapsed"
+                            Margin="0,0,0,0"
+                            Orientation="Horizontal">
+                                <Label Content="Current Profile:" />
+                                <Label Content="None" Name="CurrentProfile" />
+                        </StackPanel>
+                                                
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,10"
+                            Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <converters:ConnectionStatusImageConverter x:Key="ConnectionStatusImageConverter" />
+                            </StackPanel.Resources>
 
                             <Label
-                                Content="Operation Password"
+                                Content="Server"
                                 HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
-                                Margin="0,10,10,0"
-                                x:Name="ExternalAWACSModePasswordLabel" />
+                                HorizontalContentAlignment="Center" />
+                            <Image
+                                Height="26"
+                                HorizontalAlignment="Center"
+                                Margin="5,0,5,0"
+                                Source="{Binding Path=ClientState.IsConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
+                                x:Name="ServerConnectionStatus" />
+                            <Label
+                                Content="VOIP"
+                                HorizontalAlignment="Center"
+                                HorizontalContentAlignment="Center" />
+                            <Image
+                                Height="26"
+                                HorizontalAlignment="Center"
+                                Margin="5,0,5,0"
+                                Source="{Binding Path=ClientState.IsVoipConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
+                                x:Name="VOIPConnectionStatus" />
 
-                            <PasswordBox
-                                Height="23"
-                                HorizontalAlignment="Center"
-                                IsEnabled="{Binding Path=ClientState.ExternalAWACSModeConnected, Converter={StaticResource BooleanInverterConverter}}"
-                                Margin="0,0,10,0"
-                                Width="200"
-                                x:Name="ExternalAWACSModePassword" />
                         </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <Button
-                            Command="{Binding Path=ConnectCommand}"
-                            Content="Connect: Server"
-                            HorizontalAlignment="Center"
-                            Margin="0,15,20,0"
-                            Style="{DynamicResource AccentedSquareButtonStyle}"
-                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
-                            Width="125"
-                            x:Name="StartStop" />
-                        <Button
-                            Click="ConnectExternalAWACSMode_OnClick"
-                            Content="Connect: Radios"
-                            IsEnabled="False"
-                            Margin="0,15,0,0"
-                            Style="{DynamicResource AccentedSquareButtonStyle}"
-                            Width="125"
-                            x:Name="ConnectExternalAWACSMode" />
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-
-                        <Button
-                            Click="ShowClientList_OnClick"
-                            Content="Toggle Client List"
-                            HorizontalAlignment="Center"
-                            Margin="0,15,20,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowClientList" />
-                        <Button
-                            Click="ToggleServerSettings_OnClick"
-                            Content="Show Server Settings"
-                            HorizontalAlignment="Center"
-                            IsEnabled="False"
-                            Margin="0,15,0,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ToggleServerSettings" />
 
                     </StackPanel>
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <Button
-                            Click="ShowOverlayTwo_OnClick"
-                            Content="Two Radios"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,20,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowOverlayTwo" />
-                        <Button
-                            Click="ShowOverlayFive_OnClick"
-                            Content="Five Radios"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,20,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowOverlayFoive" />
-                        <Button
-                            Click="ShowAwacsOverlay_OnClick"
-                            Content="Ten Radios"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,0"
-                            Style="{DynamicResource SquareButtonStyle}"
-                            Width="125"
-                            x:Name="ShowAwacsOverlay" />
-
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0,0,0,0"
-                        Orientation="Horizontal">
-                        <Label Content="Current Profile:" />
-                        <Label Content="None" Name="CurrentProfile" />
-                    </StackPanel>
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Margin="0"
-                        Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <converters:ConnectionStatusImageConverter x:Key="ConnectionStatusImageConverter" />
-                        </StackPanel.Resources>
-                        <Label
-                            Content="Server"
-                            HorizontalAlignment="Center"
-                            HorizontalContentAlignment="Center" />
-                        <Image
-                            Height="26"
-                            HorizontalAlignment="Center"
-                            Margin="5,0,5,0"
-                            Source="{Binding Path=ClientState.IsConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                            x:Name="ServerConnectionStatus" />
-                        <Label
-                            Content="VOIP"
-                            HorizontalAlignment="Center"
-                            HorizontalContentAlignment="Center" />
-                        <Image
-                            Height="26"
-                            HorizontalAlignment="Center"
-                            Margin="5,0,5,0"
-                            Source="{Binding Path=ClientState.IsVoipConnected, Converter={StaticResource ConnectionStatusImageConverter}}"
-                            x:Name="VOIPConnectionStatus" />
-
-                    </StackPanel>
-
                 </StackPanel>
             </GroupBox>
         </TabItem>
 
-        <TabItem Header="Controls">
+        <TabItem Header="Keybinds">
             <TabItem.Background>
                 <SolidColorBrush Color="WhiteSmoke"/>
             </TabItem.Background>
@@ -381,18 +430,20 @@
             <GroupBox Header="Controls" x:Name="ControlsGroupBox">
 
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
-                    <StackPanel>
+                    <StackPanel
+                        Width="500">
                         <Button
                             Click="RescanInputDevices"
                             Content="Rescan Controller Input Devices"
+                            Margin="0,0,0,10"
                             Width="150px" />
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="1.2*" />
                                 <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="50" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -434,288 +485,337 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
 
+                            <Label
+                                Content="MOST USED"
+                                FontWeight="Bold"
+                                FontSize="15"
+                                Background="DarkGray"
+                                BorderBrush="Black"
+                                BorderThickness="0,1,0,1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center" />
 
                             <Label
                                 Content="Device"
                                 Grid.Column="1"
-                                Grid.Row="0"
+                                Grid.Row="1"
+                                FontWeight="Bold"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
                                 x:Name="DeviceLabel" />
                             <Label
                                 Content="Button"
                                 Grid.Column="2"
-                                Grid.Row="0"
+                                Grid.Row="1"
+                                FontWeight="Bold"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
                                 x:Name="ButtonLabel" />
 
+                            <!--Most Used Keybinds-->
+
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="2"
+                                InputName="Common PTT"
+                                x:Name="PTT" />
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.Switch1}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="1"
+                                Grid.Row="3"
                                 InputName="Radio 1"
                                 x:Name="Radio1" />
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.Switch2}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="2"
+                                Grid.Row="4"
                                 InputName="Radio 2"
                                 x:Name="Radio2" />
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.Switch3}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="3"
+                                Grid.Row="5"
                                 InputName="Radio 3"
                                 x:Name="Radio3" />
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="4"
-                                InputName="Common PTT"
-                                x:Name="PTT" />
+    
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.Intercom}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="5"
+                                Grid.Row="6"
                                 InputName="Intercom Select"
                                 x:Name="Intercom" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.IntercomPTT}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="6"
-                                InputName="Special Intercom Select &amp; PTT"
-                                x:Name="IntercomPTT" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
-                                Grid.ColumnSpan="6"
-                                Grid.Row="7"
-                                InputName="Overlay Toggle"
-                                x:Name="RadioOverlay" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch4}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="8"
-                                InputName="Radio 4"
-                                x:Name="Radio4" />
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch5}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="9"
-                                InputName="Radio 5"
-                                x:Name="Radio5" />
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch6}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="10"
-                                InputName="Radio 6"
-                                x:Name="Radio6" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch7}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="11"
-                                InputName="Radio 7"
-                                x:Name="Radio7" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch8}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="12"
-                                InputName="Radio 8"
-                                x:Name="Radio8" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch9}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="13"
-                                InputName="Radio 9"
-                                x:Name="Radio9" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Switch10}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="14"
-                                InputName="Radio 10"
-                                x:Name="Radio10" />
-
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up100}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="15"
-                                InputName="Up 100MHz"
-                                x:Name="Up100" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up10}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="16"
-                                InputName="Up 10MHz"
-                                x:Name="Up10" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up1}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="17"
-                                InputName="Up 1MHz"
-                                x:Name="Up1" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up01}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="18"
-                                InputName="Up 0.1MHz"
-                                x:Name="Up01" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up001}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="19"
-                                InputName="Up 0.01MHz"
-                                x:Name="Up001" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Up0001}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="20"
-                                InputName="Up 0.001MHz"
-                                x:Name="Up0001" />
-
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down100}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="21"
-                                InputName="Down 100MHz"
-                                x:Name="Down100" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down10}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="22"
-                                InputName="Down 10MHz"
-                                x:Name="Down10" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down1}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="23"
-                                InputName="Down 1MHz"
-                                x:Name="Down1" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down01}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="24"
-                                InputName="Down 0.1MHz"
-                                x:Name="Down01" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down001}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="25"
-                                InputName="Down 0.01MHz"
-                                x:Name="Down001" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.Down0001}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="26"
-                                InputName="Down 0.001MHz"
-                                x:Name="Down0001" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.ToggleGuard}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="27"
-                                InputName="Toggle Guard"
-                                x:Name="ToggleGuard" />
-
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.NextRadio}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="28"
+                                Grid.Row="7"
                                 InputName="Next Radio"
                                 x:Name="NextRadio" />
-
-
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.PreviousRadio}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="29"
+                                Grid.Row="8"
                                 InputName="Previous Radio"
                                 x:Name="PreviousRadio" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.ToggleEncryption}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="30"
-                                InputName="Toggle Encryption"
-                                x:Name="ToggleEncryption" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyIncrease}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="31"
-                                InputName="Encryption Key Increase"
-                                x:Name="EncryptionKeyIncrease" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyDecrease}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="32"
-                                InputName="Encryption Key Decrease"
-                                x:Name="EncryptionKeyDecrease" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.RadioChannelUp}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="33"
-                                InputName="Radio Channel Up"
-                                x:Name="RadioChannelUp" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="34"
-                                InputName="Radio Channel Down"
-                                x:Name="RadioChannelDown" />
-
-                            <local:InputBindingControl
-                                ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
-                                Grid.ColumnSpan="5"
-                                Grid.Row="35"
-                                InputName="Transponder IDENT"
-                                x:Name="TransponderIDENT" />
-
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeUp}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="36"
+                                Grid.Row="9"
                                 InputName="Radio Volume Up"
                                 x:Name="RadioVolumeUp" />
 
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="37"
+                                Grid.Row="10"
                                 InputName="Radio Volume Down"
                                 x:Name="RadioVolumeDown" />
 
                             <local:InputBindingControl
                                 ControlInputBinding="{x:Static settings:InputBinding.AwacsOverlayToggle}"
                                 Grid.ColumnSpan="5"
-                                Grid.Row="38"
-                                InputName="AWACS Overlay Toggle"
+                                Grid.Row="11"
+                                InputName="10 Radio Panel Toggle"
                                 x:Name="AwacsOverlayToggle" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.OverlayToggle}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="12"
+                                InputName="1 Radio Panel Toggle"
+                                x:Name="RadioOverlay" />
 
 
+                            <!--Radio Selection Keybinds-->
+
+
+                            <Label
+                                Content="RADIO SELECTION"
+                                FontWeight="Bold"
+                                FontSize="15"
+                                Background="DarkGray"
+                                BorderBrush="Black"
+                                BorderThickness="0,1,0,0"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="13"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch4}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="14"
+                                InputName="Radio 4"
+                                x:Name="Radio4" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch5}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="15"
+                                InputName="Radio 5"
+                                x:Name="Radio5" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch6}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="16"
+                                InputName="Radio 6"
+                                x:Name="Radio6" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch7}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="17"
+                                InputName="Radio 7"
+                                x:Name="Radio7" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch8}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="18"
+                                InputName="Radio 8"
+                                x:Name="Radio8" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch9}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="19"
+                                InputName="Radio 9"
+                                x:Name="Radio9" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Switch10}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="20"
+                                InputName="Radio 10"
+                                x:Name="Radio10" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.IntercomPTT}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="21"
+                                InputName="Special Intercom Select &amp; PTT"
+                                x:Name="IntercomPTT" />
+
+                            <!--Radio Management Keybinds-->
+
+                            <Label
+                                Content="RADIO MANAGEMENT"
+                                FontWeight="Bold"
+                                FontSize="15"
+                                Background="DarkGray"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="22"
+                                BorderThickness="0,1,0,0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.RadioChannelUp}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="23"
+                                InputName="Radio Channel Up"
+                                x:Name="RadioChannelUp" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="24"
+                                InputName="Radio Channel Down"
+                                x:Name="RadioChannelDown" />
+
+                            <!--Frequency Tuning Keybinds-->
+
+                            <Label
+                                Content="FREQUENCY TUNING"
+                                FontWeight="Bold"
+                                FontSize="15"
+                                Background="DarkGray"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="25"
+                                BorderThickness="0,1,0,0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up100}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="26"
+                                InputName="Up 100MHz"
+                                x:Name="Up100" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up10}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="27"
+                                InputName="Up 10MHz"
+                                x:Name="Up10" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up1}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="28"
+                                InputName="Up 1MHz"
+                                x:Name="Up1" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up01}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="29"
+                                InputName="Up 0.1MHz"
+                                x:Name="Up01" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up001}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="30"
+                                InputName="Up 0.01MHz"
+                                x:Name="Up001" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Up0001}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="31"
+                                InputName="Up 0.001MHz"
+                                x:Name="Up0001" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down100}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="32"
+                                InputName="Down 100MHz"
+                                x:Name="Down100" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down10}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="33"
+                                InputName="Down 10MHz"
+                                x:Name="Down10" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down1}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="34"
+                                InputName="Down 1MHz"
+                                x:Name="Down1" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down01}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="35"
+                                InputName="Down 0.1MHz"
+                                x:Name="Down01" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down001}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="36"
+                                InputName="Down 0.01MHz"
+                                x:Name="Down001" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.Down0001}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="37"
+                                InputName="Down 0.001MHz"
+                                x:Name="Down0001" />
+
+                            <!--Currently Unused by Vanguard Keybinds-->
+
+                            <Label
+                                Content="CURRENTLY UNUSED BY VANGUARD"
+                                FontWeight="Bold"
+                                FontSize="15"
+                                Background="DarkGray"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="38"
+                                BorderThickness="0,1,0,0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.ToggleGuard}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="39"
+                                InputName="Toggle Guard"
+                                x:Name="ToggleGuard" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.ToggleEncryption}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="40"
+                                InputName="Toggle Encryption"
+                                x:Name="ToggleEncryption" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyIncrease}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="41"
+                                InputName="Encryption Key Increase"
+                                x:Name="EncryptionKeyIncrease" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyDecrease}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="42"
+                                InputName="Encryption Key Decrease"
+                                x:Name="EncryptionKeyDecrease" />
+                            <local:InputBindingControl
+                                ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
+                                Grid.ColumnSpan="5"
+                                Grid.Row="43"
+                                InputName="Transponder IDENT"
+                                x:Name="TransponderIDENT" />
                         </Grid>
 
                     </StackPanel>
@@ -745,6 +845,120 @@
                     
                     <GroupBox Header="Global Settings">
                         <StackPanel>
+                            <GroupBox Header="Audio Input Settings">
+                                <StackPanel Margin="0">
+                                    <Label
+                                        Content="Audio Settings"
+                                        HorizontalAlignment="Center"
+                                        FontWeight="Medium"
+                                        FontSize="16" />
+                                    <Label
+                                         Content="Microphone"
+                                         HorizontalAlignment="Center"
+                                         x:Name="MicLabel" />
+                                    <ComboBox
+                                         HorizontalAlignment="Center"
+                                         ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
+                                         SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
+                                         ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                         VerticalAlignment="Top"
+                                         Width="250"
+                                         x:Name="Mic" />
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        Margin="0"
+                                        Orientation="Horizontal">
+                                        <ProgressBar
+                                            Height="20"
+                                            Margin="10,10,0,0"
+                                            Maximum="0"
+                                            Minimum="-96.6"
+                                            Name="Mic_VU"
+                                            ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                            Value="-96.6"
+                                            Width="150" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal" />
+                                    <Button
+                                         Click="PreviewAudio"
+                                         Content="Audio Preview"
+                                         HorizontalAlignment="Center"
+                                         IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
+                                         Margin="0,10,0,0"
+                                         Style="{DynamicResource SquareButtonStyle}"
+                                         ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
+                                         ToolTipService.ShowOnDisabled="True"
+                                         VerticalAlignment="Top"
+                                         x:Name="Preview" />
+                                    <Label
+                                         Content="Speakers &amp; Optional Mic Output"
+                                         HorizontalAlignment="Center"
+                                         x:Name="SpeakerLabel" />
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal">
+                                        <ComboBox
+                                             HorizontalAlignment="Center"
+                                             ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
+                                             Margin="0,0,5,0"
+                                             SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}"
+                                             VerticalAlignment="Top"
+                                             Width="200"
+                                             x:Name="Speakers" />
+                                        <ComboBox
+                                             HorizontalAlignment="Center"
+                                             ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
+                                             Margin="5,0,0,0"
+                                             SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}"
+                                             VerticalAlignment="Top"
+                                             Width="200"
+                                             x:Name="MicOutput" />
+                                    </StackPanel>
+
+
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        Margin="0"
+                                        Orientation="Horizontal">
+
+                                        <Slider
+                                             IsMoveToPointEnabled="true"
+                                             Margin="0,10,0,0"
+                                             Maximum="1.0"
+                                             Minimum="0.0"
+                                             ValueChanged="SpeakerBoost_ValueChanged"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             Width="150"
+                                             x:Name="SpeakerBoost" />
+
+                                        <ProgressBar
+                                             Height="20"
+                                             Margin="10,10,0,0"
+                                             Maximum="0"
+                                             Minimum="-96.6"
+                                             Name="Speaker_VU"
+                                             Value="-96.6"
+                                             Width="150" />
+                                    </StackPanel>
+                                    <StackPanel
+                                         HorizontalAlignment="Center"
+                                         Margin="0"
+                                         Orientation="Horizontal">
+                                        <Label Content="Master Volume Boost:" HorizontalAlignment="Center" />
+
+                                        <Label
+                                            Content="+/- %"
+                                            HorizontalAlignment="Center"
+                                            x:Name="SpeakerBoostLabel" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
                             <GroupBox Header="Auto Connect">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -3090,15 +3304,18 @@
                             <Run FontSize="16" FontWeight="Bold">SRS Standard Operating Procedures (SOP)</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            The Vanguard SRS SOP can be found at vngd.net under the Command Library section.
-                            <!-- (<Hyperlink NavigateUri="https://example.com">SRS SOP</Hyperlink>) -->
+                            The Vanguard SRS SOP can be found 
+                            <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual">here,</Hyperlink>
+                             as well as on the vngd.net website under the Command Library section.
+                            
                         </Paragraph>
 
                         <Paragraph>
                             <Run FontSize="16" FontWeight="Bold">Vanguard SRS Server Information</Run>
                         </Paragraph>
                         <Paragraph FontSize="14">
-                            The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel "SRS Server Status"
+                            The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel
+                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>.
                         </Paragraph>
 
                         <Paragraph>
@@ -3122,11 +3339,9 @@
                             If you have any issues with the SRS please get help on the
                             <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536">#srs-status</Hyperlink>
                             channel under the
-                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151277018516832337">SRS Support</Hyperlink>
-                            and
-                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151275589437763594">SRS Support FAQ</Hyperlink>
-                            Threads on the Vanguard Discord
-                            <Hyperlink NavigateUri="https://discord.gg/GDadyHz">here</Hyperlink>
+                            <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1153198228607610981">SRS Training &amp; Support</Hyperlink>
+                            thread on the 
+                            <Hyperlink NavigateUri="https://discord.gg/GDadyHz">Vanguard discord server.</Hyperlink>
                         </Paragraph>
 
                         <Paragraph>
@@ -3156,16 +3371,39 @@
                         </Paragraph>
                         <Paragraph FontSize="14">
                             This software was originally developed by Ciribob (which can be found
-                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">HERE</Hyperlink>
-                            ), who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
+                            <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone">here</Hyperlink>),
+                            who was gracious enough to allow us to modify it to suit Vanguard's needs. This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.
                             <LineBreak />
                             <LineBreak />
-                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Gweezlebur, Esdin, Dabble1, and Quantum_Physicist.
+                            If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach out to the SRS Development Team. The main author for this version is FPGSchiba, with additional support from Archangel-93, AdamCelestial, Gweezlebur, and Dabble1.
                             <LineBreak />
                             <LineBreak />
-                            SRS Development Team Members:
+                            <Run FontWeight="Bold">Current SRS Development Team Members:</Run>
                             <LineBreak />
-                            Dabble1, FPGSchiba, Esdin, Gweezlebur, Krehl, Quantum_Physicist
+                            Dabble1, FPGSchiba, Volts_Alpaca, Gweezlebur, Archangel-93, AdamCelestial
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Current Graphic Design Team Members:</Run>
+                            <LineBreak />
+                            Cheekermonkey, FPGElphi, Noah_Prinzrot, pr0x
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Youtube Video Tutorials - created by Vanguard's Mako Media</Run>
+                            <LineBreak />
+                            AdamCelestial, Archangel-93
+                            <LineBreak />
+                            <LineBreak />
+                            Check the videos out here:
+                            <Hyperlink NavigateUri="https://www.youtube.com/playlist?list=PLASyrT-hJCl5kpukDXbit5DU0NOcGryO9">Vanguard SRS Tutorial Videos</Hyperlink>
+                            <LineBreak />
+                            <LineBreak />
+                            <Run FontWeight="Bold">Honorable Mentions</Run>
+                            <LineBreak />
+                            Quantum-Physicist, Esdin, TheAlexi, ZZGooch, Hohh2O, and SpaceHarvest for believing in the project. Without their support, we would not be where we are today.
+                            Additionally, we would like to thank Krehl and Cold_Kill for playing an intregal part initially getting the Vanguard SRS server setup.
+                            <LineBreak />
+                            <LineBreak />
+                            Finally, thank you to everyone of you who has helped provide guidance, feedback, and support for the project. None of this would be important without all of you. On behalf of the entire development team, thank you!
                         </Paragraph>
 
                     </FlowDocument>

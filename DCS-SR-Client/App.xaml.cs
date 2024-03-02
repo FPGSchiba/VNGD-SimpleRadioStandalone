@@ -2,8 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -16,6 +15,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Sentry;
+using static Standard.NtDll;
 
 namespace DCS_SR_Client
 {
@@ -62,6 +62,8 @@ namespace DCS_SR_Client
             ListArgs();
 
 #if !DEBUG
+            FreeConsole();
+
             if (IsClientRunning())
             {
                 //check environment flag
@@ -231,6 +233,19 @@ namespace DCS_SR_Client
             }
 
             var config = new LoggingConfiguration();
+            var consoleTarget = new ConsoleTarget
+            {
+                Encoding = Encoding.UTF8,
+                WriteBuffer = false,
+                DetectConsoleAvailable = true,
+                Name = "consoleTarget",
+                StdErr = false,
+                Layout = @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+            };
+            var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            config.AddTarget("asyncConsoleTarget", consoleWrapper);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, consoleWrapper));
+
             var fileTarget = new FileTarget
             {
                 FileName = "clientlog.txt",
@@ -238,12 +253,12 @@ namespace DCS_SR_Client
                 MaxArchiveFiles = 1,
                 ArchiveAboveSize = 104857600,
                 Layout =
-                @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+                @"${longdate} | ${logger} (${level}) | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
             };
 
-            var wrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
-            config.AddTarget("asyncFileTarget", wrapper);
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, wrapper));
+            var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            config.AddTarget("asyncFileTarget", fileWrapper);
+            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileWrapper));
 
             LogManager.Configuration = config;
             loggingReady = true;
@@ -306,11 +321,16 @@ namespace DCS_SR_Client
 
         private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
+            MessageBox.Show("This is a sample and can be expanded ;)\n If you see this, please let FPGSchiba know how you did it :D");
+
             if (loggingReady)
             {
                 Logger logger = LogManager.GetCurrentClassLogger();
                 logger.Error((Exception) e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
             }
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern int FreeConsole();
     }
 }
