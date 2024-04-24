@@ -46,6 +46,7 @@ using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 using System.Windows.Navigation;
+using System.Security.Cryptography;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -56,7 +57,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
     {
         public delegate void ReceivedAutoConnect(string address, int port);
 
-        public delegate void ToggleOverlayCallback(bool uiButton, bool awacs, bool twoRadioOverlay);
+        public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
 
         private readonly AudioManager _audioManager;
 
@@ -67,9 +68,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private Overlay.RadioOverlayWindowFive _radioOverlayWindowFive;
-        private Overlay.RadioOverlayWindowTwo _radioOverlayWindowTwo;
-        private AwacsRadioOverlayWindow.RadioOverlayWindow _awacsRadioOverlay;
+        private int _windowOpen = 13;
+
+        // Vertical Radio-Overlays 
+        private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
+        private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
+        private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
+        private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
+        private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
+        private RadioOverlayWindowTenVerticalLong _radioOverlayWindowTenVerticalLong;
+        private RadioOverlayWindowTenTransparent _radioOverlayWindowTenTransparent;
+
+        // Horizontal Radio-Overlays
+        private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
+        private RadioOverlayWindowTwoHorizontal _radioOverlayWindowTwoHorizontal;
+        private RadioOverlayWindowThreeHorizontal _radioOverlayWindowThreeHorizontal;
+        private RadioOverlayWindowFiveHorizontal _radioOverlayWindowFiveHorizontal;
+        private RadioOverlayWindowTenHorizontal _radioOverlayWindowTenHorizontal;
+        private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
+
+        // Windows array
+        private Window[] windows = new Window[13];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -120,6 +139,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitToolTips();
 
             DataContext = this;
+
+            windows[0] = _radioOverlayWindowTwoVertical;
+            windows[1] = _radioOverlayWindowThreeVertical;
+            windows[2] = _radioOverlayWindowFiveVertical;
+            windows[3] = _radioOverlayWindowTenVertical;
+            windows[4] = _radioOverlayWindowTwoHorizontal;
+            windows[5] = _radioOverlayWindowThreeHorizontal;
+            windows[6] = _radioOverlayWindowFiveHorizontal;
+            windows[7] = _radioOverlayWindowTenHorizontal;
+            windows[8] = _radioOverlayWindowOneVertical;
+            windows[9] = _radioOverlayWindowOneHorizontal;
+            windows[10] = _radioOverlayWindowTenVerticalLong;
+            windows[11] = _radioOverlayWindowTenHorizontalWide;
+            windows[12] = _radioOverlayWindowTenTransparent;
 
             var client = ClientStateSingleton.Instance;
 
@@ -199,21 +232,72 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             bool mainWindowVisible = false;
             bool radioWindowVisible = false;
-            bool awacsWindowVisible = false;
+            bool awacsWindowVisible = true; //changed to bypass check
 
             int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
-            int radioTwoWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoX).DoubleValue;
-            int radioTwoWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoY).DoubleValue;
-            int radioFiveWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
-            int radioFiveWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
-            int awacsWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsX).DoubleValue;
-            int awacsWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.AwacsY).DoubleValue;
-
+            
             Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
-            Logger.Info($"Checking window visibility for two radio overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}}");
-            Logger.Info($"Checking window visibility for five radio overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}}");
-            Logger.Info($"Checking window visibility for AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}}");
+
+
+            // -------- Vertical Panels -------
+            // 1 Radio
+            int radioOneVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX).DoubleValue;
+            int radioOneVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY).DoubleValue;
+            Logger.Info($"Checking window visibility for one vertical radio overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}}");
+            // 2 Radio
+            int radioTwoVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
+            int radioTwoVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
+            Logger.Info($"Checking window visibility for two vertical radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
+            // 3 Radio
+            int radioThreeVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue;
+            int radioThreeVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue;
+            Logger.Info($"Checking window visibility for three vertical radio overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}}");
+            // 5 Radio
+            int radioFiveVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
+            int radioFiveVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
+            Logger.Info($"Checking window visibility for five vertical radio horizontal overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
+            // 10 Radio
+            int radioTenVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalX).DoubleValue;
+            int radioTenVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten vertical radio overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}}");
+            // 10 Radio Long
+            int radioTenLongVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX).DoubleValue;
+            int radioTenLongVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
+            // 10 Radio Transparent
+            int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
+            int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
+
+            // -------- Horizontal Panels -------
+            // 1 Radio
+            int radioOneHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
+            int radioOneHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for one horizontal radio overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}}");
+            // 2 Radio
+            int radioTwoHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
+            int radioTwoHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for two horizontal radio overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}}");
+            // 3 Radio
+            int radioThreeHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalX).DoubleValue;
+            int radioThreeHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for three horizontal radio overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}}");
+            // 5 Radio
+            int radioFiveHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX).DoubleValue;
+            int radioFiveHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for five horizontal radio overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}}");
+
+            //10 Radio
+            int radioTenHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX).DoubleValue;
+            int radioTenHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten radio horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
+            //10 Radio Wide
+            int radioTenWideHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalX).DoubleValue;
+            int radioTenWideHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY).DoubleValue;
+            Logger.Info($"Checking window visibility for ten wide radio horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}}");
+
+
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
@@ -224,20 +308,73 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(radioTwoWindowX, radioTwoWindowY))
+                // ------- Vertical Panels ------
+                if (screen.Bounds.Contains(radioOneVerticalX, radioOneVerticalY))
                 {
-                    Logger.Info($"Radio Two overlay {{X={radioTwoWindowX},Y={radioTwoWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"Radio One Vertical overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(radioFiveWindowX, radioFiveWindowY))
+                if (screen.Bounds.Contains(radioTwoVerticalX, radioTwoVerticalY))
                 {
-                    Logger.Info($"Radio Five overlay {{X={radioFiveWindowX},Y={radioFiveWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Info($"Radio Two Vertical overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
-                if (screen.Bounds.Contains(awacsWindowX, awacsWindowY))
+                if (screen.Bounds.Contains(radioThreeVerticalX, radioThreeVerticalY))
                 {
-                    Logger.Info($"AWACS overlay {{X={awacsWindowX},Y={awacsWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
-                    awacsWindowVisible = true;
+                    Logger.Info($"Radio Three Vertical overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioFiveVerticalX, radioFiveVerticalY))
+                {
+                    Logger.Info($"Radio Five Vertical overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTenVerticalX, radioTenVerticalY))
+                {
+                    Logger.Info($"Radio Ten Vertical overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTenLongVerticalX, radioTenLongVerticalY))
+                {
+                    Logger.Info($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTenTransparentX, radioTenTransparentY))
+                {
+                    Logger.Info($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+
+                // -------- Horizontal Panels -----------
+                if (screen.Bounds.Contains(radioOneHorizontalX, radioOneHorizontalY))
+                {
+                    Logger.Info($"Radio One Horizontal overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTwoHorizontalX, radioTwoHorizontalY))
+                {
+                    Logger.Info($"Radio Two Horizontal overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioThreeHorizontalX, radioThreeHorizontalY))
+                {
+                    Logger.Info($"Radio Three Horizontal overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioFiveHorizontalX, radioFiveHorizontalY))
+                {
+                    Logger.Info($"Radio Five Horizontal overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTenHorizontalX, radioTenHorizontalY))
+                {
+                    Logger.Info($"Radio Ten Horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+                if (screen.Bounds.Contains(radioTenWideHorizontalX, radioTenWideHorizontalY))
+                {
+                    Logger.Info($"Radio Ten Wide Horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
                 }
             }
 
@@ -266,29 +403,148 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"Radio Two overlay window outside visible area of monitors, resetting position ({radioTwoWindowX},{radioTwoWindowY}) to defaults");
-                Logger.Warn($"Radio Five overlay window outside visible area of monitors, resetting position ({radioFiveWindowX},{radioFiveWindowY}) to defaults");
+                // ------- Vertical Panels ---------
+                Logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
+                Logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
+                Logger.Warn($"Radio Three Vertical overlay window outside visible area of monitors, resetting position ({radioThreeVerticalX},{radioThreeVerticalY}) to defaults");
+                Logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
+                Logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
+                Logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
+                Logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
+                // ------- Horizontal Panels ----------
+                Logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
+                Logger.Warn($"Radio Two Horizontal overlay window outside visible area of monitors, resetting position ({radioTwoHorizontalX},{radioTwoHorizontalY}) to defaults");
+                Logger.Warn($"Radio Three Horizontal overlay window outside visible area of monitors, resetting position ({radioThreeHorizontalX},{radioThreeHorizontalY}) to defaults");
+                Logger.Warn($"Radio Five Horizontal overlay window outside visible area of monitors, resetting position ({radioFiveHorizontalX},{radioFiveHorizontalY}) to defaults");
+                Logger.Warn($"Radio Ten Horizontal overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
+                Logger.Warn($"Radio Ten Wide Horizontal overlay window outside visible area of monitors, resetting position ({radioTenWideHorizontalX},{radioTenWideHorizontalY}) to defaults");
+
+                // Reset Radio Panel Positions
+                // ----- Vertical -------
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY, 300);
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
 
-                if (_radioOverlayWindowTwo != null)
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, 300);
+
+                // ------ Horizontal ------
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY, 300);
+
+                // Null Value Protection
+                // ---- Vertical Panels -----
+                if (_radioOverlayWindowOneVertical != null)
                 {
-                    _radioOverlayWindowTwo.Left = 300;
-                    _radioOverlayWindowTwo.Top = 300;
+                    _radioOverlayWindowOneVertical.Left = 300;
+                    _radioOverlayWindowOneVertical.Top = 300;
                 }
 
-                if (_radioOverlayWindowFive != null)
+                if (_radioOverlayWindowTwoVertical != null)
                 {
-                    _radioOverlayWindowFive.Left = 300;
-                    _radioOverlayWindowFive.Top = 300;
+                    _radioOverlayWindowTwoVertical.Left = 300;
+                    _radioOverlayWindowTwoVertical.Top = 300;
+                }
+
+                if (_radioOverlayWindowThreeVertical != null)
+                {
+                    _radioOverlayWindowThreeVertical.Left = 300;
+                    _radioOverlayWindowThreeVertical.Top = 300;
+                }
+
+                if (_radioOverlayWindowFiveVertical != null)
+                {
+                    _radioOverlayWindowFiveVertical.Left = 300;
+                    _radioOverlayWindowFiveVertical.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenVertical != null)
+                {
+                    _radioOverlayWindowTenVertical.Left = 300;
+                    _radioOverlayWindowTenVertical.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenVerticalLong != null)
+                {
+                    _radioOverlayWindowTenVerticalLong.Left = 300;
+                    _radioOverlayWindowTenVerticalLong.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenTransparent != null)
+                {
+                    _radioOverlayWindowTenTransparent.Left = 300;
+                    _radioOverlayWindowTenTransparent.Top = 300;
+                }
+
+                // ------- Horizontal Panels ---------
+                if (_radioOverlayWindowOneHorizontal != null)
+                {
+                    _radioOverlayWindowOneHorizontal.Left = 300;
+                    _radioOverlayWindowOneHorizontal.Top = 300;
+                }
+
+                if (_radioOverlayWindowTwoHorizontal != null)
+                {
+                    _radioOverlayWindowTwoHorizontal.Left = 300;
+                    _radioOverlayWindowTwoHorizontal.Top = 300;
+                }
+
+                if (_radioOverlayWindowThreeHorizontal != null)
+                {
+                    _radioOverlayWindowThreeHorizontal.Left = 300;
+                    _radioOverlayWindowThreeHorizontal.Top = 300;
+                }
+
+                if (_radioOverlayWindowFiveHorizontal != null)
+                {
+                    _radioOverlayWindowFiveHorizontal.Left = 300;
+                    _radioOverlayWindowFiveHorizontal.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenHorizontal != null)
+                {
+                    _radioOverlayWindowTenHorizontal.Left = 300;
+                    _radioOverlayWindowTenHorizontal.Top = 300;
+                }
+
+                if (_radioOverlayWindowTenHorizontalWide != null)
+                {
+                    _radioOverlayWindowTenHorizontalWide.Left = 300;
+                    _radioOverlayWindowTenHorizontalWide.Top = 300;
                 }
             }
 
-            if (!awacsWindowVisible)
+           if (!awacsWindowVisible)   // --- removed by dabble
             {
                 MessageBox.Show(this,
                     "The SRS AWACS overlay is no longer visible likely due to a monitor reconfiguration.\n\nThe position will be reset to default to fix this issue",
@@ -296,15 +552,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({awacsWindowX},{awacsWindowY}) to defaults");
+                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
 
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsX, 300);
-                _globalSettings.SetPositionSetting(GlobalSettingsKeys.AwacsY, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY, 300);
 
-                if (_awacsRadioOverlay != null)
+                if (_radioOverlayWindowTenHorizontal != null)
                 {
-                    _awacsRadioOverlay.Left = 300;
-                    _awacsRadioOverlay.Top = 300;
+                    _radioOverlayWindowTenHorizontal.Left = 300;
+                    _radioOverlayWindowTenHorizontal.Top = 300;
                 }
             }
         }
@@ -378,6 +634,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IntercomStartTransmitEffect.SelectionChanged += OnIntercomStartTransmitEffectChanged;
             IntercomEndTransmitEffect.SelectionChanged += OnIntercomEndTransmitEffectChanged;
 
+            // How to change the keybind names in the keybinds tab
+
             Radio1.InputName = "Radio 1";
             Radio1.ControlInputBinding = InputBinding.Switch1;
             Radio1.InputDeviceManager = InputManager;
@@ -402,11 +660,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IntercomPTT.ControlInputBinding = InputBinding.IntercomPTT;
             IntercomPTT.InputDeviceManager = InputManager;
 
-            RadioOverlay.InputName = "Overlay Toggle";
+            RadioOverlay.InputName = "Transparent Panel Toggle"; // TODO: Replace this with 10T panel
             RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
             RadioOverlay.InputDeviceManager = InputManager;
 
-            AwacsOverlayToggle.InputName = "Awacs Toggle";
+            AwacsOverlayToggle.InputName = "10 Radio Panel Toggle";
             AwacsOverlayToggle.ControlInputBinding = InputBinding.AwacsOverlayToggle;
             AwacsOverlayToggle.InputDeviceManager = InputManager;
 
@@ -1247,14 +1505,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _audioPreview?.StopEncoding();
             _audioPreview = null;
 
-            _radioOverlayWindowTwo?.Close();
-            _radioOverlayWindowTwo = null;
+            _radioOverlayWindowOneVertical?.Close();
+            _radioOverlayWindowOneVertical = null;
 
-            _radioOverlayWindowFive?.Close();
-            _radioOverlayWindowFive = null;
+            _radioOverlayWindowTwoVertical?.Close();
+            _radioOverlayWindowTwoVertical = null;
 
-            _awacsRadioOverlay?.Close();
-            _awacsRadioOverlay = null;
+            _radioOverlayWindowThreeVertical?.Close();
+            _radioOverlayWindowThreeVertical = null;
+
+            _radioOverlayWindowFiveVertical?.Close();
+            _radioOverlayWindowFiveVertical = null;
+
+            _radioOverlayWindowTenVertical?.Close();
+            _radioOverlayWindowTenVertical = null;
+
+            _radioOverlayWindowTenVerticalLong?.Close();
+            _radioOverlayWindowTenVerticalLong = null;
+
+            _radioOverlayWindowTenTransparent?.Close();
+            _radioOverlayWindowTenTransparent = null;
+
+            _radioOverlayWindowOneHorizontal?.Close();
+            _radioOverlayWindowOneHorizontal = null;
+
+            _radioOverlayWindowTwoHorizontal?.Close();
+            _radioOverlayWindowTwoHorizontal = null;
+
+            _radioOverlayWindowThreeHorizontal?.Close();
+            _radioOverlayWindowThreeHorizontal = null;
+
+            _radioOverlayWindowFiveHorizontal?.Close();
+            _radioOverlayWindowFiveHorizontal = null;
+
+            _radioOverlayWindowTenHorizontal?.Close();
+            _radioOverlayWindowTenHorizontal = null;
+
+            _radioOverlayWindowTenHorizontalWide?.Close();
+            _radioOverlayWindowTenHorizontalWide = null;
 
             _dcsAutoConnectListener?.Stop();
             _dcsAutoConnectListener = null;
@@ -1365,120 +1653,181 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioSwitchIsPTT, (bool)RadioSwitchIsPTT.IsChecked);
         }
 
-        private void ShowOverlayFive_OnClick(object sender, RoutedEventArgs e)
+        private void ShowOverlayTwoVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, false, false);
+            ToggleOverlay(true, 0);
         }
 
-        private void ShowOverlayTwo_OnClick(object sender, RoutedEventArgs e)
+        private void ShowOverlayThreeVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, false, true);
+            ToggleOverlay(true, 1);
         }
 
-        private void ToggleOverlay(bool uiButton, bool awacs, bool twoRadioOverlay)
+        private void ShowOverlayFiveVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 2);
+        }
+
+        private void ShowOverlayTenVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 3);
+        }
+
+        private void ShowOverlayHorizontalTwo_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 4);
+        }
+
+        private void ShowOverlayThreeHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 5);
+        }
+
+        private void ShowOverlayFiveHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 6);
+        }
+
+        private void ShowOverlayTenHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 7);
+        }
+
+        private void ShowOverlayOneVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 8);
+        }
+
+        private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 9);
+        }
+
+        private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 10);
+        }
+
+        private void ShowOverlayTenHorizontalWide_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 11);
+        }
+
+        private void ShowOverlayTenTransparent_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 12);
+        }
+
+        private void ToggleOverlay(bool uiButton, int switchTo)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
             if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
             {
                 _toggleShowHide = DateTime.Now.Ticks;
-
-                if (awacs)
+                // Catching out of bounds switch to.
+                // TODO: Maybe take switchTo = 13 to close all windows.
+                if (switchTo < 0 || switchTo > windows.Count() - 1)
                 {
-                    ShowAwacsOverlay_OnClick(null, null);
+                    Logger.Error($"Could not switch to RadioWindow-{switchTo}.");
+                    return;
+                }
+
+                // This can be expanded or smallered quite easily, not like the last bit of code
+                int openWindow = _windowOpen;
+                for (int i = 0; i < windows.Count(); i++)
+                {
+                    if (windows[i] != null)
+                    {
+                        windows[i].Close();
+                        windows[i] = null;
+                        openWindow = i;
+                    }
+                }
+
+                // Check if we want to toggle or open another window
+                if (switchTo != openWindow)
+                {
+                    // Open new Window
+                    // Only needed to select right instance of the Radio panel Overlay
+                    switch (switchTo)
+                    {
+                        case 0:
+                            windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
+                            break;
+                        case 1:
+                            windows[switchTo] = new RadioOverlayWindowThreeVertical(ToggleOverlay);
+                            break;
+                        case 2:
+                            windows[switchTo] = new RadioOverlayWindowFiveVertical(ToggleOverlay);
+                            break;
+                        case 3:
+                            windows[switchTo] = new RadioOverlayWindowTenVertical(ToggleOverlay);
+                            break;
+                        case 4:
+                            windows[switchTo] = new RadioOverlayWindowTwoHorizontal(ToggleOverlay);
+                            break;
+                        case 5:
+                            windows[switchTo] = new RadioOverlayWindowThreeHorizontal(ToggleOverlay);
+                            break;
+                        case 6:
+                            windows[switchTo] = new RadioOverlayWindowFiveHorizontal(ToggleOverlay);
+                            break;
+                        case 7:
+                            windows[switchTo] = new RadioOverlayWindowTenHorizontal(ToggleOverlay);
+                            break;
+                        case 8:
+                            windows[switchTo] = new RadioOverlayWindowOneVertical(ToggleOverlay);
+                            break;
+                        case 9:
+                            windows[switchTo] = new RadioOverlayWindowOneHorizontal(ToggleOverlay);
+                            break;
+                        case 10:
+                            windows[switchTo] = new RadioOverlayWindowTenVerticalLong(ToggleOverlay);
+                            break;
+                        case 11:
+                            windows[switchTo] = new RadioOverlayWindowTenHorizontalWide(ToggleOverlay);
+                            break;
+                        case 12:
+                            windows[switchTo] = new RadioOverlayWindowTenTransparent(ToggleOverlay);
+                            break;
+                    }
+                    try
+                    {
+                        windows[switchTo].ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+                        windows[switchTo].Show();
+                        windows[switchTo].Closed += PanelWindow_Closed;
+                    }
+                    catch
+                    {
+                        Logger.Error($"Could not open Window with ID: {switchTo}.");
+                        MessageBox.Show($"Window could not Open (Window-ID: {switchTo}).\nPlease give this Information to the SRS Development Team!", "Error Opening Panel", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 }
                 else
                 {
-                    if (!twoRadioOverlay)
-                    {
-                        if ((_radioOverlayWindowFive == null) || !_radioOverlayWindowFive.IsVisible ||
-                        (_radioOverlayWindowFive.WindowState == WindowState.Minimized))
-                        {
-                            //hide awacs panel
-                            _awacsRadioOverlay?.Close();
-                            _awacsRadioOverlay = null;
-
-                            //hide Two Overlay
-                            if (_radioOverlayWindowTwo != null)
-                            {
-                                _radioOverlayWindowTwo.Close();
-                                _radioOverlayWindowTwo = null;
-                            }
-
-                            _radioOverlayWindowFive?.Close();
-
-                            _radioOverlayWindowFive = new Overlay.RadioOverlayWindowFive();
-
-
-                            _radioOverlayWindowFive.ShowInTaskbar =
-                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowFive.Show();
-                        }
-                        else
-                        {
-                            _radioOverlayWindowFive?.Close();
-                            _radioOverlayWindowFive = null;
-                        }
-                    }
-                    else
-                    {
-                        if ((_radioOverlayWindowTwo == null) || !_radioOverlayWindowTwo.IsVisible ||
-                        (_radioOverlayWindowTwo.WindowState == WindowState.Minimized))
-                        {
-                            //hide awacs panel
-                            _awacsRadioOverlay?.Close();
-                            _awacsRadioOverlay = null;
-
-                            //hide Five Overlay
-                            if (_radioOverlayWindowFive != null)
-                            {
-                                _radioOverlayWindowFive.Close();
-                                _radioOverlayWindowFive = null;
-                            }
-
-                            _radioOverlayWindowTwo?.Close();
-
-                            _radioOverlayWindowTwo = new Overlay.RadioOverlayWindowTwo();
-
-
-                            _radioOverlayWindowTwo.ShowInTaskbar =
-                                !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                            _radioOverlayWindowTwo.Show();
-                        }
-                        else
-                        {
-                            _radioOverlayWindowTwo?.Close();
-                            _radioOverlayWindowTwo = null;
-                        }
-                    }
+                    // No Panel window is open
+                    _windowOpen = 13;
                 }
-
             }
         }
 
-        private void ShowAwacsOverlay_OnClick(object sender, RoutedEventArgs e)
+        // This needs to listen on every window[switchTo].Closed Event.
+        private void PanelWindow_Closed(object sender, EventArgs e)
         {
-            if ((_awacsRadioOverlay == null) || !_awacsRadioOverlay.IsVisible ||
-                (_awacsRadioOverlay.WindowState == WindowState.Minimized))
+            // No window open -> A window was closed and Only 1 Window can be active
+            _windowOpen = 13;
+
+            // Erase window from windows array to clean up everything
+            for (int i = 0; i < windows.Count(); i++)
             {
-                //close normal overlay
-                _radioOverlayWindowTwo?.Close();
-                _radioOverlayWindowTwo = null;
-
-                _radioOverlayWindowFive?.Close();
-                _radioOverlayWindowFive = null;
-
-                _awacsRadioOverlay?.Close();
-
-                _awacsRadioOverlay = new AwacsRadioOverlayWindow.RadioOverlayWindow();
-                _awacsRadioOverlay.ShowInTaskbar =
-                    !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-                _awacsRadioOverlay.Show();
+                if (windows[i] != null)
+                {
+                    windows[i].Close();
+                    windows[i] = null;
+                }
             }
-            else
-            {
-                _awacsRadioOverlay?.Close();
-                _awacsRadioOverlay = null;
-            }
+
         }
 
         private void AutoConnect(string address, int port)
@@ -1646,27 +1995,164 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
-            _radioOverlayWindowTwo?.Close();
-            _radioOverlayWindowTwo = null;
+            _radioOverlayWindowOneVertical?.Close();
+            _radioOverlayWindowOneVertical = null;
 
-            _radioOverlayWindowFive?.Close();
-            _radioOverlayWindowFive = null;
+            _radioOverlayWindowTwoVertical?.Close();
+            _radioOverlayWindowTwoVertical = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoY, 300);
+            _radioOverlayWindowThreeVertical?.Close();
+            _radioOverlayWindowThreeVertical = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoWidth, 122);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHeight, 270);
+            _radioOverlayWindowFiveVertical?.Close();
+            _radioOverlayWindowFiveVertical = null;
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoOpacity, 1.0);
+            _radioOverlayWindowTenVertical?.Close();
+            _radioOverlayWindowTenVertical = null;
 
+            _radioOverlayWindowTenVerticalLong?.Close();
+            _radioOverlayWindowTenVerticalLong = null;
+
+            _radioOverlayWindowTenTransparent?.Close();
+            _radioOverlayWindowTenTransparent = null;
+
+            _radioOverlayWindowOneHorizontal?.Close();
+            _radioOverlayWindowOneHorizontal = null;
+
+            _radioOverlayWindowTwoHorizontal?.Close();
+            _radioOverlayWindowTwoHorizontal = null;
+
+            _radioOverlayWindowThreeHorizontal?.Close();
+            _radioOverlayWindowThreeHorizontal = null;
+
+            _radioOverlayWindowFiveHorizontal?.Close();
+            _radioOverlayWindowFiveHorizontal = null;
+
+            _radioOverlayWindowTenHorizontal?.Close();
+            _radioOverlayWindowTenHorizontal = null;
+
+            _radioOverlayWindowTenHorizontalWide?.Close();
+            _radioOverlayWindowTenHorizontalWide = null;
+
+            //Reset Panel Settings
+            // 1 Vertical
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalHeight, 175);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalOpacity, 1.0);
+
+            // 2 Vertical
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalHeight, 265);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity, 1.0);
+
+            // 3 Vertical
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalHeight, 355);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalOpacity, 1.0);
+
+            // 5 Vertical
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveX, 300);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveY, 300);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveWidth, 122);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHeight, 270);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHeight, 494);
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveOpacity, 1.0);
+
+            // 10 Vertical
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalWidth, 340);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalHeight, 500);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenVerticalOpacity, 1.0);
+
+            // 10 Vertical Long
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalHeight, 905);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalOpacity, 1.0);
+
+            // 10 Transparent
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, 100);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentTextOpacity, 1.0);
+
+            // 1 Horizontal
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalWidth, 340);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalHeight, 100);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalOpacity, 1.0);
+
+            // 2 Horizontal
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalWidth, 340);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalHeight, 160);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalOpacity, 1.0);
+
+            // 3 Horizontal
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalWidth, 510);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalHeight, 160);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalOpacity, 1.0);
+
+            // 5 Horizontal
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalWidth, 805);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalHeight, 140);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalOpacity, 1.0);
+
+            // 10 Horizontal
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalWidth, 805);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalHeight, 220);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalOpacity, 1.0);
+
+            // 10 Horizontal Wide
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalWidth, 1650);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalHeight, 127);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalOpacity, 1.0);
+
         }
 
         private void ToggleServerSettings_OnClick(object sender, RoutedEventArgs e)
@@ -1709,11 +2195,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.RadioOverlayTaskbarHide, (bool)RadioOverlayTaskbarItem.IsChecked);
 
-            if (_radioOverlayWindowTwo != null)
-                _radioOverlayWindowTwo.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_radioOverlayWindowFive != null)
-                _radioOverlayWindowFive.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
-            else if (_awacsRadioOverlay != null) _awacsRadioOverlay.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            if (_radioOverlayWindowTwoVertical != null)
+                _radioOverlayWindowTwoVertical.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            else if (_radioOverlayWindowFiveVertical != null)
+                _radioOverlayWindowFiveVertical.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
+            else if (_radioOverlayWindowTenHorizontal != null) _radioOverlayWindowTenHorizontal.ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
         }
 
         private void DCSRefocus_OnClick_Click(object sender, RoutedEventArgs e)
@@ -2080,19 +2566,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (PTTStartDelay.IsEnabled)
                 _globalSettings.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingsKeys.PTTStartDelay, (float)e.NewValue);
         }
-
-        private void Donate_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Process.Start(
-                    "https://www.patreon.com/ciribob");
-            }
-            catch (Exception)
-            {
-            }
-        }
-
+                
         private void BackgroundRadioNoiseToggle_OnClick(object sender, RoutedEventArgs e)
         {
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioBackgroundNoiseEffect, (bool)BackgroundRadioNoiseToggle.IsChecked);
@@ -2181,5 +2655,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             if (VOXMinimumRMS.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
         }
+
+        
     }
 }

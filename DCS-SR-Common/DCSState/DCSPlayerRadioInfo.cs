@@ -101,7 +101,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             {
                 radios[i] = new RadioInformation();
             }
-
         }
 
         // override object.Equals
