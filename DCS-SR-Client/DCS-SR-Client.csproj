@@ -105,11 +105,20 @@
       <HintPath>..\packages\Costura.Fody.1.6.2\lib\dotnet\Costura.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Dragablz, Version=0.0.3.234, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.234\lib\net45\Dragablz.dll</HintPath>
+    </Reference>
     <Reference Include="Easy.MessageHub, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Easy.MessageHub.3.2.1\lib\net35\Easy.MessageHub.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignColors, Version=3.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.3.0.0\lib\net462\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=5.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.5.0.0\lib\net462\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="MathNet.Filtering, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Filtering.0.7.0\lib\net461\MathNet.Filtering.dll</HintPath>
@@ -119,6 +128,9 @@
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="MvvmEventBinding, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
@@ -220,8 +232,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Wpf.Ui, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPF-UI.2.1.0\lib\net472\Wpf.Ui.dll</HintPath>
+    <Reference Include="Wpf.Ui, Version=3.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPF-UI.3.0.4\lib\net472\Wpf.Ui.dll</HintPath>
     </Reference>
     <Reference Include="WPFCustomMessageBox, Version=1.0.7.39267, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WPFCustomMessageBox.1.0.7\lib\WPFCustomMessageBox.dll</HintPath>
@@ -319,6 +331,9 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
+      <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
     </Compile>
@@ -331,6 +346,9 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
       <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml.cs">
+      <DependentUpon>RadioOverlayDragable.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml.cs">
       <DependentUpon>RadioOverlayTenHorizontalWide.xaml</DependentUpon>
@@ -430,6 +448,10 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -443,6 +465,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -745,6 +771,7 @@
     <Error Condition="!Exists('..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets'))" />
     <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props'))" />
     <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets'))" />
+    <Error Condition="!Exists('..\packages\MaterialDesignThemes.5.0.0\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.5.0.0\build\MaterialDesignThemes.targets'))" />
   </Target>
   <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
   <Import Project="..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" />
@@ -788,6 +815,7 @@
   <Target Name="AfterBuild">
     <Warning Text="Client-Version: $(Version)" />
   </Target>
+  <Import Project="..\packages\MaterialDesignThemes.5.0.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.5.0.0\build\MaterialDesignThemes.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

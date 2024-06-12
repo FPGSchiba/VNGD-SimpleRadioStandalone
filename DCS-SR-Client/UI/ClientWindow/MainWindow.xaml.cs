@@ -68,7 +68,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private int _windowOpen = 13;
+        private static int _noWindowOpen = 14;
+        private int _windowOpen = _noWindowOpen;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -87,8 +88,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowTenHorizontal _radioOverlayWindowTenHorizontal;
         private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
 
+        // Dragable Radio-Overlay
+        private RadioOverlayWindowDragable _radioOverlayWindowDragable;
+
         // Windows array
-        private Window[] windows = new Window[13];
+        private Window[] windows = new Window[_noWindowOpen];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -153,6 +157,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[10] = _radioOverlayWindowTenVerticalLong;
             windows[11] = _radioOverlayWindowTenHorizontalWide;
             windows[12] = _radioOverlayWindowTenTransparent;
+            windows[13] = _radioOverlayWindowDragable;
 
             var client = ClientStateSingleton.Instance;
 
@@ -1718,6 +1723,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ToggleOverlay(true, 12);
         }
 
+        private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 13);
+        }
+
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
@@ -1790,6 +1800,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         case 12:
                             windows[switchTo] = new RadioOverlayWindowTenTransparent(ToggleOverlay);
                             break;
+                        case 13:
+                            windows[switchTo] = new RadioOverlayWindowDragable(ToggleOverlay);
+                            break;
                     }
                     try
                     {
@@ -1807,7 +1820,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 else
                 {
                     // No Panel window is open
-                    _windowOpen = 13;
+                    _windowOpen = _noWindowOpen;
                 }
             }
         }

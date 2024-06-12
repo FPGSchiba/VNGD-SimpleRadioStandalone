@@ -349,6 +349,15 @@
                                         Style="{DynamicResource SquareButtonStyle}"
                                         Width="150"
                                         x:Name="ShowOverlayTenHorizontalWide" />
+                                    <Button
+                                        Click="ShowOverlayDragable_OnClick"
+                                        Content="Dragable"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayDragable" />
+                                        
                                 </StackPanel>
                                 <StackPanel
                                     HorizontalAlignment="Center"
