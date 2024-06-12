@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
@@ -31,7 +34,7 @@ namespace DCS_SR_Client
         public App()
         {
             SentrySdk.Init("https://1b22a96cbcc34ee4b9db85c7fa3fe4e3@o414743.ingest.sentry.io/5304752");
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
             //var location = Assembly.GetExecutingAssembly().Location;
@@ -319,9 +322,64 @@ namespace DCS_SR_Client
             base.OnExit(e);
         }
 
-        private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        private string[] Tail(TextReader reader, int lineCount)
         {
-            MessageBox.Show("This is a sample and can be expanded ;)\n If you see this, please let FPGSchiba know how you did it :D");
+            var buffer = new List<string>(lineCount);
+            string line;
+            for (int i = 0; i < lineCount; i++)
+            {
+                line = reader.ReadLine();
+                if (line == null) return buffer.ToArray();
+                buffer.Add(line);
+            }
+
+            int lastLine = lineCount - 1;           //The index of the last line read from the buffer.  Everything > this index was read earlier than everything <= this indes
+
+            while (null != (line = reader.ReadLine()))
+            {
+                lastLine++;
+                if (lastLine == lineCount) lastLine = 0;
+                buffer[lastLine] = line;
+            }
+
+            if (lastLine == lineCount - 1) return buffer.ToArray();
+            var retVal = new string[lineCount];
+            buffer.CopyTo(lastLine + 1, retVal, 0, lineCount - lastLine - 1);
+            buffer.CopyTo(0, retVal, lineCount - lastLine - 1, lastLine + 1);
+            return retVal;
+        }
+
+        private void UnhandledExceptionHandlerAsync(object sender, UnhandledExceptionEventArgs e)
+        {
+            
+
+            // Request creates an Issue on GitHub with the LogFile
+            var client = new HttpClient();
+            var content = new MultipartFormDataContent();
+            try
+            {
+                using (var f = new FileStream("clientlog.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    StreamReader sr = new StreamReader(f);
+                    string[] lines = Tail(sr, 100);
+                    System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b = new List<KeyValuePair<string, string>>();
+                    b.Add(new KeyValuePair<string, string>("log", String.Join("\n", lines)));
+                    b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
+                    b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
+                    var addMe = new FormUrlEncodedContent(b);
+
+                    content.Add(addMe);
+                    var task = Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
+                    task.Wait();
+                    var result = task.Result;
+
+                    MessageBox.Show("This is a sample and can be expanded ;)\n If you see this, please let FPGSchiba know how you did it :D" + result.Content);
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("No log file found!");
+            }
 
             if (loggingReady)
             {
