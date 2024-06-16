@@ -140,7 +140,7 @@
         <awacsOverlayWindow:RadioControlGroup x:Name="radio2"
                                  Grid.Row="1"
                                  Grid.Column="1"
-                                 RadioId="2" />
+                                 RadioId="2" Loaded="radio2_Loaded" />
         <awacsOverlayWindow:RadioControlGroup x:Name="radio3"
                                  Grid.Row="1"
                                  Grid.Column="2"
