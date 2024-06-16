@@ -47,6 +47,7 @@ using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 using System.Windows.Navigation;
 using System.Security.Cryptography;
+using System.Net.Http;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -1762,6 +1763,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     switch (switchTo)
                     {
                         case 0:
+                            throw new Exception();
                             windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
                             break;
                         case 1:

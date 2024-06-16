@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
@@ -31,7 +34,7 @@ namespace DCS_SR_Client
         public App()
         {
             SentrySdk.Init("https://1b22a96cbcc34ee4b9db85c7fa3fe4e3@o414743.ingest.sentry.io/5304752");
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
             //var location = Assembly.GetExecutingAssembly().Location;
@@ -319,14 +322,43 @@ namespace DCS_SR_Client
             base.OnExit(e);
         }
 
-        private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        private void UnhandledExceptionHandlerAsync(object sender, UnhandledExceptionEventArgs e)
         {
-            MessageBox.Show("This is a sample and can be expanded ;)\n If you see this, please let FPGSchiba know how you did it :D");
-
+            // First log generated Error
             if (loggingReady)
             {
                 Logger logger = LogManager.GetCurrentClassLogger();
-                logger.Error((Exception) e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
+                logger.Error((Exception)e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
+            }
+
+            // Request creates an Issue on GitHub with the LogFile
+            var client = new HttpClient();
+            var content = new MultipartFormDataContent();
+            try
+            {
+                System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b = new List<KeyValuePair<string, string>>();
+                b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString())); 
+                b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
+                b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
+                var addMe = new FormUrlEncodedContent(b);
+
+                content.Add(addMe);
+                var task = Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
+                task.Wait();
+                var result = task.Result;
+                var readTask = Task.Run(() => result.Content.ReadAsStringAsync());
+                readTask.Wait();
+                var resultContent = readTask.Result;
+
+                if (MessageBox.Show("This was an SRS Crash!\nThis cool new Feature now automatically created a Ticket reporting your Crash!\nWe will try to figure our your issue and maybe go to the Ticket and comment your Discord so we can reach out.\n\nWould you like to see the Issue?", "Open Issue", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(resultContent);
+                }
+                
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("No log file found! Issue could not be created.");
             }
         }
 
