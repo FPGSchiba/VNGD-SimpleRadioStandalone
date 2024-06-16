@@ -330,7 +330,7 @@ namespace DCS_SR_Client
                 Logger logger = LogManager.GetCurrentClassLogger();
                 logger.Error((Exception)e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
             }
-
+#if !DEBUG
             // Request creates an Issue on GitHub with the LogFile
             var client = new HttpClient();
             var content = new MultipartFormDataContent();
@@ -360,6 +360,7 @@ namespace DCS_SR_Client
             {
                 MessageBox.Show("No log file found! Issue could not be created.");
             }
+#endif
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
