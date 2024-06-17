@@ -72,6 +72,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private static int _noWindowOpen = 14;
         private int _windowOpen = _noWindowOpen;
 
+        // Pages
+        private WelcomePage _welcomePage;
+
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
@@ -130,6 +133,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
             InitializeComponent();
+
+            // Initialize Pages
+
+            InitPages();
+
+            DisplayFrame.Content = _welcomePage;
 
             // Initialize ToolTip controls
             ToolTips.Init();
@@ -794,6 +803,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioVolumeDown.InputName = "Radio Volume Down";
             RadioVolumeDown.ControlInputBinding = InputBinding.RadioVolumeDown;
             RadioVolumeDown.InputDeviceManager = InputManager;
+        }
+
+        private void InitPages()
+        {
+            _welcomePage = new WelcomePage();
+        }
+
+        public void On_LoginClicked()
+        {
+            Logger.Warn("Not Implemented yet!");
+        }
+
+        public void On_GuestCLicked()
+        {
+            Logger.Warn("Not Implemented yet!");
         }
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
@@ -2671,6 +2695,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumDB, (double)e.NewValue);
         }
 
-        
+        private void Minimize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }
