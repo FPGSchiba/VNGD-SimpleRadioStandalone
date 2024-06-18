@@ -55,6 +55,13 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <Button
+                x:Name="EasterEgg"
+                Width="10"
+                Height="10"
+                Opacity="0"
+                Click="EasterEgg_Click"
+            />
             <Label VerticalContentAlignment="Center">
                 <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center">
                 Disclaimer: Vanguard is an organization in the Star Citizen universe and gaming community.

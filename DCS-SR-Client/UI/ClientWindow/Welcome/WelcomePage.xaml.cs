@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Welcome;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
         private void Guest_Click(object sender, RoutedEventArgs e)
         {
             mainWindow.On_GuestCLicked();
+        }
+        private void EasterEgg_Click(object sender, RoutedEventArgs e)
+        {
+            EasterEggWindow window = new EasterEggWindow();
+            window.Show();
         }
     }
 }
