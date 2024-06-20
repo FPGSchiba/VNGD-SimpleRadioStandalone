@@ -122,14 +122,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     continue;
                 }
 
-                Logger.Info("Found Device ID:" + deviceInstance.ProductGuid +
+                Logger.Trace("Found Device ID:" + deviceInstance.ProductGuid +
                             " " +
                             deviceInstance.ProductName.Trim().Replace("\0", "") + " Usage: " +
                             deviceInstance.UsagePage + " Type: " +
                             deviceInstance.Type);
                 if (_inputDevices.ContainsKey(deviceInstance.InstanceGuid))
                 {
-                    Logger.Info("Already have device:" + deviceInstance.ProductGuid +
+                    Logger.Trace("Already have device:" + deviceInstance.ProductGuid +
                                 " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                     continue;
@@ -139,7 +139,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 if (deviceInstance.Type == DeviceType.Keyboard)
                 {
 
-                    Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid +
+                    Logger.Trace("Adding Device ID:" + deviceInstance.ProductGuid +
                                 " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                     var device = new Keyboard(_directInput);
@@ -152,7 +152,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
                 else if (deviceInstance.Type == DeviceType.Mouse)
                 {
-                    Logger.Info("Adding Device ID:" + deviceInstance.ProductGuid + " " +
+                    Logger.Trace("Adding Device ID:" + deviceInstance.ProductGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                     var device = new Mouse(_directInput);
 
@@ -168,7 +168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
 
-                    Logger.Info("Adding ID:" + deviceInstance.ProductGuid + " " +
+                    Logger.Trace("Adding ID:" + deviceInstance.ProductGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                     device.SetCooperativeLevel(WindowHelper.Handle,
@@ -179,7 +179,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 }
                 else if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.ExpandControls))
                 {
-                    Logger.Info("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
+                    Logger.Trace("Adding (Expanded Devices) ID:" + deviceInstance.ProductGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
 
                     var device = new Joystick(_directInput, deviceInstance.InstanceGuid);
@@ -190,7 +190,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     _inputDevices.Add(deviceInstance.InstanceGuid, device);
 
-                    Logger.Info("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
+                    Logger.Trace("Added (Expanded Device) ID:" + deviceInstance.ProductGuid + " " +
                                 deviceInstance.ProductName.Trim().Replace("\0", ""));
                 }
             }
@@ -235,7 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     try
                     {
                         _hashSet.Add(new Guid(trimmed));
-                        Logger.Info("Added " + trimmed);
+                        Logger.Trace("Added " + trimmed);
                     }
                     catch (Exception)
                     {

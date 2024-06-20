@@ -47,6 +47,7 @@ using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
 using System.Windows.Navigation;
 using System.Security.Cryptography;
+using System.Net.Http;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -237,143 +238,143 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
             
-            Logger.Info($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
+            Logger.Trace($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
 
 
             // -------- Vertical Panels -------
             // 1 Radio
             int radioOneVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX).DoubleValue;
             int radioOneVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY).DoubleValue;
-            Logger.Info($"Checking window visibility for one vertical radio overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}}");
+            Logger.Trace($"Checking window visibility for one vertical radio overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}}");
             // 2 Radio
             int radioTwoVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
             int radioTwoVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
-            Logger.Info($"Checking window visibility for two vertical radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
+            Logger.Trace($"Checking window visibility for two vertical radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
             // 3 Radio
             int radioThreeVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue;
             int radioThreeVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue;
-            Logger.Info($"Checking window visibility for three vertical radio overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}}");
+            Logger.Trace($"Checking window visibility for three vertical radio overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}}");
             // 5 Radio
             int radioFiveVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
             int radioFiveVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
-            Logger.Info($"Checking window visibility for five vertical radio horizontal overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
+            Logger.Trace($"Checking window visibility for five vertical radio horizontal overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
             // 10 Radio
             int radioTenVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalX).DoubleValue;
             int radioTenVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten vertical radio overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}}");
+            Logger.Trace($"Checking window visibility for ten vertical radio overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}}");
             // 10 Radio Long
             int radioTenLongVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX).DoubleValue;
             int radioTenLongVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
+            Logger.Trace($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
             // 10 Radio Transparent
             int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
             int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
+            Logger.Trace($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
             int radioOneHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
             int radioOneHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for one horizontal radio overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for one horizontal radio overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}}");
             // 2 Radio
             int radioTwoHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
             int radioTwoHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for two horizontal radio overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for two horizontal radio overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}}");
             // 3 Radio
             int radioThreeHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalX).DoubleValue;
             int radioThreeHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for three horizontal radio overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for three horizontal radio overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}}");
             // 5 Radio
             int radioFiveHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX).DoubleValue;
             int radioFiveHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for five horizontal radio overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for five horizontal radio overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}}");
 
             //10 Radio
             int radioTenHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX).DoubleValue;
             int radioTenHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten radio horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for ten radio horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
             //10 Radio Wide
             int radioTenWideHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalX).DoubleValue;
             int radioTenWideHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY).DoubleValue;
-            Logger.Info($"Checking window visibility for ten wide radio horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}}");
+            Logger.Trace($"Checking window visibility for ten wide radio horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}}");
 
 
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
-                Logger.Info($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+                Logger.Trace($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
 
                 if (screen.Bounds.Contains(mainWindowX, mainWindowY))
                 {
-                    Logger.Info($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
                 // ------- Vertical Panels ------
                 if (screen.Bounds.Contains(radioOneVerticalX, radioOneVerticalY))
                 {
-                    Logger.Info($"Radio One Vertical overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio One Vertical overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTwoVerticalX, radioTwoVerticalY))
                 {
-                    Logger.Info($"Radio Two Vertical overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Two Vertical overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioThreeVerticalX, radioThreeVerticalY))
                 {
-                    Logger.Info($"Radio Three Vertical overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Three Vertical overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioFiveVerticalX, radioFiveVerticalY))
                 {
-                    Logger.Info($"Radio Five Vertical overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Five Vertical overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenVerticalX, radioTenVerticalY))
                 {
-                    Logger.Info($"Radio Ten Vertical overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Ten Vertical overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenLongVerticalX, radioTenLongVerticalY))
                 {
-                    Logger.Info($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenTransparentX, radioTenTransparentY))
                 {
-                    Logger.Info($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
 
                 // -------- Horizontal Panels -----------
                 if (screen.Bounds.Contains(radioOneHorizontalX, radioOneHorizontalY))
                 {
-                    Logger.Info($"Radio One Horizontal overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio One Horizontal overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTwoHorizontalX, radioTwoHorizontalY))
                 {
-                    Logger.Info($"Radio Two Horizontal overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Two Horizontal overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioThreeHorizontalX, radioThreeHorizontalY))
                 {
-                    Logger.Info($"Radio Three Horizontal overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Three Horizontal overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioFiveHorizontalX, radioFiveHorizontalY))
                 {
-                    Logger.Info($"Radio Five Horizontal overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Five Horizontal overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenHorizontalX, radioTenHorizontalY))
                 {
-                    Logger.Info($"Radio Ten Horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Ten Horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenWideHorizontalX, radioTenWideHorizontalY))
                 {
-                    Logger.Info($"Radio Ten Wide Horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    Logger.Trace($"Radio Ten Wide Horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
             }
@@ -1752,6 +1753,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     switch (switchTo)
                     {
                         case 0:
+                            throw new Exception();
                             windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
                             break;
                         case 1:

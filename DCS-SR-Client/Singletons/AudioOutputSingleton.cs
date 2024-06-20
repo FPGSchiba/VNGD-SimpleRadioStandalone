@@ -59,8 +59,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private List<AudioDeviceListItem> BuildNormalAudioOutputs()
         {
-            Logger.Info("Building Normal Audio Outputs");
-            Logger.Info("Audio Output - Saved ID " +
+            Logger.Trace("Building Normal Audio Outputs");
+            Logger.Trace("Audio Output - Saved ID " +
                          GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioOutputDeviceId).RawValue);
 
             return BuildAudioOutputs("Default Speakers", false);
@@ -68,8 +68,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private List<AudioDeviceListItem> BuildMicAudioOutputs()
         {
-            Logger.Info("Building Microphone Audio Outputs");
-            Logger.Info("Mic Audio Output - Saved ID " +
+            Logger.Trace("Building Microphone Audio Outputs");
+            Logger.Trace("Mic Audio Output - Saved ID " +
                                    GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.MicAudioOutputDeviceId).RawValue);
 
             return BuildAudioOutputs("NO MIC OUTPUT / PASSTHROUGH", true);
@@ -105,7 +105,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             {
                 try
                 {
-                    Logger.Info("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
+                    Logger.Trace("Audio Output - " + device.DeviceFriendlyName + " " + device.ID + " CHN:" +
                             device.AudioClient.MixFormat.Channels + " Rate:" +
                             device.AudioClient.MixFormat.SampleRate.ToString());
 
