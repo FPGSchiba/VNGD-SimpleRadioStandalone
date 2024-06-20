@@ -81,7 +81,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     {
                         var tmpBytes = new byte[reader.Length];
                         var read = reader.Read(tmpBytes, 0, tmpBytes.Length);
-                        Logger.Info($"Read Effect {audioEffect} from {file} Successfully - Format {reader.WaveFormat}");
+                        Logger.Trace($"Read Effect {audioEffect} from {file} Successfully - Format {reader.WaveFormat}");
 
                         //convert to short  - 16 - then to float 32
                         var tmpShort = ConversionHelpers.ByteArrayToShortArray(tmpBytes);

@@ -33,6 +33,10 @@ namespace DCS_SR_Client
 
         public App()
         {
+#if !DEBUG
+            FreeConsole();
+#endif
+
             SentrySdk.Init("https://1b22a96cbcc34ee4b9db85c7fa3fe4e3@o414743.ingest.sentry.io/5304752");
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
@@ -64,8 +68,8 @@ namespace DCS_SR_Client
 
             ListArgs();
 
+
 #if !DEBUG
-            FreeConsole();
 
             if (IsClientRunning())
             {
@@ -261,7 +265,9 @@ namespace DCS_SR_Client
 
             var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", fileWrapper);
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Info, fileWrapper));
+            // TODO: clever way to enable trace logging to file.
+            // Maybe just a default for the moment?
+            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Trace, fileWrapper));
 
             LogManager.Configuration = config;
             loggingReady = true;
