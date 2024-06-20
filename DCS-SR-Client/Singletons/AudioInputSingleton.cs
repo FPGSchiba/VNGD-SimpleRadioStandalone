@@ -51,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         private List<AudioDeviceListItem> BuildAudioInputs()
         {
-            Logger.Info("Audio Input - Saved ID " +
+            Logger.Trace("Audio Input - Saved ID " +
                         GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue);
 
             var inputs = new List<AudioDeviceListItem>();
@@ -62,7 +62,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             if (devices.Count == 0)
             {
                 MicrophoneAvailable = false;
-                Logger.Info("Audio Input - No audio input devices available, disabling mic preview");
+                Logger.Trace("Audio Input - No audio input devices available, disabling mic preview");
                 return inputs;
             }
             else
@@ -71,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
             }
 
-            Logger.Info("Audio Input - " + devices.Count + " audio input devices available, configuring as usual");
+            Logger.Trace("Audio Input - " + devices.Count + " audio input devices available, configuring as usual");
 
             inputs.Add(new AudioDeviceListItem()
             {
@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                         Value = item
                     };
 
-                    Logger.Info("Audio Input - " + item.DeviceFriendlyName + " " + item.ID + " CHN:" +
+                    Logger.Trace("Audio Input - " + item.DeviceFriendlyName + " " + item.ID + " CHN:" +
                                 item.AudioClient.MixFormat.Channels + " Rate:" +
                                 item.AudioClient.MixFormat.SampleRate.ToString());
 
@@ -99,7 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                     if (item.ID.Trim().Equals(GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.AudioInputDeviceId).RawValue.Trim()))
                     {
                         SelectedAudioInput = input;
-                        Logger.Info("Audio Input - Found Saved ");
+                        Logger.Trace("Audio Input - Found Saved ");
                     }
                 }
                 catch (Exception ex)
