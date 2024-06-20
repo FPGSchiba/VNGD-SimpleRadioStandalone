@@ -3463,7 +3463,7 @@
 
         <Grid Background="#E9E9E9" Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="180" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="90" />
             </Grid.ColumnDefinitions>
@@ -3484,19 +3484,18 @@
                     Width="12"
                     x:Name="ConnectionStatus" />
                 <TextBlock Name="SRSVersionText"
-                           Width="80"
+                           Width="160"
                            Height="16"
                            Margin="5,0,0,0"
                            VerticalAlignment="Center"
                            FontSize="12"
                            Foreground="Black"
-                           Padding="0"
-                           Text="Version 2.0.0" />
+                           Text="VCS-SRS v2.0.0" />
             </StackPanel>
             <StackPanel Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
-                <Button Width="24" Height="24" Margin="0,0,3,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon Headphones}" />
-                <Button Width="24" Height="24" Margin="3,0,0,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon HelpCircleOutline}" />
-                <Button Width="24" Height="24" Margin="3,0,0,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon CogBox}" />
+                <Button x:Name="RadioNavigation" Width="24" Height="24" Margin="0,0,3,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon Headphones}" Click="RadioNavigation_Click" />
+                <Button x:Name="SupportNavigation" Width="24" Height="24" Margin="3,0,0,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon HelpCircleOutline}" Click="SupportNavigation_Click" />
+                <Button x:Name="SettingsNavigation" Width="24" Height="24" Margin="3,0,0,0" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{materialDesign:PackIcon CogBox}" Click="SettingsNavigation_Click" />
             </StackPanel>
         </Grid>
     </Grid>

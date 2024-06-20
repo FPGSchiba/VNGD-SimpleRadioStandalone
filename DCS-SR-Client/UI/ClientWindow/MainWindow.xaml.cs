@@ -69,11 +69,31 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private static int _noWindowOpen = 14;
+        private const int _noWindowOpen = 14;
         private int _windowOpen = _noWindowOpen;
 
-        // Pages
+        // State
+        private bool _loggedIn = false;
+
+        private int _openPage
+        {
+            get { return (int)this.GetValue(OpenPageProperty); }
+            set { this.SetValue(OpenPageProperty, value);}
+        }
+
+        public static readonly DependencyProperty OpenPageProperty =
+            DependencyProperty.Register("OpenPage",
+                typeof(int),
+                typeof(MainWindow),
+                new PropertyMetadata(-1, OpenPagePropertyChanged));
+
+
+        // Pages (Page & Index)
         private WelcomePage _welcomePage;
+        private const int _welcomeIndex = 0;
+
+        private SupportPage _supportPage;
+        private const int _supportIndex = 1;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -178,7 +198,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
 
-            Title = Title + " - " + version; //UpdaterChecker.VERSION
+            Title = "VCS-SRS - v" + version; //UpdaterChecker.VERSION
+            SRSVersionText.Text = "VCS-SRS v" + version;
 
             CheckWindowVisibility();
 
@@ -805,9 +826,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioVolumeDown.InputDeviceManager = InputManager;
         }
 
+        #region Pages and Navigation
+
         private void InitPages()
         {
             _welcomePage = new WelcomePage();
+            _supportPage = new SupportPage();
+            _openPage = _welcomeIndex;
+        }
+
+        private static void OpenPagePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            MainWindow mainWindow = source as MainWindow;
+            int newValue = Convert.ToInt32(e.NewValue);
+            switch (newValue)
+            {
+                case _welcomeIndex:
+                    mainWindow.RadioNavigation.IsEnabled = false;
+                    mainWindow.RadioNavigation.Opacity = 0;
+                    break;
+                case _supportIndex:
+                    mainWindow.SupportNavigation.IsEnabled = false;
+                    break;
+            }
         }
 
         public void On_LoginClicked()
@@ -819,6 +860,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             Logger.Warn("Not Implemented yet!");
         }
+
+        private void RadioNavigation_Click(object sender, RoutedEventArgs e)
+        {
+            Logger.Warn("Not Implemented yet!");
+        }
+
+        private void SupportNavigation_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayFrame.Content = _supportPage;
+            _openPage = _supportIndex;
+        }
+
+        private void SettingsNavigation_Click(object sender, RoutedEventArgs e)
+        {
+            Logger.Warn("Not Implemented yet!");
+        }
+
+        #endregion
 
         private void OnProfileDropDownChanged(object sender, SelectionChangedEventArgs e)
         {
