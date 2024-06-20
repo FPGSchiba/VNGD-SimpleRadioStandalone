@@ -7,8 +7,6 @@ Download: Link: [Latest Release](https://github.com/FPGSchiba/VNGD-SimpleRadioSt
 
 ## Contribution Guidelines
 
-Remove this line again :D
-
 ### General Workflow
 
 Following Workflow is used within this Project:
