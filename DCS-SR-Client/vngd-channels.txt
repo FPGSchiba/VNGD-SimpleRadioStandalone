@@ -140,14 +140,14 @@ Defiant Common: 120.60|120.60
 Defiant Flight Common: 120.69|120.69
 
 ---- Defiant Flight Primary Frequencies ----|1.0
-Flight 1:      120.61|120.61
-Flight 2:      120.62|120.62
-Flight 3:      120.63|120.63
-Flight 4:      120.64|120.64
-Flight 5:      120.65|120.65
-Flight 6:      120.66|120.66
-Flight 7:      120.67|120.67
-Flight 8:      120.68|120.68
+Defiant Flight 1:      120.61|120.61
+Defiant Flight 2:      120.62|120.62
+Defiant Flight 3:      120.63|120.63
+Defiant Flight 4:      120.64|120.64
+Defiant Flight 5:      120.65|120.65
+Defiant Flight 6:      120.66|120.66
+Defiant Flight 7:      120.67|120.67
+Defiant Flight 8:      120.68|120.68
 
 
 ---- Discovery Unit Wide Frequencies ----|1.0
@@ -195,6 +195,17 @@ Jackal Salvage Group 1:    135.310|135.310
 Jackal Salvage Group 2:    135.320|135.320
 Jackal Salvage Group 3:    135.330|135.330
 Jackal Transport Group 1:  135.340|135.340
+
+---- Witcher Frequencies ----|1.0
+Witcher Command:     125.10|125.10
+Witcher Team 1:      125.11|125.11
+Witcher Team 2:      125.12|125.12
+Witcher Team 3:      125.13|125.13
+Witcher Team 4:      125.14|125.14
+Witcher Team 5:      125.15|125.15
+Witcher Team 6:      125.16|125.16
+Witcher Team 7:      125.17|125.17
+Witcher Team 8:      125.18|125.18
 
 
 ---- Social Frequencies ----|1.0
