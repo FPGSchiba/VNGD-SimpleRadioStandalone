@@ -163,19 +163,24 @@ Magellan Landing: 140.205|140.205
 Magellan Social: 140.209|140.209
 
 ---- Discovery - Elcano Ship Frequencies ----|1.0
-Elcano Flight: 140.210|140.21
-Elcano Landing: 140.215|140.215
-Elcano Social: 140.219|140.219
+Elcano Command:       140.210|140.21
+Elcano General:       140.211|140.211
+Elcano Away Team 1:   140.212|140.212
+Elcano Away Team 2:   140.213|140.213
+Elcano Away Team 3:   140.214|140.214
+
+Elcano Landing:       140.215|140.215
+Elcano Social:        140.219|140.219
 
 ---- Discovery - Pegasus Ship Frequencies ----|1.0
-Pegasus Command:     140.220|140.220
-Pegasus General:     140.221|140.221
+Pegasus Command:       140.220|140.220
+Pegasus General:       140.221|140.221
 Pegasus Away Team 1:   140.222|140.222
 Pegasus Away Team 2:   140.223|140.223
 Pegasus Away Team 3:   140.224|140.224
 
-Pegasus Landing:    140.225|140.225
-Pegasus Social:     140.229|140.229
+Pegasus Landing:       140.225|140.225
+Pegasus Social:        140.229|140.229
 
 
 
