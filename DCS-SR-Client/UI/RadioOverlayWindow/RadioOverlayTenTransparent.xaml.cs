@@ -331,6 +331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //var expandicon = new ImageBrush(new BitmapImage(new Uri("/ ExpandIcon.png")));
             //var contracticon = new ImageBrush(new BitmapImage(new Uri("/ ContractIcon.png")));
 
+            // TODO: Refactor this into the XAML and use Project resources
             var expandicon = new ImageBrush(new BitmapImage(new Uri("../../ExpandIcon.png", UriKind.Relative)));
             var contracticon = new ImageBrush(new BitmapImage(new Uri("../../ContractIcon.png", UriKind.Relative)));
 
@@ -341,7 +342,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 Header.Visibility = Visibility.Collapsed;
                 Footer.Visibility = Visibility.Collapsed;
                 
-                Console.Write("button expanded pressed - window now in contract mode");
+                Logger.Debug("button expanded pressed - window now in contract mode");
             }
             else
             {
@@ -349,7 +350,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 buttonExpandText.Background = contracticon;
                 Header.Visibility = Visibility.Visible;
                 Footer.Visibility = Visibility.Visible;
-                Console.Write("button contract pressed - window now in expand mode");
+
+                Logger.Debug("button contract pressed - window now in expand mode");
             }
         }
 

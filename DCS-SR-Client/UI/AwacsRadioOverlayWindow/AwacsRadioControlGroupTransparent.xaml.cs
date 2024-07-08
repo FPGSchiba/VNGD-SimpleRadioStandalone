@@ -168,6 +168,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             _dragging = false;
         }
 
+        // This function produces a Crash with a NullReference (https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/issues/128)
         private void ToggleButtons(bool enable)
         {
 
