@@ -125,19 +125,19 @@ Discovery       140.10|140.10
 Rogue Racing    140.40|140.40
 Shinobi         140.50|140.50
 Cosmo Knights   140.60|140.60
+Mako Media      140.70|140.70
+Kraken Trading  140.80|140.80
 Atlas           130.10|130.10
 Benevolence     130.50|130.50
 Fleet Services  130.60|130.60
 Rock Raiders    135.10|135.10
-Kraken          135.50|135.50
-
+Jackals         135.30|135.30
 
 
 
 ---- Defiant Unit Wide Frequencies ----|1.0
 Defiant Common: 120.60|120.60
 Defiant Flight Common: 120.69|120.69
-Defiant Security Common: 125.69|125.69
 
 ---- Defiant Flight Primary Frequencies ----|1.0
 Flight 1:      120.61|120.61
@@ -149,40 +149,33 @@ Flight 6:      120.66|120.66
 Flight 7:      120.67|120.67
 Flight 8:      120.68|120.68
 
----- Defiant Ground Primary Frequencies ----|1.0
-Team 1:        125.61|125.61
-Team 2:        125.62|125.62
-Team 3:        125.63|125.63
-Team 4:        125.64|125.64
-Team 5:        125.65|125.65
-Team 6:        125.66|125.66
-Team 7:        125.67|125.67
-Team 8:        125.68|125.68
-
-
-
 
 ---- Discovery Unit Wide Frequencies ----|1.0
-Main Net: 140.10|140.10
+Main Net: 140.100|140.10
 Traffic Marshal: 140.105|140.105
-Science Dept: 140.12|140.12
-Security Dept: 140.17|140.17
-Medical Dept: 140.19|140.19
+Science Dept: 140.120|140.12
+Security Dept: 140.170|140.17
+Medical Dept: 140.190|140.19
 
 ---- Discovery - Magellan Ship Frequencies ----|1.0
-Magellan Flight: 140.20|140.20
+Magellan Flight: 140.200|140.20
 Magellan Landing: 140.205|140.205
 Magellan Social: 140.209|140.209
 
 ---- Discovery - Elcano Ship Frequencies ----|1.0
-Elcano Flight: 140.21|140.21
+Elcano Flight: 140.210|140.21
 Elcano Landing: 140.215|140.215
 Elcano Social: 140.219|140.219
 
 ---- Discovery - Pegasus Ship Frequencies ----|1.0
-Pegasus Flight: 140.22|140.22
-Pegasus Landing: 140.225|140.225
-Pegasus Social: 140.229|140.229
+Pegasus Command:     140.220|140.220
+Pegasus General:     140.221|140.221
+Pegasus Away Team 1:   140.222|140.222
+Pegasus Away Team 2:   140.223|140.223
+Pegasus Away Team 3:   140.224|140.224
+
+Pegasus Landing:    140.225|140.225
+Pegasus Social:     140.229|140.229
 
 
 
