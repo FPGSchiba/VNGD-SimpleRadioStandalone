@@ -189,6 +189,13 @@ Nighthawk Strike 2:      120.520|120.520
 Nighthawk Bomber 1:      120.530|120.530
 Nighthawk Scout 1:       120.540|120.540
 
+---- Jackal Frequencies ----|1.0
+Jackal Command:            135.300|135.300
+Jackal Salvage Group 1:    135.310|135.310
+Jackal Salvage Group 2:    135.320|135.320
+Jackal Salvage Group 3:    135.330|135.330
+Jackal Transport Group 1:  135.340|135.340
+
 
 ---- Social Frequencies ----|1.0
 Social #1     300.00|300.00
