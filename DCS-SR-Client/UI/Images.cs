@@ -9,6 +9,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public static BitmapImage IconDisconnected;
         public static BitmapImage IconDisconnectedError;
         public static BitmapImage IconDisconnectedGame;
+        public static BitmapImage IconExpand;
+        public static BitmapImage IconContract;
 
         public static void Init()
         {
@@ -20,6 +22,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IconDisconnectedError = new BitmapImage(new Uri("pack://application:,,,/SR-ClientRadio;component/status-disconnected-error.png"));
             // Image taken from https://icons8.com/icon/set/computer/metro @ 2018-08-01
             IconDisconnectedGame = new BitmapImage(new Uri("pack://application:,,,/SR-ClientRadio;component/status-disconnected-game.png"));
+            // Expand Icon
+            IconExpand = new BitmapImage(new Uri("pack://application:,,,/SR-ClientRadio;component/ContractIcon.png"));
+            // Contract Icon
+            IconContract = new BitmapImage(new Uri("pack://application:,,,/SR-ClientRadio;component/ExpandIcon.png"));
         }
     }
 }
