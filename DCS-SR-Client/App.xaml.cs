@@ -247,7 +247,7 @@ namespace DCS_SR_Client
                 DetectConsoleAvailable = true,
                 Name = "consoleTarget",
                 StdErr = false,
-                Layout = @"${longdate} | ${logger} | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+                Layout = @"${longdate} | ${logger} (${level}) | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
             };
             var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncConsoleTarget", consoleWrapper);
@@ -336,6 +336,11 @@ namespace DCS_SR_Client
                 Logger logger = LogManager.GetCurrentClassLogger();
                 logger.Error((Exception)e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");
             }
+
+#if DEBUG
+            MessageBox.Show("This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.", "Debug Crash", MessageBoxButton.OK)
+            
+#endif
 #if !DEBUG
             // Request creates an Issue on GitHub with the LogFile
             var client = new HttpClient();

@@ -174,13 +174,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
             {
-                RadioEnabled.Background =
-                    RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                        ? radioOn
-                        : radioOff;
-                RadioEnabled.Content = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                    ? "On"
-                    : "Off";
+                var radio = RadioHelper.GetRadio(RadioId);
+
+                if (radio != null)
+                {
+                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? radioOn : radioOff;
+                    RadioEnabled.Content = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off";
+                }
+                else
+                {
+                    Logger.Warn($"Radio with ID: {RadioId} was not found. And could not Toggle.");
+                }
+                
             }
             else
             {

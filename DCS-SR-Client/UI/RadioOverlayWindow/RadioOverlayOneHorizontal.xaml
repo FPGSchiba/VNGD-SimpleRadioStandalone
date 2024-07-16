@@ -92,7 +92,7 @@
                 Click="Button_Swap_Orientation"
                 Style="{StaticResource DarkStyle-Button}">
                 <Grid Width="10" Height="10">
-                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                    <Image Source="pack://application:,,,/SR-ClientRadio;component/SRS_Orientation_Toggle.png" />
                 </Grid>
             </Button>
             <Button Height="15"

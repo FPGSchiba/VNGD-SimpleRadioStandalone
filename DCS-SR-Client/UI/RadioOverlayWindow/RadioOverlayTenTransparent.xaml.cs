@@ -48,6 +48,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private long _lastUnitId;
 
+        private readonly ImageBrush _expandIcon = new ImageBrush(Images.IconExpand);
+        private readonly ImageBrush _contractIcon = new ImageBrush(Images.IconContract);
+
         private readonly Action<bool, int> _toggleOverlay;
 
         private readonly Action<bool, int> _ExpandPanelImageConverter;
@@ -328,17 +331,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void Button_Expand(object sender, RoutedEventArgs e)
         {
-            //var expandicon = new ImageBrush(new BitmapImage(new Uri("/ ExpandIcon.png")));
-            //var contracticon = new ImageBrush(new BitmapImage(new Uri("/ ContractIcon.png")));
-
-            // TODO: Refactor this into the XAML and use Project resources
-            var expandicon = new ImageBrush(new BitmapImage(new Uri("../../ExpandIcon.png", UriKind.Relative)));
-            var contracticon = new ImageBrush(new BitmapImage(new Uri("../../ContractIcon.png", UriKind.Relative)));
-
             if ((buttonExpandText.Text == null) || (buttonExpandText.Text == "expand"))
             {
                 buttonExpandText.Text = "contract";
-                buttonExpandText.Background = expandicon;
+                buttonExpandText.Background = _expandIcon;
                 Header.Visibility = Visibility.Collapsed;
                 Footer.Visibility = Visibility.Collapsed;
                 
@@ -347,7 +343,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             else
             {
                 buttonExpandText.Text = "expand";
-                buttonExpandText.Background = contracticon;
+                buttonExpandText.Background = _contractIcon;
                 Header.Visibility = Visibility.Visible;
                 Footer.Visibility = Visibility.Visible;
 
@@ -361,19 +357,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Close();
         }
 
-        //TODO - likely remove this function for the transparency panels (this comment written by dabble)
-        private void Button_Swap_Orientation(object sender, RoutedEventArgs e)
-        {
-            Close();
-            _toggleOverlay(true, 5); // index 5 is the horizontal orientation
-        }
-
         private void textOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //Header
             ControlText.Opacity = e.NewValue;
             Orientation.Opacity = e.NewValue;
-            buttonOrientation.Opacity = e.NewValue;
             buttonAbout.Opacity = e.NewValue;
             buttonMinimize.Opacity = e.NewValue;
             buttonClose.Opacity = e.NewValue;
