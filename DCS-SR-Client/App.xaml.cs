@@ -4,15 +4,19 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using MahApps.Metro.Controls;
+using NAudio.SoundFont;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -318,7 +322,6 @@ namespace DCS_SR_Client
         private void NotifyIcon_Quit(object sender, EventArgs args)
         {
             MainWindow.Close();
-
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -338,8 +341,9 @@ namespace DCS_SR_Client
             }
 
 #if DEBUG
-            MessageBox.Show("This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.", "Debug Crash", MessageBoxButton.OK)
-            
+            MessageBox.Show(
+                "This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.",
+                "Debug Crash", MessageBoxButton.OK);
 #endif
 #if !DEBUG
             // Request creates an Issue on GitHub with the LogFile
@@ -347,25 +351,39 @@ namespace DCS_SR_Client
             var content = new MultipartFormDataContent();
             try
             {
-                System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b = new List<KeyValuePair<string, string>>();
+                System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b =
+ new List<KeyValuePair<string, string>>();
                 b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString())); 
-                b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
+                b.Add(new KeyValuePair<string, string>("user", WindowsIdentity.GetCurrent().Name));
                 b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
+                b.Add(new KeyValuePair<string, string>("version", Regex.Replace(AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "")));
                 var addMe = new FormUrlEncodedContent(b);
 
                 content.Add(addMe);
-                var task = Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
+                var task =
+ Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
                 task.Wait();
                 var result = task.Result;
+                var resultCode = result.StatusCode;
                 var readTask = Task.Run(() => result.Content.ReadAsStringAsync());
                 readTask.Wait();
                 var resultContent = readTask.Result;
 
-                if (MessageBox.Show("This was an SRS Crash!\nThis cool new Feature now automatically created a Ticket reporting your Crash!\nWe will try to figure our your issue and maybe go to the Ticket and comment your Discord so we can reach out.\n\nWould you like to see the Issue?", "Open Issue", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                switch (resultCode)
                 {
-                    System.Diagnostics.Process.Start(resultContent);
+                    case HttpStatusCode.OK:
+                        if (MessageBox.Show("This was an SRS Crash!\nThis cool new Feature now automatically created a Ticket reporting your Crash!\nWe will try to figure our your issue and maybe go to the Ticket and comment your Discord so we can reach out.\n\nWould you like to see the Issue?", "Open Issue", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            System.Diagnostics.Process.Start(resultContent);
+                        }
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        MessageBox.Show("The SRS Crash Reporting tool did not create a Crash Report! \nThis is intentional, because this build does not have a valid Version.");
+                        break;
+                    case HttpStatusCode.InternalServerError:
+                        MessageBox.Show($"The Creation of the Crash Report failed: \n\n{resultContent}\n\nPlease report this in the SRS Discord!");
+                        break;
                 }
-                
             }
             catch (FileNotFoundException ex)
             {
