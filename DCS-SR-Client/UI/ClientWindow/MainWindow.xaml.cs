@@ -48,9 +48,16 @@ using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBin
 using System.Windows.Navigation;
 using System.Security.Cryptography;
 using System.Net.Http;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
+    enum SRSTeam
+    {
+        RedTeam,
+        BlueTeam
+    }
+
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
@@ -81,6 +88,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set { this.SetValue(OpenPageProperty, value);}
         }
 
+        private int _oldOpenPage;
+
         public static readonly DependencyProperty OpenPageProperty =
             DependencyProperty.Register("OpenPage",
                 typeof(int),
@@ -94,6 +103,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private SupportPage _supportPage;
         private const int _supportIndex = 1;
+
+        private LoginPage _loginPage;
+        private const int _loginIndex = 2;
+
+        private GuestPage _guestPage;
+        private const int _guestIndex = 3;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -832,7 +847,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             _welcomePage = new WelcomePage();
             _supportPage = new SupportPage();
+            _loginPage = new LoginPage();
+            _guestPage = new GuestPage();
             _openPage = _welcomeIndex;
+        }
+
+        private void OpenPageByIndex(int index)
+        {
+            switch (index)
+            {
+                case _welcomeIndex:
+                    DisplayFrame.Content = _welcomePage;
+                    break;
+                case _supportIndex:
+                    DisplayFrame.Content = _supportPage;
+                    break;
+                case _loginIndex:
+                    DisplayFrame.Content = _loginPage;
+                    break;
+                case _guestIndex:
+                    DisplayFrame.Content = _guestPage;
+                    break;
+                default:
+                    Logger.Error($"Page: {index} could not be found.");
+                    break;
+            }
+
+            _openPage = index;
         }
 
         private static void OpenPagePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -846,19 +887,47 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     mainWindow.RadioNavigation.Opacity = 0;
                     break;
                 case _supportIndex:
-                    mainWindow.SupportNavigation.IsEnabled = false;
+                    break;
+                case _loginIndex:
+                    mainWindow.RadioNavigation.IsEnabled = false;
+                    break;
+                case _guestIndex:
+                    mainWindow.RadioNavigation.IsEnabled = false;
+                    break;
+                default:
+                    mainWindow.Logger.Error($"Page: {newValue} could not be found.");
                     break;
             }
         }
 
-        public void On_LoginClicked()
+        public void On_WelcomeLoginClicked()
         {
-            Logger.Warn("Not Implemented yet!");
+            OpenPageByIndex(_loginIndex);
         }
 
-        public void On_GuestCLicked()
+        public void On_WelcomeGuestCLicked()
         {
-            Logger.Warn("Not Implemented yet!");
+            OpenPageByIndex(_guestIndex);
+        }
+
+        public void On_LoginLoginClicked()
+        {
+            Logger.Warn("Not Implemented!");
+        }
+
+        public void On_LoginBackClicked()
+        {
+            OpenPageByIndex(_welcomeIndex);
+        }
+
+        public void On_GuestLoginClicked()
+        {
+            Logger.Warn("Not Implemented!");
+        }
+
+        public void On_GuestBackClicked()
+        {
+            OpenPageByIndex(_welcomeIndex);
         }
 
         private void RadioNavigation_Click(object sender, RoutedEventArgs e)
@@ -868,8 +937,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
         {
-            DisplayFrame.Content = _supportPage;
-            _openPage = _supportIndex;
+            if (_openPage != _supportIndex)
+            {
+                DisplayFrame.Content = _supportPage;
+                _oldOpenPage = _openPage;
+                _openPage = _supportIndex;
+            }
+            else
+            {
+                OpenPageByIndex(_oldOpenPage);
+                _oldOpenPage = _supportIndex;
+            }
+            
         }
 
         private void SettingsNavigation_Click(object sender, RoutedEventArgs e)

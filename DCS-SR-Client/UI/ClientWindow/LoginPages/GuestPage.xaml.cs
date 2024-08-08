@@ -1,5 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Welcome;
-using NLog;
+﻿using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,37 +14,33 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 {
     /// <summary>
-    /// Interaction logic for WelcomePage.xaml
+    /// Interaction logic for GuestPage.xaml
     /// </summary>
-    public partial class WelcomePage : Page
+    public partial class GuestPage : Page
     {
         private MainWindow mainWindow;
 
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public WelcomePage()
+        public GuestPage()
         {
             InitializeComponent();
 
             mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
-        private void Login_Click(object sender, RoutedEventArgs e)
+        private void Back_OnClick(object sender, RoutedEventArgs e)
         {
-            mainWindow.On_WelcomeLoginClicked();
+            mainWindow.On_GuestBackClicked();
         }
 
-        private void Guest_Click(object sender, RoutedEventArgs e)
+        private void Login_OnClick(object sender, RoutedEventArgs e)
         {
-            mainWindow.On_WelcomeGuestCLicked();
-        }
-        private void EasterEgg_Click(object sender, RoutedEventArgs e)
-        {
-            EasterEggWindow window = new EasterEggWindow();
-            window.Show();
+            Logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: [{FleetCodeInput.Text}] {PlayerNameInput.Text}, Password: {PasswordInput.Password}");
+            mainWindow.On_GuestLoginClicked();
         }
     }
 }

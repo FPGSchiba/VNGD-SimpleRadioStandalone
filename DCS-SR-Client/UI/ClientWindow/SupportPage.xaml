@@ -48,34 +48,17 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ListBox
-                    materialDesign:ListBoxItemAssist.ShowSelection="True"
+                    materialDesign:ListBoxItemAssist.ShowSelection="False"
+                    IsSynchronizedWithCurrentItem="False"
                     BorderThickness="0"
                     Padding="0,0,10,0"
+                    materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
                 >
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalAlignment" Value="Stretch"/>
                         </Style>
                     </ListBox.ItemContainerStyle>
-                    <materialDesign:Card
-                        Width="385"
-                        Background="White"
-                        Padding="5,2"
-                    >
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="22"/>
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold">
-                                Star Citizen In-Game Radio Panel
-                            </TextBlock>
-                            <TextBlock Grid.Row="1" TextWrapping="WrapWithOverflow" FontSize="14">
-                                Star Citizen does not allow any windows to appear on top of it when in Full Screen Mode. We recommend that you run the game in WINDOWED mode to get around this limitation.
-                            </TextBlock>
-                        </Grid>
-                    </materialDesign:Card>
                     <materialDesign:Card
                         Width="385"
                         Background="White"
@@ -128,10 +111,31 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold">
-                                Star Citizen In-Game Radio Panel
+                                Vanguard VCS-SRS Server Information
                             </TextBlock>
                             <TextBlock Grid.Row="1" TextWrapping="WrapWithOverflow" FontSize="14">
-                                Star Citizen does not allow any windows to appear on top of it when in Full Screen Mode. We recommend that you run the game in WINDOWED mode to get around this limitation.
+                                The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536" RequestNavigate="Hyperlink_RequestNavigate">#srs-status</Hyperlink>.
+                            </TextBlock>
+                        </Grid>
+                    </materialDesign:Card>
+                    <materialDesign:Card
+                        Width="385"
+                        Background="White"
+                        Padding="5,2"
+                    >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="22"/>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold">
+                                Speaker and Microphone Boost
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" TextWrapping="WrapWithOverflow" FontSize="14">
+                                <Bold> Please preview your audio first</Bold> using the preview option to make sure that your microphone and speakers are configured correctly.
+                                <LineBreak />
+                                Speaker boost can be set higher to counteract the volume reduction caused by clipping and the radio effects. If speaker boost is too high - you may have issues where other windows sounds are too loud. Reduce the boost to fix this.
                             </TextBlock>
                         </Grid>
                     </materialDesign:Card>

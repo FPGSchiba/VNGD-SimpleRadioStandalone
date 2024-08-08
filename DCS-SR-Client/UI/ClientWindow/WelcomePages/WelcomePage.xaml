@@ -24,7 +24,7 @@
             <RowDefinition Height="70" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-
+        
         <StackPanel Grid.Row="0" VerticalAlignment="Bottom">
             <Label  Content="Vanguard Communications System" HorizontalAlignment="Center" FontWeight="Heavy" FontSize="24" />
             <Label Content="powered by SRS" HorizontalAlignment="Center" FontSize="16" />
