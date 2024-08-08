@@ -56,7 +56,7 @@
                 ToolTip="Swap to horizon orientation">
             <Button.Content>
                 <Grid Width="10" Height="10">
-                    <Image Source="../../SRS_Orientation_Toggle.png" />
+                    <Image Source="pack://application:,,,/SR-ClientRadio;component/SRS_Orientation_Toggle.png" />
                 </Grid>
             </Button.Content>
         </Button>

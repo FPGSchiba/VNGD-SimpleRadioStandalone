@@ -1846,7 +1846,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     switch (switchTo)
                     {
                         case 0:
-                            throw new Exception();
                             windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
                             break;
                         case 1:
