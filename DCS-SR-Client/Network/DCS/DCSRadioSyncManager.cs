@@ -29,7 +29,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly DCSGameGuiHandler _dcsGameGuiHandler;
-        private readonly DCSLineOfSightHandler _lineOfSightHandler;
         private readonly UDPCommandHandler _udpCommandHandler; 
         private readonly DCSRadioSyncHandler _dcsRadioSyncHandler;
 
@@ -43,16 +42,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public bool IsListening { get; private set; }
 
-        public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate,
-           string guid, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
+        public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate)
         {
             _clientRadioUpdate = clientRadioUpdate;
             _clientSideUpdate = clientSideUpdate;
             IsListening = false;
-            _lineOfSightHandler = new DCSLineOfSightHandler(guid);
             _udpCommandHandler = new UDPCommandHandler();
             _dcsGameGuiHandler = new DCSGameGuiHandler(clientSideUpdate);
-            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _newAircraftCallback);
+            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate);
 
             _clearRadio = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _clearRadio.Tick += CheckIfRadioIsStale;
@@ -186,7 +183,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         {
             _dcsRadioSyncHandler.Start();
             _dcsGameGuiHandler.Start();
-            _lineOfSightHandler.Start();
             _udpCommandHandler.Start();
              _clearRadio.Start();
         }
@@ -199,7 +195,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _clearRadio.Stop();
             _dcsRadioSyncHandler.Stop();
             _dcsGameGuiHandler.Stop();
-            _lineOfSightHandler.Stop();
             _udpCommandHandler.Stop();
 
         }

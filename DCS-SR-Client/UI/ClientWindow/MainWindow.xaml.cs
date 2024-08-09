@@ -81,6 +81,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         // State
         private bool _loggedIn = false;
+        private string _playerName = "";
+        private string _coalitionPassword = "";
 
         private int _openPage
         {
@@ -143,7 +145,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
-        private readonly DelegateCommand _connectCommand;
 
         private string version = "loading";
 
@@ -240,7 +241,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             InitInput();
 
-            _connectCommand = new DelegateCommand(Connect, () => ServerAddress != null);
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
@@ -910,9 +910,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             OpenPageByIndex(_guestIndex);
         }
 
-        public void On_LoginLoginClicked()
+        public void On_LoginLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword)
         {
-            Logger.Warn("Not Implemented!");
+            _resolvedIp = ip;
+            _port = port;
+            _coalitionPassword = coalitionPassword;
+            _playerName = playerName;
+            Connect(ip, port);
+
+            
         }
 
         public void On_LoginBackClicked()
@@ -920,9 +926,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             OpenPageByIndex(_welcomeIndex);
         }
 
-        public void On_GuestLoginClicked()
+        public void On_GuestLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword)
         {
-            Logger.Warn("Not Implemented!");
+            _resolvedIp = ip;
+            _port = port;
+            _coalitionPassword = coalitionPassword;
+            _playerName = playerName;
+            Connect(ip, port);
         }
 
         public void On_GuestBackClicked()
@@ -1074,12 +1084,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     ServerIp.Text = value.Address;
                     ExternalAWACSModePassword.Password = string.IsNullOrWhiteSpace(value.EAMCoalitionPassword) ? "" : value.EAMCoalitionPassword;
                 }
-
-                _connectCommand.RaiseCanExecuteChanged();
             }
         }
-
-        public ICommand ConnectCommand => _connectCommand;
 
         private void UpdatePlayerLocationAndVUMeters(object sender, EventArgs e)
         {
@@ -1347,7 +1353,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             HFEffectVolume.IsEnabled = true;
         }
 
-        private void Connect()
+        private void Connect(IPAddress ip, int port)
         {
             if (ClientState.IsConnected)
             {
@@ -1359,83 +1365,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 try
                 {
-                    //process hostname
-                    var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
-                    var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+                    _resolvedIp = ip;
+                    _port = port;
 
-                    if (ip != null)
-                    {
-                        _resolvedIp = ip;
-                        _port = GetPortFromTextBox();
+                    _client = new SRSClientSyncHandler(_guid, UpdateUICallback);
 
-                        _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate (string name, int seat)
-                        {
-                            try
-                            {
-                                //on MAIN thread
-                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                                    new ThreadStart(() =>
-                                    {
-                                        //Handle Aircraft Name - find matching profile and select if you can
-                                        name = Regex.Replace(name.Trim().ToLower(), "[^a-zA-Z0-9]", "");
-                                        //add one to seat so seat_2 is copilot
-                                        var nameSeat = $"_{seat + 1}";
+                    _loginPage.Login.IsEnabled = false;
+                    _guestPage.Login.IsEnabled = false;
 
-                                        foreach (var profileName in _globalSettings.ProfileSettingsStore.ProfileNames)
-                                        {
-                                            //find matching seat
-                                            var splitName = profileName.Trim().ToLowerInvariant().Split('_').First();
-                                            if (name.StartsWith(Regex.Replace(splitName, "[^a-zA-Z0-9]", "")) && profileName.Trim().EndsWith(nameSeat))
-                                            {
-                                                ControlsProfile.SelectedItem = profileName;
-                                                return;
-                                            }
-                                        }
+                    _guestPage.LoginInProgress.Opacity = 1;
 
-                                        foreach (var profileName in _globalSettings.ProfileSettingsStore.ProfileNames)
-                                        {
-                                            //find matching seat
-                                            if (name.StartsWith(Regex.Replace(profileName.Trim().ToLower(), "[^a-zA-Z0-9_]", "")))
-                                            {
-                                                ControlsProfile.SelectedItem = profileName;
-                                                return;
-                                            }
-                                        }
-
-                                        ControlsProfile.SelectedIndex = 0;
-
-                                    }));
-                            }
-                            catch (Exception)
-                            {
-                            }
-
-                        });
-                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
-
-                        StartStop.Content = "Connecting...";
-                        StartStop.IsEnabled = false;
-                        Mic.IsEnabled = false;
-                        Speakers.IsEnabled = false;
-                        MicOutput.IsEnabled = false;
-                        Preview.IsEnabled = false;
-
-                        if (_audioPreview != null)
-                        {
-                            Preview.Content = "Audio Preview";
-                            _audioPreview.StopEncoding();
-                            _audioPreview = null;
-                        }
-                    }
-                    else
-                    {
-                        //invalid ID
-                        MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-
-                        ClientState.IsConnected = false;
-                        ToggleServerSettings.IsEnabled = false;
-                    }
+                    _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -1448,38 +1388,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private string GetAddressFromTextBox()
-        {
-            var addr = ServerIp.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                return addr.Split(':')[0];
-            }
-
-            return addr;
-        }
-
-        private int GetPortFromTextBox()
-        {
-            var addr = ServerIp.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                int port;
-                if (int.TryParse(addr.Split(':')[1], out port))
-                {
-                    return port;
-                }
-                throw new ArgumentException("specified port is not valid");
-            }
-
-            return 5002;
-        }
-
         private void Stop(bool connectionError = false)
         {
-            if (ClientState.IsConnected && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+            if (ClientState.IsConnected && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds) && !connectionError)
             {
                 try
                 {
@@ -1501,6 +1412,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Preview.IsEnabled = true;
             ClientState.IsConnected = false;
             ToggleServerSettings.IsEnabled = false;
+
+            _loginPage.Login.IsEnabled = true;
+            _guestPage.Login.IsEnabled = true;
+
+            _guestPage.LoginInProgress.Opacity = 0;
+
+            ConnectionStatus.Fill = Brushes.Red;
 
             ConnectExternalAWACSMode.IsEnabled = false;
             ConnectExternalAWACSMode.Content = "Connect: Radios";
@@ -1598,25 +1516,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         StartStop.Content = "Disconnect: Server";
                         StartStop.IsEnabled = true;
 
+                        ConnectionStatus.Fill = Brushes.Orange;
+
                         ClientState.IsConnected = true;
                         ClientState.IsVoipConnected = false;
-
-                        if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
-                        {
-                            try
-                            {
-                                Sounds.BeepConnected.Play();
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Warn(ex, "Failed to play connect sound");
-                            }
-                        }
 
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
 
                         _audioManager.StartEncoding(_guid, InputManager,
                             _resolvedIp, _port);
+
+                        Logger.Debug("Starting AWACS Mode connection.");
+                        ConnectAWACSMode();
                     }
                     catch (Exception ex)
                     {
@@ -1632,7 +1543,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
 
-                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/baw7g3t");
+                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.com/invite/5Z7UHMzf4P");
                     }
                 }
             }
@@ -1668,6 +1579,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             //stop timer
             _updateTimer?.Stop();
 
+            ConnectAWACSMode();
             Stop();
 
             _audioPreview?.StopEncoding();
@@ -2008,6 +1920,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void AutoConnect(string address, int port)
         {
+            // TODO: Rework this with autoLogin and autoConnect not possible currently
             string connection = $"{address}:{port}";
 
             Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
@@ -2128,13 +2041,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (connectToServer)
                 {
                     ServerIp.Text = connection;
-                    Connect();
+                    // Connect();
                 }
             }
         }
 
         private async void HandleAutoConnectMismatch(string currentConnection, string advertisedConnection)
         {
+            // TODO: Handle this after AutoConnect feature
             // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
             bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
 
@@ -2164,7 +2078,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 await Task.Delay(2000);
                 StartStop.IsEnabled = true;
                 ServerIp.Text = advertisedConnection;
-                Connect();
+                // Connect();
             }
         }
 
@@ -2498,6 +2412,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
         {
+            _coalitionPassword = ExternalAWACSModePassword.Password.Trim();
+            _playerName = ExternalAWACSModeName.Text;
+            ConnectAWACSMode();
+        }
+
+        private void ConnectAWACSMode()
+        {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
@@ -2509,11 +2430,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
             }
 
+
             if (_client == null ||
                 !ClientState.IsConnected ||
-                !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE) ||
                 (!ClientState.ExternalAWACSModelSelected &&
-                string.IsNullOrWhiteSpace(ExternalAWACSModePassword.Password)))
+                 string.IsNullOrWhiteSpace(_coalitionPassword)))
             {
                 return;
             }
@@ -2523,14 +2444,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _client.DisconnectExternalAWACSMode();
             }
-            else if (!ClientState.IsGameExportConnected) //only if we're not in game
+            else
             {
-                ClientState.LastSeenName = ExternalAWACSModeName.Text;
-                _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
+                Logger.Debug("Init AWACS Connection now...");
+                Logger.Trace($"Coalition Password: {_coalitionPassword}");
+                ClientState.LastSeenName = _playerName;
+                _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAWACSModeConnectionChanged);
             }
         }
 
-        private void ExternalAWACSModeConnectionChanged(bool result, int coalition)
+        private void ExternalAWACSModeConnectionChanged(bool result, int coalition, bool error = false)
         {
             if (result)
             {
@@ -2540,6 +2463,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect: Radios";
+
+                _guestPage.LoginInProgress.Opacity = 0;
+                ConnectionStatus.Fill = Brushes.Green;
+
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+                {
+                    try
+                    {
+                        Sounds.BeepConnected.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex, "Failed to play connect sound");
+                    }
+                }
+
+                // TODO: Navigate to home
             }
             else
             {
@@ -2550,9 +2490,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
                 ClientState.LastSent = 0;
 
+                _coalitionPassword = "";
+                _playerName = "";
+
                 ConnectExternalAWACSMode.Content = "Connect: Radios";
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
+
+                if (error)
+                {
+                    MessageBox.Show("Incorrect Password to connect to VCS-SRS.", "Auth Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    Logger.Warn("Stopping server connection...");
+                    Stop(true);
+                }
             }
         }
 

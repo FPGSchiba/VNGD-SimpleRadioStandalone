@@ -113,7 +113,17 @@
                     Click="Login_OnClick"
                     IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                     Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                    Margin="50,0,0,0"
                 />
+                <ProgressBar
+                    IsIndeterminate="True"
+                    Name="LoginInProgress"
+                    Width="30"
+                    Height="30"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0"
+                    Opacity="0"
+                    Margin="20,0,0,0"/>
             </StackPanel>
         </Grid>
 

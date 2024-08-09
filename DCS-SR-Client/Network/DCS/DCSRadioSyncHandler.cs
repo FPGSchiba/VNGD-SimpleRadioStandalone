@@ -47,10 +47,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         private long _identStart = 0;
 
-        public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate, NewAircraft _newAircraft)
+        public DCSRadioSyncHandler(DCSRadioSyncManager.SendRadioUpdate radioUpdate)
         {
             _radioUpdate = radioUpdate;
-            _newAircraftCallback = _newAircraft;
         }
 
         public void Start()

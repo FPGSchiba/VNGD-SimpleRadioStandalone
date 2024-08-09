@@ -3479,7 +3479,7 @@
                     Margin="2"
                     Stroke="Black"
                     Style="{x:Null}"
-                    ToolTip="Selected Radio"
+                    ToolTip="Connection Status"
                     VerticalAlignment="Center"
                     Width="12"
                     x:Name="ConnectionStatus" />

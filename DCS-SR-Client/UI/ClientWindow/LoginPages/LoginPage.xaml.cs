@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +27,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
         private MainWindow mainWindow;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private SRSTeam _selectedTeam = SRSTeam.BlueTeam;
-        private string email = "";
 
         public LoginPage()
         {
@@ -53,7 +54,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             Logger.Info($"Login pressed with following Information: \nEmail: {EmailInput.Text}, Password: {PasswordInput.Password}, Code: {FleetCodeInput.Text}, Team: {_selectedTeam}");
-            mainWindow.On_LoginLoginClicked();
+            // process hostname
+            var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromBackend());
+            var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+
+            var playerName = $"[{FleetCodeInput.Text}] {GetPlayerNameFromBackend()}";
+
+            if (ip != null)
+            {
+                mainWindow.On_LoginLoginClicked(ip, GetPortFrombackend(), playerName, "vngd");
+            }
+            else
+            {
+                //Invalid IP
+                MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                mainWindow.ClientState.IsConnected = false;
+            }
         }
 
         private void Back_Click(object sender, RoutedEventArgs e)
@@ -69,6 +87,42 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
         private void RedTeamRadio_OnChecked(object sender, RoutedEventArgs e)
         {
             _selectedTeam = SRSTeam.RedTeam;
+        }
+
+        private string GetAddressFromBackend()
+        {
+            var addr = "";
+
+            if (addr.Contains(":"))
+            {
+                return addr.Split(':')[0];
+            }
+
+            return addr;
+        }
+
+        private int GetPortFrombackend()
+        {
+            var addr = "";
+
+            if (addr.Contains(":"))
+            {
+                int port;
+                if (int.TryParse(addr.Split(':')[1], out port))
+                {
+                    return port;
+                }
+                throw new ArgumentException("specified port is not valid");
+            }
+
+            return 5002;
+        }
+
+        private string GetPlayerNameFromBackend()
+        {
+            var playerName = "";
+
+            return playerName;
         }
     }
 }

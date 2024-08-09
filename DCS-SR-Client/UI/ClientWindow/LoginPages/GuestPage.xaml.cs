@@ -1,7 +1,10 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,8 +42,56 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
         private void Login_OnClick(object sender, RoutedEventArgs e)
         {
-            Logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: [{FleetCodeInput.Text}] {PlayerNameInput.Text}, Password: {PasswordInput.Password}");
-            mainWindow.On_GuestLoginClicked();
+            var coalitionPassword = PasswordInput.Password;
+            Logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: [{FleetCodeInput.Text}] {PlayerNameInput.Text}, Password: {coalitionPassword}");
+
+            // process hostname
+            var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
+            var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+
+            var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput}";
+
+            if (ip != null)
+            {
+                mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
+            }
+            else
+            {
+                //Invalid IP
+                MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                mainWindow.ClientState.IsConnected = false;
+            }
+        }
+
+        private string GetAddressFromTextBox()
+        {
+            var addr = IpInput.Text.Trim();
+
+            if (addr.Contains(":"))
+            {
+                return addr.Split(':')[0];
+            }
+
+            return addr;
+        }
+
+        private int GetPortFromTextBox()
+        {
+            var addr = IpInput.Text.Trim();
+
+            if (addr.Contains(":"))
+            {
+                int port;
+                if (int.TryParse(addr.Split(':')[1], out port))
+                {
+                    return port;
+                }
+                throw new ArgumentException("specified port is not valid");
+            }
+
+            return 5002;
         }
     }
 }
