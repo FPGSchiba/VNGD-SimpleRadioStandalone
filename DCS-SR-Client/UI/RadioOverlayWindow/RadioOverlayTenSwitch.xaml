@@ -10,7 +10,7 @@
     Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="180"
-        Height= "155"
+        Height= "260"
         MinWidth="178"
         MinHeight="155"
         AllowsTransparency="True"
@@ -50,7 +50,7 @@
                 FontSize="8"
                 Foreground="#E7E7E7"
                 Padding="0"
-                Text="Transparent Radio Panel" />
+                Text="Switchable Radio Panel" />
             <TextBlock Name="Orientation"
                Visibility="Collapsed"
                Width="28"

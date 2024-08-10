@@ -370,6 +370,14 @@
                                         Style="{DynamicResource SquareButtonStyle}"
                                         Width="150"
                                         x:Name="ShowOverlayTenTransparent" />
+                                    <Button
+                                        Click="ShowOverlayTenSwitch_OnClick"
+                                        Content="10 Switch"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,5,0,0"
+                                        Style="{DynamicResource SquareButtonStyle}"
+                                        Width="150"
+                                        x:Name="ShowOverlayTenSwitch" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
