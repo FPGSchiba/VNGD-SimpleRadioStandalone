@@ -49,6 +49,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             MIDS = 6,
         }
 
+        public enum Type
+        {
+            ACTIVE = 0,
+            STANDBY = 1,
+        }
+
         public bool enc = false; // encryption enabled
         public byte encKey = 0;
 
@@ -64,8 +70,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public double freqMin = 1;
 
         public double freq = 1;
-        
+        public double standbyfreq = 1;
+
         public Modulation modulation = Modulation.DISABLED;
+        public Type type = Type.ACTIVE;  // Dabble added. Default is ACTIVE frequency. Alternative is new STANDBY frequency
 
         [JsonNetworkIgnoreSerialization]
         public string name = "";
@@ -172,6 +180,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 encMode = this.encMode,
                 expansion = this.expansion,
                 freq = this.freq,
+                standbyfreq = this.standbyfreq,
                 freqMax = this.freqMax,
                 freqMin = this.freqMin,
                 freqMode = this.freqMode,
