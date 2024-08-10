@@ -1,7 +1,7 @@
 ﻿<UserControl
     Height="10"
     Name="RadioControlContainerTransparent"
-    Width="180"
+    Width="172"
     x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -57,7 +57,7 @@
             Background="#444"
             DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
             HorizontalAlignment="Center"
-            Width="20"
+            Width="12"
             x:Name="PresetChannelsView"  />
         <StackPanel
             Name="RadioTextGroup"

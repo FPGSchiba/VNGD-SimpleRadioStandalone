@@ -319,6 +319,9 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml.cs">
+      <DependentUpon>AwacsRadioControlGroupSwitch.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
     </Compile>
@@ -430,6 +433,10 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
