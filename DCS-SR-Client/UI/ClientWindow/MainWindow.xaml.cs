@@ -69,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private int _windowOpen = 13;
+        private int _windowOpen = 14;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
 
         // Windows array
-        private Window[] windows = new Window[13];
+        private Window[] windows = new Window[14];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -1841,7 +1841,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 else
                 {
                     // No Panel window is open
-                    _windowOpen = 13;
+                    _windowOpen = 14;
                 }
             }
         }
@@ -1850,7 +1850,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
-            _windowOpen = 13;
+            _windowOpen = 14;
 
             // Erase window from windows array to clean up everything
             for (int i = 0; i < windows.Count(); i++)
