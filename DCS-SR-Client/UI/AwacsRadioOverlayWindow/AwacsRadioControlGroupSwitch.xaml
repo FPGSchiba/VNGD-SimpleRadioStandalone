@@ -232,7 +232,7 @@
                     Height="10"
                     Width="10"
                     HorizontalAlignment="Center"
-                    IsEnabled="False"
+                    IsEnabled="True"
                     Margin="1,0,0,0"
                     Name="SwapRadio"
                     Padding="0"

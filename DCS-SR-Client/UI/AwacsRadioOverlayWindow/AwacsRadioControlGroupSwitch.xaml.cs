@@ -617,9 +617,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void SwapStandbyFrequency_Click(object sender, RoutedEventArgs e)
         {
             var currentRadio = RadioHelper.GetRadio(RadioId);
+            
             var oldstandbyfreq = StandbyRadioFrequency.Text;
             Logger.Info ("OldStandbyRadioFrequency ="+oldstandbyfreq);
-            var oldactivefreq = RadioFrequency.Text;
+            
+            var oldactivefreq = RadioInformation.freq;
             Logger.Info("OldActiveRadioFrequency =" + oldactivefreq);
 
             StandbyRadioFrequency.Text = oldactivefreq;
