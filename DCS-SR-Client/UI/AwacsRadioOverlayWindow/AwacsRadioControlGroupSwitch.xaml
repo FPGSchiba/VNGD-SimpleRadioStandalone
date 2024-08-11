@@ -223,7 +223,7 @@
                 </TextBlock>
                 <Button
                     Background="Gray"
-                    Click="ToggleSwitch_Click"     
+                    Click="SwapStandbyFrequency_Click"     
                     Content="S"
                     Opacity="1"
                     FontSize="5"

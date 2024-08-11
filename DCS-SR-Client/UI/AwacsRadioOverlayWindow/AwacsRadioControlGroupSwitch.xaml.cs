@@ -14,6 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 using NLog;
+using NLog.Fluent;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 {
@@ -612,6 +613,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioEnabled.Background = radioOff;
                 RadioEnabled.Content = "Off";
             }
+        }
+        private void SwapStandbyFrequency_Click(object sender, RoutedEventArgs e)
+        {
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+            var oldstandbyfreq = StandbyRadioFrequency.Text;
+            Logger.Info ("OldStandbyRadioFrequency ="+oldstandbyfreq);
+            var oldactivefreq = RadioFrequency.Text;
+            Logger.Info("OldActiveRadioFrequency =" + oldactivefreq);
+
+            StandbyRadioFrequency.Text = oldactivefreq;
+            RadioFrequency.Text = oldstandbyfreq;
         }
     }
 }
