@@ -338,8 +338,10 @@ namespace DCS_SR_Client
             }
 
 #if DEBUG
-            MessageBox.Show("This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.", "Debug Crash", MessageBoxButton.OK)
-            
+            MessageBox.Show(
+                "This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.",
+                "Debug Crash", MessageBoxButton.OK);
+
 #endif
 #if !DEBUG
             // Request creates an Issue on GitHub with the LogFile
@@ -347,14 +349,16 @@ namespace DCS_SR_Client
             var content = new MultipartFormDataContent();
             try
             {
-                System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b = new List<KeyValuePair<string, string>>();
+                System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b =
+ new List<KeyValuePair<string, string>>();
                 b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString())); 
                 b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
                 b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
                 var addMe = new FormUrlEncodedContent(b);
 
                 content.Add(addMe);
-                var task = Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
+                var task =
+ Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
                 task.Wait();
                 var result = task.Result;
                 var readTask = Task.Run(() => result.Content.ReadAsStringAsync());
