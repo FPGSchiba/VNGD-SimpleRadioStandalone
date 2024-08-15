@@ -621,10 +621,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             var oldstandbyfreq = StandbyRadioFrequency.Text;
             Logger.Info ("OldStandbyRadioFrequency ="+oldstandbyfreq);
             
-            var oldactivefreq = RadioInformation.freq;
+            var oldactivefreq = currentRadio.freq;
             Logger.Info("OldActiveRadioFrequency =" + oldactivefreq);
-
-            StandbyRadioFrequency.Text = oldactivefreq;
+            
+            StandbyRadioFrequency.Text = (oldactivefreq / MHz).ToString("0.000", CultureInfo.InvariantCulture);
             RadioFrequency.Text = oldstandbyfreq;
         }
     }
