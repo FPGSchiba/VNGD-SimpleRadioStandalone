@@ -132,8 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsExportLastReceived = 0;
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += (s, e) => {
-                NotifyPropertyChanged("IsGameConnected");
-                NotifyPropertyChanged("IsLotATCConnected");
                 NotifyPropertyChanged("ExternalAWACSModeConnected");
             };
             _timer.Start();

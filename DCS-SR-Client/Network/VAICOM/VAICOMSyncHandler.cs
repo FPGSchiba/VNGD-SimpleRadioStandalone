@@ -31,8 +31,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
         public void Start()
         {
-            
-
             Task.Factory.StartNew(() =>
             {
                 while (!_stop)
@@ -43,6 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
                         var localEp = new IPEndPoint(IPAddress.Any,
                             _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
                         _vaicomUDPListener = new UdpClient(localEp);
+                        Logger.Info($"Vaicom UPD Listener listening on: {localEp.Address}:{localEp.Port}");
                         break;
                     }
                     catch (Exception ex)
@@ -64,6 +63,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
                             if (vaicomMessageWrapper != null )
                             {
+                                Logger.Debug(vaicomMessageWrapper.ToString());
+
                                 if (vaicomMessageWrapper.MessageType == 1)
                                 {
                                     if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled))
