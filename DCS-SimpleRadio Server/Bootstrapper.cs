@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -12,6 +14,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Server.API;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
@@ -31,6 +34,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
         public Bootstrapper()
         {
+#if !DEBUG
+            FreeConsole();
+#endif
+
             Initialize();
             SetupLogging();
 
@@ -49,6 +56,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             }
 
             var config = new LoggingConfiguration();
+            var consoleTarget = new ConsoleTarget
+            {
+                Encoding = Encoding.UTF8,
+                WriteBuffer = false,
+                DetectConsoleAvailable = true,
+                Name = "consoleTarget",
+                StdErr = false,
+                Layout = @"${longdate} | ${logger} (${level}) | ${message} ${exception:format=toString,Data:maxInnerExceptionLevel=1}"
+            };
+            var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
+            config.AddTarget("asyncConsoleTarget", consoleWrapper);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, consoleWrapper));
+
             var fileTarget = new FileTarget
             {
                 FileName = "serverlog.txt",
@@ -79,6 +99,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             _simpleContainer.Singleton<IWindowManager, WindowManager>();
             _simpleContainer.Singleton<IEventAggregator, EventAggregator>();
             _simpleContainer.Singleton<ServerState>();
+            _simpleContainer.Singleton<APIModel>();
 
             _simpleContainer.Singleton<MainViewModel>();
             _simpleContainer.Singleton<ClientAdminViewModel>();
@@ -109,6 +130,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
             //create an instance of serverState to actually start the server
             _simpleContainer.GetInstance(typeof(ServerState), null);
 
+            // Create API Instance to actually start the API
+            _simpleContainer.GetInstance(typeof(APIModel), null);
+
+            Console.WriteLine("This thread is not blocking.");
+
             DisplayRootViewFor<MainViewModel>(settings);
 
             UpdaterChecker.CheckForUpdate(Settings.ServerSettingsStore.Instance.GetServerSetting(Common.Setting.ServerSettingsKeys.CHECK_FOR_BETA_UPDATES).BoolValue);
@@ -136,5 +162,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             base.OnUnhandledException(sender, e);
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern int FreeConsole();
     }
 }

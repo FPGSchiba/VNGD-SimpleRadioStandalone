@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -49,7 +47,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
 
         private DCSRadioSyncManager _radioDCSSync = null;
-        private LotATCSyncHandler _lotATCSync;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
         private VAICOMSyncHandler _vaicomSync;
@@ -137,11 +134,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _radioDCSSync.Stop();
                 _radioDCSSync = null;
             }
-            if (_lotATCSync != null)
-            {
-                _lotATCSync.Stop();
-                _lotATCSync = null;
-            }
             if (_vaicomSync != null)
             {
                 _vaicomSync.Stop();
@@ -150,8 +142,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _guid,_newAircraft);
-            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _newAircraft);
             _vaicomSync = new VAICOMSyncHandler();
 
             using (_tcpClient = new TcpClient())
@@ -167,7 +158,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     if (_tcpClient.Connected)
                     {
                         _radioDCSSync.Start();
-                        _lotATCSync.Start();
                         _vaicomSync.Start();
 
                         _tcpClient.NoDelay = true;
@@ -191,7 +181,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             _radioDCSSync.Stop();
-            _lotATCSync.Stop();
             _vaicomSync.Stop();
             _idleTimeout?.Stop();
 

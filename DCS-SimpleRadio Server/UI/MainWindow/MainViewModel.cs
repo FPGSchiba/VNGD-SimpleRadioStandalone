@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -20,6 +22,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         private readonly IEventAggregator _eventAggregator;
         private readonly IWindowManager _windowManager;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private string _version;
 
         private DispatcherTimer _passwordDebounceTimer = null;
 
@@ -31,9 +34,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             _clientAdminViewModel = clientAdminViewModel;
             _eventAggregator.Subscribe(this);
 
-            DisplayName = $"DCS-SRS Server - {UpdaterChecker.VERSION} - {ListeningPort}" ;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            _version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
 
-            Logger.Info("DCS-SRS Server Running - " + UpdaterChecker.VERSION);
+            DisplayName = $"DCS-SRS Server - {_version} - {ListeningPort}" ;
+
+            Logger.Info("DCS-SRS Server Running - " + _version);
         }
 
         public bool IsServerRunning { get; private set; } = true;

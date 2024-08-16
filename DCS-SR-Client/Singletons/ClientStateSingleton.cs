@@ -176,38 +176,5 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        public bool ShouldUseLotATCPosition()
-        {
-            if (!IsLotATCConnected)
-            {
-                return false;
-            }
-
-            if (IsGameExportConnected)
-            {
-                if (DcsPlayerRadioInfo.inAircraft)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public void ClearPositionsIfExpired()
-        {
-            //not game or Lotatc - clear it!
-            if (!IsLotATCConnected && !IsGameExportConnected)
-            {
-                PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
-            }
-        }
-
-        public void UpdatePlayerPosition(DCSLatLngPosition latLngPosition)
-        {
-            PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-            DcsPlayerRadioInfo.latLng = latLngPosition;
-        }
     }
 }
