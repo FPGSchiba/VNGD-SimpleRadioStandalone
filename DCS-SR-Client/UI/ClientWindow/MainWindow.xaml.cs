@@ -48,6 +48,8 @@ using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBin
 using System.Windows.Navigation;
 using System.Security.Cryptography;
 using System.Net.Http;
+using Sentry;
+using System.Transactions;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -70,6 +72,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private int _port = 5002;
 
         private int _windowOpen = 13;
+
+        // Sentry Transactions
+        private ITransactionTracer connectionTransaction;
+        private ISpan connectionAwacsSpan;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -1192,6 +1198,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 try
                 {
+                    connectionTransaction = SentrySdk.StartTransaction("network", "connection");
+                    SentrySdk.ConfigureScope(scope => scope.Transaction = connectionTransaction);
+
+                    
+
                     //process hostname
                     var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
                     var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
@@ -1200,6 +1211,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     {
                         _resolvedIp = ip;
                         _port = GetPortFromTextBox();
+
+                        var tcpConnectChild = connectionTransaction.StartChild("connect-tcp");
 
                         _client = new SRSClientSyncHandler(_guid, UpdateUICallback, delegate (string name, int seat)
                         {
@@ -1259,6 +1272,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             _audioPreview.StopEncoding();
                             _audioPreview = null;
                         }
+
+                        tcpConnectChild.Finish();
                     }
                     else
                     {
@@ -2350,6 +2365,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else if (!ClientState.IsGameExportConnected) //only if we're not in game
             {
+                connectionAwacsSpan = connectionTransaction.StartChild("awacs-connection");
                 ClientState.LastSeenName = ExternalAWACSModeName.Text;
                 _client.ConnectExternalAWACSMode(ExternalAWACSModePassword.Password.Trim(), ExternalAWACSModeConnectionChanged);
             }
@@ -2365,6 +2381,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
                 ConnectExternalAWACSMode.Content = "Disconnect: Radios";
+                connectionAwacsSpan.Finish();
             }
             else
             {
@@ -2379,6 +2396,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
             }
+
+            connectionTransaction.Finish();
         }
 
         private void RescanInputDevices(object sender, RoutedEventArgs e)
