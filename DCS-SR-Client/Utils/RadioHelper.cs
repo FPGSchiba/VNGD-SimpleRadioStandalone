@@ -69,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (inMHz)
             {
-                frequency = frequency * MHz;
+                frequency *= MHz;
             }
 
             var radio = GetRadio(radioId);
@@ -141,7 +141,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (inMHz)
             {
-                standbyfrequency = standbyfrequency * MHz;
+                standbyfrequency *= MHz;
             }
 
             var radio = GetRadio(radioId);
@@ -150,8 +150,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             {
                 if (radio.modulation != RadioInformation.Modulation.DISABLED
                     && radio.modulation != RadioInformation.Modulation.INTERCOM
-                    && radio.freqMode == RadioInformation.FreqMode.OVERLAY
-                    && radio.type == RadioInformation.Type.STANDBY)
+                    && radio.freqMode == RadioInformation.FreqMode.OVERLAY)
                 {
                     if (delta)
                     {

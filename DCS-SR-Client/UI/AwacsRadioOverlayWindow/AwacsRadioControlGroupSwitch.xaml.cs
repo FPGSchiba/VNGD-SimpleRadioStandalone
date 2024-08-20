@@ -45,12 +45,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             RadioFrequency.MaxLines = 1;
             RadioFrequency.MaxLength = 7;
+            
+            StandbyRadioFrequency.MaxLines = 1;
+            StandbyRadioFrequency.MaxLength = 7;
 
             RadioFrequency.LostFocus += RadioFrequencyOnLostFocus;
+            StandbyRadioFrequency.LostFocus += StandbyFrequencyOnLostFocus;
 
             RadioFrequency.KeyDown += RadioFrequencyOnKeyDown;
+            StandbyRadioFrequency.KeyDown += StandbyFrequencyOnKeyDown;
 
             RadioFrequency.GotFocus += RadioFrequencyOnGotFocus;
+            StandbyRadioFrequency.GotFocus += StandbyFrequencyOnGotFocus;
         }
 
         private int _radioId;
@@ -100,16 +106,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioFrequencyOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            double freq = 0;
             // Some locales/cultures (e.g. German) do not parse "." as decimal points since they use decimal commas ("123,45"), leading to "123.45" being parsed as "12345" and frequencies being set too high
             // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
-            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out freq))
+            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
             {
                 RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
             }
             else
             {
                 RadioFrequency.Text = "";
+            }
+        }
+        
+        private void StandbyFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
+        {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+
+            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
+                RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
+            {
+                //remove focus to somewhere else
+                RadioVolume.Focus();
+                Keyboard.ClearFocus(); //then clear altogether
+            }
+        }
+
+        private void StandbyFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        {
+            if (keyEventArgs.Key == Key.Enter)
+            {
+                //remove focus to somewhere else
+                RadioVolume.Focus();
+                Keyboard.ClearFocus(); //then clear altogher
+            }
+        }
+
+        private void StandbyFrequencyOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
+        {
+            // Some locales/cultures (e.g. German) do not parse "." as decimal points since they use decimal commas ("123,45"), leading to "123.45" being parsed as "12345" and frequencies being set too high
+            // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
+            if (double.TryParse(StandbyRadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
+            {
+                RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+            }
+            else
+            {
+                StandbyRadioFrequency.Text = "";
             }
         }
 
@@ -121,8 +163,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void RadioFrequencyText_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             // TODO functionality to use scroll wheel to change frequency using scroll wheel
-            
-
             {if (e.Delta > 0)
                 {
                     //TODO when mouse wheel goes up
@@ -305,15 +345,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    if (!RadioFrequency.IsFocused
-                        || currentRadio.freqMode == RadioInformation.FreqMode.COCKPIT
-                        || currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                    if (currentRadio.freqMode != RadioInformation.FreqMode.COCKPIT && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
                     {
-                        RadioFrequency.Text =
-                            (currentRadio.freq / MHz).ToString("0.000",
-                                CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
-                    }
+                        if (!RadioFrequency.IsFocused)
+                        {
+                            RadioFrequency.Text =
+                                (currentRadio.freq / MHz).ToString("0.000",
+                                    CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
+                        }
 
+                        if (!StandbyRadioFrequency.IsFocused)
+                        {
+                            StandbyRadioFrequency.Text =
+                                (currentRadio.standbyfreq / MHz).ToString("0.000",
+                                    CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
+                        }
+                    }
                     if (currentRadio.modulation == RadioInformation.Modulation.AM)
                     {
                         //Dabble updated this
@@ -536,8 +583,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         }
 
-
-
         internal void RepaintRadioReceive()
         {
             TransmitterName.Visibility = Visibility.Collapsed;
@@ -616,16 +661,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         }
         private void SwapStandbyFrequency_Click(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioHelper.GetRadio(RadioId);
+            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
+            {
+                RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
+            }
+            else
+            {
+                RadioFrequency.Text = "";
+            }
+            if (double.TryParse(StandbyRadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double standbyFreq))
+            {
+                RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
+            }
+            else
+            {
+                StandbyRadioFrequency.Text = "";
+            }
             
-            var oldstandbyfreq = StandbyRadioFrequency.Text;
-            Logger.Info ("OldStandbyRadioFrequency ="+oldstandbyfreq);
-            
-            var oldactivefreq = currentRadio.freq;
-            Logger.Info("OldActiveRadioFrequency =" + oldactivefreq);
-            
-            StandbyRadioFrequency.Text = (oldactivefreq / MHz).ToString("0.000", CultureInfo.InvariantCulture);
-            RadioFrequency.Text = oldstandbyfreq;
+            RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+            RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
         }
     }
 }
