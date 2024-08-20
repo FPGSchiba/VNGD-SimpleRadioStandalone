@@ -27,6 +27,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         Radio10Channel,
         IntercomChannel,
 
+        Radio1Audio,     // Radio Audio Settings - Added by Dabble
+        Radio2Audio,     // Radio Audio Settings - Added by Dabble
+        Radio3Audio,     // Radio Audio Settings - Added by Dabble
+        Radio4Audio,     // Radio Audio Settings - Added by Dabble
+        Radio5Audio,     // Radio Audio Settings - Added by Dabble
+        Radio6Audio,     // Radio Audio Settings - Added by Dabble
+        Radio7Audio,     // Radio Audio Settings - Added by Dabble
+        Radio8Audio,     // Radio Audio Settings - Added by Dabble
+        Radio9Audio,     // Radio Audio Settings - Added by Dabble
+        Radio10Audio,    // Radio Audio Settings - Added by Dabble
+        IntercomAudio,   // Radio Audio Settings - Added by Dabble
+
         RadioEffects,
         RadioEncryptionEffects, //Radio Encryption effects
         RadioEffectsClipping,
@@ -94,6 +106,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public static readonly Dictionary<string, string> DefaultSettingsProfileSettings = new Dictionary<string, string>()
         {
+            {ProfileSettingsKeys.Radio1Audio.ToString(), "AM"},
+
+
+
+
             {ProfileSettingsKeys.RadioEffects.ToString(), "false"},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
 

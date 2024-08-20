@@ -326,6 +326,9 @@
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
+      <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml.cs">
       <DependentUpon>PresetChannelsViewTransparent1.xaml</DependentUpon>
     </Compile>
@@ -391,8 +394,8 @@
       <DependentUpon>PresetChannelsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewModel.cs" />
-    <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
-      <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
+    <Compile Include="UI\ClientWindow\RadioAudioConfigUI.xaml.cs">
+      <DependentUpon>RadioAudioConfigUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml.cs">
       <DependentUpon>AwacsIntercomControlGroup.xaml</DependentUpon>
@@ -437,6 +440,10 @@
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ClientWindow\RadioChannelConfigUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -531,7 +538,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ClientWindow\RadioChannelConfigUI.xaml">
+    <Page Include="UI\ClientWindow\RadioAudioConfigUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

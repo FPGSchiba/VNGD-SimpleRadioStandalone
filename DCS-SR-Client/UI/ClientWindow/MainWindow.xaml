@@ -3120,13 +3120,14 @@
 
                             <GroupBox
                                 Grid.Column="0"
-                                Grid.ColumnSpan="2"
+                                Grid.ColumnSpan="3"
                                 Grid.Row="2"
                                 Header="Audio">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*" />
-                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
@@ -3145,133 +3146,160 @@
                                         <RowDefinition />
                                         <RowDefinition />
                                         <RowDefinition />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
 
-
+                                    <Label
+                                        Content=""
+                                        Grid.Column="0"
+                                        Grid.Row="0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center" />
+                                    <Label
+                                        Content="Left/ Right Balancing"
+                                        Grid.Column="1"
+                                        Grid.Row="0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center" />
+                                    <Label
+                                        Content="Modulation (Default = AM)"
+                                        Grid.Column="2"
+                                        Grid.Row="0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center" />
+                                    
+                                    
                                     <Label
                                         Content="Radio 1 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="0"
+                                        Grid.Row="1"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         DefaultValue="-0.2"
                                         Grid.Column="1"
-                                        Grid.Row="0"
+                                        Grid.Row="1"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Channel}"
                                         x:Name="Radio1Config" />
+                                    <local:RadioAudioConfigUi
+                                        DefaultValue="0"
+                                        Grid.Column="2"
+                                        Grid.Row="1"
+                                        ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Audio}"
+                                        x:Name="Radio1Audio" />
+
 
                                     <Label
                                         Content="Radio 2 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         DefaultValue="0.2"
                                         Grid.Column="1"
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio2Channel}"
                                         x:Name="Radio2Config" />
 
                                     <Label
                                         Content="Radio 3 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="2"
+                                        Grid.Row="3"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="2"
+                                        Grid.Row="3"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio3Channel}"
                                         x:Name="Radio3Config" />
                                     <Label
                                         Content="Radio 4 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="3"
+                                        Grid.Row="4"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="3"
+                                        Grid.Row="4"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio4Channel}"
                                         x:Name="Radio4Config" />
                                     <Label
                                         Content="Radio 5 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="4"
+                                        Grid.Row="5"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="4"
+                                        Grid.Row="5"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio5Channel}"
                                         x:Name="Radio5Config" />
                                     <Label
                                         Content="Radio 6 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="5"
+                                        Grid.Row="6"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="5"
+                                        Grid.Row="6"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio6Channel}"
                                         x:Name="Radio6Config" />
                                     <Label
                                         Content="Radio 7 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="6"
+                                        Grid.Row="7"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="6"
+                                        Grid.Row="7"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio7Channel}"
                                         x:Name="Radio7Config" />
                                     <Label
                                         Content="Radio 8 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="7"
+                                        Grid.Row="8"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="7"
+                                        Grid.Row="8"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio8Channel}"
                                         x:Name="Radio8Config" />
                                     <Label
                                         Content="Radio 9 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="8"
+                                        Grid.Row="9"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="8"
+                                        Grid.Row="9"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio9Channel}"
                                         x:Name="Radio9Config" />
                                     <Label
                                         Content="Radio 10 Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="9"
+                                        Grid.Row="10"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="9"
+                                        Grid.Row="10"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio10Channel}"
                                         x:Name="Radio10Config" />
 
                                     <Label
                                         Content="Intercom Audio Channel"
                                         Grid.Column="0"
-                                        Grid.Row="10"
+                                        Grid.Row="11"
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center" />
                                     <local:RadioChannelConfigUi
                                         Grid.Column="1"
-                                        Grid.Row="10"
+                                        Grid.Row="11"
                                         ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.IntercomChannel}"
                                         x:Name="IntercomConfig" />
                                 </Grid>
