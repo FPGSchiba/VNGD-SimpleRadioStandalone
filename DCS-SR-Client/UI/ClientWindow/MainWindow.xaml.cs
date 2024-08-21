@@ -48,6 +48,8 @@ using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBin
 using System.Windows.Navigation;
 using System.Security.Cryptography;
 using System.Net.Http;
+using System.Web.UI.WebControls;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
@@ -58,6 +60,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         BlueTeam
     }
 
+    public enum LoginType
+    {
+        Guest,
+        Member,
+        Officer,
+        Administrator
+    }
+    
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
@@ -70,30 +80,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly AudioManager _audioManager;
 
         private readonly string _guid;
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
         private SRSClientSyncHandler _client;
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private const int _noWindowOpen = 14;
-        private int _windowOpen = _noWindowOpen;
+        private const int NoWindowOpen = 14;
+        private int _windowOpen = NoWindowOpen;
 
         // State
         private bool _loggedIn = false;
         private string _playerName = "";
         private string _coalitionPassword = "";
+        public LoginType LoginType { get; private set; }
+        public DateTime ConnectedAt { get; private set;  }
 
-        private int _openPage
+        private int OpenPage
         {
-            get { return (int)this.GetValue(OpenPageProperty); }
-            set { this.SetValue(OpenPageProperty, value);}
+            get { return (int)this.GetValue(OPEN_PAGE_PROPERTY); }
+            set { this.SetValue(OPEN_PAGE_PROPERTY, value);}
         }
 
         private int _oldOpenPage;
 
-        public static readonly DependencyProperty OpenPageProperty =
-            DependencyProperty.Register("OpenPage",
+        public static readonly DependencyProperty OPEN_PAGE_PROPERTY =
+            DependencyProperty.Register(nameof(OpenPage),
                 typeof(int),
                 typeof(MainWindow),
                 new PropertyMetadata(-1, OpenPagePropertyChanged));
@@ -101,16 +113,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         // Pages (Page & Index)
         private WelcomePage _welcomePage;
-        private const int _welcomeIndex = 0;
+        private const int WelcomeIndex = 0;
 
         private SupportPage _supportPage;
-        private const int _supportIndex = 1;
+        private const int SupportIndex = 1;
 
         private LoginPage _loginPage;
-        private const int _loginIndex = 2;
+        private const int LoginIndex = 2;
 
         private GuestPage _guestPage;
-        private const int _guestIndex = 3;
+        private const int GuestIndex = 3;
+
+        private GuestSuccess _guestSuccessPage;
+        private const int GuestSuccessIndex = 4;
+
+        private HomePage _homePage;
+        private const int HomePageIndex = 5;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -133,7 +151,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private RadioOverlayWindowDragable _radioOverlayWindowDragable;
 
         // Windows array
-        private Window[] windows = new Window[_noWindowOpen];
+        private Window[] windows = new Window[NoWindowOpen];
 
         private IPAddress _resolvedIp;
         private ServerSettingsWindow _serverSettingsWindow;
@@ -145,8 +163,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
-
-        private string version = "loading";
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
@@ -212,7 +228,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
             Assembly assembly = Assembly.GetExecutingAssembly();
 
-            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+            string version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
 
             Title = "VCS-SRS - v" + version; //UpdaterChecker.VERSION
             SRSVersionText.Text = "VCS-SRS v" + version;
@@ -224,11 +240,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 Hide();
                 WindowState = WindowState.Minimized;
 
-                Logger.Info("Started DCS-SimpleRadio Client " + version + " minimized"); //UpdaterChecker.VERSION
+                _logger.Info("Started DCS-SimpleRadio Client " + version + " minimized"); //UpdaterChecker.VERSION
             }
             else
             {
-                Logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
+                _logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
             }
 
             _guid = ClientStateSingleton.Instance.ShortGUID;
@@ -277,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisableWindowVisibilityCheck))
             {
-                Logger.Info("Window visibility check is disabled, skipping");
+                _logger.Info("Window visibility check is disabled, skipping");
                 return;
             }
 
@@ -288,143 +304,143 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             int mainWindowX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             int mainWindowY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
             
-            Logger.Trace($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
+            _logger.Trace($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
 
 
             // -------- Vertical Panels -------
             // 1 Radio
             int radioOneVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX).DoubleValue;
             int radioOneVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for one vertical radio overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}}");
+            _logger.Trace($"Checking window visibility for one vertical radio overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}}");
             // 2 Radio
             int radioTwoVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue;
             int radioTwoVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for two vertical radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
+            _logger.Trace($"Checking window visibility for two vertical radio overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}}");
             // 3 Radio
             int radioThreeVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue;
             int radioThreeVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for three vertical radio overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}}");
+            _logger.Trace($"Checking window visibility for three vertical radio overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}}");
             // 5 Radio
             int radioFiveVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveX).DoubleValue;
             int radioFiveVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveY).DoubleValue;
-            Logger.Trace($"Checking window visibility for five vertical radio horizontal overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
+            _logger.Trace($"Checking window visibility for five vertical radio horizontal overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}}");
             // 10 Radio
             int radioTenVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalX).DoubleValue;
             int radioTenVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenVerticalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten vertical radio overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}}");
+            _logger.Trace($"Checking window visibility for ten vertical radio overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}}");
             // 10 Radio Long
             int radioTenLongVerticalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalX).DoubleValue;
             int radioTenLongVerticalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenLongVerticalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
+            _logger.Trace($"Checking window visibility for ten vertical long radio overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}}");
             // 10 Radio Transparent
             int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
             int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
+            _logger.Trace($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
             int radioOneHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX).DoubleValue;
             int radioOneHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for one horizontal radio overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for one horizontal radio overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}}");
             // 2 Radio
             int radioTwoHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalX).DoubleValue;
             int radioTwoHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for two horizontal radio overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for two horizontal radio overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}}");
             // 3 Radio
             int radioThreeHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalX).DoubleValue;
             int radioThreeHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for three horizontal radio overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for three horizontal radio overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}}");
             // 5 Radio
             int radioFiveHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX).DoubleValue;
             int radioFiveHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for five horizontal radio overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for five horizontal radio overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}}");
 
             //10 Radio
             int radioTenHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX).DoubleValue;
             int radioTenHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten radio horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for ten radio horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}}");
             //10 Radio Wide
             int radioTenWideHorizontalX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalX).DoubleValue;
             int radioTenWideHorizontalY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten wide radio horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}}");
+            _logger.Trace($"Checking window visibility for ten wide radio horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}}");
 
 
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
-                Logger.Trace($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+                _logger.Trace($"Checking {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
 
                 if (screen.Bounds.Contains(mainWindowX, mainWindowY))
                 {
-                    Logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
                 // ------- Vertical Panels ------
                 if (screen.Bounds.Contains(radioOneVerticalX, radioOneVerticalY))
                 {
-                    Logger.Trace($"Radio One Vertical overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio One Vertical overlay {{X={radioOneVerticalX},Y={radioOneVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTwoVerticalX, radioTwoVerticalY))
                 {
-                    Logger.Trace($"Radio Two Vertical overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Two Vertical overlay {{X={radioTwoVerticalX},Y={radioTwoVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioThreeVerticalX, radioThreeVerticalY))
                 {
-                    Logger.Trace($"Radio Three Vertical overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Three Vertical overlay {{X={radioThreeVerticalX},Y={radioThreeVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioFiveVerticalX, radioFiveVerticalY))
                 {
-                    Logger.Trace($"Radio Five Vertical overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Five Vertical overlay {{X={radioFiveVerticalX},Y={radioFiveVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenVerticalX, radioTenVerticalY))
                 {
-                    Logger.Trace($"Radio Ten Vertical overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Vertical overlay {{X={radioTenVerticalX},Y={radioTenVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenLongVerticalX, radioTenLongVerticalY))
                 {
-                    Logger.Trace($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Long Vertical overlay {{X={radioTenLongVerticalX},Y={radioTenLongVerticalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenTransparentX, radioTenTransparentY))
                 {
-                    Logger.Trace($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Transparent overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
 
                 // -------- Horizontal Panels -----------
                 if (screen.Bounds.Contains(radioOneHorizontalX, radioOneHorizontalY))
                 {
-                    Logger.Trace($"Radio One Horizontal overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio One Horizontal overlay {{X={radioOneHorizontalX},Y={radioOneHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTwoHorizontalX, radioTwoHorizontalY))
                 {
-                    Logger.Trace($"Radio Two Horizontal overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Two Horizontal overlay {{X={radioTwoHorizontalX},Y={radioTwoHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioThreeHorizontalX, radioThreeHorizontalY))
                 {
-                    Logger.Trace($"Radio Three Horizontal overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Three Horizontal overlay {{X={radioThreeHorizontalX},Y={radioThreeHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioFiveHorizontalX, radioFiveHorizontalY))
                 {
-                    Logger.Trace($"Radio Five Horizontal overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Five Horizontal overlay {{X={radioFiveHorizontalX},Y={radioFiveHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenHorizontalX, radioTenHorizontalY))
                 {
-                    Logger.Trace($"Radio Ten Horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Horizontal overlay {{X={radioTenHorizontalX},Y={radioTenHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
                 if (screen.Bounds.Contains(radioTenWideHorizontalX, radioTenWideHorizontalY))
                 {
-                    Logger.Trace($"Radio Ten Wide Horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Wide Horizontal overlay {{X={radioTenWideHorizontalX},Y={radioTenWideHorizontalY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
             }
@@ -437,7 +453,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"Main client window outside visible area of monitors, resetting position ({mainWindowX},{mainWindowY}) to defaults");
+                _logger.Warn($"Main client window outside visible area of monitors, resetting position ({mainWindowX},{mainWindowY}) to defaults");
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, 200);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, 200);
@@ -455,21 +471,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxImage.Warning);
 
                 // ------- Vertical Panels ---------
-                Logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
-                Logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
-                Logger.Warn($"Radio Three Vertical overlay window outside visible area of monitors, resetting position ({radioThreeVerticalX},{radioThreeVerticalY}) to defaults");
-                Logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
+                _logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
+                _logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
+                _logger.Warn($"Radio Three Vertical overlay window outside visible area of monitors, resetting position ({radioThreeVerticalX},{radioThreeVerticalY}) to defaults");
+                _logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
 
                 // ------- Horizontal Panels ----------
-                Logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
-                Logger.Warn($"Radio Two Horizontal overlay window outside visible area of monitors, resetting position ({radioTwoHorizontalX},{radioTwoHorizontalY}) to defaults");
-                Logger.Warn($"Radio Three Horizontal overlay window outside visible area of monitors, resetting position ({radioThreeHorizontalX},{radioThreeHorizontalY}) to defaults");
-                Logger.Warn($"Radio Five Horizontal overlay window outside visible area of monitors, resetting position ({radioFiveHorizontalX},{radioFiveHorizontalY}) to defaults");
-                Logger.Warn($"Radio Ten Horizontal overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
-                Logger.Warn($"Radio Ten Wide Horizontal overlay window outside visible area of monitors, resetting position ({radioTenWideHorizontalX},{radioTenWideHorizontalY}) to defaults");
+                _logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
+                _logger.Warn($"Radio Two Horizontal overlay window outside visible area of monitors, resetting position ({radioTwoHorizontalX},{radioTwoHorizontalY}) to defaults");
+                _logger.Warn($"Radio Three Horizontal overlay window outside visible area of monitors, resetting position ({radioThreeHorizontalX},{radioThreeHorizontalY}) to defaults");
+                _logger.Warn($"Radio Five Horizontal overlay window outside visible area of monitors, resetting position ({radioFiveHorizontalX},{radioFiveHorizontalY}) to defaults");
+                _logger.Warn($"Radio Ten Horizontal overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
+                _logger.Warn($"Radio Ten Wide Horizontal overlay window outside visible area of monitors, resetting position ({radioTenWideHorizontalX},{radioTenWideHorizontalY}) to defaults");
 
                 // Reset Radio Panel Positions
                 // ----- Vertical -------
@@ -603,7 +619,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                Logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
+                _logger.Warn($"AWACS overlay window outside visible area of monitors, resetting position ({radioTenHorizontalX},{radioTenHorizontalY}) to defaults");
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenHorizontalY, 300);
@@ -660,7 +676,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         void ReloadProfile()
         {
             //switch profiles
-            Logger.Info(ControlsProfile.SelectedValue as string + " - Profile now in use");
+            _logger.Info(ControlsProfile.SelectedValue as string + " - Profile now in use");
             _globalSettings.ProfileSettingsStore.CurrentProfileName = ControlsProfile.SelectedValue as string;
 
             //redraw UI
@@ -849,81 +865,89 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _supportPage = new SupportPage();
             _loginPage = new LoginPage();
             _guestPage = new GuestPage();
-            _openPage = _welcomeIndex;
+            _guestSuccessPage = new GuestSuccess();
+            _homePage = new HomePage();
+            OpenPage = WelcomeIndex;
         }
 
         private void OpenPageByIndex(int index)
         {
             switch (index)
             {
-                case _welcomeIndex:
+                case WelcomeIndex:
                     DisplayFrame.Content = _welcomePage;
                     break;
-                case _supportIndex:
+                case SupportIndex:
                     DisplayFrame.Content = _supportPage;
                     break;
-                case _loginIndex:
+                case LoginIndex:
                     DisplayFrame.Content = _loginPage;
                     break;
-                case _guestIndex:
+                case GuestIndex:
                     DisplayFrame.Content = _guestPage;
                     break;
+                case GuestSuccessIndex:
+                    DisplayFrame.Content = _guestSuccessPage;
+                    break;
+                case HomePageIndex:
+                    DisplayFrame.Content = _homePage;
+                    break;
                 default:
-                    Logger.Error($"Page: {index} could not be found.");
+                    _logger.Error($"Page: {index} could not be found.");
                     break;
             }
 
-            _openPage = index;
+            OpenPage = index;
         }
 
         private static void OpenPagePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
+            // lets see if we still need this - Schiba (08/21/2024)
             MainWindow mainWindow = source as MainWindow;
             int newValue = Convert.ToInt32(e.NewValue);
             switch (newValue)
             {
-                case _welcomeIndex:
-                    mainWindow.RadioNavigation.IsEnabled = false;
-                    mainWindow.RadioNavigation.Opacity = 0;
+                case WelcomeIndex:
                     break;
-                case _supportIndex:
+                case SupportIndex:
                     break;
-                case _loginIndex:
-                    mainWindow.RadioNavigation.IsEnabled = false;
+                case LoginIndex:
                     break;
-                case _guestIndex:
-                    mainWindow.RadioNavigation.IsEnabled = false;
+                case GuestIndex:
+                    break;
+                case GuestSuccessIndex:
+                    break;
+                case HomePageIndex:
                     break;
                 default:
-                    mainWindow.Logger.Error($"Page: {newValue} could not be found.");
+                    mainWindow._logger.Error($"Page: {newValue} could not be found.");
                     break;
             }
         }
 
         public void On_WelcomeLoginClicked()
         {
-            OpenPageByIndex(_loginIndex);
+            OpenPageByIndex(LoginIndex);
         }
 
         public void On_WelcomeGuestCLicked()
         {
-            OpenPageByIndex(_guestIndex);
+            OpenPageByIndex(GuestIndex);
         }
 
-        public void On_LoginLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword)
+        public void On_LoginLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword, LoginType loginType)
         {
             _resolvedIp = ip;
             _port = port;
             _coalitionPassword = coalitionPassword;
             _playerName = playerName;
+            LoginType = loginType;
             Connect(ip, port);
-
-            
         }
 
         public void On_LoginBackClicked()
         {
-            OpenPageByIndex(_welcomeIndex);
+            OpenPageByIndex(WelcomeIndex);
         }
 
         public void On_GuestLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword)
@@ -932,38 +956,54 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _port = port;
             _coalitionPassword = coalitionPassword;
             _playerName = playerName;
+            LoginType = LoginType.Guest;
             Connect(ip, port);
         }
 
         public void On_GuestBackClicked()
         {
-            OpenPageByIndex(_welcomeIndex);
+            OpenPageByIndex(WelcomeIndex);
         }
 
-        private void RadioNavigation_Click(object sender, RoutedEventArgs e)
+        public void On_GuestSuccessAcceptClicked()
         {
-            Logger.Warn("Not Implemented yet!");
+            OpenPageByIndex(HomePageIndex);
+        }
+
+        private void On_HomeLargePanelClicked()
+        {
+            _logger.Warn("Not Implemented yet!");
+        }
+
+        private void On_HomeMiniaturePanelClicked()
+        {
+            _logger.Warn("Not Implemented yet!");
+        }
+
+        private void On_HomeLogOutClicked()
+        {
+            _logger.Warn("Not Implemented yet!");
         }
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
         {
-            if (_openPage != _supportIndex)
+            if (OpenPage != SupportIndex)
             {
                 DisplayFrame.Content = _supportPage;
-                _oldOpenPage = _openPage;
-                _openPage = _supportIndex;
+                _oldOpenPage = OpenPage;
+                OpenPage = SupportIndex;
             }
             else
             {
                 OpenPageByIndex(_oldOpenPage);
-                _oldOpenPage = _supportIndex;
+                _oldOpenPage = SupportIndex;
             }
             
         }
 
         private void SettingsNavigation_Click(object sender, RoutedEventArgs e)
         {
-            Logger.Warn("Not Implemented yet!");
+            _logger.Warn("Not Implemented yet!");
         }
 
         #endregion
@@ -1398,7 +1438,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn(ex, "Failed to play disconnect sound");
+                    _logger.Warn(ex, "Failed to play disconnect sound");
                 }
             }
 
@@ -1526,12 +1566,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _audioManager.StartEncoding(_guid, InputManager,
                             _resolvedIp, _port);
 
-                        Logger.Debug("Starting AWACS Mode connection.");
+                        _logger.Debug("Starting AWACS Mode connection.");
                         ConnectAWACSMode();
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(ex,
+                        _logger.Error(ex,
                             "Unable to get audio device - likely output device error - Pick another. Error:" +
                             ex.Message);
                         Stop();
@@ -1644,7 +1684,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 if (!AudioInput.MicrophoneAvailable)
                 {
-                    Logger.Info("Unable to preview audio, no valid audio input device available or selected");
+                    _logger.Info("Unable to preview audio, no valid audio input device available or selected");
                     return;
                 }
 
@@ -1661,7 +1701,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex,
+                    _logger.Error(ex,
                         "Unable to preview audio - likely output device error - Pick another. Error:" + ex.Message);
 
                 }
@@ -1813,7 +1853,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 // TODO: Maybe take switchTo = 13 to close all windows.
                 if (switchTo < 0 || switchTo > windows.Count() - 1)
                 {
-                    Logger.Error($"Could not switch to RadioWindow-{switchTo}.");
+                    _logger.Error($"Could not switch to RadioWindow-{switchTo}.");
                     return;
                 }
 
@@ -1887,7 +1927,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     }
                     catch
                     {
-                        Logger.Error($"Could not open Window with ID: {switchTo}.");
+                        _logger.Error($"Could not open Window with ID: {switchTo}.");
                         MessageBox.Show($"Window could not Open (Window-ID: {switchTo}).\nPlease give this Information to the SRS Development Team!", "Error Opening Panel", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     
@@ -1895,7 +1935,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 else
                 {
                     // No Panel window is open
-                    _windowOpen = _noWindowOpen;
+                    _windowOpen = NoWindowOpen;
                 }
             }
         }
@@ -1923,13 +1963,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // TODO: Rework this with autoLogin and autoConnect not possible currently
             string connection = $"{address}:{port}";
 
-            Logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
+            _logger.Info($"Received AutoConnect DCS-SRS @ {connection}");
 
             var enabled = _globalSettings.GetClientSetting(GlobalSettingsKeys.AutoConnect).BoolValue;
 
             if (!enabled)
             {
-                Logger.Info($"Ignored Autoconnect - not Enabled");
+                _logger.Info($"Ignored Autoconnect - not Enabled");
             }
 
             if (ClientState.IsConnected)
@@ -1942,7 +1982,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     if (!int.TryParse(currentConnectionParts[1], out currentPort))
                     {
-                        Logger.Warn($"Failed to parse port {currentConnectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
+                        _logger.Warn($"Failed to parse port {currentConnectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
                         currentPort = 5002;
                     }
                 }
@@ -1951,7 +1991,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 if (string.Equals(address, currentAddress, StringComparison.OrdinalIgnoreCase) && port == currentPort)
                 {
                     // Current connection matches SRS server advertised by DCS, all good
-                    Logger.Info($"Current SRS connection {currentConnection} matches advertised server {connection}, ignoring autoconnect");
+                    _logger.Info($"Current SRS connection {currentConnection} matches advertised server {connection}, ignoring autoconnect");
                     return;
                 }
                 else if (port != currentPort)
@@ -1983,7 +2023,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     }
                     catch (Exception e)
                     {
-                        Logger.Warn(e, $"Failed to resolve current SRS host {currentConnectionParts[0]} to IP addresses, ignoring autoconnect advertisement");
+                        _logger.Warn(e, $"Failed to resolve current SRS host {currentConnectionParts[0]} to IP addresses, ignoring autoconnect advertisement");
                         return;
                     }
                 }
@@ -2009,7 +2049,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     }
                     catch (Exception e)
                     {
-                        Logger.Warn(e, $"Failed to resolve advertised SRS host {address} to IP addresses, ignoring autoconnect advertisement");
+                        _logger.Warn(e, $"Failed to resolve advertised SRS host {address} to IP addresses, ignoring autoconnect advertisement");
                         return;
                     }
                 }
@@ -2052,7 +2092,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Show auto connect mismatch prompt if setting has been enabled (default), otherwise automatically switch server
             bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectMismatchPrompt);
 
-            Logger.Info($"Current SRS connection {currentConnection} does not match advertised server {advertisedConnection}, {(showPrompt ? "displaying mismatch prompt" : "automatically switching server")}");
+            _logger.Info($"Current SRS connection {currentConnection} does not match advertised server {advertisedConnection}, {(showPrompt ? "displaying mismatch prompt" : "automatically switching server")}");
 
             bool switchServer = !showPrompt;
             if (showPrompt)
@@ -2446,8 +2486,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
-                Logger.Debug("Init AWACS Connection now...");
-                Logger.Trace($"Coalition Password: {_coalitionPassword}");
+                _logger.Debug("Init AWACS Connection now...");
+                _logger.Trace($"Coalition Password: {_coalitionPassword} & Name: {_playerName}");
                 ClientState.LastSeenName = _playerName;
                 _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAWACSModeConnectionChanged);
             }
@@ -2475,11 +2515,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(ex, "Failed to play connect sound");
+                        _logger.Warn(ex, "Failed to play connect sound");
                     }
                 }
 
-                // TODO: Navigate to home
+                ConnectedAt = DateTime.UtcNow;
+                OpenPageByIndex(GuestSuccessIndex);
             }
             else
             {
@@ -2502,7 +2543,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBox.Show("Incorrect Password to connect to VCS-SRS.", "Auth Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
 
-                    Logger.Warn("Stopping server connection...");
+                    _logger.Warn("Stopping server connection...");
                     Stop(true);
                 }
             }

@@ -56,13 +56,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             Logger.Info($"Login pressed with following Information: \nEmail: {EmailInput.Text}, Password: {PasswordInput.Password}, Code: {FleetCodeInput.Text}, Team: {_selectedTeam}");
             // process hostname
             var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromBackend());
+            var loginType = GetLoginTypeFromBackend();
             var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
 
             var playerName = $"[{FleetCodeInput.Text}] {GetPlayerNameFromBackend()}";
 
             if (ip != null)
             {
-                mainWindow.On_LoginLoginClicked(ip, GetPortFrombackend(), playerName, "vngd");
+                mainWindow.On_LoginLoginClicked(ip, GetPortFrombackend(), playerName, "vngd", loginType);
             }
             else
             {
@@ -89,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             _selectedTeam = SRSTeam.RedTeam;
         }
 
-        private string GetAddressFromBackend()
+        private static string GetAddressFromBackend()
         {
             var addr = "";
 
@@ -101,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             return addr;
         }
 
-        private int GetPortFrombackend()
+        private static int GetPortFrombackend()
         {
             var addr = "";
 
@@ -118,11 +119,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             return 5002;
         }
 
-        private string GetPlayerNameFromBackend()
+        private static string GetPlayerNameFromBackend()
         {
             var playerName = "";
 
             return playerName;
+        }
+
+        private static LoginType GetLoginTypeFromBackend()
+        {
+            return LoginType.Member;
         }
     }
 }

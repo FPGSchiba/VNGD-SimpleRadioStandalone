@@ -1,0 +1,226 @@
+﻿<Page
+    Height="340"
+    Title="HomePage"
+    Width="600"
+    d:DesignHeight="340"
+    d:DesignWidth="600"
+    mc:Ignorable="d"
+    x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="White" />
+        </Grid.Background>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="185" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="0">
+            <TextBlock
+                FontSize="24"
+                HorizontalAlignment="Center"
+                Margin="0,10,0,0"
+                Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                Text="Vanguard Communications System" />
+            <Label
+                Content="Operations"
+                FontSize="16"
+                HorizontalAlignment="Center"
+                Margin="0,-10,0,0" />
+        </StackPanel>
+        <Separator
+            BorderBrush="Black"
+            BorderThickness="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="0"
+            VerticalAlignment="Bottom" />
+
+        <StackPanel
+            Grid.Column="0"
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Width="185">
+            <TextBlock
+                FontSize="12"
+                Margin="10,4,10,0"
+                Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                Text="Connected As: "
+                x:Name="ConnectedAsBlock" />
+            <TextBlock
+                FontSize="8"
+                Margin="10,4,10,0"
+                Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                Text="Login Type: "
+                x:Name="LoginTypeBlock" />
+            <TextBlock
+                FontSize="8"
+                Margin="10,4,10,2"
+                Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                Text="Connection time: "
+                x:Name="ConnectionTimeBlock" />
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                Margin="0,2,0,0"
+                Panel.ZIndex="10" />
+        </StackPanel>
+
+        <StackPanel
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="1"
+            Margin="183,0,0,0"
+            Orientation="Horizontal">
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                Panel.ZIndex="10" />
+        </StackPanel>
+
+        <TabControl
+            Background="#FEF7FF"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="1"
+            Height="212"
+            HorizontalAlignment="Left"
+            Margin="0"
+            Padding="0,2,0,0"
+            TabStripPlacement="Left"
+            VerticalAlignment="Bottom"
+            Width="185">
+            <TabItem Height="40" Width="185">
+                <TabItem.Header>
+                    <StackPanel
+                        Margin="16,0,0,0"
+                        Orientation="Horizontal"
+                        Width="163">
+                        <materialDesign:PackIcon
+                            Foreground="Black"
+                            Height="18"
+                            Kind="Circle"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Width="18" />
+                        <TextBlock
+                            FontSize="14"
+                            Margin="5,0"
+                            Text="Communications"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Frame
+                        Height="270"
+                        Margin="0,-60,0,0"
+                        Width="415"
+                        x:Name="CommunicationsFrame" />
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Height="40" Width="185">
+                <TabItem.Header>
+                    <StackPanel
+                        Margin="16,0,0,0"
+                        Orientation="Horizontal"
+                        Width="163">
+                        <materialDesign:PackIcon
+                            Foreground="Black"
+                            Height="18"
+                            Kind="Circle"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Width="18" />
+                        <TextBlock
+                            FontSize="14"
+                            Margin="5,0"
+                            Text="Server Details"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Frame
+                        Height="270"
+                        Margin="0,-60,0,0"
+                        Width="415"
+                        x:Name="ServerDetailsFrame" />
+                </TabItem.Content>
+            </TabItem>
+            <TabItem Height="40" Width="185">
+                <TabItem.Header>
+                    <StackPanel
+                        Margin="16,0,0,0"
+                        Orientation="Horizontal"
+                        Width="163">
+                        <materialDesign:PackIcon
+                            Foreground="Black"
+                            Height="18"
+                            Kind="Circle"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Width="18" />
+                        <TextBlock
+                            FontSize="14"
+                            Margin="5,0"
+                            Text="Player List"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Frame
+                        Height="270"
+                        Margin="0,-60,0,0"
+                        Width="415"
+                        x:Name="PlayerListFrame" />
+                </TabItem.Content>
+            </TabItem>
+            <TabItem
+                Height="40"
+                IsEnabled="False"
+                VerticalAlignment="Bottom"
+                Width="185">
+                <TabItem.Header>
+                    <StackPanel
+                        Margin="16,0,0,0"
+                        Orientation="Horizontal"
+                        Width="163">
+                        <materialDesign:PackIcon
+                            Foreground="Black"
+                            Height="18"
+                            Kind="Circle"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Width="18" />
+                        <TextBlock
+                            FontSize="14"
+                            Margin="5,0"
+                            Text="Administration"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Frame
+                        Height="270"
+                        Margin="0,-60,0,0"
+                        Width="415"
+                        x:Name="AdministrationFrame" />
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>

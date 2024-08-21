@@ -345,8 +345,26 @@
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\HomePages\AdministrationPage.xaml.cs">
+      <DependentUpon>AdministrationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml.cs">
+      <DependentUpon>CommunicationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\HomePages\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\HomePages\PlayerListPage.xaml.cs">
+      <DependentUpon>PlayerListPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml.cs">
+      <DependentUpon>ServerDetailsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\LoginPages\GuestPage.xaml.cs">
       <DependentUpon>GuestPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml.cs">
+      <DependentUpon>GuestSuccess.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ClientWindow\LoginPages\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
@@ -479,10 +497,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\ClientWindow\HomePages\AdministrationPage.xaml" />
+    <Page Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml" />
+    <Page Include="UI\ClientWindow\HomePages\HomePage.xaml" />
+    <Page Include="UI\ClientWindow\HomePages\PlayerListPage.xaml" />
+    <Page Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml" />
     <Page Include="UI\ClientWindow\LoginPages\GuestPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml" />
     <Page Include="UI\ClientWindow\LoginPages\LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -24,36 +24,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
     /// </summary>
     public partial class GuestPage : Page
     {
-        private MainWindow mainWindow;
+        private readonly MainWindow _mainWindow;
 
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public GuestPage()
         {
             InitializeComponent();
 
-            mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
         private void Back_OnClick(object sender, RoutedEventArgs e)
         {
-            mainWindow.On_GuestBackClicked();
+            _mainWindow.On_GuestBackClicked();
         }
 
         private void Login_OnClick(object sender, RoutedEventArgs e)
         {
             var coalitionPassword = PasswordInput.Password;
-            Logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: [{FleetCodeInput.Text}] {PlayerNameInput.Text}, Password: {coalitionPassword}");
+            _logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: [{FleetCodeInput.Text}] {PlayerNameInput.Text}, Password: {coalitionPassword}");
 
             // process hostname
             var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromTextBox());
             var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
 
-            var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput}";
+            var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
 
             if (ip != null)
             {
-                mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
+                _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
                 MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
-                mainWindow.ClientState.IsConnected = false;
+                _mainWindow.ClientState.IsConnected = false;
             }
         }
 
