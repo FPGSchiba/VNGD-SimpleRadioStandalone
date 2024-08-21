@@ -361,54 +361,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                                     CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
                         }
                     }
-                    if (currentRadio.modulation == RadioInformation.Modulation.AM)
-                    {
-                        //Dabble updated this
-                        //Changed Text to remove AM from here as AM is the default Modulation.
-                        //We are keeping the other modulations for better troubleshooting should anyone
-                        //change the modulation in the future
-                        RadioMetaData.Text = "";
-                    }
-                    else if (currentRadio.modulation == RadioInformation.Modulation.FM)
-                    {
-                        RadioMetaData.Text = "FM";
-                    }
-                    else if (currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
-                    {
-                        RadioMetaData.Text = "HQ";
-                    }
-                    else
-                    {
-                        RadioMetaData.Text += "";
-                    }
-
-                    if (currentRadio.secFreq > 100)
-                    {
-                        //Dabble updated this
-                        //Because are not using the secondary radios, we don't need to identify "Guard".
-                        //Original text here " G"
-                        RadioMetaData.Text += "";
-                    }
-
-                    if (currentRadio.channel > -1)
-                    {
-                        RadioMetaData.Text += (" C" + currentRadio.channel);
-                    }
-                    if (currentRadio.enc && (currentRadio.encKey > 0))
-                    {
-                        RadioMetaData.Text += " E" + currentRadio.encKey; // ENCRYPTED
-                    }
-
-                 
                 }
+                
                 RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
 
-                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+                int freqCount = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
+                int standbyCount =
+                    _connectClientsSingleton.ClientsOnFreq(currentRadio.standbyfreq, currentRadio.modulation);
 
-                if (count > 0)
-                {
-                    RadioMetaData.Text += " 👤" + count;
-                }
+                RadioMetaData.Text = "👤" + freqCount;
+                StandbyRadioMetaData.Text = "👤" + standbyCount;
+
 
                 if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
                 {
@@ -433,8 +396,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
             }
-
-            
         }
 
         internal void RepaintStandbyRadioStatus()
