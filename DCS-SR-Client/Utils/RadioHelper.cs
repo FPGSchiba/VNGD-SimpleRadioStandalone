@@ -398,6 +398,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
             }
         }
 
+        //Dabble Added to try to make the channel dropdown work for the standby frequencies
+        public static void SelectStandbyRadioChannel(PresetChannel selectedPresetChannel, int radioId)
+        {
+            if (UpdateStandbyRadioFrequency((double)selectedPresetChannel.Value, radioId, false, false))
+            {
+                var radio = GetRadio(radioId);
+
+                if (radio != null) radio.standbychannel = selectedPresetChannel.Channel;
+            }
+        }
+
         public static void RadioChannelUp(int radioId)
         {
             var currentRadio = RadioHelper.GetRadio(radioId);

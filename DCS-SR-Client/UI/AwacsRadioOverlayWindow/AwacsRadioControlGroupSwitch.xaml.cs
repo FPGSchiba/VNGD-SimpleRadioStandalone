@@ -463,24 +463,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 
 
-                //Standby Radio Coloring
-                if (RadioId == dcsPlayerRadioInfo.selected)
-                {
-                    //Color for selected radio, not transmitting - dabble
-                    RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                }
-                else if (currentRadio != null && currentRadio.simul)
-                {
-                    //Color for deselected radio that is setup for simultaneous transmissions - dabble
-                    RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                }
-                else
-                {
-                    //Color for unselected radio that is powered on - dabble
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                }
-
-
                 if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
                     StandbyRadioFrequency.Text = "";
@@ -560,8 +542,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
 
                 }
-                RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
-
+                
+                //Connected Clients on Frequency
                 int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.standbyfreq, currentRadio.modulation);
 
                 if (count > 0)

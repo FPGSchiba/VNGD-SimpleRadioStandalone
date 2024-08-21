@@ -107,6 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonNetworkIgnoreSerialization]
         public int channel = -1;
+        public int standbychannel = -1;  //Dabble Added
 
         [JsonNetworkIgnoreSerialization]
         public bool simul = false;
@@ -175,12 +176,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
             return new RadioInformation()
             {
                 channel = this.channel,
+                standbychannel = this.standbychannel,  //dabble added
                 enc = this.enc,
                 encKey = this.encKey,
                 encMode = this.encMode,
                 expansion = this.expansion,
                 freq = this.freq,
-                standbyfreq = this.standbyfreq,
+                standbyfreq = this.standbyfreq,   //dabble added
                 freqMax = this.freqMax,
                 freqMin = this.freqMin,
                 freqMode = this.freqMode,
