@@ -16,6 +16,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
@@ -35,11 +36,9 @@ using NAudio.CoreAudioApi;
 using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
-using System.Windows.Navigation;
-using System.Security.Cryptography;
-using System.Net.Http;
 using Sentry;
-using System.Transactions;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -120,8 +119,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private const int HomePageIndex = 5;
 
         // Sentry Transactions
-        private ITransactionTracer connectionTransaction;
-        private ISpan connectionAwacsSpan;
+        private ITransactionTracer _connectionTransaction;
+        private ISpan _connectioNetworkSpan;
+        private ISpan _connectionAwacsSpan;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -1411,10 +1411,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
+                _connectionTransaction = SentrySdk.StartTransaction("network", "connection");
+                SentrySdk.ConfigureScope(scope => scope.Transaction = _connectionTransaction);
+                
                 SaveSelectedInputAndOutput();
 
                 try
                 {
+                    _connectioNetworkSpan = _connectionTransaction.StartChild("tcp-connection");
                     _resolvedIp = ip;
                     _port = port;
 
@@ -1577,6 +1581,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             _resolvedIp, _port);
 
                         _logger.Debug("Starting AWACS Mode connection.");
+                        _connectioNetworkSpan.Finish();
                         ConnectAWACSMode();
                     }
                     catch (Exception ex)
@@ -2512,8 +2517,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
             else
             {
+                _connectionTransaction.User = new SentryUser
+                {
+                    Username = _playerName
+                };
+                _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                 _logger.Debug("Init AWACS Connection now...");
-                _logger.Trace($"Coalition Password: {_coalitionPassword} & Name: {_playerName}");
                 ClientState.LastSeenName = _playerName;
                 _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAWACSModeConnectionChanged);
             }
@@ -2546,8 +2555,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
 
                 ConnectedAt = DateTime.UtcNow;
-                OpenPageByIndex(GuestSuccessIndex);
-                connectionAwacsSpan.Finish();
+                OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
+                _connectionAwacsSpan.Finish();
             }
             else
             {
@@ -2575,7 +2584,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
 
-            connectionTransaction.Finish();
+            _connectionTransaction.Finish();
         }
 
         private void RescanInputDevices(object sender, RoutedEventArgs e)

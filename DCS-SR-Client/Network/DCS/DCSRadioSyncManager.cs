@@ -40,12 +40,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
         public bool IsListening { get; private set; }
 
-        public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate, DCSRadioSyncHandler.NewAircraft _newAircraftCallback)
+        public DCSRadioSyncManager(SendRadioUpdate clientRadioUpdate, ClientSideUpdate clientSideUpdate)
         {
             _clientRadioUpdate = clientRadioUpdate;
             _clientSideUpdate = clientSideUpdate;
             IsListening = false;
-            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate, _newAircraftCallback);
+            _dcsRadioSyncHandler = new DCSRadioSyncHandler(clientRadioUpdate);
 
             _clearRadio = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _clearRadio.Tick += CheckIfRadioIsStale;

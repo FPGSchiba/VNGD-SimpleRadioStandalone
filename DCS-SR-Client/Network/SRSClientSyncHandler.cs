@@ -140,7 +140,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _newAircraft);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate);
             _vaicomSync = new VAICOMSyncHandler();
 
             using (_tcpClient = new TcpClient())
