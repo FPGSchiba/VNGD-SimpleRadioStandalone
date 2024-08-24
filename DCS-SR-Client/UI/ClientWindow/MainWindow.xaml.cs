@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,14 +9,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
@@ -25,32 +21,24 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.InputProfileWindow;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
-using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using NAudio.CoreAudioApi;
-using NAudio.Dmo;
-using NAudio.Wave;
 using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
-using System.Windows.Navigation;
-using System.Security.Cryptography;
-using System.Net.Http;
-using System.Web.UI.WebControls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
+using GridLength = System.Windows.GridLength;
+using SelectionChangedEventArgs = System.Windows.Controls.SelectionChangedEventArgs;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -98,8 +86,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private int OpenPage
         {
-            get { return (int)this.GetValue(OPEN_PAGE_PROPERTY); }
-            set { this.SetValue(OPEN_PAGE_PROPERTY, value); }
+            get { return (int)GetValue(OPEN_PAGE_PROPERTY); }
+            set { SetValue(OPEN_PAGE_PROPERTY, value); }
         }
 
         private int _oldOpenPage;
@@ -129,8 +117,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private HomePage _homePage;
         private const int HomePageIndex = 5;
-        private int _windowOpen = 14;
-
+        
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
@@ -162,7 +149,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         //used to debounce toggle
         private long _toggleShowHide;
-
         private readonly DispatcherTimer _updateTimer;
         private ServerAddress _serverAddress;
 
@@ -223,8 +209,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[12] = _radioOverlayWindowTenTransparent;
             windows[13] = _radioOverlayWindowTenSwitch;
 
-            var client = ClientStateSingleton.Instance;
-
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
             Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientY).DoubleValue;
@@ -258,7 +242,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ReloadProfile();
 
             InitInput();
-
+            
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
@@ -288,7 +272,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _updateTimer.Tick += UpdatePlayerLocationAndVUMeters;
             _updateTimer.Start();
-
         }
 
         private void CheckWindowVisibility()
@@ -337,11 +320,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // 10 Radio Transparent
             int radioTenTransparentX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentX).DoubleValue;
             int radioTenTransparentY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
+            _logger.Trace($"Checking window visibility for ten transparent radio overlay {{X={radioTenTransparentX},Y={radioTenTransparentY}}}");
             // 10 Radio Switch
             int radioTenSwitchX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenSwitchX).DoubleValue;
             int radioTenSwitchY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenSwitchY).DoubleValue;
-            Logger.Trace($"Checking window visibility for ten switch radio overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}}");
+            _logger.Trace($"Checking window visibility for ten switch radio overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
@@ -419,7 +402,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
                 if (screen.Bounds.Contains(radioTenSwitchX, radioTenSwitchY))
                 {
-                    Logger.Trace($"Radio Ten Switch overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio Ten Switch overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
 
@@ -483,14 +466,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxImage.Warning);
 
                 // ------- Vertical Panels ---------
-                Logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
-                Logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
-                Logger.Warn($"Radio Three Vertical overlay window outside visible area of monitors, resetting position ({radioThreeVerticalX},{radioThreeVerticalY}) to defaults");
-                Logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
-                Logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
-                Logger.Warn($"Radio Ten Switch overlay window outside visible area of monitors, resetting position ({radioTenSwitchX},{radioTenSwitchY}) to defaults");
+                _logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
+                _logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
+                _logger.Warn($"Radio Three Vertical overlay window outside visible area of monitors, resetting position ({radioThreeVerticalX},{radioThreeVerticalY}) to defaults");
+                _logger.Warn($"Radio Five Vertical overlay window outside visible area of monitors, resetting position ({radioFiveVerticalX},{radioFiveVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Vertical overlay window outside visible area of monitors, resetting position ({radioTenVerticalX},{radioTenVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
+                _logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
+                _logger.Warn($"Radio Ten Switch overlay window outside visible area of monitors, resetting position ({radioTenSwitchX},{radioTenSwitchY}) to defaults");
 
                 // ------- Horizontal Panels ----------
                 _logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
@@ -1746,7 +1729,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ToggleServerSettings.IsEnabled = true;
 
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-
+                
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect: Radios" : "Connect: Radios";
             }
@@ -2876,6 +2859,77 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
+        }
+
+        private void ChangeWindowLayout(int selectedUi)
+        {
+            switch (selectedUi)
+            {
+                case 0: // new UI
+                    Height = 425;
+                    BottomBar.Visibility = Visibility.Visible;
+                    MainGrid.RowDefinitions[1].Height = new GridLength(365);
+                    break;
+                case 1:
+                    Height = 700;
+                    BottomBar.Visibility = Visibility.Collapsed;
+                    MainGrid.RowDefinitions[1].Height = new GridLength(680);
+                    break;
+            }
+        }
+
+        private void TabControl_OnSelected(object sender, RoutedEventArgs e)
+        {
+            switch (TabControl.SelectedIndex)
+            {
+                case 0:
+                    ChangeWindowLayout(0);
+                    break;
+                case 1:
+                    ChangeWindowLayout(1);
+                    break;
+                default:
+                    _logger.Warn("Selected UI not recognised, setting layout to default.");
+                    ChangeWindowLayout(0);
+                    break;
+            }
+        }
+
+        private void StartStop_OnClick(object sender, RoutedEventArgs e)
+        {
+            var address = GetAddressFromTextBox();
+            var resolvedAddresses = Dns.GetHostAddresses(address);
+            var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+            Connect(ip, GetPortFromTextBox());
+        }
+        
+        private string GetAddressFromTextBox()
+        {
+            var addr = this.ServerIp.Text.Trim();
+
+            if (addr.Contains(":"))
+            {
+                return addr.Split(':')[0];
+            }
+
+            return addr;
+        }
+
+        private int GetPortFromTextBox()
+        {
+            var addr = this.ServerIp.Text.Trim();
+
+            if (addr.Contains(":"))
+            {
+                int port;
+                if (int.TryParse(addr.Split(':')[1], out port))
+                {
+                    return port;
+                }
+                throw new ArgumentException("specified port is not valid");
+            }
+
+            return 5002;
         }
     }
 }

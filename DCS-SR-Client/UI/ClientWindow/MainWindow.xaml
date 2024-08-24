@@ -1,5 +1,5 @@
 ﻿<Window
-    Height="420"
+    Height="425"
     ResizeMode="CanMinimize"
     Style="{x:Null}"
     Title="Vanguard SRS Client"
@@ -21,13 +21,14 @@
     xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid>
+    <Grid
+        x:Name="MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="360"/>
+            <RowDefinition Height="365"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
@@ -37,9 +38,6 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
 
             <StackPanel
                 Grid.Column="1"
@@ -65,15 +63,18 @@
         </Grid>
 
         <TabControl Grid.Row="1"
-                x:Name="TabControl">
+                    SelectionChanged="TabControl_OnSelected"
+                    x:Name="TabControl">
 
             <TabItem Header="New"
-                    Height="20">
+                    Height="25"
+                    Padding="0">
                 <Frame x:Name="DisplayFrame"/>
             </TabItem>
 
             <TabItem Header="Old"
-                    Height="20">
+                    Height="25"
+                    Padding="0">
                 <TabControl x:Name="TabControlOld">
                     <!--
                     <TabControl.Background>
@@ -223,7 +224,7 @@
                                         Margin="0,0,0,0"
                                         Orientation="Horizontal">
                                         <Button
-                                            Command="{Binding Path=ConnectCommand}"
+                                            Click="StartStop_OnClick"
                                             Content="Connect: Server"
                                             HorizontalAlignment="Center"
                                             Margin="0,15,20,0"
@@ -407,8 +408,8 @@
                                                     Width="150"
                                                     x:Name="ShowOverlayTenHorizontalWide"/>
                                                 <Button
-                                                    Click="ShowOverlayDragable_OnClick"
-                                                    Content="Dragable"
+                                                    Click="ShowOverlayTenSwitch_OnClick"
+                                                    Content="Switch"
                                                     HorizontalAlignment="Center"
                                                     Margin="0,5,0,0"
                                                     Style="{DynamicResource SquareButtonStyle}"
@@ -3691,15 +3692,13 @@
 
 
         <Grid Background="#E9E9E9"
-                Grid.Row="2">
+                Grid.Row="2"
+                x:Name="BottomBar">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="90"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
 
             <StackPanel
                 Grid.Column="0"
