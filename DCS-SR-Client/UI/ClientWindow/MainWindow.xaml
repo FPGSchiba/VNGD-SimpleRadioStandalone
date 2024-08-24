@@ -225,21 +225,13 @@
                                         Orientation="Horizontal">
                                         <Button
                                             Click="StartStop_OnClick"
-                                            Content="Connect: Server"
+                                            Content="Connect"
                                             HorizontalAlignment="Center"
                                             Margin="0,15,20,0"
                                             Style="{DynamicResource AccentedSquareButtonStyle}"
                                             ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
                                             Width="125"
                                             x:Name="StartStop"/>
-                                        <Button
-                                            Click="ConnectExternalAWACSMode_OnClick"
-                                            Content="Connect: Radios"
-                                            IsEnabled="False"
-                                            Margin="0,15,0,0"
-                                            Style="{DynamicResource AccentedSquareButtonStyle}"
-                                            Width="125"
-                                            x:Name="ConnectExternalAWACSMode"/>
                                     </StackPanel>
 
                                     <StackPanel
@@ -3697,7 +3689,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180"/>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel
@@ -3731,12 +3723,22 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 VerticalAlignment="Center">
+                <Button 
+                    Click="HomeNavigation_OnClick"
+                    Content="{materialDesign:PackIcon Home}"
+                    Height="24"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,3,0"
+                    Style="{StaticResource MaterialDesignIconForegroundButton}"
+                    Width="24"
+                    x:Name="HomeNavigation"/>
+                
                 <Button
                     Click="SupportNavigation_Click"
                     Content="{materialDesign:PackIcon HelpCircleOutline}"
                     Height="24"
                     HorizontalAlignment="Right"
-                    Margin="0,0,3,0"
+                    Margin="0,3,3,0"
                     Style="{StaticResource MaterialDesignIconForegroundButton}"
                     Width="24"
                     x:Name="SupportNavigation"/>

@@ -78,7 +78,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private int _windowOpen = NoWindowOpen;
 
         // State
-        private bool _loggedIn = false;
+        public bool LoggedIn
+        {
+            get { return (bool)GetValue(LOGGED_IN_PROPERTY); }
+            set { SetValue(LOGGED_IN_PROPERTY, value); }
+        }
         private string _playerName = "";
         private string _coalitionPassword = "";
         public LoginType LoginType { get; private set; }
@@ -97,7 +101,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 typeof(int),
                 typeof(MainWindow),
                 new PropertyMetadata(-1, OpenPagePropertyChanged));
-
+        
+        public static readonly DependencyProperty LOGGED_IN_PROPERTY = DependencyProperty.Register(nameof(LoggedIn), typeof(bool), typeof(MainWindow), new PropertyMetadata(false,
+            (o, args) =>
+            {
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                
+                if ((bool)args.NewValue && mainWindow != null)
+                {
+                    mainWindow.HomeNavigation.IsEnabled = false;
+                    mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
+                }
+                else if (mainWindow != null)
+                {
+                    mainWindow.HomeNavigation.IsEnabled = true;
+                    mainWindow.HomeNavigation.Visibility = Visibility.Visible;
+                }
+            }));
 
         // Pages (Page & Index)
         private WelcomePage _welcomePage;
@@ -180,7 +200,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             InitializeComponent();
 
             // Initialize Pages
-
             InitPages();
 
             DisplayFrame.Content = _welcomePage;
@@ -878,6 +897,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _guestSuccessPage = new GuestSuccess();
             _homePage = new HomePage();
             OpenPage = WelcomeIndex;
+            
+            HomeNavigation.IsEnabled = false;
+            HomeNavigation.Visibility = Visibility.Hidden;
         }
 
         private void OpenPageByIndex(int index)
@@ -915,23 +937,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // lets see if we still need this - Schiba (08/21/2024)
             MainWindow mainWindow = source as MainWindow;
             int newValue = Convert.ToInt32(e.NewValue);
-            switch (newValue)
+            if (mainWindow != null)
             {
-                case WelcomeIndex:
-                    break;
-                case SupportIndex:
-                    break;
-                case LoginIndex:
-                    break;
-                case GuestIndex:
-                    break;
-                case GuestSuccessIndex:
-                    break;
-                case HomePageIndex:
-                    break;
-                default:
-                    mainWindow._logger.Error($"Page: {newValue} could not be found.");
-                    break;
+                switch (newValue)
+                {
+                    case WelcomeIndex:
+                        mainWindow.HomeNavigation.IsEnabled = false;
+                        mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
+                        break;
+                    case SupportIndex:
+                        break;
+                    case LoginIndex:
+                        break;
+                    case GuestIndex:
+                        break;
+                    case GuestSuccessIndex:
+                        break;
+                    case HomePageIndex:
+                        break;
+                    default:
+                        mainWindow._logger.Error($"Page: {newValue} could not be found.");
+                        break;
+                }
             }
         }
 
@@ -1116,7 +1143,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ExternalAWACSModePassword.ToolTip = ToolTips.ExternalAWACSModePassword;
             ExternalAWACSModeName.ToolTip = ToolTips.ExternalAWACSModeName;
-            ConnectExternalAWACSMode.ToolTip = ToolTips.ExternalAWACSMode;
         }
 
         public InputDeviceManager InputManager { get; set; }
@@ -1413,6 +1439,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _connectionTransaction = SentrySdk.StartTransaction("network", "connection");
                 SentrySdk.ConfigureScope(scope => scope.Transaction = _connectionTransaction);
+                _connectionTransaction.SetTag("server-address", $"{ip}:{port}");
                 
                 SaveSelectedInputAndOutput();
 
@@ -1473,9 +1500,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _guestPage.LoginInProgress.Opacity = 0;
 
             ConnectionStatus.Fill = Brushes.Red;
-
-            ConnectExternalAWACSMode.IsEnabled = false;
-            ConnectExternalAWACSMode.Content = "Connect: Radios";
 
             if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
                 _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
@@ -1739,15 +1763,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ToggleServerSettings.IsEnabled = true;
 
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-
-                ConnectExternalAWACSMode.IsEnabled = eamEnabled;
-                ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect: Radios" : "Connect: Radios";
             }
             else
             {
                 ToggleServerSettings.IsEnabled = false;
-                ConnectExternalAWACSMode.IsEnabled = false;
-                ConnectExternalAWACSMode.Content = "Connect: Radios";
             }
         }
 
@@ -2481,13 +2500,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
         }
 
-        private void ConnectExternalAWACSMode_OnClick(object sender, RoutedEventArgs e)
-        {
-            _coalitionPassword = ExternalAWACSModePassword.Password.Trim();
-            _playerName = ExternalAWACSModeName.Text;
-            ConnectAWACSMode();
-        }
-
         private void ConnectAWACSMode()
         {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
@@ -2537,8 +2549,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
-                ConnectExternalAWACSMode.Content = "Disconnect: Radios";
-
+                StartStop.Content = "Disconnect";
+                
                 _guestPage.LoginInProgress.Opacity = 0;
                 ConnectionStatus.Fill = Brushes.Green;
 
@@ -2554,7 +2566,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     }
                 }
 
+                LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
+                _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
                 OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
                 _connectionAwacsSpan.Finish();
             }
@@ -2570,7 +2584,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _coalitionPassword = "";
                 _playerName = "";
 
-                ConnectExternalAWACSMode.Content = "Connect: Radios";
+                StartStop.Content = "Connect";
+                LoggedIn = false;
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
@@ -2724,18 +2739,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
 
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay, (bool)AlwaysAllowTransponderOverlay.IsChecked);
-        }
-
-        private void CurrentPosition_OnClick(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                var pos = ClientState.PlayerCoaltionLocationMetadata.LngLngPosition;
-
-                Process.Start($"https://maps.google.com/maps?q=loc:{pos.lat},{pos.lng}");
-            }
-            catch { }
-
         }
 
         private void ShowClientList_OnClick(object sender, RoutedEventArgs e)
@@ -2917,7 +2920,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var address = GetAddressFromTextBox();
             var resolvedAddresses = Dns.GetHostAddresses(address);
             var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-            Connect(ip, GetPortFromTextBox());
+            var port = GetPortFromTextBox();
+            _resolvedIp = ip;
+            _port = port;
+            _coalitionPassword = ExternalAWACSModePassword.Password.Trim();
+            _playerName = ExternalAWACSModeName.Text;
+            LoginType = LoginType.Guest;
+            Connect(ip, port);
         }
 
         private string GetAddressFromTextBox()
@@ -2947,6 +2956,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             return 5002;
+        }
+
+        private void HomeNavigation_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenPageByIndex(WelcomeIndex);
         }
     }
 }
