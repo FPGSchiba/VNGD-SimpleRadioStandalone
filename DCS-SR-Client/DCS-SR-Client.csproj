@@ -336,6 +336,7 @@
     <Compile Include="Singletons\AudioInputSingleton.cs" />
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupSwitch.xaml</DependentUpon>
     </Compile>
@@ -534,6 +535,7 @@
     <Page Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
