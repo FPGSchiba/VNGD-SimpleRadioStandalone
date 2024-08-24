@@ -52,93 +52,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             _radioUpdate = radioUpdate;
         }
 
-        public void Start()
-        {
-            //reset last sent
-            _clientStateSingleton.LastSent = 0;
-
-            Task.Factory.StartNew(() =>
-            {
-                while (!_stop)
-                {
-                    
-                    try
-                    {
-                        var localEp = new IPEndPoint(IPAddress.Any, _globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP));
-                        _dcsUdpListener = new UdpClient(localEp);
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn(ex, $"Unable to bind to the DCS Export Listener Socket Port: {_globalSettings.GetNetworkSetting(GlobalSettingsKeys.DCSIncomingUDP)}");
-                        Thread.Sleep(500);
-                    }
-                }
-
-                while (!_stop)
-                {
-                    try
-                    {
-                        var groupEp = new IPEndPoint(IPAddress.Any,0);
-                        var bytes = _dcsUdpListener.Receive(ref groupEp);
-
-                        var str = Encoding.UTF8.GetString(
-                            bytes, 0, bytes.Length).Trim();
-
-                        var message =
-                            JsonConvert.DeserializeObject<DCSPlayerRadioInfo>(str);
-
-                        Logger.Debug($"Recevied Message from DCS {str}");
-
-                        if (!string.IsNullOrWhiteSpace(message.name) && message.name != "Unknown" && message.name != _clientStateSingleton.LastSeenName)
-                        {
-                            _clientStateSingleton.LastSeenName = message.name;
-                        }
-
-                        _clientStateSingleton.DcsExportLastReceived = DateTime.Now.Ticks;
-
-                        //sync with others
-                        //Radio info is marked as Stale for FC3 aircraft after every frequency change
-
-                        ProcessRadioInfo(message);
-                    }
-                    catch (SocketException e)
-                    {
-                        // SocketException is raised when closing app/disconnecting, ignore so we don't log "irrelevant" exceptions
-                        if (!_stop)
-                        {
-                            Logger.Error(e, "SocketException Handling DCS Message");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, "Exception Handling DCS Message");
-                    }
-                }
-
-                try
-                {
-                    _dcsUdpListener.Close();
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Exception stopping DCS listener ");
-                }
-                
-            });
-        }
-
 
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
           
             // determine if its changed by comparing old to new
             var update = UpdateRadio(message);
-
-            //send to DCS UI
-            SendRadioUpdateToDCS();
-
-            Logger.Debug("Update sent to DCS");
 
             var diff = new TimeSpan( DateTime.Now.Ticks - _clientStateSingleton.LastSent);
 
@@ -149,70 +68,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 Logger.Debug("Sending Radio Info To Server - Update");
                 _clientStateSingleton.LastSent = DateTime.Now.Ticks;
                 _radioUpdate();
-            }
-        }
-
-        //send updated radio info back to DCS for ingame GUI
-        private void SendRadioUpdateToDCS()
-        {
-            if (_dcsRadioUpdateSender == null)
-            {
-                _dcsRadioUpdateSender = new UdpClient();
-            }
-
-            try
-            {
-                var connectedClientsSingleton = ConnectedClientsSingleton.Instance;
-                int[] tunedClients = new int[11];
-
-                if (_clientStateSingleton.IsConnected
-                    && _clientStateSingleton.DcsPlayerRadioInfo !=null
-                    && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
-                {
-
-                    for (int i = 0; i < tunedClients.Length; i++)
-                    {
-                        var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[i];
-                        
-                        if (clientRadio.modulation != RadioInformation.Modulation.DISABLED)
-                        {
-                            tunedClients[i] = connectedClientsSingleton.ClientsOnFreq(clientRadio.freq, clientRadio.modulation);
-                        }
-                    }
-                }
-                
-                //get currently transmitting or receiving
-                var combinedState = new CombinedRadioState()
-                {
-                    RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
-                    RadioSendingState = _clientStateSingleton.RadioSendingState,
-                    RadioReceivingState = _clientStateSingleton.RadioReceivingState,
-                    ClientCountConnected = _clients.Total,
-                    TunedClients = tunedClients,
-                };
-
-                var message = JsonConvert.SerializeObject(combinedState, new JsonSerializerSettings
-                {
-                 //   NullValueHandling = NullValueHandling.Ignore,
-                    ContractResolver = new JsonDCSPropertiesResolver(),
-                }) + "\n";
-
-                var byteData =
-                    Encoding.UTF8.GetBytes(message);
-
-                //Logger.Info("Sending Update over UDP 7080 DCS - 7082 Flight Panels: \n"+message);
-
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length,
-                    new IPEndPoint(IPAddress.Parse("127.0.0.1"),
-                        _globalSettings.GetNetworkSetting(GlobalSettingsKeys.OutgoingDCSUDPInfo))); //send to DCS
-                _dcsRadioUpdateSender.Send(byteData, byteData.Length,
-                    new IPEndPoint(IPAddress.Parse("127.0.0.1"),
-                        _globalSettings.GetNetworkSetting(GlobalSettingsKeys
-                            .OutgoingDCSUDPOther))); // send to Flight Control Panels
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Exception Sending DCS Radio Update Message");
             }
         }
 
@@ -227,7 +82,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             //update common parts
             playerRadioInfo.name = message.name;
-            playerRadioInfo.inAircraft = message.inAircraft;
             playerRadioInfo.intercomHotMic = message.intercomHotMic; // This setting Comes via -> UDP Connection Socket with DCS (Backtrace function)
             playerRadioInfo.capabilities = message.capabilities;
 
@@ -244,11 +98,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
             playerRadioInfo.simultaneousTransmissionControl = message.simultaneousTransmissionControl;
 
             playerRadioInfo.unit = message.unit;
-
-            if (!_clientStateSingleton.ShouldUseLotATCPosition())
-            {
-                _clientStateSingleton.UpdatePlayerPosition(message.latLng);
-            }
 
             var overrideFreqAndVol = false;
 

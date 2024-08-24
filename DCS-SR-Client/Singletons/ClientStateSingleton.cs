@@ -132,8 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsExportLastReceived = 0;
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += (s, e) => {
-                NotifyPropertyChanged("IsGameConnected");
-                NotifyPropertyChanged("IsLotATCConnected");
                 NotifyPropertyChanged("ExternalAWACSModeConnected");
             };
             _timer.Start();
@@ -175,39 +173,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private void NotifyPropertyChanged(string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public bool ShouldUseLotATCPosition()
-        {
-            if (!IsLotATCConnected)
-            {
-                return false;
-            }
-
-            if (IsGameExportConnected)
-            {
-                if (DcsPlayerRadioInfo.inAircraft)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public void ClearPositionsIfExpired()
-        {
-            //not game or Lotatc - clear it!
-            if (!IsLotATCConnected && !IsGameExportConnected)
-            {
-                PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
-            }
-        }
-
-        public void UpdatePlayerPosition(DCSLatLngPosition latLngPosition)
-        {
-            PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-            DcsPlayerRadioInfo.latLng = latLngPosition;
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -34,6 +35,7 @@ namespace DCS_SR_Client
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool loggingReady = false;
         private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private string version;
 
         public App()
         {
@@ -41,6 +43,26 @@ namespace DCS_SR_Client
             FreeConsole();
 #endif
 
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+
+            SentrySdk.Init(o =>
+            {
+                o.Dsn = "https://6cf3a69b53596bb57aff005e6fd54296@o4507794910543872.ingest.de.sentry.io/4507795022217296";
+                o.AutoSessionTracking = true;
+#if DEBUG
+                o.Debug = true;
+                o.TracesSampleRate = 1.0;
+                o.Release = $"vngd-srs-client@{version}";
+                o.Environment = "development";
+#endif
+#if !DEBUG
+                o.Debug = false;
+                o.TracesSampleRate = 0.25;
+                o.Release = $"vngd-srs@{version}";
+                o.Environment = "production";
+#endif
+            });
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
@@ -114,7 +136,6 @@ namespace DCS_SR_Client
             RequireAdmin();
 
             InitNotificationIcon();
-
         }
 
         private void ListArgs()
@@ -272,6 +293,37 @@ namespace DCS_SR_Client
             // Maybe just a default for the moment?
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, fileWrapper));
 
+            config.AddSentry(options =>
+            {
+                options.Layout = "${message}";
+                // Optionally specify a separate format for breadcrumbs
+                options.BreadcrumbLayout = "${logger}: ${message}";
+
+                // Debug and higher are stored as breadcrumbs (default is Info)
+                options.MinimumBreadcrumbLevel = LogLevel.Debug;
+                // Error and higher is sent as event (default is Error)
+                options.MinimumEventLevel = LogLevel.Error;
+
+                // Send the logger name as a tag
+                options.AddTag("logger", "${logger}");
+
+                options.Dsn = "https://6cf3a69b53596bb57aff005e6fd54296@o4507794910543872.ingest.de.sentry.io/4507795022217296";
+
+#if DEBUG
+                options.Debug = true;
+                options.TracesSampleRate = 1.0;
+                options.Release = $"vngd-srs-client@{version}";
+                options.Environment = "development";
+#endif
+#if !DEBUG
+                options.Debug = false;
+                options.TracesSampleRate = 0.25;
+                options.Release = $"vngd-srs-client@{version}";
+                options.Environment = "production";
+#endif
+
+            });
+
             LogManager.Configuration = config;
             loggingReady = true;
 
@@ -353,7 +405,7 @@ namespace DCS_SR_Client
                 System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b =
  new List<KeyValuePair<string, string>>();
                 b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString()));
-                b.Add(new KeyValuePair<string, string>("user", WindowsIdentity.GetCurrent().Name));
+                b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
                 b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
                 b.Add(new KeyValuePair<string, string>("version", Regex.Replace(AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "")));
                 var addMe = new FormUrlEncodedContent(b);
@@ -389,6 +441,12 @@ namespace DCS_SR_Client
                 MessageBox.Show("No log file found! Issue could not be created.");
             }
 #endif
+
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.AddAttachment("clientlog.txt");
+            });
+            SentrySdk.CaptureException((Exception)e.ExceptionObject);
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]

@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -48,7 +46,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
 
         private DCSRadioSyncManager _radioDCSSync = null;
-        private LotATCSyncHandler _lotATCSync;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
         private VAICOMSyncHandler _vaicomSync;
@@ -61,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _guid = guid;
             _updateUICallback = uiCallback;
 
-            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
+            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
             _idleTimeout.Interval = TimeSpan.FromSeconds(10);
         }
@@ -135,11 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _radioDCSSync.Stop();
                 _radioDCSSync = null;
             }
-            if (_lotATCSync != null)
-            {
-                _lotATCSync.Stop();
-                _lotATCSync = null;
-            }
             if (_vaicomSync != null)
             {
                 _vaicomSync.Stop();
@@ -148,8 +140,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate);
-            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _newAircraft);
             _vaicomSync = new VAICOMSyncHandler();
 
             using (_tcpClient = new TcpClient())
@@ -165,7 +156,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     if (_tcpClient.Connected)
                     {
                         _radioDCSSync.Start();
-                        _lotATCSync.Start();
                         _vaicomSync.Start();
 
                         _tcpClient.NoDelay = true;
@@ -189,7 +179,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             _radioDCSSync.Stop();
-            _lotATCSync.Stop();
             _vaicomSync.Stop();
             _idleTimeout?.Stop();
 
@@ -239,14 +228,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 message.Client.LatLngPosition = new DCSLatLngPosition();
             }
 
-            SendToServer(message);    
+            SendToServer(message);
         }
 
         private void ClientCoalitionUpdate()
         {
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
 
-            var message =  new NetworkMessage
+            var message = new NetworkMessage
             {
                 Client = new SRClient
                 {
@@ -282,7 +271,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
-                 Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
+                Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
             }
         }
 
@@ -359,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             _serverSettings.Decode(serverMessage.ServerSettings);
                                         }
-                                        
+
                                         if (_clients.ContainsKey(serverMessage.Client.ClientGuid))
                                         {
                                             var srClient = _clients[serverMessage.Client.ClientGuid];
@@ -584,7 +573,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
                 {
-                    Logger.Debug("Sending Radio Update To Server: "+ (json));
+                    Logger.Debug("Sending Radio Update To Server: " + (json));
                 }
 
                 var bytes = Encoding.UTF8.GetBytes(json);

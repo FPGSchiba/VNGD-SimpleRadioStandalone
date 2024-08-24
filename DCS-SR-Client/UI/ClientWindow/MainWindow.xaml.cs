@@ -35,10 +35,11 @@ using NAudio.CoreAudioApi;
 using NLog;
 using WPFCustomMessageBox;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
-using GridLength = System.Windows.GridLength;
-using SelectionChangedEventArgs = System.Windows.Controls.SelectionChangedEventArgs;
+using System.Windows.Navigation;
+using System.Security.Cryptography;
+using System.Net.Http;
+using Sentry;
+using System.Transactions;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -117,7 +118,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private HomePage _homePage;
         private const int HomePageIndex = 5;
-        
+
+        // Sentry Transactions
+        private ITransactionTracer connectionTransaction;
+        private ISpan connectionAwacsSpan;
+
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
@@ -242,7 +247,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ReloadProfile();
 
             InitInput();
-            
+
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
@@ -1729,7 +1734,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ToggleServerSettings.IsEnabled = true;
 
                 bool eamEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-                
+
                 ConnectExternalAWACSMode.IsEnabled = eamEnabled;
                 ConnectExternalAWACSMode.Content = ClientState.ExternalAWACSModelSelected ? "Disconnect: Radios" : "Connect: Radios";
             }
@@ -2542,6 +2547,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 ConnectedAt = DateTime.UtcNow;
                 OpenPageByIndex(GuestSuccessIndex);
+                connectionAwacsSpan.Finish();
             }
             else
             {
@@ -2568,6 +2574,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     Stop(true);
                 }
             }
+
+            connectionTransaction.Finish();
         }
 
         private void RescanInputDevices(object sender, RoutedEventArgs e)
@@ -2902,7 +2910,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
             Connect(ip, GetPortFromTextBox());
         }
-        
+
         private string GetAddressFromTextBox()
         {
             var addr = this.ServerIp.Text.Trim();
