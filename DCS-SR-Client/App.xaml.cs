@@ -4,15 +4,19 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using MahApps.Metro.Controls;
+using NAudio.SoundFont;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -37,7 +41,6 @@ namespace DCS_SR_Client
             FreeConsole();
 #endif
 
-            SentrySdk.Init("https://1b22a96cbcc34ee4b9db85c7fa3fe4e3@o414743.ingest.sentry.io/5304752");
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
@@ -130,7 +133,7 @@ namespace DCS_SR_Client
             {
                 return;
             }
-            
+
             WindowsPrincipal principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
             bool hasAdministrativeRight = principal.IsInRole(WindowsBuiltInRole.Administrator);
 
@@ -172,9 +175,9 @@ namespace DCS_SR_Client
             }
             else
             {
-                
+
             }
-           
+
         }
 
         private string GetArgsString()
@@ -233,7 +236,7 @@ namespace DCS_SR_Client
         private void SetupLogging()
         {
             // If there is a configuration file then this will already be set
-            if(LogManager.Configuration != null)
+            if (LogManager.Configuration != null)
             {
                 loggingReady = true;
                 return;
@@ -267,7 +270,7 @@ namespace DCS_SR_Client
             config.AddTarget("asyncFileTarget", fileWrapper);
             // TODO: clever way to enable trace logging to file.
             // Maybe just a default for the moment?
-            config.LoggingRules.Add( new LoggingRule("*", LogLevel.Trace, fileWrapper));
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, fileWrapper));
 
             LogManager.Configuration = config;
             loggingReady = true;
@@ -278,7 +281,7 @@ namespace DCS_SR_Client
 
         private void InitNotificationIcon()
         {
-            if(_notifyIcon != null)
+            if (_notifyIcon != null)
             {
                 return;
             }
@@ -318,12 +321,11 @@ namespace DCS_SR_Client
         private void NotifyIcon_Quit(object sender, EventArgs args)
         {
             MainWindow.Close();
-
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            if(_notifyIcon !=null)
+            if (_notifyIcon != null)
                 _notifyIcon.Visible = false;
             base.OnExit(e);
         }
@@ -341,7 +343,6 @@ namespace DCS_SR_Client
             MessageBox.Show(
                 "This was an SRS Crash!\nPlease open the logfile: `clientlog.txt` in the folder: `VNGD-SimpleRadioStandalone/DCS-SR-Client/bin/Debug/`. There you will find more information.",
                 "Debug Crash", MessageBoxButton.OK);
-
 #endif
 #if !DEBUG
             // Request creates an Issue on GitHub with the LogFile
@@ -351,9 +352,10 @@ namespace DCS_SR_Client
             {
                 System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> b =
  new List<KeyValuePair<string, string>>();
-                b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString())); 
-                b.Add(new KeyValuePair<string, string>("user", System.Security.Principal.WindowsIdentity.GetCurrent().Name));
+                b.Add(new KeyValuePair<string, string>("log", e.ExceptionObject.ToString()));
+                b.Add(new KeyValuePair<string, string>("user", WindowsIdentity.GetCurrent().Name));
                 b.Add(new KeyValuePair<string, string>("time", DateTime.Now.ToString()));
+                b.Add(new KeyValuePair<string, string>("version", Regex.Replace(AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "")));
                 var addMe = new FormUrlEncodedContent(b);
 
                 content.Add(addMe);
@@ -361,15 +363,26 @@ namespace DCS_SR_Client
  Task.Run(() => client.PostAsync("https://06k9wc7197.execute-api.us-east-1.amazonaws.com/dev/issue", content));
                 task.Wait();
                 var result = task.Result;
+                var resultCode = result.StatusCode;
                 var readTask = Task.Run(() => result.Content.ReadAsStringAsync());
                 readTask.Wait();
                 var resultContent = readTask.Result;
 
-                if (MessageBox.Show("This was an SRS Crash!\nThis cool new Feature now automatically created a Ticket reporting your Crash!\nWe will try to figure our your issue and maybe go to the Ticket and comment your Discord so we can reach out.\n\nWould you like to see the Issue?", "Open Issue", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                switch (resultCode)
                 {
-                    System.Diagnostics.Process.Start(resultContent);
+                    case HttpStatusCode.OK:
+                        if (MessageBox.Show("This was an SRS Crash!\nThis cool new Feature now automatically created a Ticket reporting your Crash!\nWe will try to figure our your issue and maybe go to the Ticket and comment your Discord so we can reach out.\n\nWould you like to see the Issue?", "Open Issue", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            System.Diagnostics.Process.Start(resultContent);
+                        }
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        MessageBox.Show("The SRS Crash Reporting tool did not create a Crash Report! \nThis is intentional, because this build does not have a valid Version.");
+                        break;
+                    case HttpStatusCode.InternalServerError:
+                        MessageBox.Show($"The Creation of the Crash Report failed: \n\n{resultContent}\n\nPlease report this in the SRS Discord!");
+                        break;
                 }
-                
             }
             catch (FileNotFoundException ex)
             {

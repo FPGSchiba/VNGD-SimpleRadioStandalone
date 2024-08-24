@@ -69,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
 
             if (inMHz)
             {
-                frequency = frequency * MHz;
+                frequency *= MHz;
             }
 
             var radio = GetRadio(radioId);
@@ -122,6 +122,78 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                     {
                         inLimit = false;
                         radio.freq = radio.freqMin;
+                    }
+
+                    //set to no channel
+                    radio.channel = -1;
+
+                    //make radio data stale to force resysnc
+                    ClientStateSingleton.Instance.LastSent = 0;
+                }
+            }
+            return inLimit;
+        }
+
+        public static bool UpdateStandbyRadioFrequency(double standbyfrequency, int radioId, bool delta = true, bool inMHz = true)
+        {
+            bool inLimit = true;
+            const double MHz = 1000000;
+
+            if (inMHz)
+            {
+                standbyfrequency *= MHz;
+            }
+
+            var radio = GetRadio(radioId);
+
+            if (radio != null && radioId > 0)
+            {
+                if (radio.modulation != RadioInformation.Modulation.DISABLED
+                    && radio.modulation != RadioInformation.Modulation.INTERCOM
+                    && radio.freqMode == RadioInformation.FreqMode.OVERLAY)
+                {
+                    if (delta)
+                    {
+                        if (GlobalSettingsStore.Instance.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RotaryStyleIncrement))
+                        {
+                            // Easier to simply shift the decimal place value to the ones position for finding numeral at specific position
+                            double adjustedFrequency = Math.Abs((int)Math.Round(radio.freq / standbyfrequency));
+
+                            double deltaPosition = (adjustedFrequency % 10) - (adjustedFrequency % 1) / 1; // calculate the value of the position where the delta will be applied
+                            double rollOverValue = standbyfrequency < 0 ? 0 : 9;
+                            double futureValue = standbyfrequency + radio.standbyfreq; // used for checking 10Mhz increments 
+
+                            if (Math.Abs(standbyfrequency) <= 1000000)
+                            {
+                                standbyfrequency = deltaPosition == rollOverValue ? standbyfrequency *= -9 : standbyfrequency;
+                            }
+                            else if (standbyfrequency < 0 && radio.freqMin > futureValue)
+                            {
+                                standbyfrequency = 0;
+                            }
+                            else if (futureValue > radio.freqMax)
+                            {
+                                standbyfrequency = 0;
+                            }
+                        }
+
+                        radio.standbyfreq = (int)Math.Round(radio.standbyfreq + standbyfrequency);
+                    }
+                    else
+                    {
+                        radio.standbyfreq = (int)Math.Round(standbyfrequency);
+                    }
+
+                    //make sure we're not over or under a limit
+                    if (radio.standbyfreq > radio.freqMax)
+                    {
+                        inLimit = false;
+                        radio.standbyfreq = radio.freqMax;
+                    }
+                    else if (radio.freq < radio.freqMin)
+                    {
+                        inLimit = false;
+                        radio.standbyfreq = radio.freqMin;
                     }
 
                     //set to no channel
@@ -323,6 +395,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
                 var radio = GetRadio(radioId);
 
                 if (radio != null) radio.channel = selectedPresetChannel.Channel;
+            }
+        }
+
+        //Dabble Added to try to make the channel dropdown work for the standby frequencies
+        public static void SelectStandbyRadioChannel(PresetChannel selectedPresetChannel, int radioId)
+        {
+            if (UpdateStandbyRadioFrequency((double)selectedPresetChannel.Value, radioId, false, false))
+            {
+                var radio = GetRadio(radioId);
+
+                if (radio != null) radio.standbychannel = selectedPresetChannel.Channel;
             }
         }
 

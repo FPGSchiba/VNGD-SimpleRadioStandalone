@@ -89,6 +89,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenTransparentWidth,
         RadioTenTransparentHeight,
 
+        // Radio 10S
+        RadioTenSwitchX,
+        RadioTenSwitchY,
+        RadioTenSwitchSize,
+        RadioTenSwitchBackgroundOpacity,
+        RadioTenSwitchTextOpacity,
+        RadioTenSwitchWidth,
+        RadioTenSwitchHeight,
+
         // --------- Horizontal Panels --------------
         // Radio 1H
         RadioOneHorizontalX,
@@ -142,6 +151,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ClientX,
         ClientY,
         #endregion
+
+        Radio1Enabled,
+        Radio2Enabled,
+        Radio3Enabled,
+        Radio4Enabled,
+        Radio5Enabled,
+        Radio6Enabled,
+        Radio7Enabled,
+        Radio8Enabled,
+        Radio9Enabled,
+        Radio10Enabled,
 
         MicAudioOutputDeviceId,
 
@@ -619,6 +639,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.ClientY.ToString(), "200"},
 
 #endregion
+
+            // Radio Toggle Settings
+            {GlobalSettingsKeys.Radio1Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio2Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio3Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio4Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio5Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio6Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio7Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio8Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio9Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio10Enabled.ToString(), "true"},
 
             //    {GlobalSettingsKeys.CliendIdShort.ToString(), ShortGuid.NewGuid().ToString()},
             {GlobalSettingsKeys.ClientIdLong.ToString(), Guid.NewGuid().ToString()},
