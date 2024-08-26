@@ -884,6 +884,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioVolumeDown.InputName = "Radio Volume Down";
             RadioVolumeDown.ControlInputBinding = InputBinding.RadioVolumeDown;
             RadioVolumeDown.InputDeviceManager = InputManager;
+
+            RadioSwap.InputName = "Radio Swap";   //Dabble Added
+            RadioSwap.ControlInputBinding = InputBinding.RadioSwap;
+            RadioSwap.InputDeviceManager = InputManager;
         }
 
         #region Pages and Navigation

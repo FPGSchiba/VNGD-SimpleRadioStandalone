@@ -342,7 +342,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ModifierIntercomPTT = 236,
 
         AwacsOverlayToggle = 137,
-        ModifierAwacsOverlayToggle = 237
+        ModifierAwacsOverlayToggle = 237,
+
+        RadioSwap = 138,           //Dabble Added - Swaps active radio standby and active radio frequencies
+        ModifierRadioSwap= 238     //Dabble Added
     }
 
 
@@ -642,8 +645,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             // Radio Toggle Settings
             {GlobalSettingsKeys.Radio1Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio2Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio3Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio2Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio3Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio4Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio5Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio6Enabled.ToString(), "false"},

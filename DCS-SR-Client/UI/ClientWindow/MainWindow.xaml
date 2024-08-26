@@ -553,6 +553,7 @@
                                             <RowDefinition/>
                                             <RowDefinition/>
                                             <RowDefinition/>
+                                            <RowDefinition/>
                                         </Grid.RowDefinitions>
 
                                         <Label
@@ -877,6 +878,12 @@
                                             Grid.Row="43"
                                             InputName="Transponder IDENT"
                                             x:Name="TransponderIDENT"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.RadioSwap}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="44"
+                                            InputName="Radio Swap"
+                                            x:Name="RadioSwap"/>
                                     </Grid>
 
                                 </StackPanel>

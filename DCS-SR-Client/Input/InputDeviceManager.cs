@@ -789,8 +789,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                         RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
                                         break;
 
+                                    
+                                    case InputBinding.RadioSwap:      // Dabble Added for Radio Swap Keybind Functionality
+                                            var RadioId = dcsPlayerRadioInfo.selected;
+                                                                                 
+                                            var freq = 100;             // need to add link to active frequency
+                                            var standbyFreq = 200 ;     // need to add link to standby frequency
 
-                                    default:
+
+                                        RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+                                        RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
+                                        break;
+
+                                        default:
                                         break;
                                 }
                             }
@@ -915,7 +926,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.AwacsOverlayToggle; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.RadioSwap; i++)  //dabble updated to reflect last binding on list
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {
