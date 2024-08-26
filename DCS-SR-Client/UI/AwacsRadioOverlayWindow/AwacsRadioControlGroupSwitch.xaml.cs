@@ -361,7 +361,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                                 (currentRadio.freq / MHz).ToString("0.000",
                                     CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
 
-                            SwapRadio.Visibility = Visibility.Visible;
+                            SwapRadio.Visibility = Visibility.Visible;  //makes swap radio button visible when radio is turned on - Dabble
                         }
 
                         if (!StandbyRadioFrequency.IsFocused)
@@ -370,7 +370,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                                 (currentRadio.standbyfreq / MHz).ToString("0.000",
                                     CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
 
-                            SwapRadio.Visibility = Visibility.Visible;
+                            SwapRadio.Visibility = Visibility.Visible;   //makes swap radio button visible when radio is turned on (not sure if this line is necessary. added for redundancy - dabble
                         }
                     }
                 }
