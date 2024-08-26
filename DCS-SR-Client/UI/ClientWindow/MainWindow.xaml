@@ -554,6 +554,25 @@
                                             <RowDefinition/>
                                             <RowDefinition/>
                                             <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
                                         </Grid.RowDefinitions>
 
                                         <Label
@@ -884,6 +903,97 @@
                                             Grid.Row="44"
                                             InputName="Radio Swap"
                                             x:Name="RadioSwap"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio1HToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="45"
+                                            InputName="1 Horizontal Radio Panel Toggle"
+                                            x:Name="Radio1HToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio1VToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="46"
+                                            InputName="1 Vertical Radio Panel Toggle"
+                                            x:Name="Radio1VToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio2HToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="47"
+                                            InputName="2 Horizontal Radio Panel Toggle"
+                                            x:Name="Radio2HToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio2VToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="48"
+                                            InputName="2 Vertical Radio Panel Toggle"
+                                            x:Name="Radio2VToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio3HToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="49"
+                                            InputName="3 Horizontal Radio Panel Toggle"
+                                            x:Name="Radio3HToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio3VToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="50"
+                                            InputName="3 Vertical Radio Panel Toggle"
+                                            x:Name="Radio3VToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio5HToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="51"
+                                            InputName="5 Horizontal Radio Panel Toggle"
+                                            x:Name="Radio5HToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio5VToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="52"
+                                            InputName="5 Vertical Radio Panel Toggle"
+                                            x:Name="Radio5VToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10HToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="53"
+                                            InputName="10 Horizontal Radio Panel Toggle"
+                                            x:Name="Radio10HToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10VToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="54"
+                                            InputName="10 Vertical Radio Panel Toggle"
+                                            x:Name="Radio10VToggle"/>
+
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10HWToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="55"
+                                            InputName="10 Horizontal Wide Radio Panel Toggle"
+                                            x:Name="Radio10HWToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="56"
+                                            InputName="10 Vertical Long Radio Panel Toggle"
+                                            x:Name="Radio10VLToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10TToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="57"
+                                            InputName="Compact Radio Panel - Original Toggle"
+                                            x:Name="Radio10TToggle"/>
+                                        <local:InputBindingControl
+                                            ControlInputBinding="{x:Static settings:InputBinding.Radio10SToggle}"
+                                            Grid.ColumnSpan="5"
+                                            Grid.Row="58"
+                                            InputName="Compact Radio Panel - New Toggle"
+                                            x:Name="Radio10SToggle"/>
+
+
+
+
+
+
                                     </Grid>
 
                                 </StackPanel>
