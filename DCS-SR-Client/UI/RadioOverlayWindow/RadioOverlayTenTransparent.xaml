@@ -50,7 +50,7 @@
                 FontSize="8"
                 Foreground="#E7E7E7"
                 Padding="0"
-                Text="Transparent Radio Panel" />
+                Text="Compact Radio Panel - Original" />
             <TextBlock Name="Orientation"
                Visibility="Collapsed"
                Width="28"

@@ -399,14 +399,7 @@
                                                     Style="{DynamicResource SquareButtonStyle}"
                                                     Width="150"
                                                     x:Name="ShowOverlayTenHorizontalWide"/>
-                                                <Button
-                                                    Click="ShowOverlayTenSwitch_OnClick"
-                                                    Content="Switch"
-                                                    HorizontalAlignment="Center"
-                                                    Margin="0,5,0,0"
-                                                    Style="{DynamicResource SquareButtonStyle}"
-                                                    Width="150"
-                                                    x:Name="ShowOverlayDragable"/>
+                                                
 
                                             </StackPanel>
                                             <StackPanel
@@ -417,17 +410,25 @@
                                                     Height="15"
                                                     HorizontalAlignment="Center"
                                                     Margin="0,0,0,0"
-                                                    Text="Transparent Radio Panels"
+                                                    Text="Compact Radio Panels"
                                                     VerticalAlignment="Center"
                                                     Width="150"/>
                                                 <Button
                                                     Click="ShowOverlayTenTransparent_OnClick"
-                                                    Content="10 Transparent"
+                                                    Content="Original"
                                                     HorizontalAlignment="Center"
                                                     Margin="0,5,0,0"
                                                     Style="{DynamicResource SquareButtonStyle}"
                                                     Width="150"
                                                     x:Name="ShowOverlayTenTransparent"/>
+                                                <Button
+                                                    Click="ShowOverlayTenSwitch_OnClick"
+                                                    Content="Switchable"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,5,0,0"
+                                                    Style="{DynamicResource SquareButtonStyle}"
+                                                    Width="150"
+                                                    x:Name="ShowOverlayDragable"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
