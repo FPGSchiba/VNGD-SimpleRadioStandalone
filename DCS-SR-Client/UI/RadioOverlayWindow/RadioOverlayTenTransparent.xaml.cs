@@ -365,6 +365,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             buttonAbout.Opacity = e.NewValue;
             buttonMinimize.Opacity = e.NewValue;
             buttonClose.Opacity = e.NewValue;
+            buttonExpand.Opacity = e.NewValue;
 
             //Radio 1
             Radio1.RadioEnabled.Opacity = e.NewValue;

@@ -257,9 +257,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 //Color and settings for disconnected radio
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
+                
                 RadioFrequency.Text = "Unknown";
+                StandbyRadioFrequency.Text = "Unknown";
 
                 RadioMetaData.Text = "";
+                StandbyRadioMetaData.Text = "";
 
                 RadioVolume.IsEnabled = false;
 
@@ -318,6 +321,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
 
+                    StandbyRadioFrequency.Text = "";
+                    StandbyRadioMetaData.Text = "";
+
+                    SwapRadio.Visibility = Visibility.Hidden;
+
                     RadioVolume.IsEnabled = true; // volume slider works even when radio is turned off.
 
                     ToggleButtons(false);
@@ -352,6 +360,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                             RadioFrequency.Text =
                                 (currentRadio.freq / MHz).ToString("0.000",
                                     CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
+
+                            SwapRadio.Visibility = Visibility.Visible;
                         }
 
                         if (!StandbyRadioFrequency.IsFocused)
@@ -359,6 +369,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                             StandbyRadioFrequency.Text =
                                 (currentRadio.standbyfreq / MHz).ToString("0.000",
                                     CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
+
+                            SwapRadio.Visibility = Visibility.Visible;
                         }
                     }
                 }

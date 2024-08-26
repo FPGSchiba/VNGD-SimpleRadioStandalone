@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
 
-        private double radioHeight = 10;
+        private double radioHeight = 20;
         private double currentHeight;
 
         private long _lastUnitId;
@@ -365,6 +365,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             buttonAbout.Opacity = e.NewValue;
             buttonMinimize.Opacity = e.NewValue;
             buttonClose.Opacity = e.NewValue;
+            buttonExpand.Opacity = e.NewValue;
 
             //Radio 1
             Radio1.RadioEnabled.Opacity = e.NewValue;
@@ -376,6 +377,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio1.TransmitterName.Opacity = e.NewValue;
             Radio1.RadioActive.Opacity = e.NewValue;
             Radio1.RadioVolume.Opacity = e.NewValue;
+            Radio1.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio1.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio1.SwapRadio.Opacity = e.NewValue;
+            Radio1.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 2
             Radio2.RadioEnabled.Opacity = e.NewValue;
             Radio2.PresetChannelsView.Opacity = e.NewValue;
@@ -386,6 +391,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio2.TransmitterName.Opacity = e.NewValue;
             Radio2.RadioActive.Opacity = e.NewValue;
             Radio2.RadioVolume.Opacity = e.NewValue;
+            Radio2.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio2.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio2.SwapRadio.Opacity = e.NewValue;
+            Radio2.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 3
             Radio3.RadioEnabled.Opacity = e.NewValue;
             Radio3.PresetChannelsView.Opacity = e.NewValue;
@@ -396,6 +405,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio3.TransmitterName.Opacity = e.NewValue;
             Radio3.RadioActive.Opacity = e.NewValue;
             Radio3.RadioVolume.Opacity = e.NewValue;
+            Radio3.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio3.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio3.SwapRadio.Opacity = e.NewValue;
+            Radio3.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 4
             Radio4.RadioEnabled.Opacity = e.NewValue;
             Radio4.PresetChannelsView.Opacity = e.NewValue;
@@ -406,6 +419,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio4.TransmitterName.Opacity = e.NewValue;
             Radio4.RadioActive.Opacity = e.NewValue;
             Radio4.RadioVolume.Opacity = e.NewValue;
+            Radio4.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio4.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio4.SwapRadio.Opacity = e.NewValue;
+            Radio4.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 5
             Radio5.RadioEnabled.Opacity = e.NewValue;
             Radio5.PresetChannelsView.Opacity = e.NewValue;
@@ -416,6 +433,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio5.TransmitterName.Opacity = e.NewValue;
             Radio5.RadioActive.Opacity = e.NewValue;
             Radio5.RadioVolume.Opacity = e.NewValue;
+            Radio5.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio5.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio5.SwapRadio.Opacity = e.NewValue;
+            Radio5.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 6
             Radio6.RadioEnabled.Opacity = e.NewValue;
             Radio6.PresetChannelsView.Opacity = e.NewValue;
@@ -426,6 +447,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio6.TransmitterName.Opacity = e.NewValue;
             Radio6.RadioActive.Opacity = e.NewValue;
             Radio6.RadioVolume.Opacity = e.NewValue;
+            Radio6.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio6.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio6.SwapRadio.Opacity = e.NewValue;
+            Radio6.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 7
             Radio7.RadioEnabled.Opacity = e.NewValue;
             Radio7.PresetChannelsView.Opacity = e.NewValue;
@@ -436,6 +461,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio7.TransmitterName.Opacity = e.NewValue;
             Radio7.RadioActive.Opacity = e.NewValue;
             Radio7.RadioVolume.Opacity = e.NewValue;
+            Radio7.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio7.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio7.SwapRadio.Opacity = e.NewValue;
+            Radio7.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 8
             Radio8.RadioEnabled.Opacity = e.NewValue;
             Radio8.PresetChannelsView.Opacity = e.NewValue;
@@ -446,6 +475,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio8.TransmitterName.Opacity = e.NewValue;
             Radio8.RadioActive.Opacity = e.NewValue;
             Radio8.RadioVolume.Opacity = e.NewValue;
+            Radio8.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio8.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio8.SwapRadio.Opacity = e.NewValue;
+            Radio8.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 9
             Radio9.RadioEnabled.Opacity = e.NewValue;
             Radio9.PresetChannelsView.Opacity = e.NewValue;
@@ -456,6 +489,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio9.TransmitterName.Opacity = e.NewValue;
             Radio9.RadioActive.Opacity = e.NewValue;
             Radio9.RadioVolume.Opacity = e.NewValue;
+            Radio9.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio9.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio9.SwapRadio.Opacity = e.NewValue;
+            Radio9.RadioTextGroupStandby.Opacity = e.NewValue;
             //Radio 10
             Radio10.RadioEnabled.Opacity = e.NewValue;
             Radio10.PresetChannelsView.Opacity = e.NewValue;
@@ -466,6 +503,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio10.TransmitterName.Opacity = e.NewValue;
             Radio10.RadioActive.Opacity = e.NewValue;
             Radio10.RadioVolume.Opacity = e.NewValue;
+            Radio10.StandbyRadioFrequency.Opacity = e.NewValue;
+            Radio10.StandbyRadioMetaData.Opacity = e.NewValue;
+            Radio10.SwapRadio.Opacity = e.NewValue;
+            Radio10.RadioTextGroupStandby.Opacity = e.NewValue;
             //Vox and Intercom
             Intercom.Opacity = e.NewValue;
             //Footer

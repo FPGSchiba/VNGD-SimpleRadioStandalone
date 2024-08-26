@@ -197,7 +197,7 @@
                     Width="30"
                     x:Name="StandbyRadioFrequency" />
                 <TextBlock
-                    Background="Transparent"
+                    Background="Black"
                     FontSize="8"
                     Foreground="#003b00"
                     Height="10"
