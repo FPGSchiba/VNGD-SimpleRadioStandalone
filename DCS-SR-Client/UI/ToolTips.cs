@@ -8,6 +8,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public static ToolTip ExternalAWACSMode;
         public static ToolTip ExternalAWACSModeName;
         public static ToolTip ExternalAWACSModePassword;
+        public static ToolTip ServerIp;
 
         public static void Init()
         {
@@ -41,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
             externalAWACSModeNameContent.Children.Add(new TextBlock
             {
-                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"[DI] FPGSchiba.\" \n\n First Fleet ID Codes as follows: \n Atlas = [AT] \n Benevolence = [BE] \n Chaos = [CH] \n Command= CO \n Defiant = [DF] \n Discovery = [DI] \n Fleet Services = [FS] \n Kraken Trading Company = [KT] \n Mako Media = [MM] \n Nighthawks = [NH] \n Obsidian = [OB] \n Rock Raiders = [RR] \n Rogue Racing = [RG] \n Shinobi = [SH] \n Taccom = [TC] \n Vice = [VC] \n Witcher = [WT] \n\n See Vanguard SRS SOP for more details "
+                Text = "Enter your First Fleet Identification Code followed by your Vanguard Playername.\nExample: \"[DI] FPGSchiba.\" \n\n First Fleet ID Codes as follows: \n Benevolence = [BE] \n Chaos = [CH] \n Command= [CO] \n Defiant = [DF] \n Discovery = [DI] \n Fleet Services = [FS] \n Jackals = [JA] \n Kraken Trading Company = [KT] \n Mako Media = [MM]  \n Obsidian = [OB] \n Rock Raiders = [RR] \n Rogue Racing = [RG] \n Shinobi = [SH] \n Taccom = [TC] \n Vice = [VC] \n Witcher = [WT] \n\n The operation may require you to use a custom FFID. Check with the operation commander for more info. \n See Vanguard SRS SOP for more details "
             });
 
             ExternalAWACSModeName.Content = externalAWACSModeNameContent;
@@ -65,6 +66,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             });
 
             ExternalAWACSModePassword.Content = externalAWACSModePasswordContent;
+
+            ServerIp = new ToolTip();
+            StackPanel ServerIpcontent = new StackPanel();
+
+            ServerIpcontent.Children.Add(new TextBlock
+            {
+                Text = "Server IP Address",
+                FontWeight = FontWeights.Bold
+            });
+            ServerIpcontent.Children.Add(new TextBlock
+            {
+                Text = "You can find the current Vanguard SRS IP address under the #SRS-Status Channel on the Vanguard Discord."
+            });
+            ServerIpcontent.Children.Add(new TextBlock
+            {
+                Text = "Note: You must be at least a Talon Cadet to view the channel."
+            });
+
+            ServerIp.Content = ServerIpcontent;
+
         }
     }
 }

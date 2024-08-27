@@ -1215,6 +1215,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ExternalAWACSModePassword.ToolTip = ToolTips.ExternalAWACSModePassword;
             ExternalAWACSModeName.ToolTip = ToolTips.ExternalAWACSModeName;
+            ServerIp.ToolTip = ToolTips.ServerIp;
         }
 
         public InputDeviceManager InputManager { get; set; }
@@ -1694,7 +1695,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
 
-                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.com/invite/5Z7UHMzf4P");
+                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/5Z7UHMzf4P");   //Dabble updated to reflect VNGD SRS Dev Team Discord
                     }
                 }
             }
