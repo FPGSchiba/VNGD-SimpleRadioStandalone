@@ -39,9 +39,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
             _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
             var lastSeenName = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
-            var fleetCode = Regex.Match(lastSeenName, "(?<=\\[)([A-Z]{2})(?=\\])").Value;
+            var fleetCode = Regex.Match(lastSeenName, "(?<=\\[)([A-Z]{2,4})(?=\\])").Value;
             FleetCodeInput.Text = fleetCode;
-            var playerName = Regex.Replace(lastSeenName, "\\[[A-Z]{2}\\]\\s", "");
+            var playerName = Regex.Replace(lastSeenName, "\\[[A-Z]{2,4}\\]\\s", "");
             PlayerNameInput.Text = playerName;
             IpInput.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).RawValue;
         }

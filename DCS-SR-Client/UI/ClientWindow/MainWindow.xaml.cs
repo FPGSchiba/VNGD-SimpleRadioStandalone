@@ -1007,19 +1007,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             OpenPageByIndex(HomePageIndex);
         }
 
-        private void On_HomeLargePanelClicked()
+        public void On_HomeSwitchClicked()
         {
-            _logger.Warn("Not Implemented yet!");
+            ToggleOverlay(true, 13);
         }
 
-        private void On_HomeMiniaturePanelClicked()
+        public void On_HomeTransparentClicked()
         {
-            _logger.Warn("Not Implemented yet!");
+            ToggleOverlay(true, 12);
+        }
+        
+        public void On_HomeLayoutClicked()
+        {
+            ToggleOverlay(true, 5);
         }
 
-        private void On_HomeLogOutClicked()
+        public void On_HomeLogOutClicked()
         {
-            _logger.Warn("Not Implemented yet!");
+            ConnectAWACSMode();
+            Stop();
+            OpenPageByIndex(WelcomeIndex);
         }
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
@@ -1485,7 +1492,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             ClientState.IsConnectionErrored = connectionError;
 
-            StartStop.Content = "Connect: Server";
+            StartStop.Content = "Connect";
             StartStop.IsEnabled = true;
             Mic.IsEnabled = true;
             Speakers.IsEnabled = true;
@@ -1591,7 +1598,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     try
                     {
-                        StartStop.Content = "Disconnect: Server";
+                        StartStop.Content = "disconnect";
                         StartStop.IsEnabled = true;
 
                         ConnectionStatus.Fill = Brushes.Orange;
@@ -2112,7 +2119,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question);
 
-                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect: server");
+                    connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect");
                 }
 
                 if (connectToServer)
@@ -2549,7 +2556,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
-                StartStop.Content = "Disconnect";
+                StartStop.Content = "disconnect";
                 
                 _guestPage.LoginInProgress.Opacity = 0;
                 ConnectionStatus.Fill = Brushes.Green;
@@ -2571,6 +2578,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
                 OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
                 _connectionAwacsSpan.Finish();
+                
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new SentryUser
+                    {
+                        Username = ClientState.LastSeenName
+                    };
+                });
             }
             else
             {
@@ -2583,9 +2598,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _coalitionPassword = "";
                 _playerName = "";
+                
+                ConnectionStatus.Fill = Brushes.Orange;
 
                 StartStop.Content = "Connect";
                 LoggedIn = false;
+                ConnectedAt = new DateTime();
                 ExternalAWACSModePassword.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
                 ExternalAWACSModeName.IsEnabled = _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
 
@@ -2597,6 +2615,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _logger.Warn("Stopping server connection...");
                     Stop(true);
                 }
+                
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new SentryUser();
+                });
             }
 
             _connectionTransaction.Finish();

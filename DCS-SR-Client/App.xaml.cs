@@ -441,12 +441,11 @@ namespace DCS_SR_Client
                 MessageBox.Show("No log file found! Issue could not be created.");
             }
 #endif
-
-            SentrySdk.ConfigureScope(scope =>
+                
+            SentrySdk.CaptureException((Exception)e.ExceptionObject, scope =>
             {
                 scope.AddAttachment("clientlog.txt");
             });
-            SentrySdk.CaptureException((Exception)e.ExceptionObject);
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]

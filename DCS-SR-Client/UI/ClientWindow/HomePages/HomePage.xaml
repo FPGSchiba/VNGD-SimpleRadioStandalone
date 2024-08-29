@@ -103,8 +103,7 @@
             Margin="0"
             Padding="0,2,0,0"
             TabStripPlacement="Left"
-            VerticalAlignment="Bottom"
-            Width="185">
+            VerticalAlignment="Bottom">
             <TabItem Height="40" Width="185">
                 <TabItem.Header>
                     <StackPanel
@@ -125,13 +124,7 @@
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <TabItem.Content>
-                    <Frame
-                        Height="270"
-                        Margin="0,-60,0,0"
-                        Width="415"
-                        x:Name="CommunicationsFrame" />
-                </TabItem.Content>
+                <Frame Margin="0,-62,0,0" Source="CommunicationsPage.xaml"/>
             </TabItem>
             <TabItem Height="40" Width="185">
                 <TabItem.Header>
@@ -153,13 +146,7 @@
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <TabItem.Content>
-                    <Frame
-                        Height="270"
-                        Margin="0,-60,0,0"
-                        Width="415"
-                        x:Name="ServerDetailsFrame" />
-                </TabItem.Content>
+                <Frame Margin="0, -62, 0, 0" Source="ServerDetailsPage.xaml" />
             </TabItem>
             <TabItem Height="40" Width="185">
                 <TabItem.Header>
@@ -181,13 +168,7 @@
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <TabItem.Content>
-                    <Frame
-                        Height="270"
-                        Margin="0,-60,0,0"
-                        Width="415"
-                        x:Name="PlayerListFrame" />
-                </TabItem.Content>
+                <Frame Margin="0,-62,0,0" Source="PlayerListPage.xaml" />
             </TabItem>
             <TabItem
                 Height="40"
@@ -213,13 +194,7 @@
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <TabItem.Content>
-                    <Frame
-                        Height="270"
-                        Margin="0,-60,0,0"
-                        Width="415"
-                        x:Name="AdministrationFrame" />
-                </TabItem.Content>
+                <Frame Margin="0,-62,0,0" Source="AdministrationPage.xaml" />
             </TabItem>
         </TabControl>
     </Grid>
