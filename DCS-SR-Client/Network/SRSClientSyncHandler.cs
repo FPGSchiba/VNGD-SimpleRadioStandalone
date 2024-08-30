@@ -403,6 +403,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after Update message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 
@@ -453,6 +456,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after SYNC message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 
@@ -468,6 +474,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after Server Settings message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 

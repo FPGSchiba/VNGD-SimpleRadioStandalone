@@ -15,12 +15,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
             
             _mainWindow = Application.Current.MainWindow as MainWindow;
             
-            // Pages
-            CommunicationsFrame.Content = new CommunicationsPage();
-            ServerDetailsFrame.Content = new ServerDetailsPage();
-            PlayerListFrame.Content = new PlayerListPage();
-            AdministrationFrame.Content = new AdministrationPage();
-            
             // UI Setup
             if (_mainWindow != null)
             {
