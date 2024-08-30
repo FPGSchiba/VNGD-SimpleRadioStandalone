@@ -74,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private const int NoWindowOpen = 14;
+        private const int NoWindowOpen = 16;
         private int _windowOpen = NoWindowOpen;
 
         // State
@@ -142,6 +142,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private ITransactionTracer _connectionTransaction;
         private ISpan _connectioNetworkSpan;
         private ISpan _connectionAwacsSpan;
+
+        // Menu Radio Overlays
+        private RadioOverlayMenuSelect _radioOverlayMenuSelect;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
@@ -232,6 +235,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[11] = _radioOverlayWindowTenHorizontalWide;
             windows[12] = _radioOverlayWindowTenTransparent;
             windows[13] = _radioOverlayWindowTenSwitch;
+            windows[14] = _radioOverlayWindowDragable;
+            windows[15] = _radioOverlayMenuSelect;
 
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
@@ -315,6 +320,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _logger.Trace($"Checking window visibility for main client window {{X={mainWindowX},Y={mainWindowY}}}");
 
+            // -------- Radio Select Panel --------
+            // Radio Select Panel
+            int radioSelectMenuX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX).DoubleValue;
+            int radioSelectMenuY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY).DoubleValue;
+            _logger.Trace($"Checking window visibility for radio select menu overlay {{X={radioSelectMenuX},Y={radioSelectMenuY}}}");
+
+            // -------- Dragable Panels -------
+            // Dragable Panel
+            int radioDragableX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableX).DoubleValue;
+            int radioDragableY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableY).DoubleValue;
+            _logger.Trace($"Checking window visibility for dragable radio overlay {{X={radioDragableX},Y={radioDragableY}}}");
 
             // -------- Vertical Panels -------
             // 1 Radio
@@ -388,6 +404,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
+                // ------- Radio Menu Select ---------
+                if (screen.Bounds.Contains(radioSelectMenuX, radioSelectMenuY))
+                {
+                    _logger.Trace($"Radio Select Menu overlay {{X={radioSelectMenuX},Y={radioSelectMenuY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+
+                // ------- Dragable Panels ------
+                if (screen.Bounds.Contains(radioDragableX, radioDragableY))
+                {
+                    _logger.Trace($"Dragable Radio Panel overlay {{X={radioDragableX},Y={radioDragableY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
+
                 // ------- Vertical Panels ------
                 if (screen.Bounds.Contains(radioOneVerticalX, radioOneVerticalY))
                 {
@@ -489,6 +519,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
+                // ------- Radio Select Menu --------
+                // ------- Menu Select Panels ---------
+                _logger.Warn($"Radio Select Menu overlay window outside visible area of monitors, resetting position ({radioSelectMenuX},{radioSelectMenuY}) to defaults");
+
+                // ------- Dragable Panels ---------
+                _logger.Warn($"Dragable Radio overlay window outside visible area of monitors, resetting position ({radioDragableX},{radioDragableY}) to defaults");
+
                 // ------- Vertical Panels ---------
                 _logger.Warn($"Radio One Vertical overlay window outside visible area of monitors, resetting position ({radioOneVerticalX},{radioOneVerticalY}) to defaults");
                 _logger.Warn($"Radio Two Vertical overlay window outside visible area of monitors, resetting position ({radioTwoVerticalX},{radioTwoVerticalY}) to defaults");
@@ -508,6 +545,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _logger.Warn($"Radio Ten Wide Horizontal overlay window outside visible area of monitors, resetting position ({radioTenWideHorizontalX},{radioTenWideHorizontalY}) to defaults");
 
                 // Reset Radio Panel Positions
+                // ----- Radio Select Menu ------
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY, 300);
+
+                // ----- Draggable ------
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableY, 300);
+
                 // ----- Vertical -------
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY, 300);
@@ -553,6 +598,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenWideHorizontalY, 300);
 
                 // Null Value Protection
+                // ---- Menu Panels -----
+                if (_radioOverlayMenuSelect != null)
+                {
+                    _radioOverlayMenuSelect.Left = 300;
+                    _radioOverlayMenuSelect.Top = 300;
+                }
+
+                // ---- Draggable Panels ----
+                if (_radioOverlayWindowDragable != null)
+                {
+                    _radioOverlayWindowDragable.Left = 300;
+                    _radioOverlayWindowDragable.Top = 300;
+                }
+
                 // ---- Vertical Panels -----
                 if (_radioOverlayWindowOneVertical != null)
                 {
@@ -1879,6 +1938,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ToggleOverlay(true, 13);
         }
+        private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 14);
+        }
+        private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, 15);
+        }
 
         private void ToggleOverlay(bool uiButton, int switchTo)
         {
@@ -1955,6 +2022,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         case 13:
                             windows[switchTo] = new RadioOverlayWindowTenSwitch(ToggleOverlay);
                             break;
+                        case 14:
+                            windows[switchTo] = new RadioOverlayWindowDragable(ToggleOverlay);
+                            break;
+                        case 15:
+                            windows[switchTo] = new RadioOverlayMenuSelect(ToggleOverlay);
+                            break;
                     }
                     try
                     {
@@ -1981,7 +2054,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
-            _windowOpen = 14;
+            _windowOpen = 16;
 
             // Erase window from windows array to clean up everything
             for (int i = 0; i < windows.Count(); i++)
@@ -2162,6 +2235,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
+            _radioOverlayMenuSelect?.Close();
+            _radioOverlayMenuSelect = null;
+
+            _radioOverlayWindowDragable?.Close();
+            _radioOverlayWindowDragable = null;
+
             _radioOverlayWindowOneVertical?.Close();
             _radioOverlayWindowOneVertical = null;
 
@@ -2205,6 +2284,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindowTenHorizontalWide = null;
 
             //Reset Panel Settings
+            // Menu Select
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectHeight, 175);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectOpacity, 1.0);
+
+            // Dragable Panel
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableHeight, 175);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowOpacity, 1.0);
+
             // 1 Vertical
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX, 300);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY, 300);

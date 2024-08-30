@@ -31,6 +31,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         #region Radio panel settings
 
+        // --------- Radio Selection Menu -----------
+        // Radio Selection Menu
+        RadioMenuSelectX,
+        RadioMenuSelectY,
+        RadioMenuSelectSize,
+        RadioMenuSelectOpacity,
+        RadioMenuSelectWidth,
+        RadioMenuSelectHeight,
+
+        // --------- Dragable Panels --------------
+        // Radio Dragable
+        RadioOverlayWindowDragableX,
+        RadioOverlayWindowDragableY,
+        RadioOverlayWindowDragableSize,
+        RadioOverlayWindowOpacity,
+        RadioOverlayWindowDragableWidth,
+        RadioOverlayWindowDragableHeight,
+
         // --------- Vertical Panels --------------
         // Radio 1V
         RadioOneVerticalX,

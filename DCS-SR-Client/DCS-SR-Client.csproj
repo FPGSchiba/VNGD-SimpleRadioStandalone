@@ -384,6 +384,9 @@
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml.cs">
       <DependentUpon>PresetChannelsViewTransparent1.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml.cs">
+      <DependentUpon>RadioOverlayMenuSelect.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
       <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
     </Compile>
@@ -538,6 +541,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
