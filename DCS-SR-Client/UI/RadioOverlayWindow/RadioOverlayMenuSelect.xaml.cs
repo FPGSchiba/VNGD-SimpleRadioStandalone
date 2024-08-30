@@ -21,8 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup = new RadioControlGroup[5];
-
+        
         private readonly DispatcherTimer _updateTimer;
 
         private long _lastUnitId;
@@ -42,21 +41,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _aspectRatio = MinWidth / MinHeight;
 
             AllowsTransparency = true;
-            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalOpacity).DoubleValue;
+            Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectOpacity).DoubleValue;
             windowOpacitySlider.Value = Opacity;
 
-            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalX).DoubleValue;
-            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalY).DoubleValue;
+            Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX).DoubleValue;
+            Top = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY).DoubleValue;
 
-            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalWidth).DoubleValue;
-            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioFiveHorizontalHeight).DoubleValue;
+            Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectWidth).DoubleValue;
+            Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectHeight).DoubleValue;
             
-            radioControlGroup[0] = radio1;
-            radioControlGroup[1] = radio2;
-            radioControlGroup[2] = radio3;
-            radioControlGroup[3] = radio4;
-            radioControlGroup[4] = radio5;
-
 
             //allows click and drag anywhere on the window
             containerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -64,13 +57,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             CalculateScale();
 
             LocationChanged += Location_Changed;
-
-            RadioRefresh(null, null);
-
-            //init radio refresh
-            _updateTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(80)};
-            _updateTimer.Tick += RadioRefresh;
-            _updateTimer.Start();
 
             this._toggleOverlay = ToggleOverlay;
         }
@@ -81,59 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //  AppConfiguration.Instance.RadioY = Left;
         }
 
-        private void RadioRefresh(object sender, EventArgs eventArgs)
-        {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            foreach (var radio in radioControlGroup)
-            {
-                radio.RepaintRadioStatus();
-                radio.RepaintRadioReceive();
-            }
-
-            intercom.RepaintRadioStatus();
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "Radio Panel Selection";
-                    }
-                    else
-                    {
-                        ControlText.Text = "Radio Panel Selection";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "Radio Panel Selection (Disconnected)";
-
-                }
-            }
-            else
-            {
-                ControlText.Text = "Radio Panel Selection (Disconnected)";
-            }
-        }
+        
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -150,7 +84,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             base.OnClosing(e);
 
-            _updateTimer.Stop();
         }
 
         private void Button_Minimise(object sender, RoutedEventArgs e)
@@ -189,8 +122,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             WindowState = WindowState.Normal;
         }
 
-//
-//
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
@@ -214,7 +145,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
 
         public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
-            typeof(double), typeof(RadioOverlayWindowFiveHorizontal),
+            typeof(double), typeof(RadioOverlayMenuSelect),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
 
@@ -255,26 +186,105 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         #endregion
 
-        private void ToggleGlobalSimultaneousTransmissionButton_Click(object sender, RoutedEventArgs e)
+        #region Radio Selection Buttons
+
+        private void ShowOverlayTwoVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo != null)
-            {
-                dcsPlayerRadioInfo.simultaneousTransmission = !dcsPlayerRadioInfo.simultaneousTransmission;
-
-                if (!dcsPlayerRadioInfo.simultaneousTransmission)
-                {
-                    foreach (var radio in dcsPlayerRadioInfo.radios)
-                    {
-                        radio.simul = false;
-                    }
-                }
-
-                foreach (var radio in radioControlGroup)
-                {
-                    radio.RepaintRadioStatus();
-                }
-            }
+            Close();
+            _toggleOverlay(true, 0);
         }
+
+        private void ShowOverlayThreeVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 1);
+        }
+
+        private void ShowOverlayFiveVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 2);
+        }
+
+        private void ShowOverlayTenVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 3);
+        }
+
+        private void ShowOverlayTwoHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 4);
+        }
+
+        private void ShowOverlayThreeHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 5);
+        }
+
+        private void ShowOverlayFiveHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 6);
+        }
+
+        private void ShowOverlayTenHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 7);
+        }
+
+        private void ShowOverlayOneVertical_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 8);
+        }
+
+        private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 9);
+        }
+
+        private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 10);
+        }
+
+        private void ShowOverlayTenHorizontalWide_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 11);
+        }
+
+        private void ShowOverlayTenTransparent_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 12);
+        }
+
+        private void ShowOverlayTenSwitch_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 13);
+        }
+        private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 14);
+        }
+        private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 15);
+        }
+
+
+
+        #endregion
+
     }
 }

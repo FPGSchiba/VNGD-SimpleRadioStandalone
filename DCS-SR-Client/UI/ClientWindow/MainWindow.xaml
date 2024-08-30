@@ -429,6 +429,14 @@
                                                     Style="{DynamicResource SquareButtonStyle}"
                                                     Width="150"
                                                     x:Name="ShowOverlayDragable"/>
+                                                <Button
+                                                    Click="ShowOverlayMenuSelect_OnClick"
+                                                    Content="Radio Panel Menu"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,5,0,0"
+                                                    Style="{DynamicResource SquareButtonStyle}"
+                                                    Width="150"
+                                                    x:Name="ShowOverlayMenu"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
