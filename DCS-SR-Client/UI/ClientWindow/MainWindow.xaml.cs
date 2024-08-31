@@ -145,27 +145,43 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         // Menu Radio Overlays
         private RadioOverlayMenuSelect _radioOverlayMenuSelect;
+        public const int MenuSelectIndex = 15;
 
         // Vertical Radio-Overlays 
         private RadioOverlayWindowOneVertical _radioOverlayWindowOneVertical;
+        public const int OneVerticalIndex = 8;
         private RadioOverlayWindowTwoVertical _radioOverlayWindowTwoVertical;
-        private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
+        public const int TwoVerticalIndex = 0;
         private RadioOverlayWindowThreeVertical _radioOverlayWindowThreeVertical;
+        public const int ThreeVerticalIndex = 1;
+        private RadioOverlayWindowFiveVertical _radioOverlayWindowFiveVertical;
+        public const int FiveVerticalIndex = 2;
         private RadioOverlayWindowTenVertical _radioOverlayWindowTenVertical;
+        public const int TenVerticalIndex = 3;
         private RadioOverlayWindowTenVerticalLong _radioOverlayWindowTenVerticalLong;
+        public const int TenVerticalLongIndex = 10;
         private RadioOverlayWindowTenTransparent _radioOverlayWindowTenTransparent;
+        public const int TransparentIndex = 12;
         private RadioOverlayWindowTenSwitch _radioOverlayWindowTenSwitch;
+        public const int SwitchIndex = 13;
 
         // Horizontal Radio-Overlays
         private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
+        public const int OneHorizontalIndex = 9;
         private RadioOverlayWindowTwoHorizontal _radioOverlayWindowTwoHorizontal;
+        public const int TwoHorizontalIndex = 4;
         private RadioOverlayWindowThreeHorizontal _radioOverlayWindowThreeHorizontal;
+        public const int ThreeHorizontalIndex = 5;
         private RadioOverlayWindowFiveHorizontal _radioOverlayWindowFiveHorizontal;
+        public const int FiveHorizontalIndex = 6;
         private RadioOverlayWindowTenHorizontal _radioOverlayWindowTenHorizontal;
+        public const int TenHorizontalIndex = 7;
         private RadioOverlayWindowTenHorizontalWide _radioOverlayWindowTenHorizontalWide;
+        public const int TenHorizontalWideIndex = 11;
 
         // Dragable Radio-Overlay
         private RadioOverlayWindowDragable _radioOverlayWindowDragable;
+        public const int DragableIndex = 14;
 
         // Windows array
         private Window[] windows = new Window[NoWindowOpen];
@@ -221,22 +237,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             DataContext = this;
 
-            windows[0] = _radioOverlayWindowTwoVertical;
-            windows[1] = _radioOverlayWindowThreeVertical;
-            windows[2] = _radioOverlayWindowFiveVertical;
-            windows[3] = _radioOverlayWindowTenVertical;
-            windows[4] = _radioOverlayWindowTwoHorizontal;
-            windows[5] = _radioOverlayWindowThreeHorizontal;
-            windows[6] = _radioOverlayWindowFiveHorizontal;
-            windows[7] = _radioOverlayWindowTenHorizontal;
-            windows[8] = _radioOverlayWindowOneVertical;
-            windows[9] = _radioOverlayWindowOneHorizontal;
-            windows[10] = _radioOverlayWindowTenVerticalLong;
-            windows[11] = _radioOverlayWindowTenHorizontalWide;
-            windows[12] = _radioOverlayWindowTenTransparent;
-            windows[13] = _radioOverlayWindowTenSwitch;
-            windows[14] = _radioOverlayWindowDragable;
-            windows[15] = _radioOverlayMenuSelect;
+            windows[TwoVerticalIndex] = _radioOverlayWindowTwoVertical;
+            windows[ThreeVerticalIndex] = _radioOverlayWindowThreeVertical;
+            windows[FiveVerticalIndex] = _radioOverlayWindowFiveVertical;
+            windows[TenVerticalIndex] = _radioOverlayWindowTenVertical;
+            windows[TwoHorizontalIndex] = _radioOverlayWindowTwoHorizontal;
+            windows[ThreeHorizontalIndex] = _radioOverlayWindowThreeHorizontal;
+            windows[FiveHorizontalIndex] = _radioOverlayWindowFiveHorizontal;
+            windows[TenHorizontalIndex] = _radioOverlayWindowTenHorizontal;
+            windows[OneVerticalIndex] = _radioOverlayWindowOneVertical;
+            windows[OneHorizontalIndex] = _radioOverlayWindowOneHorizontal;
+            windows[TenVerticalLongIndex] = _radioOverlayWindowTenVerticalLong;
+            windows[TenHorizontalWideIndex] = _radioOverlayWindowTenHorizontalWide;
+            windows[TransparentIndex] = _radioOverlayWindowTenTransparent;
+            windows[SwitchIndex] = _radioOverlayWindowTenSwitch;
+            windows[DragableIndex] = _radioOverlayWindowDragable;
+            windows[MenuSelectIndex] = _radioOverlayMenuSelect;
 
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = _globalSettings.GetPositionSetting(GlobalSettingsKeys.ClientX).DoubleValue;
@@ -1878,83 +1894,83 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ShowOverlayTwoVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 0);
+            ToggleOverlay(true, TwoVerticalIndex);
         }
 
         private void ShowOverlayThreeVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 1);
+            ToggleOverlay(true, ThreeVerticalIndex);
         }
 
         private void ShowOverlayFiveVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 2);
+            ToggleOverlay(true, FiveVerticalIndex);
         }
 
         private void ShowOverlayTenVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 3);
+            ToggleOverlay(true, TenVerticalIndex);
         }
 
         private void ShowOverlayHorizontalTwo_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 4);
+            ToggleOverlay(true, TwoHorizontalIndex);
         }
 
         private void ShowOverlayThreeHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 5);
+            ToggleOverlay(true, ThreeHorizontalIndex);
         }
 
         private void ShowOverlayFiveHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 6);
+            ToggleOverlay(true, FiveHorizontalIndex);
         }
 
         private void ShowOverlayTenHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 7);
+            ToggleOverlay(true, TenHorizontalIndex);
         }
 
         private void ShowOverlayOneVertical_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 8);
+            ToggleOverlay(true, OneVerticalIndex);
         }
 
         private void ShowOverlayOneHorizontal_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 9);
+            ToggleOverlay(true, OneHorizontalIndex);
         }
 
         private void ShowOverlayTenVerticalLong_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 10);
+            ToggleOverlay(true, TenVerticalLongIndex);
         }
 
         private void ShowOverlayTenHorizontalWide_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 11);
+            ToggleOverlay(true, TenHorizontalWideIndex);
         }
 
         private void ShowOverlayTenTransparent_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 12);
+            ToggleOverlay(true, TransparentIndex);
         }
 
         private void ShowOverlayTenSwitch_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 13);
+            ToggleOverlay(true, SwitchIndex);
         }
         private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 14);
+            ToggleOverlay(true, DragableIndex);
         }
         private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
         {
-            ToggleOverlay(true, 15);
+            ToggleOverlay(true, MenuSelectIndex);
         }
 
-        private void ToggleOverlay(bool uiButton, int switchTo)
+        public void ToggleOverlay(bool uiButton, int switchTo)
         {
             //debounce show hide (1 tick = 100ns, 6000000 ticks = 600ms debounce)
             if ((DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton)
@@ -1987,52 +2003,52 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     // Only needed to select right instance of the Radio panel Overlay
                     switch (switchTo)
                     {
-                        case 0:
+                        case TwoVerticalIndex:
                             windows[switchTo] = new RadioOverlayWindowTwoVertical(ToggleOverlay);
                             break;
-                        case 1:
+                        case ThreeVerticalIndex:
                             windows[switchTo] = new RadioOverlayWindowThreeVertical(ToggleOverlay);
                             break;
-                        case 2:
+                        case FiveVerticalIndex:
                             windows[switchTo] = new RadioOverlayWindowFiveVertical(ToggleOverlay);
                             break;
-                        case 3:
+                        case TenVerticalIndex:
                             windows[switchTo] = new RadioOverlayWindowTenVertical(ToggleOverlay);
                             break;
-                        case 4:
+                        case TwoHorizontalIndex:
                             windows[switchTo] = new RadioOverlayWindowTwoHorizontal(ToggleOverlay);
                             break;
-                        case 5:
+                        case ThreeHorizontalIndex:
                             windows[switchTo] = new RadioOverlayWindowThreeHorizontal(ToggleOverlay);
                             break;
-                        case 6:
+                        case FiveHorizontalIndex:
                             windows[switchTo] = new RadioOverlayWindowFiveHorizontal(ToggleOverlay);
                             break;
-                        case 7:
+                        case TenHorizontalIndex:
                             windows[switchTo] = new RadioOverlayWindowTenHorizontal(ToggleOverlay);
                             break;
-                        case 8:
+                        case OneVerticalIndex:
                             windows[switchTo] = new RadioOverlayWindowOneVertical(ToggleOverlay);
                             break;
-                        case 9:
+                        case OneHorizontalIndex:
                             windows[switchTo] = new RadioOverlayWindowOneHorizontal(ToggleOverlay);
                             break;
-                        case 10:
+                        case TenVerticalLongIndex:
                             windows[switchTo] = new RadioOverlayWindowTenVerticalLong(ToggleOverlay);
                             break;
-                        case 11:
+                        case TenHorizontalWideIndex:
                             windows[switchTo] = new RadioOverlayWindowTenHorizontalWide(ToggleOverlay);
                             break;
-                        case 12:
+                        case TransparentIndex:
                             windows[switchTo] = new RadioOverlayWindowTenTransparent(ToggleOverlay);
                             break;
-                        case 13:
+                        case SwitchIndex:
                             windows[switchTo] = new RadioOverlayWindowTenSwitch(ToggleOverlay);
                             break;
-                        case 14:
+                        case DragableIndex:
                             windows[switchTo] = new RadioOverlayWindowDragable(ToggleOverlay);
                             break;
-                        case 15:
+                        case MenuSelectIndex:
                             windows[switchTo] = new RadioOverlayMenuSelect(ToggleOverlay);
                             break;
                     }
@@ -2040,6 +2056,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     {
                         windows[switchTo].ShowInTaskbar = !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RadioOverlayTaskbarHide);
                         windows[switchTo].Show();
+                        // Subscribe Event Closed here to handle closing windows.
                         windows[switchTo].Closed += PanelWindow_Closed;
                     }
                     catch
@@ -2056,12 +2073,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 }
             }
         }
-
-        // This needs to listen on every window[switchTo].Closed Event.
+        
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
-            _windowOpen = 16;
+            _windowOpen = NoWindowOpen;
 
             // Erase window from windows array to clean up everything
             for (int i = 0; i < windows.Count(); i++)
