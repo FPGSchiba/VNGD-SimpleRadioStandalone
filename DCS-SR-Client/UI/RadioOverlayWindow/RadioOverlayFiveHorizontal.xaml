@@ -58,7 +58,7 @@
                 Width="505" />
             <Button
                 Background="DarkSlateGray"
-                Click="ShowOverlayOneVertical_OnClick"
+                Click="ShowOverlayMenuSelect_OnClick"
                 Content="Radio Panel Menu"
                 FontSize="10"
                 Foreground="#E7E7E7"
