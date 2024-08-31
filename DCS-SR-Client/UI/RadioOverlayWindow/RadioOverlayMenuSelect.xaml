@@ -126,11 +126,12 @@
             Orientation="Vertical">
             <Label
                 Content="1 Radio"
+                Foreground="#E7E7E7"
                 FontSize="16"
                 HorizontalAlignment="Center"
                 />
             <Button
-                Background="IndianRed"
+                Background="Gray"
                 Click="ShowOverlayOneVertical_OnClick"
                 Content="1 Vertical"
                 FontSize="10"
@@ -144,7 +145,7 @@
                 Height="25"
                 Width="100" />
             <Button
-                Background="IndianRed"
+                Background="Gray"
                 Click="ShowOverlayOneHorizontal_OnClick"
                 Content="1 Horizontal"
                 FontSize="10"
@@ -167,10 +168,11 @@
             Orientation="Vertical">
             <Label
                  Content="2 Radio"
+                Foreground="#E7E7E7"
                  FontSize="14"
                  HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTwoVertical_OnClick"
                  Content="2 Vertical"
                  FontSize="10"
@@ -184,7 +186,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTwoHorizontal_OnClick"
                  Content="2 Horizontal"
                  FontSize="10"
@@ -207,10 +209,11 @@
             Orientation="Vertical">
             <Label
                  Content="3 Radio"
+                Foreground="#E7E7E7"
                  FontSize="14"
                  HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayThreeVertical_OnClick"
                  Content="3 Vertical"
                  FontSize="10"
@@ -224,7 +227,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayThreeHorizontal_OnClick"
                  Content="3 Horizontal"
                  FontSize="10"
@@ -247,10 +250,11 @@
             Orientation="Vertical">
             <Label
                  Content="5 Radio"
+                Foreground="#E7E7E7"
                  FontSize="14"
                  HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayFiveVertical_OnClick"
                  Content="5 Vertical"
                  FontSize="10"
@@ -264,7 +268,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayFiveHorizontal_OnClick"
                  Content="5 Horizontal"
                  FontSize="10"
@@ -287,10 +291,11 @@
             Orientation="Vertical">
             <Label
                  Content="10 Radio"
+                 Foreground="#E7E7E7"
                  FontSize="14"
                  HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenVertical_OnClick"
                  Content="10 Vertical"
                  FontSize="10"
@@ -304,7 +309,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenHorizontal_OnClick"
                  Content="10 Horizontal"
                  FontSize="10"
@@ -326,11 +331,12 @@
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
-                 Content="Ultra-Wide"
-                 FontSize="14"
-                 HorizontalAlignment="Center"/>
+                Content="Ultra-Wide"
+                Foreground="#E7E7E7"
+                FontSize="14"
+                HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenVerticalLong_OnClick"
                  Content="10 Vertical Long"
                  FontSize="10"
@@ -344,7 +350,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenHorizontalWide_OnClick"
                  Content="10 Horizontal Wide"
                  FontSize="10"
@@ -367,10 +373,11 @@
             Orientation="Vertical">
             <Label
                  Content="Compact"
+                 Foreground="#E7E7E7"
                  FontSize="14"
                  HorizontalAlignment="Center"/>
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenTransparent_OnClick"
                  Content="Original"
                  FontSize="10"
@@ -384,7 +391,7 @@
                  Height="25"
                  Width="100" />
             <Button
-                 Background="IndianRed"
+                 Background="Gray"
                  Click="ShowOverlayTenSwitch_OnClick"
                  Content="Switchable"
                  FontSize="10"

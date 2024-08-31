@@ -55,7 +55,22 @@
                 Padding="0"
                 Text="5 Radio Panel"
                 VerticalAlignment="Center"
-                Width="605" />
+                Width="505" />
+            <Button
+                Background="DarkSlateGray"
+                Click="ShowOverlayOneVertical_OnClick"
+                Content="Radio Panel Menu"
+                FontSize="10"
+                Foreground="#E7E7E7"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsEnabled="True"
+                Margin="0,0,2,0"
+                Name="RadioMenu"
+                Padding="0"
+                Style="{StaticResource DarkStyle-Button}"
+                Height="15"
+                Width="100" />
             <TextBlock
                 FontSize="8"
                 Foreground="#E7E7E7"
