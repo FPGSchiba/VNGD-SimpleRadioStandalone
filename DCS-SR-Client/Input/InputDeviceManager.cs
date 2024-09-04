@@ -13,6 +13,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
+using NLog.Fluent;
 using SharpDX.DirectInput;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
@@ -57,8 +58,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             new Guid("82c43344-0000-0000-0000-504944564944"),  //  LEFT VPC Rotor TCS
             new Guid("c2ab046d-0000-0000-0000-504944564944"),  // Logitech G13 Joystick
             new Guid("aaaa3344-0000-0000-0000-504944564944") //K51, it uses VPC board
-            
-
         };
 
         private readonly DirectInput _directInput;
@@ -89,8 +88,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             LoadBlackList();
 
             InitDevices();
-
-
         }
 
         public void InitDevices()
@@ -301,7 +298,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                     catch (Exception)
                     {
                     }
-
                 }
             }
         }
@@ -510,12 +506,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                                         return;
                                     }
-
-                                    //                                if (initial[i, j] == 1)
-                                    //                                {
-                                    //                                    Console.WriteLine("Pressed: "+j);
-                                    //                                    MessageBox.Show("Keyboard!");
-                                    //                                }
                                 }
                             }
                             else if (deviceList[i] is Mouse)
@@ -622,12 +612,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     //contains main binding and optional modifier binding + states of each
                     var bindState = bindStates[i];
-
-                        bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
+                    bindState.MainDeviceState = GetButtonState(bindState.MainDevice);
 
                     if (bindState.ModifierDevice != null)
                     {
-                            bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
+                        bindState.ModifierState = GetButtonState(bindState.ModifierDevice);
 
                         bindState.IsActive = bindState.MainDeviceState && bindState.ModifierState;
                     }
@@ -686,276 +675,168 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 foreach (var bindState in bindStates)
                 {
+                    if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
+                    {
+                        //Assign to a totally different binding to mark as unassign
+                        _lastActiveBinding = InputBinding.ModifierIntercom;
+                    }
+                    
+                    //key repeat
+                    if (bindState.IsActive && (bindState.MainDevice.InputBind != _lastActiveBinding))
+                    {
+                        _lastActiveBinding = bindState.MainDevice.InputBind;
 
-        // < ------------ Dabble Added Radio Panel Toggle Keybindings Actions --------------------->
+                        var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
 
-
-                        if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio1VToggle)
+                        if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                         {
-                            //Open 1V Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 8); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio1HToggle)
-                        {
-                            //Open 1H Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 9); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio2VToggle)
-                        {
-                            //Open 2V Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 0); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio2HToggle)
-                        {
-                            //Open 2H Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 4); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-                        
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio3VToggle)
-                        {
-                            //Open 3V Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 1); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio3HToggle)
-                        {
-                            //Open 3H Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 5); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio5VToggle)
-                        {
-                            //Open 5V Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 2); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio5HToggle)
-                        {
-                            //Open 5H Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 6); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10VToggle)
-                        {
-                            //Open 10V Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 3); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10HToggle)
-                        {
-                            //Open 10H Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 7); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10VLToggle)
-                        {
-                            //Open 10VL Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 10); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10HWToggle)
-                        {
-                            //Open 10HW Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 11); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10TToggle)
-                        {
-                            //Open 10T Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 12); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10SToggle)
-                        {
-                            //Open 10S Panel
-                            Application.Current.Dispatcher.Invoke(
-                                () => { _toggleOverlayCallback(false, 13); }); // Change second digit to match overlay window number you want to open
-                            break;
-                        }
-
-          //<--------------------------- Audio Balancing Keybindings (added by Dabble) ------------->
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.LeftBalance)
-                        {
-                            //Select active radio and adjust balance LEFT .1
-                            
-                            //needs to be added
-
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.RightBalance)
-                        {
-                            //Select active radio and adjust balance RIGHT .1
-
-                            //needs to be added
-
-                            break;
-                        }
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.CenterBalance)
-                        {
-                            //Select active radio and adjust balance to .50
-
-                            //needs to be added
-
-                            break;
-                        }
-
-        //<-------------------- Night Mode Keybindings (added by Dabble)---------------------------->
-
-                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.PanelNightMode)
-                        {
-                            //Select current panel and determine if background opacity is less than .2.
+                            Logger.Trace($"I am here and evaluating Inputs: {bindState.MainDevice.InputBind}");
+                            switch (bindState.MainDevice.InputBind)
+                            {
+                                case InputBinding.Up100:
+                                    RadioHelper.UpdateRadioFrequency(100, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Up10:
+                                    RadioHelper.UpdateRadioFrequency(10, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Up1:
+                                    RadioHelper.UpdateRadioFrequency(1, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Up01:
+                                    RadioHelper.UpdateRadioFrequency(0.1, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Up001:
+                                    RadioHelper.UpdateRadioFrequency(0.01, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Up0001:
+                                    RadioHelper.UpdateRadioFrequency(0.001, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down100:
+                                    RadioHelper.UpdateRadioFrequency(-100, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down10:
+                                    RadioHelper.UpdateRadioFrequency(-10, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down1:
+                                    RadioHelper.UpdateRadioFrequency(-1, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down01:
+                                    RadioHelper.UpdateRadioFrequency(-0.1, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down001:
+                                    RadioHelper.UpdateRadioFrequency(-0.01, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.Down0001:
+                                    RadioHelper.UpdateRadioFrequency(-0.001, dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.ToggleGuard:
+                                    RadioHelper.ToggleGuard(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.ToggleEncryption:
+                                    RadioHelper.ToggleEncryption(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.NextRadio:
+                                    RadioHelper.SelectNextRadio();
+                                    break;
+                                case InputBinding.PreviousRadio:
+                                    RadioHelper.SelectPreviousRadio();
+                                    break;
+                                case InputBinding.EncryptionKeyIncrease:
+                                    RadioHelper.IncreaseEncryptionKey(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.EncryptionKeyDecrease:
+                                    RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.RadioChannelUp:
+                                    RadioHelper.RadioChannelUp(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.RadioChannelDown:
+                                    RadioHelper.RadioChannelDown(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.TransponderIDENT:
+                                    TransponderHelper.ToggleIdent();
+                                    break;
+                                case InputBinding.RadioVolumeUp:
+                                    RadioHelper.RadioVolumeUp(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.RadioVolumeDown:
+                                    RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
+                                    break;
+                                case InputBinding.RadioSwap:
+                                    var RadioId = dcsPlayerRadioInfo.selected;
+                                    var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
+                                    var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
+                                    RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+                                    RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
+                                    break;
+                                case InputBinding.Radio1VToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio1HToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneHorizontalIndex); });
+                                    break;
+                                case InputBinding.Radio2VToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio2HToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio3VToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio3HToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeHorizontalIndex); });
+                                    break;
+                                case InputBinding.Radio5VToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio5HToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveHorizontalIndex); });
+                                    break;
+                                case InputBinding.Radio10VToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalIndex); });
+                                    break;
+                                case InputBinding.Radio10HToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalIndex); });
+                                    break;
+                                case InputBinding.Radio10VLToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalLongIndex); });
+                                    break;
+                                case InputBinding.Radio10HWToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalWideIndex); });
+                                    break;
+                                case InputBinding.Radio10TToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TransparentIndex); });
+                                    break;
+                                case InputBinding.Radio10SToggle:
+                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
+                                    break;
+                                case InputBinding.LeftBalance:
+                                    //Select active radio and adjust balance LEFT .1
+                                    //needs to be added
+                                    Logger.Debug("Added Left Balance");
+                                    break;
+                                case InputBinding.RightBalance:
+                                    //Select active radio and adjust balance RIGHT .1
+                                    //needs to be added
+                                    Logger.Info("Added Right Balance");
+                                    break;
+                                case InputBinding.CenterBalance:
+                                    //Select active radio and adjust balance to .50
+                                    //needs to be added
+                                    Logger.Debug("Center balanced Radio");
+                                    break;
+                                case InputBinding.PanelNightMode:
+                                    //Select current panel and determine if background opacity is less than .2.
                                     //If true, then set background opacity and text to 1.0. 
                                     //Else, set background opacity and text .2
-
-                            //needs to be added
-
-                            break;
-                        }
-
-        //<--------------------------- Resume Original SRS Keybindings -------------------------->
-
-
-                        else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
-                             (int)bindState.MainDevice.InputBind <= (int)InputBinding.AwacsOverlayToggle)
-                    {
-                        if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
-                        {
-                            //Assign to a totally different binding to mark as unassign
-                            _lastActiveBinding = InputBinding.ModifierIntercom;
-                        }
-                        //key repeat
-                        if (bindState.IsActive && (bindState.MainDevice.InputBind != _lastActiveBinding))
-                        {
-                            _lastActiveBinding = bindState.MainDevice.InputBind;
-
-                                var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
-
-                            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
-                            {
-                                switch (bindState.MainDevice.InputBind)
-                                {
-                                    case InputBinding.Up100:
-                                        RadioHelper.UpdateRadioFrequency(100, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Up10:
-                                        RadioHelper.UpdateRadioFrequency(10, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Up1:
-                                        RadioHelper.UpdateRadioFrequency(1, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Up01:
-                                        RadioHelper.UpdateRadioFrequency(0.1, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Up001:
-                                        RadioHelper.UpdateRadioFrequency(0.01, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Up0001:
-                                        RadioHelper.UpdateRadioFrequency(0.001, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down100:
-                                        RadioHelper.UpdateRadioFrequency(-100, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down10:
-                                        RadioHelper.UpdateRadioFrequency(-10, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down1:
-                                        RadioHelper.UpdateRadioFrequency(-1, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down01:
-                                        RadioHelper.UpdateRadioFrequency(-0.1, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down001:
-                                        RadioHelper.UpdateRadioFrequency(-0.01, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.Down0001:
-                                        RadioHelper.UpdateRadioFrequency(-0.001, dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.ToggleGuard:
-                                        RadioHelper.ToggleGuard(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.ToggleEncryption:
-                                        RadioHelper.ToggleEncryption(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.NextRadio:
-                                        RadioHelper.SelectNextRadio();
-                                        break;
-                                    case InputBinding.PreviousRadio:
-                                        RadioHelper.SelectPreviousRadio();
-                                        break;
-                                    case InputBinding.EncryptionKeyIncrease:
-                                        RadioHelper.IncreaseEncryptionKey(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.EncryptionKeyDecrease:
-                                        RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.RadioChannelUp:
-                                        RadioHelper.RadioChannelUp(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.RadioChannelDown:
-                                        RadioHelper.RadioChannelDown(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.TransponderIDENT:
-                                        TransponderHelper.ToggleIdent();
-                                        break;
-                                    case InputBinding.RadioVolumeUp:
-                                        RadioHelper.RadioVolumeUp(dcsPlayerRadioInfo.selected);
-                                        break;
-                                    case InputBinding.RadioVolumeDown:
-                                        RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
-                                        break;
-
-                                    
-                                    case InputBinding.RadioSwap:      // Dabble Added for Radio Swap Keybind Functionality
-                                            var RadioId = dcsPlayerRadioInfo.selected;
-                                                                                 
-                                            var freq = 100;             // need to add link to active frequency
-                                            var standbyFreq = 200 ;     // need to add link to standby frequency
-
-
-                                        RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
-                                        RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
-                                        break;
-
-                                        default:
-                                        break;
-                                }
+                                    //needs to be added
+                                    Logger.Debug("Swapped night mode.");
+                                    break;
                             }
-
-
-                            break;
                         }
                     }
+                
                 }
 
                 Thread.Sleep(40);
@@ -1039,13 +920,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
                             $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
 
-            MessageBox.Show(
-                $"An error occurred while querying your {device.Information.ProductName.Trim().Replace("\0", "")} input device.\nThis could for example be caused by unplugging " +
-                $"your joystick or disabling it in the Windows settings.\n\nAll controls bound to this input device will not work anymore until your restart SRS.",
-                "Input device error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
             try
             {
                 device.Unacquire();
@@ -1072,7 +946,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Radio10SToggle; i++)  //dabble updated to reflect last binding on list
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.PanelNightMode; i++)  // schiba updated night mode
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {
