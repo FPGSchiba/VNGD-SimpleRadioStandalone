@@ -360,7 +360,59 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ModifierIntercomPTT = 236,
 
         AwacsOverlayToggle = 137,
-        ModifierAwacsOverlayToggle = 237
+        ModifierAwacsOverlayToggle = 237,
+
+        //New keybindings that Dabble added
+
+        RadioSwap = 138,           //Dabble Added - Swaps active radio standby and active radio frequencies
+        ModifierRadioSwap= 238,     //Dabble Added
+
+        //Toggle Standard Radio Panels (all added by Dabble)
+        Radio1HToggle = 139,
+        ModifierRadio1HToggle = 239,
+
+        Radio1VToggle = 140,
+        ModifierRadio1VToggle = 240,
+
+        Radio2VToggle = 141,
+        ModifierRadio2VToggle = 241,
+
+        Radio2HToggle = 142,
+        ModifierRadio2HToggle = 242,
+
+        Radio3VToggle = 143,
+        ModifierRadio3VToggle = 243,
+
+        Radio3HToggle = 144,
+        ModifierRadio3HToggle = 244,
+
+        Radio5VToggle = 145,
+        ModifierRadio5VToggle = 245,
+
+        Radio5HToggle = 146,
+        ModifierRadio5HToggle = 246,
+
+        Radio10VToggle = 147,
+        ModifierRadio10VToggle = 247,
+
+        Radio10HToggle = 148,
+        ModifierRadio10HToggle = 248,
+
+        //Ultrawide Panels
+
+        Radio10VLToggle = 149,
+        ModifierRadio10VLToggle = 249,
+
+        Radio10HWToggle = 150,
+        ModifierRadio10HWToggle = 250,
+
+        //Compact Panels
+
+        Radio10TToggle = 151,
+        ModifierRadio10TToggle = 251,
+
+        Radio10SToggle = 152,
+        ModifierRadio10SToggle = 252
     }
 
 
@@ -660,8 +712,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             // Radio Toggle Settings
             {GlobalSettingsKeys.Radio1Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio2Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio3Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio2Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio3Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio4Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio5Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio6Enabled.ToString(), "false"},

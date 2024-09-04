@@ -831,14 +831,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             IntercomPTT.ControlInputBinding = InputBinding.IntercomPTT;
             IntercomPTT.InputDeviceManager = InputManager;
 
-            RadioOverlay.InputName = "Transparent Panel Toggle"; // TODO: Replace this with 10T panel
-            RadioOverlay.ControlInputBinding = InputBinding.OverlayToggle;
-            RadioOverlay.InputDeviceManager = InputManager;
-
-            AwacsOverlayToggle.InputName = "10 Radio Panel Toggle";
-            AwacsOverlayToggle.ControlInputBinding = InputBinding.AwacsOverlayToggle;
-            AwacsOverlayToggle.InputDeviceManager = InputManager;
-
             Radio4.InputName = "Radio 4";
             Radio4.ControlInputBinding = InputBinding.Switch4;
             Radio4.InputDeviceManager = InputManager;
@@ -959,6 +951,72 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioVolumeDown.InputName = "Radio Volume Down";
             RadioVolumeDown.ControlInputBinding = InputBinding.RadioVolumeDown;
             RadioVolumeDown.InputDeviceManager = InputManager;
+
+            //Dabble Added Following Keybinds
+
+            RadioSwap.InputName = "Swap Standby Frequency";   //Dabble Added
+            RadioSwap.ControlInputBinding = InputBinding.RadioSwap;
+            RadioSwap.InputDeviceManager = InputManager;
+
+            //Specific Radio Panel Toggles
+
+            Radio1HToggle.InputName = "1 Radio Horizontal";   //Dabble Added
+            Radio1HToggle.ControlInputBinding = InputBinding.Radio1HToggle;
+            Radio1HToggle.InputDeviceManager = InputManager;
+
+            Radio1VToggle.InputName = "1 Radio Vertical";   //Dabble Added
+            Radio1VToggle.ControlInputBinding = InputBinding.Radio1VToggle;
+            Radio1VToggle.InputDeviceManager = InputManager;
+
+            Radio2HToggle.InputName = "2 Radio Horizontal";   //Dabble Added
+            Radio2HToggle.ControlInputBinding = InputBinding.Radio2HToggle;
+            Radio2HToggle.InputDeviceManager = InputManager;
+
+            Radio2VToggle.InputName = "2 Radio Vertical";   //Dabble Added
+            Radio2VToggle.ControlInputBinding = InputBinding.Radio2VToggle;
+            Radio2VToggle.InputDeviceManager = InputManager;
+
+            Radio3HToggle.InputName = "3 Radio Horizontal";   //Dabble Added
+            Radio3HToggle.ControlInputBinding = InputBinding.Radio3HToggle;
+            Radio3HToggle.InputDeviceManager = InputManager;
+
+            Radio3VToggle.InputName = "3 Radio Vertical";   //Dabble Added
+            Radio3VToggle.ControlInputBinding = InputBinding.Radio3VToggle;
+            Radio3VToggle.InputDeviceManager = InputManager;
+
+            Radio5HToggle.InputName = "5 Radio Horizontal";   //Dabble Added
+            Radio5HToggle.ControlInputBinding = InputBinding.Radio5HToggle;
+            Radio5HToggle.InputDeviceManager = InputManager;
+
+            Radio5VToggle.InputName = "5 Radio Vertical";   //Dabble Added
+            Radio5VToggle.ControlInputBinding = InputBinding.Radio5VToggle;
+            Radio5VToggle.InputDeviceManager = InputManager;
+
+            Radio10HToggle.InputName = "10 Radio Horizontal";   //Dabble Added
+            Radio10HToggle.ControlInputBinding = InputBinding.Radio10HToggle;
+            Radio10HToggle.InputDeviceManager = InputManager;
+
+            Radio10VToggle.InputName = "10 Radio Vertical";   //Dabble Added
+            Radio10VToggle.ControlInputBinding = InputBinding.Radio10VToggle;
+            Radio10VToggle.InputDeviceManager = InputManager;
+
+            Radio10HWToggle.InputName = "10 Radio Horiz. Ultra-Wide";   //Dabble Added
+            Radio10HWToggle.ControlInputBinding = InputBinding.Radio10HWToggle;
+            Radio10HWToggle.InputDeviceManager = InputManager;
+
+            Radio10VLToggle.InputName = "10 Radio Vertical Long";   //Dabble Added
+            Radio10VLToggle.ControlInputBinding = InputBinding.Radio10VLToggle;
+            Radio10VLToggle.InputDeviceManager = InputManager;
+
+            Radio10TToggle.InputName = "Compact Panel - Original";   //Dabble Added
+            Radio10TToggle.ControlInputBinding = InputBinding.Radio10TToggle;
+            Radio10TToggle.InputDeviceManager = InputManager;
+
+            Radio10SToggle.InputName = "Compact Panel - New";   //Dabble Added
+            Radio10SToggle.ControlInputBinding = InputBinding.Radio10SToggle;
+            Radio10SToggle.InputDeviceManager = InputManager;
+
+
         }
 
         #region Pages and Navigation
@@ -1173,7 +1231,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             PTT.LoadInputSettings();
             Intercom.LoadInputSettings();
             IntercomPTT.LoadInputSettings();
-            RadioOverlay.LoadInputSettings();
             Radio4.LoadInputSettings();
             Radio5.LoadInputSettings();
             Radio6.LoadInputSettings();
@@ -1203,7 +1260,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             RadioChannelDown.LoadInputSettings();
             RadioVolumeUp.LoadInputSettings();
             RadioVolumeDown.LoadInputSettings();
-            AwacsOverlayToggle.LoadInputSettings();
+
+            //added by dabble
+            Radio1VToggle.LoadInputSettings();
+            Radio1HToggle.LoadInputSettings();
+            Radio2VToggle.LoadInputSettings();
+            Radio2HToggle.LoadInputSettings();
+            Radio3VToggle.LoadInputSettings();
+            Radio3HToggle.LoadInputSettings();
+            Radio5VToggle.LoadInputSettings();
+            Radio5HToggle.LoadInputSettings();
+            Radio10VToggle.LoadInputSettings();
+            Radio10HToggle.LoadInputSettings();
+            Radio10VLToggle.LoadInputSettings();
+            Radio10HWToggle.LoadInputSettings();
+            Radio10TToggle.LoadInputSettings();
+            Radio10SToggle.LoadInputSettings();
         }
 
         private void ReloadRadioAudioChannelSettings()
@@ -1225,6 +1297,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ExternalAWACSModePassword.ToolTip = ToolTips.ExternalAWACSModePassword;
             ExternalAWACSModeName.ToolTip = ToolTips.ExternalAWACSModeName;
+            ServerIp.ToolTip = ToolTips.ServerIp;
         }
 
         public InputDeviceManager InputManager { get; set; }
@@ -1704,7 +1777,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
 
-                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.com/invite/5Z7UHMzf4P");
+                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/5Z7UHMzf4P");   //Dabble updated to reflect VNGD SRS Dev Team Discord
                     }
                 }
             }

@@ -686,21 +686,126 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                 foreach (var bindState in bindStates)
                 {
-                    if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.OverlayToggle)
-                    {
-                        //run on main
-                        Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false, 8); }); // Change second digit to match overlay window number you want to open
-                        break;                                            // TODO Replace "8" with 10T panel ID number
-                    }
-                    else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.AwacsOverlayToggle)
-                    {
-                        //run on main
-                        Application.Current.Dispatcher.Invoke(
-                            () => { _toggleOverlayCallback(false, 7); }); // Change second digit to match overlay window number you want to open
+
+        // < ------------ Dabble Added Radio Panel Toggle Keybindings Actions --------------------->
+
+
+                        if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio1VToggle)
+                        {
+                            //Open 1V Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 8); }); // Change second digit to match overlay window number you want to open
                             break;
-                    }
-                    else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio1HToggle)
+                        {
+                            //Open 1H Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 9); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio2VToggle)
+                        {
+                            //Open 2V Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 0); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio2HToggle)
+                        {
+                            //Open 2H Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 4); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+                        
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio3VToggle)
+                        {
+                            //Open 3V Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 1); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio3HToggle)
+                        {
+                            //Open 3H Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 5); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio5VToggle)
+                        {
+                            //Open 5V Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 2); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio5HToggle)
+                        {
+                            //Open 5H Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 6); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10VToggle)
+                        {
+                            //Open 10V Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 3); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10HToggle)
+                        {
+                            //Open 10H Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 7); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10VLToggle)
+                        {
+                            //Open 10VL Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 10); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10HWToggle)
+                        {
+                            //Open 10HW Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 11); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10TToggle)
+                        {
+                            //Open 10T Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 12); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.Radio10SToggle)
+                        {
+                            //Open 10S Panel
+                            Application.Current.Dispatcher.Invoke(
+                                () => { _toggleOverlayCallback(false, 13); }); // Change second digit to match overlay window number you want to open
+                            break;
+                        }
+
+            //<--------------------------- Resume Original SRS Keybindings -------------------------->
+
+
+                        else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
                              (int)bindState.MainDevice.InputBind <= (int)InputBinding.AwacsOverlayToggle)
                     {
                         if (bindState.MainDevice.InputBind == _lastActiveBinding && !bindState.IsActive)
@@ -789,8 +894,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                         RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
                                         break;
 
+                                    
+                                    case InputBinding.RadioSwap:      // Dabble Added for Radio Swap Keybind Functionality
+                                            var RadioId = dcsPlayerRadioInfo.selected;
+                                                                                 
+                                            var freq = 100;             // need to add link to active frequency
+                                            var standbyFreq = 200 ;     // need to add link to standby frequency
 
-                                    default:
+
+                                        RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+                                        RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
+                                        break;
+
+                                        default:
                                         break;
                                 }
                             }
@@ -915,7 +1031,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             //REMEMBER TO UPDATE THIS WHEN NEW BINDINGS ARE ADDED
             //MIN + MAX bind numbers
-            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.AwacsOverlayToggle; i++)
+            for (int i = (int)InputBinding.Intercom; i <= (int)InputBinding.Radio10SToggle; i++)  //dabble updated to reflect last binding on list
             {
                 if (!currentInputProfile.ContainsKey((InputBinding)i))
                 {
