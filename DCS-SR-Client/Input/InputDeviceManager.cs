@@ -766,9 +766,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     var RadioId = dcsPlayerRadioInfo.selected;
                                     var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
                                     var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
+
+                                    Logger.Info("Initiating Frequency Swap on Radio = " + RadioId);
+                                    Logger.Info("Old Active Frequency = " + freq);
+                                    Logger.Info("Old Standby Frequency = " + standbyFreq);                          
+
                                     RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
+                                        Logger.Info("New Standby Frequency = " + freq);
+                                    
                                     RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
-                                    break;
+                                        Logger.Info("New Active Frequency = " + standbyFreq);
+                                    
+                                        break;
                                 case InputBinding.Radio1VToggle:
                                     Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneVerticalIndex); });
                                     break;
