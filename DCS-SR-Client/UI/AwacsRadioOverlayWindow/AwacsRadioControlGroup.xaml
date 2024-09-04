@@ -7,7 +7,8 @@
     xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI">
 
     <TabControl
         Background="#444"
@@ -57,210 +58,268 @@
                     Text="Radio"
                     x:Name="RadioLabel" />
             </TabItem.Header>
-            <StackPanel Orientation="Vertical">
-                <!--    -->
-                <!--  <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10"  -->
-                <!--  Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>  -->
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        Click="Up10_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="15,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="+10MHz"
-                        Width="15"
-                        x:Name="Up10" />
-                    <Button
-                        Click="Up1_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="+1MHZ"
-                        Width="15"
-                        x:Name="Up1" />
-                    <Button
-                        Click="Up01_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="+0.1MHz"
-                        Width="15"
-                        x:Name="Up01" />
-                    <Button
-                        Click="Up001_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="+0.01MHz"
-                        Width="15"
-                        x:Name="Up001" />
-                    <Button
-                        Click="Up0001_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="+0.01MHz"
-                        Width="15"
-                        x:Name="Up0001" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBox
-                        Background="Black"
-                        BorderThickness="0"
-                        Foreground="#00FF00"
-                        Height="15"
-                        HorizontalAlignment="Center"
-                        MouseDown="RadioFrequencyText_Click"
-                        MouseRightButtonDown="RadioFrequencyText_RightClick"
-                        Style="{x:Null}"
-                        Text="000.000"
-                        TextAlignment="Center"
-                        TextWrapping="Wrap"
-                        VerticalAlignment="Center"
-                        Width="60"
-                        x:Name="RadioFrequency" />
-                    <TextBlock
-                        Background="Black"
-                        Foreground="#00FF00"
-                        Height="15"
-                        HorizontalAlignment="Center"
-                        MouseDown="RadioFrequencyText_Click"
-                        MouseRightButtonDown="RadioFrequencyText_RightClick"
-                        Style="{x:Null}"
-                        Text="AM"
-                        TextAlignment="Center"
-                        TextWrapping="NoWrap"
-                        VerticalAlignment="Center"
-                        Width="80"
-                        x:Name="RadioMetaData" />
-                    <TextBlock
-                        Background="Black"
-                        Foreground="#00FF00"
-                        Height="15"
-                        HorizontalAlignment="Center"
-                        Style="{x:Null}"
-                        Text="USER"
-                        TextAlignment="Center"
-                        TextWrapping="NoWrap"
-                        VerticalAlignment="Center"
-                        Visibility="Collapsed"
-                        Width="140"
-                        x:Name="TransmitterName" />
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical" Margin="2">
+                    <!--    -->
+                    <!--  <Label Style="{x:Null}" x:Name="radioLabel" Content="No Radio" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10"  -->
+                    <!--  Width="110" Padding="0" Margin="0" Foreground="#E7E7E7"/>  -->
+                    <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                        <Button
+                            Click="Up10_Click"
+                            Content=""
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="5,0,0,0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            ToolTip="+10MHz"
+                            Width="10"
+                            x:Name="Up10" />
+                        <Button
+                            Click="Up1_Click"
+                            Content=""
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="2,0,0,0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            ToolTip="+1MHZ"
+                            Width="10"
+                            x:Name="Up1" />
+                        <Button
+                            Click="Up01_Click"
+                            Content=""
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="2,0,0,0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            ToolTip="+0.1MHz"
+                            Width="10"
+                            x:Name="Up01" />
+                        <Button
+                            Click="Up001_Click"
+                            Content=""
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="2,0,0,0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            ToolTip="+0.01MHz"
+                            Width="10"
+                            x:Name="Up001" />
+                        <Button
+                            Click="Up0001_Click"
+                            Content=""
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="2,0,0,0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            ToolTip="+0.01MHz"
+                            Width="10"
+                            x:Name="Up0001" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <presetChannels:PresetChannelsViewTransparent1
+                                    Background="#444"
+                                    DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Height="15"
+                                    Width="12"
+                                    x:Name="PresetChannelsView" />
+                                <TextBox
+                                    Background="Black"
+                                    BorderThickness="0"
+                                    Foreground="#00FF00"
+                                    Height="15"
+                                    HorizontalAlignment="Center"
+                                    MouseDown="RadioFrequencyText_Click"
+                                    MouseRightButtonDown="RadioFrequencyText_RightClick"
+                                    Style="{x:Null}"
+                                    Text="000.000"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    x:Name="RadioFrequency" />
+                                <TextBlock
+                                    Background="Black"
+                                    Foreground="#00FF00"
+                                    Height="15"
+                                    HorizontalAlignment="Center"
+                                    MouseDown="RadioFrequencyText_Click"
+                                    MouseRightButtonDown="RadioFrequencyText_RightClick"
+                                    Style="{x:Null}"
+                                    Text="AM"
+                                    TextAlignment="Center"
+                                    TextWrapping="NoWrap"
+                                    VerticalAlignment="Center"
+                                    Width="60"
+                                    x:Name="RadioMetaData" />
+                                <TextBlock
+                                    Background="Black"
+                                    Foreground="#00FF00"
+                                    Height="15"
+                                    HorizontalAlignment="Center"
+                                    Style="{x:Null}"
+                                    Text="USER"
+                                    TextAlignment="Center"
+                                    TextWrapping="NoWrap"
+                                    VerticalAlignment="Center"
+                                    Visibility="Collapsed"
+                                    Width="140"
+                                    x:Name="TransmitterName" />
 
-                    <Ellipse
-                        Fill="#FF9900"
-                        Height="10"
-                        HorizontalAlignment="Right"
-                        Margin="2"
-                        MouseDown="RadioSelectSwitch"
-                        Stroke="Black"
-                        Style="{x:Null}"
-                        ToolTip="Selected Radio"
-                        VerticalAlignment="Center"
-                        Width="10"
-                        x:Name="RadioActive" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        Click="Down10_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="15,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="-10MHZ"
-                        Width="15"
-                        x:Name="Down10" />
-                    <Button
-                        Click="Down1_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="-1MHz"
-                        Width="15"
-                        x:Name="Down1" />
-                    <Button
-                        Click="Down01_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="-0.1MHz"
-                        Width="15"
-                        x:Name="Down01" />
-                    <Button
-                        Click="Down001_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="-0.01MHz"
-                        Width="15"
-                        x:Name="Down001" />
-                    <Button
-                        Click="Down0001_Click"
-                        Content=""
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="2,0,0,0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        ToolTip="-0.01MHz"
-                        Width="15"
-                        x:Name="Down0001" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        Background="IndianRed"
-                        Click="ToggleSwitch_Click"
-                        Content="Off"
-                        FontSize="5"
-                        Foreground="Black"
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        IsEnabled="False"
-                        Margin="0,0,2,0"
-                        Name="RadioEnabled"
-                        Padding="0"
-                        Style="{StaticResource DarkStyle-Button}"
-                        Width="15" />
+                                
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <presetChannels:PresetChannelsViewTransparent1
+                                    Background="#444"
+                                    DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
+                                    HorizontalAlignment="Center"
+                                    Height="15"
+                                    Width="12"
+                                    x:Name="StandbyPresetChannelsView" />
+                                <TextBox
+                                    Background="Black"
+                                    BorderThickness="0"
+                                    Foreground="#003b00"
+                                    Height="15"
+                                    HorizontalAlignment="Center"
+                                    MouseDown="RadioFrequencyText_Click"
+                                    MouseRightButtonDown="RadioFrequencyText_RightClick"
+                                    Style="{x:Null}"
+                                    Text="000.000"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    x:Name="StandbyRadioFrequency" />
+                                <TextBlock
+                                    Background="Black"
+                                    Foreground="#003b00"
+                                    Height="15"
+                                    HorizontalAlignment="Center"
+                                    MouseDown="RadioFrequencyText_Click"
+                                    MouseRightButtonDown="RadioFrequencyText_RightClick"
+                                    Style="{x:Null}"
+                                    Text="AM"
+                                    TextAlignment="Center"
+                                    TextWrapping="NoWrap"
+                                    VerticalAlignment="Center"
+                                    Width="60"
+                                    x:Name="StandbyRadioMetaData" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                            <Button
+                                Click="Down10_Click"
+                                Content=""
+                                Height="10"
+                                HorizontalAlignment="Center"
+                                IsEnabled="False"
+                                Margin="5,0,0,0"
+                                Style="{StaticResource DarkStyle-Button}"
+                                ToolTip="-10MHZ"
+                                Width="10"
+                                x:Name="Down10" />
+                            <Button
+                                Click="Down1_Click"
+                                Content=""
+                                Height="10"
+                                HorizontalAlignment="Center"
+                                IsEnabled="False"
+                                Margin="2,0,0,0"
+                                Style="{StaticResource DarkStyle-Button}"
+                                ToolTip="-1MHz"
+                                Width="10"
+                                x:Name="Down1" />
+                            <Button
+                                Click="Down01_Click"
+                                Content=""
+                                Height="10"
+                                HorizontalAlignment="Center"
+                                IsEnabled="False"
+                                Margin="2,0,0,0"
+                                Style="{StaticResource DarkStyle-Button}"
+                                ToolTip="-0.1MHz"
+                                Width="10"
+                                x:Name="Down01" />
+                            <Button
+                                Click="Down001_Click"
+                                Content=""
+                                Height="10"
+                                HorizontalAlignment="Center"
+                                IsEnabled="False"
+                                Margin="2,0,0,0"
+                                Style="{StaticResource DarkStyle-Button}"
+                                ToolTip="-0.01MHz"
+                                Width="10"
+                                x:Name="Down001" />
+                            <Button
+                                Click="Down0001_Click"
+                                Content=""
+                                Height="10"
+                                HorizontalAlignment="Center"
+                                IsEnabled="False"
+                                Margin="2,0,0,0"
+                                Style="{StaticResource DarkStyle-Button}"
+                                ToolTip="-0.01MHz"
+                                Width="10"
+                                x:Name="Down0001" />
+                        </StackPanel>
 
-                    <Slider
-                        Height="20"
-                        IsEnabled="False"
-                        Margin="2,2,0,0"
-                        Maximum="100"
-                        Style="{x:Null}"
-                        Thumb.DragCompleted="RadioVolume_DragCompleted"
-                        Thumb.DragStarted="RadioVolume_DragStarted"
-                        Width="80"
-                        x:Name="RadioVolume" />
+                        <Rectangle
+                            Fill="#FF9900"
+                            Height="30"
+                            HorizontalAlignment="Right"
+                            Margin="1,0,0,0"
+                            MouseDown="RadioSelectSwitch"
+                            Stroke="Black"
+                            StrokeThickness="1"
+                            Style="{x:Null}"
+                            ToolTip="Selected Radio"
+                            VerticalAlignment="Center"
+                            Width="7"
+                            x:Name="RadioActive" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="2,6,2,2">
+                        <Button
+                            Background="IndianRed"
+                            Click="ToggleSwitch_Click"
+                            Content="Off"
+                            FontSize="5"
+                            Foreground="Black"
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            IsEnabled="False"
+                            Margin="0,0,2,0"
+                            Name="RadioEnabled"
+                            Padding="0"
+                            Style="{StaticResource DarkStyle-Button}"
+                            Width="15" />
+
+                        
 
 
+                    </StackPanel>
                 </StackPanel>
+
+                <Slider
+                    Height="50"
+                    IsEnabled="False"
+                    Margin="2,0,0,0"
+                    Orientation="Vertical"
+                    Maximum="100"
+                    Style="{x:Null}"
+                    Thumb.DragCompleted="RadioVolume_DragCompleted"
+                    Thumb.DragStarted="RadioVolume_DragStarted"
+                    Width="20"
+                    x:Name="RadioVolume" />
             </StackPanel>
         </TabItem>
         <TabItem Name="EncryptionTab">
@@ -322,7 +381,7 @@
                 DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
                 HorizontalAlignment="Center"
                 Width="120"
-                x:Name="PresetChannelsView"  />
+                x:Name="PresetChannelsViewOld"  />
 
         </TabItem>
     </TabControl>

@@ -456,7 +456,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (RadioId == dcsPlayerRadioInfo.selected)  // Radio Selected
                     {
                         RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                        TabControl.BorderThickness = new Thickness(3);
+                        // TabControl.BorderThickness = new Thickness(3);
                     }
                     else if (currentRadio != null && currentRadio.simul)
                     {
@@ -465,7 +465,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     else
                     {
                         RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                        TabControl.BorderThickness = new Thickness(1); 
+                        // TabControl.BorderThickness = new Thickness(1); 
                     }
                 }
 
