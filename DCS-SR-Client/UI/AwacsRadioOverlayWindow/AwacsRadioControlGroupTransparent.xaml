@@ -163,7 +163,7 @@
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted"
-                Width="50"
+                Width="40"
                 x:Name="RadioVolume" />
         </Viewbox>
     </StackPanel>

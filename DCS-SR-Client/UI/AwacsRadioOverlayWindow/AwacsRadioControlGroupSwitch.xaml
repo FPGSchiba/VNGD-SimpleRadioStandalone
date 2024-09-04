@@ -243,7 +243,7 @@
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted"
-                Width="50"
+                Width="40"
                 x:Name="RadioVolume" />
         </Viewbox>
 
@@ -258,6 +258,7 @@
             Foreground="Black"
             Height="10"
             HorizontalAlignment="Center"
+            Visibility="Hidden"
             IsEnabled="False"
             Margin="1,0,0,0"
             Name="ToggleGroupManageRadio"
