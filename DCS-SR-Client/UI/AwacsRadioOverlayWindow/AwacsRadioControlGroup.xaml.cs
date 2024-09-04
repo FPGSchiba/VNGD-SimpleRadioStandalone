@@ -545,7 +545,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (currentRadio.channel > -1)
                     {
                        // RadioMetaData.Text += (" C" + currentRadio.channel);
-                       // Dabble removed this to improve clarity. We add it back if needed.
+                       // Dabble removed this to improve clarity. We can add it back if needed.
                     }
                     if (currentRadio.enc && (currentRadio.encKey > 0))
                     {
