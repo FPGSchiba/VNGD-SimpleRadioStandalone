@@ -158,7 +158,7 @@
                  FontSize="18"
                  HorizontalAlignment="Center"/>
             <Label
-                 Content="It is HIGHLY recommended only monitor 2 radios at a time"
+                 Content="It is HIGHLY recommended to only monitor 2 radios at a time"
                  Foreground="#E7E7E7"
                  Padding="0"
                  FontSize="10"

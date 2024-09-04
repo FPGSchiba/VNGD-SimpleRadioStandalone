@@ -17,8 +17,7 @@
           DialogTheme="Inherit"
           Grid.Row="0"
           CloseOnClickAway="True"
-          Identifier="PanelDialog"
-         >
+          Identifier="PanelDialog" >
           <materialDesign:DialogHost.DialogContent>
               <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"> 
                   <Grid>
