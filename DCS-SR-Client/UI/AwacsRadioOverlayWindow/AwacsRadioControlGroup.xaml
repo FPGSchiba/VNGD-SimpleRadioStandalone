@@ -11,6 +11,7 @@
 
     <TabControl
         Background="#444"
+        BorderThickness="1"
         Style="{x:Null}"
         x:Name="TabControl">
 

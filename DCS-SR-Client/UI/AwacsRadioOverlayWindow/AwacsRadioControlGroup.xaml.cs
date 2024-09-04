@@ -436,7 +436,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                         break;
                 }
 
-                if (transmitting.IsSending)
+                if (transmitting.IsSending)   //User Sending 
                 {
                     if (transmitting.SendingOn == RadioId)
                     {
@@ -453,9 +453,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    if (RadioId == dcsPlayerRadioInfo.selected)
+                    if (RadioId == dcsPlayerRadioInfo.selected)  // Radio Selected
                     {
                         RadioActive.Fill = new SolidColorBrush(Colors.Green);
+                        TabControl.BorderThickness = new Thickness(3);
                     }
                     else if (currentRadio != null && currentRadio.simul)
                     {
@@ -464,6 +465,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     else
                     {
                         RadioActive.Fill = new SolidColorBrush(Colors.Orange);
+                        TabControl.BorderThickness = new Thickness(1); 
                     }
                 }
 
@@ -542,7 +544,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                     if (currentRadio.channel > -1)
                     {
-                        RadioMetaData.Text += (" C" + currentRadio.channel);
+                       // RadioMetaData.Text += (" C" + currentRadio.channel);
+                       // Dabble removed this to improve clarity. We add it back if needed.
                     }
                     if (currentRadio.enc && (currentRadio.encKey > 0))
                     {
