@@ -772,10 +772,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     Logger.Info("Old Standby Frequency = " + standbyFreq);                          
 
                                     RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
-                                        Logger.Info("New Standby Frequency = " + freq);
+                                        Logger.Info("New Standby Frequency = " + dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq);
                                     
                                     RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
-                                        Logger.Info("New Active Frequency = " + standbyFreq);
+                                        Logger.Info("New Active Frequency = " + dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq);
                                     
                                         break;
                                 case InputBinding.Radio1VToggle:
