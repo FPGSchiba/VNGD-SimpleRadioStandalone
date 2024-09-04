@@ -394,7 +394,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ModifierRadio10TToggle = 251,
 
         Radio10SToggle = 152,
-        ModifierRadio10SToggle = 252
+        ModifierRadio10SToggle = 252,
+
+        //Left & Right Radio Balancing
+        LeftBalance = 153,
+        ModifierLeftBalance = 253,
+
+        RightBalance = 154,
+        ModifierRightBalance = 254,
+
+        CenterBalance = 155,
+        ModifierCenterBalance = 255,
+
+        // Night Mode
+        PanelNightMode = 156,
+        ModifierPanelNightMode = 157
+        
     }
 
 
