@@ -50,7 +50,7 @@
                 TextWrapping="WrapWithOverflow"
                 Width="400"
                 x:Name="Block">
-                Welcome [player name] to the Vanguard Communications System- our purpose built communication system based upon the popular SRS platform. By joining our communications, you accept our organization’s rules. For more information, please go to<Span /> <Hyperlink NavigateUri="https://vngd.net" RequestNavigate="Hyperlink_RequestNavigate">vngd.net</Hyperlink>
+                Welcome [PlayerName] to the Vanguard Communications System- our purpose built communication system based upon the popular SRS platform. By joining our communications, you accept our organization’s rules. For more information, please go to<Span /> <Hyperlink NavigateUri="https://vngd.net" RequestNavigate="Hyperlink_RequestNavigate">vngd.net</Hyperlink>
                 .</TextBlock>
             <Label
                 Content="Real Life First, Drama Free Zone, Be Respectful, No Jerks Allowed"

@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using NLog;
+using Sentry;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 {
@@ -30,7 +32,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
         private void Login_OnClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Sentry implementation with UserName & Acceptance -> Track Agreements
+            SentrySdk.Metrics.Set("GuestLoginEULA", ClientStateSingleton.Instance.LastSeenName,
+                unit: MeasurementUnit.Custom("username"));
+
             _mainWindow.On_GuestSuccessAcceptClicked();
         }
     }

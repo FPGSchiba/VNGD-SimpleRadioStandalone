@@ -66,7 +66,6 @@ namespace DCS_SR_Client
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
-            //var location = Assembly.GetExecutingAssembly().Location;
 
             //check for opus.dll
             if (!File.Exists(location + "\\opus.dll"))

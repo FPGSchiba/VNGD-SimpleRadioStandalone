@@ -39,9 +39,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
             _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
             var lastSeenName = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
-            var fleetCode = Regex.Match(lastSeenName, "(?<=\\[)([A-Z]{2,4})(?=\\])").Value;
+            var fleetCode = Regex.Match(lastSeenName, "(?<=\\[)([A-Z0-9]{2,4})(?=\\])").Value;
             FleetCodeInput.Text = fleetCode;
-            var playerName = Regex.Replace(lastSeenName, "\\[[A-Z]{2,4}\\]\\s", "");
+            var playerName = Regex.Replace(lastSeenName, "\\[[A-Z0-9]{2,4}\\]\\s", "");
             PlayerNameInput.Text = playerName;
             IpInput.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).RawValue;
         }
@@ -53,7 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
         private void Login_OnClick(object sender, RoutedEventArgs e)
         {
-            if (Regex.Match(FleetCodeInput.Text, "^[A-Z]{2}$").Success)
+            if (Regex.Match(FleetCodeInput.Text, "^[A-Z0-9]{2,4}$").Success)
             {
                 var coalitionPassword = PasswordInput.Password;
                 var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
@@ -63,26 +63,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
                 string address = GetAddressFromTextBox();
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, address);
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, playerName);
-                var resolvedAddresses = Dns.GetHostAddresses(address);
-                var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-
-                if (ip != null)
+                try
                 {
+                    var resolvedAddresses = Dns.GetHostAddresses(address);
+                    var ip = resolvedAddresses.FirstOrDefault(xa =>
+                        xa.AddressFamily ==
+                        AddressFamily
+                            .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
                     _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
                 }
-                else
+                catch (SocketException ex)
                 {
-                    //Invalid IP
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
-
                     _mainWindow.ClientState.IsConnected = false;
                 }
             }
             else
             {
                 System.Windows.Forms.MessageBox.Show(
-                    $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2 uppercase Letters", "Invalid Fleet-Code",
+                    $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2-4 uppercase Letters", "Invalid Fleet-Code",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             

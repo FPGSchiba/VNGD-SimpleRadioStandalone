@@ -131,8 +131,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
             foreach (var clientListModel in tempList.OrderByDescending(model => model.Coalition)
                          .ThenBy(model => model.Name.ToLower()).ToList())
             {
-                var fleetCode = Regex.Match(clientListModel.Name, "(?<=\\[)([A-Z]{2,4})(?=\\])").Value;
-                var playerName = Regex.Replace(clientListModel.Name, "\\[[A-Z]{2,4}\\]\\s", "");
+                var fleetCode = Regex.Match(clientListModel.Name, "(?<=\\[)([A-Z0-9]{2,4})(?=\\])").Value;
+                var playerName = Regex.Replace(clientListModel.Name, "\\[[A-Z0-9]{2,4}\\]\\s", "");
                 
                 var item = new PlayerListItem
                 {
