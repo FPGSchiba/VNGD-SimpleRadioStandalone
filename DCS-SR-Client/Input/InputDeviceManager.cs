@@ -763,21 +763,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
                                     break;
                                 case InputBinding.RadioSwap:
-                                    var RadioId = dcsPlayerRadioInfo.selected;
+                                    var radioId = dcsPlayerRadioInfo.selected;
                                     var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
                                     var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
-
-                                    Logger.Info("Initiating Frequency Swap on Radio = " + RadioId);
-                                    Logger.Info("Old Active Frequency = " + freq);
-                                    Logger.Info("Old Standby Frequency = " + standbyFreq);                          
-
-                                    RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
-                                        Logger.Info("New Standby Frequency = " + dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq);
                                     
-                                    RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
-                                        Logger.Info("New Active Frequency = " + dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq);
-                                    
-                                        break;
+                                    RadioHelper.UpdateStandbyRadioFrequency(freq, radioId, false, false);
+                                    RadioHelper.UpdateRadioFrequency(standbyFreq, radioId, false, false);
+                                    break;
                                 case InputBinding.Radio1VToggle:
                                     Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneVerticalIndex); });
                                     break;
