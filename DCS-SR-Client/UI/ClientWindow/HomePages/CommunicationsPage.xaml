@@ -60,7 +60,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Button
                         Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                        Content="SWITCH RADIO PANEL"
+                        Content="SELECT RADIO PANEL"
                         Height="40"
                         Margin="0,100,0,0"
                         Style="{StaticResource MaterialDesignFlatDarkBgButton}"
