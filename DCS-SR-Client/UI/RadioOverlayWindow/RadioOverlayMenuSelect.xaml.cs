@@ -80,10 +80,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY, Top);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectHeight, Height);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectOpacity, Opacity);
-
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectOpacity, 1);
+            
             base.OnClosing(e);
-
         }
 
         private void Button_Minimise(object sender, RoutedEventArgs e)

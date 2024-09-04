@@ -1,8 +1,8 @@
 ﻿<Window
     AllowsTransparency="True"
     Background="#444"
-    Height="140"
-    MinHeight="140"
+    Height="180"
+    MinHeight="180"
     MinWidth="805"
     Name="RadioOverlayWin"
     Opacity="1.0"
@@ -37,9 +37,9 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
+            <RowDefinition Height="40"/>
             <RowDefinition />
             <RowDefinition Height="25" />
-
         </Grid.RowDefinitions>
 
         <StackPanel
@@ -117,11 +117,59 @@
             </Button>
         </StackPanel>
 
+        <StackPanel 
+            Orientation="Vertical"
+            Grid.Row="1"
+            Grid.ColumnSpan="3"
+            Margin="0,2,0,2">
+            <Label
+                Content="Basic Radio Panels"
+                Foreground="#E7E7E7"
+                Padding="0"
+                FontSize="18"
+                HorizontalAlignment="Center"/>
+            <Label
+                Content="Subtext"
+                Visibility="Hidden"
+                Foreground="#E7E7E7"
+                Padding="0"
+                FontSize="10"
+                HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <Line
+            Grid.Row="1"
+            Grid.Column="3"
+            Grid.RowSpan="2"
+            StrokeThickness="4"
+            Stroke="Black">
+        </Line>
+
+        <StackPanel 
+            Orientation="Vertical"
+            Grid.Row="1"
+            Grid.Column="3"
+            Grid.ColumnSpan="4"
+            Margin="0,2,0,2">
+            <Label
+                 Content="Advanced Radio Panels"
+                 Foreground="#E7E7E7"
+                 Padding="0"
+                 FontSize="18"
+                 HorizontalAlignment="Center"/>
+            <Label
+                 Content="It is HIGHLY recommended only monitor 2 radios at a time"
+                 Foreground="#E7E7E7"
+                 Padding="0"
+                 FontSize="10"
+                 HorizontalAlignment="Center"/>
+        </StackPanel>
+
         <!--Radio Panel Selection Buttons-->
         <!-- 1 Radio Panels -->
         <StackPanel
-            Grid.Column="0"
-            Grid.Row="1"
+            Grid.Column="1"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -162,8 +210,8 @@
 
         <!-- 2 Radio Panels -->
         <StackPanel
-            Grid.Column="1"
-            Grid.Row="1"
+            Grid.Column="2"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -203,8 +251,8 @@
 
         <!-- 3 Radio Panels -->
         <StackPanel
-            Grid.Column="2"
-            Grid.Row="1"
+            Grid.Column="3"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -244,8 +292,8 @@
 
         <!-- 5 Radio Panels -->
         <StackPanel
-            Grid.Column="3"
-            Grid.Row="1"
+            Grid.Column="4"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -285,8 +333,8 @@
 
         <!-- 10 Radio Panels -->
         <StackPanel
-            Grid.Column="4"
-            Grid.Row="1"
+            Grid.Column="5"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -326,8 +374,8 @@
 
         <!-- 10 UltraWide Radio Panels -->
         <StackPanel
-            Grid.Column="5"
-            Grid.Row="1"
+            Grid.Column="6"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -367,8 +415,8 @@
 
         <!-- 10 Compact Panels -->
         <StackPanel
-            Grid.Column="6"
-            Grid.Row="1"
+            Grid.Column="0"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             Orientation="Vertical">
             <Label
@@ -407,6 +455,18 @@
         </StackPanel>
 
         <!--Footer Section-->
+        <Label
+            Content="HINT: Did you know that the compact panels are expandable?"
+            Foreground="DarkGray"
+            Grid.Column="0"
+            Grid.ColumnSpan="4"
+            Grid.Row="4"
+            Padding="0"
+            Margin="20,0,0,0"
+            FontSize="10"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"/>
+        
         <TextBlock
             FontSize="12"
             Foreground="#E7E7E7"
