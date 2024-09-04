@@ -954,7 +954,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             //Dabble Added Following Keybinds
 
-            RadioSwap.InputName = "Swap Standby Frequency";   //Dabble Added
+            RadioSwap.InputName = "Swap Standby Frequency (WIP)";   //Dabble Added
             RadioSwap.ControlInputBinding = InputBinding.RadioSwap;
             RadioSwap.InputDeviceManager = InputManager;
 
@@ -1016,7 +1016,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio10SToggle.ControlInputBinding = InputBinding.Radio10SToggle;
             Radio10SToggle.InputDeviceManager = InputManager;
 
+            // Audio Balancing
+            LeftBalance.InputName = "Left Balance (WIP)";   //Dabble Added
+            LeftBalance.ControlInputBinding = InputBinding.LeftBalance;
+            LeftBalance.InputDeviceManager = InputManager;
 
+            RightBalance.InputName = "Right Balance (WIP)";   //Dabble Added
+            RightBalance.ControlInputBinding = InputBinding.RightBalance;
+            RightBalance.InputDeviceManager = InputManager;
+
+            CenterBalance.InputName = "Reset Balance (WIP)";   //Dabble Added
+            CenterBalance.ControlInputBinding = InputBinding.CenterBalance;
+            CenterBalance.InputDeviceManager = InputManager;
+
+            //Panel Night Mode
+            PanelNightMode.InputName = "Panel Night Mode Toggle (WIP)";   //Dabble Added
+            PanelNightMode.ControlInputBinding = InputBinding.PanelNightMode;
+            PanelNightMode.InputDeviceManager = InputManager;
         }
 
         #region Pages and Navigation

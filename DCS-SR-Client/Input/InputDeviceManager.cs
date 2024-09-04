@@ -802,7 +802,48 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             break;
                         }
 
-            //<--------------------------- Resume Original SRS Keybindings -------------------------->
+          //<--------------------------- Audio Balancing Keybindings (added by Dabble) ------------->
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.LeftBalance)
+                        {
+                            //Select active radio and adjust balance LEFT .1
+                            
+                            //needs to be added
+
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.RightBalance)
+                        {
+                            //Select active radio and adjust balance RIGHT .1
+
+                            //needs to be added
+
+                            break;
+                        }
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.CenterBalance)
+                        {
+                            //Select active radio and adjust balance to .50
+
+                            //needs to be added
+
+                            break;
+                        }
+
+        //<-------------------- Night Mode Keybindings (added by Dabble)---------------------------->
+
+                        else if (bindState.IsActive && bindState.MainDevice.InputBind == InputBinding.PanelNightMode)
+                        {
+                            //Select current panel and determine if background opacity is less than .2.
+                                    //If true, then set background opacity and text to 1.0. 
+                                    //Else, set background opacity and text .2
+
+                            //needs to be added
+
+                            break;
+                        }
+
+        //<--------------------------- Resume Original SRS Keybindings -------------------------->
 
 
                         else if ((int)bindState.MainDevice.InputBind >= (int)InputBinding.Up100 &&
