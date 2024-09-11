@@ -8,7 +8,8 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI">
+    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
+    xmlns:balance="namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioChannelConfigUI">
 
     <TabControl
         Background="#444"
@@ -277,7 +278,7 @@
                             Fill="#FF9900"
                             Height="30"
                             HorizontalAlignment="Right"
-                            Margin="1,0,0,0"
+                            Margin="0,0,0,0"
                             MouseDown="RadioSelectSwitch"
                             Stroke="Black"
                             StrokeThickness="1"
@@ -303,9 +304,37 @@
                             Style="{StaticResource DarkStyle-Button}"
                             Width="15" />
 
-                        
-
-
+                        <StackPanel Orientation="Vertical">
+                            <Viewbox
+                                Height="10"
+                                Width="100">
+                                <Slider Name="ChannelSelector"
+                                        Maximum="1.0"
+                                        Minimum="-1.0"
+                                        Value="0" 
+                                        TickPlacement="BottomRight"
+                                        SmallChange="0.1" 
+                                        LargeChange="0.3"
+                                        IsSnapToTickEnabled="True"
+                                        TickFrequency="0.1" 
+                                        Width="180" 
+                                        Height="20" ValueChanged="ChannelSelector_ValueChanged">
+                                </Slider>
+                            </Viewbox>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="10"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="0" FontSize="6" Content="L" HorizontalAlignment="Left"> </Label>
+                                <Label Grid.Column="1" FontSize="6" Content="C" HorizontalAlignment="Center"> </Label>
+                                <Label Grid.Column="2" FontSize="6" Content="R" HorizontalAlignment="Right"> </Label>
+                            </Grid>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
 

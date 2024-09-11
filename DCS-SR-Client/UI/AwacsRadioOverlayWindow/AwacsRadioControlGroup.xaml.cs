@@ -822,5 +822,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 SetRadioEnabled(false);
             }
         }
+
+        private void ChannelSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            var radio = RadioHelper.GetRadio(RadioId);
+
+            if(radio == null)
+            {
+                return;
+                Logger.Warn($"Radio ID: {radio} was not found when adjusting balance from the radio panel and could not be changed.");
+            }
+            
+            if(radio == 1) // Radio 1 Adjustments
+            {
+                GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingKey, (float)ChannelSelector.Value);
+            }
+        }
     }
 }
