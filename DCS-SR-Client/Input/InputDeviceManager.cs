@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Serialization;
 using System.Windows.Interop;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
@@ -70,7 +71,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom
             ; //intercom used to represent null as we cant
 
-        private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
+        private readonly Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
         public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
@@ -690,7 +691,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                         if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                         {
-                            Logger.Trace($"I am here and evaluating Inputs: {bindState.MainDevice.InputBind}");
                             switch (bindState.MainDevice.InputBind)
                             {
                                 case InputBinding.Up100:
@@ -813,21 +813,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
                                     break;
                                 case InputBinding.LeftBalance:
-                                    //Select active radio and adjust balance LEFT .1
-                                    //needs to be added
-                                    Logger.Debug("Added Left Balance");
+                                    // TODO: Call back new UI for update
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(GetCurrentChannel()) - 0.1f, -1.0f));
                                     break;
                                 case InputBinding.RightBalance:
-                                    //Select active radio and adjust balance RIGHT .1
-                                    //needs to be added
-                                    Logger.Info("Added Right Balance");
+                                    // TODO: Call back new UI for update
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(GetCurrentChannel()) + 0.1f, 1.0f));
                                     break;
                                 case InputBinding.CenterBalance:
-                                    //Select active radio and adjust balance to .50
-                                    //needs to be added
-                                    Logger.Debug("Center balanced Radio");
+                                    // TODO: Call back new UI for update
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), 0f);
                                     break;
                                 case InputBinding.PanelNightMode:
+                                    // TODO: Call back UI for update
                                     //Select current panel and determine if background opacity is less than .2.
                                     //If true, then set background opacity and text to 1.0. 
                                     //Else, set background opacity and text .2
@@ -847,6 +845,37 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         }
 
 
+        private ProfileSettingsKeys GetCurrentChannel()
+        {
+            switch (ClientStateSingleton.Instance.DcsPlayerRadioInfo.selected)
+            {
+                case 0:
+                    return ProfileSettingsKeys.IntercomChannel;
+                case 1:
+                    return ProfileSettingsKeys.Radio1Channel;
+                case 2:
+                    return ProfileSettingsKeys.Radio2Channel;
+                case 3:
+                    return ProfileSettingsKeys.Radio3Channel;
+                case 4:
+                    return ProfileSettingsKeys.Radio4Channel;
+                case 5:
+                    return ProfileSettingsKeys.Radio5Channel;
+                case 6:
+                    return ProfileSettingsKeys.Radio6Channel;
+                case 7:
+                    return ProfileSettingsKeys.Radio7Channel;
+                case 8:
+                    return ProfileSettingsKeys.Radio8Channel;
+                case 9:
+                    return ProfileSettingsKeys.Radio9Channel;
+                case 10:
+                    return ProfileSettingsKeys.Radio10Channel;
+                default: // This should not happen (we only have 11 radios (10 radios + 1 intercom))
+                    return ProfileSettingsKeys.Radio1Channel;
+            }
+        }
+        
         public void StopPtt()
         {
             _detectPtt = false;

@@ -3677,12 +3677,10 @@
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center"/>
                                                 <local:RadioChannelConfigUi
-                                                    DefaultValue="-0.2"
                                                     Grid.Column="1"
                                                     Grid.Row="0"
                                                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Channel}"
                                                     x:Name="Radio1Config"/>
-
                                                 <Label
                                                     Content="Radio 2 Audio Channel"
                                                     Grid.Column="0"
@@ -3690,12 +3688,10 @@
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center"/>
                                                 <local:RadioChannelConfigUi
-                                                    DefaultValue="0.2"
                                                     Grid.Column="1"
                                                     Grid.Row="1"
                                                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio2Channel}"
                                                     x:Name="Radio2Config"/>
-
                                                 <Label
                                                     Content="Radio 3 Audio Channel"
                                                     Grid.Column="0"
