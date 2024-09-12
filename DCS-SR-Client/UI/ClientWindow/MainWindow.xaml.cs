@@ -319,6 +319,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _updateTimer.Start();
         }
 
+        public String GetPlayerName()
+        {
+            if (LoggedIn)
+            {
+                return _playerName;
+            }
+
+            return null;
+        }
+
         private void CheckWindowVisibility()
         {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisableWindowVisibilityCheck))

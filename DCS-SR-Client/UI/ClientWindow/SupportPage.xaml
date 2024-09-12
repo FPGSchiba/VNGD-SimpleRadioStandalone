@@ -326,6 +326,97 @@
                     </FlowDocument>
                 </FlowDocumentScrollViewer>
             </TabItem>
+            <TabItem Height="45" Width="185">
+                <TabItem.Header>
+                    <StackPanel
+                        Margin="16,0,0,0"
+                        Orientation="Horizontal"
+                        Width="163">
+                        <materialDesign:PackIcon
+                            Foreground="#FEF7FF"
+                            Height="18"
+                            Kind="Circle"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Width="18" />
+                        <TextBlock
+                            FontSize="14"
+                            Margin="5,0"
+                            VerticalAlignment="Center">
+                            Feedback
+                        </TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        materialDesign:HintAssist.Hint="Contact email address"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Margin="5,5,5,5"
+                        Padding="8"
+                        FontSize="16"
+                        x:Name="EmailText"
+                    />
+                    
+                    <ComboBox
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Padding="8"
+                        materialDesign:HintAssist.Hint="Feedback Type"
+                        Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                        x:Name="FeedbackType"
+                        Margin="5,5,5,5"
+                        FontSize="16"
+                    >
+                        <ComboBoxItem
+                            Content="Bug" />
+                        <ComboBoxItem
+                            Content="Feature" />
+                        <ComboBoxItem
+                            Content="Other" />
+                    </ComboBox>
+                    
+                    <TextBox 
+                        Grid.Row="1" 
+                        Grid.Column="0" 
+                        Grid.ColumnSpan="2"
+                        FontSize="16"
+                        materialDesign:HintAssist.Hint="Input your Feedback here"
+                        AcceptsReturn="True"
+                        SpellCheck.IsEnabled="True"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        TextWrapping="Wrap"
+                        VerticalScrollBarVisibility="Auto"
+                        VerticalAlignment="Stretch"
+                        Margin="5,0,5,5"
+                        x:Name="FeedbackText"
+                    />
+                    <Button
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Click="Submit_OnClick"
+                        Content="SUBMIT"
+                        Margin="5,5,5,5"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                        materialDesign:ButtonAssist.CornerRadius="15"
+                        />
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Page>
