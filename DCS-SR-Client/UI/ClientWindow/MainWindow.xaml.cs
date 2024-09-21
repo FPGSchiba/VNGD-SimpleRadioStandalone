@@ -164,6 +164,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public const int TransparentIndex = 12;
         private RadioOverlayWindowTenSwitch _radioOverlayWindowTenSwitch;
         public const int SwitchIndex = 13;
+        private RadioOverlayWindowEngineering _radioOverlayWindowEngineering;
+        public const int EngineeringIndex = 16;
 
         // Horizontal Radio-Overlays
         private RadioOverlayWindowOneHorizontal _radioOverlayWindowOneHorizontal;
@@ -251,6 +253,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             windows[TenHorizontalWideIndex] = _radioOverlayWindowTenHorizontalWide;
             windows[TransparentIndex] = _radioOverlayWindowTenTransparent;
             windows[SwitchIndex] = _radioOverlayWindowTenSwitch;
+            windows[EngineeringIndex] = _radioOverlayWindowEngineering;
             windows[DragableIndex] = _radioOverlayWindowDragable;
             windows[MenuSelectIndex] = _radioOverlayMenuSelect;
 
@@ -391,6 +394,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             int radioTenSwitchX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenSwitchX).DoubleValue;
             int radioTenSwitchY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenSwitchY).DoubleValue;
             _logger.Trace($"Checking window visibility for ten switch radio overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}}");
+            // Engineering
+            int radioEngineeringX = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioEngineeringX).DoubleValue;
+            int radioEngineeringY = (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioEngineeringY).DoubleValue;
+            _logger.Trace($"Checking window visibility for engineering radio overlay {{X={radioEngineeringX},Y={radioEngineeringY}}}");
 
             // -------- Horizontal Panels -------
             // 1 Radio
@@ -485,6 +492,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _logger.Trace($"Radio Ten Switch overlay {{X={radioTenSwitchX},Y={radioTenSwitchY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
+                if (screen.Bounds.Contains(radioEngineeringX, radioEngineeringY))
+                {
+                    _logger.Trace($"Radio Engineering overlay {{X={radioEngineeringX},Y={radioEngineeringY}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    radioWindowVisible = true;
+                }
 
 
                 // -------- Horizontal Panels -----------
@@ -561,6 +573,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _logger.Warn($"Radio Ten Long Vertical overlay window outside visible area of monitors, resetting position ({radioTenLongVerticalX},{radioTenLongVerticalY}) to defaults");
                 _logger.Warn($"Radio Ten Transparent overlay window outside visible area of monitors, resetting position ({radioTenTransparentX},{radioTenTransparentY}) to defaults");
                 _logger.Warn($"Radio Ten Switch overlay window outside visible area of monitors, resetting position ({radioTenSwitchX},{radioTenSwitchY}) to defaults");
+                _logger.Warn($"Radio Engineering overlay window outside visible area of monitors, resetting position ({radioEngineeringX},{radioEngineeringY}) to defaults");
 
                 // ------- Horizontal Panels ----------
                 _logger.Warn($"Radio One Horizontal overlay window outside visible area of monitors, resetting position ({radioOneHorizontalX},{radioOneHorizontalY}) to defaults");
@@ -603,6 +616,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchX, 300);
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchY, 300);
+
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringX, 300);
+                _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringY, 300);
 
                 // ------ Horizontal ------
                 _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);
@@ -684,6 +700,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 {
                     _radioOverlayWindowTenSwitch.Left = 300;
                     _radioOverlayWindowTenSwitch.Top = 300;
+                }
+                if (_radioOverlayWindowEngineering != null)
+                {
+                    _radioOverlayWindowEngineering.Left = 300;
+                    _radioOverlayWindowEngineering.Top = 300;
                 }
 
 
@@ -1867,6 +1888,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindowTenSwitch?.Close();
             _radioOverlayWindowTenSwitch = null;
 
+            _radioOverlayWindowEngineering?.Close();
+            _radioOverlayWindowEngineering = null;
+
             _radioOverlayWindowOneHorizontal?.Close();
             _radioOverlayWindowOneHorizontal = null;
 
@@ -2058,6 +2082,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             ToggleOverlay(true, SwitchIndex);
         }
+
+        private void ShowOverlayEngineering_OnClick(object sender, RoutedEventArgs e)
+        {
+            ToggleOverlay(true, EngineeringIndex);
+        }
+
         private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
         {
             ToggleOverlay(true, DragableIndex);
@@ -2141,6 +2171,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             break;
                         case SwitchIndex:
                             windows[switchTo] = new RadioOverlayWindowTenSwitch(ToggleOverlay);
+                            break;
+                        case EngineeringIndex:
+                            windows[switchTo] = new RadioOverlayWindowEngineering(ToggleOverlay);
                             break;
                         case DragableIndex:
                             windows[switchTo] = new RadioOverlayWindowDragable(ToggleOverlay);
@@ -2385,6 +2418,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _radioOverlayWindowTenSwitch?.Close();
             _radioOverlayWindowTenSwitch = null;
 
+            _radioOverlayWindowEngineering?.Close();
+            _radioOverlayWindowEngineering = null;
+
             _radioOverlayWindowOneHorizontal?.Close();
             _radioOverlayWindowOneHorizontal = null;
 
@@ -2495,6 +2531,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchBackgroundOpacity, 1.0);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchTextOpacity, 1.0);
+
+            // Engineering
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringY, 300);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringHeight, 100);
+
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringBackgroundOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioEngineeringTextOpacity, 1.0);
 
             // 1 Horizontal
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneHorizontalX, 300);

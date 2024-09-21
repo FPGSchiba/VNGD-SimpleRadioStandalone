@@ -116,6 +116,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenSwitchWidth,
         RadioTenSwitchHeight,
 
+        // Radio Engineering
+        RadioEngineeringX,
+        RadioEngineeringY,
+        RadioEngineeringSize,
+        RadioEngineeringBackgroundOpacity,
+        RadioEngineeringTextOpacity,
+        RadioEngineeringWidth,
+        RadioEngineeringHeight,
+
         // --------- Horizontal Panels --------------
         // Radio 1H
         RadioOneHorizontalX,

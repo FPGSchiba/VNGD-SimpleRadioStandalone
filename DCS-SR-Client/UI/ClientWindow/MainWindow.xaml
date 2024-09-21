@@ -430,6 +430,14 @@
                                                     Width="150"
                                                     x:Name="ShowOverlayDragable"/>
                                                 <Button
+                                                    Click="ShowOverlayEngineering_OnClick"
+                                                    Content="Engineering"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,5,0,0"
+                                                    Style="{DynamicResource SquareButtonStyle}"
+                                                    Width="150"
+                                                    x:Name="ShowOverlayEngineering"/>
+                                                <Button
                                                     Click="ShowOverlayMenuSelect_OnClick"
                                                     Content="Radio Panel Menu"
                                                     HorizontalAlignment="Center"
