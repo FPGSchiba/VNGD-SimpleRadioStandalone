@@ -377,6 +377,9 @@
     <Compile Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Components\BalanceControl.xaml.cs">
+      <DependentUpon>BalanceControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml.cs">
       <DependentUpon>PresetStandbyChannelsViewTransparent.xaml</DependentUpon>
     </Compile>
@@ -536,6 +539,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\Components\BalanceControl.xaml" />
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

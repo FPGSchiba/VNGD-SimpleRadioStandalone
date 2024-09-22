@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages"
       mc:Ignorable="d"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
       Title="CommunicationsPage" Height="270" Width="415">
     <Grid>
         <Grid.RowDefinitions>
@@ -67,13 +68,14 @@
                         materialDesign:ButtonAssist.CornerRadius="25" />
             
                 </StackPanel>
+                <components:BalanceControl Height="50" Width="50" />
                 <StackPanel>
                     <Button
                         Click="Logout_OnClick"
                         Content="LOGOUT"
                         Height="30"
                         IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                        Margin="280,80,15,10"
+                        Margin="280,30,15,10"
                         Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                         Width="90"
                         materialDesign:ButtonAssist.CornerRadius="15"
