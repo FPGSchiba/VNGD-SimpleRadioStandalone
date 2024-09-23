@@ -74,7 +74,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
-        private const int NoWindowOpen = 16;
+        private const int NoWindowOpen = 17;  // Update when adding new panel
         private int _windowOpen = NoWindowOpen;
 
         // State
