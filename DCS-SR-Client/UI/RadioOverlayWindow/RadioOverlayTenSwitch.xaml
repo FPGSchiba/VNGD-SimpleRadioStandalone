@@ -5,8 +5,6 @@
         xmlns:awacsOverlayWindow="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow"
         xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
 
-
-
     Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="180"

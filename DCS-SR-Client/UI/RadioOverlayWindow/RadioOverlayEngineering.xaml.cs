@@ -32,8 +32,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[] radioControlGroupTransparent =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[10];
+        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[] radioControlGroupSwitch =
+            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[10];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -43,13 +43,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
 
-        private double radioHeight = 10;
+        private double radioHeight = 20;
         private double currentHeight;
 
         private long _lastUnitId;
 
         private readonly ImageBrush _expandIcon = new ImageBrush(Images.IconExpand);
         private readonly ImageBrush _contractIcon = new ImageBrush(Images.IconContract);
+
+        // Damage Control Component State Colors
+        private readonly SolidColorBrush DCComponentGood = new SolidColorBrush(Colors.Green);
+        private readonly SolidColorBrush DCComponentFair = new SolidColorBrush(Colors.Yellow);
+        private readonly SolidColorBrush DCComponentCritical = new SolidColorBrush(Colors.Red);
+        private readonly SolidColorBrush DCComponentDestroyed = new SolidColorBrush(Colors.Black);
+        private readonly SolidColorBrush DCComponentNotInstalled = new SolidColorBrush(Colors.Gray);
 
         private readonly Action<bool, int> _toggleOverlay;
 
@@ -87,17 +94,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             AllowsTransparency = true;
             BackgroundOpacitySlider.Value = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioEngineeringBackgroundOpacity).DoubleValue;
             TextOpacitySlider.Value = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioEngineeringTextOpacity).DoubleValue;
-            
-            radioControlGroupTransparent[0] = Radio1;
-            radioControlGroupTransparent[1] = Radio2;
-            radioControlGroupTransparent[2] = Radio3;
-            radioControlGroupTransparent[3] = Radio4;
-            radioControlGroupTransparent[4] = Radio5;
-            radioControlGroupTransparent[5] = Radio6;
-            radioControlGroupTransparent[6] = Radio7;
-            radioControlGroupTransparent[7] = Radio8;
-            radioControlGroupTransparent[8] = Radio9;
-            radioControlGroupTransparent[9] = Radio10;
+
+            radioControlGroupSwitch[0] = Radio1;
+            radioControlGroupSwitch[1] = Radio2;
+            radioControlGroupSwitch[2] = Radio3;
+            radioControlGroupSwitch[3] = Radio4;
+            radioControlGroupSwitch[4] = Radio5;
+            radioControlGroupSwitch[5] = Radio6;
+            radioControlGroupSwitch[6] = Radio7;
+            radioControlGroupSwitch[7] = Radio8;
+            radioControlGroupSwitch[8] = Radio9;
+            radioControlGroupSwitch[9] = Radio10;
             
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -134,7 +141,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             int numVisibleRadios = 0;
 
-            foreach (var radio in radioControlGroupTransparent)
+            foreach (var radio in radioControlGroupSwitch)
             {
                 radioHeight = !double.IsNaN(radio.Height) ? radio.Height : 0;
                 radio.RepaintRadioStatus();
@@ -563,6 +570,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             Close();
             _toggleOverlay(true, 15);
+        }
+
+        private void ShipConditionChangeResponse_Click(object sender, RoutedEventArgs e)
+        {
+            // if Ship Condition changed, then button visibility.show happen
+
+            // when button is pressed, button visibility.hidden & send response to state manager
+        }
+
+
+        //Damage Control Color Changes
+        private void DamageControlStatusUpdates(object sender, RoutedEventArgs e)
+        {
+            DCQuantumDrive.Background = DCComponentGood;
+            DCCooler.Background = DCComponentGood;
+            DCEngine.Background = DCComponentGood;
+            DCGuns.Background = DCComponentGood;
+            DCMissile.Background = DCComponentGood;
+            DCTorpedo.Background = DCComponentGood;
+            DCShield.Background = DCComponentGood;
+            DCCrewStatus.Background = DCComponentGood;
         }
     }
 }
