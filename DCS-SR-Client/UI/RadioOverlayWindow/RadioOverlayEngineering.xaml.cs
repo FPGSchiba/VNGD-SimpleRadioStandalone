@@ -583,14 +583,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         //Damage Control Color Changes
         private void DamageControlStatusUpdates(object sender, RoutedEventArgs e)
         {
-            DCQuantumDrive.Background = DCComponentGood;
-            DCCooler.Background = DCComponentGood;
-            DCEngine.Background = DCComponentGood;
-            DCGuns.Background = DCComponentGood;
-            DCMissile.Background = DCComponentGood;
-            DCTorpedo.Background = DCComponentGood;
-            DCShield.Background = DCComponentGood;
-            DCCrewStatus.Background = DCComponentGood;
+            // DCQuantumDrive.Background = DCComponentGood;
+            // DCCooler.Background = DCComponentGood;
+            // DCEngine.Background = DCComponentGood;
+            // DCGuns.Background = DCComponentGood;
+            // DCMissile.Background = DCComponentGood;
+            // DCTorpedo.Background = DCComponentGood;
+            // DCShield.Background = DCComponentGood;
+            // DCCrewStatus.Background = DCComponentGood;
         }
     }
 }
