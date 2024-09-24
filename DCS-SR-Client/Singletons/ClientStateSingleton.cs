@@ -38,6 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
+        public PresetStandbyChannelsViewModel[] StandbyChannels { get; }
 
         public long LastSent { get; set; }
 
@@ -137,10 +138,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             _timer.Start();
 
             FixedChannels = new PresetChannelsViewModel[10];
-
+            StandbyChannels = new PresetStandbyChannelsViewModel[10];
+            
             for (int i = 0; i < FixedChannels.Length; i++)
             {
                 FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i + 1);
+                StandbyChannels[i] = new PresetStandbyChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
 
             LastSent = 0;

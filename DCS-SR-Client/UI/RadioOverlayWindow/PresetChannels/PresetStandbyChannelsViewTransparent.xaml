@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
     xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
-    d:DataContext="{d:DesignInstance presetChannels:PresetChannelsViewModel,
-                                              IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance presetChannels:PresetStandbyChannelsViewModel, IsDesignTimeCreatable=False}"
     d:DesignHeight="10"
     mc:Ignorable="d"
     Height="10"
@@ -25,7 +24,7 @@
                   VerticalAlignment="Top"
                   DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding PresetChannels}"
-                  SelectedItem="{Binding SelectedStandbyPresetChannel}" 
+                  SelectedItem="{Binding SelectedPresetChannel}" 
                   ToolTip="Select a predefined radio frequency via a dropdown menu" SelectionChanged="FrequencyDropDown_SelectionChanged"/>
 
         <!--<Button Name="ReloadButton"

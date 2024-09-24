@@ -35,6 +35,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
+        public PresetStandbyChannelsViewModel StandbyChannelViewModel { get; set; }
 
 
         public RadioControlGroupSwitch()
@@ -75,9 +76,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void UpdateBinding()
         {
             ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
+            StandbyChannelViewModel = _clientStateSingleton.StandbyChannels[_radioId - 1];
 
             var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
             bindingExpression?.UpdateTarget();
+            var standbyBindingExpression = StandbyPresetChannelsView.GetBindingExpression(DataContextProperty);
+            standbyBindingExpression?.UpdateTarget();
         }
 
 

@@ -267,8 +267,8 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel>
-                <Label
-                    Content="ENGINEERING and DAMAGE CONTROL"
+                <TextBlock
+                    Text="ENGINEERING &amp; DAMAGE CONTROL"
                     Margin="2,3,0,0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -276,137 +276,138 @@
                     Foreground="#E7E7E7"
                     Padding="0,0,0,0"
                     Style="{x:Null}">
-                </Label>
+                </TextBlock>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Label
-                        Content="Ship Condition"
+                    <TextBlock
+                        Text="Ship Condition"
                         FontSize="8"
                         Padding="1"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Foreground="#FF9900">
-                    </Label>
+                    </TextBlock>
                     <Border Width="15" Height="15" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="ShipConditionCode">
-                        <Label
-                            Content="1"
+                        <TextBlock
+                            Text="1"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Button
                         Background="IndianRed"
                         Click="ShipConditionChangeResponse_Click"
-                        Content="READY"
-                        FontSize="5"
-                        Foreground="Black"
                         Height="15"
                         Width="25"
                         HorizontalAlignment="Center"
-                        IsEnabled="False"
+                        Visibility="Visible"
                         Margin="3"
-                        Name="RadioEnabled"
-                        Opacity="1"
+                        x:Name="RadioEnabled"
                         Padding="0"
-                        Style="{StaticResource DarkStyle-Button}"/>
+                        Style="{StaticResource DarkStyle-Button}">
+                        <Button.Content>
+                            <TextBlock 
+                                FontSize="7"
+                                Text="READY"
+                                Foreground="Black"/>
+                        </Button.Content>
+                    </Button>
                     <Border Width="25" Height="15" BorderBrush="Black" BorderThickness="1" Margin="20,3,3,3" Padding="0" Background="CadetBlue" Name="DCCrewStatus">
-                        <Label
-                             Content="CREW"
+                        <TextBlock
+                             Text="CREW"
                              FontSize="8"
                              Padding="1"
                              VerticalAlignment="Center"
                              HorizontalAlignment="Center"
                              Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="15" Height="15" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCCritical">
-                        <Label
-                             Content="!!!"
-                             FontSize="8"
-                             Padding="1"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Center"
-                             Foreground="#FF9900">
-                        </Label>
+                        <TextBlock
+                            Text="!!!"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
                     </Border>
-
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal">
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCShield">
-                        <Label
-                            Content="SH"
+                        <TextBlock
+                            Text="SH"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCQuantumDrive">
-                        <Label
-                            Content="QD"
+                        <TextBlock
+                            Text="QD"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCEngine">
-                        <Label
-                            Content="ENG"
+                        <TextBlock
+                            Text="ENG"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCGuns">
-                        <Label
-                            Content="GUN"
+                        <TextBlock
+                            Text="GUN"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCMissile">
-                        <Label
-                            Content="MIS"
+                        <TextBlock
+                            Text="MIS"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCTorpedo">
-                        <Label
-                            Content="TOR"
+                        <TextBlock
+                            Text="TOR"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
                     <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCCooler">
-                        <Label
-                            Content="CL"
+                        <TextBlock
+                            Text="CL"
                             FontSize="8"
                             Padding="1"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Foreground="#FF9900">
-                        </Label>
+                        </TextBlock>
                     </Border>
-
                 </StackPanel>
             </StackPanel>
         </StackPanel>

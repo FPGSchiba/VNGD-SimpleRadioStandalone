@@ -211,7 +211,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             double neededRadioHeight = !double.IsNaN(radioHeight) ? radioHeight * numVisibleRadios : 0;
             double neededHeaderHeight = !double.IsNaN(Header.ActualHeight) && Header.ActualHeight != 0 ? 14 : 0; // Using the expand button to determine the window state
-            double neededFooterHeight = !double.IsNaN(Footer.ActualHeight) && Footer.ActualHeight != 0 ? 10 : 0;
+            double neededFooterHeight = !double.IsNaN(Footer.ActualHeight) && Footer.ActualHeight != 0 ? 90 : 0;
             double newNeededHeight = neededRadioHeight + neededFooterHeight + neededHeaderHeight + 31;
             if (newNeededHeight != currentHeight && !double.IsNaN(newNeededHeight))
             {
