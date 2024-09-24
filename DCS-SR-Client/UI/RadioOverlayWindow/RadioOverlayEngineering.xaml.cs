@@ -98,13 +98,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             radioControlGroupSwitch[0] = Radio1;
             radioControlGroupSwitch[1] = Radio2;
             radioControlGroupSwitch[2] = Radio3;
-            radioControlGroupSwitch[3] = Radio4;
-            radioControlGroupSwitch[4] = Radio5;
-            radioControlGroupSwitch[5] = Radio6;
-            radioControlGroupSwitch[6] = Radio7;
-            radioControlGroupSwitch[7] = Radio8;
-            radioControlGroupSwitch[8] = Radio9;
-            radioControlGroupSwitch[9] = Radio10;
             
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -403,76 +396,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Radio3.TransmitterName.Opacity = e.NewValue;
             Radio3.RadioActive.Opacity = e.NewValue;
             Radio3.RadioVolume.Opacity = e.NewValue;
-            //Radio 4
-            Radio4.RadioEnabled.Opacity = e.NewValue;
-            Radio4.PresetChannelsView.Opacity = e.NewValue;
-            Radio4.RadioTextGroup.Opacity = e.NewValue;
-            Radio4.RadioLabel.Opacity = e.NewValue;
-            Radio4.RadioFrequency.Opacity = e.NewValue;
-            Radio4.RadioMetaData.Opacity = e.NewValue;
-            Radio4.TransmitterName.Opacity = e.NewValue;
-            Radio4.RadioActive.Opacity = e.NewValue;
-            Radio4.RadioVolume.Opacity = e.NewValue;
-            //Radio 5
-            Radio5.RadioEnabled.Opacity = e.NewValue;
-            Radio5.PresetChannelsView.Opacity = e.NewValue;
-            Radio5.RadioTextGroup.Opacity = e.NewValue;
-            Radio5.RadioLabel.Opacity = e.NewValue;
-            Radio5.RadioFrequency.Opacity = e.NewValue;
-            Radio5.RadioMetaData.Opacity = e.NewValue;
-            Radio5.TransmitterName.Opacity = e.NewValue;
-            Radio5.RadioActive.Opacity = e.NewValue;
-            Radio5.RadioVolume.Opacity = e.NewValue;
-            //Radio 6
-            Radio6.RadioEnabled.Opacity = e.NewValue;
-            Radio6.PresetChannelsView.Opacity = e.NewValue;
-            Radio6.RadioTextGroup.Opacity = e.NewValue;
-            Radio6.RadioLabel.Opacity = e.NewValue;
-            Radio6.RadioFrequency.Opacity = e.NewValue;
-            Radio6.RadioMetaData.Opacity = e.NewValue;
-            Radio6.TransmitterName.Opacity = e.NewValue;
-            Radio6.RadioActive.Opacity = e.NewValue;
-            Radio6.RadioVolume.Opacity = e.NewValue;
-            //Radio 7
-            Radio7.RadioEnabled.Opacity = e.NewValue;
-            Radio7.PresetChannelsView.Opacity = e.NewValue;
-            Radio7.RadioTextGroup.Opacity = e.NewValue;
-            Radio7.RadioLabel.Opacity = e.NewValue;
-            Radio7.RadioFrequency.Opacity = e.NewValue;
-            Radio7.RadioMetaData.Opacity = e.NewValue;
-            Radio7.TransmitterName.Opacity = e.NewValue;
-            Radio7.RadioActive.Opacity = e.NewValue;
-            Radio7.RadioVolume.Opacity = e.NewValue;
-            //Radio 8
-            Radio8.RadioEnabled.Opacity = e.NewValue;
-            Radio8.PresetChannelsView.Opacity = e.NewValue;
-            Radio8.RadioTextGroup.Opacity = e.NewValue;
-            Radio8.RadioLabel.Opacity = e.NewValue;
-            Radio8.RadioFrequency.Opacity = e.NewValue;
-            Radio8.RadioMetaData.Opacity = e.NewValue;
-            Radio8.TransmitterName.Opacity = e.NewValue;
-            Radio8.RadioActive.Opacity = e.NewValue;
-            Radio8.RadioVolume.Opacity = e.NewValue;
-            //Radio 9
-            Radio9.RadioEnabled.Opacity = e.NewValue;
-            Radio9.PresetChannelsView.Opacity = e.NewValue;
-            Radio9.RadioTextGroup.Opacity = e.NewValue;
-            Radio9.RadioLabel.Opacity = e.NewValue;
-            Radio9.RadioFrequency.Opacity = e.NewValue;
-            Radio9.RadioMetaData.Opacity = e.NewValue;
-            Radio9.TransmitterName.Opacity = e.NewValue;
-            Radio9.RadioActive.Opacity = e.NewValue;
-            Radio9.RadioVolume.Opacity = e.NewValue;
-            //Radio 10
-            Radio10.RadioEnabled.Opacity = e.NewValue;
-            Radio10.PresetChannelsView.Opacity = e.NewValue;
-            Radio10.RadioTextGroup.Opacity = e.NewValue;
-            Radio10.RadioLabel.Opacity = e.NewValue;
-            Radio10.RadioFrequency.Opacity = e.NewValue;
-            Radio10.RadioMetaData.Opacity = e.NewValue;
-            Radio10.TransmitterName.Opacity = e.NewValue;
-            Radio10.RadioActive.Opacity = e.NewValue;
-            Radio10.RadioVolume.Opacity = e.NewValue;
+            
             //Vox and Intercom
             Intercom.Opacity = e.NewValue;
             //Footer

@@ -8,9 +8,9 @@
     Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="180"
-        Height= "320"
+        Height= "200"
         MinWidth="178"
-        MinHeight="320"
+        MinHeight="200"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -123,13 +123,6 @@
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio3"  RadioId="3"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio4"  RadioId="4"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio5"  RadioId="5"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio6"  RadioId="6"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio7"  RadioId="7"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio8"  RadioId="8"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio9"  RadioId="9"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio10" RadioId="10" Visibility="Visible"/>
 
             <StackPanel
                 Orientation="Horizontal"
