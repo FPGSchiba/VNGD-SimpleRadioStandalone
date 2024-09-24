@@ -1,4 +1,4 @@
-﻿<Window x:Class="Ciribob.DCS.SimpleRadio.Standalone.Overlay.RadioOverlayWindowTenSwitch"
+﻿<Window x:Class="Ciribob.DCS.SimpleRadio.Standalone.Overlay.RadioOverlayWindowEngineering"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Overlay"
@@ -8,9 +8,9 @@
     Name="RadioOverlayWin"
         Title="DCS-SimpleRadio"
         Width="180"
-        Height= "260"
-        MinWidth="180"
-        MinHeight="260"
+        Height= "200"
+        MinWidth="178"
+        MinHeight="200"
         AllowsTransparency="True"
         Background="#444"
         LocationChanged="RadioOverlayWindow_OnLocationChanged"
@@ -48,7 +48,7 @@
                 FontSize="8"
                 Foreground="#E7E7E7"
                 Padding="0"
-                Text="Compact Radio Panel - New" />
+                Text="Compact Radio Panel - Original" />
             <TextBlock Name="Orientation"
                Visibility="Collapsed"
                Width="28"
@@ -123,13 +123,6 @@
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio1"  RadioId="1"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio2"  RadioId="2"  Visibility="Visible" />
             <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio3"  RadioId="3"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio4"  RadioId="4"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio5"  RadioId="5"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio6"  RadioId="6"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio7"  RadioId="7"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio8"  RadioId="8"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio9"  RadioId="9"  Visibility="Visible" />
-            <awacsOverlayWindow:RadioControlGroupSwitch Margin="0,0,0,0" x:Name="Radio10" RadioId="10" Visibility="Visible"/>
 
             <StackPanel
                 Orientation="Horizontal"
@@ -271,6 +264,150 @@
                             ValueChanged="textOpacitySlider_ValueChanged"
                             Value="0.1" />
                     </Viewbox>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock
+                    Text="ENGINEERING &amp; DAMAGE CONTROL"
+                    Margin="2,3,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="6"
+                    Foreground="#E7E7E7"
+                    Padding="0,0,0,0"
+                    Style="{x:Null}">
+                </TextBlock>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock
+                        Text="Ship Condition"
+                        FontSize="8"
+                        Padding="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="#FF9900">
+                    </TextBlock>
+                    <Border Width="15" Height="15" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="ShipConditionCode">
+                        <TextBlock
+                            Text="1"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Button
+                        Background="IndianRed"
+                        Click="ShipConditionChangeResponse_Click"
+                        Height="15"
+                        Width="25"
+                        HorizontalAlignment="Center"
+                        Visibility="Visible"
+                        Margin="3"
+                        x:Name="RadioEnabled"
+                        Padding="0"
+                        Style="{StaticResource DarkStyle-Button}">
+                        <Button.Content>
+                            <TextBlock 
+                                FontSize="7"
+                                Text="READY"
+                                Foreground="Black"/>
+                        </Button.Content>
+                    </Button>
+                    <Border Width="25" Height="15" BorderBrush="Black" BorderThickness="1" Margin="20,3,3,3" Padding="0" Background="CadetBlue" Name="DCCrewStatus">
+                        <TextBlock
+                             Text="CREW"
+                             FontSize="8"
+                             Padding="1"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="15" Height="15" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCCritical">
+                        <TextBlock
+                            Text="!!!"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCShield">
+                        <TextBlock
+                            Text="SH"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCQuantumDrive">
+                        <TextBlock
+                            Text="QD"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCEngine">
+                        <TextBlock
+                            Text="ENG"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCGuns">
+                        <TextBlock
+                            Text="GUN"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCMissile">
+                        <TextBlock
+                            Text="MIS"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCTorpedo">
+                        <TextBlock
+                            Text="TOR"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
+                    <Border Width="20" Height="20" BorderBrush="Black" BorderThickness="1" Margin="3" Padding="0" Background="CadetBlue" Name="DCCooler">
+                        <TextBlock
+                            Text="CL"
+                            FontSize="8"
+                            Padding="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Foreground="#FF9900">
+                        </TextBlock>
+                    </Border>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

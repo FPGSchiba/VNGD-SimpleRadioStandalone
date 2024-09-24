@@ -170,7 +170,7 @@
                 Orientation="Horizontal">
                 <presetChannels:PresetChannelsViewTransparent1
                     Background="#444"
-                    DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
+                    DataContext="{Binding StandbyChannelViewModel, Mode=TwoWay}"
                     HorizontalAlignment="Center"
                     Width="12"
                     x:Name="StandbyPresetChannelsView" />

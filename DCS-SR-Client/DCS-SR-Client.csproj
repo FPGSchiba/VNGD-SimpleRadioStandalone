@@ -402,6 +402,9 @@
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml.cs">
       <DependentUpon>RadioOverlayTenSwitch.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml.cs">
+      <DependentUpon>RadioOverlayEngineering.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml.cs">
       <DependentUpon>RadioOverlayTenVerticalLong.xaml</DependentUpon>
     </Compile>
@@ -565,6 +568,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -7,6 +7,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
+using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels
 {
@@ -15,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
         private IPresetChannelsStore _channelsStore;
         private int _radioId;
 
-        public DelegateCommand StandbyDropDownClosedCommand { get; set; }
+        public DelegateCommand DropDownClosedCommand { get; set; }
 
 
         private readonly object _presetChannelLock = new object();
@@ -46,7 +47,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
             _radioId = radioId;
             _channelsStore = channels;
             ReloadCommand = new DelegateCommand(OnReload);
-            StandbyDropDownClosedCommand = new DelegateCommand(StandbyDropDownClosed);
+            DropDownClosedCommand = new DelegateCommand(StandbyDropDownClosed);
             PresetChannels = new ObservableCollection<PresetChannel>();
         }
 
@@ -59,6 +60,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
                 && SelectedPresetChannel.Value is Double
                 && (Double)SelectedPresetChannel.Value > 0 && RadioId > 0)
             {
+                var logger = LogManager.GetCurrentClassLogger();
+                logger.Info("Selected Standby Channel: {0}", SelectedPresetChannel.Value);
                 RadioHelper.SelectStandbyRadioChannel(SelectedPresetChannel, RadioId);
             }
         }

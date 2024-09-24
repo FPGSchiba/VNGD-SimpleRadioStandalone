@@ -329,6 +329,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                             channelModel.Max = clientRadio.freqMax;
                             channelModel.Min = clientRadio.freqMin;
                             channelModel.Reload();
+                            var standbyChannelModel = _clientStateSingleton.StandbyChannels[i - 1];
+                            standbyChannelModel.Max = clientRadio.freqMax;
+                            standbyChannelModel.Min = clientRadio.freqMin;
+                            standbyChannelModel.Reload();
                             clientRadio.channel = -1; //reset channel
 
                             if (_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.AutoSelectPresetChannel))
@@ -339,6 +343,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                         else
                         {
                             _clientStateSingleton.FixedChannels[i - 1].Clear();
+                            _clientStateSingleton.StandbyChannels[i - 1].Clear();
                             //clear
                         }
                     }
