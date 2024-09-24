@@ -32,8 +32,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[] radioControlGroupSwitch =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[10];
+        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[] radioControlGroupSwitch = new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[3];
 
         private readonly DispatcherTimer _updateTimer;
 
