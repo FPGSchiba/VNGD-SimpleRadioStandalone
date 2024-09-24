@@ -5,39 +5,58 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
              mc:Ignorable="d"
-             d:DesignHeight="50" d:DesignWidth="50">
+             d:DesignHeight="100" d:DesignWidth="100">
     <UserControl.Resources>
-        <local:ValueAngleConverter x:Key="valueAngleConverter"/>
-        <local:ValueTextConverter x:Key="valueTextConverter"/>
+        <local:ValueAngleConverter x:Key="ValueAngleConverter"/>
+        <local:ValueTextConverter x:Key="ValueTextConverter"/>
+        <local:OffsetConverter x:Key="OffsetConverter" />
+        <local:KnobConverter x:Key="KnobConverter" />
+        <local:SizeConverter x:Key="SizeConverter" />
     </UserControl.Resources>
     <Grid>
         <Slider Name="knob">
             <Slider.Template>
                 <ControlTemplate>
                     <Viewbox>
-                        <Canvas Width="50" Height="50" Margin="5">
-                            <Ellipse Fill="LightBlue" Width="50" Height="50" Canvas.Left="0" Canvas.Top="0" 
-                                        Stroke="Black" StrokeThickness="2"
-                                        MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                        MouseMove="Ellipse_MouseMove"/>
-                            <Ellipse Fill="Black" Width="10" Height="10" Canvas.Left="19.5" Canvas.Top="19.5"/>
+                        <Canvas 
+                            Width="{Binding Radius, Converter={StaticResource SizeConverter}}" 
+                            Height="{Binding Radius, Converter={StaticResource SizeConverter}}" 
+                            Margin="5">
+                            <Ellipse Fill="LightBlue" 
+                                     Width="{Binding Radius, Converter={StaticResource SizeConverter}}" 
+                                     Height="{Binding Radius, Converter={StaticResource SizeConverter}}" 
+                                     Canvas.Left="0" Canvas.Top="0"
+                                     Stroke="Black" StrokeThickness="2"
+                                     MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                     MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                                     MouseMove="Ellipse_MouseMove"
+                                     MouseWheel="Ellipse_OnMouseWheel"/>
+                            <Ellipse Fill="Black"
+                                     Width="{Binding Radius, Converter={StaticResource KnobConverter}}"
+                                     Height="{Binding Radius, Converter={StaticResource KnobConverter}}" 
+                                     Canvas.Left="{Binding Radius, Converter={StaticResource OffsetConverter}}"
+                                     Canvas.Top="{Binding Radius, Converter={StaticResource OffsetConverter}}" />
                             <Canvas>
-                                <Line Stroke="Red" StrokeThickness="2" X1="25" Y1="25" X2="25" Y2="5"
-                                        MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"/>
-                                <Ellipse Fill="Red" Width="7" Height="7" Canvas.Left="21.5" Canvas.Top="0" 
-                                        MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                            MouseLeftButtonUp="Ellipse_MouseLeftButtonUp">
+                                <Line Stroke="Red" StrokeThickness="2" 
+                                      X1="{Binding Radius}" Y1="{Binding Radius}" 
+                                      X2="{Binding Radius}" Y2="0"
+                                      MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"/>
+                                <Ellipse Fill="Red" 
+                                         Width="{Binding Radius, Converter={StaticResource KnobConverter}}"
+                                         Height="{Binding Radius, Converter={StaticResource KnobConverter}}" 
+                                         Canvas.Left="{Binding Radius, Converter={StaticResource OffsetConverter}}" Canvas.Top="0"
+                                         MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                         MouseLeftButtonUp="Ellipse_MouseLeftButtonUp">
                                     <Ellipse.ToolTip>
                                         <ToolTip>
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                        Path="Value" Converter="{StaticResource valueTextConverter}"/>
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value" Converter="{StaticResource ValueTextConverter}"/>
                                         </ToolTip>
                                     </Ellipse.ToolTip>
                                 </Ellipse>
                                 <Canvas.RenderTransform>
-                                    <RotateTransform CenterX="25" CenterY="25">
+                                    <RotateTransform CenterX="{Binding Radius}" CenterY="{Binding Radius}">
                                         <RotateTransform.Angle>
-                                            <MultiBinding Converter="{StaticResource valueAngleConverter}">
+                                            <MultiBinding Converter="{StaticResource ValueAngleConverter}">
                                                 <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
                                                 <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Minimum"/>
                                                 <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Maximum"/>
@@ -45,12 +64,11 @@
                                         </RotateTransform.Angle>
                                     </RotateTransform>
                                 </Canvas.RenderTransform>
-                            </Canvas>                            
+                            </Canvas>
                         </Canvas>
                     </Viewbox>
                 </ControlTemplate>
             </Slider.Template>
         </Slider>
     </Grid>
-
 </UserControl>

@@ -68,7 +68,9 @@
                         materialDesign:ButtonAssist.CornerRadius="25" />
             
                 </StackPanel>
-                <components:BalanceControl Height="50" Width="50" />
+                
+                <components:BalanceControl Width="30" Height="30" Radius="15" />
+                
                 <StackPanel>
                     <Button
                         Click="Logout_OnClick"
