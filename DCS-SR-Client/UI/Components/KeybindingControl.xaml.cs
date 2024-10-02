@@ -1,21 +1,16 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using NLog;
 using SharpDX.DirectInput;
-
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 {
-    /// <summary>
-    ///     Interaction logic for InputBindingControl.xaml
-    /// </summary>
-    public partial class InputBindingControl : UserControl
+    public partial class KeybindingControl : UserControl
     {
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private InputDeviceManager _inputDeviceManager;
 
-        public InputBindingControl()
+        public KeybindingControl()
         {
             InitializeComponent();
         }

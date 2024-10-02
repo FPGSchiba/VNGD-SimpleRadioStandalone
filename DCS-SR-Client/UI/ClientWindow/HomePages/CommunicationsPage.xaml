@@ -69,8 +69,6 @@
             
                 </StackPanel>
                 
-                <components:BalanceControl Width="30" Height="30" Radius="15" />
-                
                 <StackPanel>
                     <Button
                         Click="Logout_OnClick"

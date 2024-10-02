@@ -19,6 +19,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
+    xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid
@@ -641,85 +642,85 @@
 
                                         <!--  Most Used Keybinds  -->
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="2"
                                             InputName="Common PTT"
                                             x:Name="PTT"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch1}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="3"
                                             InputName="Radio 1"
                                             x:Name="Radio1"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch2}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="4"
                                             InputName="Radio 2"
                                             x:Name="Radio2"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch3}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="5"
                                             InputName="Radio 3"
                                             x:Name="Radio3"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Intercom}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="6"
                                             InputName="Intercom Select"
                                             x:Name="Intercom"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.NextRadio}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="7"
                                             InputName="Next Radio"
                                             x:Name="NextRadio"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.PreviousRadio}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="8"
                                             InputName="Previous Radio"
                                             x:Name="PreviousRadio"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeUp}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="9"
                                             InputName="Radio Volume Up"
                                             x:Name="RadioVolumeUp"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="10"
                                             InputName="Radio Volume Down"
                                             x:Name="RadioVolumeDown"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                              ControlInputBinding="{x:Static settings:InputBinding.RadioSwap}"
                                              Grid.ColumnSpan="5"
                                              Grid.Row="11"
                                              InputName="Radio Swap"
                                              x:Name="RadioSwap"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                              ControlInputBinding="{x:Static settings:InputBinding.LeftBalance}"
                                              Grid.ColumnSpan="5"
                                              Grid.Row="12"
                                              InputName="Left Balance"
                                              x:Name="LeftBalance"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                              ControlInputBinding="{x:Static settings:InputBinding.RightBalance}"
                                              Grid.ColumnSpan="5"
                                              Grid.Row="13"
                                              InputName="Right Balance"
                                              x:Name="RightBalance"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                              ControlInputBinding="{x:Static settings:InputBinding.CenterBalance}"
                                              Grid.ColumnSpan="5"
                                              Grid.Row="14"
@@ -759,49 +760,49 @@
                                              VerticalContentAlignment="Center"
                                              x:Name="ButtonLabel1"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch4}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="17"
                                             InputName="Radio 4"
                                             x:Name="Radio4"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch5}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="18"
                                             InputName="Radio 5"
                                             x:Name="Radio5"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch6}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="19"
                                             InputName="Radio 6"
                                             x:Name="Radio6"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch7}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="20"
                                             InputName="Radio 7"
                                             x:Name="Radio7"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch8}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="21"
                                             InputName="Radio 8"
                                             x:Name="Radio8"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch9}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="22"
                                             InputName="Radio 9"
                                             x:Name="Radio9"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Switch10}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="23"
                                             InputName="Radio 10"
                                             x:Name="Radio10"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.IntercomPTT}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="24"
@@ -839,20 +840,20 @@
                                              VerticalContentAlignment="Center"
                                              x:Name="ButtonLabel2"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.RadioChannelUp}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="27"
                                             InputName="Radio Channel Up"
                                             x:Name="RadioChannelUp"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="28"
                                             InputName="Radio Channel Down"
                                             x:Name="RadioChannelDown"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.PanelNightMode}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="29"
@@ -892,85 +893,85 @@
                                              VerticalContentAlignment="Center"
                                              x:Name="ButtonLabel3"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio1HToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="32"
                                             InputName="1 Horizontal Radio Panel Toggle"
                                             x:Name="Radio1HToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio1VToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="33"
                                             InputName="1 Vertical Radio Panel Toggle"
                                             x:Name="Radio1VToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio2HToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="34"
                                             InputName="2 Horizontal Radio Panel Toggle"
                                             x:Name="Radio2HToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio2VToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="35"
                                             InputName="2 Vertical Radio Panel Toggle"
                                             x:Name="Radio2VToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio3HToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="36"
                                             InputName="3 Horizontal Radio Panel Toggle"
                                             x:Name="Radio3HToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio3VToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="37"
                                             InputName="3 Vertical Radio Panel Toggle"
                                             x:Name="Radio3VToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio5HToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="38"
                                             InputName="5 Horizontal Radio Panel Toggle"
                                             x:Name="Radio5HToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio5VToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="39"
                                             InputName="5 Vertical Radio Panel Toggle"
                                             x:Name="Radio5VToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10HToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="40"
                                             InputName="10 Horizontal Radio Panel Toggle"
                                             x:Name="Radio10HToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10VToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="41"
                                             InputName="10 Vertical Radio Panel Toggle"
                                             x:Name="Radio10VToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10HWToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="42"
                                             InputName="10 Horizontal Wide Radio Panel Toggle"
                                             x:Name="Radio10HWToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="43"
                                             InputName="10 Vertical Long Radio Panel Toggle"
                                             x:Name="Radio10VLToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10TToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="44"
                                             InputName="Compact Radio Panel - Original Toggle"
                                             x:Name="Radio10TToggle"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Radio10SToggle}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="45"
@@ -1013,73 +1014,73 @@
                                         
                                         
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up100}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="48"
                                             InputName="Up 100MHz"
                                             x:Name="Up100"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up10}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="49"
                                             InputName="Up 10MHz"
                                             x:Name="Up10"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up1}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="50"
                                             InputName="Up 1MHz"
                                             x:Name="Up1"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up01}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="51"
                                             InputName="Up 0.1MHz"
                                             x:Name="Up01"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up001}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="52"
                                             InputName="Up 0.01MHz"
                                             x:Name="Up001"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Up0001}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="53"
                                             InputName="Up 0.001MHz"
                                             x:Name="Up0001"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down100}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="54"
                                             InputName="Down 100MHz"
                                             x:Name="Down100"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down10}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="55"
                                             InputName="Down 10MHz"
                                             x:Name="Down10"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down1}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="56"
                                             InputName="Down 1MHz"
                                             x:Name="Down1"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down01}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="57"
                                             InputName="Down 0.1MHz"
                                             x:Name="Down01"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down001}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="58"
                                             InputName="Down 0.01MHz"
                                             x:Name="Down001"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.Down0001}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="59"
@@ -1117,31 +1118,31 @@
                                              VerticalContentAlignment="Center"
                                              x:Name="ButtonLabel5"/>
 
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.ToggleGuard}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="62"
                                             InputName="Toggle Guard"
                                             x:Name="ToggleGuard"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.ToggleEncryption}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="63"
                                             InputName="Toggle Encryption"
                                             x:Name="ToggleEncryption"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyIncrease}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="64"
                                             InputName="Encryption Key Increase"
                                             x:Name="EncryptionKeyIncrease"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyDecrease}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="65"
                                             InputName="Encryption Key Decrease"
                                             x:Name="EncryptionKeyDecrease"/>
-                                        <local:InputBindingControl
+                                        <components:InputBindingControl
                                             ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
                                             Grid.ColumnSpan="5"
                                             Grid.Row="66"

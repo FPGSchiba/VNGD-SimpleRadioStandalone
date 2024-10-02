@@ -56,8 +56,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                     return;
                 }
             }
-            //Canculate the current rotation angle and set the value.
             
+            //Calculate the current rotation angle and set the value.
             Point newPos = e.GetPosition(_templateCanvas);
             double angle = GetAngleR(newPos);
             

@@ -368,6 +368,27 @@
     <Compile Include="UI\ClientWindow\LoginPages\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\AudioPage.xaml.cs">
+      <DependentUpon>AudioPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\GeneralPage.xaml.cs">
+      <DependentUpon>GeneralPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml.cs">
+      <DependentUpon>KeybindingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\LegacyPage.xaml.cs">
+      <DependentUpon>LegacyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml.cs">
+      <DependentUpon>MiscellaneousPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml.cs">
+      <DependentUpon>RadioEffectsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ClientWindow\SettingPages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\SupportPage.xaml.cs">
       <DependentUpon>SupportPage.xaml</DependentUpon>
     </Compile>
@@ -379,6 +400,18 @@
     </Compile>
     <Compile Include="UI\Components\BalanceControl.xaml.cs">
       <DependentUpon>BalanceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\InputBindingControl.xaml.cs">
+      <DependentUpon>InputBindingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\KeybindingControl.xaml.cs">
+      <DependentUpon>KeybindingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\ToggleGlobalSetting.xaml.cs">
+      <DependentUpon>ToggleGlobalSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\ToggleProfileSetting.xaml.cs">
+      <DependentUpon>ToggleProfileSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml.cs">
       <DependentUpon>PresetStandbyChannelsViewTransparent.xaml</DependentUpon>
@@ -446,9 +479,6 @@
     </Compile>
     <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml.cs">
       <DependentUpon>RadioOverlayTwoVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\InputBindingControl.xaml.cs">
-      <DependentUpon>InputBindingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Input\InputDeviceManager.cs" />
     <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
@@ -530,6 +560,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\ClientWindow\SettingPages\AudioPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\GeneralPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\LegacyPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\SettingsPage.xaml" />
     <Page Include="UI\ClientWindow\SupportPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -543,6 +580,13 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Components\BalanceControl.xaml" />
+    <Page Include="UI\Components\InputBindingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Components\KeybindingControl.xaml" />
+    <Page Include="UI\Components\ToggleGlobalSetting.xaml" />
+    <Page Include="UI\Components\ToggleProfileSetting.xaml" />
     <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -630,10 +674,6 @@
     <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\InputBindingControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ClientWindow\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -855,7 +895,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="UI\ClientWindow\RadioSelectionPages\" />
-    <Folder Include="UI\ClientWindow\SettingPage\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">

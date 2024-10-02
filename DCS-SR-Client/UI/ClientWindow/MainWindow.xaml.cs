@@ -39,6 +39,7 @@ using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBin
 using Sentry;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -137,6 +138,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private HomePage _homePage;
         private const int HomePageIndex = 5;
+        
+        private SettingsPage _settingsPage;
+        private const int SettingsIndex = 6;
 
         // Sentry Transactions
         private ITransactionTracer _connectionTransaction;
@@ -1074,6 +1078,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _guestPage = new GuestPage();
             _guestSuccessPage = new GuestSuccess();
             _homePage = new HomePage();
+            _settingsPage = new SettingsPage();
             OpenPage = WelcomeIndex;
             
             HomeNavigation.IsEnabled = false;
@@ -1132,6 +1137,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     case GuestSuccessIndex:
                         break;
                     case HomePageIndex:
+                        break;
+                    case SettingsIndex:
                         break;
                     default:
                         mainWindow._logger.Error($"Page: {newValue} could not be found.");
@@ -1225,7 +1232,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SettingsNavigation_Click(object sender, RoutedEventArgs e)
         {
-            _logger.Warn("Not Implemented yet!");
+            if (OpenPage != SettingsIndex)
+            {
+                DisplayFrame.Content = _settingsPage;
+                _oldOpenPage = OpenPage;
+                OpenPage = SettingsIndex;
+            }
+            else
+            {
+                OpenPageByIndex(_oldOpenPage);
+                _oldOpenPage = SettingsIndex;
+            }
         }
 
         #endregion
