@@ -7,7 +7,8 @@
     xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:awacsControls="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow">
 
     <TabControl
         Background="#444"
@@ -323,6 +324,20 @@
                 Width="120"
                 x:Name="PresetChannelsView"  />
 
+        </TabItem>
+
+        <!-- New Ship Status Tab -->
+        <TabItem Name="ShipStatusTab">
+            <TabItem.Header>
+                <TextBlock
+                    FontSize="10"
+                    Foreground="#E7E7E7"
+                    Margin="3,0,3,0"
+                    Padding="0"
+                    Text="Ship" />
+            </TabItem.Header>
+
+            <awacsControls:ShipStatusControl Background="#444" />
         </TabItem>
     </TabControl>
 </UserControl>

@@ -331,6 +331,11 @@
     <Compile Include="Singletons\ClientStateSingleton.cs" />
     <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
     <Compile Include="Singletons\AudioInputSingleton.cs" />
+    <Compile Include="Singletons\ShipStateManagerSingleton.cs" />
+    <Compile Include="State\Component.cs" />
+    <Compile Include="State\Condition.cs" />
+    <Compile Include="State\StateChangedEventArgs.cs" />
+    <Compile Include="State\StateManager.cs" />
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
     </Compile>
@@ -340,6 +345,10 @@
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\AwacsRadioOverlayWindow\ShipStatusControl.xaml.cs">
+      <DependentUpon>ShipStatusControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\AwacsRadioOverlayWindow\ShipStatusViewModel.cs" />
     <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
     <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
       <DependentUpon>ClientListWindow.xaml</DependentUpon>
@@ -511,6 +520,9 @@
     <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\AwacsRadioOverlayWindow\ShipStatusControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
       <SubType>Designer</SubType>
