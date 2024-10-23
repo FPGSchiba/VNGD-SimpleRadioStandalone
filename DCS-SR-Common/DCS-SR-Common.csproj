@@ -133,6 +133,8 @@
     <Compile Include="Setting\ServerSettingsKeys.cs" />
     <Compile Include="Network\ShortGuid.cs" />
     <Compile Include="Network\SRClient.cs" />
+    <Compile Include="State\ShipComponent.cs" />
+    <Compile Include="State\ShipCondition.cs" />
     <Compile Include="Timers\ITimer.cs" />
     <Compile Include="Timers\Timer.cs" />
     <Compile Include="Network\UDPVoicePacket.cs" />

@@ -1,4 +1,5 @@
 ﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.State;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.State;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,7 +19,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             DataContext = _viewModel;
         }
 
-        private void UpdateStatusDisplay(State.Condition condition)
+        private void UpdateStatusDisplay(ShipCondition condition)
         {
             if (ShipConditionText != null)
             {
@@ -28,15 +29,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             _viewModel.UpdateComponents();
         }
 
-        private static SolidColorBrush GetConditionBrush(State.Condition condition)
+        private static SolidColorBrush GetConditionBrush(ShipCondition condition)
         {
             switch (condition)
             {
-                case State.Condition.Normal:
+                case ShipCondition.Normal:
                     return new SolidColorBrush(Colors.LimeGreen);
-                case State.Condition.Combat:
+                case ShipCondition.Combat:
                     return new SolidColorBrush(Colors.Red);
-                case State.Condition.LowPower:
+                case ShipCondition.LowPower:
                     return new SolidColorBrush(Colors.Yellow);
                 default:
                     return new SolidColorBrush(Colors.Orange);
@@ -45,14 +46,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void CombatMode_Click(object sender, RoutedEventArgs e)
         {
-            _stateManager.SetCondition(State.Condition.Combat);
-            UpdateStatusDisplay(State.Condition.Combat);
+            _stateManager.SetCondition(ShipCondition.Combat);
+            UpdateStatusDisplay(ShipCondition.Combat);
         }
 
         private void NormalMode_Click(object sender, RoutedEventArgs e)
         {
-            _stateManager.SetCondition(State.Condition.Normal);
-            UpdateStatusDisplay(State.Condition.Normal);
+            _stateManager.SetCondition(ShipCondition.Normal);
+            UpdateStatusDisplay(ShipCondition.Normal);
         }
     }
 }

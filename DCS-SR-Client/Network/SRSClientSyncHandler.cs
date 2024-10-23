@@ -12,6 +12,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.State;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -44,6 +45,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
 
+        
+        private ShipStateUpdateHandler _shipStateHandler;
+
 
         private DCSRadioSyncManager _radioDCSSync = null;
 
@@ -57,6 +61,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         {
             _guid = guid;
             _updateUICallback = uiCallback;
+            _shipStateHandler = new ShipStateUpdateHandler(ShipStateManagerSingleton.Instance.StateManager, guid);
+
 
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
@@ -229,6 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             SendToServer(message);
+            SendShipStateUpdate();
         }
 
         private void ClientCoalitionUpdate()
@@ -412,6 +419,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         CallUpdateUIOnMain();
 
                                         break;
+
+                                    case NetworkMessage.MessageType.SHIP_STATE_UPDATE:
+                                    case NetworkMessage.MessageType.SHIP_STATE_SYNC:
+                                        HandleShipStateUpdate(serverMessage);
+                                        CallUpdateUIOnMain();
+                                        break;
                                     case NetworkMessage.MessageType.SYNC:
                                         // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
 
@@ -576,27 +589,72 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             try
             {
                 _lastSent = DateTime.Now.Ticks;
-                message.Version = UpdaterChecker.VERSION;
 
                 var json = message.Encode();
-
-                if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
-                {
-                    Logger.Debug("Sending Radio Update To Server: " + (json));
-                }
-
                 var bytes = Encoding.UTF8.GetBytes(json);
-                _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
-                //Need to flush?
+
+                if (_tcpClient?.Connected == true)
+                {
+                    _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
+                }
             }
             catch (Exception ex)
             {
                 if (!_stop)
                 {
-                    Logger.Error(ex, "Client exception sending to server");
+                    Logger.Error(ex, "Error sending message to server");
                 }
+            }
+        }
+        private void HandleShipStateUpdate(NetworkMessage message)
+        {
+            if (message?.Client == null) return;
 
-                Disconnect();
+            var client = message.Client;
+            if (_clients.ContainsKey(client.ClientGuid))
+            {
+                var srClient = _clients[client.ClientGuid];
+                if (srClient != null)
+                {
+                    srClient.ShipCondition = client.ShipCondition;
+                    srClient.ShipComponentStates = client.ShipComponentStates;
+
+                    // Update local ship state if message is from server's authoritative state
+                    if (message.MsgType == NetworkMessage.MessageType.SHIP_STATE_SYNC)
+                    {
+                        ShipStateManagerSingleton.Instance.StateManager.UpdateFromNetworkMessage(client);
+                    }
+                }
+            }
+        }
+
+        private void SendShipStateUpdate()
+        {
+            try
+            {
+                var message = new NetworkMessage
+                {
+                    Client = new SRClient
+                    {
+                        ClientGuid = _guid,
+                        Coalition = _clientStateSingleton.PlayerCoaltionLocationMetadata.side,
+                        Name = _clientStateSingleton.PlayerCoaltionLocationMetadata.name
+                    },
+                    MsgType = NetworkMessage.MessageType.SHIP_STATE_UPDATE
+                };
+
+                ShipStateManagerSingleton.Instance.StateManager.PopulateNetworkMessage(message.Client);
+
+                var json = message.Encode();
+                var bytes = Encoding.UTF8.GetBytes(json);
+                _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
+            }
+            catch (Exception ex)
+            {
+                if (!_stop)
+                {
+                    Logger.Error(ex, "Error sending ship state update");
+                }
             }
         }
 

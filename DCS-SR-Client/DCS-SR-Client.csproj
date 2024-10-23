@@ -304,6 +304,8 @@
     <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputDeviceBase.cs" />
     <Compile Include="Input\XInputController.cs" />
+    <Compile Include="Network\ShipState.cs" />
+    <Compile Include="Network\ShipStateUpdateHandler.cs" />
     <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
     <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
     <Compile Include="Audio\Recording\AudioRecordingLameWriterBase.cs" />
@@ -334,8 +336,9 @@
     <Compile Include="Singletons\ShipStateManagerSingleton.cs" />
     <Compile Include="State\Component.cs" />
     <Compile Include="State\Condition.cs" />
+    <Compile Include="State\ShipStateManagerExtensions.cs" />
     <Compile Include="State\StateChangedEventArgs.cs" />
-    <Compile Include="State\StateManager.cs" />
+    <Compile Include="State\ShipStateManager.cs" />
     <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
       <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
     </Compile>

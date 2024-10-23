@@ -1,33 +1,31 @@
-﻿using System;
+﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.State;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
-using System.Net.Sockets;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Newtonsoft.Json;
+using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 {
-    public class SRClient : INotifyPropertyChanged
+    public partial class SRClient : INotifyPropertyChanged
     {
         private int _coalition;
 
-        [JsonIgnore] 
+        [JsonIgnore]
         private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
         public string ClientGuid { get; set; }
-        private string _name= "";
+        private string _name = "";
 
         public string Name
         {
-            get
-            {
-                return _name;
-            }
+            get { return _name; }
             set
             {
-                if(value == null || value == "")
+                if (value == null || value == "")
                 {
                     value = "---";
                 }
@@ -51,15 +49,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
+
         public bool AllowRecord { get; set; }
 
         [JsonIgnore]
-        public string AllowRecordingStatus {
-            get
-            {
-
-                return AllowRecord ? "R" : "-";
-            }
+        public string AllowRecordingStatus
+        {
+            get { return AllowRecord ? "R" : "-"; }
         }
 
         [JsonIgnore]
@@ -103,20 +99,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         {
             get
             {
-                if (_lineOfSightLoss == 0)
-                {
-                    return 0;
-                }
-                if ((LatLngPosition.lat == 0) && (LatLngPosition.lng == 0))
-                {
-                    return 0;
-                }
+                if (_lineOfSightLoss == 0) return 0;
+                if ((LatLngPosition.lat == 0) && (LatLngPosition.lng == 0)) return 0;
                 return _lineOfSightLoss;
             }
             set { _lineOfSightLoss = value; }
         }
 
-        // Used by server client list to display last frequency client transmitted on
         private string _transmittingFrequency;
         [JsonIgnore]
         public string TransmittingFrequency
@@ -132,33 +121,57 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
         }
 
-        // Used by server client list to remove last frequency client transmitted on after threshold
         [JsonIgnore]
         public DateTime LastTransmissionReceived { get; set; }
-        
-        //is an SRSClientSession but dont want to include the dependancy for now
+
         [JsonIgnore]
         public object ClientSession { get; set; }
 
+        // Ship state properties
+        private ShipCondition _shipCondition;
+        private Dictionary<ShipComponent, string> _shipComponentStates;
+
+        public ShipCondition ShipCondition
+        {
+            get { return _shipCondition; }
+            set
+            {
+                if (_shipCondition != value)
+                {
+                    _shipCondition = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShipCondition)));
+                }
+            }
+        }
+
+        public Dictionary<ShipComponent, string> ShipComponentStates
+        {
+            get { return _shipComponentStates ?? (_shipComponentStates = new Dictionary<ShipComponent, string>()); }
+            set
+            {
+                _shipComponentStates = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShipComponentStates)));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public override string ToString() 
+        public override string ToString()
         {
             string side;
-
-            if (Coalition == 1)
+            switch (Coalition)
             {
-                side = "Red";
+                case 1:
+                    side = "Red";
+                    break;
+                case 2:
+                    side = "Blue";
+                    break;
+                default:
+                    side = "Spectator";
+                    break;
             }
-            else if (Coalition == 2)
-            {
-                side = "Blue";
-            }
-            else
-            {
-                side = "Spectator";
-            }
-            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss " + _lineOfSightLoss + " Pos" + LatLngPosition;
+            return Name == "" ? "Unknown" : $"{Name} - {side} LOS Loss {_lineOfSightLoss} Pos{LatLngPosition}";
         }
     }
 }

@@ -22,7 +22,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             CLIENT_DISCONNECT, // Client disconnected
             VERSION_MISMATCH,
             EXTERNAL_AWACS_MODE_PASSWORD, // Received server side to "authenticate"/pick side for external AWACS mode
-            EXTERNAL_AWACS_MODE_DISCONNECT // Received server side on "voluntary" disconnect by the client (without closing the server connection)
+            EXTERNAL_AWACS_MODE_DISCONNECT, // Received server side on "voluntary" disconnect by the client (without closing the server connection)
+            SHIP_STATE_UPDATE,    // Client sending state update
+            SHIP_STATE_SYNC      // Server sending authoritative state
         }
 
         public SRClient Client { get; set; }
