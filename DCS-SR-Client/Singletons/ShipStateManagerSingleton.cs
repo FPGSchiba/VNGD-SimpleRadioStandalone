@@ -24,6 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             StateManager.SetCondition(newCondition);
             StateChanged?.Invoke(this, new StateChangedEventArgs(newCondition));
         }
+        public object ClientSyncHandler { get; set; }
 
         public void UpdateComponentState(ShipComponent component, string state)
         {

@@ -67,6 +67,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
             _idleTimeout.Interval = TimeSpan.FromSeconds(10);
+
+            // Subscribe to ship state changes
+            ShipStateEvents.StateChanged += HandleShipStateChanged;
         }
 
         private void CheckIfIdleTimeOut(object sender, EventArgs e)
@@ -611,43 +614,60 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             if (message?.Client == null) return;
 
             var client = message.Client;
-            if (_clients.ContainsKey(client.ClientGuid))
-            {
-                var srClient = _clients[client.ClientGuid];
-                if (srClient != null)
-                {
-                    srClient.ShipCondition = client.ShipCondition;
-                    srClient.ShipComponentStates = client.ShipComponentStates;
+            Logger.Debug($"Received ship state update from {client.Name} ({client.ClientGuid})");
 
-                    // Update local ship state if message is from server's authoritative state
-                    if (message.MsgType == NetworkMessage.MessageType.SHIP_STATE_SYNC)
+            // Only process state updates from other clients or server syncs
+            if (client.ClientGuid != _guid || message.MsgType == NetworkMessage.MessageType.SHIP_STATE_SYNC)
+            {
+                if (_clients.ContainsKey(client.ClientGuid))
+                {
+                    var srClient = _clients[client.ClientGuid];
+                    if (srClient != null)
                     {
+                        // Update the client's state in our list
+                        srClient.ShipCondition = client.ShipCondition;
+                        srClient.ShipComponentStates = client.ShipComponentStates;
+
+                        Logger.Debug($"Updated client {client.Name} ship state to {client.ShipCondition}");
+
+                        // If this is a server sync or we're receiving another client's update,
+                        // update our local state manager
                         ShipStateManagerSingleton.Instance.StateManager.UpdateFromNetworkMessage(client);
                     }
                 }
             }
+
+            // Always call UI update as the state might have changed
+            CallUpdateUIOnMain();
+        }
+
+        private void HandleShipStateChanged(object sender, EventArgs e)
+        {
+            SendShipStateUpdate();
         }
 
         private void SendShipStateUpdate()
         {
             try
             {
+                var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
+
                 var message = new NetworkMessage
                 {
                     Client = new SRClient
                     {
                         ClientGuid = _guid,
-                        Coalition = _clientStateSingleton.PlayerCoaltionLocationMetadata.side,
-                        Name = _clientStateSingleton.PlayerCoaltionLocationMetadata.name
+                        Coalition = sideInfo.side,
+                        Name = sideInfo.name
                     },
                     MsgType = NetworkMessage.MessageType.SHIP_STATE_UPDATE
                 };
 
+                // Populate the current state
                 ShipStateManagerSingleton.Instance.StateManager.PopulateNetworkMessage(message.Client);
 
-                var json = message.Encode();
-                var bytes = Encoding.UTF8.GetBytes(json);
-                _tcpClient.GetStream().Write(bytes, 0, bytes.Length);
+                Logger.Debug($"Sending ship state update: Condition={message.Client.ShipCondition}");
+                SendToServer(message);
             }
             catch (Exception ex)
             {
@@ -658,10 +678,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
+        // Add method to trigger state updates when local state changes
+        public void NotifyShipStateChanged()
+        {
+            if (_tcpClient?.Connected == true)
+            {
+                SendShipStateUpdate();
+            }
+        }
+
         //implement IDispose? To close stuff properly?
         public void Disconnect()
         {
             _stop = true;
+
+            // Unsubscribe from events
+            ShipStateEvents.StateChanged -= HandleShipStateChanged;
 
             _lastSent = DateTime.Now.Ticks;
             _idleTimeout?.Stop();
@@ -672,7 +704,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 if (_tcpClient != null)
                 {
-                    _tcpClient.Close(); // this'll stop the socket blocking
+                    _tcpClient.Close();
                 }
             }
             catch (Exception)
@@ -681,8 +713,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             Logger.Error("Disconnecting from server");
             ClientStateSingleton.Instance.IsConnected = false;
-
-            //CallOnMain(false);
         }
     }
 }

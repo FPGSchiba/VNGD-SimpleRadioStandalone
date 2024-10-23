@@ -41,6 +41,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.State
                 currentCondition = newCondition;
                 UpdateComponentStates();
                 OnStateChanged(newCondition);
+
+                // Notify via events
+                ShipStateEvents.NotifyStateChanged();
             }
         }
 
@@ -51,6 +54,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.State
             {
                 componentStates[component] = state;
                 Console.WriteLine($"Updated {component} state to: {state}");
+
+                // Notify via events
+                ShipStateEvents.NotifyStateChanged();
             }
         }
 

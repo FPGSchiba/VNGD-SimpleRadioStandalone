@@ -336,6 +336,7 @@
     <Compile Include="Singletons\ShipStateManagerSingleton.cs" />
     <Compile Include="State\Component.cs" />
     <Compile Include="State\Condition.cs" />
+    <Compile Include="State\ShipStateEvents.cs" />
     <Compile Include="State\ShipStateManagerExtensions.cs" />
     <Compile Include="State\StateChangedEventArgs.cs" />
     <Compile Include="State\ShipStateManager.cs" />
