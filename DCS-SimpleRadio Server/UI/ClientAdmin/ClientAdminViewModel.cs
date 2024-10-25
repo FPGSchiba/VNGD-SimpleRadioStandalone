@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
@@ -29,21 +31,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 
         public ObservableCollection<ClientViewModel> Clients { get; } = new ObservableCollection<ClientViewModel>();
 
-        protected override void OnActivate()
+        protected override Task OnActivateAsync(CancellationToken token)
         {
             _updateTimer?.Start();
 
-            base.OnActivate();
+            return base.OnActivateAsync(token);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected override Task OnDeactivateAsync(bool close, CancellationToken token)
         {
             if (close)
             {
                 _updateTimer?.Stop();
             }
 
-            base.OnDeactivate(close);
+            return base.OnDeactivateAsync(close, token);
         }
 
         public void Handle(ServerStateMessage message)
@@ -51,6 +53,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
             Clients.Clear();
 
             message.Clients.Apply(client => Clients.Add(new ClientViewModel(client, _eventAggregator)));
+        }
+
+        public Task HandleAsync(ServerStateMessage message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
         }
 
         private void _updateTimer_Tick(object sender, EventArgs e)

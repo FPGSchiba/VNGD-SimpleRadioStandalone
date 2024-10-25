@@ -59,15 +59,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon server_10 {
-            get {
-                object obj = ResourceManager.GetObject("server_10", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
+        internal static IConvertible Getserver_10()
+        {
+            object obj = ResourceManager.GetObject("server_10", resourceCulture);
+            return ((IConvertible)(obj));
         }
     }
 }

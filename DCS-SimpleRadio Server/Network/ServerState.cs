@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
@@ -21,8 +20,7 @@ using LogManager = NLog.LogManager;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 {
-    public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>,
-        IHandle<BanClientMessage>
+    public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>, IHandle<BanClientMessage>
     {
         private static readonly string DEFAULT_CLIENT_EXPORT_FILE = "clients-list.json";
 
@@ -62,15 +60,35 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         public void Handle(StartServerMessage message)
         {
             StartServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+            _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                 new List<SRClient>(_connectedClients.Values)));
         }
 
         public void Handle(StopServerMessage message)
         {
             StopServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(false,
+            _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(false,
                 new List<SRClient>(_connectedClients.Values)));
+        }
+
+        public Task HandleAsync(StartServerMessage message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
+        }
+
+        public Task HandleAsync(StopServerMessage message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
+        }
+
+        public Task HandleAsync(KickClientMessage message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
+        }
+
+        public Task HandleAsync(BanClientMessage message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
         }
 
         private void StartExport()

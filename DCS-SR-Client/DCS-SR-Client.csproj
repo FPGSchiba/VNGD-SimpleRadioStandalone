@@ -1,25 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="Version">
-  <Import Project="..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props" Condition="Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project TreatAsLocalProperty="Version" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Version Condition=" '$(Version)' == '' ">v0.0.0</Version>
-    <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Version Condition=" '$(Version)' == '' ">0.0.0</Version>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Ciribob.DCS.SimpleRadio.Standalone.Client</RootNamespace>
     <AssemblyName>SR-ClientRadio</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -31,33 +17,13 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>DCS_SR_Client.App</StartupObject>
@@ -69,21 +35,13 @@
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
-  <PropertyGroup />
   <PropertyGroup>
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-    <Optimize>false</Optimize>
     <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -91,667 +49,22 @@
     <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
     <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
-  <PropertyGroup />
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Costura, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Costura.Fody.1.6.2\lib\dotnet\Costura.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Dragablz, Version=0.0.3.234, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.234\lib\net45\Dragablz.dll</HintPath>
-    </Reference>
-    <Reference Include="Easy.MessageHub, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Easy.MessageHub.3.2.1\lib\net35\Easy.MessageHub.dll</HintPath>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignColors, Version=3.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignColors.3.0.0\lib\net462\MaterialDesignColors.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=5.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.5.0.0\lib\net462\MaterialDesignThemes.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Filtering, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Filtering.0.7.0\lib\net461\MathNet.Filtering.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
-    </Reference>
-    <Reference Include="MvvmEventBinding, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Lame, Version=1.0.8.41605, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Lame.1.0.8\lib\net40\NAudio.Lame.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.5.0.5\lib\net46\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry, Version=4.10.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.4.10.1\lib\net462\Sentry.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.NLog, Version=4.10.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.NLog.4.10.1\lib\net462\Sentry.NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.PlatformAbstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.PlatformAbstractions.1.1.1\lib\net471\Sentry.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.Protocol, Version=2.1.8.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Protocol.2.1.8\lib\net46\Sentry.Protocol.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpConfig, Version=3.2.9.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpConfig.3.2.9.1\lib\net461\SharpConfig.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DirectInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.DirectInput.4.2.0\lib\net45\SharpDX.DirectInput.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.XInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Collections.Immutable, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.6.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Common, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Drawing.Common.7.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=6.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.6.0.1\lib\net461\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json, Version=6.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.6.0.8\lib\net461\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WebRtcVadSharp, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebRtcVadSharp.1.3.2\lib\netstandard2.0\WebRtcVadSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="Wpf.Ui, Version=3.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPF-UI.3.0.5\lib\net472\Wpf.Ui.dll</HintPath>
-    </Reference>
-    <Reference Include="WPFCustomMessageBox, Version=1.0.7.39267, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFCustomMessageBox.1.0.7\lib\WPFCustomMessageBox.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Platform, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Xaml, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
-    <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
-    <Compile Include="Audio\Models\DeJitteredTransmission.cs" />
-    <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
-    <Compile Include="Audio\Providers\ClientEffectsPipeline.cs" />
-    <Compile Include="Audio\Providers\RadioMixingProvider.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingManager.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingSample.cs" />
-    <Compile Include="Audio\Recording\TransmissionAssembler.cs" />
-    <Compile Include="Audio\Recording\MixDownLameRecordingWriter.cs" />
-    <Compile Include="Audio\Recording\PerRadioLameRecordingWriter.cs" />
-    <Compile Include="Audio\Models\TransmittedAudio.cs" />
-    <Compile Include="Audio\Providers\AudioProvider.cs" />
-    <Compile Include="Audio\Models\CachedAudioEffect.cs" />
-    <Compile Include="Audio\Managers\AudioManager.cs" />
-    <Compile Include="Audio\Managers\AudioPreview.cs" />
-    <Compile Include="Audio\Models\ClientAudio.cs" />
-    <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
-    <Compile Include="Audio\Models\JitterBufferAudio.cs" />
-    <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
-    <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
-    <Compile Include="Audio\Utility\SpeexWrapper.cs" />
-    <Compile Include="Input\InputAxisDevice.cs" />
-    <Compile Include="Input\InputButtonDevice.cs" />
-    <Compile Include="Input\InputDevice.cs" />
-    <Compile Include="Input\InputDeviceBase.cs" />
-    <Compile Include="Input\XInputController.cs" />
-    <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
-    <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingLameWriterBase.cs" />
-    <Compile Include="Audio\Recording\ClientTransmissionBuffer.cs" />
-    <Compile Include="Settings\ProfileSettingsStore.cs" />
-    <Compile Include="Input\InputBindState.cs" />
-    <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
-    <Compile Include="Network\DCS\DCSRadioSyncHandler.cs" />
-    <Compile Include="Network\DCS\Models\CombinedRadioState.cs" />
-    <Compile Include="Network\DCS\Models\DCSLosCheckRequest.cs" />
-    <Compile Include="Network\DCS\Models\DCSLosCheckResult.cs" />
-    <Compile Include="Network\UDPVoiceHandler.cs" />
-    <Compile Include="Settings\SynchedServerSettings.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\Favourites\CsvFavouriteServerStore.cs" />
-    <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
-    <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
-    <Compile Include="Settings\RadioChannels\FilePresetChannelsStore.cs" />
-    <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
-    <Compile Include="Singletons\AudioOutputSingleton.cs" />
-    <Compile Include="Singletons\ClientStateSingleton.cs" />
-    <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
-    <Compile Include="Singletons\AudioInputSingleton.cs" />
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupSwitch.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
-    <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
-      <DependentUpon>ClientListWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\AdministrationPage.xaml.cs">
-      <DependentUpon>AdministrationPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml.cs">
-      <DependentUpon>CommunicationsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\HomePage.xaml.cs">
-      <DependentUpon>HomePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\PlayerListPage.xaml.cs">
-      <DependentUpon>PlayerListPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml.cs">
-      <DependentUpon>ServerDetailsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\GuestPage.xaml.cs">
-      <DependentUpon>GuestPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml.cs">
-      <DependentUpon>GuestSuccess.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\AudioPage.xaml.cs">
-      <DependentUpon>AudioPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\GeneralPage.xaml.cs">
-      <DependentUpon>GeneralPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml.cs">
-      <DependentUpon>KeybindingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\LegacyPage.xaml.cs">
-      <DependentUpon>LegacyPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml.cs">
-      <DependentUpon>MiscellaneousPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml.cs">
-      <DependentUpon>RadioEffectsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\SettingsPage.xaml.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SupportPage.xaml.cs">
-      <DependentUpon>SupportPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\WelcomePages\EasterEggWindow.xaml.cs">
-      <DependentUpon>EasterEggWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml.cs">
-      <DependentUpon>WelcomePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\BalanceControl.xaml.cs">
-      <DependentUpon>BalanceControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\InputBindingControl.xaml.cs">
-      <DependentUpon>InputBindingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\KeybindingControl.xaml.cs">
-      <DependentUpon>KeybindingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\ToggleGlobalSetting.xaml.cs">
-      <DependentUpon>ToggleGlobalSetting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\ToggleProfileSetting.xaml.cs">
-      <DependentUpon>ToggleProfileSetting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml.cs">
-      <DependentUpon>PresetStandbyChannelsViewTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewModel.cs" />
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml.cs">
-      <DependentUpon>PresetChannelsViewTransparent1.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml.cs">
-      <DependentUpon>RadioOverlayMenuSelect.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml.cs">
-      <DependentUpon>RadioOverlayDragable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml.cs">
-      <DependentUpon>RadioOverlayTenHorizontalWide.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml.cs">
-      <DependentUpon>RadioOverlayTenSwitch.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml.cs">
-      <DependentUpon>RadioOverlayEngineering.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml.cs">
-      <DependentUpon>RadioOverlayTenVerticalLong.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayTwoHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayThreeHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayFiveHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml.cs">
-      <DependentUpon>RadioOverlayTenVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml.cs">
-      <DependentUpon>RadioOverlayThreeVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
-      <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml.cs">
-      <DependentUpon>RadioOverlayTenTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml.cs">
-      <DependentUpon>IntercomControlGroupTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
-      <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml.cs">
-      <DependentUpon>IntercomControlGroup3Horizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml.cs">
-      <DependentUpon>RadioCapabilities.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml.cs">
-      <DependentUpon>RadioOverlayFiveVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml.cs">
-      <DependentUpon>RadioOverlayTwoVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Input\InputDeviceManager.cs" />
-    <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
-    <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
-    <Compile Include="UI\Images.cs" />
-    <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
-      <DependentUpon>InputProfileWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml.cs">
-      <DependentUpon>PresetChannelsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewModel.cs" />
-    <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
-      <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml.cs">
-      <DependentUpon>AwacsIntercomControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroup.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayTenHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\Favourites\ServerAddress.cs" />
-    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml.cs">
-      <DependentUpon>FavouriteServersView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml.cs">
-      <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Audio\Providers\RadioFilter.cs" />
-    <Compile Include="Network\Models\RadioSendingState.cs" />
-    <Compile Include="Network\DCS\DCSRadioSyncManager.cs" />
-    <Compile Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
-      <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\GlobalSettingsStore.cs" />
-    <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
-    <Compile Include="UI\Sounds.cs" />
-    <Compile Include="UI\ToolTips.cs" />
-    <Compile Include="Audio\Recording\AudioManipulationHelper.cs" />
-    <Compile Include="Utils\AxisTuningHelper.cs" />
-    <Compile Include="Utils\DelegateCommand.cs" />
-    <Compile Include="Utils\RadioHelper.cs" />
-    <Compile Include="Utils\TransponderHelper.cs" />
-    <Compile Include="Utils\ValueConverters\BooleanInverterConverter.cs" />
-    <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
-    <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
-    <Compile Include="Utils\WPFElementHelper.cs" />
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\HomePages\AdministrationPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\HomePage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\PlayerListPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml" />
-    <Page Include="UI\ClientWindow\LoginPages\GuestPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml" />
-    <Page Include="UI\ClientWindow\LoginPages\LoginPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\SettingPages\AudioPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\GeneralPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\LegacyPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\SettingsPage.xaml" />
-    <Page Include="UI\ClientWindow\SupportPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\WelcomePages\EasterEggWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Components\BalanceControl.xaml" />
-    <Page Include="UI\Components\InputBindingControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Components\KeybindingControl.xaml" />
-    <Page Include="UI\Components\ToggleGlobalSetting.xaml" />
-    <Page Include="UI\Components\ToggleProfileSetting.xaml" />
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Network\SRSClientSyncHandler.cs" />
-    <Compile Include="UI\ClientWindow\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="UI\InputProfileWindow\InputProfileWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\RadioChannelConfigUI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Styles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Resource Include="UI\ClientWindow\WelcomePages\easter-egg.png" />
     <Resource Include="SRS_Orientation_Toggle.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="UI\ClientWindow\vanguardsrsback.png" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="awacs-radios.json">
+    <None Update="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="vngd-channels.txt">
+    <None Update="vngd-channels.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="AudioEffects\AM_COLLISION.wav">
@@ -829,16 +142,7 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config" />
-    <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -853,21 +157,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DCS-SR-Common\DCS-SR-Common.csproj">
-      <Project>{cf8da5c1-0105-4486-9e28-cb2321d8f122}</Project>
-      <Name>DCS-SR-Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NAudio\NAudio.csproj">
-      <Project>{da4f02e3-0b5e-42cd-b8d9-5583fa51d66e}</Project>
-      <Name>NAudio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpusWrapper\OpusWrapper.csproj">
-      <Project>{838bdb0b-5eb1-4c1e-9026-0a8842ac00c6}</Project>
-      <Name>OpusWrapper</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\DCS-SR-Common\DCS-SR-Common.csproj" />
+    <ProjectReference Include="..\NAudio\NAudio.csproj" />
+    <ProjectReference Include="..\OpusWrapper\OpusWrapper.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FodyWeavers.xml">
+    <None Update="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -888,7 +183,6 @@
     <Content Include="AudioEffects\beep-connected.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\ExpandIcon.bmp" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -896,27 +190,394 @@
   <ItemGroup>
     <Folder Include="UI\ClientWindow\RadioSelectionPages\" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0" />
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="Easy.MessageHub" Version="5.1.0" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
+    <PackageReference Include="Fody" Version="6.8.2" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MaterialDesignColors" Version="3.1.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
+    <PackageReference Include="MathNet.Filtering" Version="0.7.0" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.6" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="MvvmEventBinding" Version="1.0.0" />
+    <PackageReference Include="NAudio.Lame" Version="2.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="Sentry" Version="4.12.1" />
+    <PackageReference Include="Sentry.NLog" Version="4.12.1" />
+    <PackageReference Include="SharpConfig" Version="3.2.9.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
+    <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Reflection.Metadata" Version="8.0.1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="WebRtcVadSharp" Version="1.3.2" />
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+    <PackageReference Include="WPFCustomMessageBox" Version="1.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SystemWebAdapters" Version="1.4.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="8.0.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="8.0.0" />
+    <PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="8.0.0" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2662" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Audio\BufferedSampleProvider.cs" />
+    <Compile Remove="DejitterBuffer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\CanvasOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\ContainerCustomisations.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Converters\BooleanAndToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Converters\EqualityToBooleanConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Converters\EqualityToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Converters\ShowDefaultCloseButtonConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\CollectionTeaser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\FuncComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\HitTest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\InterTabTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\MultiComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\Native.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\SystemCommand.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\TabHeaderDragStartInformation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Core\WindowMessage.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DefaultInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DefaultInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\Branch.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\BranchAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\BranchItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\BranchResult.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\CouldBeHeaderedStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\DropZone.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\DropZoneLocation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\Finder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\FloatingItemSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\FloatRequestedEvent.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\FloatTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\Layout.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\LayoutAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\LocationReport.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\LocationReportBuilder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\LocationReportException.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\LocationSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\Tiler.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Dockablz\TilerCalculator.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzColors.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzDragCompletedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzDragDeltaEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzDragStartedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzItemEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzItemsControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\DragablzWindow.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\EmptyHeaderSizingHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\HeaderedDragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\HeaderedItemViewModel.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\HorizontalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\HorizontalPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\IInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\IInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\IItemsOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\IManualInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\INewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\InterTabController.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\ItemActionCallbackArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\LocationChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\LocationHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\MoveItemRequest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\NewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net40\.NETFramework,Version=v4.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net40\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net45\.NETFramework,Version=v4.5.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net45\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net5.0-windows\.NETCoreApp,Version=v5.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\net5.0-windows\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\netcoreapp3.0\.NETCoreApp,Version=v3.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\obj\Release\netcoreapp3.0\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\OrderChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\PositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Properties\AssemblyInfo.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Properties\Resources.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Properties\Settings.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Referenceless\AnonymousDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Referenceless\DefaultDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Referenceless\Disposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Referenceless\ICancelable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Referenceless\SerialDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\StackOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\StackPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\StoryboardCompletionListener.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\TabablzControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\TabablzHeaderSizeConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\TabablzItemStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\TabEmptiedResponse.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Themes\BrushToRadialGradientBrushConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Themes\MaterialDesignAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Themes\Ripple.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Themes\RippleAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Themes\SystemCommandIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\Trapezoid.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\VerticalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net40\VerticalPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\CanvasOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\ContainerCustomisations.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Converters\BooleanAndToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Converters\EqualityToBooleanConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Converters\EqualityToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Converters\ShowDefaultCloseButtonConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\CollectionTeaser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\FuncComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\HitTest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\InterTabTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\MultiComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\Native.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\SystemCommand.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\TabHeaderDragStartInformation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Core\WindowMessage.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DefaultInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DefaultInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\Branch.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\BranchAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\BranchItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\BranchResult.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\CouldBeHeaderedStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\DropZone.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\DropZoneLocation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\Finder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\FloatingItemSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\FloatRequestedEvent.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\FloatTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\Layout.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\LayoutAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\LocationReport.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\LocationReportBuilder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\LocationReportException.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\LocationSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\Tiler.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Dockablz\TilerCalculator.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzColors.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzDragCompletedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzDragDeltaEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzDragStartedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzItemEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzItemsControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\DragablzWindow.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\EmptyHeaderSizingHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\HeaderedDragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\HeaderedItemViewModel.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\HorizontalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\HorizontalPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\IInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\IInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\IItemsOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\IManualInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\INewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\InterTabController.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\ItemActionCallbackArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\LocationChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\LocationHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\MoveItemRequest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\NewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net40\.NETFramework,Version=v4.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net40\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net45\.NETFramework,Version=v4.5.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net45\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net5.0-windows\.NETCoreApp,Version=v5.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\net5.0-windows\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\netcoreapp3.0\.NETCoreApp,Version=v3.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\obj\Release\netcoreapp3.0\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\OrderChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\PositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Properties\AssemblyInfo.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Properties\Resources.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Properties\Settings.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Referenceless\AnonymousDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Referenceless\DefaultDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Referenceless\Disposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Referenceless\ICancelable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Referenceless\SerialDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\StackOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\StackPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\StoryboardCompletionListener.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\TabablzControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\TabablzHeaderSizeConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\TabablzItemStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\TabEmptiedResponse.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Themes\BrushToRadialGradientBrushConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Themes\MaterialDesignAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Themes\Ripple.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Themes\RippleAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Themes\SystemCommandIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\Trapezoid.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\VerticalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\net45\VerticalPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\CanvasOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\ContainerCustomisations.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Converters\BooleanAndToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Converters\EqualityToBooleanConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Converters\EqualityToVisibilityConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Converters\ShowDefaultCloseButtonConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\CollectionTeaser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\FuncComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\HitTest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\InterTabTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\MultiComparer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\Native.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\SystemCommand.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\TabHeaderDragStartInformation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Core\WindowMessage.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DefaultInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DefaultInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\Branch.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\BranchAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\BranchItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\BranchResult.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\CouldBeHeaderedStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\DropZone.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\DropZoneLocation.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\Extensions.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\Finder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\FloatingItemSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\FloatRequestedEvent.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\FloatTransfer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\Layout.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\LayoutAccessor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\LocationReport.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\LocationReportBuilder.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\LocationReportException.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\LocationSnapShot.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\Tiler.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Dockablz\TilerCalculator.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzColors.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzDragCompletedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzDragDeltaEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzDragStartedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzItemEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzItemsControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\DragablzWindow.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\EmptyHeaderSizingHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\HeaderedDragablzItem.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\HeaderedItemViewModel.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\HorizontalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\HorizontalPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\IInterLayoutClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\IInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\IItemsOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\IManualInterTabClient.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\INewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\InterTabController.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\ItemActionCallbackArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\LocationChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\LocationHint.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\MoveItemRequest.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\NewTabHost.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net40\.NETFramework,Version=v4.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net40\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net45\.NETFramework,Version=v4.5.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net45\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net5.0-windows\.NETCoreApp,Version=v5.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\net5.0-windows\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\netcoreapp3.0\.NETCoreApp,Version=v3.0.AssemblyAttributes.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\obj\Release\netcoreapp3.0\GeneratedInternalTypeHelper.g.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\OrderChangedEventArgs.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\PositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Properties\AssemblyInfo.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Properties\Resources.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Properties\Settings.Designer.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Referenceless\AnonymousDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Referenceless\DefaultDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Referenceless\Disposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Referenceless\ICancelable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Referenceless\SerialDisposable.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\StackOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\StackPositionMonitor.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\StoryboardCompletionListener.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\TabablzControl.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\TabablzHeaderSizeConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\TabablzItemStyleSelector.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\TabEmptiedResponse.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Themes\BrushToRadialGradientBrushConverter.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Themes\MaterialDesignAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Themes\Ripple.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Themes\RippleAssist.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Themes\SystemCommandIcon.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\Trapezoid.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\VerticalOrganiser.cs" />
+    <Compile Remove="packages\Dragablz.0.0.3.234\src\netcoreapp3.0\VerticalPositionMonitor.cs" />
+    <Compile Remove="UI\ClientWindow\InputBindingListControl.xaml.cs" />
+    <Page Remove="packages\Microsoft.UI.Xaml.2.8.6\lib\uap10.0\Microsoft.UI.Xaml\Themes\Generic.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\CollectionView\ItemsViewStyles.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FlyoutPageControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsAutoSuggestBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsCheckBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsCommandBarStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsEmbeddedPageWrapper.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsFlyout.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsProgressBarStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\FormsTextBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\MasterDetailControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\Microsoft.UI.Xaml\DensityStyles\Compact.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\Microsoft.UI.Xaml\Themes\generic.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\PageControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\PickerStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\PromptDialog.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\Resources.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\Shell\ShellPageWrapper.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\SliderStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\StepperControl.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.14393\Xamarin.Forms.Platform.UAP\TabbedPageStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\CollectionView\ItemsViewStyles.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FlyoutPageControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsAutoSuggestBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsCheckBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsCommandBarStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsEmbeddedPageWrapper.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsFlyout.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsProgressBarStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\FormsTextBoxStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\MasterDetailControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\Microsoft.UI.Xaml\DensityStyles\Compact.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\Microsoft.UI.Xaml\Themes\generic.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\PageControlStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\PickerStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\PromptDialog.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\Resources.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\Shell\ShellPageWrapper.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\Shell\ShellStyles.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\SliderStyle.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\StepperControl.xaml" />
+    <Page Remove="packages\Xamarin.Forms.5.0.0.2612\lib\uap10.0.16299\Xamarin.Forms.Platform.UAP\TabbedPageStyle.xaml" />
+    <Page Remove="UI\ClientWindow\InputBindingListControl.xaml" />
+  </ItemGroup>
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
-  <Import Project="..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets" Condition="Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets'))" />
-    <Error Condition="!Exists('..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets'))" />
-    <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props'))" />
-    <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets'))" />
-    <Error Condition="!Exists('..\packages\Sentry.4.10.1\build\Sentry.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Sentry.4.10.1\build\Sentry.targets'))" />
-  </Target>
-  <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
-  <Import Project="..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" />
-  <Import Project="..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets" Condition="Exists('..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets')" />
-  <Import Project="..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets')" />
   <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <InputFilename ParameterType="System.String" Required="true" />
@@ -943,7 +604,6 @@
       <Version Include="$(Version)" />
     </ItemGroup>
     <PropertyGroup>
-      <!-- Define Constants -->
       <AssemblyInfo>Properties\AssemblyInfo.cs</AssemblyInfo>
       <AssemblyInfoContent>$([System.IO.File]::ReadAllText($(AssemblyInfo)))</AssemblyInfoContent>
       <VersionRegex>(\[\s*assembly\s*:\s*AssemblyVersion\(\s*"(\d+)\.(\d+)\.(\d+)(\.)(\d+)("\)\s*\]))</VersionRegex>
@@ -954,12 +614,4 @@
   <Target Name="AfterBuild">
     <Warning Text="Client-Version: $(Version)" />
   </Target>
-  <Import Project="..\packages\Sentry.4.10.1\build\Sentry.targets" Condition="Exists('..\packages\Sentry.4.10.1\build\Sentry.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

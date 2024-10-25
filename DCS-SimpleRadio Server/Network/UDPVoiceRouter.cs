@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
@@ -425,5 +426,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
+        public Task HandleAsync(ServerFrequenciesChanged message, CancellationToken token)
+        {
+            return new Task(() => Handle(message), token);
+        }
     }
 }

@@ -171,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             Console.WriteLine("This thread is not blocking.");
 
-            DisplayRootViewFor<MainViewModel>(settings);
+            DisplayRootViewForAsync<MainViewModel>(settings);
 
             UpdaterChecker.CheckForUpdate(Settings.ServerSettingsStore.Instance.GetServerSetting(Common.Setting.ServerSettingsKeys.CHECK_FOR_BETA_UPDATES).BoolValue);
         }
