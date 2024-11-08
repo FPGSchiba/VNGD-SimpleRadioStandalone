@@ -159,6 +159,7 @@ Medical Dept: 140.190|140.19
 
 ---- Discovery - Magellan Ship Frequencies ----|1.0
 Magellan Flight: 140.200|140.20
+Magellan Away Team: 140.201|140.201
 Magellan Landing: 140.205|140.205
 Magellan Social: 140.209|140.209
 
