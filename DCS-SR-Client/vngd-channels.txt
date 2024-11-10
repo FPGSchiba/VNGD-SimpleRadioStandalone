@@ -174,14 +174,12 @@ Elcano Landing:       140.215|140.215
 Elcano Social:        140.219|140.219
 
 ---- Discovery - Pegasus Ship Frequencies ----|1.0
-Pegasus Command:       140.220|140.220
-Pegasus General:       140.221|140.221
-Pegasus Away Team 1:   140.222|140.222
-Pegasus Away Team 2:   140.223|140.223
-Pegasus Away Team 3:   140.224|140.224
-
-Pegasus Landing:       140.225|140.225
-Pegasus Social:        140.229|140.229
+Pegasus General:      140.220|140.220
+Pegasus Weapons:      140.221|140.221
+Pegasus Away Team 1:  140.224|140.224
+Pegasus Away Team 2:  140.225|140.225
+Pegasus Away Team 3:  140.226|140.226
+Pegasus Landing:      140.228|140.228
 
 ---- Nighthawk Frequencies ----|1.0
 Nighthawk Command:       120.500|120.500
