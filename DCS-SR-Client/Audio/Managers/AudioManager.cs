@@ -114,10 +114,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
         }
 
-        public void StartEncoding(string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port)
+        public void StartEncoding(InputDeviceManager inputManager, IPAddress ipAddress, int port)
         {
-            guid = ClientStateSingleton.Instance.ShortGUID;
+            var guid = ClientStateSingleton.Instance.ShortGUID;
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)

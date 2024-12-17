@@ -18,10 +18,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private static volatile ClientStateSingleton _instance;
         private static object _lock = new Object();
 
-        public delegate bool RadioUpdatedCallback();
-
-        private List<RadioUpdatedCallback> _radioCallbacks = new List<RadioUpdatedCallback>();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
@@ -33,16 +29,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         // Timestamp the last UDP Export broadcast was received from DCS, used for determining active game connection
         public long DcsExportLastReceived { get; set; }
 
-        // Timestamp for the last time 
-        public long LotATCLastReceived { get; set; }
-
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
         public PresetStandbyChannelsViewModel[] StandbyChannels { get; }
 
         public long LastSent { get; set; }
-
-        public long LastPositionCoalitionSent { get; set; }
 
         private static readonly DispatcherTimer _timer = new DispatcherTimer();
 
@@ -78,7 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         }
 
         private bool isConnectionErrored;
-        public string ShortGUID { get; }
+        public string ShortGUID { get; set; }
 
         public bool IsConnectionErrored
         {
@@ -107,8 +98,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 50000000; } }
-
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
         public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
         // Indicates an active game connection has been detected (1 tick = 100ns, 100000000 ticks = 10s stale timer), not updated by EAM
@@ -122,8 +111,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         {
             RadioSendingState = new RadioSendingState();
             RadioReceivingState = new RadioReceivingState[11];
-
-            ShortGUID = ShortGuid.NewGuid();
+            
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 

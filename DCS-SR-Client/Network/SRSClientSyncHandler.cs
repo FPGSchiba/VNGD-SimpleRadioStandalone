@@ -53,9 +53,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private DispatcherTimer _idleTimeout;
 
-        public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback)
+        public SRSClientSyncHandler(UpdateUICallback uiCallback)
         {
-            _guid = guid;
             _updateUICallback = uiCallback;
 
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
@@ -75,39 +74,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         }
 
 
-        public void TryConnect(IPEndPoint endpoint, ConnectCallback callback)
+        public void TryConnect(IPEndPoint endpoint, string password, string playerName, ConnectCallback callback, ExternalAWACSModeConnectCallback externalAwacsModeConnectCallback)
         {
             _callback = callback;
             _serverEndpoint = endpoint;
+            _externalAWACSModeCallback = externalAwacsModeConnectCallback;
 
-            var tcpThread = new Thread(Connect);
+            var tcpThread = new Thread(() => Connect(password, playerName));
             tcpThread.Start();
-        }
-
-        public void ConnectExternalAWACSMode(string password, ExternalAWACSModeConnectCallback callback)
-        {
-            if (_clientStateSingleton.ExternalAWACSModelSelected)
-            {
-                return;
-            }
-
-            _externalAWACSModeCallback = callback;
-
-            var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-            sideInfo.name = _clientStateSingleton.LastSeenName;
-            SendToServer(new NetworkMessage
-            {
-                Client = new SRClient
-                {
-                    Coalition = sideInfo.side,
-                    Name = sideInfo.name,
-                    LatLngPosition = sideInfo.LngLngPosition,
-                    ClientGuid = _guid,
-                    AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
-                },
-                ExternalAWACSModePassword = password,
-                MsgType = NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD
-            });
         }
 
         public void DisconnectExternalAWACSMode()
@@ -122,7 +96,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             CallExternalAWACSModeOnMain(false, 0);
         }
 
-        private void Connect()
+        private void Connect(string password, string playerName)
         {
             _lastSent = DateTime.Now.Ticks;
             _idleTimeout.Start();
@@ -161,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         _tcpClient.NoDelay = true;
 
                         CallOnMain(true);
-                        ClientSyncLoop();
+                        ClientSyncLoop(password, playerName);
                     }
                     else
                     {
@@ -204,7 +178,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
-                    Seat = sideInfo.seat,
                     ClientGuid = _guid,
                     RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
                     AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
@@ -219,15 +192,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
 
-            if (needValidPosition)
-            {
-                message.Client.LatLngPosition = sideInfo.LngLngPosition;
-            }
-            else
-            {
-                message.Client.LatLngPosition = new DCSLatLngPosition();
-            }
-
             SendToServer(message);
         }
 
@@ -241,23 +205,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     Coalition = sideInfo.side,
                     Name = sideInfo.name,
-                    Seat = sideInfo.seat,
                     ClientGuid = _guid,
                     AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                 },
                 MsgType = NetworkMessage.MessageType.UPDATE
             };
-
-            var needValidPosition = _serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED) || _serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED);
-
-            if (needValidPosition)
-            {
-                message.Client.LatLngPosition = sideInfo.LngLngPosition;
-            }
-            else
-            {
-                message.Client.LatLngPosition = new DCSLatLngPosition();
-            }
 
             SendToServer(message);
         }
@@ -300,7 +252,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
         }
 
-        private void ClientSyncLoop()
+        private void ClientSyncLoop(string password, string playerName)
         {
             //clear the clients list
             _clients.Clear();
@@ -311,19 +263,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 try
                 {
                     var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
-                    //start the loop off by sending a SYNC Request
+                    // Start off by sending login information 
                     SendToServer(new NetworkMessage
                     {
                         Client = new SRClient
                         {
                             Coalition = sideInfo.side,
-                            Name = sideInfo.name.Length > 0 ? sideInfo.name : _clientStateSingleton.LastSeenName,
-                            LatLngPosition = sideInfo.LngLngPosition,
-                            ClientGuid = _guid,
-                            RadioInfo = _clientStateSingleton.DcsPlayerRadioInfo,
+                            Name = playerName,
                             AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                         },
-                        MsgType = NetworkMessage.MessageType.SYNC,
+                        Password = password,
+                        MsgType = NetworkMessage.MessageType.LOGIN
                     });
 
                     string line;
@@ -359,8 +309,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 srClient.Name = updatedSrClient.Name;
                                                 srClient.Coalition = updatedSrClient.Coalition;
 
-                                                srClient.LatLngPosition = updatedSrClient.LatLngPosition;
-
                                                 if (updatedSrClient.RadioInfo != null)
                                                 {
                                                     srClient.RadioInfo = updatedSrClient.RadioInfo;
@@ -386,11 +334,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             var connectedClient = serverMessage.Client;
                                             connectedClient.LastUpdate = DateTime.Now.Ticks;
-
-                                            //init with LOS true so you can hear them incase of bad DCS install where
-                                            //LOS isnt working
-                                            connectedClient.LineOfSightLoss = 0.0f;
-                                            //0.0 is NO LOSS therefore full Line of sight
 
                                             _clients[serverMessage.Client.ClientGuid] = connectedClient;
 
@@ -443,10 +386,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                             foreach (var client in serverMessage.Clients)
                                             {
                                                 client.LastUpdate = DateTime.Now.Ticks;
-                                                //init with LOS true so you can hear them incase of bad DCS install where
-                                                //LOS isnt working
-                                                client.LineOfSightLoss = 0.0f;
-                                                //0.0 is NO LOSS therefore full Line of sight
                                                 _clients[client.ClientGuid] = client;
                                             }
                                         }
@@ -501,21 +440,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         Disconnect();
                                         break;
-                                    case NetworkMessage.MessageType.EXTERNAL_AWACS_MODE_PASSWORD:
-                                        if (serverMessage.Client.Coalition == 0)
-                                        {
-                                            Logger.Info("External AWACS mode authentication failed");
+                                    case NetworkMessage.MessageType.LOGIN_SUCCESS:
+                                        Logger.Info("External AWACS mode authentication succeeded, coalition {0}", serverMessage.Client.Coalition == 1 ? "red" : "blue");
 
-                                            CallExternalAWACSModeOnMain(false, 0, true);
-                                        }
-                                        else if (_radioDCSSync != null && _radioDCSSync.IsListening)
-                                        {
-                                            Logger.Info("External AWACS mode authentication succeeded, coalition {0}", serverMessage.Client.Coalition == 1 ? "red" : "blue");
+                                        CallExternalAWACSModeOnMain(true, serverMessage.Client.Coalition);
 
-                                            CallExternalAWACSModeOnMain(true, serverMessage.Client.Coalition);
+                                        _radioDCSSync.StartExternalAWACSModeLoop();
 
-                                            _radioDCSSync.StartExternalAWACSModeLoop();
-                                        }
+                                        break;
+                                    case NetworkMessage.MessageType.LOGIN_FAILED:
+                                        Logger.Info("External AWACS mode authentication failed");
+                                        CallExternalAWACSModeOnMain(false, 0, true);
                                         break;
                                     default:
                                         Logger.Error("Recevied unknown " + line);

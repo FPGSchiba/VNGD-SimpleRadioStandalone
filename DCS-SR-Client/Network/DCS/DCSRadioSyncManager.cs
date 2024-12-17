@@ -49,7 +49,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
             _clearRadio = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _clearRadio.Tick += CheckIfRadioIsStale;
-
         }
 
         private void CheckIfRadioIsStale(object sender, EventArgs e)

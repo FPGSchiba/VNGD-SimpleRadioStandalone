@@ -399,12 +399,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                                 radio.modulation == RadioInformation.Modulation.INTERCOM
                                                 || radio.modulation == RadioInformation.Modulation.MIDS // IGNORE LOS and Distance for MIDS - we assume a Link16 Network is in place
                                                 || globalFrequency
-                                                || (
-                                                    HasLineOfSight(udpVoicePacket, out losLoss)
-                                                    && InRange(udpVoicePacket.Guid, udpVoicePacket.Frequencies[i],
-                                                        out receivPowerLossPercent)
-                                                    && !blockedRadios.Contains(state.ReceivedOn)
-                                                )
+                                                || !blockedRadios.Contains(state.ReceivedOn)
                                             )
                                             {
                                                 // This is already done in CanHearTransmission!!
@@ -667,81 +662,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             return transmitting;
-        }
-
-        private bool HasLineOfSight(UDPVoicePacket udpVoicePacket, out float losLoss)
-        {
-            losLoss = 0; //0 is NO LOSS
-            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.LOS_ENABLED))
-            {
-                return true;
-            }
-
-            //anything below 30 MHz and AM ignore (AM stand-in for actual HF modulations)
-            for (int i = 0; i < udpVoicePacket.Frequencies.Length; i++)
-            {
-                if (udpVoicePacket.Modulations[i] == (int)Modulation.AM 
-                    && udpVoicePacket.Frequencies[i] <= RadioCalculator.HF_FREQUENCY_LOS_IGNORED)
-                {
-                    //assume HF is bouncing off the sky for now
-                    return true;
-                }
-            }
-
-            SRClient transmittingClient;
-            if (_clients.TryGetValue(udpVoicePacket.Guid, out transmittingClient))
-            {
-                var myLatLng= _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
-                var clientLatLng = transmittingClient.LatLngPosition;
-                if (myLatLng == null || clientLatLng == null || !myLatLng.isValid() || !clientLatLng.isValid())
-                {
-                    return true;
-                }
-                
-                losLoss = transmittingClient.LineOfSightLoss;
-                return transmittingClient.LineOfSightLoss < 1.0f; // 1.0 or greater  is TOTAL loss
-                
-            }
-
-            losLoss = 0;
-            return false;
-        }
-
-        private bool InRange(string transmissingClientGuid, double frequency, out double signalStrength)
-        {
-            signalStrength = 0;
-            if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.DISTANCE_ENABLED))
-            {
-                return true;
-            }
-
-            SRClient transmittingClient;
-            if (_clients.TryGetValue(transmissingClientGuid, out transmittingClient))
-            {
-                double dist = 0;
-               
-                var myLatLng = _clientStateSingleton.PlayerCoaltionLocationMetadata.LngLngPosition;
-                var clientLatLng = transmittingClient.LatLngPosition;
-                //No DCS Position - do we have LotATC Position?
-                if (myLatLng == null || clientLatLng == null || !myLatLng.isValid() || !clientLatLng.isValid())
-                {
-                    return true;
-                }
-                else
-                {
-                    //Calculate with Haversine (distance over ground) + Pythagoras (crow flies distance)
-                    dist = RadioCalculator.CalculateDistanceHaversine(myLatLng, clientLatLng);
-                }
-
-                var max = RadioCalculator.FriisMaximumTransmissionRange(frequency);
-                // % loss of signal
-                // 0 is no loss 1.0 is full loss
-                signalStrength = (dist / max);
-
-                return max > dist;
-            }
-
-            return false;
         }
 
         private int SortRadioReceivingPriorities(RadioReceivingPriority x, RadioReceivingPriority y)

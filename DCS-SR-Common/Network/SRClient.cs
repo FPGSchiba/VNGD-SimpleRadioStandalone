@@ -40,8 +40,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
         }
 
-        public int Seat { get; set; }
-
         public int Coalition
         {
             get { return _coalition; }
@@ -95,27 +93,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
 
         public DCSPlayerRadioInfo RadioInfo { get; set; }
 
-        [JsonDCSIgnoreSerialization]
-        public DCSLatLngPosition LatLngPosition { get; set; }
-
-        [JsonIgnore]
-        public float LineOfSightLoss
-        {
-            get
-            {
-                if (_lineOfSightLoss == 0)
-                {
-                    return 0;
-                }
-                if ((LatLngPosition.lat == 0) && (LatLngPosition.lng == 0))
-                {
-                    return 0;
-                }
-                return _lineOfSightLoss;
-            }
-            set { _lineOfSightLoss = value; }
-        }
-
         // Used by server client list to display last frequency client transmitted on
         private string _transmittingFrequency;
         [JsonIgnore]
@@ -158,7 +135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             {
                 side = "Spectator";
             }
-            return Name == "" ? "Unknown" : Name + " - " + side + " LOS Loss " + _lineOfSightLoss + " Pos" + LatLngPosition;
+            return Name == "" ? "Unknown" : Name + " - " + side;
         }
     }
 }

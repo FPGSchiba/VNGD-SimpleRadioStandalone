@@ -67,8 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
 
         private readonly AudioManager _audioManager;
-
-        private readonly string _guid;
+        
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
         private SRSClientSyncHandler _client;
@@ -284,8 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             {
                 _logger.Info("Started DCS-SimpleRadio Client " + version); //UpdaterChecker.VERSION
             }
-
-            _guid = ClientStateSingleton.Instance.ShortGUID;
+            
             Analytics.Log("Client", "Startup", _globalSettings.GetClientSetting(GlobalSettingsKeys.ClientIdLong).RawValue);
 
             InitSettingsScreen();
@@ -1209,7 +1207,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         public void On_HomeLogOutClicked()
         {
-            ConnectAWACSMode();
             Stop();
             OpenPageByIndex(WelcomeIndex);
         }
@@ -1666,14 +1663,44 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _resolvedIp = ip;
                     _port = port;
 
-                    _client = new SRSClientSyncHandler(_guid, UpdateUICallback);
+                    _client = new SRSClientSyncHandler(UpdateUICallback);
 
                     _loginPage.Login.IsEnabled = false;
                     _guestPage.Login.IsEnabled = false;
 
                     _guestPage.LoginInProgress.Opacity = 1;
+                    
+                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                    {
+                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+                    }
 
-                    _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
+
+                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                    {
+                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+                    }
+
+
+                    if (string.IsNullOrWhiteSpace(_coalitionPassword))
+                    {
+                        return;
+                    }
+
+                    // Already connected, disconnect
+                    if (ClientState.ExternalAWACSModelSelected)
+                    {
+                        _client.Disconnect();
+                    }
+                    else
+                    {
+                        _connectionTransaction.User = new SentryUser
+                        {
+                            Username = _playerName
+                        };
+                        ClientState.LastSeenName = _playerName;
+                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), _coalitionPassword, _playerName, ConnectCallback, ExternalAWACSModeConnectionChanged);
+                    }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -1817,13 +1844,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         ClientState.IsVoipConnected = false;
 
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
-
-                        _audioManager.StartEncoding(_guid, InputManager,
-                            _resolvedIp, _port);
-
-                        _logger.Debug("Starting AWACS Mode connection.");
+                        
                         _connectioNetworkSpan.Finish();
-                        ConnectAWACSMode();
                     }
                     catch (Exception ex)
                     {
@@ -1874,8 +1896,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             //stop timer
             _updateTimer?.Stop();
-
-            ConnectAWACSMode();
+            
             Stop();
 
             _audioPreview?.StopEncoding();
@@ -2780,46 +2801,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetClientSetting(GlobalSettingsKeys.PlayConnectionSounds, (bool)PlayConnectionSounds.IsChecked);
         }
 
-        private void ConnectAWACSMode()
-        {
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-            }
-
-
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
-            }
-
-
-            if (_client == null ||
-                !ClientState.IsConnected ||
-                (!ClientState.ExternalAWACSModelSelected &&
-                 string.IsNullOrWhiteSpace(_coalitionPassword)))
-            {
-                return;
-            }
-
-            // Already connected, disconnect
-            if (ClientState.ExternalAWACSModelSelected)
-            {
-                _client.DisconnectExternalAWACSMode();
-            }
-            else
-            {
-                _connectionTransaction.User = new SentryUser
-                {
-                    Username = _playerName
-                };
-                _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
-                _logger.Debug("Init AWACS Connection now...");
-                ClientState.LastSeenName = _playerName;
-                _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAWACSModeConnectionChanged);
-            }
-        }
-
         private void ExternalAWACSModeConnectionChanged(bool result, int coalition, bool error = false)
         {
             if (result)
@@ -2851,6 +2832,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
                 OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
                 _connectionAwacsSpan.Finish();
+                _audioManager.StartEncoding(InputManager, _resolvedIp, _port);
                 
                 SentrySdk.ConfigureScope(scope =>
                 {
