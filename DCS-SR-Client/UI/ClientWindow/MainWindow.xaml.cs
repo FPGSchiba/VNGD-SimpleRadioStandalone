@@ -1846,6 +1846,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
                         
                         _connectioNetworkSpan.Finish();
+                        _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                     }
                     catch (Exception ex)
                     {
@@ -2803,6 +2804,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ExternalAWACSModeConnectionChanged(bool result, int coalition, bool error = false)
         {
+            if (!_audioManager.IsEncoding)
+            {
+                _audioManager.StartEncoding(InputManager, _resolvedIp, _port);
+            }
+
             if (result)
             {
                 ClientState.ExternalAWACSModelSelected = true;
@@ -2832,7 +2838,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
                 OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
                 _connectionAwacsSpan.Finish();
-                _audioManager.StartEncoding(InputManager, _resolvedIp, _port);
                 
                 SentrySdk.ConfigureScope(scope =>
                 {

@@ -70,6 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public float MicMax { get; set; } = -100;
         public float SpeakerMax { get; set; } = -100;
+        public bool IsEncoding { get; set; } = false;
 
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
@@ -116,6 +117,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         public void StartEncoding(InputDeviceManager inputManager, IPAddress ipAddress, int port)
         {
+            if (IsEncoding)
+            {
+                return;
+            }
+            IsEncoding = true;
             var guid = ClientStateSingleton.Instance.ShortGUID;
 
             MMDevice speakers = null;

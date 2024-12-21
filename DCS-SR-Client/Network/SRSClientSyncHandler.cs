@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -251,6 +252,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //IGNORE
             }
         }
+        
+        private static string ToHex(byte[] bytes, bool upperCase)
+        {
+            StringBuilder result = new StringBuilder(bytes.Length * 2);
+            for (int i = 0; i < bytes.Length; i++)
+                result.Append(bytes[i].ToString(upperCase ? "X2" : "x2"));
+            return result.ToString();
+        }
+
+        private static string SHA256HexHashString(string StringIn)
+        {
+            string hashString;
+            using (var sha256 = SHA256Managed.Create())
+            {
+                var hash = sha256.ComputeHash(Encoding.Default.GetBytes(StringIn));
+                hashString = ToHex(hash, false);
+            }
+
+            return hashString;
+        }
 
         private void ClientSyncLoop(string password, string playerName)
         {
@@ -272,7 +293,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                             Name = playerName,
                             AllowRecord = GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowRecording)
                         },
-                        Password = password,
+                        Password = SHA256HexHashString(password),
                         MsgType = NetworkMessage.MessageType.LOGIN
                     });
 
@@ -356,31 +377,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         break;
                                     case NetworkMessage.MessageType.SYNC:
-                                        // Logger.Info("Recevied: " + NetworkMessage.MessageType.SYNC);
-
-                                        //check server version
-                                        if (serverMessage.Version == null)
-                                        {
-                                            Logger.Error("Disconnecting Unversioned Server");
-                                            Disconnect();
-                                            break;
-                                        }
-
-                                        var serverVersion = Version.Parse(serverMessage.Version);
-                                        var protocolVersion = Version.Parse(UpdaterChecker.MINIMUM_PROTOCOL_VERSION);
-
-                                        ServerVersion = serverMessage.Version;
-
-                                        if (serverVersion < protocolVersion)
-                                        {
-                                            Logger.Error($"Server version ({serverMessage.Version}) older than minimum procotol version ({UpdaterChecker.MINIMUM_PROTOCOL_VERSION}) - disconnecting");
-
-                                            ShowVersionMistmatchWarning(serverMessage.Version);
-
-                                            Disconnect();
-                                            break;
-                                        }
-
                                         if (serverMessage.Clients != null)
                                         {
                                             foreach (var client in serverMessage.Clients)
@@ -406,7 +402,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         break;
 
                                     case NetworkMessage.MessageType.SERVER_SETTINGS:
-
                                         _serverSettings.Decode(serverMessage.ServerSettings);
                                         ServerVersion = serverMessage.Version;
 
@@ -423,7 +418,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                                         break;
                                     case NetworkMessage.MessageType.CLIENT_DISCONNECT:
-
                                         SRClient outClient;
                                         _clients.TryRemove(serverMessage.Client.ClientGuid, out outClient);
 
@@ -442,11 +436,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         break;
                                     case NetworkMessage.MessageType.LOGIN_SUCCESS:
                                         Logger.Info("External AWACS mode authentication succeeded, coalition {0}", serverMessage.Client.Coalition == 1 ? "red" : "blue");
-
+                                        // Set the ID for the client
+                                        Logger.Info("Registering Client with GUID: " + serverMessage.Client.ClientGuid);
+                                        _clientStateSingleton.ShortGUID = serverMessage.Client.ClientGuid;
+                                        
                                         CallExternalAWACSModeOnMain(true, serverMessage.Client.Coalition);
 
                                         _radioDCSSync.StartExternalAWACSModeLoop();
-
                                         break;
                                     case NetworkMessage.MessageType.LOGIN_FAILED:
                                         Logger.Info("External AWACS mode authentication failed");
