@@ -1,0 +1,299 @@
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages.KeybindingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
+      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage"
+      xmlns:settings="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Settings"
+      mc:Ignorable="d"
+      Title="KeybindingPage" Height="270" Width="415">
+    <Grid>
+        <ScrollViewer>
+            <StackPanel>
+                <components:ToggleGlobalSetting Height="50" Title="Allow More Controller Input Devices" SettingKey="ExpandControls" />
+                <components:ToggleGlobalSetting Height="50" Title="Allow XInput Controller (XBox Controller)" SettingKey="AllowXInputController" />
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Most Used"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Ptt}"
+                    InputName="Push to Talk - PTT" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch1}"
+                    InputName="Radio 1" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch2}"
+                    InputName="Radio 2" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch3}"
+                    InputName="Radio 3" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Intercom}"
+                    InputName="Intercom Select" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.NextRadio}"
+                    InputName="Select Next Radio" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.PreviousRadio}"
+                    InputName="Select Previous Radio" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeUp}"
+                    InputName="Radio Volume Up" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
+                    InputName="Radio Volume Down" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"
+                    InputName="L Radio Panel Toggle" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10SToggle}"
+                    InputName="S Radio Panel Toggle" />
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Radio Selection"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch4}"
+                    InputName="Radio 4" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch5}"
+                    InputName="Radio 5" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch6}"
+                    InputName="Radio 6" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch7}"
+                    InputName="Radio 7" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch8}"
+                    InputName="Radio 8" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch9}"
+                    InputName="Radio 9" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Switch10}"
+                    InputName="Radio 10" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.IntercomPTT}"
+                    InputName="PTT Intercom Select" />
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Radio Channels"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RadioChannelUp}"
+                    InputName="Radio Channel Up" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
+                    InputName="Radio Channel Down" />
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Frequencies"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up100}"
+                    InputName="Up 100MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up10}"
+                    InputName="Up 10MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up1}"
+                    InputName="Up 1MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up01}"
+                    InputName="Up 0.1MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up001}"
+                    InputName="Up 0.01MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Up0001}"
+                    InputName="Up 0.001MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down0001}"
+                    InputName="Down 0.001MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down001}"
+                    InputName="Down 0.01MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down01}"
+                    InputName="Up 0.1MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down1}"
+                    InputName="Down 1MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down10}"
+                    InputName="Down 10MHz" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Down100}"
+                    InputName="Down 100MHz" />
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Others / Unused"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.ToggleGuard}"
+                    InputName="Toggle Guard" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.ToggleEncryption}"
+                    InputName="Toggle Encryption" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyIncrease}"
+                    InputName="Encryption Key Up" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.EncryptionKeyDecrease}"
+                    InputName="Encryption Key Down" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.TransponderIDENT}"
+                    InputName="Transponder Toggle" />
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                <Separator
+                    BorderBrush="White"
+                    BorderThickness="25"
+                    VerticalAlignment="Bottom" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

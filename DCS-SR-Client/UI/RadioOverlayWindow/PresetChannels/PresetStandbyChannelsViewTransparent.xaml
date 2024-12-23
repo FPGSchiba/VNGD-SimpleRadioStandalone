@@ -1,0 +1,44 @@
+﻿<UserControl
+    x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels.PresetStandbyChannelsViewTransparent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
+    xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
+    d:DataContext="{d:DesignInstance presetChannels:PresetStandbyChannelsViewModel, IsDesignTimeCreatable=False}"
+    d:DesignHeight="10"
+    mc:Ignorable="d"
+    Height="10"
+    Width="12">
+    <WrapPanel HorizontalAlignment="Center"
+               Background="#444"
+               Orientation="Horizontal"
+               Width="12">
+        <ComboBox x:Name="FrequencyDropDown"
+                  Width="12"
+                  Height="10"
+                  FontSize="12"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
+                  ItemsSource="{Binding PresetChannels}"
+                  SelectedItem="{Binding SelectedPresetChannel}" 
+                  ToolTip="Select a predefined radio frequency via a dropdown menu" SelectionChanged="FrequencyDropDown_SelectionChanged"/>
+
+        <!--<Button Name="ReloadButton"
+                Width="8"
+                Height="10"
+                FontSize="6"
+                Padding="0"
+                VerticalAlignment="Center"
+                Margin="0,0,0,0"
+                HorizontalAlignment="Center"
+                Command="{Binding Path=ReloadCommand}"
+                Content="R"
+                Style="{x:Null}" 
+                ToolTip="Refresh the channel dropdown list"/>-->
+
+    </WrapPanel>
+</UserControl>

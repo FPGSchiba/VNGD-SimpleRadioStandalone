@@ -7,14 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Newtonsoft.Json;
 using NLog;
 
@@ -36,8 +31,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
         public void Start()
         {
-            
-
             Task.Factory.StartNew(() =>
             {
                 while (!_stop)
@@ -48,6 +41,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
                         var localEp = new IPEndPoint(IPAddress.Any,
                             _globalSettings.GetNetworkSetting(GlobalSettingsKeys.VAICOMIncomingUDP));
                         _vaicomUDPListener = new UdpClient(localEp);
+                        Logger.Info($"Vaicom UPD Listener listening on: {localEp.Address}:{localEp.Port}");
                         break;
                     }
                     catch (Exception ex)
@@ -69,6 +63,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
                             if (vaicomMessageWrapper != null )
                             {
+                                Logger.Debug(vaicomMessageWrapper.ToString());
+
                                 if (vaicomMessageWrapper.MessageType == 1)
                                 {
                                     if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VAICOMTXInhibitEnabled))

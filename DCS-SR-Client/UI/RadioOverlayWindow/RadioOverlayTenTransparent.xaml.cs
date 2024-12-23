@@ -186,22 +186,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 {
                     if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
                     {
-                        ControlText.Text = "10 Radio Panel Transparent";
+                        ControlText.Text = "Compact Radio Panel - Original";
                     }
                     else
                     {
-                        ControlText.Text = "10 Radio Panel Transparent";
+                        ControlText.Text = "Compact Radio Panel - Original";
                     }
                 }
                 else
                 {
-                    ControlText.Text = "10 Radio Panel Transparent (Disconnected)";
+                    ControlText.Text = "Compact Radio Panel - Original (Disconnected)";
                     
                 }
             }
             else
             {
-                ControlText.Text = "10 Radio Panel Transparent (Disconnected)";
+                ControlText.Text = "Compact Radio Panel - Original (Disconnected)";
             }
 
             FocusDCS();
@@ -362,9 +362,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //Header
             ControlText.Opacity = e.NewValue;
             Orientation.Opacity = e.NewValue;
-            buttonAbout.Opacity = e.NewValue;
             buttonMinimize.Opacity = e.NewValue;
             buttonClose.Opacity = e.NewValue;
+            buttonExpand.Opacity = e.NewValue;
 
             //Radio 1
             Radio1.RadioEnabled.Opacity = e.NewValue;
@@ -557,6 +557,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             //reset last focus so we dont switch back to dcs while dragging
             _lastFocus = DateTime.Now.Ticks;
+        }
+
+        private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 15);
         }
     }
 }

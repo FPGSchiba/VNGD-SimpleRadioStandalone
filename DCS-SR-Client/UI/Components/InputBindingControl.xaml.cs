@@ -2,15 +2,17 @@
 using System.Windows;
 using System.Windows.Controls;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 {
     /// <summary>
     ///     Interaction logic for InputBindingControl.xaml
     /// </summary>
     public partial class InputBindingControl : UserControl
     {
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private InputDeviceManager _inputDeviceManager;
 
         public InputBindingControl()
@@ -39,8 +41,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             ModifierBinding = (InputBinding)((int)ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
-
-            // TODO: Add Hardcoded default values for Keybinds here...
             
             if (currentInputProfile != null)
             {
@@ -87,6 +87,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 DeviceText.Text = GetDeviceText(device.Button, device.DeviceName);
 
                 device.InputBind = ControlInputBinding;
+                _logger.Debug($"Setting Input binding for device: {device.DeviceName}-{device.Button} to input bind: {device.InputBind}");
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
             });

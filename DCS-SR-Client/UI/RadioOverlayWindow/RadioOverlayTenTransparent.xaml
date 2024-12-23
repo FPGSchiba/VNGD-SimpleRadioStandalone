@@ -50,7 +50,7 @@
                 FontSize="8"
                 Foreground="#E7E7E7"
                 Padding="0"
-                Text="Transparent Radio Panel" />
+                Text="Compact Radio Panel - Original" />
             <TextBlock Name="Orientation"
                Visibility="Collapsed"
                Width="28"
@@ -62,21 +62,25 @@
                Foreground="#E7E7E7"
                Padding="0"
                Text="Vertical" />
-            <Button Name="buttonAbout"
-                Margin="0,0,0,0"
-                Click="Button_About"
-                Style="{StaticResource DarkStyle-Button}">
+
+            <Button
+                Click="ShowOverlayMenuSelect_OnClick"
+                Height="15"
+                Margin="0,0,3,0"
+                Style="{StaticResource DarkStyle-Button}"
+                VerticalAlignment="Center">
                 <Button.Content>
-                    <Grid Width="10" Height="10">
-                        <TextBlock HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontWeight="Bold"
-                       FontSize="10"
-                       Padding="0"
-                       Text="?" />
+                    <Grid Height="10" Width="10">
+                        <TextBlock
+                            FontSize="10"
+                            HorizontalAlignment="Center"
+                            Padding="0,0,0,1"
+                            Text="M"
+                            VerticalAlignment="Center" />
                     </Grid>
                 </Button.Content>
             </Button>
+
             <Button Name="buttonMinimize"
                 Margin="0,0,0,0"
                 Click="Button_Minimise"

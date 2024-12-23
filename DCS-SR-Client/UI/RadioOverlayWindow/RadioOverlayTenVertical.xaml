@@ -51,7 +51,7 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <TextBlock Name="ControlText"
-                       Width="250"
+                       Width="230"
                        Height="12"
                        Margin="5,0,0,0"
                        VerticalAlignment="Center"
@@ -68,7 +68,7 @@
                   Foreground="#E7E7E7"
                   Padding="0"
                   Text="Vertical" />
-            <Button Margin="0,0,0,0"
+            <Button Margin="0,0,2,0"
                    Height="15"
                    Click="Button_Swap_Orientation"
                    Style="{StaticResource DarkStyle-Button}"
@@ -79,6 +79,25 @@
                     </Grid>
                 </Button.Content>
             </Button>
+
+            <Button
+                Click="ShowOverlayMenuSelect_OnClick"
+                Height="15"
+                Margin="0,0,5,0"
+                Style="{StaticResource DarkStyle-Button}"
+                VerticalAlignment="Center">
+                <Button.Content>
+                    <Grid Height="10" Width="10">
+                        <TextBlock
+                            FontSize="10"
+                            HorizontalAlignment="Center"
+                            Padding="0,0,0,1"
+                            Text="M"
+                            VerticalAlignment="Center" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"

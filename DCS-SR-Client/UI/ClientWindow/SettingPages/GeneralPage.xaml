@@ -1,0 +1,26 @@
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage.GeneralPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage"
+      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
+      mc:Ignorable="d"
+      Title="GeneralPage" Height="270" Width="415">
+    <Grid>
+        <ScrollViewer>
+            <StackPanel>
+                <components:ToggleGlobalSetting Height="50" Title="Start Minimized" SettingKey="StartMinimised" />
+                <components:ToggleGlobalSetting Height="50" Title="Minimize to Tray" SettingKey="MinimiseToTray" />
+                <components:ToggleGlobalSetting Height="50" Title="Show Transmitter Name" SubTitle="Requires Server Setting ON too" SettingKey="ShowTransmitterName"/>
+                <components:ToggleGlobalSetting Height="50" Title="Play Connection Sounds" SettingKey="PlayConnectionSounds" />
+                <components:ToggleGlobalSetting Height="50" Title="Radio Switch works as Push to Talk (PTT)" SettingKey="AllowRecording" />
+                <components:ToggleGlobalSetting Height="50" Title="Allow Anonymous Usage Stats" SettingKey="AllowRecording" />
+                <Separator
+                    BorderBrush="White"
+                    BorderThickness="25"
+                    VerticalAlignment="Bottom" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -30,8 +30,10 @@ set "releasesArchiveName=.\Vanguard-SRS-%version%.zip"
 :: Set to quiet, redirected to NUL for batch file testing - change if needed
 
 nuget restore
-msbuild -v:q /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false /p:Version=%version% > NUL
-if %errorlevel% neq 0 then goto builderror
+msbuild -v:q /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false /p:Version=%version% > NULL
+IF NOT errorlevel 0 (
+    goto msbuilderror
+) 
 echo msbuild completed with no error level
 
 
@@ -64,7 +66,9 @@ echo Copied Presets to Release
 
 :: Final release archive
 tar -acf %releasesArchiveName% %releasesFolderName%
-if %errorlevel% neq 0 then goto tarerror
+IF NOT errorlevel 0 (
+    goto tarerror
+)
 
 ::Cleanup - when I know what to clean up
 

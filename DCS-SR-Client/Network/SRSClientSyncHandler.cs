@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.LotATC;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
@@ -27,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
     public class SRSClientSyncHandler
     {
         public delegate void ConnectCallback(bool result, bool connectionError, string connection);
-        public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition);
+        public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition, bool error = false);
         public delegate void UpdateUICallback();
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -39,7 +37,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private ConnectCallback _callback;
         private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
         private UpdateUICallback _updateUICallback;
-        private readonly DCSRadioSyncHandler.NewAircraft _newAircraft;
         private IPEndPoint _serverEndpoint;
         private TcpClient _tcpClient;
 
@@ -49,7 +46,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
 
         private DCSRadioSyncManager _radioDCSSync = null;
-        private LotATCSyncHandler _lotATCSync;
 
         private static readonly int MAX_DECODE_ERRORS = 5;
         private VAICOMSyncHandler _vaicomSync;
@@ -57,13 +53,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private DispatcherTimer _idleTimeout;
 
-        public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback, DCSRadioSyncHandler.NewAircraft _newAircraft)
+        public SRSClientSyncHandler(string guid, UpdateUICallback uiCallback)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
-            this._newAircraft = _newAircraft;
 
-            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) {Interval = TimeSpan.FromSeconds(1)};
+            _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
             _idleTimeout.Interval = TimeSpan.FromSeconds(10);
         }
@@ -137,11 +132,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 _radioDCSSync.Stop();
                 _radioDCSSync = null;
             }
-            if (_lotATCSync != null)
-            {
-                _lotATCSync.Stop();
-                _lotATCSync = null;
-            }
             if (_vaicomSync != null)
             {
                 _vaicomSync.Stop();
@@ -150,8 +140,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
             bool connectionError = false;
 
-            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate, _guid,_newAircraft);
-            _lotATCSync = new LotATCSyncHandler(ClientCoalitionUpdate, _guid);
+            _radioDCSSync = new DCSRadioSyncManager(ClientRadioUpdated, ClientCoalitionUpdate);
             _vaicomSync = new VAICOMSyncHandler();
 
             using (_tcpClient = new TcpClient())
@@ -167,7 +156,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     if (_tcpClient.Connected)
                     {
                         _radioDCSSync.Start();
-                        _lotATCSync.Start();
                         _vaicomSync.Start();
 
                         _tcpClient.NoDelay = true;
@@ -191,7 +179,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
 
             _radioDCSSync.Stop();
-            _lotATCSync.Stop();
             _vaicomSync.Stop();
             _idleTimeout?.Stop();
 
@@ -241,14 +228,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 message.Client.LatLngPosition = new DCSLatLngPosition();
             }
 
-            SendToServer(message);    
+            SendToServer(message);
         }
 
         private void ClientCoalitionUpdate()
         {
             var sideInfo = _clientStateSingleton.PlayerCoaltionLocationMetadata;
 
-            var message =  new NetworkMessage
+            var message = new NetworkMessage
             {
                 Client = new SRClient
                 {
@@ -284,16 +271,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             }
             catch (Exception ex)
             {
-                 Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
+                Logger.Error(ex, "Failed to update UI after connection callback (result {result}, connectionError {connectionError})", result, connectionError);
             }
         }
 
-        private void CallExternalAWACSModeOnMain(bool result, int coalition)
+        private void CallExternalAWACSModeOnMain(bool result, int coalition, bool error = false)
         {
             try
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                    new ThreadStart(delegate { _externalAWACSModeCallback(result, coalition); }));
+                    new ThreadStart(delegate { _externalAWACSModeCallback(result, coalition, error); }));
             }
             catch (Exception)
             {
@@ -361,7 +348,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             _serverSettings.Decode(serverMessage.ServerSettings);
                                         }
-                                        
+
                                         if (_clients.ContainsKey(serverMessage.Client.ClientGuid))
                                         {
                                             var srClient = _clients[serverMessage.Client.ClientGuid];
@@ -416,6 +403,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after Update message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 
@@ -466,6 +456,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after SYNC message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 
@@ -481,6 +474,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         if (_clientStateSingleton.ExternalAWACSModelSelected &&
                                             !_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE))
                                         {
+                                            Logger.Debug("Closing AWACS Mode after Server Settings message...");
+                                            Logger.Debug($"Mode selected: {_clientStateSingleton.ExternalAWACSModelSelected}");
+                                            Logger.Debug($"Server AWACS Settings: {_serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE)}");
                                             DisconnectExternalAWACSMode();
                                         }
 
@@ -510,7 +506,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         {
                                             Logger.Info("External AWACS mode authentication failed");
 
-                                            CallExternalAWACSModeOnMain(false, 0);
+                                            CallExternalAWACSModeOnMain(false, 0, true);
                                         }
                                         else if (_radioDCSSync != null && _radioDCSSync.IsListening)
                                         {
@@ -586,7 +582,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 
                 if (message.MsgType == NetworkMessage.MessageType.RADIO_UPDATE)
                 {
-                    Logger.Debug("Sending Radio Update To Server: "+ (json));
+                    Logger.Debug("Sending Radio Update To Server: " + (json));
                 }
 
                 var bytes = Encoding.UTF8.GetBytes(json);

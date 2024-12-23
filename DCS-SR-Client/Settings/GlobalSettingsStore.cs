@@ -31,6 +31,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         #region Radio panel settings
 
+        // --------- Radio Selection Menu -----------
+        // Radio Selection Menu
+        RadioMenuSelectX,
+        RadioMenuSelectY,
+        RadioMenuSelectSize,
+        RadioMenuSelectOpacity,
+        RadioMenuSelectWidth,
+        RadioMenuSelectHeight,
+
+        // --------- Dragable Panels --------------
+        // Radio Dragable
+        RadioOverlayWindowDragableX,
+        RadioOverlayWindowDragableY,
+        RadioOverlayWindowDragableSize,
+        RadioOverlayWindowOpacity,
+        RadioOverlayWindowDragableWidth,
+        RadioOverlayWindowDragableHeight,
+
         // --------- Vertical Panels --------------
         // Radio 1V
         RadioOneVerticalX,
@@ -88,6 +106,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         RadioTenTransparentTextOpacity,
         RadioTenTransparentWidth,
         RadioTenTransparentHeight,
+
+        // Radio 10S
+        RadioTenSwitchX,
+        RadioTenSwitchY,
+        RadioTenSwitchSize,
+        RadioTenSwitchBackgroundOpacity,
+        RadioTenSwitchTextOpacity,
+        RadioTenSwitchWidth,
+        RadioTenSwitchHeight,
+
+        // Radio Engineering
+        RadioEngineeringX,
+        RadioEngineeringY,
+        RadioEngineeringSize,
+        RadioEngineeringBackgroundOpacity,
+        RadioEngineeringTextOpacity,
+        RadioEngineeringWidth,
+        RadioEngineeringHeight,
 
         // --------- Horizontal Panels --------------
         // Radio 1H
@@ -333,7 +369,93 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         ModifierIntercomPTT = 236,
 
         AwacsOverlayToggle = 137,
-        ModifierAwacsOverlayToggle = 237
+        ModifierAwacsOverlayToggle = 237,
+
+        //New keybindings that Dabble added
+
+        RadioSwap = 138,           //Dabble Added - Swaps active radio standby and active radio frequencies
+        ModifierRadioSwap= 238,     //Dabble Added
+
+        //Toggle Standard Radio Panels (all added by Dabble)
+        Radio1HToggle = 139,
+        ModifierRadio1HToggle = 239,
+
+        Radio1VToggle = 140,
+        ModifierRadio1VToggle = 240,
+
+        Radio2VToggle = 141,
+        ModifierRadio2VToggle = 241,
+
+        Radio2HToggle = 142,
+        ModifierRadio2HToggle = 242,
+
+        Radio3VToggle = 143,
+        ModifierRadio3VToggle = 243,
+
+        Radio3HToggle = 144,
+        ModifierRadio3HToggle = 244,
+
+        Radio5VToggle = 145,
+        ModifierRadio5VToggle = 245,
+
+        Radio5HToggle = 146,
+        ModifierRadio5HToggle = 246,
+
+        Radio10VToggle = 147,
+        ModifierRadio10VToggle = 247,
+
+        Radio10HToggle = 148,
+        ModifierRadio10HToggle = 248,
+
+        //Ultrawide Panels
+
+        Radio10VLToggle = 149,
+        ModifierRadio10VLToggle = 249,
+
+        Radio10HWToggle = 150,
+        ModifierRadio10HWToggle = 250,
+
+        //Compact Panels
+
+        Radio10TToggle = 151,
+        ModifierRadio10TToggle = 251,
+
+        Radio10SToggle = 152,
+        ModifierRadio10SToggle = 252,
+
+        //Left & Right Radio Balancing
+        LeftBalance = 153,
+        ModifierLeftBalance = 253,
+
+        RightBalance = 154,
+        ModifierRightBalance = 254,
+
+        CenterBalance = 155,
+        ModifierCenterBalance = 255,
+
+        // Night Mode
+        PanelNightMode = 156,
+        ModifierPanelNightMode = 157
+        
+    }
+
+    public class GlobalSection
+    {
+        private GlobalSection(string value)
+        {
+            Value = value;
+        }
+
+        public string Value { get; private set; }
+
+        public static GlobalSection PositionSettings => new GlobalSection("Position Settings");
+        public static GlobalSection ClientSettings => new GlobalSection("Client Settings");
+        public static GlobalSection NetworkSettings => new GlobalSection("Network Settings");
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 
 
@@ -395,10 +517,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {
                 Logger.Info($"Did not find client config file at path ${Path}/${ConfigFileName}, initialising with default config");
 
-                _configuration = new Configuration();
-                _configuration.Add(new Section("Position Settings"));
-                _configuration.Add(new Section("Client Settings"));
-                _configuration.Add(new Section("Network Settings"));
+                _configuration = new Configuration
+                {
+                    new Section(GlobalSection.PositionSettings.Value),
+                    new Section(GlobalSection.ClientSettings.Value),
+                    new Section(GlobalSection.NetworkSettings.Value)
+                };
 
                 Save();
             }
@@ -493,7 +617,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetClientSetting(GlobalSettingsKeys key, string[] strArray)
         {
-            SetSetting("Client Settings", key.ToString(), strArray);
+            SetSetting(GlobalSection.ClientSettings, key.ToString(), strArray);
         }
 
         private readonly Dictionary<string, string> defaultGlobalSettings = new Dictionary<string, string>()
@@ -633,8 +757,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             // Radio Toggle Settings
             {GlobalSettingsKeys.Radio1Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio2Enabled.ToString(), "true"},
-            {GlobalSettingsKeys.Radio3Enabled.ToString(), "true"},
+            {GlobalSettingsKeys.Radio2Enabled.ToString(), "false"},
+            {GlobalSettingsKeys.Radio3Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio4Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio5Enabled.ToString(), "false"},
             {GlobalSettingsKeys.Radio6Enabled.ToString(), "false"},
@@ -713,13 +837,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public Setting GetPositionSetting(GlobalSettingsKeys key)
         {
-            return GetSetting("Position Settings", key.ToString());
+            return GetSetting(GlobalSection.PositionSettings, key.ToString());
         }
 
         public void SetPositionSetting(GlobalSettingsKeys key, double value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
-            SetSetting("Position Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+            SetSetting(GlobalSection.PositionSettings, key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
         public int GetClientSettingInt(GlobalSettingsKeys key)
@@ -729,7 +853,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (int)val;
             }
 
-            var setting = GetSetting("Client Settings", key.ToString());
+            var setting = GetSetting(GlobalSection.ClientSettings, key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 return 0;
@@ -745,7 +869,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (double)val;
             }
 
-            var setting = GetSetting("Client Settings", key.ToString());
+            var setting = GetSetting(GlobalSection.ClientSettings, key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 return 0D;
@@ -760,7 +884,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (bool)val;
             }
 
-            var setting = GetSetting("Client Settings", key.ToString());
+            var setting = GetSetting(GlobalSection.ClientSettings, key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 return false;
@@ -771,36 +895,36 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public Setting GetClientSetting(GlobalSettingsKeys key)
         {
-            return GetSetting("Client Settings", key.ToString());
+            return GetSetting(GlobalSection.ClientSettings, key.ToString());
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, string value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(GlobalSection.ClientSettings, key.ToString(), value);
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, bool value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(GlobalSection.ClientSettings, key.ToString(), value);
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, int value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(GlobalSection.ClientSettings, key.ToString(), value);
         }
 
         public void SetClientSetting(GlobalSettingsKeys key, double value)
         {
             _settingsCache.TryRemove(key.ToString(), out _);
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(GlobalSection.ClientSettings, key.ToString(), value);
         }
 
         public int GetNetworkSetting(GlobalSettingsKeys key)
         {
-            var networkSetting = GetSetting("Network Settings", key.ToString());
+            var networkSetting = GetSetting(GlobalSection.NetworkSettings, key.ToString());
 
             if (networkSetting == null || networkSetting.RawValue.Length == 0)
             {
@@ -813,22 +937,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetNetworkSetting(GlobalSettingsKeys key, int value)
         {
-            SetSetting("Network Settings", key.ToString(), value.ToString(CultureInfo.InvariantCulture));
+            SetSetting(GlobalSection.NetworkSettings, key.ToString(), value.ToString(CultureInfo.InvariantCulture));
         }
 
-        private Setting GetSetting(string section, string setting)
+        private Setting GetSetting(GlobalSection section, string setting)
         {
-            if (!_configuration.Contains(section))
+            if (!_configuration.Contains(section.Value))
             {
-                _configuration.Add(section);
+                _configuration.Add(section.Value);
             }
 
-            if (!_configuration[section].Contains(setting))
+            if (!_configuration[section.Value].Contains(setting))
             {
                 if (defaultGlobalSettings.ContainsKey(setting))
                 {
                     //save
-                    _configuration[section]
+                    _configuration[section.Value]
                         .Add(new Setting(setting, defaultGlobalSettings[setting]));
 
                     Save();
@@ -836,65 +960,64 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 else if(defaultArraySettings.ContainsKey(setting))
                 {
                     //save
-                    _configuration[section]
+                    _configuration[section.Value]
                         .Add(new Setting(setting, defaultArraySettings[setting]));
 
                     Save();
                 }
                 else
                 {
-                    _configuration[section]
+                    _configuration[section.Value]
                         .Add(new Setting(setting, ""));
                     Save();
                 }
             }
 
-            return _configuration[section][setting];
+            return _configuration[section.Value][setting];
         }
 
-        private void SetSetting(string section, string key, object setting)
+        private void SetSetting(GlobalSection section, string key, object setting)
         {
             if (setting == null)
             {
                 setting = "";
             }
-            if (!_configuration.Contains(section))
+            if (!_configuration.Contains(section.Value))
             {
-                _configuration.Add(section);
+                _configuration.Add(section.Value);
             }
 
-            if (!_configuration[section].Contains(key))
+            if (!_configuration[section.Value].Contains(key))
             {
-                _configuration[section].Add(new Setting(key, setting));
+                _configuration[section.Value].Add(new Setting(key, setting));
             }
             else
             {
                 
-                if (setting is bool)
+                if (setting is bool booleanSetting)
                 {
-                    _configuration[section][key].BoolValue = (bool) setting ;
+                    _configuration[section.Value][key].BoolValue = booleanSetting ;
                 }
-                else if (setting.GetType() == typeof(string))
+                else if (setting is string stringSetting)
                 {
-                    _configuration[section][key].StringValue = setting as string;
+                    _configuration[section.Value][key].StringValue = stringSetting;
                 }
-                else if(setting is string[])
+                else if(setting is string[] stringArraySetting)
                 {
-                    _configuration[section][key].StringValueArray = setting as string[];
+                    _configuration[section.Value][key].StringValueArray = stringArraySetting;
                 }
-                else if (setting is int)
+                else if (setting is int intSetting)
                 {
-                    _configuration[section][key].IntValue = (int)setting;
+                    _configuration[section.Value][key].IntValue = intSetting;
                 }
-                else if (setting is double)
+                else if (setting is double doubleSetting)
                 {
-                    _configuration[section][key].DoubleValue = (double)setting;
+                    _configuration[section.Value][key].DoubleValue = doubleSetting;
                 }
                 else
                 {
                     Logger.Error("Unknown Setting Type - Not Saved ");
                 }
-                
             }
 
             Save();

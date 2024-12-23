@@ -1,0 +1,90 @@
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages.ServerDetailsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Title="ServerDetailsPage" Height="270" Width="415">
+    <ScrollViewer>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="70"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+            
+            <Label Grid.Row="0" Grid.Column="0" FontSize="14" Content="Coalition Security" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="0" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="CoalitionSecurity" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="1" Grid.Column="0" FontSize="14" Content="Spectator Audio" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="SpectatorAudio" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="2" Grid.Column="0" FontSize="14" Content="Line of Sight" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="LineOfSight" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="3" Grid.Column="0" FontSize="14" Content="Distance Limitations" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="DistanceLimitations" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="4" Grid.Column="0" FontSize="14" Content="IRL Radio Tx Behaviour" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="4" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="RealRadioBehaviour" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="5" Grid.Column="0" FontSize="14" Content="IRL Radio Rx Interfence" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="5" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="RealRadioInterface" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="6" Grid.Column="0" FontSize="14" Content="Radio Expansion" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="6" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="RadioExpansion" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="7" Grid.Column="0" FontSize="14" Content="External AWACS Mode" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="7" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="ExternalMode" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="8" Grid.Column="0" FontSize="14" Content="Allow Radio Encryption" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="8" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="RadioEncryption" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="9" Grid.Column="0" FontSize="14" Content="Strict Radio Encryption" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="9" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="StrictEncryption" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="10" Grid.Column="0" FontSize="14" Content="Show Tuned Client Count" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="10" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="TunedClientCount" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="11" Grid.Column="0" FontSize="14" Content="Show Transmitter Name" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Button Grid.Row="11" Grid.Column="1" Content="OFF" Style="{StaticResource MaterialDesignRaisedLightButton}" BorderBrush="Black" BorderThickness="1" IsEnabled="False" Opacity="1" x:Name="TransmitterName" Margin="0,0,10,0"  />
+            <Separator VerticalAlignment="Bottom" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="12" Grid.Column="0" FontSize="14" Content="Server Version" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Label Grid.Row="12" Grid.Column="1" Content="none" Foreground="#555" x:Name="ServerVersion" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <Separator VerticalAlignment="Bottom" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" />
+            
+            <Label Grid.Row="13" Grid.Column="0" FontSize="14" Content="Retransmit Node Limit" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <Label Grid.Row="13" Grid.Column="1" Content="none" Foreground="#555" x:Name="RetransmitLimit" VerticalAlignment="Center" Margin="0,0,10,0" />
+        </Grid>
+    </ScrollViewer>
+</Page>

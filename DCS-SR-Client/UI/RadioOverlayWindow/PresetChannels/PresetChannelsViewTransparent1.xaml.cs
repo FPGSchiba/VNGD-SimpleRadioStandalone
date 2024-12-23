@@ -14,5 +14,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
             //set to window width
             //FrequencyDropDown.Width = Width;
         }
+
+        private void FrequencyDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
