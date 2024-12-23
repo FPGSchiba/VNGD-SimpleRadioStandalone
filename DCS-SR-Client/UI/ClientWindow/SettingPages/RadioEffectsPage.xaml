@@ -1,12 +1,195 @@
-﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage.RadioEffectsPage"
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages.RadioEffectsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
       mc:Ignorable="d"
-      Title="RadioEffectsPage" Height="450" Width="800">
-    <Grid>
-        <TextBlock>Radio Effects</TextBlock>
-    </Grid>
+      Title="RadioEffectsPage" Height="275" Width="415">
+    <ScrollViewer>
+        <StackPanel>
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Radio Transmit (TX) Effects" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button
+                        Width="55"
+                        Content="Start"
+                        Padding="0"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        Background="#E8DEF8"
+                        Foreground="Black"
+                        BorderBrush="#79747E"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,20,0"
+                        Click="TxStart_OnClick"
+                        x:Name="TxStart"/>
+                    <Button
+                        Width="55"
+                        Content="End"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        Background="#E8DEF8"
+                        Foreground="Black"
+                        BorderBrush="#79747E"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center"
+                        Click="TxEnd_OnClick"
+                        x:Name="TxEnd"/>
+                </StackPanel>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Radio Receive (RX) Effects" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button
+                        Width="55"
+                        Content="Start"
+                        Padding="0"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        Background="#E8DEF8"
+                        Foreground="Black"
+                        BorderBrush="#79747E"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,20,0"
+                        Click="RxStart_OnClick"
+                        x:Name="RxStart"/>
+                    <Button
+                        Width="55"
+                        Content="End"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        Background="#E8DEF8"
+                        Foreground="Black"
+                        BorderBrush="#79747E"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center"
+                        Click="RxEnd_OnClick"
+                        x:Name="RxEnd"/>
+                </StackPanel>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Radio Transmit Start Sound" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <ComboBox
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="131"
+                    Height="30"
+                    Padding="5"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    x:Name="RadioStartTransmitEffect"/>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Radio Transmit End Sound" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <ComboBox
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="131"
+                    Height="30"
+                    Padding="5"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    x:Name="RadioEndTransmitEffect"/>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Intercom Transmit Start Sound" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <ComboBox
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="131"
+                    Height="30"
+                    Padding="5"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    x:Name="IntercomStartTransmitEffect"/>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="255" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Intercom Transmit End Sound" FontWeight="Bold" VerticalAlignment="Center" />
+                
+                <ComboBox
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="131"
+                    Height="30"
+                    Padding="5"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    x:Name="IntercomEndTransmitEffect"/>
+            </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleProfileSetting Height="50" Title="Radio Encryption Effects" SubTitle="Requires Tx or Rx effects on" SettingKey="RadioEncryptionEffects" />
+            <components:ToggleProfileSetting Height="50" Title="Enable Radio Voice Effect" SubTitle="Client Side Only" SettingKey="RadioEffects" />
+            <components:ToggleProfileSetting Height="50" Title="Enable Clipping Effect" SubTitle="Requires Radio Effects On!" SettingKey="RadioEffectsClipping" />
+            
+            <Separator
+                BorderBrush="White"
+                BorderThickness="25"
+                VerticalAlignment="Bottom" />
+        </StackPanel>
+    </ScrollViewer>
 </Page>

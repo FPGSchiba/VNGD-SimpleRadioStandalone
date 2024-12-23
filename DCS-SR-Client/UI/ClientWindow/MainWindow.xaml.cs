@@ -1407,7 +1407,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
             ConnectedClientsSingleton.Instance.NotifyAll();
-
         }
 
         private void InitSettingsScreen()
@@ -1445,8 +1444,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
             RecordingQuality.IsEnabled = false;
             RecordingQuality.ValueChanged += RecordingQuality_ValueChanged;
-            RecordingQuality.Value = double.Parse(
-                _globalSettings.GetClientSetting(GlobalSettingsKeys.RecordingQuality).StringValue[1].ToString());
+            RecordingQuality.Value = double.Parse(_globalSettings.GetClientSetting(GlobalSettingsKeys.RecordingQuality).StringValue[1].ToString());
             RecordingQuality.IsEnabled = true;
 
             var objValue = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\DCS-SR-Standalone", "SRSAnalyticsOptOut", "FALSE");

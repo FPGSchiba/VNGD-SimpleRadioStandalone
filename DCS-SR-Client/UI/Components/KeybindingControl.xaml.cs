@@ -31,8 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 
         public void LoadInputSettings()
         {
-            DeviceLabel.Content = InputName;
-            ModifierLabel.Content = "        + Modifier";
+            InputNameText.Content = InputName;
             ModifierBinding = (InputBinding)((int)ControlInputBinding) + 100; //add 100 gets the enum of the modifier
 
             var currentInputProfile = GlobalSettingsStore.Instance.ProfileSettingsStore.GetCurrentInputProfile();
@@ -43,43 +42,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                 if (currentInputProfile.ContainsKey(ControlInputBinding))
                 {
                     var button = devices[ControlInputBinding].Button;
-                    DeviceText.Text =
-                        GetDeviceText(button, devices[ControlInputBinding].DeviceName);
-                    Device.Text = GetDeviceName(devices[ControlInputBinding].DeviceName);
+                    PrimaryButton.Content = $"{GetDeviceText(button, devices[ControlInputBinding].DeviceName)} ({GetDeviceName(devices[ControlInputBinding].DeviceName)})";
                 }
                 else
                 {
-                    DeviceText.Text = "None";
-                    Device.Text = "None";
+                    PrimaryButton.Content = "None (None)";
                 }
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
                 {
                     var button = devices[ModifierBinding].Button;
-                    ModifierText.Text =
-                        GetDeviceText(button, devices[ModifierBinding].DeviceName);
-                    ModifierDevice.Text = GetDeviceName(devices[ModifierBinding].DeviceName);
+                    ModifierButton.Content = $"{GetDeviceText(button, devices[ModifierBinding].DeviceName)} ({GetDeviceName(devices[ModifierBinding].DeviceName)})";
                 }
                 else
                 {
-                    ModifierText.Text = "None";
-                    ModifierDevice.Text = "None";
+                    ModifierButton.Content = "None (None)";
                 }
             }
         }
 
         private void Device_Click(object sender, RoutedEventArgs e)
         {
-            DeviceClear.IsEnabled = false;
-            DeviceButton.IsEnabled = false;
+            PrimaryButton.IsEnabled = false;
 
             InputDeviceManager.AssignButton(device =>
             {
-                DeviceClear.IsEnabled = true;
-                DeviceButton.IsEnabled = true;
-
-                Device.Text = GetDeviceName(device.DeviceName);
-                DeviceText.Text = GetDeviceText(device.Button, device.DeviceName);
+                PrimaryButton.IsEnabled = true;
+                
+                if ((Key)device.Button == Key.Escape)
+                {
+                    DeviceClear_Click(sender, e);
+                    return;
+                }
+                
+                PrimaryButton.Content = $"{GetDeviceText(device.Button, device.DeviceName)} ({GetDeviceName(device.DeviceName)})";
 
                 device.InputBind = ControlInputBinding;
                 _logger.Debug($"Setting Input binding for device: {device.DeviceName}-{device.Button} to input bind: {device.InputBind}");
@@ -127,22 +123,24 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
         {
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ControlInputBinding);
 
-            Device.Text = "None";
-            DeviceText.Text = "None";
+            PrimaryButton.Content = "None (None)";
         }
 
         private void Modifier_Click(object sender, RoutedEventArgs e)
         {
-            ModifierButtonClear.IsEnabled = false;
             ModifierButton.IsEnabled = false;
 
             InputDeviceManager.AssignButton(device =>
             {
-                ModifierButtonClear.IsEnabled = true;
                 ModifierButton.IsEnabled = true;
-
-                ModifierDevice.Text = device.DeviceName;
-                ModifierText.Text = GetDeviceText(device.Button, device.DeviceName);
+                
+                if ((Key)device.Button == Key.Escape)
+                {
+                    ModifierClear_Click(sender, e);
+                    return;
+                }
+                
+                ModifierButton.Content = $"{GetDeviceText(device.Button, device.DeviceName)} ({GetDeviceName(device.DeviceName)})";
                 device.InputBind = ModifierBinding;
 
                 GlobalSettingsStore.Instance.ProfileSettingsStore.SetControlSetting(device);
@@ -151,9 +149,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
+            // TODO: A method to call this
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ModifierBinding);
-            ModifierDevice.Text = "None";
-            ModifierText.Text = "None";
+            ModifierButton.Content = "None (None)";
         }
     }
 }

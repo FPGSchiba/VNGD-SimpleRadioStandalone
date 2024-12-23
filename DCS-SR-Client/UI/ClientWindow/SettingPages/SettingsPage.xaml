@@ -164,7 +164,8 @@
             <TabItem
                 Height="40"
                 VerticalAlignment="Bottom"
-                Width="185">
+                Width="185"
+                IsEnabled="False">
                 <TabItem.Header>
                     <StackPanel
                         Margin="16,0,0,0"
@@ -189,7 +190,8 @@
             <TabItem
                 Height="40"
                 VerticalAlignment="Bottom"
-                Width="185">
+                Width="185"
+                IsEnabled="False">
                 <TabItem.Header>
                     <StackPanel
                         Margin="16,0,0,0"

@@ -16,6 +16,10 @@
                 <components:ToggleGlobalSetting Height="50" Title="Play Connection Sounds" SettingKey="PlayConnectionSounds" />
                 <components:ToggleGlobalSetting Height="50" Title="Radio Switch works as Push to Talk (PTT)" SettingKey="AllowRecording" />
                 <components:ToggleGlobalSetting Height="50" Title="Allow Anonymous Usage Stats" SettingKey="AllowRecording" />
+                <Separator
+                    BorderBrush="White"
+                    BorderThickness="25"
+                    VerticalAlignment="Bottom" />
             </StackPanel>
         </ScrollViewer>
     </Grid>
