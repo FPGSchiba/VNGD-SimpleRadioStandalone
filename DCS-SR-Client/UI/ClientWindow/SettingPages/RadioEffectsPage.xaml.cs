@@ -17,9 +17,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             InitializeComponent();
             
             TxStart.Background = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start) ? _enabledBrush : _disabledBrush;
+            TxStartText.Text = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start) ? "On" : "Off";
             TxEnd.Background = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End) ? _enabledBrush : _disabledBrush;
+            TxEndText.Text = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start) ? "On" : "Off";
             RxStart.Background = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start) ? _enabledBrush : _disabledBrush;
+            RxStartText.Text = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start) ? "On" : "Off";
             RxEnd.Background = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End) ? _enabledBrush : _disabledBrush;
+            RxEndText.Text = _globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start) ? "On" : "Off";
             
             RadioEndTransmitEffect.IsEnabled = false;
             RadioEndTransmitEffect.ItemsSource = CachedAudioEffectProvider.Instance.RadioTransmissionEnd;
@@ -49,6 +53,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             var enabled = !_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End);
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_End, enabled);
             TxEnd.Background = enabled ? _enabledBrush : _disabledBrush;
+            TxEndText.Text = enabled ? "On" : "Off";
         }
 
         private void TxStart_OnClick(object sender, RoutedEventArgs e)
@@ -56,6 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             var enabled = !_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start);
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioTxEffects_Start, enabled);
             TxStart.Background = enabled ? _enabledBrush : _disabledBrush;
+            TxStartText.Text = enabled ? "On" : "Off";
         }
 
         private void RxStart_OnClick(object sender, RoutedEventArgs e)
@@ -63,6 +69,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             var enabled = !_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start);
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_Start, enabled);
             RxStart.Background = enabled ? _enabledBrush : _disabledBrush;
+            RxStartText.Text = enabled ? "On" : "Off";
         }
 
         private void RxEnd_OnClick(object sender, RoutedEventArgs e)
@@ -70,6 +77,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             var enabled = !_globalSettings.ProfileSettingsStore.GetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End);
             _globalSettings.ProfileSettingsStore.SetClientSettingBool(ProfileSettingsKeys.RadioRxEffects_End, enabled);
             RxEnd.Background = enabled ? _enabledBrush : _disabledBrush;
+            RxEndText.Text = enabled ? "On" : "Off";
         }
     }
 }

@@ -1,23 +1,12 @@
 ﻿using NLog;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using MessageBox = System.Windows.MessageBox;
 
@@ -56,6 +45,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             if (Regex.Match(FleetCodeInput.Text, "^[A-Z0-9]{2,4}$").Success)
             {
                 var coalitionPassword = PasswordInput.Password;
+                if (string.IsNullOrEmpty(coalitionPassword))
+                {
+                    System.Windows.Forms.MessageBox.Show("Please enter a password. It is needed to connect to VCS-SRS.", "Missing Password",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
                 _logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: {playerName}, Password: {coalitionPassword}");
             
@@ -70,6 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
                         xa.AddressFamily ==
                         AddressFamily
                             .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+                    _mainWindow.ServerIp.Text = address;
                     _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
                 }
                 catch (SocketException ex)
@@ -85,8 +81,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
                     $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2-4 uppercase Letters", "Invalid Fleet-Code",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
-            
         }
 
         private string GetAddressFromTextBox()

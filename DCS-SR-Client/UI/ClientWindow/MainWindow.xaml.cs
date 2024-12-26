@@ -40,6 +40,7 @@ using Sentry;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage;
+using MaterialDesignThemes.Wpf;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {
@@ -88,6 +89,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private string _coalitionPassword = "";
         public LoginType LoginType { get; private set; }
         public DateTime ConnectedAt { get; private set; }
+        public string RawServerAddress;
 
         private int OpenPage
         {
@@ -95,7 +97,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set { SetValue(OPEN_PAGE_PROPERTY, value); }
         }
 
-        private int _oldOpenPage;
+        private int _oldOpenSupportPage;
+        private int _oldOpenSettingsPage;
 
         public static readonly DependencyProperty OPEN_PAGE_PROPERTY =
             DependencyProperty.Register(nameof(OpenPage),
@@ -1107,6 +1110,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 case HomePageIndex:
                     DisplayFrame.Content = _homePage;
                     break;
+                case SettingsIndex:
+                    DisplayFrame.Content = _settingsPage;
+                    break;
                 default:
                     _logger.Error($"Page: {index} could not be found.");
                     break;
@@ -1192,21 +1198,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             OpenPageByIndex(HomePageIndex);
         }
 
-        public void On_HomeSwitchClicked()
-        {
-            ToggleOverlay(true, 13);
-        }
-
-        public void On_HomeTransparentClicked()
-        {
-            ToggleOverlay(true, 12);
-        }
-        
-        public void On_HomeLayoutClicked()
-        {
-            ToggleOverlay(true, 5);
-        }
-
         public void On_HomeLogOutClicked()
         {
             ConnectAWACSMode();
@@ -1218,14 +1209,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (OpenPage != SupportIndex)
             {
-                DisplayFrame.Content = _supportPage;
-                _oldOpenPage = OpenPage;
-                OpenPage = SupportIndex;
+                if (OpenPage == SettingsIndex)
+                {
+                    SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.CogBox };
+                    _oldOpenSupportPage = _oldOpenSettingsPage;
+                }
+                else
+                {
+                    _oldOpenSupportPage = OpenPage;
+                }
+                OpenPageByIndex(SupportIndex);
+                SupportNavigation.Content = new PackIcon { Kind = PackIconKind.Headset };
+                
             }
             else
             {
-                OpenPageByIndex(_oldOpenPage);
-                _oldOpenPage = SupportIndex;
+                OpenPageByIndex(_oldOpenSupportPage);
+                SupportNavigation.Content = new PackIcon { Kind = PackIconKind.HelpCircleOutline };
             }
 
         }
@@ -1234,14 +1234,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             if (OpenPage != SettingsIndex)
             {
-                DisplayFrame.Content = _settingsPage;
-                _oldOpenPage = OpenPage;
-                OpenPage = SettingsIndex;
+                if (OpenPage == SupportIndex)
+                {
+                    SupportNavigation.Content = new PackIcon { Kind = PackIconKind.HelpCircleOutline };
+                    _oldOpenSettingsPage = _oldOpenSupportPage;
+                }
+                else
+                {
+                    _oldOpenSettingsPage = OpenPage;
+                }
+                OpenPageByIndex(SettingsIndex);
+                SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.Headset };
+                
             }
             else
             {
-                OpenPageByIndex(_oldOpenPage);
-                _oldOpenPage = SettingsIndex;
+                OpenPageByIndex(_oldOpenSettingsPage);
+                SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.CogBox };
             }
         }
 
@@ -2847,7 +2856,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
-                OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
+                OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
+                
+                ExternalAWACSModeName.Text = ClientState.LastSeenName;
+
                 _connectionAwacsSpan.Finish();
                 
                 SentrySdk.ConfigureScope(scope =>
@@ -2857,6 +2869,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Username = ClientState.LastSeenName
                     };
                 });
+                
+                _connectionTransaction.Finish();
             }
             else
             {
@@ -2892,8 +2906,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     scope.User = new SentryUser();
                 });
             }
-
-            _connectionTransaction.Finish();
         }
 
         private void RescanInputDevices(object sender, RoutedEventArgs e)
@@ -3184,10 +3196,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     BottomBar.Visibility = Visibility.Visible;
                     MainGrid.RowDefinitions[1].Height = new GridLength(365);
                     break;
-                case 1:
-                    Height = 700;
+                case 1: // Old UI
+                    Height = 750;
                     BottomBar.Visibility = Visibility.Collapsed;
-                    MainGrid.RowDefinitions[1].Height = new GridLength(680);
+                    MainGrid.RowDefinitions[1].Height = new GridLength(730);
                     break;
             }
         }

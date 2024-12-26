@@ -179,7 +179,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 if (radio != null)
                 {
                     RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? radioOn : radioOff;
-                    RadioEnabled.Content = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off";
+                    RadioEnabled.Content = new TextBlock
+                    {
+                        FontSize = 5,
+                        Text = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off",
+                    };
                 }
                 else
                 {
@@ -190,7 +194,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             else
             {
                 RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
             }
         }
 
@@ -447,13 +455,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
                 RadioEnabled.Background = radioOn;
-                RadioEnabled.Content = "On";
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "On",
+                };
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
                 RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
             }
         }
     }

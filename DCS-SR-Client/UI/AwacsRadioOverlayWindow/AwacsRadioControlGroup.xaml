@@ -235,7 +235,6 @@
                     <Button
                         Background="IndianRed"
                         Click="ToggleSwitch_Click"
-                        Content="Off"
                         FontSize="5"
                         Foreground="Black"
                         Height="10"
@@ -245,7 +244,11 @@
                         Name="RadioEnabled"
                         Padding="0"
                         Style="{StaticResource DarkStyle-Button}"
-                        Width="15" />
+                        Width="15" >
+                        <Button.Content>
+                            <TextBlock Text="Off" FontSize="5" />
+                        </Button.Content>
+                    </Button>
 
                     <Slider
                         Height="20"

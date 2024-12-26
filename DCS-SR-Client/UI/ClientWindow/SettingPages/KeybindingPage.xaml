@@ -55,6 +55,10 @@
                     InputName="Intercom Select" />
                 <components:KeybindingControl 
                     Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RadioSwap}"
+                    InputName="Swap Frequencies"/>
+                <components:KeybindingControl 
+                    Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.NextRadio}"
                     InputName="Select Next Radio" />
                 <components:KeybindingControl 
@@ -67,8 +71,20 @@
                     InputName="Radio Volume Up" />
                 <components:KeybindingControl 
                     Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.RightBalance}"
+                    InputName="Radio Balance Right"/>
+                <components:KeybindingControl 
+                    Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.RadioVolumeDown}"
                     InputName="Radio Volume Down" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.LeftBalance}"
+                    InputName="Radio Balance Left"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.CenterBalance}"
+                    InputName="Radio Balance Center"/>
                 <components:KeybindingControl 
                     Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"

@@ -394,13 +394,16 @@
                         Grid.Column="0" 
                         Grid.ColumnSpan="2"
                         FontSize="16"
+                        materialDesign:HintAssist.HelperText="0/4000 Characters"
                         materialDesign:HintAssist.Hint="Input your Feedback here"
                         AcceptsReturn="True"
                         SpellCheck.IsEnabled="True"
+                        TextChanged="FeedbackText_OnTextChanged"
                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
                         TextWrapping="Wrap"
                         VerticalScrollBarVisibility="Auto"
                         VerticalAlignment="Stretch"
+                        MaxLength="4000"
                         Margin="5,0,5,5"
                         x:Name="FeedbackText"
                     />
@@ -408,12 +411,14 @@
                         Grid.Row="2"
                         Grid.Column="1"
                         Click="Submit_OnClick"
+                        IsEnabled="False"
                         Content="SUBMIT"
                         Margin="5,5,5,5"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch"
                         Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                         materialDesign:ButtonAssist.CornerRadius="15"
+                        Name="SubmitButton"
                         />
                 </Grid>
             </TabItem>

@@ -34,7 +34,7 @@
         <Button 
             Grid.Column="1"
             x:Name="ModifierButton"
-            ToolTip="Press 'ESC' to unbind"
+            ToolTip="Select and press 'ESC' to unbind"
             materialDesign:ButtonAssist.CornerRadius="8"
             VerticalContentAlignment="Center"
             Background="#E8DEF8"
@@ -48,7 +48,7 @@
         <Button 
             Grid.Column="2"
             x:Name="PrimaryButton"
-            ToolTip="Press 'ESC' to unbind"
+            ToolTip="Select and press 'ESC' to unbind"
             materialDesign:ButtonAssist.CornerRadius="8"
             VerticalContentAlignment="Center"
             Background="#E8DEF8"

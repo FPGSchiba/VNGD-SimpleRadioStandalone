@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,9 +38,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
+        
+        private static bool IsValid(string email)
+        { 
+            var valid = true;
+            
+            try
+            { 
+                var _ = new MailAddress(email);
+            }
+            catch
+            {
+                valid = false;
+            }
+
+            return valid;
+        }
 
         private void Submit_OnClick(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(FeedbackText.Text) || string.IsNullOrEmpty(FeedbackType.Text) || string.IsNullOrEmpty(EmailText.Text))
+            {
+                MessageBox.Show("Please provide all necessary information before submitting.", "Missing Feedback", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+
+            if (!IsValid(EmailText.Text))
+            {
+                MessageBox.Show("Please provide a valid Email Address.", "Invalid Email", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            
             var eventId = SentrySdk.CaptureMessage($"Feedback: {FeedbackType.Text}");
             SentrySdk.CaptureUserFeedback(eventId, EmailText.Text, FeedbackText.Text, _mainWindow.GetPlayerName());
             
@@ -49,6 +79,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             
             MessageBox.Show("Successfully submitted your Feedback.", "Success!", MessageBoxButton.OK,
                 MessageBoxImage.Information);
+            
+        }
+
+        private void FeedbackText_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            SubmitButton.IsEnabled = !string.IsNullOrEmpty(FeedbackText.Text);
+            MaterialDesignThemes.Wpf.HintAssist.SetHelperText(FeedbackText, $"{FeedbackText.Text.Length}/4000");
             
         }
     }

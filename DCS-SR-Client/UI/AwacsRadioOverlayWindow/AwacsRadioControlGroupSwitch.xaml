@@ -17,7 +17,6 @@
         <Button
             Background="IndianRed"
             Click="ToggleSwitch_Click"
-            Content="Off"
             FontSize="5"
             Foreground="Black"
             Height="10"
@@ -28,7 +27,11 @@
             Opacity="1"
             Padding="0"
             Style="{StaticResource DarkStyle-Button}"
-            Width="15" />
+            Width="15" >
+            <Button.Content>
+                <TextBlock Text="Off" FontSize="5" />
+            </Button.Content>
+        </Button>
         <!--<Button
              Background="DarkGray"
              Click="ToggleChannel_Click"
@@ -218,7 +221,6 @@
                 <Button
                     Background="Gray"
                     Click="SwapStandbyFrequency_Click"
-                    Content="S"
                     FontSize="5"
                     FontWeight="Light"
                     Foreground="Black"
@@ -230,7 +232,11 @@
                     Opacity="1"
                     Padding="0"
                     Style="{StaticResource DarkStyle-Button}"
-                    Width="10" />
+                    Width="10" >
+                    <Button.Content>
+                        <TextBlock Text="S" FontSize="5" />
+                    </Button.Content>
+                </Button>
             </StackPanel>
         </StackPanel>
 
