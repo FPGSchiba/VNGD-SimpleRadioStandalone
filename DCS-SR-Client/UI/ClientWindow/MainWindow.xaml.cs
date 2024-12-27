@@ -1090,6 +1090,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void OpenPageByIndex(int index)
         {
+            if (index != SupportIndex)
+            {
+                SupportNavigation.IsEnabled = true;
+            }
+            if (index != SettingsIndex)
+            {
+                SettingsNavigation.IsEnabled = true;
+            }
+            
             switch (index)
             {
                 case WelcomeIndex:
@@ -1097,6 +1106,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     break;
                 case SupportIndex:
                     DisplayFrame.Content = _supportPage;
+                    SupportNavigation.IsEnabled = false;
                     break;
                 case LoginIndex:
                     DisplayFrame.Content = _loginPage;
@@ -1112,6 +1122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     break;
                 case SettingsIndex:
                     DisplayFrame.Content = _settingsPage;
+                    SettingsNavigation.IsEnabled = false;
                     break;
                 default:
                     _logger.Error($"Page: {index} could not be found.");
@@ -1207,51 +1218,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
         {
-            if (OpenPage != SupportIndex)
-            {
-                if (OpenPage == SettingsIndex)
-                {
-                    SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.CogBox };
-                    _oldOpenSupportPage = _oldOpenSettingsPage;
-                }
-                else
-                {
-                    _oldOpenSupportPage = OpenPage;
-                }
-                OpenPageByIndex(SupportIndex);
-                SupportNavigation.Content = new PackIcon { Kind = PackIconKind.Headset };
-                
-            }
-            else
-            {
-                OpenPageByIndex(_oldOpenSupportPage);
-                SupportNavigation.Content = new PackIcon { Kind = PackIconKind.HelpCircleOutline };
-            }
-
+            // Can create a Loop if back and forth between the two pages
+            _oldOpenSupportPage = OpenPage == SettingsIndex ? _oldOpenSettingsPage : OpenPage;
+            OpenPageByIndex(SupportIndex);
         }
 
         private void SettingsNavigation_Click(object sender, RoutedEventArgs e)
         {
-            if (OpenPage != SettingsIndex)
-            {
-                if (OpenPage == SupportIndex)
-                {
-                    SupportNavigation.Content = new PackIcon { Kind = PackIconKind.HelpCircleOutline };
-                    _oldOpenSettingsPage = _oldOpenSupportPage;
-                }
-                else
-                {
-                    _oldOpenSettingsPage = OpenPage;
-                }
-                OpenPageByIndex(SettingsIndex);
-                SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.Headset };
-                
-            }
-            else
-            {
-                OpenPageByIndex(_oldOpenSettingsPage);
-                SettingsNavigation.Content = new PackIcon { Kind = PackIconKind.CogBox };
-            }
+            // Can create a Loop if back and forth between the two pages
+            _oldOpenSettingsPage = OpenPage == SupportIndex ? _oldOpenSupportPage : OpenPage;
+            OpenPageByIndex(SettingsIndex);
+        }
+        
+        public void On_SettingsBackClicked()
+        {
+            OpenPageByIndex(_oldOpenSettingsPage);
+        }
+        
+        public void On_SupportBackClicked()
+        {
+            OpenPageByIndex(_oldOpenSupportPage);
         }
 
         #endregion

@@ -85,8 +85,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
         private void FeedbackText_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             SubmitButton.IsEnabled = !string.IsNullOrEmpty(FeedbackText.Text);
-            MaterialDesignThemes.Wpf.HintAssist.SetHelperText(FeedbackText, $"{FeedbackText.Text.Length}/4000");
-            
+        }
+
+        private void Back_OnClick(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.On_SupportBackClicked();
         }
     }
 }

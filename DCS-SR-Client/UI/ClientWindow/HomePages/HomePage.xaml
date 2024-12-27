@@ -42,6 +42,7 @@
                 HorizontalAlignment="Center"
                 Margin="0,-10,0,0" />
         </StackPanel>
+        
         <Separator
             BorderBrush="Black"
             BorderThickness="1"
@@ -92,18 +93,31 @@
                 BorderThickness="1"
                 Panel.ZIndex="10" />
         </StackPanel>
+        
+        <Button
+            Grid.Row="1"
+            Grid.Column="0"
+            Click="Logout_OnClick"
+            Content="LOGOUT"
+            Height="30"
+            Margin="0,0,0,10"
+            VerticalAlignment="Bottom"
+            Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+            Width="90"
+            materialDesign:ButtonAssist.CornerRadius="15"
+            x:Name="Logout" />
 
         <TabControl
             Background="#FEF7FF"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Grid.Row="1"
-            Height="212"
+            Height="160"
             HorizontalAlignment="Left"
-            Margin="0"
+            Margin="0,60,0,0"
             Padding="0,2,0,0"
             TabStripPlacement="Left"
-            VerticalAlignment="Bottom">
+            VerticalAlignment="Top">
             <TabItem Height="40" Width="185">
                 <TabItem.Header>
                     <StackPanel
@@ -197,5 +211,6 @@
                 <Frame Margin="0,-62,0,0" Source="AdministrationPage.xaml" />
             </TabItem>
         </TabControl>
+        
     </Grid>
 </Page>
