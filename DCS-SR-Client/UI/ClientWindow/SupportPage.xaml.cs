@@ -68,6 +68,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow
             {
                 MessageBox.Show("Please provide a valid Email Address.", "Invalid Email", MessageBoxButton.OK,
                     MessageBoxImage.Error);
+                return;
             }
             
             var eventId = SentrySdk.CaptureMessage($"Feedback: {FeedbackType.Text}");
