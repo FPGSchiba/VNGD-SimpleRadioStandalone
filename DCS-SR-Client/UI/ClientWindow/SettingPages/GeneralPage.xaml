@@ -16,6 +16,35 @@
                 <components:ToggleGlobalSetting Height="50" Title="Play Connection Sounds" SettingKey="PlayConnectionSounds" />
                 <components:ToggleGlobalSetting Height="50" Title="Radio Switch works as Push to Talk (PTT)" SettingKey="AllowRecording" />
                 <components:ToggleGlobalSetting Height="50" Title="Allow Anonymous Usage Stats" SettingKey="AllowRecording" />
+                <components:ToggleGlobalSetting Height="50" Title="Auto Connect" SettingKey="AutoConnect" />
+                <components:ToggleGlobalSetting Height="50" Title="Auto Connect Prompt" SettingKey="AutoConnectPrompt" />
+                <components:ToggleGlobalSetting Height="50" Title="Auto Connect Mismatch Prompt" SettingKey="AutoConnectMismatchPrompt" />
+                
+                <Grid Height="50" Margin="5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="215" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <Label Content="Reset Radio Overlay" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                    </StackPanel>
+                
+                    <Button 
+                        Grid.Column="1"
+                        Height="30"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Width="100"
+                        Content="RESET"
+                        Click="ButtonBase_OnClick"/>
+                </Grid>
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    VerticalAlignment="Bottom" />
+                
                 <Separator
                     BorderBrush="White"
                     BorderThickness="25"

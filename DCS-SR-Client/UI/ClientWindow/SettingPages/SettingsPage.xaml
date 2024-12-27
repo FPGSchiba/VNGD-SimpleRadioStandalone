@@ -84,7 +84,6 @@
             HorizontalAlignment="Left"
             Margin="0"
             Padding="0,2,0,0"
-            Height="235"
             VerticalAlignment="Top"
             TabStripPlacement="Left">
             <TabItem Height="40" Width="185">
@@ -207,8 +206,7 @@
             <TabItem
                 Height="40"
                 VerticalAlignment="Bottom"
-                Width="185"
-                IsEnabled="False">
+                Width="185">
                 <TabItem.Header>
                     <StackPanel
                         Margin="16,0,0,0"

@@ -196,6 +196,11 @@
             </Grid>
             
             <Separator
+                BorderBrush="Black"
+                BorderThickness="0,0,0,1"
+                VerticalAlignment="Bottom" />
+            
+            <Separator
                 BorderBrush="White"
                 BorderThickness="25"
                 VerticalAlignment="Bottom" />

@@ -85,14 +85,6 @@
                     Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.CenterBalance}"
                     InputName="Radio Balance Center"/>
-                <components:KeybindingControl 
-                    Height="50"
-                    ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"
-                    InputName="L Radio Panel Toggle" />
-                <components:KeybindingControl 
-                    Height="50"
-                    ControlInputBinding="{x:Static settings:InputBinding.Radio10SToggle}"
-                    InputName="S Radio Panel Toggle" />
                 
                 <Separator
                     BorderBrush="Black"
@@ -164,7 +156,7 @@
                     
                     <TextBlock
                         Grid.Column="0"
-                        Text="Radio Channels"
+                        Text="Radio Management"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontSize="20"
@@ -183,6 +175,91 @@
                     Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
                     InputName="Radio Channel Down" />
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.PanelNightMode}"
+                    InputName="Night Mode Toggle (WIP)"/>
+                
+                <Separator
+                    BorderBrush="Black"
+                    BorderThickness="0,0,0,1"/>
+                
+                <Grid Width="415" Height="50" Background="#E9E9E9" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="120" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Radio Panels"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold" />
+                    <Separator Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="1" Text="Modifier" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                    <Separator Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" />
+                    <TextBlock Grid.Column="2" Text="Primary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" />
+                </Grid>
+                
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio1HToggle}"
+                    InputName="1 Radio Horizontal"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio1VToggle}"
+                    InputName="1 Radio Vertical"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio2HToggle}"
+                    InputName="2 Radio Horizontal"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio2VToggle}"
+                    InputName="2 Radio Vertical"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio3HToggle}"
+                    InputName="3 Radio Horizontal"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio3VToggle}"
+                    InputName="3 Radio Vertical"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio5HToggle}"
+                    InputName="5 Radio Horizontal"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio5VToggle}"
+                    InputName="5 Radio Vertical"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10HToggle}"
+                    InputName="10 Radio Horizontal"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10VToggle}"
+                    InputName="10 Radio Vertical"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10HWToggle}"
+                    InputName="10 Radio Horiz. Ultra-Wide"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10VLToggle}"
+                    InputName="10 Radio Vertical Long"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10TToggle}"
+                    InputName="Compact Panel - Original"/>
+                <components:KeybindingControl 
+                    Height="50"
+                    ControlInputBinding="{x:Static settings:InputBinding.Radio10SToggle}"
+                    InputName="Compact Panel - Swap"/>
                 
                 <Separator
                     BorderBrush="Black"

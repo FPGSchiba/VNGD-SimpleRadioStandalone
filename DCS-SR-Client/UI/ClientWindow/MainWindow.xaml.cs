@@ -2395,7 +2395,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
+        public void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
             _radioOverlayMenuSelect?.Close();
