@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -1816,6 +1817,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _logger.Debug("Starting AWACS Mode connection.");
                         _connectioNetworkSpan.Finish();
+                        
                         ConnectAWACSMode();
                     }
                     catch (Exception ex)
