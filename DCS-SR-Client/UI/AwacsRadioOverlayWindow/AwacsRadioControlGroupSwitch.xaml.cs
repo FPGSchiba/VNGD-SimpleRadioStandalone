@@ -25,6 +25,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private static readonly Brush RadioOff = Brushes.IndianRed;
+        
+        public bool IsEnabled
+        {
+            get => RadioEnabled.Background == RadioOn;
+        }
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
         public PresetStandbyChannelsViewModel StandbyChannelViewModel { get; set; }
@@ -55,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         public int RadioId
         {
-            private get { return _radioId; }
+            get { return _radioId; }
             set
             {
                 _radioId = value;

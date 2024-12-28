@@ -21,6 +21,7 @@ using System.Reflection.Metadata;
 using Xamarin.Forms.Shapes;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using Wpf.Ui.Controls;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
@@ -43,8 +44,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly double _originalMinHeight;
 
-        private double radioHeight = 10;
-        private double currentHeight;
+        private static readonly double RadioHeight = 10;
+        private double _currentHeight;
 
         private long _lastUnitId;
 
@@ -108,12 +109,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Width = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth).DoubleValue;
             Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight).DoubleValue;
 
-            currentHeight = Height;
+            _currentHeight = Height;
 
             //  Window_Loaded(null, null);
             CalculateScale();
-
-            LocationChanged += Location_Changed;
 
             RadioRefresh(null, null);
 
@@ -125,10 +124,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             this._toggleOverlay = ToggleOverlay;
         }
 
-        private void Location_Changed(object sender, EventArgs e)
-        {
-        }
-
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
@@ -136,26 +131,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             foreach (var radio in radioControlGroupTransparent)
             {
-                radioHeight = !double.IsNaN(radio.Height) ? radio.Height : 0;
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
-
-                if ((buttonShowText.Text != null) && (buttonShowText.Text == "Hide"))
+                
+                if (buttonShowText.Text != null && buttonShowText.Text == "Hide")
                 {
                     radio.Visibility = Visibility.Visible;
                     numVisibleRadios++;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set Visible");
-                }
-                else if (((buttonShowText.Text != null) && (buttonShowText.Text == "Show")) && (radio.RadioEnabled.Content == "On"))
-                {
-                    radio.Visibility = Visibility.Visible;
-                    numVisibleRadios++;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set visible");
                 }
                 else
                 {
-                    radio.Visibility = Visibility.Collapsed;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set collapsed");
+                    if (radio.IsEnabled)
+                    {
+                        radio.Visibility = Visibility.Visible;
+                        numVisibleRadios++;
+                    }
+                    else
+                    {
+                        radio.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
 
@@ -178,7 +172,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                     if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
                     {
                         availableRadios++;
-
                     }
                 }
 
@@ -210,25 +203,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void CalculateHeight(int numVisibleRadios)
         {
 
-            double neededRadioHeight = !double.IsNaN(radioHeight) ? radioHeight * numVisibleRadios : 0;
+            double neededRadioHeight = !double.IsNaN(RadioHeight) ? RadioHeight * numVisibleRadios : 0;
             double neededHeaderHeight = !double.IsNaN(Header.ActualHeight) && Header.ActualHeight != 0 ? 14 : 0; // Using the expand button to determine the window state
             double neededFooterHeight = !double.IsNaN(Footer.ActualHeight) && Footer.ActualHeight != 0 ? 10 : 0;
-            double newNeededHeight = neededRadioHeight + neededFooterHeight + neededHeaderHeight + 31;
-            if (newNeededHeight != currentHeight && !double.IsNaN(newNeededHeight))
+            double newNeededHeight = neededRadioHeight + neededFooterHeight + neededHeaderHeight + 30;
+            if (!double.IsNaN(newNeededHeight) && newNeededHeight != _currentHeight)
             {
                 MinHeight = newNeededHeight;
                 _aspectRatio = MinWidth / newNeededHeight;
                 containerPanel_SizeChanged(null, null);
-                Height = Height + 1;
-                currentHeight = newNeededHeight;
+                Height += 1;
+                _currentHeight = newNeededHeight;
             }
             /* May be use this code if it gets unstable with self adjusting.
              * This is not recommended, due to performance
              * It requires quite a bit of calculation and should not be done without reason.
-            else
-            {
-                containerPanel_SizeChanged(null, null);
-            }
             */
         }
 
@@ -269,6 +258,33 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            int numVisibleRadios = 0;
+
+            foreach (var radio in radioControlGroupTransparent)
+            {
+                radio.RepaintRadioStatus();
+                radio.RepaintRadioReceive();
+
+                if (buttonShowText.Text != null && buttonShowText.Text == "Hide")
+                {
+                    radio.Visibility = Visibility.Visible;
+                    numVisibleRadios++;
+                }
+                else
+                {
+                    if (radio.IsEnabled)
+                    {
+                        radio.Visibility = Visibility.Visible;
+                        numVisibleRadios++;
+                    }
+                    else
+                    {
+                        radio.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+
+            CalculateHeight(numVisibleRadios);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentWidth, Width);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight, Height);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenTransparentBackgroundOpacity, Opacity);
@@ -312,7 +328,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 _radioCapabilitiesWindow?.Close();
                 _radioCapabilitiesWindow = null;
             }
-
         }
                 
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
@@ -327,6 +342,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 buttonShowText.Text = "Hide";
                 
             }
+            
+            containerPanel_SizeChanged(sender, null);
         }
 
         private void Button_Expand(object sender, RoutedEventArgs e)
@@ -349,6 +366,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 Logger.Debug("button contract pressed - window now in expand mode");
             }
+            
+            containerPanel_SizeChanged(sender, null);
         }
 
 
@@ -487,10 +506,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             CalculateScale();
 
             WindowState = WindowState.Normal;
-            Logger.Debug("Size Changed Transparent Panel");
         }
-
-
+        
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
@@ -505,9 +522,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 Width = sizeInfo.NewSize.Height * _aspectRatio;
             else
                 Height = sizeInfo.NewSize.Width / _aspectRatio;
-
-
-            // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120

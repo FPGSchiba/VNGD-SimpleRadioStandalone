@@ -28,11 +28,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
-        private readonly static Brush radioOff = Brushes.IndianRed;
+        private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
+        private static readonly Brush RadioOff = Brushes.IndianRed;
 
         
-
+        public bool IsEnabled
+        {
+            get => RadioEnabled.Background == RadioOn;
+        }
+        
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
 
@@ -56,7 +60,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         public int RadioId
         {
-            private get { return _radioId; }
+            get { return _radioId; }
             set
             {
                 _radioId = value;
@@ -178,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (radio != null)
                 {
-                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? radioOn : radioOff;
+                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? RadioOn : RadioOff;
                     RadioEnabled.Content = new TextBlock
                     {
                         FontSize = 5,
@@ -193,7 +197,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
             else
             {
-                RadioEnabled.Background = radioOff;
+                RadioEnabled.Background = RadioOff;
                 RadioEnabled.Content = new TextBlock
                 {
                     FontSize = 5,
@@ -268,7 +272,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
-                    RadioActive.Fill = radioOff;
+                    RadioActive.Fill = RadioOff;
                     RadioLabel.Text = "OFF";
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
@@ -454,7 +458,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioEnabled.Background = radioOn;
+                RadioEnabled.Background = RadioOn;
                 RadioEnabled.Content = new TextBlock
                 {
                     FontSize = 5,
@@ -464,7 +468,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-                RadioEnabled.Background = radioOff;
+                RadioEnabled.Background = RadioOff;
                 RadioEnabled.Content = new TextBlock
                 {
                     FontSize = 5,
