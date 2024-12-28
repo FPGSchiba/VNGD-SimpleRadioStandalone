@@ -41,7 +41,6 @@ using Sentry;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage;
-using MaterialDesignThemes.Wpf;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 {

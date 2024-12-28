@@ -23,6 +23,7 @@
                   HorizontalAlignment="Center"
                   VerticalAlignment="Top"
                   Height="20"
+                  FontSize="8"
                   materialDesign:HintAssist.HelperText="Channel Selection"
                   DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding Path=PresetChannels}"
@@ -30,7 +31,7 @@
                   Margin="0,0,0,12">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock  Text="{Binding Path=Text}" FontSize="12" Height="18" />
+                    <TextBlock  Text="{Binding Path=Text}" FontSize="8" Padding="0" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
