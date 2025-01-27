@@ -6,8 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
@@ -15,11 +13,6 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using NLog;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using MessageBox = System.Windows.Forms.MessageBox;
-using System.Reflection.Metadata;
-using Xamarin.Forms.Shapes;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
@@ -40,8 +33,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-
-        private readonly double _originalMinHeight;
 
         private static readonly double RadioHeight = 20;
         private double _currentHeight;
@@ -72,14 +63,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //expand = Contracted
             //contract = Expanded
             buttonExpandText.Text = "expand";
-            
-
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
             _aspectRatio = MinWidth / MinHeight;
-
-            _originalMinHeight = MinHeight;
+            
             WindowInteropHelper windowInteropHelper = new WindowInteropHelper(MainWindow.GetWindow(this));
             Screen screen = System.Windows.Forms.Screen.FromHandle(windowInteropHelper.Handle);
             MaxHeight = screen.Bounds.Height;
@@ -110,8 +98,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             _currentHeight = Height;
 
-            //  Window_Loaded(null, null);
+            // Calculate initial scale and layout
             CalculateScale();
+            containerPanel_SizeChanged(this, null);
 
             RadioRefresh(null, null);
 
@@ -122,10 +111,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             this._toggleOverlay = ToggleOverlay;
         }
-
-        private void RadioRefresh(object sender, EventArgs eventArgs)
+        
+        private int getNumVisibleRadios()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             int numVisibleRadios = 0;
 
             foreach (var radio in radioControlGroupSwitch)
@@ -133,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
 
-                if (buttonShowText.Text != null && buttonShowText.Text == "Hide")
+                if (buttonShowText.Text == "Hide")
                 {
                     radio.Visibility = Visibility.Visible;
                     numVisibleRadios++;
@@ -152,52 +140,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
             }
 
-            CalculateHeight(numVisibleRadios);
+            return numVisibleRadios;
+        }
 
+        private void RadioRefresh(object sender, EventArgs eventArgs)
+        {
+            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
+            
+            int numVisibleRadios = getNumVisibleRadios();
+            CalculateHeight(numVisibleRadios);
             Intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
             {
-                //reset when we switch planes
                 if (_lastUnitId != dcsPlayerRadioInfo.unitId)
                 {
                     _lastUnitId = dcsPlayerRadioInfo.unitId;
                 }
 
-                var availableRadios = 0;
+                var availableRadios = dcsPlayerRadioInfo.radios.Count(r => r.modulation != RadioInformation.Modulation.DISABLED);
 
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "Compact Radio Panel - New";
-                    }
-                    else
-                    {
-                        ControlText.Text = "Compact Radio Panel - New";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "Compact Radio Panel - New (Disconnected)";
-                    
-                }
+                ControlText.Text = availableRadios > 1
+                    ? "Compact Radio Panel - New"
+                    : "Compact Radio Panel - New (Disconnected)";
             }
             else
             {
                 ControlText.Text = "Compact Radio Panel - New (Disconnected)";
             }
-
-            FocusDCS();
         }
 
         private void CalculateHeight(int numVisibleRadios)
@@ -214,41 +184,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 containerPanel_SizeChanged(null, null);
                 Height += 1;
             }
-            /* May be use this code if it gets unstable with self adjusting.
-             * This is not recommended, due to performance
-             * It requires quite a bit of calculation and should not be done without reason.
-            */
         }
-
-        private long _lastFocus;
+        
         private RadioCapabilities _radioCapabilitiesWindow;
-
-        private void FocusDCS()
-        {
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusDCS))
-            {
-                var overlayWindow = new WindowInteropHelper(this).Handle;
-
-                //focus DCS if needed
-                var foreGround = WindowHelper.GetForegroundWindow();
-
-                Process[] localByName = Process.GetProcessesByName("dcs");
-
-                if (localByName != null && localByName.Length > 0)
-                {
-                    //either DCS is in focus OR Overlay window is not in focus
-                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
-                        this.IsMouseOver)
-                    {
-                        _lastFocus = DateTime.Now.Ticks;
-                    }
-                    else if (DateTime.Now.Ticks > _lastFocus + 20000000 && overlayWindow == foreGround)
-                    {
-                        WindowHelper.BringProcessToFront(localByName[0]);
-                    }
-                }
-            }
-        }
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -264,28 +202,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
 
-                if (buttonShowText.Text != null && buttonShowText.Text == "Hide")
+                if (radio.IsEnabled)
                 {
-                    radio.Visibility = Visibility.Visible;
                     numVisibleRadios++;
                 }
-                else
-                {
-                    if (radio.IsEnabled)
-                    {
-                        radio.Visibility = Visibility.Visible;
-                        numVisibleRadios++;
-                    }
-                    else
-                    {
-                        radio.Visibility = Visibility.Collapsed;
-                    }
-                }
             }
-
+            
+            Logger.Debug("Closing Radio Overlay Window, with {0} visible radios", numVisibleRadios);
+            
             CalculateHeight(numVisibleRadios);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchWidth, Width);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchHeight, Height);
+            containerPanel_SizeChanged(this, null);
+            
+            // This is a bit of a hack to ensure the window is closed properly and saved so it opens the same size next time
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchWidth, Width * 0.747);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchHeight, Height * 0.747);
+            
+            // Save the position of the window
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchBackgroundOpacity, Opacity);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchTextOpacity, Opacity);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioTenSwitchX, Left);
@@ -311,17 +243,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 
         private void Button_ShowAllRadios(object sender, RoutedEventArgs e)
         {
-            if ((buttonShowText.Text == null) || (buttonShowText.Text == "Hide"))
+            if (buttonShowText.Text == "Hide")
             {
                 buttonShowText.Text = "Show";
-                 
             }
             else
             {
                 buttonShowText.Text = "Hide";
             }
             
+            // Refresh the radio visibility
+            RadioRefresh(sender, e);
+            
+            // Scale and height recalculation
+            CalculateScale();
+            CalculateHeight(getNumVisibleRadios());
             containerPanel_SizeChanged(sender, null);
+            
+            // Force the UI to update
+            InvalidateVisual();
+            UpdateLayout();
+            Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
         }
 
         private void Button_Expand(object sender, RoutedEventArgs e)
@@ -332,7 +274,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 buttonExpandText.Background = _expandIcon;
                 Header.Visibility = Visibility.Collapsed;
                 Footer.Visibility = Visibility.Collapsed;
-                
+
                 Logger.Debug("button expanded pressed - window now in contract mode");
             }
             else
@@ -344,7 +286,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
                 Logger.Debug("button contract pressed - window now in expand mode");
             }
-            
+
+            CalculateScale();
+            CalculateHeight(getNumVisibleRadios());
             containerPanel_SizeChanged(sender, null);
         }
 
@@ -528,9 +472,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void CalculateScale()
         {
             var yScale = ActualHeight / RadioOverlayWin.MinHeight;
-            var xScale = ActualWidth / RadioOverlayWin.MinHeight;
+            var xScale = ActualWidth / RadioOverlayWin.MinWidth;
             var value = Math.Min(xScale, yScale);
-            ScaleValue = (double) OnCoerceScaleValue(RadioOverlayWin, value);
+            ScaleValue = (double)OnCoerceScaleValue(RadioOverlayWin, value);
+
+            // Recalculate the layout after changing the scale
+            WindowState = WindowState.Normal;
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -545,14 +492,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
             typeof(double), typeof(RadioOverlayWindowTenSwitch),
-            new UIPropertyMetadata(1.0, OnScaleValueChanged,
-                OnCoerceScaleValue));
+            new UIPropertyMetadata(1.0, OnScaleValueChanged, OnCoerceScaleValue));
 
         private static object OnCoerceScaleValue(DependencyObject o, object value)
         {
             var mainWindow = o as RadioOverlayWindowTenSwitch;
             if (mainWindow != null)
-                return mainWindow.OnCoerceScaleValue((double) value);
+                return mainWindow.OnCoerceScaleValue((double)value);
             return value;
         }
 
@@ -560,7 +506,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         {
             var mainWindow = o as RadioOverlayWindowTenSwitch;
             if (mainWindow != null)
-                mainWindow.OnScaleValueChanged((double) e.OldValue, (double) e.NewValue);
+                mainWindow.OnScaleValueChanged((double)e.OldValue, (double)e.NewValue);
         }
 
         protected virtual double OnCoerceScaleValue(double value)
@@ -574,21 +520,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         protected virtual void OnScaleValueChanged(double oldValue, double newValue)
         {
+            ApplicationScaleTransform.ScaleX = newValue;
+            ApplicationScaleTransform.ScaleY = newValue;
         }
 
         public double ScaleValue
         {
-            get { return (double) GetValue(ScaleValueProperty); }
+            get { return (double)GetValue(ScaleValueProperty); }
             set { SetValue(ScaleValueProperty, value); }
         }
 
         #endregion
-
-        private void RadioOverlayWindow_OnLocationChanged(object sender, EventArgs e)
-        {
-            //reset last focus so we dont switch back to dcs while dragging
-            _lastFocus = DateTime.Now.Ticks;
-        }
 
         private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
         {
