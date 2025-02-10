@@ -16,5 +16,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage
         {
             _mainWindow.On_SettingsBackClicked();
         }
+        
+        public void ReloadRadioAudioChannelSettings()
+        {
+            var balancingPage = BalancingFrame.Content as BalancingPage;
+            if (balancingPage == null) return;
+            balancingPage.ReloadRadioAudioChannelSettings();
+        }
     }
 }

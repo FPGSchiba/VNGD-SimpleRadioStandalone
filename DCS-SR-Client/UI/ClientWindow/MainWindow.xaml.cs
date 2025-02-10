@@ -66,6 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public delegate void ReceivedAutoConnect(string address, int port);
 
         public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
+        public delegate void UpdateChannelCallback(ProfileSettingsKeys channel, float balance);
 
         private readonly AudioManager _audioManager;
 
@@ -831,7 +832,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitInput()
         {
-            InputManager = new InputDeviceManager(this, ToggleOverlay);
+            InputManager = new InputDeviceManager(this, ToggleOverlay, UpdateChannelSettings);
 
             InitSettingsProfiles();
 
@@ -1348,6 +1349,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio9Config.Reload();
             Radio10Config.Reload();
             IntercomConfig.Reload();
+            
+            _settingsPage.ReloadRadioAudioChannelSettings();
+        }
+
+        public void UpdateChannelSettings(ProfileSettingsKeys channel, float balance)
+        {
+            ReloadRadioAudioChannelSettings();
         }
 
         private void InitToolTips()

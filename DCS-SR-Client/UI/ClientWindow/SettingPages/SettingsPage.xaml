@@ -201,7 +201,7 @@
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Frame Source="BalancingPage.xaml" />
+                <Frame Source="BalancingPage.xaml" Name="BalancingFrame" />
             </TabItem>
             <TabItem
                 Height="40"

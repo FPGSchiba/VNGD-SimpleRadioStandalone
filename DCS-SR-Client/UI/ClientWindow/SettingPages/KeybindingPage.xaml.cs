@@ -21,7 +21,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
                 MessageBox.Show("Could not Initialize Keybindings, because no MainWindow is open.\n Please tell this to FPG_Schiba!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            var inputDeviceManager = new InputDeviceManager(mainWindow, mainWindow.ToggleOverlay);
+            var inputDeviceManager = new InputDeviceManager(mainWindow, mainWindow.ToggleOverlay, mainWindow.UpdateChannelSettings);
             InitInputBindings(inputDeviceManager);
         }
 

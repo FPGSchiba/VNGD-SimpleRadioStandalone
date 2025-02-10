@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Name="RadioChannelConfig"
-             d:DesignHeight="50"
+             d:DesignHeight="55"
              d:DesignWidth="200"
              mc:Ignorable="d">
     <StackPanel Margin="3">

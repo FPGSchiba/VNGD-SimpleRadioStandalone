@@ -14,7 +14,7 @@
                 <components:ToggleGlobalSetting Height="50" Title="Minimize to Tray" SettingKey="MinimiseToTray" />
                 <components:ToggleGlobalSetting Height="50" Title="Show Transmitter Name" SubTitle="Requires Server Setting ON too" SettingKey="ShowTransmitterName"/>
                 <components:ToggleGlobalSetting Height="50" Title="Play Connection Sounds" SettingKey="PlayConnectionSounds" />
-                <components:ToggleGlobalSetting Height="50" Title="Radio Switch works as Push to Talk (PTT)" SettingKey="AllowRecording" />
+                <components:ToggleProfileSetting Height="50" Title="Radio Switch works as Push to Talk (PTT)" SettingKey="RadioSwitchIsPTT" />
                 <components:ToggleGlobalSetting Height="50" Title="Allow Anonymous Usage Stats" SettingKey="AllowRecording" />
                 <components:ToggleGlobalSetting Height="50" Title="Auto Connect" SettingKey="AutoConnect" />
                 <components:ToggleGlobalSetting Height="50" Title="Auto Connect Prompt" SettingKey="AutoConnectPrompt" />

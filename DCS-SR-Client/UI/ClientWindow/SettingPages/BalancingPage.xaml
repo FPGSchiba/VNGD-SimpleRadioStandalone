@@ -22,6 +22,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio1Channel}"
                     x:Name="Radio1Config"/>
             </Grid>
@@ -39,6 +40,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio2Channel}"
                     x:Name="Radio2Config"/>
             </Grid>
@@ -56,6 +58,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio3Channel}"
                     x:Name="Radio3Config"/>
             </Grid>
@@ -73,6 +76,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio4Channel}"
                     x:Name="Radio4Config"/>
             </Grid>
@@ -90,6 +94,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio5Channel}"
                     x:Name="Radio5Config"/>
             </Grid>
@@ -107,6 +112,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio6Channel}"
                     x:Name="Radio6Config"/>
             </Grid>
@@ -124,6 +130,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio7Channel}"
                     x:Name="Radio7Config"/>
             </Grid>
@@ -141,6 +148,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio8Channel}"
                     x:Name="Radio8Config"/>
             </Grid>
@@ -158,6 +166,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio9Channel}"
                     x:Name="Radio9Config"/>
             </Grid>
@@ -175,6 +184,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.Radio10Channel}"
                     x:Name="Radio10Config"/>
             </Grid>
@@ -191,6 +201,7 @@
                 <ui:RadioChannelConfigUi
                     Grid.Column="1"
                     Grid.Row="0"
+                    Height="55"
                     ProfileSettingKey="{x:Static settings:ProfileSettingsKeys.IntercomChannel}"
                     x:Name="IntercomConfig"/>
             </Grid>
