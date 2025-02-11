@@ -47,7 +47,7 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <TextBlock x:Name="ControlText"
-                       Width="160"
+                       Width="147"
                        Height="12"
                        FontSize="8"
                        Foreground="#E7E7E7"
@@ -91,6 +91,25 @@
                     <Image Source="pack://application:,,,/SR-ClientRadio;component/SRS_Orientation_Toggle.png" />
                 </Grid>
             </Button>
+
+            <Button
+                Click="ShowOverlayMenuSelect_OnClick"
+                Height="15"
+                Margin="0,0,3,0"
+                Style="{StaticResource DarkStyle-Button}"
+                VerticalAlignment="Center">
+                <Button.Content>
+                    <Grid Height="10" Width="10">
+                        <TextBlock
+                            FontSize="10"
+                            HorizontalAlignment="Center"
+                            Padding="0,0,0,1"
+                            Text="M"
+                            VerticalAlignment="Center" />
+                    </Grid>
+                </Button.Content>
+            </Button>
+
             <Button Height="15"
                     Margin="0,0,0,0"
                     VerticalAlignment="Center"

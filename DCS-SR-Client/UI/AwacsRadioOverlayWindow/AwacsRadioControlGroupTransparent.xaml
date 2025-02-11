@@ -1,7 +1,7 @@
 ﻿<UserControl
     Height="10"
     Name="RadioControlContainerTransparent"
-    Width="180"
+    Width="172"
     x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -16,7 +16,6 @@
         <Button
             Background="IndianRed"
             Click="ToggleSwitch_Click"
-            Content="Off"
             Opacity="1"
             FontSize="5"
             Foreground="Black"
@@ -27,7 +26,11 @@
             Name="RadioEnabled"
             Padding="0"
             Style="{StaticResource DarkStyle-Button}"
-            Width="15" />
+            Width="15" >
+            <Button.Content>
+                <TextBlock Text="Off" FontSize="5" />
+            </Button.Content>
+        </Button>
         <!--<Button
              Background="DarkGray"
              Click="ToggleChannel_Click"
@@ -57,7 +60,7 @@
             Background="#444"
             DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
             HorizontalAlignment="Center"
-            Width="20"
+            Width="12"
             x:Name="PresetChannelsView"  />
         <StackPanel
             Name="RadioTextGroup"
@@ -163,7 +166,7 @@
                 Style="{x:Null}"
                 Thumb.DragCompleted="RadioVolume_DragCompleted"
                 Thumb.DragStarted="RadioVolume_DragStarted"
-                Width="50"
+                Width="40"
                 x:Name="RadioVolume" />
         </Viewbox>
     </StackPanel>

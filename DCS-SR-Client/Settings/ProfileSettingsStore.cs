@@ -96,6 +96,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         {
             {ProfileSettingsKeys.RadioEffects.ToString(), "false"},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
+            
+            {ProfileSettingsKeys.Radio1Channel.ToString(), "-0.2"},
+            {ProfileSettingsKeys.Radio2Channel.ToString(), "0.2"},
 
             {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
             {ProfileSettingsKeys.NATOTone.ToString(), "false"},

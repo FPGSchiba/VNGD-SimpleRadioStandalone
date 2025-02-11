@@ -1,0 +1,76 @@
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.WelcomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d" 
+      d:DesignHeight="340"
+      d:DesignWidth="600"
+      Width="600"
+      Height="340"
+      Title="WelcomePage">
+
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="White" />
+        </Grid.Background>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.3*" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0" VerticalAlignment="Bottom">
+            <Label  Content="Vanguard Communications System" HorizontalAlignment="Center" FontWeight="Heavy" FontSize="24" />
+            <Label Content="powered by SRS" HorizontalAlignment="Center" FontSize="16" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Center">
+            <!-- Login is not yet implemented via vngd.net, so we're using the Guest button for now
+            <Button
+                Width="90"
+                Height="30"
+                Content="LOGIN"
+                x:Name="Login"
+                materialDesign:ButtonAssist.CornerRadius="15"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                Click="Login_Click"
+            />
+            -->
+            <!-- Change this to Guest in the future -->
+            <Button
+                Width="90"
+                Height="30"
+                Content="LOGIN" 
+                x:Name="Guest"
+                materialDesign:ButtonAssist.CornerRadius="15"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                Margin="0,0,0,0"
+                Click="Guest_Click"
+            />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <Button
+                x:Name="EasterEgg"
+                Width="10"
+                Height="10"
+                Opacity="0"
+                Click="EasterEgg_Click"
+            />
+            <Label VerticalContentAlignment="Center">
+                <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center">
+                Disclaimer: Vanguard is an organization in the Star Citizen universe and gaming community.
+                We are not affiliated with Roberts Space Industries, Star Citizen, or any other entity.
+                </TextBlock>
+            </Label>
+        </StackPanel>
+    </Grid>
+</Page>

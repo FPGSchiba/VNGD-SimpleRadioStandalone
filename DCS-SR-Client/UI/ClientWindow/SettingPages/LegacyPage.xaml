@@ -1,0 +1,467 @@
+﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages.LegacyPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage"
+      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
+      mc:Ignorable="d"
+      Title="LegacyPage" Height="270" Width="415">
+    <ScrollViewer>
+        <StackPanel>
+            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="SRS Interface"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold" />
+                <TextBlock 
+                    Text="Old Settings"
+                    Margin="5,-8,0,0"/>
+            </StackPanel>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleGlobalSetting Height="50" Title="Hide Overlay Taskbar Item" SettingKey="RadioOverlayTaskbarHide" />
+            <components:ToggleGlobalSetting Height="50" Title="Auto Refocus DCS" SettingKey="RefocusDCS" />
+            
+            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="Miscellaneous"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold" />
+                <TextBlock 
+                    Text="Old Settings"
+                    Margin="5,-8,0,0"/>
+            </StackPanel>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleGlobalSetting Height="50" Title="Auto select Profile for Aircraft" SettingKey="AutoSelectSettingsProfile" />
+            <components:ToggleGlobalSetting Height="50" Title="Check for Beta updates" SettingKey="CheckForBetaUpdates" />
+            <Grid Height="50" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="Set SRS Path for DCS" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <Button 
+                    Grid.Column="1"
+                    Height="30"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Width="100"
+                    Content="SET PATH"
+                    Click="SetSRSPath_Click"/>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleGlobalSetting Height="50" Title="Require Admin" SettingKey="RequireAdmin" />
+            <components:ToggleGlobalSetting Height="50" Title="Allow VAICOM TX Inhibit" SettingKey="VAICOMTXInhibitEnabled" />
+            <components:ToggleGlobalSetting Height="50" Title="Play connection sounds" SettingKey="PlayConnectionSounds" />
+            
+            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="Controls / Cockpit Integration"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold" />
+                <TextBlock 
+                    Text="Old Settings"
+                    Margin="5,-8,0,0"/>
+            </StackPanel>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleProfileSetting Height="50" Title="Auto Select First Channel Presets" SettingKey="AutoSelectPresetChannel" />
+            <components:ToggleProfileSetting Height="50" Title="ALWAYS allow SRS Hotkeys" SettingKey="AlwaysAllowHotasControls" />
+            <components:ToggleProfileSetting Height="50" Title="ALWAYS allow Transponder Overlay Controls" SettingKey="AlwaysAllowTransponderOverlay" />
+            <components:ToggleProfileSetting Height="50" Title="Allow INCOCKPIT DCS Controlled PTT" SettingKey="AllowDCSPTT" />
+            <components:ToggleProfileSetting Height="50" Title="Rotary Style Frequency Increment/Decrement" SettingKey="RotaryStyleIncrement" />
+            
+            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="Radio Effects Settings"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold" />
+                <TextBlock 
+                    Text="Old Settings"
+                    Margin="5,-8,0,0"/>
+            </StackPanel>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleProfileSetting Height="50" Title="MIDS Tx &amp; Rx Effects" SubTitle="Requires Tx or Rx Effects on" SettingKey="MIDSRadioEffect" />
+            <Grid Height="110" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="Enable FM Radio Tone"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10">
+
+                    <ToggleButton HorizontalAlignment="Center" Margin="0,0,0,5" x:Name="ToggleButton" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked" />
+
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="NATOToneVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="110" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="Enable HAVEQUICK Effect"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10">
+
+                    <ToggleButton HorizontalAlignment="Center" Margin="0,0,0,5" x:Name="HaveToggleButton" Checked="HaveToggleButton_OnChecked" Unchecked="HaveToggleButton_OnUnchecked" />
+                    
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="HQToneVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <components:ToggleProfileSetting Height="50" Title="Enable Background Radio Effects" SubTitle="(UHF/VHF/HF/FM)" SettingKey="RadioBackgroundNoiseEffect" />
+            <Grid Height="80" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="UHF Effect Volume"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10"
+                    VerticalAlignment="Center">
+
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="UHFEffectVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="80" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="VHF Effect Volume"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10"
+                    VerticalAlignment="Center">
+
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="VHFEffectVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="80" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="HF Effect Volume"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10"
+                    VerticalAlignment="Center">
+
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="HFEffectVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Grid Height="80" Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <Label Content="FM Effect Volume"  VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                </StackPanel>
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10"
+                    VerticalAlignment="Center">
+
+                    <Slider
+                        IsEnabled="False"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="10"
+                        Maximum="200"
+                        Minimum="0"
+                        SmallChange="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="100"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="FMEffectVolume"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="0%"
+                            FontSize="10"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"/>
+                        <Label
+                            Content="100%"
+                            FontSize="10"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center"/>
+                        <Label
+                            Content="200%"
+                            FontSize="10"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            
+            <Separator
+                BorderBrush="White"
+                BorderThickness="40"
+                VerticalAlignment="Bottom" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

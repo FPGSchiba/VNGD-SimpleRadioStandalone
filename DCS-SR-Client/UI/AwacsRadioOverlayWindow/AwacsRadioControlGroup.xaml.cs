@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Web.Caching;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,6 +31,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private static Brush radioOff = Brushes.IndianRed;
+        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
@@ -202,18 +204,30 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
             {
-                RadioEnabled.Background =
-                    RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                        ? radioOn
-                        : radioOff;
-                RadioEnabled.Content = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                    ? "On"
-                    : "Off";
+                var currentRadio = RadioHelper.GetRadio(RadioId);
+
+                if (currentRadio != null)
+                {
+                    RadioEnabled.Background = currentRadio.modulation != RadioInformation.Modulation.DISABLED ? radioOn : radioOff;
+                    RadioEnabled.Content = new TextBlock
+                    {
+                        FontSize = 5,
+                        Text = currentRadio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off",
+                    };
+                }
+                else
+                {
+                    Logger.Warn($"Radio with ID: {RadioId} was not found. And could not Toggle.");
+                }
             }
             else
             {
                 RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
             }
             
             if (enable)
@@ -298,7 +312,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
-                RadioFrequency.Text = "Off";
+                RadioFrequency.Text = "No Conn";
 
                 RadioMetaData.Text = "";
 
@@ -314,6 +328,121 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             {
                 var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
+                bool radioEnabled;
+
+                switch (RadioId)
+                {
+                    case 0:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio1Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 1:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio2Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 2:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio3Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 3:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio4Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 4:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio5Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 5:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio6Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 6:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio7Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 7:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio8Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 8:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio9Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                    case 9:
+                        radioEnabled = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.Radio10Enabled);
+                        if (radioEnabled && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                        {
+                            SetRadioEnabled(true);
+                        }
+                        else if (!radioEnabled && currentRadio.modulation == RadioInformation.Modulation.MIDS)
+                        {
+                            SetRadioEnabled(false);
+                        }
+                        break;
+                }
 
                 if (transmitting.IsSending)
                 {
@@ -626,22 +755,84 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
         }
 
+        private void SetRadioEnabled(bool enabled)
+        {
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+
+            if (enabled && currentRadio != null)
+            {
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+                RadioEnabled.Background = radioOn;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "On",
+                };
+                
+            }
+            else if (currentRadio != null)
+            {
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
+                RadioEnabled.Background = radioOff;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
+            }
+            else
+            {
+                Logger.Warn($"Radio with ID: {RadioId} was not found and could not be toggled.");
+                return;
+            }
+
+            switch (RadioId)
+            {
+                case 0:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio1Enabled, enabled);
+                    break;
+                case 1:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio2Enabled, enabled);
+                    break;
+                case 2:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio3Enabled, enabled);
+                    break;
+                case 3:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio4Enabled, enabled);
+                    break;
+                case 4:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio5Enabled, enabled);
+                    break;
+                case 5:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio6Enabled, enabled);
+                    break;
+                case 6:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio7Enabled, enabled);
+                    break;
+                case 7:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio8Enabled, enabled);
+                    break;
+                case 8:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio9Enabled, enabled);
+                    break;
+                case 9:
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio10Enabled, enabled);
+                    break;
+            }
+            RepaintRadioStatus();
+        }
+
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
             var currentRadio = RadioHelper.GetRadio(RadioId);
             // Radio is disabled and exists
-            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+            if (currentRadio.modulation == RadioInformation.Modulation.DISABLED)
             {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioEnabled.Background = radioOn;
-                RadioEnabled.Content = "On";
-
+                SetRadioEnabled(true);
             }
-            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
+            else if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-                RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                SetRadioEnabled(false);
             }
         }
     }

@@ -287,5 +287,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
             }
         }
+
+        private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+            _toggleOverlay(true, 15);
+        }
     }
 }

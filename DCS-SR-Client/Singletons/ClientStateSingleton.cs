@@ -38,6 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
+        public PresetStandbyChannelsViewModel[] StandbyChannels { get; }
 
         public long LastSent { get; set; }
 
@@ -132,17 +133,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             DcsExportLastReceived = 0;
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += (s, e) => {
-                NotifyPropertyChanged("IsGameConnected");
-                NotifyPropertyChanged("IsLotATCConnected");
                 NotifyPropertyChanged("ExternalAWACSModeConnected");
             };
             _timer.Start();
 
             FixedChannels = new PresetChannelsViewModel[10];
-
+            StandbyChannels = new PresetStandbyChannelsViewModel[10];
+            
             for (int i = 0; i < FixedChannels.Length; i++)
             {
                 FixedChannels[i] = new PresetChannelsViewModel(new FilePresetChannelsStore(), i + 1);
+                StandbyChannels[i] = new PresetStandbyChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
 
             LastSent = 0;
@@ -175,39 +176,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
         private void NotifyPropertyChanged(string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public bool ShouldUseLotATCPosition()
-        {
-            if (!IsLotATCConnected)
-            {
-                return false;
-            }
-
-            if (IsGameExportConnected)
-            {
-                if (DcsPlayerRadioInfo.inAircraft)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public void ClearPositionsIfExpired()
-        {
-            //not game or Lotatc - clear it!
-            if (!IsLotATCConnected && !IsGameExportConnected)
-            {
-                PlayerCoaltionLocationMetadata.LngLngPosition = new DCSLatLngPosition();
-            }
-        }
-
-        public void UpdatePlayerPosition(DCSLatLngPosition latLngPosition)
-        {
-            PlayerCoaltionLocationMetadata.LngLngPosition = latLngPosition;
-            DcsPlayerRadioInfo.latLng = latLngPosition;
         }
     }
 }

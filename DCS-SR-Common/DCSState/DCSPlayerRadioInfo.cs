@@ -21,14 +21,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
 
         [JsonNetworkIgnoreSerialization]
         [JsonDCSIgnoreSerialization]
-        public DCSLatLngPosition latLng = new DCSLatLngPosition();
-
-        [JsonNetworkIgnoreSerialization]
-        [JsonDCSIgnoreSerialization]
-        public bool inAircraft = false;
-
-        [JsonNetworkIgnoreSerialization]
-        [JsonDCSIgnoreSerialization]
         public volatile bool ptt = false;
 
         public RadioInformation[] radios = new RadioInformation[11]; //10 + intercom
@@ -88,7 +80,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
         public void Reset()
         {
             name = "";
-            latLng = new DCSLatLngPosition();
             ptt = false;
             selected = 0;
             unit = "";
@@ -133,11 +124,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common
                 }
 
                 if (unitId != compareRadio.unitId)
-                {
-                    return false;
-                }
-
-                if (inAircraft != compareRadio.inAircraft)
                 {
                     return false;
                 }

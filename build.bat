@@ -1,26 +1,19 @@
 @echo off
 
 ::Command line arguments
-set presetsFolder=%1
-set version=%2
+set version=%1
 
 :::::::::  File structure settings :::::::::::::::::
 
 ::Release
-set "releasesFolderName=Vanguard-SRS-%version%"
+set "releasesFolderName=VCS-SRS-%version%"
 set "releasesFolder=%releasesFolderName%"
 
 ::Client Release
-set clientReleasesFolder=.\SRS-Client
-set clientArchiveName=Vanguard-SRS-Client-%version%.zip
-set clientFolder=%clientReleasesFolder%\%clientFolderName%\
-
-::Presets
-set "presetsFolderName=SRS-Radio-Presets"
-set "presetsFolder=%presetsFolder%\"
+set clientArchiveName=VCS-SRS-Client-%version%.zip
 
 ::Final Release Archive
-set "releasesArchiveName=.\Vanguard-SRS-%version%.zip"
+set "releasesArchiveName=.\VCS-SRS-%version%.zip"
 
 ::::::::::: /File structure settings ::::::::::::::::
 
@@ -30,11 +23,11 @@ set "releasesArchiveName=.\Vanguard-SRS-%version%.zip"
 :: Set to quiet, redirected to NUL for batch file testing - change if needed
 
 nuget restore
-msbuild -v:q /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false /p:Version=%version% > NUL
-if %errorlevel% neq 0 then goto builderror
+msbuild -v:q /p:Configuration=Release /p:Platform=x64 /p:SourceLinkCreate=false /p:Version=%version% > NULL
+IF NOT errorlevel 0 (
+    goto msbuilderror
+) 
 echo msbuild completed with no error level
-
-
 
 :::: Create File Structure  
 ::
@@ -43,8 +36,6 @@ echo msbuild completed with no error level
 ::   
 
 mkdir %releasesFolder%\
-mkdir %releasesFolder%\%clientReleasesFolder%
-mkdir %releasesFolder%\%presetsFolder%
 ::mkdir %releasesFolderName%
 echo Created Release Folders
 
@@ -55,16 +46,15 @@ echo Removed unneeded files
 
 :: Move the build into the client fold
 
-XCOPY .\install-build\ %releasesFolder%\%clientReleasesFolder% /Y /q /e
+XCOPY .\install-build\ %releasesFolder% /Y /q /e
 echo Copied Client to Release 
-
-XCOPY %presetsFolder% .\%releasesFolder%\%presetsFolderName%\ /q /e /k /h /i /y 
-echo Copied Presets to Release
 
 
 :: Final release archive
 tar -acf %releasesArchiveName% %releasesFolderName%
-if %errorlevel% neq 0 then goto tarerror
+IF NOT errorlevel 0 (
+    goto tarerror
+)
 
 ::Cleanup - when I know what to clean up
 

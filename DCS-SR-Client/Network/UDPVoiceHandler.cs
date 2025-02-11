@@ -172,17 +172,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         //Store last release time
                                     }
                                 }
-                                // commented out this code because we do not want to turn on PTT if radio is disabled
-                                //else
-                                //{
-                                //    //turn on PTT even if not valid radio switch
-                                //    if (radioSwitchPtt)
-                                //    {
-                                //        _lastPTTPress = DateTime.Now.Ticks;
-                                //        ptt = true;
-                                //    }
-                                //}
-
                             }
                         }
                         else if (inputBindState.MainDevice.InputBind == InputBinding.Ptt)
@@ -911,7 +900,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
                 {
                     //dont transmit on all if the INTERCOM is selected & AWACS
-                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM && _clientStateSingleton.DcsPlayerRadioInfo.inAircraft == false)
+                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM)
                     {
                         //even if simul transmission is enabled - if we're an AWACS we probably dont want this
                         var intercom = new List<RadioInformation>();
