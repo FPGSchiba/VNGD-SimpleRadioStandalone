@@ -430,6 +430,7 @@
                                                     Style="{DynamicResource SquareButtonStyle}"
                                                     Width="150"
                                                     x:Name="ShowOverlayDragable"/>
+                                                <!-- The Engineering Panel is not ready yet.
                                                 <Button
                                                     Click="ShowOverlayEngineering_OnClick"
                                                     Content="Engineering"
@@ -437,7 +438,7 @@
                                                     Margin="0,5,0,0"
                                                     Style="{DynamicResource SquareButtonStyle}"
                                                     Width="150"
-                                                    x:Name="ShowOverlayEngineering"/>
+                                                    x:Name="ShowOverlayEngineering"/> -->
                                                 <Button
                                                     Click="ShowOverlayMenuSelect_OnClick"
                                                     Content="Radio Panel Menu"

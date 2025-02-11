@@ -386,8 +386,6 @@
             <Button
                  Background="Gray"
                  Click="ShowOverlayTenVerticalLong_OnClick"
-                 Content="10 Vertical Long"
-                 FontSize="10"
                  Foreground="Black"
                  HorizontalAlignment="Center"
                  IsEnabled="True"
@@ -396,11 +394,14 @@
                  Padding="0"
                  Style="{StaticResource DarkStyle-Button}"
                  Height="25"
-                 Width="100" />
+                 Width="100" >
+                <Button.Content>
+                    <TextBlock Text="10 Vertical Long" FontSize="12" />
+                </Button.Content>
+            </Button>
             <Button
                  Background="Gray"
                  Click="ShowOverlayTenHorizontalWide_OnClick"
-                 Content="10 Horizontal Wide"
                  FontSize="10"
                  Foreground="Black"
                  HorizontalAlignment="Center"
@@ -410,7 +411,11 @@
                  Padding="0"
                  Style="{StaticResource DarkStyle-Button}"
                  Height="25"
-                 Width="100" />
+                 Width="100" >
+                <Button.Content>
+                    <TextBlock Text="10 Horizontal Wide" FontSize="11" />
+                </Button.Content>
+            </Button>
         </StackPanel>
 
         <!-- 10 Compact Panels -->

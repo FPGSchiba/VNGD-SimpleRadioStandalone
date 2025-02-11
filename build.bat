@@ -1,26 +1,19 @@
 @echo off
 
 ::Command line arguments
-set presetsFolder=%1
-set version=%2
+set version=%1
 
 :::::::::  File structure settings :::::::::::::::::
 
 ::Release
-set "releasesFolderName=Vanguard-SRS-%version%"
+set "releasesFolderName=VCS-SRS-%version%"
 set "releasesFolder=%releasesFolderName%"
 
 ::Client Release
-set clientReleasesFolder=.\SRS-Client
-set clientArchiveName=Vanguard-SRS-Client-%version%.zip
-set clientFolder=%clientReleasesFolder%\%clientFolderName%\
-
-::Presets
-set "presetsFolderName=SRS-Radio-Presets"
-set "presetsFolder=%presetsFolder%\"
+set clientArchiveName=VCS-SRS-Client-%version%.zip
 
 ::Final Release Archive
-set "releasesArchiveName=.\Vanguard-SRS-%version%.zip"
+set "releasesArchiveName=.\VCS-SRS-%version%.zip"
 
 ::::::::::: /File structure settings ::::::::::::::::
 
@@ -36,8 +29,6 @@ IF NOT errorlevel 0 (
 ) 
 echo msbuild completed with no error level
 
-
-
 :::: Create File Structure  
 ::
 ::   .\Vanguard-SRS-%version%\presets        -- Preset manager, etc
@@ -45,8 +36,6 @@ echo msbuild completed with no error level
 ::   
 
 mkdir %releasesFolder%\
-mkdir %releasesFolder%\%clientReleasesFolder%
-mkdir %releasesFolder%\%presetsFolder%
 ::mkdir %releasesFolderName%
 echo Created Release Folders
 
@@ -57,11 +46,8 @@ echo Removed unneeded files
 
 :: Move the build into the client fold
 
-XCOPY .\install-build\ %releasesFolder%\%clientReleasesFolder% /Y /q /e
+XCOPY .\install-build\ %releasesFolder% /Y /q /e
 echo Copied Client to Release 
-
-XCOPY %presetsFolder% .\%releasesFolder%\%presetsFolderName%\ /q /e /k /h /i /y 
-echo Copied Presets to Release
 
 
 :: Final release archive

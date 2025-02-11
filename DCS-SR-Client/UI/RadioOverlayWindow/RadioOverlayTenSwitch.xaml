@@ -13,7 +13,6 @@
         MinHeight="260"
         AllowsTransparency="True"
         Background="#444"
-        LocationChanged="RadioOverlayWindow_OnLocationChanged"
         Opacity="1.0"
         ResizeMode="CanResizeWithGrip"
         Style="{x:Null}"

@@ -68,19 +68,6 @@
                         materialDesign:ButtonAssist.CornerRadius="25" />
             
                 </StackPanel>
-                
-                <StackPanel>
-                    <Button
-                        Click="Logout_OnClick"
-                        Content="LOGOUT"
-                        Height="30"
-                        IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                        Margin="280,30,15,10"
-                        Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                        Width="90"
-                        materialDesign:ButtonAssist.CornerRadius="15"
-                        x:Name="Logout" />
-                </StackPanel>
             </StackPanel>
         </materialDesign:DialogHost>
     </Grid>

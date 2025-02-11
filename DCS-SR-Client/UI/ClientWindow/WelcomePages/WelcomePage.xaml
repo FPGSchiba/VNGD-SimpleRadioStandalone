@@ -31,6 +31,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Center">
+            <!-- Login is not yet implemented via vngd.net, so we're using the Guest button for now
             <Button
                 Width="90"
                 Height="30"
@@ -41,15 +42,17 @@
                 Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                 Click="Login_Click"
             />
+            -->
+            <!-- Change this to Guest in the future -->
             <Button
                 Width="90"
                 Height="30"
-                Content="GUEST"
+                Content="LOGIN" 
                 x:Name="Guest"
                 materialDesign:ButtonAssist.CornerRadius="15"
                 IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                 Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                Margin="37,0,0,0"
+                Margin="0,0,0,0"
                 Click="Guest_Click"
             />
         </StackPanel>

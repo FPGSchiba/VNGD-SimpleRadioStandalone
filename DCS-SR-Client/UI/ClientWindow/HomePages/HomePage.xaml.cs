@@ -66,5 +66,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
                 LoginTypeBlock.Text = "Login Type: ---";
             }
         }
+        
+        private void Logout_OnClick(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.On_HomeLogOutClicked();
+        }
     }
 }

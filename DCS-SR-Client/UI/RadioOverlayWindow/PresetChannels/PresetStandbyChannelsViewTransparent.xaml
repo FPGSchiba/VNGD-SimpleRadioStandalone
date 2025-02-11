@@ -25,8 +25,13 @@
                   DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding PresetChannels}"
                   SelectedItem="{Binding SelectedPresetChannel}" 
-                  ToolTip="Select a predefined radio frequency via a dropdown menu" SelectionChanged="FrequencyDropDown_SelectionChanged"/>
-
+                  ToolTip="Select a predefined radio frequency via a dropdown menu" SelectionChanged="FrequencyDropDown_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock  Text="{Binding Path=Text}" FontSize="12" Height="18" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         <!--<Button Name="ReloadButton"
                 Width="8"
                 Height="10"

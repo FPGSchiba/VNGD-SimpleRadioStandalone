@@ -20,7 +20,6 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button
                         Width="55"
-                        Content="Start"
                         Padding="0"
                         materialDesign:ButtonAssist.CornerRadius="8"
                         Background="#E8DEF8"
@@ -30,10 +29,17 @@
                         HorizontalAlignment="Center"
                         Margin="0,0,20,0"
                         Click="TxStart_OnClick"
-                        x:Name="TxStart"/>
+                        x:Name="TxStart">
+                        <Button.Content>
+                            <StackPanel>
+                                <TextBlock Text="Start" HorizontalAlignment="Center" Margin="0,2,0,-4" />
+                                <TextBlock Text="On" FontSize="10" HorizontalAlignment="Center" Name="TxStartText" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                     <Button
                         Width="55"
-                        Content="End"
+                        Padding="0"
                         materialDesign:ButtonAssist.CornerRadius="8"
                         Background="#E8DEF8"
                         Foreground="Black"
@@ -41,7 +47,14 @@
                         BorderThickness="1"
                         HorizontalAlignment="Center"
                         Click="TxEnd_OnClick"
-                        x:Name="TxEnd"/>
+                        x:Name="TxEnd">
+                        <Button.Content>
+                            <StackPanel>
+                                <TextBlock Text="End" HorizontalAlignment="Center" Margin="0,2,0,-4" />
+                                <TextBlock Text="On" FontSize="10" HorizontalAlignment="Center" Name="TxEndText" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                 </StackPanel>
             </Grid>
             
@@ -60,7 +73,6 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button
                         Width="55"
-                        Content="Start"
                         Padding="0"
                         materialDesign:ButtonAssist.CornerRadius="8"
                         Background="#E8DEF8"
@@ -70,10 +82,17 @@
                         HorizontalAlignment="Center"
                         Margin="0,0,20,0"
                         Click="RxStart_OnClick"
-                        x:Name="RxStart"/>
+                        x:Name="RxStart">
+                        <Button.Content>
+                            <StackPanel>
+                                <TextBlock Text="Start" HorizontalAlignment="Center" Margin="0,2,0,-4" />
+                                <TextBlock Text="On" FontSize="10" HorizontalAlignment="Center" Name="RxStartText" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                     <Button
                         Width="55"
-                        Content="End"
+                        Padding="0"
                         materialDesign:ButtonAssist.CornerRadius="8"
                         Background="#E8DEF8"
                         Foreground="Black"
@@ -81,7 +100,14 @@
                         BorderThickness="1"
                         HorizontalAlignment="Center"
                         Click="RxEnd_OnClick"
-                        x:Name="RxEnd"/>
+                        x:Name="RxEnd">
+                        <Button.Content>
+                            <StackPanel>
+                                <TextBlock Text="End" HorizontalAlignment="Center" Margin="0,2,0,-4" />
+                                <TextBlock Text="On" FontSize="10" HorizontalAlignment="Center" Name="RxEndText" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                 </StackPanel>
             </Grid>
             

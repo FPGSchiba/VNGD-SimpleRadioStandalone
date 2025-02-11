@@ -4,10 +4,8 @@ How to use...
 2) Ensure that the file is named "vngd-channels.txt"
 3) Click RELOAD on the channel dropdown section to refresh the list.
 
-
 ---- Current Operation Frequencies ----|1.0
 Open the vngd-channels.txt file to edit|1.0
-
 
 ---- Request Frequencies ----|1.0
 Party Request      118.50|118.50
@@ -16,7 +14,6 @@ A/A Request        124.00|124.00
 Logistics Request  133.00|133.00
 MedEvac Request    134.00|134.00
 Refuel Request     136.00|136.00
-
 
 ---- Command Frequencies ----|1.0
 Operation Command    118.00|118.00
@@ -34,8 +31,6 @@ Task Force Delta Command     153.00|153.00
 Task Force Echo Command      154.00|154.00
 Task Force Foxtrot Command   155.00|155.00
 Task Force Golf Command      156.00|156.00
-
-
 
 ---- Task Force Alpha Sub-Command Frequencies ----|1.0
 TF Alpha Group 1  150.10|150.10
@@ -127,13 +122,10 @@ Shinobi         140.50|140.50
 Cosmo Knights   140.60|140.60
 Mako Media      140.70|140.70
 Kraken Trading  140.80|140.80
-Atlas           130.10|130.10
 Benevolence     130.50|130.50
 Fleet Services  130.60|130.60
 Rock Raiders    135.10|135.10
 Jackals         135.30|135.30
-
-
 
 ---- Defiant Unit Wide Frequencies ----|1.0
 Defiant Common: 120.60|120.60
@@ -148,7 +140,6 @@ Defiant Flight 5:      120.65|120.65
 Defiant Flight 6:      120.66|120.66
 Defiant Flight 7:      120.67|120.67
 Defiant Flight 8:      120.68|120.68
-
 
 ---- Discovery Unit Wide Frequencies ----|1.0
 Main Net: 140.100|140.10
@@ -205,7 +196,6 @@ Fenrir Team 5:      125.15|125.15
 Fenrir Team 6:      125.16|125.16
 Fenrir Team 7:      125.17|125.17
 Fenrir Team 8:      125.18|125.18
-
 
 ---- Social Frequencies ----|1.0
 Social #1     300.00|300.00
@@ -272,7 +262,6 @@ Global Ground Unit #2       114.00|114.00
 Global Misc. Unit #1        115.00|115.00
 Global Misc. Unit #2        116.00|116.00
 Global Misc. Unit #3        117.00|117.00
-
 
 ---- Special Use Frequencies ----|1.0
 Guard       121.50|121.50

@@ -41,6 +41,7 @@
                 HorizontalAlignment="Center"
                 Margin="0,-10,0,0" />
         </StackPanel>
+        
         <Separator
             BorderBrush="Black"
             BorderThickness="1"
@@ -60,6 +61,20 @@
                 BorderThickness="1"
                 Panel.ZIndex="10" />
         </StackPanel>
+        
+        <Button 
+            Grid.Column="0"
+            Grid.Row="0"
+            VerticalAlignment="Bottom" 
+            HorizontalAlignment="Left"
+            Margin="10,0,0,10"
+            Content="Back"
+            Height="30"
+            Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+            Width="90"
+            materialDesign:ButtonAssist.CornerRadius="15"
+            x:Name="Back"
+            Click="Back_OnClick"/>
 
         <TabControl
             Background="#FEF7FF"
@@ -69,6 +84,7 @@
             HorizontalAlignment="Left"
             Margin="0"
             Padding="0,2,0,0"
+            VerticalAlignment="Top"
             TabStripPlacement="Left">
             <TabItem Height="40" Width="185">
                 <TabItem.Header>
@@ -164,8 +180,7 @@
             <TabItem
                 Height="40"
                 VerticalAlignment="Bottom"
-                Width="185"
-                IsEnabled="False">
+                Width="185">
                 <TabItem.Header>
                     <StackPanel
                         Margin="16,0,0,0"
@@ -181,17 +196,17 @@
                         <TextBlock
                             FontSize="14"
                             Margin="5,0"
-                            Text="Miscellaneous" 
+                            Text="Radio Balancing" 
+                            Height="20"
                             VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Frame Source="MiscellaneousPage.xaml" />
+                <Frame Source="BalancingPage.xaml" Name="BalancingFrame" />
             </TabItem>
             <TabItem
                 Height="40"
                 VerticalAlignment="Bottom"
-                Width="185"
-                IsEnabled="False">
+                Width="185">
                 <TabItem.Header>
                     <StackPanel
                         Margin="16,0,0,0"

@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -65,6 +66,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         public delegate void ReceivedAutoConnect(string address, int port);
 
         public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
+        public delegate void UpdateChannelCallback(ProfileSettingsKeys channel, float balance);
 
         private readonly AudioManager _audioManager;
 
@@ -88,6 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private string _coalitionPassword = "";
         public LoginType LoginType { get; private set; }
         public DateTime ConnectedAt { get; private set; }
+        public string RawServerAddress;
 
         private int OpenPage
         {
@@ -95,7 +98,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             set { SetValue(OPEN_PAGE_PROPERTY, value); }
         }
 
-        private int _oldOpenPage;
+        private int _oldOpenSupportPage;
+        private int _oldOpenSettingsPage;
 
         public static readonly DependencyProperty OPEN_PAGE_PROPERTY =
             DependencyProperty.Register(nameof(OpenPage),
@@ -828,7 +832,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void InitInput()
         {
-            InputManager = new InputDeviceManager(this, ToggleOverlay);
+            InputManager = new InputDeviceManager(this, ToggleOverlay, UpdateChannelSettings);
 
             InitSettingsProfiles();
 
@@ -1087,6 +1091,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void OpenPageByIndex(int index)
         {
+            if (index != SupportIndex)
+            {
+                SupportNavigation.IsEnabled = true;
+            }
+            if (index != SettingsIndex)
+            {
+                SettingsNavigation.IsEnabled = true;
+            }
+            
             switch (index)
             {
                 case WelcomeIndex:
@@ -1094,6 +1107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     break;
                 case SupportIndex:
                     DisplayFrame.Content = _supportPage;
+                    SupportNavigation.IsEnabled = false;
                     break;
                 case LoginIndex:
                     DisplayFrame.Content = _loginPage;
@@ -1106,6 +1120,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     break;
                 case HomePageIndex:
                     DisplayFrame.Content = _homePage;
+                    break;
+                case SettingsIndex:
+                    DisplayFrame.Content = _settingsPage;
+                    SettingsNavigation.IsEnabled = false;
                     break;
                 default:
                     _logger.Error($"Page: {index} could not be found.");
@@ -1192,21 +1210,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             OpenPageByIndex(HomePageIndex);
         }
 
-        public void On_HomeSwitchClicked()
-        {
-            ToggleOverlay(true, 13);
-        }
-
-        public void On_HomeTransparentClicked()
-        {
-            ToggleOverlay(true, 12);
-        }
-        
-        public void On_HomeLayoutClicked()
-        {
-            ToggleOverlay(true, 5);
-        }
-
         public void On_HomeLogOutClicked()
         {
             ConnectAWACSMode();
@@ -1216,33 +1219,26 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void SupportNavigation_Click(object sender, RoutedEventArgs e)
         {
-            if (OpenPage != SupportIndex)
-            {
-                DisplayFrame.Content = _supportPage;
-                _oldOpenPage = OpenPage;
-                OpenPage = SupportIndex;
-            }
-            else
-            {
-                OpenPageByIndex(_oldOpenPage);
-                _oldOpenPage = SupportIndex;
-            }
-
+            // Can create a Loop if back and forth between the two pages
+            _oldOpenSupportPage = OpenPage == SettingsIndex ? _oldOpenSettingsPage : OpenPage;
+            OpenPageByIndex(SupportIndex);
         }
 
         private void SettingsNavigation_Click(object sender, RoutedEventArgs e)
         {
-            if (OpenPage != SettingsIndex)
-            {
-                DisplayFrame.Content = _settingsPage;
-                _oldOpenPage = OpenPage;
-                OpenPage = SettingsIndex;
-            }
-            else
-            {
-                OpenPageByIndex(_oldOpenPage);
-                _oldOpenPage = SettingsIndex;
-            }
+            // Can create a Loop if back and forth between the two pages
+            _oldOpenSettingsPage = OpenPage == SupportIndex ? _oldOpenSupportPage : OpenPage;
+            OpenPageByIndex(SettingsIndex);
+        }
+        
+        public void On_SettingsBackClicked()
+        {
+            OpenPageByIndex(_oldOpenSettingsPage);
+        }
+        
+        public void On_SupportBackClicked()
+        {
+            OpenPageByIndex(_oldOpenSupportPage);
         }
 
         #endregion
@@ -1353,6 +1349,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             Radio9Config.Reload();
             Radio10Config.Reload();
             IntercomConfig.Reload();
+            
+            _settingsPage.ReloadRadioAudioChannelSettings();
+        }
+
+        public void UpdateChannelSettings(ProfileSettingsKeys channel, float balance)
+        {
+            ReloadRadioAudioChannelSettings();
         }
 
         private void InitToolTips()
@@ -1821,6 +1824,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
                         _logger.Debug("Starting AWACS Mode connection.");
                         _connectioNetworkSpan.Finish();
+                        
                         ConnectAWACSMode();
                     }
                     catch (Exception ex)
@@ -2400,7 +2404,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
         }
 
-        private void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
+        public void ResetRadioWindow_Click(object sender, RoutedEventArgs e)
         {
             //close overlay
             _radioOverlayMenuSelect?.Close();
@@ -2847,7 +2851,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
-                OpenPageByIndex(GuestSuccessIndex); // TODO: Check which Page is open
+                OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
+                
+                ExternalAWACSModeName.Text = ClientState.LastSeenName;
+
                 _connectionAwacsSpan.Finish();
                 
                 SentrySdk.ConfigureScope(scope =>
@@ -2857,6 +2864,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                         Username = ClientState.LastSeenName
                     };
                 });
+                
+                _connectionTransaction.Finish();
             }
             else
             {
@@ -2892,8 +2901,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     scope.User = new SentryUser();
                 });
             }
-
-            _connectionTransaction.Finish();
         }
 
         private void RescanInputDevices(object sender, RoutedEventArgs e)
@@ -3184,10 +3191,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     BottomBar.Visibility = Visibility.Visible;
                     MainGrid.RowDefinitions[1].Height = new GridLength(365);
                     break;
-                case 1:
-                    Height = 700;
+                case 1: // Old UI
+                    Height = 750;
                     BottomBar.Visibility = Visibility.Collapsed;
-                    MainGrid.RowDefinitions[1].Height = new GridLength(680);
+                    MainGrid.RowDefinitions[1].Height = new GridLength(730);
                     break;
             }
         }

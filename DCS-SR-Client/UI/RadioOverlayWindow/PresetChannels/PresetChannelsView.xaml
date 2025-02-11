@@ -7,30 +7,44 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
     xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     d:DataContext="{d:DesignInstance presetChannels:PresetChannelsViewModel,
                                               IsDesignTimeCreatable=False}"
     d:DesignHeight="100"
-    d:DesignWidth="135"
+    d:DesignWidth="120"
     mc:Ignorable="d">
-    <WrapPanel HorizontalAlignment="Center"
-               Background="#444"
-               Orientation="Vertical">
+    <StackPanel 
+        HorizontalAlignment="Center"
+        Background="#444"
+        Orientation="Vertical">
         <ComboBox x:Name="FrequencyDropDown"
-                  Width="135"
+                  MinWidth="110"
+                  MaxWidth="110"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Top"
+                  Height="20"
+                  FontSize="8"
+                  materialDesign:HintAssist.HelperText="Channel Selection"
                   DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
                   ItemsSource="{Binding Path=PresetChannels}"
-                  SelectedItem="{Binding Path=SelectedPresetChannel}" />
+                  SelectedItem="{Binding Path=SelectedPresetChannel}"
+                  Margin="0,0,0,12">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock  Text="{Binding Path=Text}" FontSize="8" Padding="0" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <Button Name="ReloadButton"
                 Width="50"
                 Height="20"
-                Margin="0,5,0,0"
+                Margin="0,6,0,0"
                 HorizontalAlignment="Center"
                 Command="{Binding Path=ReloadCommand}"
                 Content="Reload"
+                Padding="0"
                 Style="{x:Null}" />
 
-    </WrapPanel>
+    </StackPanel>
 </UserControl>

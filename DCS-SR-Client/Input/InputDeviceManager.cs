@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Serialization;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
@@ -64,6 +65,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly DirectInput _directInput;
         private readonly Dictionary<Guid, dynamic> _inputDevices = new Dictionary<Guid, dynamic>();
         private readonly MainWindow.ToggleOverlayCallback _toggleOverlayCallback;
+        private readonly MainWindow.UpdateChannelCallback _updateChannelCallback;
 
         private volatile bool _detectPtt;
 
@@ -74,7 +76,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private readonly Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
 
 
-        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback)
+        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback, MainWindow.UpdateChannelCallback _updateChannelCallback)
         {
             _directInput = new DirectInput();
 
@@ -83,6 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 new WindowInteropHelper(window);
 
             this._toggleOverlayCallback = _toggleOverlayCallback;
+            this._updateChannelCallback = _updateChannelCallback;
 
             LoadWhiteList();
 
@@ -691,6 +694,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                         if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
                         {
+                            var currentChannel = GetCurrentChannel();
+                            var currentBalance = 0.0f;
                             switch (bindState.MainDevice.InputBind)
                             {
                                 case InputBinding.Up100:
@@ -766,7 +771,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     var radioId = dcsPlayerRadioInfo.selected;
                                     var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
                                     var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
-                                    
                                     RadioHelper.UpdateStandbyRadioFrequency(freq, radioId, false, false);
                                     RadioHelper.UpdateRadioFrequency(standbyFreq, radioId, false, false);
                                     break;
@@ -813,16 +817,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
                                     break;
                                 case InputBinding.LeftBalance:
-                                    // TODO: Call back new UI for update
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(GetCurrentChannel()) - 0.1f, -1.0f));
+                                    currentChannel = GetCurrentChannel();
+                                    currentBalance = Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) - 0.1f, -1.0f);
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.RightBalance:
-                                    // TODO: Call back new UI for update
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(GetCurrentChannel()) + 0.1f, 1.0f));
+                                    currentChannel = GetCurrentChannel();
+                                    currentBalance = Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) + 0.1f, 1.0f);
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.CenterBalance:
-                                    // TODO: Call back new UI for update
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(GetCurrentChannel(), 0f);
+                                    currentChannel = GetCurrentChannel();
+                                    currentBalance = 0f;
+                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.PanelNightMode:
                                     // TODO: Call back UI for update
