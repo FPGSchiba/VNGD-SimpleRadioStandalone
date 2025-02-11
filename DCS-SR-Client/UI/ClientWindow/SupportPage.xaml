@@ -120,13 +120,13 @@
                                 FontWeight="Bold"
                                 Grid.Row="0"
                                 Grid.RowSpan="2">
-                                VCS-SRS Standard Operating Procedures (SOP)
+                                VCS Standard Operating Procedures Manual
                             </TextBlock>
                             <TextBlock
                                 FontSize="14"
                                 Grid.Row="1"
                                 TextWrapping="WrapWithOverflow">
-                                The Vanguard SRS SOP can be found<Span /> <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
+                                The VCS (Vanguard Communication System) SOP can be found<Span /> <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
                                 , as well as on the vngd.net website under the Command Library section.</TextBlock>
                         </Grid>
                     </materialDesign:Card>
@@ -168,14 +168,13 @@
                                 FontSize="16"
                                 FontWeight="Bold"
                                 Grid.Row="0">
-                                Vanguard VCS-SRS Server Information
+                                VCS Server Information
                             </TextBlock>
                             <TextBlock
                                 FontSize="14"
                                 Grid.Row="1"
                                 TextWrapping="WrapWithOverflow">
-                                The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel<Span /> <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536" RequestNavigate="Hyperlink_RequestNavigate">#srs-status</Hyperlink>
-                                .</TextBlock>
+                                The VCS server information can be found on the Vanguard website or in the Vanguard Discord channel<Span /> <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536" RequestNavigate="Hyperlink_RequestNavigate">#srs-status</Hyperlink>.</TextBlock>
                         </Grid>
                     </materialDesign:Card>
                     <materialDesign:Card
@@ -233,19 +232,18 @@
                         PagePadding="10,0, 10, 50">
                         <Paragraph FontWeight="Bold">Credits &amp; Acknowledgments</Paragraph>
                         <Paragraph>
-                            This software was originally developed by Ciribob (which can be found<Span /> <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
-                            ),
+                            This software was originally developed by Ciribob (which can be found<Span /> <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>),
                             who was gracious enough to allow us to modify it to suit Vanguard's needs.
                             This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.<LineBreak />
                             <LineBreak />
                             If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach
                             out to the SRS Development Team.
-                            The main author for this version is FPGSchiba, with additional support from Archangel-93, AdamCelestial, Gweezlebur, and Dabble1.</Paragraph>
-                        <Paragraph FontWeight="Bold">VCS-SRS Development Team</Paragraph>
+                            The main author for this version is FPGSchiba, with additional support from Gweezlebur, and Dabble1.</Paragraph>
+                        <Paragraph FontWeight="Bold">VCS Development Team</Paragraph>
                         <Paragraph>
-                            Dabble1, FPGSchiba, Volts_Alpaca, Gweezlebur, Archangel-93, AdamCelestial
+                            Dabble1, FPGSchiba, Gweezlebur, Archangel-93
                         </Paragraph>
-                        <Paragraph FontWeight="Bold">VCS-SRS Graphic Design Team</Paragraph>
+                        <Paragraph FontWeight="Bold">VCS Graphic Design Team</Paragraph>
                         <Paragraph>
                             Cheekermonkey, FPGElphi, Noah_Prinzrot, pr0x
                         </Paragraph>
@@ -253,13 +251,13 @@
                         <Paragraph>
                             AdamCelestial, Archangel-93<LineBreak />
                             <LineBreak />
-                            Check the videos out here:<Span /> <Hyperlink NavigateUri="https://www.youtube.com/watch?v=YSBP09E1xm8" RequestNavigate="Hyperlink_RequestNavigate">Vanguard SRS Tutorial Videos</Hyperlink>
+                            Check the videos out here:<Span /> <Hyperlink NavigateUri="https://www.youtube.com/watch?v=YSBP09E1xm8" RequestNavigate="Hyperlink_RequestNavigate">VCS Tutorial Videos</Hyperlink>
                         </Paragraph>
                         <Paragraph FontWeight="Bold">Honorable Mentions</Paragraph>
                         <Paragraph>
                             Quantum-Physicist, Esdin, TheAlexi, ZZGooch, Hohh2O, and SpaceHarvest for believing in the project.
                             Without their support, we would not be where we are today. Additionally, we would like to thank Krehl
-                            and Cold_Kill for playing an intregal part initially getting the Vanguard SRS server setup.<LineBreak />
+                            and Cold_Kill for playing an intregal part initially getting the VCS server setup.<LineBreak />
                             <LineBreak />
                             Finally, thank you to everyone of you who has helped provide guidance, feedback, and support for the project.
                             None of this would be important without all of you. On behalf of the entire development team, thank you!</Paragraph>
@@ -301,7 +299,8 @@
                             Everyone is permitted to copy and distribute verbatim copies<LineBreak />
                             of this license document, but changing it is not allowed.<LineBreak />
                             <LineBreak />
-                            <Bold>Exact License</Bold>:<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone?tab=License-1-ov-file" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
+                            <Bold>Exact License</Bold>:<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone?tab=License-1-ov-file" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink><LineBreak />
+                            <LineBreak />
                             <Bold>Preamble</Bold><LineBreak />
                             <LineBreak />   
                             The GNU General Public License is a free, copyleft license for<LineBreak />
@@ -398,14 +397,13 @@
                         PagePadding="10,0">
                         <Paragraph FontWeight="Bold">Latest Version &amp; Updates</Paragraph>
                         <Paragraph>
-                            While we wish to eventually add one, VCS-SRS does not currently have an autoupdater. You can always get the latest version from GitHub’s Release section for VNGD-SRS:
+                            While we wish to eventually add one, VCS does not currently have an autoupdater. You can always get the latest version from GitHub’s Release section for VNGD-SRS:
                         </Paragraph>
                         <Paragraph>
                             <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest</Hyperlink>
                         </Paragraph>
                         <Paragraph>
-                            Old Versions are<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
-                            .</Paragraph>
+                            Old Versions are<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>.</Paragraph>
                     </FlowDocument>
                 </FlowDocumentScrollViewer>
             </TabItem>

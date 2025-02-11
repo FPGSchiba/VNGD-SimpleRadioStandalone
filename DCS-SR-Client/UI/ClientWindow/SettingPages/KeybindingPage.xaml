@@ -175,10 +175,13 @@
                     Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.RadioChannelDown}"
                     InputName="Radio Channel Down" />
+                
+                <!-- Once finished we can reanable this
                 <components:KeybindingControl 
                     Height="50"
                     ControlInputBinding="{x:Static settings:InputBinding.PanelNightMode}"
                     InputName="Night Mode Toggle (WIP)"/>
+                -->
                 
                 <Separator
                     BorderBrush="Black"

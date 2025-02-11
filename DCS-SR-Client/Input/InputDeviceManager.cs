@@ -771,7 +771,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     var radioId = dcsPlayerRadioInfo.selected;
                                     var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
                                     var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
-                                    
                                     RadioHelper.UpdateStandbyRadioFrequency(freq, radioId, false, false);
                                     RadioHelper.UpdateRadioFrequency(standbyFreq, radioId, false, false);
                                     break;
@@ -818,7 +817,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
                                     break;
                                 case InputBinding.LeftBalance:
-                                    // TODO: Call back new UI for update
                                     currentChannel = GetCurrentChannel();
                                     currentBalance = Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) - 0.1f, -1.0f);
                                     _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
@@ -826,7 +824,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                         new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.RightBalance:
-                                    // TODO: Call back new UI for update
                                     currentChannel = GetCurrentChannel();
                                     currentBalance = Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) + 0.1f, 1.0f);
                                     _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
@@ -834,7 +831,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                         new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.CenterBalance:
-                                    // TODO: Call back new UI for update
                                     currentChannel = GetCurrentChannel();
                                     currentBalance = 0f;
                                     _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
