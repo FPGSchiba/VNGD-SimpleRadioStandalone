@@ -232,7 +232,7 @@
                             ToolTip="Panel Opacity"
                             Style="{x:Null}"
                             Opacity="0.6"
-                            ValueChanged="backgroundOpacitySlider_ValueChanged"
+                            ValueChanged="BackgroundOpacitySliderValueChanged"
                             Value="1" />
                     </Viewbox>
                 </StackPanel>
@@ -265,7 +265,7 @@
                             ToolTip="Panel Opacity"
                             Style="{x:Null}"
                             Opacity="0.6"
-                            ValueChanged="textOpacitySlider_ValueChanged"
+                            ValueChanged="TextOpacitySliderValueChanged"
                             Value="0.1" />
                     </Viewbox>
                 </StackPanel>

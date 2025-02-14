@@ -30,41 +30,40 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
        
         private void On_TimerTick(object sender, EventArgs e)
         {
-            if (ClientStateSingleton.Instance.IsConnected)
-            {
-                if (DateTime.UtcNow.Year - _mainWindow.ConnectedAt.Year > 1)
-                {
-                    ConnectionTimeBlock.Text = "Connection Time: loading";
-                }
-                else
-                {
-                    var diff = DateTime.UtcNow - _mainWindow.ConnectedAt;
-                    var hours = (int)Math.Round(Math.Floor(diff.TotalHours), 0);
-                    var hourS = hours == 1 ? "" : "s";
-                    var totalMinutes = (diff.TotalHours - hours) * 60;
-                    var minutes = (int)Math.Round(Math.Floor(totalMinutes), 0);
-                    var minuteS = minutes == 1 ? "" : "s";
-                    if (hours == 0)
-                    {
-                        var seconds = (int)Math.Round((totalMinutes - minutes) * 60, 0);
-                        var secondS = seconds == 1 ? "" : "s";
-                        ConnectionTimeBlock.Text = $"Connection Time: {minutes} minute{minuteS} {seconds} second{secondS}";
-                    }
-                    else
-                    {
-                        ConnectionTimeBlock.Text = $"Connection Time: {hours} hour{hourS} {minutes} minute{minuteS}";
-                    }
-                    
-                    ConnectedAsBlock.Text = $"Connected as: {ClientStateSingleton.Instance.LastSeenName}";
-                    LoginTypeBlock.Text = $"Login Type: {_mainWindow.LoginType}";
-                }
-            }
-            else
+            if (!ClientStateSingleton.Instance.IsConnected)
             {
                 ConnectionTimeBlock.Text = "Connection Time: ---";
                 ConnectedAsBlock.Text = "Connected as: ---";
                 LoginTypeBlock.Text = "Login Type: ---";
+                return;
             }
+            
+            if (DateTime.UtcNow.Year - _mainWindow.ConnectedAt.Year > 1)
+            {
+                ConnectionTimeBlock.Text = "Connection Time: loading";
+                return;
+            }
+            
+            var diff = DateTime.UtcNow - _mainWindow.ConnectedAt;
+            var hours = (int)Math.Round(Math.Floor(diff.TotalHours), 0);
+            var hourS = hours == 1 ? "" : "s";
+            var totalMinutes = (diff.TotalHours - hours) * 60;
+            var minutes = (int)Math.Round(Math.Floor(totalMinutes), 0);
+            var minuteS = minutes == 1 ? "" : "s";
+            
+            if (hours == 0)
+            {
+                var seconds = (int)Math.Round((totalMinutes - minutes) * 60, 0);
+                var secondS = seconds == 1 ? "" : "s";
+                ConnectionTimeBlock.Text = $"Connection Time: {minutes} minute{minuteS} {seconds} second{secondS}";
+            }
+            else
+            {
+                ConnectionTimeBlock.Text = $"Connection Time: {hours} hour{hourS} {minutes} minute{minuteS}";
+            }
+            
+            ConnectedAsBlock.Text = $"Connected as: {ClientStateSingleton.Instance.LastSeenName}";
+            LoginTypeBlock.Text = $"Login Type: {_mainWindow.LoginType}";
         }
         
         private void Logout_OnClick(object sender, RoutedEventArgs e)

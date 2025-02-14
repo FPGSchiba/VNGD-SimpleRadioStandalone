@@ -18,7 +18,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
     {
         private bool _isPressed = false;
         private Canvas _templateCanvas = null;
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         
         // The value of the control.
         public double Radius { get; set; }
@@ -98,7 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
         private void Ellipse_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if(!_isPressed)
-                // TODO: Change this to look at the current angle and adjust the value based on that
+                // Change this to look at the current angle and adjust the value based on that
                 knob.Value += e.Delta / 120;
         }
     }
@@ -213,9 +213,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
             do
             {
                 current = VisualTreeHelper.GetParent(current) as FrameworkElement;
-                if (current is T)
+                if (current is T result)
                 {
-                    return (T)current;
+                    return result;
                 }
             }
             while (current != null);
@@ -225,11 +225,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
         //Get the rotation angle from the value
         public static double GetAngle(double value, double maximum, double minimum)
         {
-            // TODO: Change this method to clamp between 90 and 270 so we stay in the top half of the circle
             double current = (value / (maximum - minimum)) * 360;
-            if (current == 360)
-                current = 359.999;
-
+            if (Math.Abs(current - 270) > 0.001f)
+                current = 269.999f;
+            if (current < 90)
+                current = 90.001f;
+            
             return current;
         }
 

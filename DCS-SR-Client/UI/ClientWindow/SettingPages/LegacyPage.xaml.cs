@@ -25,7 +25,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (NATOToneVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -34,7 +34,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             NATOToneVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.NATOToneVolume)
-                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                    / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.NATOToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             NATOToneVolume.IsEnabled = true;
             
             // HAVEQUICK Tone Volume
@@ -43,7 +43,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (HQToneVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             HQToneVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.HQToneVolume)
-                                  / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                  / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.HQToneVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             HQToneVolume.IsEnabled = true;
             
             // UHF Effect Volume
@@ -61,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (UHFEffectVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -70,7 +70,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             UHFEffectVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.UHFNoiseVolume)
-                                     / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                     / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.UHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             UHFEffectVolume.IsEnabled = true;
             
             // VHF Effect Volume
@@ -79,7 +79,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (VHFEffectVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -88,7 +88,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             VHFEffectVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.VHFNoiseVolume)
-                                     / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                     / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.VHFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             VHFEffectVolume.IsEnabled = true;
             
             // HF Effect Volume
@@ -97,7 +97,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (HFEffectVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -106,7 +106,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             HFEffectVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.HFNoiseVolume)
-                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                    / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             HFEffectVolume.IsEnabled = true;
             
             // FM Effect Volume
@@ -115,7 +115,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             {
                 if (FMEffectVolume.IsEnabled)
                 {
-                    var orig = double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture);
+                    var orig = double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture);
 
                     var vol = orig * (e.NewValue / 100);
 
@@ -124,7 +124,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
             };
             FMEffectVolume.Value = (_globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.FMNoiseVolume)
-                                    / double.Parse(ProfileSettingsStore.DefaultSettingsProfileSettings[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
+                                    / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.FMNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             FMEffectVolume.IsEnabled = true;
         }
         
