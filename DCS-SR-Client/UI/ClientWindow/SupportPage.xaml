@@ -20,27 +20,25 @@
             <ColumnDefinition Width="415" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <StackPanel
-            Grid.ColumnSpan="3"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Bottom">
-            <Label
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Grid.Row="0">
+            <TextBlock
                 FontSize="24"
-                FontWeight="Bold"
                 HorizontalAlignment="Center"
-                Margin="0,0,0,-10">
-                Vanguard Communication System
-            </Label>
+                Margin="0,10,0,0"
+                Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                Text="Vanguard Communications System" />
             <Label
+                Content="Support Center"
                 FontSize="16"
                 HorizontalAlignment="Center"
-                Margin="0,0,0,12">
-                Support Center
-            </Label>
+                Margin="0,-10,0,0" />
         </StackPanel>
 
         <Rectangle
@@ -51,6 +49,20 @@
             Height="2"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Bottom" />
+        
+        <Button 
+            Grid.Column="0"
+            Grid.Row="0"
+            VerticalAlignment="Bottom" 
+            HorizontalAlignment="Left"
+            Margin="10,0,0,10"
+            Content="Back"
+            Height="30"
+            Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+            Width="90"
+            materialDesign:ButtonAssist.CornerRadius="15"
+            x:Name="Back"
+            Click="Back_OnClick"/>
 
         <TabControl
             Background="#FEF7FF"
@@ -108,13 +120,13 @@
                                 FontWeight="Bold"
                                 Grid.Row="0"
                                 Grid.RowSpan="2">
-                                VCS-SRS Standard Operating Procedures (SOP)
+                                VCS Standard Operating Procedures Manual
                             </TextBlock>
                             <TextBlock
                                 FontSize="14"
                                 Grid.Row="1"
                                 TextWrapping="WrapWithOverflow">
-                                The Vanguard SRS SOP can be found<Span /> <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
+                                The VCS (Vanguard Communication System) SOP can be found<Span /> <Hyperlink NavigateUri="https://www.profile.vngd.net/wings/command/library/3be21dcb-d0cd-4793-9890-64f0462776a9/srs-radio-sop-%26-training-manual" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
                                 , as well as on the vngd.net website under the Command Library section.</TextBlock>
                         </Grid>
                     </materialDesign:Card>
@@ -156,14 +168,13 @@
                                 FontSize="16"
                                 FontWeight="Bold"
                                 Grid.Row="0">
-                                Vanguard VCS-SRS Server Information
+                                VCS Server Information
                             </TextBlock>
                             <TextBlock
                                 FontSize="14"
                                 Grid.Row="1"
                                 TextWrapping="WrapWithOverflow">
-                                The Vanguard SRS server information can be found on the Vanguard website or in the Vanguard Discord channel<Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536" RequestNavigate="Hyperlink_RequestNavigate">#srs-status</Hyperlink>
-                                .</TextBlock>
+                                The VCS server information can be found on the Vanguard website or in the Vanguard Discord channel<Span /> <Hyperlink NavigateUri="https://discord.com/channels/491511591402209281/1151272629886529536" RequestNavigate="Hyperlink_RequestNavigate">#srs-status</Hyperlink>.</TextBlock>
                         </Grid>
                     </materialDesign:Card>
                     <materialDesign:Card
@@ -221,19 +232,18 @@
                         PagePadding="10,0, 10, 50">
                         <Paragraph FontWeight="Bold">Credits &amp; Acknowledgments</Paragraph>
                         <Paragraph>
-                            This software was originally developed by Ciribob (which can be found<Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
-                            ),
+                            This software was originally developed by Ciribob (which can be found<Span /> <Hyperlink NavigateUri="https://github.com/ciribob/DCS-SimpleRadioStandalone" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>),
                             who was gracious enough to allow us to modify it to suit Vanguard's needs.
                             This software has additional versions planned, but due to our real life commitments, will take some time to accomplish.<LineBreak />
                             <LineBreak />
                             If you are interested in assisting with the continued development of SRS for Vanguard, please do not hesitate to reach
                             out to the SRS Development Team.
-                            The main author for this version is FPGSchiba, with additional support from Archangel-93, AdamCelestial, Gweezlebur, and Dabble1.</Paragraph>
-                        <Paragraph FontWeight="Bold">VCS-SRS Development Team</Paragraph>
+                            The main author for this version is FPGSchiba, with additional support from Gweezlebur, and Dabble1.</Paragraph>
+                        <Paragraph FontWeight="Bold">VCS Development Team</Paragraph>
                         <Paragraph>
-                            Dabble1, FPGSchiba, Volts_Alpaca, Gweezlebur, Archangel-93, AdamCelestial
+                            Dabble1, FPGSchiba, Gweezlebur, Archangel-93
                         </Paragraph>
-                        <Paragraph FontWeight="Bold">VCS-SRS Graphic Design Team</Paragraph>
+                        <Paragraph FontWeight="Bold">VCS Graphic Design Team</Paragraph>
                         <Paragraph>
                             Cheekermonkey, FPGElphi, Noah_Prinzrot, pr0x
                         </Paragraph>
@@ -241,13 +251,13 @@
                         <Paragraph>
                             AdamCelestial, Archangel-93<LineBreak />
                             <LineBreak />
-                            Check the videos out here:<Hyperlink NavigateUri="https://www.youtube.com/watch?v=YSBP09E1xm8" RequestNavigate="Hyperlink_RequestNavigate">Vanguard SRS Tutorial Videos</Hyperlink>
+                            Check the videos out here:<Span /> <Hyperlink NavigateUri="https://www.youtube.com/watch?v=YSBP09E1xm8" RequestNavigate="Hyperlink_RequestNavigate">VCS Tutorial Videos</Hyperlink>
                         </Paragraph>
                         <Paragraph FontWeight="Bold">Honorable Mentions</Paragraph>
                         <Paragraph>
                             Quantum-Physicist, Esdin, TheAlexi, ZZGooch, Hohh2O, and SpaceHarvest for believing in the project.
                             Without their support, we would not be where we are today. Additionally, we would like to thank Krehl
-                            and Cold_Kill for playing an intregal part initially getting the Vanguard SRS server setup.<LineBreak />
+                            and Cold_Kill for playing an intregal part initially getting the VCS server setup.<LineBreak />
                             <LineBreak />
                             Finally, thank you to everyone of you who has helped provide guidance, feedback, and support for the project.
                             None of this would be important without all of you. On behalf of the entire development team, thank you!</Paragraph>
@@ -281,7 +291,79 @@
                         FontSize="14"
                         PagePadding="10,0">
                         <Paragraph>
-                            To be filled out later. Dont copy it without our permission. Common Use license.
+                            <LineBreak />
+                            GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007<LineBreak />
+                            <LineBreak />
+                            Copyright (C) 2007 Free Software Foundation, Inc. <LineBreak />
+                            <LineBreak />
+                            Everyone is permitted to copy and distribute verbatim copies<LineBreak />
+                            of this license document, but changing it is not allowed.<LineBreak />
+                            <LineBreak />
+                            <Bold>Exact License</Bold>:<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone?tab=License-1-ov-file" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink><LineBreak />
+                            <LineBreak />
+                            <Bold>Preamble</Bold><LineBreak />
+                            <LineBreak />   
+                            The GNU General Public License is a free, copyleft license for<LineBreak />
+                            software and other kinds of works.<LineBreak />
+                            <LineBreak />
+                            The licenses for most software and other practical works are designed
+                            to take away your freedom to share and change the works.  By contrast,
+                            the GNU General Public License is intended to guarantee your freedom to
+                            share and change all versions of a program--to make sure it remains free
+                            software for all its users.  We, the Free Software Foundation, use the
+                            GNU General Public License for most of our software; it applies also to
+                            any other work released this way by its authors.  You can apply it to
+                            your programs, too.<LineBreak />
+                            <LineBreak />
+                            When we speak of free software, we are referring to freedom, not
+                            price.  Our General Public Licenses are designed to make sure that you
+                            have the freedom to distribute copies of free software (and charge for
+                            them if you wish), that you receive source code or can get it if you
+                            want it, that you can change the software or use pieces of it in new
+                            free programs, and that you know you can do these things.<LineBreak />
+                            <LineBreak />
+                            To protect your rights, we need to prevent others from denying you
+                            these rights or asking you to surrender the rights.  Therefore, you have
+                            certain responsibilities if you distribute copies of the software, or if
+                            you modify it: responsibilities to respect the freedom of others.<LineBreak />
+                            <LineBreak />
+                            For example, if you distribute copies of such a program, whether
+                            gratis or for a fee, you must pass on to the recipients the same
+                            freedoms that you received.  You must make sure that they, too, receive
+                            or can get the source code.  And you must show them these terms so they
+                            know their rights.<LineBreak />
+                            <LineBreak />
+                            Developers that use the GNU GPL protect your rights with two steps:
+                            (1) assert copyright on the software, and (2) offer you this License
+                            giving you legal permission to copy, distribute and/or modify it.<LineBreak />
+                            <LineBreak />
+                            For the developers' and authors' protection, the GPL clearly explains
+                            that there is no warranty for this free software.  For both users' and
+                            authors' sake, the GPL requires that modified versions be marked as
+                            changed, so that their problems will not be attributed erroneously to
+                            authors of previous versions.<LineBreak />
+                            <LineBreak />
+                            Some devices are designed to deny users access to install or run
+                            modified versions of the software inside them, although the manufacturer
+                            can do so.  This is fundamentally incompatible with the aim of
+                            protecting users' freedom to change the software.  The systematic
+                            pattern of such abuse occurs in the area of products for individuals to
+                            use, which is precisely where it is most unacceptable.  Therefore, we
+                            have designed this version of the GPL to prohibit the practice for those
+                            products.  If such problems arise substantially in other domains, we
+                            stand ready to extend this provision to those domains in future versions
+                            of the GPL, as needed to protect the freedom of users.<LineBreak />
+                            <LineBreak />
+                            Finally, every program is threatened constantly by software patents.
+                            States should not allow patents to restrict development and use of
+                            software on general-purpose computers, but in those that do, we wish to
+                            avoid the special danger that patents applied to a free program could
+                            make it effectively proprietary.  To prevent this, the GPL assures that
+                            patents cannot be used to render the program non-free.<LineBreak />
+                            <LineBreak />
+                            The precise terms and conditions for copying, distribution and
+                            modification follow.<LineBreak />
+                            <LineBreak />
                             We aren’t affiliated with RSI, CIG, SRS, or any other entity.
                         </Paragraph>
                     </FlowDocument>
@@ -315,14 +397,13 @@
                         PagePadding="10,0">
                         <Paragraph FontWeight="Bold">Latest Version &amp; Updates</Paragraph>
                         <Paragraph>
-                            While we wish to eventually add one, VCS-SRS does not currently have an autoupdater. You can always get the latest version from GitHub’s Release section for VNGD-SRS:
+                            While we wish to eventually add one, VCS does not currently have an autoupdater. You can always get the latest version from GitHub’s Release section for VNGD-SRS:
                         </Paragraph>
                         <Paragraph>
                             <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases/latest</Hyperlink>
                         </Paragraph>
                         <Paragraph>
-                            Old Versions are<Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>
-                            .</Paragraph>
+                            Old Versions are<Span /> <Hyperlink NavigateUri="https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/releases" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink>.</Paragraph>
                     </FlowDocument>
                 </FlowDocumentScrollViewer>
             </TabItem>
@@ -397,10 +478,12 @@
                         materialDesign:HintAssist.Hint="Input your Feedback here"
                         AcceptsReturn="True"
                         SpellCheck.IsEnabled="True"
+                        TextChanged="FeedbackText_OnTextChanged"
                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
                         TextWrapping="Wrap"
                         VerticalScrollBarVisibility="Auto"
                         VerticalAlignment="Stretch"
+                        MaxLength="4000"
                         Margin="5,0,5,5"
                         x:Name="FeedbackText"
                     />
@@ -408,12 +491,14 @@
                         Grid.Row="2"
                         Grid.Column="1"
                         Click="Submit_OnClick"
+                        IsEnabled="False"
                         Content="SUBMIT"
                         Margin="5,5,5,5"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch"
                         Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                         materialDesign:ButtonAssist.CornerRadius="15"
+                        Name="SubmitButton"
                         />
                 </Grid>
             </TabItem>

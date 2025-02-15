@@ -82,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
                 TransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? "ON" : "OFF";
                 TransmitterName.Background = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? _onColor : _offColor;
                 
-                ServerVersion.Content = SRSClientSyncHandler.ServerVersion;
+                ServerVersion.Content = SrsClientSyncHandler.ServerVersion;
 
                 RetransmitLimit.Content = settings.RetransmitNodeLimit;
             }

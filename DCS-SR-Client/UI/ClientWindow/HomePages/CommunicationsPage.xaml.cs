@@ -37,11 +37,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
             };
 
         }
-        
-        private void Logout_OnClick(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.On_HomeLogOutClicked();
-        }
 
         private void PanelButton_OnClick(object sender, RoutedEventArgs e)
         {

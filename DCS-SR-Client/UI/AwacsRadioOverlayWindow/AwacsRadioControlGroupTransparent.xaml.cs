@@ -1,18 +1,13 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using UserControl = System.Windows.Controls.UserControl;
 using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
@@ -20,19 +15,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
     /// <summary>
     ///     Interaction logic for RadioControlGroup.xaml
     /// </summary>
-    public partial class RadioControlGroupTransparent : UserControl
+    public partial class RadioControlGroupTransparent
     {
         private const double MHz = 1000000;
-        private const int MaxSimultaneousTransmissions = 1;
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
-        private readonly static Brush radioOff = Brushes.IndianRed;
-
+        private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
+        private static readonly Brush RadioOff = Brushes.IndianRed;
+        private static readonly Brush GreenForeground = (Brush)new BrushConverter().ConvertFromString("#0F0");
         
-
+        public bool IsRadioEnabled
+        {
+            get => this.RadioEnabled.Background == RadioOn;
+        }
+        
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
 
@@ -56,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         public int RadioId
         {
-            private get { return _radioId; }
+            get { return _radioId; }
             set
             {
                 _radioId = value;
@@ -82,7 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
             {
                 //remove focus to somewhere else
-                RadioVolume.Focus();
+                this.RadioVolume.Focus();
                 Keyboard.ClearFocus(); //then clear altogether
             }
         }
@@ -92,17 +90,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (keyEventArgs.Key == Key.Enter)
             {
                 //remove focus to somewhere else
-                RadioVolume.Focus();
+                this.RadioVolume.Focus();
                 Keyboard.ClearFocus(); //then clear altogher
             }
         }
 
         private void RadioFrequencyOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            double freq = 0;
             // Some locales/cultures (e.g. German) do not parse "." as decimal points since they use decimal commas ("123,45"), leading to "123.45" being parsed as "12345" and frequencies being set too high
             // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
-            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out freq))
+            if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
             {
                 RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
             }
@@ -120,22 +117,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         private void RadioFrequencyText_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             // TODO functionality to use scroll wheel to change frequency using scroll wheel
-            
-
-            {if (e.Delta > 0)
-                {
-                    //TODO when mouse wheel goes up
-                    Logger.Info("MouseWheel radio frequency Up");
-                }
-
-            if (e.Delta < 0)
-                {
-                    //TODO when mouse wheel goes down
-                    Logger.Info("MouseWheel radio frequency Down");
-                }
-                e.Handled = true;
+            if (e.Delta > 0)
+            {
+                Logger.Info("MouseWheel radio frequency Up");
             }
-
+            else if (e.Delta < 0)
+            {
+                Logger.Info("MouseWheel radio frequency Down");
+            }
+            e.Handled = true;
         }
 
         private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
@@ -169,7 +159,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         }
 
         // This function produces a Crash with a NullReference (https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/issues/128)
-        private void ToggleButtons(bool enable)
+        private void ToggleButtons()
         {
 
             if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
@@ -178,8 +168,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (radio != null)
                 {
-                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? radioOn : radioOff;
-                    RadioEnabled.Content = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off";
+                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? RadioOn : RadioOff;
+                    RadioEnabled.Content = new TextBlock
+                    {
+                        FontSize = 5,
+                        Text = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off",
+                    };
                 }
                 else
                 {
@@ -189,8 +183,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             }
             else
             {
-                RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                RadioEnabled.Background = RadioOff;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
             }
         }
 
@@ -210,7 +208,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 RadioVolume.IsEnabled = false;
 
-                ToggleButtons(false);
+                ToggleButtons();
                 RadioEnabled.IsEnabled = false;
 
                 //reset dragging just incase
@@ -226,12 +224,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     if (transmitting.SendingOn == RadioId)
                     {
                         //Color for user transmitting - dabble
-                        RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+                        RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
                     }
                     else if (currentRadio != null && currentRadio.simul)
                     {
                         //Color for simultaneous transmissions - dabble
-                        RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4F86FF"));
+                        RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
                     }
                     else
                     {
@@ -260,14 +258,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
                 if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
                 {
-                    RadioActive.Fill = radioOff;
+                    RadioActive.Fill = RadioOff;
                     RadioLabel.Text = "OFF";
                     RadioFrequency.Text = "";
                     RadioMetaData.Text = "";
 
                     RadioVolume.IsEnabled = true; // volume slider works even when radio is turned off.
 
-                    ToggleButtons(false);
+                    ToggleButtons();
                     RadioEnabled.IsEnabled = true;
 
                     return;
@@ -350,25 +348,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     RadioMetaData.Text += " 👤" + count;
                 }
 
-                if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-                {
-                    RadioVolume.IsEnabled = true;
-
-                    //reset dragging just incase
-                    //    _dragging = false;
-                }
-                else
-                {
-                    RadioVolume.IsEnabled = true;   // Even if radio is turned off, radio volume is adjustable
-
-                    //reset dragging just incase
-                    //  _dragging = false;
-                }
-
-                ToggleButtons(currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY);
+                ToggleButtons();
                 RadioEnabled.IsEnabled = currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY;
 
-                if (_dragging == false)
+                if (!_dragging)
                 {
                     RadioVolume.Value = currentRadio.volume * 100.0;
                 }
@@ -376,10 +359,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             
         }
-
         
-
-
         internal void RepaintRadioReceive()
         {
             TransmitterName.Visibility = Visibility.Collapsed;
@@ -389,22 +369,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             if (dcsPlayerRadioInfo == null)
             {
-                RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                RadioMetaData.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                RadioFrequency.Foreground = GreenForeground;
+                RadioMetaData.Foreground = GreenForeground;
                 
             }
             else
             {
                 var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
                 //check if current
-
-                if ((receiveState == null) || !receiveState.IsReceiving)
-                {
-                    RadioFrequency.Foreground =
-                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                    RadioMetaData.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                }
-                else if ((receiveState != null) && receiveState.IsReceiving)
+                
+                if (receiveState != null && receiveState.IsReceiving)
                 {
                     if (receiveState.SentBy.Length > 0)
                     {
@@ -430,10 +404,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                 }
                 else
                 {
-                    RadioFrequency.Foreground =
-                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                    RadioMetaData.Foreground =
-                        new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                    RadioFrequency.Foreground = GreenForeground;
+                    RadioMetaData.Foreground = GreenForeground;
                 }
             }
         }
@@ -446,14 +418,22 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioEnabled.Background = radioOn;
-                RadioEnabled.Content = "On";
+                RadioEnabled.Background = RadioOn;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "On",
+                };
             }
             else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
             {
                 RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-                RadioEnabled.Background = radioOff;
-                RadioEnabled.Content = "Off";
+                RadioEnabled.Background = RadioOff;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
             }
         }
     }

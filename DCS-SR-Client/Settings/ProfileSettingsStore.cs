@@ -5,9 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Microsoft.Win32;
 using NLog;
 using SharpConfig;
 
@@ -72,12 +69,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
     public class ProfileSettingsStore
     {
-        private static readonly object _lock = new object();
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly object Lock = new object();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         //cache all the settings in their correct types for speed
         //fixes issue where we access settings a lot and have issues
-        private ConcurrentDictionary<string, object> _settingsCache = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object> _settingsCache = new ConcurrentDictionary<string, object>();
 
         public string CurrentProfileName
         {
@@ -90,43 +87,48 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
 
-        public string Path { get; }
+        private string Path { get; }
 
-        public static readonly Dictionary<string, string> DefaultSettingsProfileSettings = new Dictionary<string, string>()
+        private const string FalseDefault = "false";
+        private const string TrueDefault = "true";
+        private const string DefaultProfile = "default";
+        private const string ClientSettings = "Client Settings";
+        
+        protected static readonly Dictionary<string, string> DEFAULT_SETTINGS_PROFILE_SETTINGS = new Dictionary<string, string>()
         {
-            {ProfileSettingsKeys.RadioEffects.ToString(), "false"},
-            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), "false"},
+            {ProfileSettingsKeys.RadioEffects.ToString(), FalseDefault},
+            {ProfileSettingsKeys.RadioEffectsClipping.ToString(), FalseDefault},
             
             {ProfileSettingsKeys.Radio1Channel.ToString(), "-0.2"},
             {ProfileSettingsKeys.Radio2Channel.ToString(), "0.2"},
 
-            {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), "true"},
-            {ProfileSettingsKeys.NATOTone.ToString(), "false"},
-            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), "false"},
+            {ProfileSettingsKeys.RadioEncryptionEffects.ToString(), TrueDefault},
+            {ProfileSettingsKeys.NATOTone.ToString(), FalseDefault},
+            {ProfileSettingsKeys.HAVEQUICKTone.ToString(), FalseDefault},
 
-            {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), "true"},
-            {ProfileSettingsKeys.RadioRxEffects_End.ToString(), "true"},
+            {ProfileSettingsKeys.RadioRxEffects_Start.ToString(), TrueDefault},
+            {ProfileSettingsKeys.RadioRxEffects_End.ToString(), TrueDefault},
 
             {ProfileSettingsKeys.RadioTransmissionStartSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_START+".wav"},
             {ProfileSettingsKeys.RadioTransmissionEndSelection.ToString(), CachedAudioEffect.AudioEffectTypes.RADIO_TRANS_END+".wav"},
 
 
-            {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), "true"},
-            {ProfileSettingsKeys.RadioTxEffects_End.ToString(), "true"},
-            {ProfileSettingsKeys.MIDSRadioEffect.ToString(), "true"},
+            {ProfileSettingsKeys.RadioTxEffects_Start.ToString(), TrueDefault},
+            {ProfileSettingsKeys.RadioTxEffects_End.ToString(), TrueDefault},
+            {ProfileSettingsKeys.MIDSRadioEffect.ToString(), TrueDefault},
 
-            {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), "false"},
+            {ProfileSettingsKeys.AutoSelectPresetChannel.ToString(), FalseDefault},
 
-            {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),"false" },
-            {ProfileSettingsKeys.AllowDCSPTT.ToString(),"true" },
-            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), "true"},
-            {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), "false"},
-            {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), "false"},
+            {ProfileSettingsKeys.AlwaysAllowHotasControls.ToString(),FalseDefault },
+            {ProfileSettingsKeys.AllowDCSPTT.ToString(),TrueDefault },
+            {ProfileSettingsKeys.RadioSwitchIsPTT.ToString(), TrueDefault},
+            {ProfileSettingsKeys.RadioSwitchIsPTTOnlyWhenValid.ToString(), FalseDefault},
+            {ProfileSettingsKeys.AlwaysAllowTransponderOverlay.ToString(), FalseDefault},
 
             {ProfileSettingsKeys.PTTReleaseDelay.ToString(), "100"},
             {ProfileSettingsKeys.PTTStartDelay.ToString(), "0"},
 
-            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), "false"},
+            {ProfileSettingsKeys.RadioBackgroundNoiseEffect.ToString(), FalseDefault},
 
             {ProfileSettingsKeys.NATOToneVolume.ToString(), "1.2"},
             {ProfileSettingsKeys.HQToneVolume.ToString(), "0.3"},
@@ -138,7 +140,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             {ProfileSettingsKeys.AMCollisionVolume.ToString(), "1.0"},
 
-            {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), "false"},
+            {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), FalseDefault},
         };
 
 
@@ -158,84 +160,98 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public Configuration GetCurrentProfile()
         {
-            return InputConfigs[GetProfileCfgFileName(CurrentProfileName)];
+            return _inputConfigs[GetProfileCfgFileName(CurrentProfileName)];
         }
         public Dictionary<string, Dictionary<InputBinding, InputDevice>> InputProfiles { get; set; } = new Dictionary<string, Dictionary<InputBinding, InputDevice>>();
 
-        private Dictionary<string, Configuration> InputConfigs = new Dictionary<string, Configuration>();
+        private readonly Dictionary<string, Configuration> _inputConfigs = new Dictionary<string, Configuration>();
 
         private readonly GlobalSettingsStore _globalSettings;
-        private string _currentProfileName = "default";
+        private string _currentProfileName = DefaultProfile;
 
         public ProfileSettingsStore(GlobalSettingsStore globalSettingsStore)
         {
             this._globalSettings = globalSettingsStore;
             this.Path = _globalSettings.Path;
-
+        
             MigrateOldSettings();
-
+        
             var profiles = GetProfiles();
             foreach (var profile in profiles)
             {
-                Configuration _configuration = null;
-                try
-                {
-                    int count = 0;
-                    while (GlobalSettingsStore.IsFileLocked(new FileInfo(Path + GetProfileCfgFileName(profile))) && count <10)
-                    {
-                        Thread.Sleep(200);
-                        count++;
-                    }
-                    _configuration = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profile));
-                    InputConfigs[GetProfileCfgFileName(profile)] = _configuration;
-
-                    var inputProfile = new Dictionary<InputBinding, InputDevice>();
-                    InputProfiles[GetProfileName(profile)] = inputProfile;
-
-                    foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
-                    {
-                        var device = GetControlSetting(bind, _configuration);
-
-                        if (device != null)
-                        {
-                            inputProfile[bind] = device;
-                        }
-                    }
-
-                    _configuration.SaveToFile(Path+GetProfileCfgFileName(profile), Encoding.UTF8);
-                
-                }
-                catch (FileNotFoundException)
-                {
-                    Logger.Info(
-                        $"Did not find input config file at path {profile}, initialising with default config");
-                }
-                catch (ParserException)
-                {
-                    Logger.Info(
-                        $"Error with input config - creating a new default ");
-                }
-
-                if (_configuration == null)
-                {
-                    _configuration = new Configuration();
-                    var inputProfile = new Dictionary<InputBinding, InputDevice>();
-                    InputProfiles[GetProfileName(profile)] = inputProfile;
-                    InputConfigs[GetProfileCfgFileName(profile)] = new Configuration();
-                    _configuration.SaveToFile(Path+GetProfileCfgFileName(profile), Encoding.UTF8);
-
-                }
+                LoadProfile(profile);
             }
-
-            //add default
-            if (!InputProfiles.ContainsKey(GetProfileName("default")))
+        
+            AddDefaultProfile();
+        }
+        
+        private void LoadProfile(string profile)
+        {
+            Configuration configuration = null;
+            try
             {
-                InputConfigs[GetProfileCfgFileName("default")] = new Configuration();
-
+                configuration = LoadConfiguration(profile);
+                _inputConfigs[GetProfileCfgFileName(profile)] = configuration;
+        
                 var inputProfile = new Dictionary<InputBinding, InputDevice>();
-                InputProfiles[GetProfileName("default")] = inputProfile;
-
-                InputConfigs[GetProfileCfgFileName("default")].SaveToFile(GetProfileCfgFileName("default"));
+                InputProfiles[GetProfileName(profile)] = inputProfile;
+        
+                foreach (InputBinding bind in Enum.GetValues(typeof(InputBinding)))
+                {
+                    var device = GetControlSetting(bind, configuration);
+                    if (device != null)
+                    {
+                        inputProfile[bind] = device;
+                    }
+                }
+        
+                configuration.SaveToFile(Path + GetProfileCfgFileName(profile), Encoding.UTF8);
+            }
+            catch (FileNotFoundException e)
+            {
+                _logger.Info(e, $"Did not find input config file at path {profile}, initialising with default config");
+            }
+            catch (ParserException e)
+            {
+                _logger.Info(e, "Error with input config - creating a new default ");
+            }
+        
+            if (configuration == null)
+            {
+                InitializeDefaultConfiguration(profile);
+            }
+        }
+        
+        private Configuration LoadConfiguration(string profile)
+        {
+            int count = 0;
+            while (GlobalSettingsStore.IsFileLocked(new FileInfo(Path + GetProfileCfgFileName(profile))) && count < 10)
+            {
+                Thread.Sleep(200);
+                count++;
+            }
+            return Configuration.LoadFromFile(Path + GetProfileCfgFileName(profile));
+        }
+        
+        private void InitializeDefaultConfiguration(string profile)
+        {
+            var configuration = new Configuration();
+            var inputProfile = new Dictionary<InputBinding, InputDevice>();
+            InputProfiles[GetProfileName(profile)] = inputProfile;
+            _inputConfigs[GetProfileCfgFileName(profile)] = configuration;
+            configuration.SaveToFile(Path + GetProfileCfgFileName(profile), Encoding.UTF8);
+        }
+        
+        private void AddDefaultProfile()
+        {
+            if (!InputProfiles.ContainsKey(GetProfileName(DefaultProfile)))
+            {
+                _inputConfigs[GetProfileCfgFileName(DefaultProfile)] = new Configuration();
+        
+                var inputProfile = new Dictionary<InputBinding, InputDevice>();
+                InputProfiles[GetProfileName(DefaultProfile)] = inputProfile;
+        
+                _inputConfigs[GetProfileCfgFileName(DefaultProfile)].SaveToFile(GetProfileCfgFileName(DefaultProfile));
             }
         }
 
@@ -253,18 +269,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     File.AppendAllText(Path + "default.cfg", inputText, Encoding.UTF8);
 
-                    Logger.Info(
-                        $"Migrated the previous input-default.cfg and global settings to the new profile");
+                    _logger.Info("Migrated the previous input-default.cfg and global settings to the new profile");
                 }
                 else
                 {
-                    Logger.Info(
-                        $"No need to migrate - migration complete");
+                    _logger.Info("No need to migrate - migration complete");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex,"Error migrating input profiles");
+                _logger.Error(ex,"Error migrating input profiles");
             }
           
         }
@@ -273,9 +287,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         {
             var profiles = _globalSettings.GetClientSetting(GlobalSettingsKeys.SettingsProfiles).StringValueArray;
 
-            if (profiles == null || profiles.Length == 0 || !profiles.Contains("default"))
+            if (profiles == null || profiles.Length == 0 || !profiles.Contains(DefaultProfile))
             {
-                profiles = new[] { "default" };
+                profiles = new[] { DefaultProfile };
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.SettingsProfiles, profiles);
             }
 
@@ -289,13 +303,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.SettingsProfiles, profiles.ToArray());
 
-            InputConfigs[GetProfileCfgFileName(profileName)] = new Configuration();
+            _inputConfigs[GetProfileCfgFileName(profileName)] = new Configuration();
 
             var inputProfile = new Dictionary<InputBinding, InputDevice>();
             InputProfiles[GetProfileName(profileName)] = inputProfile;
         }
 
-        private string GetProfileCfgFileName(string prof)
+        private static string GetProfileCfgFileName(string prof)
         {
             if (prof.Contains(".cfg"))
             {
@@ -305,7 +319,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return  prof + ".cfg";
         }
 
-        private string GetProfileName(string cfg)
+        private static string GetProfileName(string cfg)
         {
             if (cfg.Contains(".cfg"))
             {
@@ -338,7 +352,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Error reading input device saved settings ");
+                _logger.Error(e, "Error reading input device saved settings ");
             }
 
 
@@ -384,40 +398,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private Setting GetSetting(string section, string setting)
         {
-            var _configuration = GetCurrentProfile();
+            var configuration = GetCurrentProfile();
 
-            if (!_configuration.Contains(section))
+            if (!configuration.Contains(section))
             {
-                _configuration.Add(section);
+                configuration.Add(section);
             }
 
-            if (!_configuration[section].Contains(setting))
+            if (!configuration[section].Contains(setting))
             {
-                if (DefaultSettingsProfileSettings.ContainsKey(setting))
+                if (DEFAULT_SETTINGS_PROFILE_SETTINGS.ContainsKey(setting))
                 {
                     //save
-                    _configuration[section]
-                        .Add(new Setting(setting, DefaultSettingsProfileSettings[setting]));
-
-                    Save();
-                }
-                else if (DefaultSettingsProfileSettings.ContainsKey(setting))
-                {
-                    //save
-                    _configuration[section]
-                        .Add(new Setting(setting, DefaultSettingsProfileSettings[setting]));
+                    configuration[section]
+                        .Add(new Setting(setting, DEFAULT_SETTINGS_PROFILE_SETTINGS[setting]));
 
                     Save();
                 }
                 else
                 {
-                    _configuration[section]
+                    configuration[section]
                         .Add(new Setting(setting, ""));
                     Save();
                 }
             }
 
-            return _configuration[section][setting];
+            return configuration[section][setting];
         }
 
         public bool GetClientSettingBool(ProfileSettingsKeys key)
@@ -428,7 +434,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (bool)val;
             }
 
-            var setting = GetSetting("Client Settings", key.ToString());
+            var setting = GetSetting(ClientSettings, key.ToString());
             if (setting.RawValue.Length == 0)
             {
                 _settingsCache[key.ToString()] = false;
@@ -451,7 +457,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (float) val;
             }
 
-            var setting =  GetSetting("Client Settings", key.ToString()).FloatValue;
+            var setting =  GetSetting(ClientSettings, key.ToString()).FloatValue;
 
             _settingsCache[key.ToString()] = setting;
 
@@ -465,7 +471,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 return (string)val;
             }
 
-            var setting = GetSetting("Client Settings", key.ToString()).RawValue;
+            var setting = GetSetting(ClientSettings, key.ToString()).RawValue;
 
             _settingsCache[key.ToString()] = setting;
 
@@ -475,71 +481,70 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void SetClientSettingBool(ProfileSettingsKeys key, bool value)
         {
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(ClientSettings, key.ToString(), value);
 
-            _settingsCache.TryRemove(key.ToString(), out var res);
+            _settingsCache.TryRemove(key.ToString(), out var _);
         }
 
         public void SetClientSettingFloat(ProfileSettingsKeys key, float value)
         {
-            SetSetting("Client Settings", key.ToString(), value);
+            SetSetting(ClientSettings, key.ToString(), value);
 
-            _settingsCache.TryRemove(key.ToString(), out var res);
+            _settingsCache.TryRemove(key.ToString(), out var _);
         }
         public void SetClientSettingString(ProfileSettingsKeys key, string value)
         {
-            SetSetting("Client Settings", key.ToString(), value);
-            _settingsCache.TryRemove(key.ToString(), out var res);
+            SetSetting(ClientSettings, key.ToString(), value);
+            _settingsCache.TryRemove(key.ToString(), out var _);
         }
 
         private void SetSetting(string section, string key, object setting)
         {
-            var _configuration = GetCurrentProfile();
+            var configuration = GetCurrentProfile();
 
             if (setting == null)
             {
                 setting = "";
             }
-            if (!_configuration.Contains(section))
+            if (!configuration.Contains(section))
             {
-                _configuration.Add(section);
+                configuration.Add(section);
             }
 
-            if (!_configuration[section].Contains(key))
+            if (!configuration[section].Contains(key))
             {
-                _configuration[section].Add(new Setting(key, setting));
+                configuration[section].Add(new Setting(key, setting));
             }
             else
             {
-                if (setting is bool)
+                if (setting is bool bSetting)
                 {
-                    _configuration[section][key].BoolValue = (bool)setting;
+                    configuration[section][key].BoolValue = bSetting;
                 }
-                else if (setting is float)
+                else if (setting is float fSetting)
                 {
-                    _configuration[section][key].FloatValue = (float)setting;
+                    configuration[section][key].FloatValue = fSetting;
                 }
-                else if (setting is double)
+                else if (setting is double dSetting)
                 {
-                    _configuration[section][key].DoubleValue = (double)setting;
+                    configuration[section][key].DoubleValue = dSetting;
                 }
-                else if (setting is int)
+                else if (setting is int iSetting)
                 {
-                    _configuration[section][key].DoubleValue = (int)setting;
+                    configuration[section][key].DoubleValue = iSetting;
                 }
-                else if (setting.GetType() == typeof(string))
+                else if (setting is string sSetting)
                 {
-                    _configuration[section][key].StringValue = setting as string;
+                    configuration[section][key].StringValue = sSetting;
                 }
-                else if (setting is string[])
+                else if (setting is string[] ssSetting)
                 {
-                    _configuration[section][key].StringValueArray = setting as string[];
+                    configuration[section][key].StringValueArray = ssSetting;
                 }
                 else
                 {
-                    Logger.Error("Unknown Setting Type - Not Saved ");
+                    _logger.Error("Unknown Setting Type - Not Saved ");
                 }
-
             }
 
             Save();
@@ -547,23 +552,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         public void Save()
         {
-            lock (_lock)
+            lock (Lock)
             {
                 try
                 {
                     var configuration = GetCurrentProfile();
                     configuration.SaveToFile(Path+GetProfileCfgFileName(CurrentProfileName));
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Logger.Error("Unable to save settings!");
+                    _logger.Error(e, "Unable to save settings!");
                 }
             }
         }
 
         public void RemoveProfile(string profile)
         {
-            InputConfigs.Remove(GetProfileCfgFileName(profile));
+            _inputConfigs.Remove(GetProfileCfgFileName(profile));
             InputProfiles.Remove(GetProfileName(profile));
 
             var profiles = InputProfiles.Keys.ToList();
@@ -571,41 +576,45 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             try
             {
-                File.Delete(Path+GetProfileCfgFileName(profile));
+                File.Delete(Path + GetProfileCfgFileName(profile));
             }
-            catch
-            { }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Unable to delete profile!");
+            }
 
-            CurrentProfileName = "default";
+            CurrentProfileName = DefaultProfile;
         }
 
         public void RenameProfile(string oldName,string newName)
         {
-            InputConfigs[GetProfileCfgFileName(newName)] = InputConfigs[GetProfileCfgFileName(oldName)];
+            _inputConfigs[GetProfileCfgFileName(newName)] = _inputConfigs[GetProfileCfgFileName(oldName)];
             InputProfiles[GetProfileName(newName)]= InputProfiles[GetProfileName(oldName)];
 
-            InputConfigs.Remove(GetProfileCfgFileName(oldName));
+            _inputConfigs.Remove(GetProfileCfgFileName(oldName));
             InputProfiles.Remove(GetProfileName(oldName));
 
             var profiles = InputProfiles.Keys.ToList();
             _globalSettings.SetClientSetting(GlobalSettingsKeys.SettingsProfiles, profiles.ToArray());
 
-            CurrentProfileName = "default";
+            CurrentProfileName = DefaultProfile;
 
-            InputConfigs[GetProfileCfgFileName(newName)].SaveToFile(GetProfileCfgFileName(newName));
+            _inputConfigs[GetProfileCfgFileName(newName)].SaveToFile(GetProfileCfgFileName(newName));
 
             try
             {
-                File.Delete(Path+GetProfileCfgFileName(oldName));
+                File.Delete(Path + GetProfileCfgFileName(oldName));
             }
-            catch
-            { }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Unable to rename profile!");
+            }
         }
 
         public void CopyProfile(string profileToCopy, string profileName)
         {
             var config = Configuration.LoadFromFile(Path+GetProfileCfgFileName(profileToCopy));
-            InputConfigs[GetProfileCfgFileName(profileName)] = config;
+            _inputConfigs[GetProfileCfgFileName(profileName)] = config;
 
             var inputProfile = new Dictionary<InputBinding, InputDevice>();
             InputProfiles[GetProfileName(profileName)] = inputProfile;
@@ -623,9 +632,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             var profiles = InputProfiles.Keys.ToList();
             _globalSettings.SetClientSetting(GlobalSettingsKeys.SettingsProfiles, profiles.ToArray());
 
-            CurrentProfileName = "default";
+            CurrentProfileName = DefaultProfile;
 
-            InputConfigs[GetProfileCfgFileName(profileName)].SaveToFile(Path+GetProfileCfgFileName(profileName));
+            _inputConfigs[GetProfileCfgFileName(profileName)].SaveToFile(Path+GetProfileCfgFileName(profileName));
 
         }
     }

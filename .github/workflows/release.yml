@@ -31,7 +31,7 @@ jobs:
         uses: nuget/setup-nuget@v1
 
       - name: Build & Package
-        run: ./build.bat ".\SRS-Radio-Presets" ${{ steps.version.outputs.version_tag }}
+        run: ./build.bat ${{ steps.version.outputs.version_tag }}
 
       - name: Setup VSTest
         uses: Malcolmnixon/Setup-VSTest@v3
@@ -50,6 +50,6 @@ jobs:
           tag: ${{ steps.version.outputs.version_tag }}
           name: Release ${{ steps.version.outputs.version_tag }}
           body: "Please update Release notes"
-          artifacts: "Vanguard-SRS-${{ steps.version.outputs.version_tag }}.zip"
+          artifacts: "VCS-SRS-${{ steps.version.outputs.version_tag }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true

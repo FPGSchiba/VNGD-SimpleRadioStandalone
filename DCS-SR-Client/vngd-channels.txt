@@ -4,10 +4,8 @@ How to use...
 2) Ensure that the file is named "vngd-channels.txt"
 3) Click RELOAD on the channel dropdown section to refresh the list.
 
-
 ---- Current Operation Frequencies ----|1.0
 Open the vngd-channels.txt file to edit|1.0
-
 
 ---- Request Frequencies ----|1.0
 Party Request      118.50|118.50
@@ -16,7 +14,6 @@ A/A Request        124.00|124.00
 Logistics Request  133.00|133.00
 MedEvac Request    134.00|134.00
 Refuel Request     136.00|136.00
-
 
 ---- Command Frequencies ----|1.0
 Operation Command    118.00|118.00
@@ -34,8 +31,6 @@ Task Force Delta Command     153.00|153.00
 Task Force Echo Command      154.00|154.00
 Task Force Foxtrot Command   155.00|155.00
 Task Force Golf Command      156.00|156.00
-
-
 
 ---- Task Force Alpha Sub-Command Frequencies ----|1.0
 TF Alpha Group 1  150.10|150.10
@@ -119,7 +114,7 @@ Vice            120.10|120.10
 Chaos           120.30|120.30
 Nighthawks      120.50|120.50
 Defiant         120.60|120.60
-Witcher         125.10|125.10
+Fenrir          125.10|125.10
 Obsidian        125.50|125.50
 Discovery       140.10|140.10
 Rogue Racing    140.40|140.40
@@ -127,13 +122,10 @@ Shinobi         140.50|140.50
 Cosmo Knights   140.60|140.60
 Mako Media      140.70|140.70
 Kraken Trading  140.80|140.80
-Atlas           130.10|130.10
 Benevolence     130.50|130.50
 Fleet Services  130.60|130.60
 Rock Raiders    135.10|135.10
 Jackals         135.30|135.30
-
-
 
 ---- Defiant Unit Wide Frequencies ----|1.0
 Defiant Common: 120.60|120.60
@@ -149,7 +141,6 @@ Defiant Flight 6:      120.66|120.66
 Defiant Flight 7:      120.67|120.67
 Defiant Flight 8:      120.68|120.68
 
-
 ---- Discovery Unit Wide Frequencies ----|1.0
 Main Net: 140.100|140.10
 Traffic Marshal: 140.105|140.105
@@ -159,6 +150,7 @@ Medical Dept: 140.190|140.19
 
 ---- Discovery - Magellan Ship Frequencies ----|1.0
 Magellan Flight: 140.200|140.20
+Magellan Away Team: 140.201|140.201
 Magellan Landing: 140.205|140.205
 Magellan Social: 140.209|140.209
 
@@ -173,14 +165,12 @@ Elcano Landing:       140.215|140.215
 Elcano Social:        140.219|140.219
 
 ---- Discovery - Pegasus Ship Frequencies ----|1.0
-Pegasus Command:       140.220|140.220
-Pegasus General:       140.221|140.221
-Pegasus Away Team 1:   140.222|140.222
-Pegasus Away Team 2:   140.223|140.223
-Pegasus Away Team 3:   140.224|140.224
-
-Pegasus Landing:       140.225|140.225
-Pegasus Social:        140.229|140.229
+Pegasus General:      140.220|140.220
+Pegasus Weapons:      140.221|140.221
+Pegasus Away Team 1:  140.224|140.224
+Pegasus Away Team 2:  140.225|140.225
+Pegasus Away Team 3:  140.226|140.226
+Pegasus Landing:      140.228|140.228
 
 ---- Nighthawk Frequencies ----|1.0
 Nighthawk Command:       120.500|120.500
@@ -196,17 +186,16 @@ Jackal Salvage Group 2:    135.320|135.320
 Jackal Salvage Group 3:    135.330|135.330
 Jackal Transport Group 1:  135.340|135.340
 
----- Witcher Frequencies ----|1.0
-Witcher Command:     125.10|125.10
-Witcher Team 1:      125.11|125.11
-Witcher Team 2:      125.12|125.12
-Witcher Team 3:      125.13|125.13
-Witcher Team 4:      125.14|125.14
-Witcher Team 5:      125.15|125.15
-Witcher Team 6:      125.16|125.16
-Witcher Team 7:      125.17|125.17
-Witcher Team 8:      125.18|125.18
-
+---- Fenrir Frequencies ----|1.0
+Fenrir Command:     125.10|125.10
+Fenrir Team 1:      125.11|125.11
+Fenrir Team 2:      125.12|125.12
+Fenrir Team 3:      125.13|125.13
+Fenrir Team 4:      125.14|125.14
+Fenrir Team 5:      125.15|125.15
+Fenrir Team 6:      125.16|125.16
+Fenrir Team 7:      125.17|125.17
+Fenrir Team 8:      125.18|125.18
 
 ---- Social Frequencies ----|1.0
 Social #1     300.00|300.00
@@ -273,7 +262,6 @@ Global Ground Unit #2       114.00|114.00
 Global Misc. Unit #1        115.00|115.00
 Global Misc. Unit #2        116.00|116.00
 Global Misc. Unit #3        117.00|117.00
-
 
 ---- Special Use Frequencies ----|1.0
 Guard       121.50|121.50

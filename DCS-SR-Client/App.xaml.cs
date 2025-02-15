@@ -1,41 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using MahApps.Metro.Controls;
-using NAudio.SoundFont;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Sentry;
-using static Standard.NtDll;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
-namespace DCS_SR_Client
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 {
     /// <summary>
     ///     Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public class App : Application
     {
-        private System.Windows.Forms.NotifyIcon _notifyIcon;
-        private bool loggingReady = false;
-        private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private string version;
+        private NotifyIcon _notifyIcon;
+        private bool _loggingReady;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly string _version;
 
         public App()
         {
@@ -44,7 +37,7 @@ namespace DCS_SR_Client
 #endif
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
+            _version = Regex.Replace(AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(), @"(?<=\d\.\d\.\d)(.*)(?=)", "");
 
             SentrySdk.Init(o =>
             {
@@ -53,7 +46,7 @@ namespace DCS_SR_Client
 #if DEBUG
                 o.Debug = true;
                 o.TracesSampleRate = 1.0;
-                o.Release = $"vngd-srs-client@{version}";
+                o.Release = $"vngd-srs-client@{_version}";
                 o.Environment = "development";
 #endif
 #if !DEBUG
@@ -63,7 +56,7 @@ namespace DCS_SR_Client
                 o.Environment = "production";
 #endif
             });
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandlerAsync);
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandlerAsync;
 
             var location = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -139,11 +132,11 @@ namespace DCS_SR_Client
 
         private void ListArgs()
         {
-            Logger.Info("Arguments:");
+            _logger.Info("Arguments:");
             var args = Environment.GetCommandLineArgs();
             foreach (var s in args)
             {
-                Logger.Info(s);
+                _logger.Info(s);
             }
         }
 
@@ -173,7 +166,7 @@ namespace DCS_SR_Client
                     };
                     try
                     {
-                        Process p = Process.Start(startInfo);
+                        Process.Start(startInfo);
 
                         //shutdown this process as another has started
                         Dispatcher?.BeginInvoke(new Action(() =>
@@ -193,14 +186,9 @@ namespace DCS_SR_Client
                     }
                 });
             }
-            else
-            {
-
-            }
-
         }
 
-        private string GetArgsString()
+        private static string GetArgsString()
         {
             StringBuilder builder = new StringBuilder();
             var args = Environment.GetCommandLineArgs();
@@ -218,10 +206,6 @@ namespace DCS_SR_Client
                     builder.Append(str);
                     builder.Append("\"");
                 }
-                else if (s.Contains("SR-ClientRadio.exe"))
-                {
-                    ///ignore
-                }
                 else
                 {
                     builder.Append(s);
@@ -229,24 +213,6 @@ namespace DCS_SR_Client
             }
 
             return builder.ToString();
-        }
-
-        private bool IsClientRunning()
-        {
-
-            Process currentProcess = Process.GetCurrentProcess();
-            string currentProcessName = currentProcess.ProcessName.ToLower().Trim();
-
-            foreach (Process clsProcess in Process.GetProcesses())
-            {
-                if (clsProcess.Id != currentProcess.Id &&
-                    clsProcess.ProcessName.ToLower().Trim() == currentProcessName)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /* 
@@ -258,7 +224,7 @@ namespace DCS_SR_Client
             // If there is a configuration file then this will already be set
             if (LogManager.Configuration != null)
             {
-                loggingReady = true;
+                _loggingReady = true;
                 return;
             }
 
@@ -288,9 +254,9 @@ namespace DCS_SR_Client
 
             var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", fileWrapper);
-            // TODO: clever way to enable trace logging to file.
-            // Maybe just a default for the moment?
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, fileWrapper));
+            
+            // Default Log Level for File Logging is: Warning (LogLevel.Warn)
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Warn, fileWrapper));
 
             config.AddSentry(options =>
             {
@@ -311,7 +277,7 @@ namespace DCS_SR_Client
 #if DEBUG
                 options.Debug = true;
                 options.TracesSampleRate = 1.0;
-                options.Release = $"vngd-srs-client@{version}";
+                options.Release = $"vngd-srs-client@{_version}";
                 options.Environment = "development";
 #endif
 #if !DEBUG
@@ -324,9 +290,7 @@ namespace DCS_SR_Client
             });
 
             LogManager.Configuration = config;
-            loggingReady = true;
-
-            Logger = LogManager.GetCurrentClassLogger();
+            _loggingReady = true;
         }
 
 
@@ -336,41 +300,43 @@ namespace DCS_SR_Client
             {
                 return;
             }
-            System.Windows.Forms.MenuItem notifyIconContextMenuShow = new System.Windows.Forms.MenuItem
+            MenuItem notifyIconContextMenuShow = new MenuItem
             {
                 Index = 0,
                 Text = "Show"
             };
-            notifyIconContextMenuShow.Click += new EventHandler(NotifyIcon_Show);
+            notifyIconContextMenuShow.Click += NotifyIcon_Show;
 
-            System.Windows.Forms.MenuItem notifyIconContextMenuQuit = new System.Windows.Forms.MenuItem
+            MenuItem notifyIconContextMenuQuit = new MenuItem
             {
                 Index = 1,
                 Text = "Quit"
             };
-            notifyIconContextMenuQuit.Click += new EventHandler(NotifyIcon_Quit);
+            notifyIconContextMenuQuit.Click += NotifyIcon_Quit;
 
-            System.Windows.Forms.ContextMenu notifyIconContextMenu = new System.Windows.Forms.ContextMenu();
-            notifyIconContextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
+            ContextMenu notifyIconContextMenu = new ContextMenu();
+            notifyIconContextMenu.MenuItems.AddRange(new [] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
 
-            _notifyIcon = new System.Windows.Forms.NotifyIcon
+            _notifyIcon = new NotifyIcon
             {
                 Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
                 Visible = true
             };
             _notifyIcon.ContextMenu = notifyIconContextMenu;
-            _notifyIcon.DoubleClick += new EventHandler(NotifyIcon_Show);
+            _notifyIcon.DoubleClick += NotifyIcon_Show;
 
         }
 
         private void NotifyIcon_Show(object sender, EventArgs args)
         {
+            if (MainWindow == null) return;
             MainWindow.Show();
             MainWindow.WindowState = WindowState.Normal;
         }
 
         private void NotifyIcon_Quit(object sender, EventArgs args)
         {
+            if (MainWindow == null) return;
             MainWindow.Close();
         }
 
@@ -384,7 +350,7 @@ namespace DCS_SR_Client
         private void UnhandledExceptionHandlerAsync(object sender, UnhandledExceptionEventArgs e)
         {
             // First log generated Error
-            if (loggingReady)
+            if (_loggingReady)
             {
                 Logger logger = LogManager.GetCurrentClassLogger();
                 logger.Error((Exception)e.ExceptionObject, "Received unhandled exception, {0}", e.IsTerminating ? "exiting" : "continuing");

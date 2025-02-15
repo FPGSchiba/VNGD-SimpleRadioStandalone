@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Threading;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
@@ -307,7 +308,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             _pingStop.Cancel();
 
             _inputManager.StopPtt();
-
         }
 
         private SRClient IsClientMetaDataValid(string clientGuid)

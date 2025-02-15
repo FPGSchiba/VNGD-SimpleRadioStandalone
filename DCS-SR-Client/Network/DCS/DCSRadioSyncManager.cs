@@ -11,6 +11,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
 using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using Newtonsoft.Json;
 using NLog;
+using Xamarin.Forms.Internals;
 
 /**
 Keeps radio information in Sync Between DCS and
@@ -104,6 +105,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
                 {
                     radioJson = File.ReadAllText(AWACS_RADIOS_FILE);
                     awacsRadios = JsonConvert.DeserializeObject<RadioInformation[]>(radioJson);
+                    foreach (var radio in awacsRadios)
+                    {
+                        Logger.Debug($"Loaded AWACS radio file: '{radio.name}': freq: {radio.freq}, stbyfreq: {radio.standbyfreq}");
+                    }
                 }
             }
             catch (Exception ex)

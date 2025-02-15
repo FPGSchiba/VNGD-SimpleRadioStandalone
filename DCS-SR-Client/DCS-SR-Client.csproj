@@ -380,8 +380,8 @@
     <Compile Include="UI\ClientWindow\SettingPages\LegacyPage.xaml.cs">
       <DependentUpon>LegacyPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml.cs">
-      <DependentUpon>MiscellaneousPage.xaml</DependentUpon>
+    <Compile Include="UI\ClientWindow\SettingPages\BalancingPage.xaml.cs">
+      <DependentUpon>BalancingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml.cs">
       <DependentUpon>RadioEffectsPage.xaml</DependentUpon>
@@ -564,7 +564,7 @@
     <Page Include="UI\ClientWindow\SettingPages\GeneralPage.xaml" />
     <Page Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml" />
     <Page Include="UI\ClientWindow\SettingPages\LegacyPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\MiscellaneousPage.xaml" />
+    <Page Include="UI\ClientWindow\SettingPages\BalancingPage.xaml" />
     <Page Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml" />
     <Page Include="UI\ClientWindow\SettingPages\SettingsPage.xaml" />
     <Page Include="UI\ClientWindow\SupportPage.xaml">
@@ -683,7 +683,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Network\SRSClientSyncHandler.cs" />
+    <Compile Include="Network\SrsClientSyncHandler.cs" />
     <Compile Include="UI\ClientWindow\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -892,9 +892,6 @@
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\ClientWindow\RadioSelectionPages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">

@@ -26,7 +26,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private void InitBalanceSlider(object sender, RoutedEventArgs e)
         {
             ChannelSelector.IsEnabled = false;
-            GlobalSettingsStore.Instance.ProfileSettingsStore.SetClientSettingFloat(ProfileSettingKey, DefaultValue);
             Reload();
 
             ChannelSelector.ValueChanged += ChannelSelector_SelectionChanged;
