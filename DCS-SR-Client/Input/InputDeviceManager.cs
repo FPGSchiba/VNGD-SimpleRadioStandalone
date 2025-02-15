@@ -250,10 +250,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
             if (disposing)
             {
                 StopPtt();
-                foreach (var kpDevice in _inputDevices.Select(kpDevice => kpDevice.Value).Where(device => device != null && !device.IsDisposed))
+                foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed))
                 {
-                    kpDevice.Value.Unacquire();
-                    kpDevice.Value.Dispose();
+                    device.Unacquire();
+                    device.Dispose();
                 }
             }
         }
@@ -568,9 +568,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             foreach (var deviceGuid in uniqueDevices)
             {
-                foreach (var kpDevice in _inputDevices.Select(kpDevice => kpDevice.Value).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(deviceGuid)))
+                foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(deviceGuid)))
                 {
-                    var device = kpDevice.Value;
                     try
                     {
                         //poll the device as it has a bind
@@ -883,9 +882,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
         private bool GetButtonState(InputDevice inputDeviceBinding)
         {
-            foreach (var kpDevice in _inputDevices.Select(x => x.Value).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid)))
+            foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid)))
             {
-                var device = kpDevice.Value;
                 try
                 {
                     if (device is XInputController xInputController)

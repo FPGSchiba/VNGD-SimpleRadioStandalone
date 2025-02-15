@@ -42,7 +42,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private readonly Action<bool, int> _toggleOverlay;
     
-        public RadioOverlayWindowTenTransparent(Action<bool, int> toggleOverlay, RadioCapabilities radioCapabilitiesWindow)
+        public RadioOverlayWindowTenTransparent(Action<bool, int> toggleOverlay)
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
