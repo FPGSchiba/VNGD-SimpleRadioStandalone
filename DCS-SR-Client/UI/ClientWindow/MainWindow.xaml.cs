@@ -2804,7 +2804,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
 
         private void ExternalAWACSModeConnectionChanged(bool result, int coalition, bool error = false)
         {
-            if (!_audioManager.IsEncoding)
+            if (!_audioManager.IsEncoding && !error)
             {
                 _audioManager.StartEncoding(InputManager, _resolvedIp, _port);
             }

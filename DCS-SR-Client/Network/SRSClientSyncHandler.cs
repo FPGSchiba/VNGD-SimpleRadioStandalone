@@ -91,6 +91,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             {
                 return;
             }
+            
+            SendToServer(new NetworkMessage
+            {
+                MsgType = NetworkMessage.MessageType.CLIENT_DISCONNECT
+            });
 
             _radioDCSSync.StopExternalAWACSModeLoop();
 
@@ -429,9 +434,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         break;
                                     case NetworkMessage.MessageType.VERSION_MISMATCH:
                                         Logger.Error($"Version Mismatch Between Client ({UpdaterChecker.VERSION}) & Server ({serverMessage.Version}) - Disconnecting");
-
                                         ShowVersionMistmatchWarning(serverMessage.Version);
-
                                         Disconnect();
                                         break;
                                     case NetworkMessage.MessageType.LOGIN_SUCCESS:
@@ -439,14 +442,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                                         // Set the ID for the client
                                         Logger.Info("Registering Client with GUID: " + serverMessage.Client.ClientGuid);
                                         _clientStateSingleton.ShortGUID = serverMessage.Client.ClientGuid;
-                                        
                                         CallExternalAWACSModeOnMain(true, serverMessage.Client.Coalition);
-
                                         _radioDCSSync.StartExternalAWACSModeLoop();
                                         break;
                                     case NetworkMessage.MessageType.LOGIN_FAILED:
                                         Logger.Info("External AWACS mode authentication failed");
                                         CallExternalAWACSModeOnMain(false, 0, true);
+                                        Disconnect();
                                         break;
                                     default:
                                         Logger.Error("Recevied unknown " + line);
@@ -548,11 +550,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                     _tcpClient.Close(); // this'll stop the socket blocking
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, "Failed to close TCP Client correctly");
             }
 
-            Logger.Error("Disconnecting from server");
+            Logger.Info("Disconnecting from server");
             ClientStateSingleton.Instance.IsConnected = false;
 
             //CallOnMain(false);
