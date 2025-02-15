@@ -94,7 +94,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private const string DefaultProfile = "default";
         private const string ClientSettings = "Client Settings";
         
-        protected static readonly Dictionary<string, string> DEFAULT_SETTINGS_PROFILE_SETTINGS = new Dictionary<string, string>()
+        public static readonly Dictionary<string, string> DEFAULT_SETTINGS_PROFILE_SETTINGS = new Dictionary<string, string>()
         {
             {ProfileSettingsKeys.RadioEffects.ToString(), FalseDefault},
             {ProfileSettingsKeys.RadioEffectsClipping.ToString(), FalseDefault},

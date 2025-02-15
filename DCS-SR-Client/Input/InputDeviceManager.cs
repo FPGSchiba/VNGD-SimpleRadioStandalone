@@ -11,6 +11,7 @@ using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
+using Microsoft.CSharp.RuntimeBinder;
 using NLog;
 using SharpDX.DirectInput;
 
@@ -568,9 +569,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
             foreach (var deviceGuid in uniqueDevices)
             {
-                foreach (var kpDevice in _inputDevices.Select(kpDevice => kpDevice.Value).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(deviceGuid)))
+                foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(deviceGuid)))
                 {
-                    var device = kpDevice.Value;
                     try
                     {
                         //poll the device as it has a bind
@@ -579,7 +579,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
                     catch (Exception e)
                     {
                         // ignored
-                        DeviceError(device,e);
+                        DeviceError(device, e);
                     }
                 }
             }
@@ -883,49 +883,66 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 
         private bool GetButtonState(InputDevice inputDeviceBinding)
         {
-            foreach (var kpDevice in _inputDevices.Select(x => x.Value).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid)))
+            foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid)))
             {
-                var device = kpDevice.Value;
                 try
                 {
                     if (device is XInputController xInputController)
                     {
-                        var state = xInputController.GetCurrentState();
-                        return state.HasFlag((SharpDX.XInput.GamepadButtonFlags)inputDeviceBinding.Button);
+                        return HandleXInputController(xInputController, inputDeviceBinding);
                     }
                     if (device is Joystick joystick)
                     {
-                        var state = joystick.GetCurrentState();
-
-                        if (inputDeviceBinding.Button >= 128) //its a POV!
-                        {
-                            var pov = state.PointOfViewControllers;
-                            //-128 to get POV index
-                            return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
-                        }
-                        return state.Buttons[inputDeviceBinding.Button];
+                        return HandleJoystick(joystick, inputDeviceBinding);
                     }
                     if (device is Keyboard keyboard)
                     {
-                        var state = keyboard.GetCurrentState();
-                        return state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                        return HandleKeyboard(keyboard, inputDeviceBinding);
                     }
                     if (device is Mouse mouse)
                     {
-                        var state = mouse.GetCurrentState();
-
-                        //just incase mouse changes number of buttons, like logitech can?
-                        if (inputDeviceBinding.Button < state.Buttons.Length)
-                        {
-                            return state.Buttons[inputDeviceBinding.Button];
-                        }
+                        return HandleMouse(mouse, inputDeviceBinding);
                     }
                 }
                 catch (Exception e)
                 {
-                   DeviceError(device, e);
+                    DeviceError(device, e);
                 }
-
+            }
+            return false;
+        }
+        
+        private bool HandleXInputController(XInputController xInputController, InputDevice inputDeviceBinding)
+        {
+            var state = xInputController.GetCurrentState();
+            return state.HasFlag((SharpDX.XInput.GamepadButtonFlags)inputDeviceBinding.Button);
+        }
+        
+        private bool HandleJoystick(Joystick joystick, InputDevice inputDeviceBinding)
+        {
+            var state = joystick.GetCurrentState();
+            if (inputDeviceBinding.Button >= 128) //its a POV!
+            {
+                var pov = state.PointOfViewControllers;
+                //-128 to get POV index
+                return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
+            }
+            return state.Buttons[inputDeviceBinding.Button];
+        }
+        
+        private bool HandleKeyboard(Keyboard keyboard, InputDevice inputDeviceBinding)
+        {
+            var state = keyboard.GetCurrentState();
+            return state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+        }
+        
+        private bool HandleMouse(Mouse mouse, InputDevice inputDeviceBinding)
+        {
+            var state = mouse.GetCurrentState();
+            //just incase mouse changes number of buttons, like logitech can?
+            if (inputDeviceBinding.Button < state.Buttons.Length)
+            {
+                return state.Buttons[inputDeviceBinding.Button];
             }
             return false;
         }

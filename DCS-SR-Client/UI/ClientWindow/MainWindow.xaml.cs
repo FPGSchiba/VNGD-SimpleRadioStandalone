@@ -1440,7 +1440,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _resolvedIp = ip;
                     _port = port;
 
-                    _client = new SrsClientSyncHandler(_guid, UpdateUiCallback);
+                    _client = new SrsClientSyncHandler(UpdateUiCallback);
 
                     _loginPage.Login.IsEnabled = false;
                     _guestPage.Login.IsEnabled = false;
@@ -1476,7 +1476,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             Username = _playerName
                         };
                         ClientState.LastSeenName = _playerName;
-                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), _coalitionPassword, _playerName, ConnectCallback, ExternalAWACSModeConnectionChanged);
+                        _client.TryConnect(new IPEndPoint(_resolvedIp, _port), _coalitionPassword, _playerName, ConnectCallback, ExternalAwacsModeConnectionChanged);
                     }
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
@@ -2607,7 +2607,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                 _logger.Debug("Init AWACS Connection now...");
                 ClientState.LastSeenName = _playerName;
-                _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAwacsModeConnectionChanged);
             }
         }
 

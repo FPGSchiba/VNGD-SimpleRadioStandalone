@@ -23,7 +23,7 @@ using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
 {
-    public class SRSClientSyncHandler
+    public class SrsClientSyncHandler
     {
         public delegate void ConnectCallback(bool result, bool connectionError, string connection);
         public delegate void ExternalAWACSModeConnectCallback(bool result, int coalition, bool error = false);
@@ -54,7 +54,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private DispatcherTimer _idleTimeout;
 
-        public SRSClientSyncHandler(UpdateUICallback uiCallback)
+        public SrsClientSyncHandler(UpdateUICallback uiCallback)
         {
             _updateUICallback = uiCallback;
 
