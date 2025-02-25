@@ -52,7 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 #if !DEBUG
                 o.Debug = false;
                 o.TracesSampleRate = 0.25;
-                o.Release = $"vngd-srs@{version}";
+                o.Release = $"vngd-srs@{_version}";
                 o.Environment = "production";
 #endif
             });
@@ -283,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 #if !DEBUG
                 options.Debug = false;
                 options.TracesSampleRate = 0.25;
-                options.Release = $"vngd-srs-client@{version}";
+                options.Release = $"vngd-srs-client@{_version}";
                 options.Environment = "production";
 #endif
 

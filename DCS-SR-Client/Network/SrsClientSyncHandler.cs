@@ -302,6 +302,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 //IGNORE
             }
         }
+        
+        private static bool IsValidLine(string line)
+        {
+            // Add your validation logic here
+            return !string.IsNullOrEmpty(line) && line.Length < 4096; // Example validation (4 MB max)
+        }
 
         private void ClientSyncLoop()
         {
@@ -313,9 +319,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 try
                 {
                     SendInitialSyncRequest();
-        
+                    
                     string line;
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = reader.ReadLine()) != null && IsValidLine(line))
                     {
                         try
                         {
@@ -386,7 +392,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                         ProcessExternalAWACSModePasswordMessage(serverMessage);
                         break;
                     default:
-                        Logger.Error("Received unknown " + line);
+                        Logger.Error("Received unknown Packet Type: " + serverMessage.MsgType);
                         break;
                 }
             }
