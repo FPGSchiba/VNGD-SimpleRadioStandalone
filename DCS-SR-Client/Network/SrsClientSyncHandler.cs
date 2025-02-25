@@ -630,7 +630,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 Logger.Error(e, "Error closing TCP Client");
             }
 
-            Logger.Error("Disconnecting from server");
+            Logger.Info("Disconnecting from server");
             ClientStateSingleton.Instance.IsConnected = false;
         }
     }
