@@ -320,8 +320,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 {
                     SendInitialSyncRequest();
                     
-                    string line;
-                    while ((line = reader.ReadLine()) != null && IsValidLine(line))
+                    string line = reader.ReadLine();
+                    while (IsValidLine(line) && line != null)
                     {
                         try
                         {
