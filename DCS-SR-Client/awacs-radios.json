@@ -44,7 +44,7 @@
     "freqMin": 1000000.0,
     "freq": 118500000.0,
     "standbyfreq": 121500000.0,
-    "modulation": 0,
+    "modulation": 3,
     "name": "Radio 2",
     "secFreq": 243000000.0,
     "volume": 1.0,

@@ -394,7 +394,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         {
             int[] radioWindowX = {
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX).DoubleValue,
-                (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableX).DoubleValue,
+                (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioDraggableX).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalX).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalX).DoubleValue,
@@ -414,7 +414,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         
             int[] radioWindowY = {
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectY).DoubleValue,
-                (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableY).DoubleValue,
+                (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioDraggableY).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioOneVerticalY).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalY).DoubleValue,
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioThreeVerticalY).DoubleValue,
@@ -473,7 +473,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         
             GlobalSettingsKeys[] radioWindowX = {
                 GlobalSettingsKeys.RadioMenuSelectX,
-                GlobalSettingsKeys.RadioOverlayWindowDragableX,
+                GlobalSettingsKeys.RadioDraggableX,
                 GlobalSettingsKeys.RadioOneVerticalX,
                 GlobalSettingsKeys.RadioTwoVerticalX,
                 GlobalSettingsKeys.RadioThreeVerticalX,
@@ -493,7 +493,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         
             GlobalSettingsKeys[] radioWindowY = {
                 GlobalSettingsKeys.RadioMenuSelectY,
-                GlobalSettingsKeys.RadioOverlayWindowDragableY,
+                GlobalSettingsKeys.RadioDraggableY,
                 GlobalSettingsKeys.RadioOneVerticalY,
                 GlobalSettingsKeys.RadioTwoVerticalY,
                 GlobalSettingsKeys.RadioThreeVerticalY,
@@ -2235,13 +2235,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioMenuSelectOpacity, 1.0);
 
             // Dragable Panel
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableX, 300);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableY, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioDraggableX, 300);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioDraggableY, 300);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableWidth, 170);
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowDragableHeight, 175);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioDraggableWidth, 170);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioDraggableHeight, 175);
 
-            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOverlayWindowOpacity, 1.0);
+            _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioDraggableOpacity, 1.0);
 
             // 1 Vertical
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioOneVerticalX, 300);

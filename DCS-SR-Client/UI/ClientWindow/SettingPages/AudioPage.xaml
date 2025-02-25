@@ -242,17 +242,16 @@
             
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="135" />
-                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="215" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 
                 <StackPanel Grid.Column="0">
-                    <Label Content="Noise Cancellation" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Label Content="Voice Detection Threshold" FontWeight="Bold" VerticalAlignment="Center" />
                 </StackPanel>
                 
                 <Slider
-                    Grid.Column="2"
+                    Grid.Column="1"
                     IsSnapToTickEnabled="True"
                     LargeChange="4"
                     Maximum="0"
@@ -267,6 +266,26 @@
                     ValueChanged="VOXMinimumRMS_ValueChanged"
                     x:Name="VOXMinimumRMS"/>
             </Grid>
+            
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
+            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="Push to Talk (PTT)"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold" />
+                <TextBlock 
+                    Text="Detection Settings"
+                    Margin="5,-8,0,0"/>
+            </StackPanel>
+            <Separator
+                BorderBrush="Black"
+                BorderThickness="1"
+                VerticalAlignment="Bottom" />
             
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>

@@ -42,12 +42,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         // --------- Dragable Panels --------------
         // Radio Dragable
-        RadioOverlayWindowDragableX,
-        RadioOverlayWindowDragableY,
-        RadioOverlayWindowDragableSize,
-        RadioOverlayWindowOpacity,
-        RadioOverlayWindowDragableWidth,
-        RadioOverlayWindowDragableHeight,
+        RadioDraggableX,
+        RadioDraggableY,
+        RadioDraggableSize,
+        RadioDraggableOpacity,
+        RadioDraggableWidth,
+        RadioDraggableHeight,
 
         // --------- Vertical Panels --------------
         // Radio 1V
@@ -643,7 +643,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.SpeakerBoost.ToString(), "0.514"},
 
             #region Radio Panel settings
-
+            
+            // Menu Select
+            {GlobalSettingsKeys.RadioMenuSelectX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioMenuSelectY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioMenuSelectSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioMenuSelectOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioMenuSelectWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioMenuSelectHeight.ToString(), "270"},
+            
+            // Draggable
+            {GlobalSettingsKeys.RadioDraggableX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioDraggableY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioDraggableSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioDraggableOpacity.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioDraggableWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioDraggableHeight.ToString(), "270"},
+            
             // Raio 1V
             {GlobalSettingsKeys.RadioOneVerticalX.ToString(), "300"},
             {GlobalSettingsKeys.RadioOneVerticalY.ToString(), "300"},
@@ -748,6 +764,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.RadioTenTransparentTextOpacity.ToString(), "1"},
             {GlobalSettingsKeys.RadioTenTransparentWidth.ToString(), "122"},
             {GlobalSettingsKeys.RadioTenTransparentHeight.ToString(), "270"},
+            
+            // Radio 10S
+            {GlobalSettingsKeys.RadioTenSwitchX.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenSwitchY.ToString(), "300"},
+            {GlobalSettingsKeys.RadioTenSwitchSize.ToString(), "1.0"},
+            {GlobalSettingsKeys.RadioTenSwitchBackgroundOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenSwitchTextOpacity.ToString(), "1"},
+            {GlobalSettingsKeys.RadioTenSwitchWidth.ToString(), "122"},
+            {GlobalSettingsKeys.RadioTenSwitchHeight.ToString(), "270"},
             
             // Client Window
             {GlobalSettingsKeys.ClientX.ToString(), "200"},
