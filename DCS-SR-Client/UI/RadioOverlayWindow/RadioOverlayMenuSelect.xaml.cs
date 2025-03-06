@@ -2,37 +2,22 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NLog;
 
 namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
     /// </summary>
-    public partial class RadioOverlayMenuSelect : Window
+    public partial class RadioOverlayMenuSelect
     {
         private readonly double _aspectRatio;
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        
-        private readonly DispatcherTimer _updateTimer;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
-        private long _lastUnitId;
+        private readonly Action<bool, int> _toggleOverlay;
 
-        private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
-
-        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-
-        private Action<bool, int> _toggleOverlay;
-
-        public RadioOverlayMenuSelect(Action<bool, int> ToggleOverlay)
+        public RadioOverlayMenuSelect(Action<bool, int> toggleOverlay)
         {
             InitializeComponent();
 
@@ -58,16 +43,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             LocationChanged += Location_Changed;
 
-            this._toggleOverlay = ToggleOverlay;
+            this._toggleOverlay = toggleOverlay;
         }
 
         private void Location_Changed(object sender, EventArgs e)
         {
-            //   AppConfiguration.Instance.RadioX = Top;
-            //  AppConfiguration.Instance.RadioY = Left;
+            //force aspect ratio
+            CalculateScale();
         }
-
-        
 
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -110,7 +93,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private void windowOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Opacity = e.NewValue;
-            //AppConfiguration.Instance.RadioOpacity = Opacity;
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -135,15 +117,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 Width = sizeInfo.NewSize.Height * _aspectRatio;
             else
                 Height = sizeInfo.NewSize.Width / _aspectRatio;
-
-            //  AppConfiguration.Instance.RadioWidth = Width;
-            // AppConfiguration.Instance.RadioHeight = Height;
-            // Console.WriteLine(this.Height +" width:"+ this.Width);
         }
 
         #region ScaleValue Depdency Property //StackOverflow: http://stackoverflow.com/questions/3193339/tips-on-developing-resolution-independent-application/5000120#5000120
 
-        public static readonly DependencyProperty ScaleValueProperty = DependencyProperty.Register("ScaleValue",
+        public static readonly DependencyProperty SCALE_VALUE_PROPERTY = DependencyProperty.Register("ScaleValue",
             typeof(double), typeof(RadioOverlayMenuSelect),
             new UIPropertyMetadata(1.0, OnScaleValueChanged,
                 OnCoerceScaleValue));
@@ -179,8 +157,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         public double ScaleValue
         {
-            get { return (double) GetValue(ScaleValueProperty); }
-            set { SetValue(ScaleValueProperty, value); }
+            get { return (double) GetValue(SCALE_VALUE_PROPERTY); }
+            set { SetValue(SCALE_VALUE_PROPERTY, value); }
         }
 
         #endregion
@@ -270,19 +248,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Close();
             _toggleOverlay(true, 13);
         }
+        
         private void ShowOverlayDragable_OnClick(object sender, RoutedEventArgs e)
         {
             Close();
             _toggleOverlay(true, 14);
         }
+        
         private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)
         {
             Close();
             _toggleOverlay(true, 15);
         }
-
-
-
+        
         #endregion
 
     }

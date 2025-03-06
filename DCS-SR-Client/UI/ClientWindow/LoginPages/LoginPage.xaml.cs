@@ -26,7 +26,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
     {
         private MainWindow mainWindow;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private SRSTeam _selectedTeam = SRSTeam.BlueTeam;
+        private SrsTeam _selectedTeam = SrsTeam.BlueTeam;
 
         public LoginPage()
         {
@@ -42,10 +42,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
         {
             switch (_selectedTeam)
             {
-                case SRSTeam.BlueTeam:
+                case SrsTeam.BlueTeam:
                     BlueTeamRadio.IsChecked = true;
                     break;
-                case SRSTeam.RedTeam:
+                case SrsTeam.RedTeam:
                     RedTeamRadio.IsChecked = true;
                     break;
             }
@@ -82,12 +82,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
 
         private void BlueTeamRadio_OnChecked(object sender, RoutedEventArgs e)
         {
-            _selectedTeam = SRSTeam.BlueTeam;
+            _selectedTeam = SrsTeam.BlueTeam;
         }
 
         private void RedTeamRadio_OnChecked(object sender, RoutedEventArgs e)
         {
-            _selectedTeam = SRSTeam.RedTeam;
+            _selectedTeam = SrsTeam.RedTeam;
         }
 
         private static string GetAddressFromBackend()

@@ -128,7 +128,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
                 else
                 {
-                    if (radio.IsEnabled)
+                    if (radio.IsRadioEnabled)
                     {
                         radio.Visibility = Visibility.Visible;
                         numVisibleRadios++;
@@ -202,7 +202,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
 
-                if (radio.IsEnabled)
+                if (radio.IsRadioEnabled)
                 {
                     numVisibleRadios++;
                 }

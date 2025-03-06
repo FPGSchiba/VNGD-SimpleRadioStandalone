@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -19,7 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
     /// </summary>
-    public partial class RadioOverlayWindowTenTransparent : Window
+    public partial class RadioOverlayWindowTenTransparent
     {
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -36,18 +37,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private static readonly double RadioHeight = 10;
         private double _currentHeight;
 
-        private long _lastUnitId;
-
         private readonly ImageBrush _expandIcon = new ImageBrush(Images.IconExpand);
         private readonly ImageBrush _contractIcon = new ImageBrush(Images.IconContract);
 
         private readonly Action<bool, int> _toggleOverlay;
-
-        private readonly Action<bool, int> _ExpandPanelImageConverter;
-        
-        // BitmapImage expandimage = new BitmapImage(new Uri("/ ExpandIcon.png", UriKind.Relative));
     
-        public RadioOverlayWindowTenTransparent(Action<bool, int> ToggleOverlay)
+        public RadioOverlayWindowTenTransparent(Action<bool, int> toggleOverlay)
         {
             //load opacity before the intialising as the slider changed
             //method fires after initialisation
@@ -62,14 +57,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             //expand = Contracted
             //contract = Expanded
             buttonExpandText.Text = "expand";
-            
-
 
             this.WindowStartupLocation = WindowStartupLocation.Manual;
 
             _aspectRatio = MinWidth / MinHeight;
             
-            WindowInteropHelper windowInteropHelper = new WindowInteropHelper(MainWindow.GetWindow(this));
+            WindowInteropHelper windowInteropHelper = new WindowInteropHelper(MainWindow.GetWindow(this) ?? throw new InvalidOperationException());
             Screen screen = System.Windows.Forms.Screen.FromHandle(windowInteropHelper.Handle);
             MaxHeight = screen.Bounds.Height;
 
@@ -98,8 +91,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Height = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTenTransparentHeight).DoubleValue;
 
             _currentHeight = Height;
-
-            //  Window_Loaded(null, null);
+            
             CalculateScale();
             containerPanel_SizeChanged(this, null);
 
@@ -110,7 +102,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
 
-            this._toggleOverlay = ToggleOverlay;
+            this._toggleOverlay = toggleOverlay;
         }
         
         private int getNumVisibleRadios()
@@ -129,7 +121,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 }
                 else
                 {
-                    if (radio.IsEnabled)
+                    if (radio.IsRadioEnabled)
                     {
                         radio.Visibility = Visibility.Visible;
                         numVisibleRadios++;
@@ -150,48 +142,29 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             
             int numVisibleRadios = getNumVisibleRadios();
             CalculateHeight(numVisibleRadios);
-
+        
             Intercom.RepaintRadioStatus();
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
+        
+            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
             {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "Compact Radio Panel - Original";
-                    }
-                    else
-                    {
-                        ControlText.Text = "Compact Radio Panel - Original";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "Compact Radio Panel - Original (Disconnected)";
-                    
-                }
+                HandleCurrentDcsPlayerRadioInfo(dcsPlayerRadioInfo);
             }
             else
             {
                 ControlText.Text = "Compact Radio Panel - Original (Disconnected)";
             }
+        }
+        
+        private void HandleCurrentDcsPlayerRadioInfo(DCSPlayerRadioInfo dcsPlayerRadioInfo)
+        {
+            var availableRadios = GetAvailableRadiosCount(dcsPlayerRadioInfo);
+        
+            ControlText.Text = availableRadios > 1 ? "Compact Radio Panel - Original" : "Compact Radio Panel - Original (Disconnected)";
+        }
+        
+        private static int GetAvailableRadiosCount(DCSPlayerRadioInfo dcsPlayerRadioInfo)
+        {
+            return dcsPlayerRadioInfo.radios.Select(t => t.modulation).Count(mod => mod != RadioInformation.Modulation.DISABLED);
         }
 
         private void CalculateHeight(int numVisibleRadios)
@@ -201,7 +174,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             double neededHeaderHeight = !double.IsNaN(Header.ActualHeight) && Header.ActualHeight != 0 ? 14 : 0; // Using the expand button to determine the window state
             double neededFooterHeight = !double.IsNaN(Footer.ActualHeight) && Footer.ActualHeight != 0 ? 10 : 0;
             double newNeededHeight = neededRadioHeight + neededFooterHeight + neededHeaderHeight + 30;
-            if (!double.IsNaN(newNeededHeight) && newNeededHeight != _currentHeight)
+            if (!double.IsNaN(newNeededHeight) && Math.Abs(newNeededHeight - _currentHeight) > 0.001f)
             {
                 MinHeight = newNeededHeight;
                 _aspectRatio = MinWidth / newNeededHeight;
@@ -210,8 +183,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 Height += 1;
             }
         }
-        
-        private RadioCapabilities _radioCapabilitiesWindow;
         
         private void WrapPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -227,7 +198,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
 
-                if (radio.IsEnabled)
+                if (radio.IsRadioEnabled)
                 {
                     numVisibleRadios++;
                 }
@@ -323,7 +294,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             Close();
         }
 
-        private void textOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void TextOpacitySliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //Header
             ControlText.Opacity = e.NewValue;
@@ -440,11 +411,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
             textText.Opacity = e.NewValue;
         }
 
-        private void backgroundOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void BackgroundOpacitySliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Background.Opacity = e.NewValue;
-            
-            //Opacity = e.NewValue;
         }
 
         private void containerPanel_SizeChanged(object sender, SizeChangedEventArgs e)

@@ -11,17 +11,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage
         
         public void ReloadRadioAudioChannelSettings()
         {
-            Radio1Config.Reload();
-            Radio2Config.Reload();
-            Radio3Config.Reload();
-            Radio4Config.Reload();
-            Radio5Config.Reload();
-            Radio6Config.Reload();
-            Radio7Config.Reload();
-            Radio8Config.Reload();
-            Radio9Config.Reload();
-            Radio10Config.Reload();
-            IntercomConfig.Reload();
+            this.Radio1Config.Reload();
+            this.Radio2Config.Reload();
+            this.Radio3Config.Reload();
+            this.Radio4Config.Reload();
+            this.Radio5Config.Reload();
+            this.Radio6Config.Reload();
+            this.Radio7Config.Reload();
+            this.Radio8Config.Reload();
+            this.Radio9Config.Reload();
+            this.Radio10Config.Reload();
+            this.IntercomConfig.Reload();
         }
     }
 }

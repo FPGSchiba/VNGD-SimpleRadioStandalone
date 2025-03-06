@@ -1,14 +1,16 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using NLog;
 using SharpDX.DirectInput;
 namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 {
-    public partial class KeybindingControl : UserControl
+    public partial class KeybindingControl
     {
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private InputDeviceManager _inputDeviceManager;
+        private const string NoKeybinding = "None (None)";
 
         public KeybindingControl()
         {
@@ -46,7 +48,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                 }
                 else
                 {
-                    PrimaryButton.Content = "None (None)";
+                    PrimaryButton.Content = NoKeybinding;
                 }
 
                 if (currentInputProfile.ContainsKey(ModifierBinding))
@@ -56,7 +58,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                 }
                 else
                 {
-                    ModifierButton.Content = "None (None)";
+                    ModifierButton.Content = NoKeybinding;
                 }
             }
         }
@@ -84,7 +86,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
             });
         }
 
-        private string GetDeviceName(string name)
+        private static string GetDeviceName(string name)
         {
             //fix crazy long WINWING names
             if (name.Length > 30)
@@ -104,7 +106,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                     var key = (Key)button;
                     return key.ToString();
                 }
-                catch { }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Failed to get keyboard key");
+                }
 
             }
             else if (name.ToLowerInvariant() == "xinputcontroller")
@@ -114,16 +119,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
                     var buttonFlag = (SharpDX.XInput.GamepadButtonFlags)button;
                     return buttonFlag.ToString("G");
                 }
-                catch { }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Failed to get XInput button");
+                }
             }
             return button < 128 ? (button + 1).ToString() : "POV " + (button - 127);
         }
 
-        private void DeviceClear_Click(object sender, RoutedEventArgs e)
+        private void DeviceClear_Click(object _, RoutedEventArgs e)
         {
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ControlInputBinding);
 
-            PrimaryButton.Content = "None (None)";
+            PrimaryButton.Content = NoKeybinding;
         }
 
         private void Modifier_Click(object sender, RoutedEventArgs e)
@@ -149,9 +157,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
 
         private void ModifierClear_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: A method to call this
             GlobalSettingsStore.Instance.ProfileSettingsStore.RemoveControlSetting(ModifierBinding);
-            ModifierButton.Content = "None (None)";
+            ModifierButton.Content = NoKeybinding;
         }
     }
 }

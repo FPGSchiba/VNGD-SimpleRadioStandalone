@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components;
 using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
@@ -47,14 +49,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             IEnumerable children = LogicalTreeHelper.GetChildren(parent);
             foreach (object child in children)
             {
-                if (child is DependencyObject)
+                if (child is DependencyObject dependencyObject)
                 {
-                    DependencyObject depChild = child as DependencyObject;
-                    if (child is T)
+                    if (dependencyObject is T logicalChild)
                     {
-                        logicalCollection.Add(child as T);
+                        logicalCollection.Add(logicalChild);
                     }
-                    GetLogicalChildCollection(depChild, logicalCollection);
+                    GetLogicalChildCollection(dependencyObject, logicalCollection);
                 }
             }
         }

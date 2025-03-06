@@ -13,7 +13,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
 {
     public class PresetStandbyChannelsViewModel
     {
-        private IPresetChannelsStore _channelsStore;
+        private readonly IPresetChannelsStore _channelsStore;
         private int _radioId;
 
         public DelegateCommand DropDownClosedCommand { get; set; }
@@ -74,8 +74,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.Preset
         public void Reload()
         {
             PresetChannels.Clear();
-
-            var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios;
 
             string vngdFileName = "vngd-channels";
 

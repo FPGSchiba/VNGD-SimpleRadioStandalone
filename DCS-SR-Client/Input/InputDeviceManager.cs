@@ -5,20 +5,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Xml.Serialization;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
 using NLog;
-using NLog.Fluent;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
 {
     public class InputDeviceManager : IDisposable
     {
@@ -28,7 +24,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public static HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
+        private readonly HashSet<Guid> _blacklistedDevices = new HashSet<Guid>
         {
             new Guid("1b171b1c-0000-0000-0000-504944564944"),
             //Corsair K65 Gaming keyboard  It reports as a Joystick when its a keyboard...
@@ -40,7 +36,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         };
 
         //devices that report incorrectly but SHOULD work?
-        public static HashSet<Guid> _whitelistDevices = new HashSet<Guid>
+        private readonly HashSet<Guid> _whitelistedDevices = new HashSet<Guid>
         {
             new Guid("1105231d-0000-0000-0000-504944564944"), //GTX Throttle
             new Guid("b351044f-0000-0000-0000-504944564944"), //F16 MFD 1 Usage: Generic Type: Supplemental
@@ -73,10 +69,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         private InputBinding _lastActiveBinding = InputBinding.ModifierIntercom
             ; //intercom used to represent null as we cant
 
-        private readonly Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
+        private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
 
-        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback _toggleOverlayCallback, MainWindow.UpdateChannelCallback _updateChannelCallback)
+        public InputDeviceManager(Window window, MainWindow.ToggleOverlayCallback toggleOverlayCallback, MainWindow.UpdateChannelCallback updateChannelCallback)
         {
             _directInput = new DirectInput();
 
@@ -84,8 +80,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             WindowHelper =
                 new WindowInteropHelper(window);
 
-            this._toggleOverlayCallback = _toggleOverlayCallback;
-            this._updateChannelCallback = _updateChannelCallback;
+            _toggleOverlayCallback = toggleOverlayCallback;
+            _updateChannelCallback = updateChannelCallback;
 
             LoadWhiteList();
 
@@ -202,7 +198,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             var path = Environment.CurrentDirectory + "\\whitelist.txt";
             Logger.Info("Attempt to Load Whitelist from " + path);
 
-            LoadGuidFromPath(path, _whitelistDevices);
+            LoadGuidFromPath(path, _whitelistedDevices);
         }
 
         private void LoadBlackList()
@@ -213,7 +209,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             LoadGuidFromPath(path, _blacklistedDevices);
         }
 
-        private void LoadGuidFromPath(string path, HashSet<Guid> _hashSet)
+        private static void LoadGuidFromPath(string path, HashSet<Guid> hashSet)
         {
             if (!File.Exists(path))
             {
@@ -222,12 +218,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
 
             string[] lines = File.ReadAllLines(path);
-            if (lines?.Length <= 0)
+            if (lines.Length <= 0)
             {
                 return;
 
             }
-
+            
             foreach (var line in lines)
             {
                 var trimmed = line.Trim();
@@ -235,11 +231,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     try
                     {
-                        _hashSet.Add(new Guid(trimmed));
+                        hashSet.Add(new Guid(trimmed));
                         Logger.Trace("Added " + trimmed);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.Error(e, "Failed to parse GUID from " + trimmed);
                     }
                 }
             }
@@ -247,31 +244,34 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private WindowInteropHelper WindowHelper { get; }
 
-
-        public void Dispose()
+        
+        protected virtual void Dispose(bool disposing)
         {
-            StopPtt();
-            foreach (var kpDevice in _inputDevices)
+            if (disposing)
             {
-                if (kpDevice.Value != null)
+                StopPtt();
+                foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed))
                 {
-                    if (!kpDevice.Value.IsDisposed)
-                    {
-                        kpDevice.Value.Unacquire();
-                        kpDevice.Value.Dispose();
-                    }
+                    device.Unacquire();
+                    device.Dispose();
                 }
             }
         }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-        public bool IsBlackListed(Guid device)
+        private bool IsBlackListed(Guid device)
         {
             return _blacklistedDevices.Contains(device);
         }
 
-        public bool IsWhiteListed(Guid device)
+        private bool IsWhiteListed(Guid device)
         {
-            return _whitelistDevices.Contains(device);
+            return _whitelistedDevices.Contains(device);
         }
 
         private void PollAllDevices()
@@ -299,8 +299,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         deviceList[i].Dispose();
                         deviceList[i] = null;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Logger.Error(e, "Failed to unacquire and dispose device");
                     }
                 }
             }
@@ -326,19 +327,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                     try
                     {
-                        if (deviceList[i] is XInputController)
+                        if (deviceList[i] is XInputController deviceXInputController)
                         {
-                            var state = (deviceList[i] as XInputController).GetCurrentState();
+                            var state = (deviceXInputController).GetCurrentState();
                             var values = (SharpDX.XInput.GamepadButtonFlags[])Enum.GetValues(typeof(SharpDX.XInput.GamepadButtonFlags));
                             for (var j = 0; j < values.Length; j++)
                             {
                                 initial[i, j] = state.HasFlag(values[j]) ? 1 : 0;
                             }
                         }
-                        else if (deviceList[i] is Joystick)
+                        else if (deviceList[i] is Joystick joystick)
                         {
 
-                            var state = (deviceList[i] as Joystick).GetCurrentState();
+                            var state = (joystick).GetCurrentState();
 
                             for (var j = 0; j < state.Buttons.Length; j++)
                             {
@@ -351,9 +352,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                 initial[i, j + 128] = pov[j];
                             }
                         }
-                        else if (deviceList[i] is Keyboard)
+                        else if (deviceList[i] is Keyboard keyboard)
                         {
-                            var keyboard = deviceList[i] as Keyboard;
                             var state = keyboard.GetCurrentState();
 
                             for (var j = 0; j < 128; j++)
@@ -361,10 +361,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                 initial[i, j] = state.IsPressed(state.AllKeys[j]) ? 1 : 0;
                             }
                         }
-                        else if (deviceList[i] is Mouse)
+                        else if (deviceList[i] is Mouse mouse)
                         {
-                            var mouse = deviceList[i] as Mouse;
-
                             var state = mouse.GetCurrentState();
 
                             for (var j = 0; j < state.Buttons.Length; j++)
@@ -383,11 +381,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                         deviceList[i] = null;
                     }
                 }
-
-                var device = string.Empty;
-                var button = 0;
-                var deviceGuid = Guid.Empty;
-                var buttonValue = -1;
+                
                 var found = false;
 
                 while (!found)
@@ -405,9 +399,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
                         try
                         {
-                            if (deviceList[i] is XInputController)
+                            if (deviceList[i] is XInputController xInputController)
                             {
-                                var state = (deviceList[i] as XInputController).GetCurrentState();
+                                var state = (xInputController).GetCurrentState();
                                 var values = (SharpDX.XInput.GamepadButtonFlags[])Enum.GetValues(typeof(SharpDX.XInput.GamepadButtonFlags));
                                 for (var j = 0; j < values.Length; j++)
                                 {
@@ -430,9 +424,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     }
                                 }
                             }
-                            else if (deviceList[i] is Joystick)
+                            else if (deviceList[i] is Joystick joystick)
                             {
-                                var state = (deviceList[i] as Joystick).GetCurrentState();
+                                var state = joystick.GetCurrentState();
 
                                 for (var j = 0; j < 128 + 4; j++)
                                 {
@@ -484,9 +478,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     }
                                 }
                             }
-                            else if (deviceList[i] is Keyboard)
+                            else if (deviceList[i] is Keyboard keyboard)
                             {
-                                var keyboard = deviceList[i] as Keyboard;
                                 var state = keyboard.GetCurrentState();
 
                                 for (var j = 0; j < 128; j++)
@@ -512,9 +505,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                     }
                                 }
                             }
-                            else if (deviceList[i] is Mouse)
+                            else if (deviceList[i] is Mouse mouse)
                             {
-                                var state = (deviceList[i] as Mouse).GetCurrentState();
+                                var state = mouse.GetCurrentState();
 
                                 //skip left mouse button - start at 1 with j 0 is left, 1 is right, 2 is middle
                                 for (var j = 1; j < state.Buttons.Length; j++)
@@ -575,17 +568,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
             foreach (var deviceGuid in uniqueDevices)
             {
-                foreach (var kpDevice in _inputDevices)
+                foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(deviceGuid)))
                 {
-                    var device = kpDevice.Value;
-                    if (device == null ||
-                        device.IsDisposed ||
-                        !device.Information.InstanceGuid.Equals(deviceGuid))
+                    try
                     {
-                        continue;
-                    }
-
-                    try {
                         //poll the device as it has a bind
                         device.Poll();
                     }
@@ -838,7 +824,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                                         new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
                                     break;
                                 case InputBinding.PanelNightMode:
-                                    // TODO: Call back UI for update
+                                    // Call back UI for update
                                     //Select current panel and determine if background opacity is less than .2.
                                     //If true, then set background opacity and text to 1.0. 
                                     //Else, set background opacity and text .2
@@ -858,7 +844,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         }
 
 
-        private ProfileSettingsKeys GetCurrentChannel()
+        private static ProfileSettingsKeys GetCurrentChannel()
         {
             switch (ClientStateSingleton.Instance.DcsPlayerRadioInfo.selected)
             {
@@ -896,27 +882,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         private bool GetButtonState(InputDevice inputDeviceBinding)
         {
-            foreach (var kpDevice in _inputDevices)
+            foreach (var device in _inputDevices.Select(kpDevice => kpDevice is KeyValuePair<Guid, dynamic> ? kpDevice.Value : null).Where(device => device != null && !device.IsDisposed && device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid)))
             {
-                var device = kpDevice.Value;
-                if (device == null ||
-                    device.IsDisposed ||
-                    !device.Information.InstanceGuid.Equals(inputDeviceBinding.InstanceGuid))
-                {
-                    continue;
-                }
-
                 try
                 {
-                    if (device is XInputController)
+                    if (device is XInputController xInputController)
                     {
-                        var state = (device as XInputController).GetCurrentState();
+                        var state = xInputController.GetCurrentState();
                         return state.HasFlag((SharpDX.XInput.GamepadButtonFlags)inputDeviceBinding.Button);
                     }
-                    else if (device is Joystick)
+                    if (device is Joystick joystick)
                     {
-                        //device.Poll();
-                        var state = (device as Joystick).GetCurrentState();
+                        var state = joystick.GetCurrentState();
 
                         if (inputDeviceBinding.Button >= 128) //its a POV!
                         {
@@ -924,23 +901,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                             //-128 to get POV index
                             return pov[inputDeviceBinding.Button - 128] == inputDeviceBinding.ButtonValue;
                         }
-                        else
-                        {
-                            return state.Buttons[inputDeviceBinding.Button];
-                        }
+                        return state.Buttons[inputDeviceBinding.Button];
                     }
-                    else if (device is Keyboard)
+                    if (device is Keyboard keyboard)
                     {
-                        var keyboard = device as Keyboard;
-                       // keyboard.Poll();
                         var state = keyboard.GetCurrentState();
-                        return
-                            state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
+                        return state.IsPressed(state.AllKeys[inputDeviceBinding.Button]);
                     }
-                    else if (device is Mouse)
+                    if (device is Mouse mouse)
                     {
-                       // device.Poll();
-                        var state = (device as Mouse).GetCurrentState();
+                        var state = mouse.GetCurrentState();
 
                         //just incase mouse changes number of buttons, like logitech can?
                         if (inputDeviceBinding.Button < state.Buttons.Length)
@@ -958,7 +928,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             return false;
         }
 
-        private void DeviceError(Device device, Exception e)
+        private static void DeviceError(Device device, Exception e)
         {
             Logger.Error(e, $"Failed to get current state of input device {device.Information.ProductName.Trim().Replace("\0", "")} " +
                             $"(ID: {device.Information.ProductGuid}) while retrieving button state, ignoring until next restart/rediscovery");
@@ -982,7 +952,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             }
         }
 
-        public List<InputBindState> GenerateBindStateList()
+        private List<InputBindState> GenerateBindStateList()
         {
             var bindStates = new List<InputBindState>();
             var currentInputProfile = _globalSettings.ProfileSettingsStore.GetCurrentInputProfile();

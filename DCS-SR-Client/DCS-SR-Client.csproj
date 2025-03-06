@@ -683,7 +683,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Network\SRSClientSyncHandler.cs" />
+    <Compile Include="Network\SrsClientSyncHandler.cs" />
     <Compile Include="UI\ClientWindow\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
