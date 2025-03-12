@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using MaterialDesignThemes.Wpf;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
@@ -19,6 +20,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
     public partial class GuestPage : Page
     {
         private readonly MainWindow _mainWindow;
+        private FFIDInformation _ffidInformation;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
@@ -119,6 +121,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
             {
                 Login_OnClick(sender, e);
             }
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            _ffidInformation = new FFIDInformation();
+            _ffidInformation.ShowDialog(); // ShowDialog blocks the main window
         }
     }
 }

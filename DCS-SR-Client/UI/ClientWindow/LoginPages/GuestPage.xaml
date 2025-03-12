@@ -87,28 +87,53 @@
                     materialDesign:HintAssist.Hint="Password" />
             </StackPanel>
 
-            <StackPanel
+            <Grid
                 Grid.Row="3"
                 Height="38"
                 HorizontalAlignment="Center"
-                Orientation="Horizontal"
                 VerticalAlignment="Top">
-                <TextBox
-                    AcceptsReturn="False"
-                    FontSize="16"
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                
+                
+                <StackPanel 
+                    Grid.Column="0"
                     Height="38"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
-                    Margin="70,0,50,0"
-                    Name="FleetCodeInput"
-                    Padding="8"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                    TextWrapping="NoWrap"
-                    VerticalAlignment="Top"
-                    Width="130"
-                    materialDesign:HintAssist.Hint="Fleet ID Code" />
+                    Orientation="Horizontal">
+                    
+                    <Button
+                        Margin="27,0,5,0"
+                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                        ToolTip="MaterialDesignIconForegroundButton"
+                        Height="38"
+                        Width="38"
+                        Click="ButtonBase_OnClick"
+                    >
+                        <materialDesign:PackIcon Kind="CrosshairsQuestion" Height="38" Width="38" />
+                    </Button>
+                    
+                    <TextBox
+                        AcceptsReturn="False"
+                        FontSize="16"
+                        Height="38"
+                        HorizontalAlignment="Center"
+                        IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
+                        Margin="0,0,0,0"
+                        Name="FleetCodeInput"
+                        Padding="8"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        TextWrapping="NoWrap"
+                        VerticalAlignment="Top"
+                        Width="130"
+                        materialDesign:HintAssist.Hint="Fleet ID Code" />
+                </StackPanel>
 
                 <TextBox
+                    Grid.Column="2"
                     AcceptsReturn="False"
                     FontSize="16"
                     Height="38"
@@ -121,7 +146,7 @@
                     VerticalAlignment="Top"
                     Width="200"
                     materialDesign:HintAssist.Hint="Player Name" />
-            </StackPanel>
+            </Grid>
 
             <StackPanel
                 Grid.Row="5"

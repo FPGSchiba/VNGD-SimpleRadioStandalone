@@ -359,6 +359,9 @@
     <Compile Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml.cs">
       <DependentUpon>ServerDetailsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ClientWindow\LoginPages\FFIDInformation.xaml.cs">
+      <DependentUpon>FFIDInformation.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ClientWindow\LoginPages\GuestPage.xaml.cs">
       <DependentUpon>GuestPage.xaml</DependentUpon>
     </Compile>
@@ -530,6 +533,7 @@
     <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
     <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
     <Compile Include="Utils\WPFElementHelper.cs" />
+    <Compile Include="Vanguard\Unit.cs" />
     <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -551,6 +555,7 @@
     <Page Include="UI\ClientWindow\HomePages\HomePage.xaml" />
     <Page Include="UI\ClientWindow\HomePages\PlayerListPage.xaml" />
     <Page Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml" />
+    <Page Include="UI\ClientWindow\LoginPages\FFIDInformation.xaml" />
     <Page Include="UI\ClientWindow\LoginPages\GuestPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
