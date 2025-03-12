@@ -297,9 +297,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
                     new ThreadStart(delegate { _updateUICallback(); }));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //IGNORE
+                Logger.Error(e, "Failed to update UI after connection callback");
             }
         }
         

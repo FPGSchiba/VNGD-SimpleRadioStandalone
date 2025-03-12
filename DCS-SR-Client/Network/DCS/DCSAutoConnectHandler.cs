@@ -93,7 +93,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
 
                 try
                 {
-                    _dcsUdpListener.Close();
+                    _dcsUdpListener?.Close();
                 }
                 catch (Exception e)
                 {

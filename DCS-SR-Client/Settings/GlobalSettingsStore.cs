@@ -1058,9 +1058,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     _configuration.SaveToFile(Path + ConfigFileName);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Logger.Error("Unable to save settings!");
+                    Logger.Error(e, "Unable to save settings!");
                 }
             }
         }

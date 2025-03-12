@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
 
                     try
                     {
-                        _vaicomUDPListener.Close();
+                        _vaicomUDPListener?.Close();
                     }
                     catch (Exception e)
                     {

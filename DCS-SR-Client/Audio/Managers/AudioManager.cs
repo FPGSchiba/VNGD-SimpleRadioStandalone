@@ -303,8 +303,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
-            Logger.Error("Recording Stopped");
+            Logger.Error(e.Exception, "Recording Stopped");
         }
+        
         Stopwatch _stopwatch = new Stopwatch();
         // private WaveFileWriter _beforeWaveFile;
         // private WaveFileWriter _afterFileWriter;
@@ -452,16 +453,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                     }
                     catch (Exception ex)
                     {
+                        // Can safely ignore this error as it's just a single frame
                         _errorCount++;
                         if (_errorCount < 10)
                         {
-                            Logger.Error(ex, "Error encoding Opus! " + ex.Message);
+                            Logger.Warn(ex, "Error encoding Opus! " + ex.Message);
                         }
                         else if (_errorCount == 10)
                         {
-                            Logger.Error(ex, "Final Log of Error encoding Opus! " + ex.Message);
+                            Logger.Warn(ex, "Final Log of Error encoding Opus! " + ex.Message);
                         }
-
                     }
                 }
             }

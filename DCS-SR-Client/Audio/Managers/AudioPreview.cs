@@ -227,7 +227,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         private void WasapiCaptureOnRecordingStopped(object sender, StoppedEventArgs e)
         {
-            Logger.Error("Recording Stopped");
+            Logger.Error(e.Exception, "Recording Stopped");
         }
 
         //Stopwatch _stopwatch = new Stopwatch();
