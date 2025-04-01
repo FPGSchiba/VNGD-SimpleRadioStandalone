@@ -129,8 +129,8 @@
     <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
@@ -171,6 +171,18 @@
     <Reference Include="SharpDX.XInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
     </Reference>
+    <Reference Include="SocketIO.Core, Version=3.1.2.0, Culture=neutral, PublicKeyToken=c9a3629195a82104, processorArchitecture=MSIL">
+      <HintPath>packages\SocketIO.Core.3.1.2\lib\netstandard2.0\SocketIO.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SocketIO.Serializer.Core, Version=3.1.2.0, Culture=neutral, PublicKeyToken=c9a3629195a82104, processorArchitecture=MSIL">
+      <HintPath>packages\SocketIO.Serializer.Core.3.1.2\lib\netstandard2.0\SocketIO.Serializer.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SocketIO.Serializer.SystemTextJson, Version=3.1.2.0, Culture=neutral, PublicKeyToken=c9a3629195a82104, processorArchitecture=MSIL">
+      <HintPath>packages\SocketIO.Serializer.SystemTextJson.3.1.2\lib\netstandard2.0\SocketIO.Serializer.SystemTextJson.dll</HintPath>
+    </Reference>
+    <Reference Include="SocketIOClient, Version=3.1.2.0, Culture=neutral, PublicKeyToken=c9a3629195a82104, processorArchitecture=MSIL">
+      <HintPath>packages\SocketIOClient.3.1.2\lib\net462\SocketIOClient.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -205,11 +217,11 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=6.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.6.0.8\lib\net461\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=8.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.8.0.4\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -308,6 +320,7 @@
     <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
     <Compile Include="Audio\Recording\AudioRecordingLameWriterBase.cs" />
     <Compile Include="Audio\Recording\ClientTransmissionBuffer.cs" />
+    <Compile Include="Network\VcsClientSyncHandler.cs" />
     <Compile Include="Settings\ProfileSettingsStore.cs" />
     <Compile Include="Input\InputBindState.cs" />
     <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />

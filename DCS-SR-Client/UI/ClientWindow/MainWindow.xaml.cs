@@ -73,7 +73,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
         private readonly string _guid;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
-        private SrsClientSyncHandler _client;
+        private SrsClientSyncHandler _srsClient;
+        private VcsClientSyncHandler _vcsClient;
         private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
@@ -1421,6 +1422,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                                     / double.Parse(ProfileSettingsStore.DEFAULT_SETTINGS_PROFILE_SETTINGS[ProfileSettingsKeys.HFNoiseVolume.ToString()], CultureInfo.InvariantCulture)) * 100;
             HFEffectVolume.IsEnabled = true;
         }
+        
+        private void VcsUiUpdate(VcsUiUpdateType type, string message)
+        {
+            _logger.Info($"{type}: {message}");
+        }
 
         private void Connect(IPAddress ip, int port)
         {
@@ -1442,14 +1448,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _resolvedIp = ip;
                     _port = port;
 
-                    _client = new SrsClientSyncHandler(_guid, UpdateUiCallback);
+                    _srsClient = new SrsClientSyncHandler(_guid, UpdateUiCallback);
+                    _vcsClient = new VcsClientSyncHandler(VcsUiUpdate);
 
                     _loginPage.Login.IsEnabled = false;
                     _guestPage.Login.IsEnabled = false;
 
                     _guestPage.LoginInProgress.Opacity = 1;
 
-                    _client.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
+                    // _srsClient.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
+                    _vcsClient.Connect(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName});
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -1509,10 +1517,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _logger.Error(e, "Failed to stop audio encoding");
             }
 
-            if (_client != null)
+            if (_srsClient != null)
             {
-                _client.Disconnect();
-                _client = null;
+                _srsClient.Disconnect();
+                _srsClient = null;
             }
 
             ClientState.DcsPlayerRadioInfo.Reset();
@@ -2559,7 +2567,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             }
 
 
-            if (_client == null ||
+            if (_srsClient == null ||
                 !ClientState.IsConnected ||
                 (!ClientState.ExternalAWACSModelSelected &&
                  string.IsNullOrWhiteSpace(_coalitionPassword)))
@@ -2570,7 +2578,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
             // Already connected, disconnect
             if (ClientState.ExternalAWACSModelSelected)
             {
-                _client.DisconnectExternalAWACSMode();
+                _srsClient.DisconnectExternalAWACSMode();
             }
             else
             {
@@ -2581,7 +2589,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                 _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                 _logger.Debug("Init AWACS Connection now...");
                 ClientState.LastSeenName = _playerName;
-                _client.ConnectExternalAWACSMode(_coalitionPassword, ExternalAwacsModeConnectionChanged);
+                _srsClient.ConnectExternalAWACSMode(_coalitionPassword, ExternalAwacsModeConnectionChanged);
             }
         }
 
