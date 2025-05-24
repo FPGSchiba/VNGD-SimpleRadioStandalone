@@ -1,5 +1,5 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+﻿using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Network;
 using MahApps.Metro.Controls;
 using NLog;
 using System;
@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Threading;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList
+namespace Vanguard.VCS.Client.UI.ClientWindow
 {
     /// <summary>
     /// Interaction logic for ClientListWindow.xaml

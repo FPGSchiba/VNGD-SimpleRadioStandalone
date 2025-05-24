@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Recording;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common;
 using NAudio.Utils;
 using NAudio.Wave;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class RadioMixingProvider : ISampleProvider
     {

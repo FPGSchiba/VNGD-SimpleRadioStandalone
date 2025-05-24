@@ -1,31 +1,26 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using FragLabs.Audio.Codecs;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
-using Timer = Cabhishek.Timers.Timer;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Network.Models;
+using static Vanguard.VCS.Common.RadioInformation;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Vanguard.VCS.Client.Network
 {
     internal class UdpVoiceHandler
     {

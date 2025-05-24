@@ -6,13 +6,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using NLog;
-using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 using IMultiValueConverter = System.Windows.Data.IMultiValueConverter;
 using IValueConverter = System.Windows.Data.IValueConverter;
 using Point = System.Windows.Point;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
+namespace Vanguard.VCS.Client.UI.Components
 {
     public partial class BalanceControl : UserControl
     {

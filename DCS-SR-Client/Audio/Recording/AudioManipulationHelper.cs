@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     public static class AudioManipulationHelper
     {

@@ -2,13 +2,12 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
+using IntercomUtils = Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
+namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for IntercomControlGroup.xaml
@@ -28,8 +27,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
         {
             InitializeComponent();
 
-            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
-            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxicDisabled;
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? IntercomUtils.IntercomControlGroup.voxEnabled : IntercomUtils.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? IntercomUtils.IntercomControlGroup.voxEnabled : IntercomUtils.IntercomControlGroup.voxicDisabled;
             _intercomInformation = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
             IntercomNumberSpinner.Maximum = (int)Math.Round(_intercomInformation.freqMax, 0);
             IntercomNumberSpinner.Minimum = 1;
@@ -164,8 +163,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
                     _clientStateSingleton.IntercomOffset = 1;
 
 
-                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
+                    Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxicDisabled;
                 }
 
                 if (_dragging == false)
@@ -194,25 +193,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
             }
 
 
             if (spinnervalue == 1)
             {
                 IntercomEnabled.IsEnabled = false;
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
+                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxicDisabled;
             }
             else
             {
                 IntercomEnabled.IsEnabled = true;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
                 }
                 else
                 {
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
                 }
             }
 
@@ -233,16 +232,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
             {
-                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
             }
         }
 
@@ -252,16 +251,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
-                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
             }
         }
     }

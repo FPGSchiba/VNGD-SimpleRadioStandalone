@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters
+namespace Vanguard.VCS.Client.Utils.ValueConverters
 {
     class MicAvailabilityTooltipConverter : IValueConverter
     {

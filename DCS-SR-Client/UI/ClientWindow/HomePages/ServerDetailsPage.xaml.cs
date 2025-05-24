@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Media;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.Setting;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
+namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {
     public partial class ServerDetailsPage : Page
     {

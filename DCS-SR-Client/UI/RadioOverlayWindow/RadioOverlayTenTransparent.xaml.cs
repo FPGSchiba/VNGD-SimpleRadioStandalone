@@ -6,16 +6,16 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI;
 using NLog;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Common;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Vanguard.VCS.Client.UI.ClientWindow;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml

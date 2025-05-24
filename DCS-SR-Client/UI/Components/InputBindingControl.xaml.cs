@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Settings;
 using NLog;
 using SharpDX.DirectInput;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
+namespace Vanguard.VCS.Client.UI.Components
 {
     /// <summary>
     ///     Interaction logic for InputBindingControl.xaml

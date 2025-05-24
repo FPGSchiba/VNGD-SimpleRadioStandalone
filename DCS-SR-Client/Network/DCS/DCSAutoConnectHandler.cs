@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+using Vanguard.VCS.Client.Settings;
 using NLog;
+using Vanguard.VCS.Client.UI.ClientWindow;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
+namespace Vanguard.VCS.Client.Network.DCS
 {
     public class DCSAutoConnectHandler
     {

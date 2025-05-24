@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
+namespace Vanguard.VCS.Common.Helpers
 {
     public class JsonDCSPropertiesResolver : DefaultContractResolver
     {

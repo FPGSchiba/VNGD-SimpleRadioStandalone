@@ -17,32 +17,31 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.ClientList;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.Favourites;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Network.DCS;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.ClientWindow.HomePages;
+using Vanguard.VCS.Client.UI.ClientWindow.Favourites;
+using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
 using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NLog;
 using WPFCustomMessageBox;
-using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
+using InputBinding = Vanguard.VCS.Client.Settings.InputBinding;
 using Sentry;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Settings.Favourites;
+using Vanguard.VCS.Client.UI.ClientWindow.LoginPages;
+using Vanguard.VCS.Client.UI.ClientWindow.SettingPages;
+using Vanguard.VCS.Client.UI.ClientWindow.WelcomePages;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Vanguard.VCS.Client.UI.ClientWindow
 {
     enum SrsTeam
     {
@@ -1457,7 +1456,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                     _guestPage.LoginInProgress.Opacity = 1;
 
                     // _srsClient.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
-                    _vcsClient.Connect(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName});
+                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName});
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -1626,7 +1625,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
                             "JOIN DISCORD SERVER",
                             MessageBoxImage.Error);
 
-                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start(Properties.Settings.Default.DiscordURL);   //Dabble updated to reflect VNGD SRS Dev Team Discord
+                        if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/PMKtQsSk");
                     }
                 }
             }

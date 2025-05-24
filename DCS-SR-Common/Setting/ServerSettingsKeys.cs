@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
+namespace Vanguard.VCS.Common.Setting
 {
     public enum ServerSettingsKeys
     {

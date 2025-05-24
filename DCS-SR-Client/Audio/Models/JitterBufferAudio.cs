@@ -1,6 +1,6 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using Vanguard.VCS.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
+namespace Vanguard.VCS.Client.Audio.Models
 {
     public class JitterBufferAudio
     {

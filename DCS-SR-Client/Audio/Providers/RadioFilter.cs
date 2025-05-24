@@ -1,11 +1,8 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+﻿using Vanguard.VCS.Client.Settings;
 using MathNet.Filtering;
-using MathNet.Filtering.FIR;
-using MathNet.Filtering.Windowing;
-using NAudio.Dsp;
 using NAudio.Wave;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class RadioFilter : ISampleProvider
     {

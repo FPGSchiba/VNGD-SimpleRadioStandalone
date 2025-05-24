@@ -1,4 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+﻿using Vanguard.VCS.Common.Setting;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
+namespace Vanguard.VCS.Common.Helpers
 {
     public static class LoggingHelper
     {

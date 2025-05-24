@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components
+namespace Vanguard.VCS.Client.UI.Components
 {
     public partial class ToggleProfileSetting : UserControl
     {

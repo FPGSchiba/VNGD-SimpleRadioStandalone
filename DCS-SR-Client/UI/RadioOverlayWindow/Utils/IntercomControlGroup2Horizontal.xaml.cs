@@ -2,13 +2,11 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Newtonsoft.Json.Linq;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 {
     /// <summary>
     ///     Interaction logic for IntercomControlGroup2Horizontal.xaml

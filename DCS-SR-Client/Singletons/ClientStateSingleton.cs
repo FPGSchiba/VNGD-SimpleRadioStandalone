@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Network.Models;
+using Vanguard.VCS.Client.Network.VAICOM.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Settings.RadioChannels;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Network;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
+namespace Vanguard.VCS.Client.Singletons
 {
     public sealed class ClientStateSingleton : INotifyPropertyChanged
     {

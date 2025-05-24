@@ -5,15 +5,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
+using Vanguard.VCS.Common;
 using Dragablz;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml

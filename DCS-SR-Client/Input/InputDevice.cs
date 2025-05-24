@@ -1,7 +1,7 @@
 ﻿using System;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Input
 {
     public class InputDevice
     {

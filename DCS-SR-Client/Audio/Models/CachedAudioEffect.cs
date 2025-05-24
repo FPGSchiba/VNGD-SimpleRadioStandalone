@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Properties;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Common;
 using NAudio.Wave;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client.Audio.Models
 {
     public class CachedAudioEffect
     {

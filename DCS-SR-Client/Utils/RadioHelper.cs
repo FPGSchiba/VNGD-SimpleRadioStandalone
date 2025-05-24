@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
 using NLog;
+using Vanguard.VCS.Client.Settings.RadioChannels;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
+namespace Vanguard.VCS.Client.Utils
 {
     public static class RadioHelper
     {

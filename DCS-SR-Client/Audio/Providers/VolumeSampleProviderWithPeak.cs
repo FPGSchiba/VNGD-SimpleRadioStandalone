@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+﻿using Vanguard.VCS.Common.Helpers;
 using NAudio.Wave;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     //From https://raw.githubusercontent.com/naudio/NAudio/master/NAudio/Wave/SampleProviders/VolumeSampleProvider.cs
     public class VolumeSampleProviderWithPeak : ISampleProvider

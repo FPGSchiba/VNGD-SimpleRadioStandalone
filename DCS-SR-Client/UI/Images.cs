@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Media.Imaging;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Vanguard.VCS.Client.UI
 {
     public static class Images
     {

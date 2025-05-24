@@ -1,11 +1,7 @@
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Windows;
-
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-
+/*
 [assembly: AssemblyTitle("SimpleRadio Standalone Client")]
 [assembly: AssemblyDescription("Client for SimpleRadio Standalone")]
 [assembly: AssemblyConfiguration("")]
@@ -53,3 +49,4 @@ using System.Windows;
 
 [assembly: AssemblyVersion("0.0.0")] // DO NOT CHANGE THIS
 [assembly: AssemblyFileVersion("0.0.0")] // DO NOT CHANGE THIS
+*/

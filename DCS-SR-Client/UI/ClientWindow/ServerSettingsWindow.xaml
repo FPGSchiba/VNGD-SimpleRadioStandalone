@@ -1,0 +1,265 @@
+﻿<controls:MetroWindow
+    Height="300"
+    ResizeMode="NoResize"
+    Title="Server Settings"
+    Width="300"
+    x:Class="Vanguard.VCS.Client.UI.ClientWindow.ServerSettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Orientation="Vertical">
+
+        <ScrollViewer Height="230">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label
+                    Content="Coalition Security"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    HorizontalContentAlignment="Center"
+                    Name="CoalitionSecurity"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Spectator Audio"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    HorizontalContentAlignment="Center"
+                    Name="SpectatorAudio"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Line Of Sight"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    HorizontalContentAlignment="Center"
+                    Name="LineOfSight"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Distance Limitations"
+                    Grid.Column="0"
+                    Grid.Row="3"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    HorizontalContentAlignment="Center"
+                    Name="Distance"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="IRL Radio Tx Behaviour"
+                    Grid.Column="0"
+                    Grid.Row="4"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="4"
+                    HorizontalContentAlignment="Center"
+                    Name="RealRadio"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="IRL Radio Rx Interfence"
+                    Grid.Column="0"
+                    Grid.Row="5"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="5"
+                    HorizontalContentAlignment="Center"
+                    Name="RadioRXInterference"
+                    VerticalContentAlignment="Center" />
+
+
+                <Label
+                    Content="Radio Expansion"
+                    Grid.Column="0"
+                    Grid.Row="6"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="6"
+                    HorizontalContentAlignment="Center"
+                    Name="RadioExpansion"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="External AWACS Mode"
+                    Grid.Column="0"
+                    Grid.Row="7"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="7"
+                    HorizontalContentAlignment="Center"
+                    Name="ExternalAWACSMode"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Allow Radio Encryption"
+                    Grid.Column="0"
+                    Grid.Row="8"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="8"
+                    HorizontalContentAlignment="Center"
+                    Name="AllowRadioEncryption"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Strict Radio Encryption"
+                    Grid.Column="0"
+                    Grid.Row="9"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="9"
+                    HorizontalContentAlignment="Center"
+                    Name="StrictRadioEncryption"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Show Tuned Client Count"
+                    Grid.Column="0"
+                    Grid.Row="10"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="10"
+                    HorizontalContentAlignment="Center"
+                    Name="TunedClientCount"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Show Transmitter Name"
+                    Grid.Column="0"
+                    Grid.Row="11"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="11"
+                    HorizontalContentAlignment="Center"
+                    Name="ShowTransmitterName"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Server Version"
+                    Grid.Column="0"
+                    Grid.Row="12"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Unknown"
+                    Grid.Column="1"
+                    Grid.Row="12"
+                    HorizontalContentAlignment="Center"
+                    Name="ServerVersion"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="Retransmit Node Limit"
+                    Grid.Column="0"
+                    Grid.Row="13"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" />
+
+                <Label
+                    Content="0"
+                    Grid.Column="1"
+                    Grid.Row="13"
+                    HorizontalContentAlignment="Center"
+                    Name="NodeLimit"
+                    VerticalContentAlignment="Center" />
+
+
+
+
+            </Grid>
+        </ScrollViewer>
+
+        <Button
+            Click="CloseButton_OnClick"
+            Content="Close"
+            HorizontalAlignment="Center"
+            Margin="5,5,5,5"
+            Width="80" />
+
+
+    </StackPanel>
+</controls:MetroWindow>

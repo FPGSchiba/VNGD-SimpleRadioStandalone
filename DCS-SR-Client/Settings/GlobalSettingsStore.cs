@@ -5,12 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using SharpConfig;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Settings
 {
   
     public enum GlobalSettingsKeys

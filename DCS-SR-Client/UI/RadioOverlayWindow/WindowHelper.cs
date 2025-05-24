@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     //Source http://stackoverflow.com/a/37724335
     public static class WindowHelper

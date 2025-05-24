@@ -1,6 +1,6 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+﻿using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common
 {
     public class DCSPlayerSideInfo
     {

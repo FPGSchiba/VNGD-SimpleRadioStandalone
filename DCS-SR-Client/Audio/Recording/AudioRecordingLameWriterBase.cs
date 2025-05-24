@@ -1,13 +1,12 @@
 ﻿using NAudio.Wave;
 using NLog;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Common;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     internal abstract class AudioRecordingLameWriterBase
     {

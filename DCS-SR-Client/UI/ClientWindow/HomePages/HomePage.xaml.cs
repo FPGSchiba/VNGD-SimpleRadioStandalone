@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Vanguard.VCS.Client.Singletons;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
+namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {
     public partial class HomePage : Page
     {

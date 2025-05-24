@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class RadioEffectsPage : Page
     {

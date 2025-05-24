@@ -5,7 +5,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
+namespace Vanguard.VCS.Client.Audio.Managers
 {
 
     public class EventDrivenResampler

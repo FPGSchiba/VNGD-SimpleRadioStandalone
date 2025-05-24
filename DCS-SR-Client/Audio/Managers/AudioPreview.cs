@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Providers;
+using Vanguard.VCS.Client.Audio.Utility;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Helpers;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
 using NAudio.Dmo;
@@ -19,7 +18,7 @@ using NAudio.Wave.SampleProviders;
 using NLog;
 using WPFCustomMessageBox;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
+namespace Vanguard.VCS.Client.Audio.Managers
 {
     internal class AudioPreview
     {

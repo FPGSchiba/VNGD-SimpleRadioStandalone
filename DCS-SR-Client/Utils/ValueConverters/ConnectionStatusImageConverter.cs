@@ -1,9 +1,9 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
+﻿using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI;
 using System;
 using System.Windows.Data;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters
+namespace Vanguard.VCS.Client.Utils.ValueConverters
 {
     class ConnectionStatusImageConverter : IValueConverter
     {

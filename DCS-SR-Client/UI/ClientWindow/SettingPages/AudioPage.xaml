@@ -1,14 +1,16 @@
-﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages.AudioPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages"
-      xmlns:converters="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters"
-      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:components="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components"
-      mc:Ignorable="d"
-      Title="AudioPage" Height="275" Width="415">
+﻿<Page
+    Height="275"
+    Title="AudioPage"
+    Width="415"
+    mc:Ignorable="d"
+    x:Class="Vanguard.VCS.Client.UI.ClientWindow.SettingPages.AudioPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:components="clr-namespace:Vanguard.VCS.Client.UI.Components"
+    xmlns:converters="clr-namespace:Vanguard.VCS.Client.Utils.ValueConverters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Page.Resources>
         <converters:MicAvailabilityTooltipConverter x:Key="MicAvailabilityTooltipConverter" />
     </Page.Resources>
@@ -20,37 +22,41 @@
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Microphone" FontWeight="Bold" VerticalAlignment="Center" />
-                
+                <Label
+                    Content="Microphone"
+                    FontWeight="Bold"
+                    Grid.Column="0"
+                    VerticalAlignment="Center" />
+
                 <StackPanel
                     Grid.Column="1"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
                     Margin="0,0,10,0"
-                    Orientation="Horizontal">
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
                     <ProgressBar
-                        Height="20"
                         BorderBrush="Black"
                         BorderThickness="1"
+                        Height="20"
                         Maximum="0"
                         Minimum="-96.6"
-                        x:Name="Mic_VU"
                         ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
                         Value="-96.6"
-                        Width="80"/>
+                        Width="80"
+                        x:Name="Mic_VU" />
                 </StackPanel>
-                
+
                 <ComboBox
                     Grid.Column="2"
+                    Height="30"
                     ItemsSource="{Binding Path=AudioInput.InputAudioDevices}"
+                    Padding="5"
                     SelectedItem="{Binding Path=AudioInput.SelectedAudioInput, Mode=TwoWay}"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
                     ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
                     VerticalAlignment="Center"
                     Width="163"
-                    Height="30"
-                    Padding="5"
-                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                    x:Name="Mic"/>
+                    x:Name="Mic" />
             </Grid>
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
@@ -58,19 +64,23 @@
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
-                <Label Grid.Column="0" Content="Speakers" FontWeight="Bold" VerticalAlignment="Center" />
-                
+
+                <Label
+                    Content="Speakers"
+                    FontWeight="Bold"
+                    Grid.Column="0"
+                    VerticalAlignment="Center" />
+
                 <ComboBox
                     Grid.Column="2"
+                    Height="30"
                     ItemsSource="{Binding Path=AudioOutput.OutputAudioDevices}"
+                    Padding="5"
                     SelectedItem="{Binding Path=AudioOutput.SelectedAudioOutput, Mode=TwoWay}"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
                     VerticalAlignment="Center"
                     Width="163"
-                    Height="30"
-                    Padding="5"
-                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                    x:Name="Speakers"/>
+                    x:Name="Speakers" />
             </Grid>
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
@@ -78,151 +88,190 @@
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <Label Content="Pass Through" FontWeight="Bold" VerticalAlignment="Center" />
-                    <TextBlock Text="Advanced Setting" FontWeight="Thin" FontSize="10" Margin="5,-8,0,0" />
+                    <Label
+                        Content="Pass Through"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="Advanced Setting" />
                 </StackPanel>
-                
+
                 <ComboBox
                     Grid.Column="2"
+                    Height="30"
                     ItemsSource="{Binding Path=AudioOutput.MicOutputAudioDevices}"
+                    Padding="5"
                     SelectedItem="{Binding Path=AudioOutput.SelectedMicAudioOutput, Mode=TwoWay}"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
                     VerticalAlignment="Center"
                     Width="163"
-                    Height="30"
-                    Padding="5"
-                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                    x:Name="MicOutput"/>
+                    x:Name="MicOutput" />
             </Grid>
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="135" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Master Volume" FontWeight="Bold" VerticalAlignment="Center" />
-                    <TextBlock Text="Volume Boost | Reduction" FontWeight="Thin" FontSize="10" Margin="5,-8,0,0" />
+                    <Label
+                        Content="Master Volume"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="Volume Boost | Reduction" />
                 </StackPanel>
-                
+
                 <StackPanel
                     Grid.Column="1"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
                     Margin="0,0,10,0"
-                    Orientation="Horizontal">
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
                     <ProgressBar
-                        Height="20"
                         BorderBrush="Black"
                         BorderThickness="1"
+                        Height="20"
                         Maximum="0"
                         Minimum="-96.6"
                         Name="Speaker_VU"
                         Value="-96.6"
-                        Width="80"/>
+                        Width="80" />
                 </StackPanel>
-                
-                <StackPanel Grid.Column="2" Width="175" Orientation="Horizontal">
-                    <Label Content="-30 dB" Width="50" VerticalAlignment="Center" x:Name="SpeakerBoostLabel" />
-                    <Slider
-                        IsMoveToPointEnabled="true"
+
+                <StackPanel
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    Width="175">
+                    <Label
+                        Content="-30 dB"
                         VerticalAlignment="Center"
+                        Width="50"
+                        x:Name="SpeakerBoostLabel" />
+                    <Slider
+                        Height="20"
                         HorizontalAlignment="Right"
+                        IsMoveToPointEnabled="true"
                         Maximum="1.0"
                         Minimum="0.0"
-                        Height="20"
                         ValueChanged="SpeakerBoost_ValueChanged"
+                        VerticalAlignment="Center"
                         Width="110"
-                        x:Name="SpeakerBoost"/>
+                        x:Name="SpeakerBoost" />
                 </StackPanel>
-                
+
             </Grid>
             <Grid Height="40" Margin="5,0">
                 <Button
-                    Height="30"
-                    Width="115"
+                    Click="PreviewAudio"
                     Content="Audio Test"
-                    materialDesign:ButtonAssist.CornerRadius="15"
+                    Height="30"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding AudioInput.MicrophoneAvailable}"
                     ToolTip="{Binding Path=AudioInput.MicrophoneAvailable, Converter={StaticResource MicAvailabilityTooltipConverter}}"
                     ToolTipService.ShowOnDisabled="True"
                     VerticalAlignment="Center"
-                    Click="PreviewAudio"
-                    x:Name="Preview"/>
+                    Width="115"
+                    materialDesign:ButtonAssist.CornerRadius="15"
+                    x:Name="Preview" />
             </Grid>
-            
+
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            
-            <components:ToggleGlobalSetting Height="40" Title="Microphone Automatic Gain Control" SettingKey="AGC" />
-            <components:ToggleGlobalSetting Height="40" Title="Microphone Noise Suppression" SettingKey="Denoise" />
-            
-            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="AGC"
+                Title="Microphone Automatic Gain Control" />
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="Denoise"
+                Title="Microphone Noise Suppression" />
+
+            <StackPanel
+                Background="#E9E9E9"
+                Height="40"
+                Margin="0,0">
                 <TextBlock
+                    FontSize="20"
+                    FontWeight="Bold"
                     Margin="5,0,0,0"
                     Text="Voice Activated Communication (VOX)"
-                    VerticalAlignment="Center"
-                    FontSize="20"
-                    FontWeight="Bold" />
-                <TextBlock 
-                    Text="Detection Settings"
-                    Margin="5,-8,0,0"/>
+                    VerticalAlignment="Center" />
+                <TextBlock Margin="5,-8,0,0" Text="Detection Settings" />
             </StackPanel>
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="135" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Voice Detection" FontWeight="Bold" VerticalAlignment="Center" />
-                    <TextBlock Text="Minimum Transition Length" FontWeight="Thin" FontSize="10" Margin="5,-8,0,0" />
+                    <Label
+                        Content="Voice Detection"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="Minimum Transition Length" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="2"
-                    materialDesign:SliderAssist.HideActiveTrack="True"
+                    Height="40"
                     IsSnapToTickEnabled="True"
                     LargeChange="200"
                     Maximum="2000"
                     Minimum="0"
                     SmallChange="100"
+                    Style="{StaticResource MaterialDesignSlider}"
                     TickFrequency="100"
                     TickPlacement="BottomRight"
-                    AutoToolTipPlacement="TopLeft"
                     Value="500"
+                    ValueChanged="VOXMinimumTime_ValueChanged"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Height="40"
-                    Style="{StaticResource MaterialDesignSlider}"
-                    x:Name="VOXMinimimumTXTime"
-                    ValueChanged="VOXMinimumTime_ValueChanged"/>
+                    materialDesign:SliderAssist.HideActiveTrack="True"
+                    x:Name="VOXMinimimumTXTime" />
             </Grid>
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="135" />
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Noise Cancellation" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Label
+                        Content="Noise Cancellation"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="2"
                     IsSnapToTickEnabled="True"
                     LargeChange="1"
@@ -233,24 +282,27 @@
                     TickPlacement="BottomRight"
                     ToolTip="Less noise cancellation will make your voice more likely to be heard, but will have a higher chance of a false positive"
                     Value="0"
+                    ValueChanged="VOXMode_ValueChanged"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    AutoToolTipPlacement="TopLeft"
-                    ValueChanged="VOXMode_ValueChanged"
-                    x:Name="VOXMode"/>
+                    x:Name="VOXMode" />
             </Grid>
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="215" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Voice Detection Threshold" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Label
+                        Content="Voice Detection Threshold"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="1"
                     IsSnapToTickEnabled="True"
                     LargeChange="4"
@@ -259,46 +311,54 @@
                     SmallChange="2"
                     TickFrequency="4"
                     TickPlacement="BottomRight"
-                    AutoToolTipPlacement="TopLeft"
                     Value="-50"
+                    ValueChanged="VOXMinimumRMS_ValueChanged"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ValueChanged="VOXMinimumRMS_ValueChanged"
-                    x:Name="VOXMinimumRMS"/>
+                    x:Name="VOXMinimumRMS" />
             </Grid>
-            
+
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+            <StackPanel
+                Background="#E9E9E9"
+                Height="40"
+                Margin="0,0">
                 <TextBlock
+                    FontSize="20"
+                    FontWeight="Bold"
                     Margin="5,0,0,0"
                     Text="Push to Talk (PTT)"
-                    VerticalAlignment="Center"
-                    FontSize="20"
-                    FontWeight="Bold" />
-                <TextBlock 
-                    Text="Detection Settings"
-                    Margin="5,-8,0,0"/>
+                    VerticalAlignment="Center" />
+                <TextBlock Margin="5,-8,0,0" Text="Detection Settings" />
             </StackPanel>
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="215" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Push to Talk Release delay (ms)" FontWeight="Bold" VerticalAlignment="Center" />
-                    <TextBlock Text="VCS-SRS Hotkeys Only" FontWeight="Thin" FontSize="10" Margin="5,-8,0,0" />
+                    <Label
+                        Content="Push to Talk Release delay (ms)"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="VCS-SRS Hotkeys Only" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="1"
                     IsSnapToTickEnabled="True"
                     LargeChange="50"
@@ -307,26 +367,33 @@
                     SmallChange="20"
                     TickFrequency="50"
                     TickPlacement="BottomRight"
-                    AutoToolTipPlacement="TopLeft"
                     Value="0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
                     ValueChanged="PushToTalkReleaseDelay_ValueChanged"
-                    x:Name="PTTReleaseDelay"/>
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    x:Name="PTTReleaseDelay" />
             </Grid>
-            
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="215" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Push to Talk Start Delay (ms)" FontWeight="Bold" VerticalAlignment="Center" />
-                    <TextBlock Text="VCS-SRS Hotkeys Only" FontWeight="Thin" FontSize="10" Margin="5,-8,0,0" />
+                    <Label
+                        Content="Push to Talk Start Delay (ms)"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        FontSize="10"
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="VCS-SRS Hotkeys Only" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="1"
                     IsSnapToTickEnabled="True"
                     LargeChange="50"
@@ -335,46 +402,61 @@
                     SmallChange="20"
                     TickFrequency="50"
                     TickPlacement="BottomRight"
-                    AutoToolTipPlacement="TopLeft"
                     Value="0"
+                    ValueChanged="PushToTalkStartDelay_ValueChanged"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ValueChanged="PushToTalkStartDelay_ValueChanged"
-                    x:Name="PTTStartDelay"/>
+                    x:Name="PTTStartDelay" />
             </Grid>
-            
+
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            <StackPanel Height="40" Background="#E9E9E9" Margin="0,0" >
+            <StackPanel
+                Background="#E9E9E9"
+                Height="40"
+                Margin="0,0">
                 <TextBlock
+                    FontSize="20"
+                    FontWeight="Bold"
                     Margin="5,0,0,0"
                     Text="Recording"
-                    VerticalAlignment="Center"
-                    FontSize="20"
-                    FontWeight="Bold" />
+                    VerticalAlignment="Center" />
             </StackPanel>
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            
-            <components:ToggleGlobalSetting Title="Allow Transmission to be recorded" Height="40" SettingKey="AllowRecording" />
-            <components:ToggleGlobalSetting Title="Record Transmissions" Height="40" SettingKey="RecordAudio" />
-            <components:ToggleGlobalSetting Title="Record to Single File" Height="40" SettingKey="SingleFileMixdown" />
-            
+
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="AllowRecording"
+                Title="Allow Transmission to be recorded" />
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="RecordAudio"
+                Title="Record Transmissions" />
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="SingleFileMixdown"
+                Title="Record to Single File" />
+
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="215" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0">
-                    <Label Content="Recording Quality" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Label
+                        Content="Recording Quality"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center" />
                 </StackPanel>
-                
+
                 <Slider
+                    AutoToolTipPlacement="TopLeft"
                     Grid.Column="1"
                     IsSnapToTickEnabled="True"
                     LargeChange="3"
@@ -383,22 +465,24 @@
                     SmallChange="1"
                     TickFrequency="1"
                     TickPlacement="BottomRight"
-                    AutoToolTipPlacement="TopLeft"
                     ToolTip="Quality can only be set if Record Transmissions is set to off"
                     ToolTipService.ShowOnDisabled="True"
                     Value="0"
+                    ValueChanged="RecordingQuality_ValueChanged"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ValueChanged="RecordingQuality_ValueChanged"
-                    x:Name="RecordingQuality"/>
+                    x:Name="RecordingQuality" />
             </Grid>
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
-            
-            <components:ToggleGlobalSetting Title="Record Tone for disallowed Audio" Height="40" SettingKey="DisallowedAudioTone" />
-            
+
+            <components:ToggleGlobalSetting
+                Height="40"
+                SettingKey="DisallowedAudioTone"
+                Title="Record Tone for disallowed Audio" />
+
             <Separator
                 BorderBrush="White"
                 BorderThickness="20"

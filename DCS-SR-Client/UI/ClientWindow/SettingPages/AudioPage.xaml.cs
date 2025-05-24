@@ -3,15 +3,15 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Client.Audio;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Helpers;
 using NAudio.CoreAudioApi;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class AudioPage : Page
     {

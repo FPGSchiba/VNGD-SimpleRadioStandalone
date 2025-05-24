@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Client.Network.DCS;
+using Vanguard.VCS.Client.Network.VAICOM;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Vanguard.VCS.Client.Network
 {
     public class SrsClientSyncHandler
     {

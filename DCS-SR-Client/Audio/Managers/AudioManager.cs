@@ -5,16 +5,16 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Providers;
+using Vanguard.VCS.Client.Audio.Utility;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Audio.Recording;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
@@ -24,10 +24,10 @@ using NAudio.Wave.SampleProviders;
 using NLog;
 using WebRtcVadSharp;
 using WPFCustomMessageBox;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
+using static Vanguard.VCS.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
+namespace Vanguard.VCS.Client.Audio.Managers
 {
     public class AudioManager
     {

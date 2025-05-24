@@ -1,22 +1,18 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Web.Caching;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
+using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
+namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioControlGroup.xaml

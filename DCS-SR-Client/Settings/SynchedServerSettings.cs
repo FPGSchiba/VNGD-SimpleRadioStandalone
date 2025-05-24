@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Common.Setting;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Settings
 {
     public class SyncedServerSettings
     {

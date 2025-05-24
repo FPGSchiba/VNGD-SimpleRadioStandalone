@@ -6,14 +6,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Network;
 using NLog;
 using Sentry;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
+namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {
     class PlayerListItem : INotifyPropertyChanged
     {

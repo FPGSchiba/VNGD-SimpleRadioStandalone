@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml

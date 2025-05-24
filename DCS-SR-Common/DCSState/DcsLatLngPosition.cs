@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState
+namespace Vanguard.VCS.Common.DCSState
 {
     public class DCSLatLngPosition
     {

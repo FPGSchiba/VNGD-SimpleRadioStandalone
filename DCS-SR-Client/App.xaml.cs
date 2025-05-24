@@ -8,8 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -17,8 +18,9 @@ using NLog.Targets.Wrappers;
 using Sentry;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client
 {
     /// <summary>
     ///     Interaction logic for App.xaml

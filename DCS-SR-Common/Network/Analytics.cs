@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     public class Analytics
     {

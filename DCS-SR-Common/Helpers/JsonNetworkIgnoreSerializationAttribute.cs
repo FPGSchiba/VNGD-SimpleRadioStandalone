@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers
+namespace Vanguard.VCS.Common.Helpers
 {
     public class JsonNetworkIgnoreSerializationAttribute :Attribute
     {

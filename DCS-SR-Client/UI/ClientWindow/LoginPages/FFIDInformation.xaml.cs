@@ -1,7 +1,7 @@
 ﻿using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Vanguard;
+using Vanguard.VCS.Client.Vanguard;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {
     public partial class FFIDInformation : Window
     {

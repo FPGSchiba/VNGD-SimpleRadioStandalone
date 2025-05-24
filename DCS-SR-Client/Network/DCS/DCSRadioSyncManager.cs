@@ -5,20 +5,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
 using Newtonsoft.Json;
 using NLog;
-using Xamarin.Forms.Internals;
 
 /**
 Keeps radio information in Sync Between DCS and
-
 **/
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
+namespace Vanguard.VCS.Client.Network.DCS
 {
     public class DCSRadioSyncManager
     {

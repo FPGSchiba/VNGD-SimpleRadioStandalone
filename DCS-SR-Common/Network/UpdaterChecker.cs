@@ -9,7 +9,7 @@ using NLog;
 using Octokit;
 using Application = System.Windows.Application;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common
 {
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker

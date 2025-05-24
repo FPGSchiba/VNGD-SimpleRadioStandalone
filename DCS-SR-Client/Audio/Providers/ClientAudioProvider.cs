@@ -1,20 +1,14 @@
 ﻿using System;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using MathNet.Filtering;
-using NAudio.Dsp;
+using Vanguard.VCS.Client.Audio.Managers;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Vanguard.VCS.Client.Audio.Models;
+using static Vanguard.VCS.Common.RadioInformation;
+using Vanguard.VCS.Client.Singletons;
+using WaveFormat = SharpDX.Multimedia.WaveFormat;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class ClientAudioProvider : AudioProvider
     {

@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Vanguard.VCS.Client.UI.ClientWindow
 {
     /// <summary>
     ///     Interaction logic for RadioChannelConfigUI.xaml

@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading;
 using NLog;
 using SharpConfig;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Input;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Settings
 {
     public enum ProfileSettingsKeys
     {

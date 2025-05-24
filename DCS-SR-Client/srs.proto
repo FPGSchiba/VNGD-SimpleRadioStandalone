@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package srspb;
+
+option go_package = "github.com/FPGSchiba/vcs-srs-server/srspb";
+option csharp_namespace = "Vanguard.VCS.Client.Network";
+
+// Service definition
+service SRSService {
+  // Initial client connection and authentication (metadata)
+  rpc Connect(ClientConnectRequest) returns (ServerConnectResponse);
+
+  // Client update (metadata, client info, position)
+  rpc UpdateClientInfo(ClientInfo) returns (ServerResponse);
+
+  // Client radio update (metadata, radio info)
+  rpc UpdateRadioInfo(RadioInfo) returns (ServerResponse);
+
+  // Client synchronization request
+  rpc SyncClient(ClientSyncRequest) returns (ServerSyncResponse);
+
+  // Client disconnect (metadata)
+  rpc DisconnectClient(ClientDisconnectRequest) returns (ServerResponse);
+
+  // Server settings request
+  rpc GetServerSettings(Empty) returns (ServerSettings);
+
+  // Server-to-client updates stream
+  rpc SubscribeToUpdates(SubscribeRequest) returns (stream ServerUpdate);
+}
+
+// Empty message for requests that don't need parameters
+message Empty {}
+
+// Subscribe request
+message SubscribeRequest {
+  string client_guid = 1;
+}
+
+// Server update message
+message ServerUpdate {
+  UpdateType type = 1;
+  oneof update {
+    ClientUpdate client_update = 2;
+    ServerAction server_action = 3;
+    ServerSettings settings_update = 4;
+  }
+
+  enum UpdateType {
+    UNKNOWN = 0;
+    CLIENT_JOINED = 1;
+    CLIENT_LEFT = 2;
+    CLIENT_RADIO_UPDATE = 3;
+    CLIENT_INFO_UPDATE = 4;
+    SERVER_SETTINGS_CHANGED = 5;
+    SERVER_ACTION = 6;
+  }
+}
+
+// Client update information
+message ClientUpdate {
+  string client_guid = 1;
+  optional ClientInfo client_info = 2;
+  optional RadioInfo radio_info = 3;
+}
+
+// Server action (kicks, bans, mutes)
+message ServerAction {
+  ActionType type = 1;
+  string target_client_guid = 2;
+  string reason = 3;
+  optional int64 duration = 4; // Duration in seconds for temporary actions
+
+  enum ActionType {
+    UNKNOWN = 0;
+    KICK = 1;
+    BAN = 2;
+    MUTE = 3;
+    UNMUTE = 4;
+  }
+}
+
+// Initial client connection request
+message ClientConnectRequest {
+  string version = 1;
+}
+
+// Initial server connection response
+message ServerConnectResponse {
+  bool success = 1;
+  string error_message = 2;
+  optional string client_guid = 3; // Server sets the Client GUID
+}
+
+// Client information
+message ClientInfo {
+  string client_guid = 1;
+  string name = 2;
+  string coalition = 3;
+  int64 last_update = 4;
+}
+
+// Radio information
+message RadioInfo {
+  string client_guid = 1;
+  int64 last_update = 2;
+  repeated Radio radios = 3;
+  bool muted = 4;
+}
+
+message Radio {
+  int32 id = 1;
+  string name = 2;
+  float frequency = 3;
+  bool enabled = 6;
+}
+
+// Server settings
+message ServerSettings {
+  map<string, ServerSetting> settings = 1;
+}
+
+// Individual server setting
+message ServerSetting {
+  oneof value {
+    string string_value = 1;
+    bool bool_value = 2;
+    int32 int_value = 3;
+    float float_value = 4;
+  }
+}
+
+// Client synchronization request
+message ClientSyncRequest {
+  string client_guid = 1;
+}
+
+// Server synchronization response
+message ServerSyncResponse {
+  repeated ClientInfo connected_clients = 1;
+  ServerSettings server_settings = 2;
+  string version = 3;
+}
+
+// Client disconnect request
+message ClientDisconnectRequest {
+  string client_guid = 1;
+}
+
+// Generic server response
+message ServerResponse {
+  bool success = 1;
+  string error_message = 2;
+}

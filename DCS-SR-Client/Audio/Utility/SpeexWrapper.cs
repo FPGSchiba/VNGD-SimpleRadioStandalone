@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 using NAudio.Wave;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility
+namespace Vanguard.VCS.Client.Audio.Utility
 {
     //From https://github.com/mischa/HelloVR/blob/1796d2607f1f583d2669f005839e494511b2b83b/Assets/Plugins/Dissonance/Core/Audio/Capture/SpeexDspNative.cs
     internal static class SpeexDspNative

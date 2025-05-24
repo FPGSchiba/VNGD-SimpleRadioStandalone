@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Setting;
 using MathNet.Filtering;
 using NAudio.Dsp;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class ClientEffectsPipeline
     {
