@@ -302,29 +302,27 @@ namespace Vanguard.VCS.Client
             {
                 return;
             }
-            MenuItem notifyIconContextMenuShow = new MenuItem
-            {
-                Index = 0,
-                Text = "Show"
-            };
+            // Create a ContextMenuStrip instead of ContextMenu
+            ContextMenuStrip notifyIconContextMenu = new ContextMenuStrip();
+
+            // Add menu items using ToolStripMenuItem instead of MenuItem
+            ToolStripMenuItem notifyIconContextMenuShow = new ToolStripMenuItem("Show");
             notifyIconContextMenuShow.Click += NotifyIcon_Show;
 
-            MenuItem notifyIconContextMenuQuit = new MenuItem
-            {
-                Index = 1,
-                Text = "Quit"
-            };
+            ToolStripMenuItem notifyIconContextMenuQuit = new ToolStripMenuItem("Quit");
             notifyIconContextMenuQuit.Click += NotifyIcon_Quit;
 
-            ContextMenu notifyIconContextMenu = new ContextMenu();
-            notifyIconContextMenu.MenuItems.AddRange(new [] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
+            // Add items to the context menu
+            notifyIconContextMenu.Items.Add(notifyIconContextMenuShow);
+            notifyIconContextMenu.Items.Add(notifyIconContextMenuQuit);
 
+            // Create and configure the NotifyIcon
             _notifyIcon = new NotifyIcon
             {
                 Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
-                Visible = true
+                Visible = true,
+                ContextMenuStrip = notifyIconContextMenu // Use ContextMenuStrip instead of ContextMenu
             };
-            _notifyIcon.ContextMenu = notifyIconContextMenu;
             _notifyIcon.DoubleClick += NotifyIcon_Show;
 
         }

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Vanguard.VCS.Client.Vanguard
+namespace Vanguard.VCS.Client.Internal
 {
     public class Unit : INotifyPropertyChanged
     {

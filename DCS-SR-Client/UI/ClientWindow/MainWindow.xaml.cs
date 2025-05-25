@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using Easy.MessageHub;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Network.DCS;
@@ -31,7 +32,6 @@ using Vanguard.VCS.Common.Network;
 using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NLog;
-using WPFCustomMessageBox;
 using InputBinding = Vanguard.VCS.Client.Settings.InputBinding;
 using Sentry;
 using Vanguard.VCS.Client.Audio.Models;
@@ -67,7 +67,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public delegate void ToggleOverlayCallback(bool uiButton, int switchTo);
         public delegate void UpdateChannelCallback(ProfileSettingsKeys channel, float balance);
 
-        private readonly AudioManager _audioManager;
+        public readonly AudioManager AudioManager;
+        private IMessageHub _hub = new MessageHub();
 
         private readonly string _guid;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -277,7 +278,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Title = "VCS-SRS - v" + version; //UpdaterChecker.VERSION
             SRSVersionText.Text = "VCS-SRS v" + version;
 
-            CheckWindowVisibility();
+            this.Loaded +=  MainWindow_Loaded;
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.StartMinimised))
             {
@@ -312,12 +313,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
 
-            _audioManager = new AudioManager(AudioOutput.WindowsN);
-            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
+            AudioManager = new AudioManager(AudioOutput.WindowsN, _hub);
+            AudioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
 
             if (SpeakerBoostLabel != null)
             {
-                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
+                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(AudioManager.SpeakerBoost);
             }
 
             // Use Update Checker for automatic Updates, needs rewrite of the UpdateCheker
@@ -339,6 +340,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
 
             return null;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            CheckWindowVisibility();
         }
 
         private void CheckWindowVisibility()
@@ -1169,14 +1175,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 }
                 Speaker_VU.Value = _audioPreview.SpeakerMax;
             }
-            else if (_audioManager != null)
+            else if (AudioManager != null)
             {
                 // Only update mic volume output if an audio input device is available - sometimes the value can still change, leaving the user with the impression their mic is working after all
                 if (AudioInput.MicrophoneAvailable)
                 {
-                    Mic_VU.Value = _audioManager.MicMax;
+                    Mic_VU.Value = AudioManager.MicMax;
                 }
-                Speaker_VU.Value = _audioManager.SpeakerMax;
+                Speaker_VU.Value = AudioManager.SpeakerMax;
             }
             else
             {
@@ -1447,7 +1453,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _resolvedIp = ip;
                     _port = port;
 
-                    _srsClient = new SrsClientSyncHandler(_guid, UpdateUiCallback);
+                    _srsClient = new SrsClientSyncHandler(_guid, UpdateUiCallback, _hub);
                     _vcsClient = new VcsClientSyncHandler(VcsUiUpdate);
 
                     _loginPage.Login.IsEnabled = false;
@@ -1509,7 +1515,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             try
             {
-                _audioManager.StopEncoding();
+                AudioManager.StopEncoding();
             }
             catch (Exception e)
             {
@@ -1603,7 +1609,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
 
-                        _audioManager.StartEncoding(_guid, InputManager,
+                        AudioManager.StartEncoding(_guid, InputManager,
                             _resolvedIp, _port);
 
                         _logger.Debug("Starting AWACS Mode connection.");
@@ -1617,12 +1623,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                             "Unable to get audio device - likely output device error - Pick another. Error:" +
                             ex.Message);
                         Stop();
-
-                        var messageBoxResult = CustomMessageBox.ShowYesNo(
+                        
+                        var messageBoxResult = MessageBox.Show(
                             "Problem initialising Audio Output!\n\nTry a different Output device and please post your clientlog.txt to the support Discord server.\n\nJoin support Discord server now?",
                             "Audio Output Error",
-                            "OPEN PRIVACY SETTINGS",
-                            "JOIN DISCORD SERVER",
+                            MessageBoxButton.YesNo,
                             MessageBoxImage.Error);
 
                         if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/PMKtQsSk");
@@ -1784,9 +1789,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _audioPreview.SpeakerBoost = convertedValue;
             }
-            if (_audioManager != null)
+            if (AudioManager != null)
             {
-                _audioManager.SpeakerBoost = convertedValue;
+                AudioManager.SpeakerBoost = convertedValue;
             }
 
             _globalSettings.SetClientSetting(GlobalSettingsKeys.SpeakerBoost,

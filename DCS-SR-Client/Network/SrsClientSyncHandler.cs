@@ -29,6 +29,7 @@ namespace Vanguard.VCS.Client.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private volatile bool _stop = false;
+        private readonly IMessageHub _hub;
 
         public static string ServerVersion { get; private set; }
         private readonly string _guid;
@@ -53,10 +54,11 @@ namespace Vanguard.VCS.Client.Network
         private long _lastSent = -1;
         private readonly DispatcherTimer _idleTimeout;
 
-        public SrsClientSyncHandler(string guid, UpdateUICallback uiCallback)
+        public SrsClientSyncHandler(string guid, UpdateUICallback uiCallback, IMessageHub hub)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
+            _hub = hub;
 
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
@@ -517,7 +519,7 @@ namespace Vanguard.VCS.Client.Network
         
             if (outClient != null)
             {
-                MessageHub.Instance.Publish(outClient);
+                _hub.Publish(outClient);
             }
         }
         

@@ -35,7 +35,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 for (int i = 0;  i < radios; i++)
                 {
                     JitterBufferProviderInterface[i] =
-                        new JitterBufferProviderInterface(new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
+                        new JitterBufferProviderInterface(new NAudio.Wave.WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
 
                 }
                 

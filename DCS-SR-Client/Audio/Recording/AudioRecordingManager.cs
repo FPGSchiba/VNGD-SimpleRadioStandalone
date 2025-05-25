@@ -160,7 +160,8 @@ namespace Vanguard.VCS.Client.Audio.Recording
             _logger.Info("Transmission recording started.");
 
             _audioRecordingWriter?.Stop();
-
+            
+            /*
             if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
             {
                 _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
@@ -169,6 +170,7 @@ namespace Vanguard.VCS.Client.Audio.Recording
             {
                 _audioRecordingWriter = new PerRadioLameRecordingWriter(_sampleRate);
             }
+            */
          
             _stop = false;
 

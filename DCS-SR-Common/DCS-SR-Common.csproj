@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>Vnaguard.VCS.Common</RootNamespace>
-    <AssemblyName>DCS-SR-Common</AssemblyName>
+    <AssemblyName>Vnaguard.VCS.Common</AssemblyName>
+    <TargetName>VCS-Common</TargetName>
     <ProjectGuid>{CF8DA5C1-0105-4486-9E28-CB2321D8F122}</ProjectGuid>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Platforms>AnyCPU;x64</Platforms>

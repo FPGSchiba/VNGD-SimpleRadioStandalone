@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <ProjectGuid>{A0245CB5-7C06-4FC7-9477-ECB0D1A88239}</ProjectGuid>
     <RootNamespace>DCS_SR_CommonTests</RootNamespace>
     <AssemblyName>DCS-SR-CommonTests</AssemblyName>

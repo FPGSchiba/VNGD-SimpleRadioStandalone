@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Vanguard.VCS.Client.Vanguard;
+using Vanguard.VCS.Client.Internal;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {

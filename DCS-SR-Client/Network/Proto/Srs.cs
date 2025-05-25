@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
+namespace Vanguard.VCS.Client.Network {
 
   /// <summary>Holder for reflection information generated from srs.proto</summary>
   public static partial class SrsReflection {
@@ -73,29 +73,28 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             "bnREaXNjb25uZWN0UmVxdWVzdBoVLnNyc3BiLlNlcnZlclJlc3BvbnNlEjgK",
             "EUdldFNlcnZlclNldHRpbmdzEgwuc3JzcGIuRW1wdHkaFS5zcnNwYi5TZXJ2",
             "ZXJTZXR0aW5ncxJEChJTdWJzY3JpYmVUb1VwZGF0ZXMSFy5zcnNwYi5TdWJz",
-            "Y3JpYmVSZXF1ZXN0GhMuc3JzcGIuU2VydmVyVXBkYXRlMAFCX1opZ2l0aHVi",
-            "LmNvbS9GUEdTY2hpYmEvdmNzLXNycy1zZXJ2ZXIvc3JzcGKqAjFDaXJpYm9i",
-            "LkRDUy5TaW1wbGVSYWRpby5TdGFuZGFsb25lLkNsaWVudC5OZXR3b3JrYgZw",
-            "cm90bzM="));
+            "Y3JpYmVSZXF1ZXN0GhMuc3JzcGIuU2VydmVyVXBkYXRlMAFCSVopZ2l0aHVi",
+            "LmNvbS9GUEdTY2hpYmEvdmNzLXNycy1zZXJ2ZXIvc3JzcGKqAhtWYW5ndWFy",
+            "ZC5WQ1MuQ2xpZW50Lk5ldHdvcmtiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Parser, new[]{ "Type", "ClientUpdate", "ServerAction", "SettingsUpdate" }, new[]{ "Update" }, new[]{ typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType) }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate.Parser, new[]{ "ClientGuid", "ClientInfo", "RadioInfo" }, new[]{ "ClientInfo", "RadioInfo" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Parser, new[]{ "Type", "TargetClientGuid", "Reason", "Duration" }, new[]{ "Duration" }, new[]{ typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType) }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest.Parser, new[]{ "Version" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse.Parser, new[]{ "Success", "ErrorMessage", "ClientGuid" }, new[]{ "ClientGuid" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo.Parser, new[]{ "ClientGuid", "Name", "Coalition", "LastUpdate" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo.Parser, new[]{ "ClientGuid", "LastUpdate", "Radios", "Muted" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio.Parser, new[]{ "Id", "Name", "Frequency", "Enabled" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings.Parser, new[]{ "Settings" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting.Parser, new[]{ "StringValue", "BoolValue", "IntValue", "FloatValue" }, new[]{ "Value" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse.Parser, new[]{ "ConnectedClients", "ServerSettings", "Version" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse), global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse.Parser, new[]{ "Success", "ErrorMessage" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.Empty), global::Vanguard.VCS.Client.Network.Empty.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.SubscribeRequest), global::Vanguard.VCS.Client.Network.SubscribeRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerUpdate), global::Vanguard.VCS.Client.Network.ServerUpdate.Parser, new[]{ "Type", "ClientUpdate", "ServerAction", "SettingsUpdate" }, new[]{ "Update" }, new[]{ typeof(global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType) }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ClientUpdate), global::Vanguard.VCS.Client.Network.ClientUpdate.Parser, new[]{ "ClientGuid", "ClientInfo", "RadioInfo" }, new[]{ "ClientInfo", "RadioInfo" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerAction), global::Vanguard.VCS.Client.Network.ServerAction.Parser, new[]{ "Type", "TargetClientGuid", "Reason", "Duration" }, new[]{ "Duration" }, new[]{ typeof(global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType) }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ClientConnectRequest), global::Vanguard.VCS.Client.Network.ClientConnectRequest.Parser, new[]{ "Version" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerConnectResponse), global::Vanguard.VCS.Client.Network.ServerConnectResponse.Parser, new[]{ "Success", "ErrorMessage", "ClientGuid" }, new[]{ "ClientGuid" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ClientInfo), global::Vanguard.VCS.Client.Network.ClientInfo.Parser, new[]{ "ClientGuid", "Name", "Coalition", "LastUpdate" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.RadioInfo), global::Vanguard.VCS.Client.Network.RadioInfo.Parser, new[]{ "ClientGuid", "LastUpdate", "Radios", "Muted" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.Radio), global::Vanguard.VCS.Client.Network.Radio.Parser, new[]{ "Id", "Name", "Frequency", "Enabled" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerSettings), global::Vanguard.VCS.Client.Network.ServerSettings.Parser, new[]{ "Settings" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerSetting), global::Vanguard.VCS.Client.Network.ServerSetting.Parser, new[]{ "StringValue", "BoolValue", "IntValue", "FloatValue" }, new[]{ "Value" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ClientSyncRequest), global::Vanguard.VCS.Client.Network.ClientSyncRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerSyncResponse), global::Vanguard.VCS.Client.Network.ServerSyncResponse.Parser, new[]{ "ConnectedClients", "ServerSettings", "Version" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest), global::Vanguard.VCS.Client.Network.ClientDisconnectRequest.Parser, new[]{ "ClientGuid" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Vanguard.VCS.Client.Network.ServerResponse), global::Vanguard.VCS.Client.Network.ServerResponse.Parser, new[]{ "Success", "ErrorMessage" }, null, null, null, null)
           }));
     }
     #endregion
@@ -120,7 +119,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -284,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -485,7 +484,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -529,10 +528,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 1;
-    private global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType type_ = global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown;
+    private global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType type_ = global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType Type {
+    public global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType Type {
       get { return type_; }
       set {
         type_ = value;
@@ -543,8 +542,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     public const int ClientUpdateFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate ClientUpdate {
-      get { return updateCase_ == UpdateOneofCase.ClientUpdate ? (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate) update_ : null; }
+    public global::Vanguard.VCS.Client.Network.ClientUpdate ClientUpdate {
+      get { return updateCase_ == UpdateOneofCase.ClientUpdate ? (global::Vanguard.VCS.Client.Network.ClientUpdate) update_ : null; }
       set {
         update_ = value;
         updateCase_ = value == null ? UpdateOneofCase.None : UpdateOneofCase.ClientUpdate;
@@ -555,8 +554,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     public const int ServerActionFieldNumber = 3;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction ServerAction {
-      get { return updateCase_ == UpdateOneofCase.ServerAction ? (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction) update_ : null; }
+    public global::Vanguard.VCS.Client.Network.ServerAction ServerAction {
+      get { return updateCase_ == UpdateOneofCase.ServerAction ? (global::Vanguard.VCS.Client.Network.ServerAction) update_ : null; }
       set {
         update_ = value;
         updateCase_ = value == null ? UpdateOneofCase.None : UpdateOneofCase.ServerAction;
@@ -567,8 +566,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     public const int SettingsUpdateFieldNumber = 4;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings SettingsUpdate {
-      get { return updateCase_ == UpdateOneofCase.SettingsUpdate ? (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings) update_ : null; }
+    public global::Vanguard.VCS.Client.Network.ServerSettings SettingsUpdate {
+      get { return updateCase_ == UpdateOneofCase.SettingsUpdate ? (global::Vanguard.VCS.Client.Network.ServerSettings) update_ : null; }
       set {
         update_ = value;
         updateCase_ = value == null ? UpdateOneofCase.None : UpdateOneofCase.SettingsUpdate;
@@ -624,7 +623,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown) hash ^= Type.GetHashCode();
+      if (Type != global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown) hash ^= Type.GetHashCode();
       if (updateCase_ == UpdateOneofCase.ClientUpdate) hash ^= ClientUpdate.GetHashCode();
       if (updateCase_ == UpdateOneofCase.ServerAction) hash ^= ServerAction.GetHashCode();
       if (updateCase_ == UpdateOneofCase.SettingsUpdate) hash ^= SettingsUpdate.GetHashCode();
@@ -647,7 +646,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Type);
       }
@@ -673,7 +672,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Type);
       }
@@ -699,7 +698,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
       if (updateCase_ == UpdateOneofCase.ClientUpdate) {
@@ -723,25 +722,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       if (other == null) {
         return;
       }
-      if (other.Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
+      if (other.Type != global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType.Unknown) {
         Type = other.Type;
       }
       switch (other.UpdateCase) {
         case UpdateOneofCase.ClientUpdate:
           if (ClientUpdate == null) {
-            ClientUpdate = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate();
+            ClientUpdate = new global::Vanguard.VCS.Client.Network.ClientUpdate();
           }
           ClientUpdate.MergeFrom(other.ClientUpdate);
           break;
         case UpdateOneofCase.ServerAction:
           if (ServerAction == null) {
-            ServerAction = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction();
+            ServerAction = new global::Vanguard.VCS.Client.Network.ServerAction();
           }
           ServerAction.MergeFrom(other.ServerAction);
           break;
         case UpdateOneofCase.SettingsUpdate:
           if (SettingsUpdate == null) {
-            SettingsUpdate = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+            SettingsUpdate = new global::Vanguard.VCS.Client.Network.ServerSettings();
           }
           SettingsUpdate.MergeFrom(other.SettingsUpdate);
           break;
@@ -767,11 +766,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Type = (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType) input.ReadEnum();
+            Type = (global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType) input.ReadEnum();
             break;
           }
           case 18: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate();
+            global::Vanguard.VCS.Client.Network.ClientUpdate subBuilder = new global::Vanguard.VCS.Client.Network.ClientUpdate();
             if (updateCase_ == UpdateOneofCase.ClientUpdate) {
               subBuilder.MergeFrom(ClientUpdate);
             }
@@ -780,7 +779,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             break;
           }
           case 26: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction();
+            global::Vanguard.VCS.Client.Network.ServerAction subBuilder = new global::Vanguard.VCS.Client.Network.ServerAction();
             if (updateCase_ == UpdateOneofCase.ServerAction) {
               subBuilder.MergeFrom(ServerAction);
             }
@@ -789,7 +788,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             break;
           }
           case 34: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+            global::Vanguard.VCS.Client.Network.ServerSettings subBuilder = new global::Vanguard.VCS.Client.Network.ServerSettings();
             if (updateCase_ == UpdateOneofCase.SettingsUpdate) {
               subBuilder.MergeFrom(SettingsUpdate);
             }
@@ -817,11 +816,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Type = (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Types.UpdateType) input.ReadEnum();
+            Type = (global::Vanguard.VCS.Client.Network.ServerUpdate.Types.UpdateType) input.ReadEnum();
             break;
           }
           case 18: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientUpdate();
+            global::Vanguard.VCS.Client.Network.ClientUpdate subBuilder = new global::Vanguard.VCS.Client.Network.ClientUpdate();
             if (updateCase_ == UpdateOneofCase.ClientUpdate) {
               subBuilder.MergeFrom(ClientUpdate);
             }
@@ -830,7 +829,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             break;
           }
           case 26: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction();
+            global::Vanguard.VCS.Client.Network.ServerAction subBuilder = new global::Vanguard.VCS.Client.Network.ServerAction();
             if (updateCase_ == UpdateOneofCase.ServerAction) {
               subBuilder.MergeFrom(ServerAction);
             }
@@ -839,7 +838,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             break;
           }
           case 34: {
-            global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings subBuilder = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+            global::Vanguard.VCS.Client.Network.ServerSettings subBuilder = new global::Vanguard.VCS.Client.Network.ServerSettings();
             if (updateCase_ == UpdateOneofCase.SettingsUpdate) {
               subBuilder.MergeFrom(SettingsUpdate);
             }
@@ -890,7 +889,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -936,10 +935,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "client_info" field.</summary>
     public const int ClientInfoFieldNumber = 2;
-    private global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo clientInfo_;
+    private global::Vanguard.VCS.Client.Network.ClientInfo clientInfo_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo ClientInfo {
+    public global::Vanguard.VCS.Client.Network.ClientInfo ClientInfo {
       get { return clientInfo_; }
       set {
         clientInfo_ = value;
@@ -948,10 +947,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "radio_info" field.</summary>
     public const int RadioInfoFieldNumber = 3;
-    private global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo radioInfo_;
+    private global::Vanguard.VCS.Client.Network.RadioInfo radioInfo_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo RadioInfo {
+    public global::Vanguard.VCS.Client.Network.RadioInfo RadioInfo {
       get { return radioInfo_; }
       set {
         radioInfo_ = value;
@@ -1074,13 +1073,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       }
       if (other.clientInfo_ != null) {
         if (clientInfo_ == null) {
-          ClientInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo();
+          ClientInfo = new global::Vanguard.VCS.Client.Network.ClientInfo();
         }
         ClientInfo.MergeFrom(other.ClientInfo);
       }
       if (other.radioInfo_ != null) {
         if (radioInfo_ == null) {
-          RadioInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo();
+          RadioInfo = new global::Vanguard.VCS.Client.Network.RadioInfo();
         }
         RadioInfo.MergeFrom(other.RadioInfo);
       }
@@ -1109,14 +1108,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
           }
           case 18: {
             if (clientInfo_ == null) {
-              ClientInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo();
+              ClientInfo = new global::Vanguard.VCS.Client.Network.ClientInfo();
             }
             input.ReadMessage(ClientInfo);
             break;
           }
           case 26: {
             if (radioInfo_ == null) {
-              RadioInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo();
+              RadioInfo = new global::Vanguard.VCS.Client.Network.RadioInfo();
             }
             input.ReadMessage(RadioInfo);
             break;
@@ -1146,14 +1145,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
           }
           case 18: {
             if (clientInfo_ == null) {
-              ClientInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo();
+              ClientInfo = new global::Vanguard.VCS.Client.Network.ClientInfo();
             }
             input.ReadMessage(ClientInfo);
             break;
           }
           case 26: {
             if (radioInfo_ == null) {
-              RadioInfo = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo();
+              RadioInfo = new global::Vanguard.VCS.Client.Network.RadioInfo();
             }
             input.ReadMessage(RadioInfo);
             break;
@@ -1184,7 +1183,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1220,10 +1219,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 1;
-    private global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType type_ = global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown;
+    private global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType type_ = global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType Type {
+    public global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType Type {
       get { return type_; }
       set {
         type_ = value;
@@ -1310,7 +1309,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown) hash ^= Type.GetHashCode();
+      if (Type != global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown) hash ^= Type.GetHashCode();
       if (TargetClientGuid.Length != 0) hash ^= TargetClientGuid.GetHashCode();
       if (Reason.Length != 0) hash ^= Reason.GetHashCode();
       if (HasDuration) hash ^= Duration.GetHashCode();
@@ -1332,7 +1331,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Type);
       }
@@ -1358,7 +1357,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Type);
       }
@@ -1384,7 +1383,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown) {
+      if (Type != global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
       if (TargetClientGuid.Length != 0) {
@@ -1408,7 +1407,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       if (other == null) {
         return;
       }
-      if (other.Type != global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType.Unknown) {
+      if (other.Type != global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType.Unknown) {
         Type = other.Type;
       }
       if (other.TargetClientGuid.Length != 0) {
@@ -1440,7 +1439,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Type = (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType) input.ReadEnum();
+            Type = (global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType) input.ReadEnum();
             break;
           }
           case 18: {
@@ -1475,7 +1474,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Type = (global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerAction.Types.ActionType) input.ReadEnum();
+            Type = (global::Vanguard.VCS.Client.Network.ServerAction.Types.ActionType) input.ReadEnum();
             break;
           }
           case 18: {
@@ -1531,7 +1530,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1732,7 +1731,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2024,7 +2023,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2336,7 +2335,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2395,12 +2394,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "radios" field.</summary>
     public const int RadiosFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio> _repeated_radios_codec
-        = pb::FieldCodec.ForMessage(26, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio.Parser);
-    private readonly pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio> radios_ = new pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio>();
+    private static readonly pb::FieldCodec<global::Vanguard.VCS.Client.Network.Radio> _repeated_radios_codec
+        = pb::FieldCodec.ForMessage(26, global::Vanguard.VCS.Client.Network.Radio.Parser);
+    private readonly pbc::RepeatedField<global::Vanguard.VCS.Client.Network.Radio> radios_ = new pbc::RepeatedField<global::Vanguard.VCS.Client.Network.Radio>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Radio> Radios {
+    public pbc::RepeatedField<global::Vanguard.VCS.Client.Network.Radio> Radios {
       get { return radios_; }
     }
 
@@ -2634,7 +2633,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2946,7 +2945,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2978,12 +2977,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "settings" field.</summary>
     public const int SettingsFieldNumber = 1;
-    private static readonly pbc::MapField<string, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting>.Codec _map_settings_codec
-        = new pbc::MapField<string, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting.Parser), 10);
-    private readonly pbc::MapField<string, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting> settings_ = new pbc::MapField<string, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting>();
+    private static readonly pbc::MapField<string, global::Vanguard.VCS.Client.Network.ServerSetting>.Codec _map_settings_codec
+        = new pbc::MapField<string, global::Vanguard.VCS.Client.Network.ServerSetting>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Vanguard.VCS.Client.Network.ServerSetting.Parser), 10);
+    private readonly pbc::MapField<string, global::Vanguard.VCS.Client.Network.ServerSetting> settings_ = new pbc::MapField<string, global::Vanguard.VCS.Client.Network.ServerSetting>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSetting> Settings {
+    public pbc::MapField<string, global::Vanguard.VCS.Client.Network.ServerSetting> Settings {
       get { return settings_; }
     }
 
@@ -3136,7 +3135,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[11]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3543,7 +3542,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[12]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3744,7 +3743,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[13]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3778,21 +3777,21 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
 
     /// <summary>Field number for the "connected_clients" field.</summary>
     public const int ConnectedClientsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo> _repeated_connectedClients_codec
-        = pb::FieldCodec.ForMessage(10, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo.Parser);
-    private readonly pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo> connectedClients_ = new pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo>();
+    private static readonly pb::FieldCodec<global::Vanguard.VCS.Client.Network.ClientInfo> _repeated_connectedClients_codec
+        = pb::FieldCodec.ForMessage(10, global::Vanguard.VCS.Client.Network.ClientInfo.Parser);
+    private readonly pbc::RepeatedField<global::Vanguard.VCS.Client.Network.ClientInfo> connectedClients_ = new pbc::RepeatedField<global::Vanguard.VCS.Client.Network.ClientInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo> ConnectedClients {
+    public pbc::RepeatedField<global::Vanguard.VCS.Client.Network.ClientInfo> ConnectedClients {
       get { return connectedClients_; }
     }
 
     /// <summary>Field number for the "server_settings" field.</summary>
     public const int ServerSettingsFieldNumber = 2;
-    private global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings serverSettings_;
+    private global::Vanguard.VCS.Client.Network.ServerSettings serverSettings_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings ServerSettings {
+    public global::Vanguard.VCS.Client.Network.ServerSettings ServerSettings {
       get { return serverSettings_; }
       set {
         serverSettings_ = value;
@@ -3917,7 +3916,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       connectedClients_.Add(other.connectedClients_);
       if (other.serverSettings_ != null) {
         if (serverSettings_ == null) {
-          ServerSettings = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+          ServerSettings = new global::Vanguard.VCS.Client.Network.ServerSettings();
         }
         ServerSettings.MergeFrom(other.ServerSettings);
       }
@@ -3949,7 +3948,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
           }
           case 18: {
             if (serverSettings_ == null) {
-              ServerSettings = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+              ServerSettings = new global::Vanguard.VCS.Client.Network.ServerSettings();
             }
             input.ReadMessage(ServerSettings);
             break;
@@ -3983,7 +3982,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
           }
           case 18: {
             if (serverSettings_ == null) {
-              ServerSettings = new global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings();
+              ServerSettings = new global::Vanguard.VCS.Client.Network.ServerSettings();
             }
             input.ReadMessage(ServerSettings);
             break;
@@ -4017,7 +4016,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[14]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4218,7 +4217,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

@@ -1,4 +1,5 @@
-﻿using Vanguard.VCS.Client.Settings;
+﻿/* Recording does not work right now
+using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common;
 using NAudio.Lame;
 using System;
@@ -80,3 +81,4 @@ namespace Vanguard.VCS.Client.Audio.Recording
         }
     }
 }
+*/

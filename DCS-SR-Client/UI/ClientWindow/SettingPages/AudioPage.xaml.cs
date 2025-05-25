@@ -35,12 +35,16 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
             
-            _audioManager = new AudioManager(AudioOutput.WindowsN);
-            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-
-            if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow != null)
             {
-                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
+                _audioManager = mainWindow.AudioManager;
+                _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
+                
+                if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
+                {
+                    SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
+                }
             }
             
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };

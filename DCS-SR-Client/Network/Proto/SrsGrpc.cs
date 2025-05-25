@@ -7,7 +7,7 @@
 
 using grpc = global::Grpc.Core;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
+namespace Vanguard.VCS.Client.Network {
   /// <summary>
   /// Service definition
   /// </summary>
@@ -49,32 +49,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest> __Marshaller_srspb_ClientConnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientConnectRequest> __Marshaller_srspb_ClientConnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientConnectRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse> __Marshaller_srspb_ServerConnectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerConnectResponse> __Marshaller_srspb_ServerConnectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerConnectResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo> __Marshaller_srspb_ClientInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientInfo> __Marshaller_srspb_ClientInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientInfo.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> __Marshaller_srspb_ServerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerResponse> __Marshaller_srspb_ServerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo> __Marshaller_srspb_RadioInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.RadioInfo> __Marshaller_srspb_RadioInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.RadioInfo.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest> __Marshaller_srspb_ClientSyncRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientSyncRequest> __Marshaller_srspb_ClientSyncRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientSyncRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse> __Marshaller_srspb_ServerSyncResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Marshaller_srspb_ServerSyncResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSyncResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest> __Marshaller_srspb_ClientDisconnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest> __Marshaller_srspb_ClientDisconnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientDisconnectRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty> __Marshaller_srspb_Empty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.Empty> __Marshaller_srspb_Empty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.Empty.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings> __Marshaller_srspb_ServerSettings = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSettings> __Marshaller_srspb_ServerSettings = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSettings.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest> __Marshaller_srspb_SubscribeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.SubscribeRequest> __Marshaller_srspb_SubscribeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.SubscribeRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate> __Marshaller_srspb_ServerUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerUpdate> __Marshaller_srspb_ServerUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerUpdate.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse> __Method_Connect = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientConnectRequest, global::Vanguard.VCS.Client.Network.ServerConnectResponse> __Method_Connect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientConnectRequest, global::Vanguard.VCS.Client.Network.ServerConnectResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "Connect",
@@ -82,7 +82,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerConnectResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> __Method_UpdateClientInfo = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateClientInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "UpdateClientInfo",
@@ -90,7 +90,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> __Method_UpdateRadioInfo = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateRadioInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "UpdateRadioInfo",
@@ -98,7 +98,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse> __Method_SyncClient = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Method_SyncClient = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "SyncClient",
@@ -106,7 +106,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerSyncResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> __Method_DisconnectClient = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_DisconnectClient = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
         "DisconnectClient",
@@ -114,7 +114,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings> __Method_GetServerSettings = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings> __Method_GetServerSettings = new grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings>(
         grpc::MethodType.Unary,
         __ServiceName,
         "GetServerSettings",
@@ -122,7 +122,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
         __Marshaller_srspb_ServerSettings);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate> __Method_SubscribeToUpdates = new grpc::Method<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest, global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate> __Method_SubscribeToUpdates = new grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate>(
         grpc::MethodType.ServerStreaming,
         __ServiceName,
         "SubscribeToUpdates",
@@ -132,7 +132,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
     {
-      get { return global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SrsReflection.Descriptor.Services[0]; }
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.Services[0]; }
     }
 
     /// <summary>Client for SRSService</summary>
@@ -171,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse Connect(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerConnectResponse Connect(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return Connect(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -182,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse Connect(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerConnectResponse Connect(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_Connect, null, options, request);
       }
@@ -195,7 +195,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse> ConnectAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerConnectResponse> ConnectAsync(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return ConnectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -206,7 +206,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerConnectResponse> ConnectAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerConnectResponse> ConnectAsync(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_Connect, null, options, request);
       }
@@ -219,7 +219,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse UpdateClientInfo(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse UpdateClientInfo(global::Vanguard.VCS.Client.Network.ClientInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return UpdateClientInfo(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -230,7 +230,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse UpdateClientInfo(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse UpdateClientInfo(global::Vanguard.VCS.Client.Network.ClientInfo request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_UpdateClientInfo, null, options, request);
       }
@@ -243,7 +243,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> UpdateClientInfoAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> UpdateClientInfoAsync(global::Vanguard.VCS.Client.Network.ClientInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return UpdateClientInfoAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -254,7 +254,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> UpdateClientInfoAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientInfo request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> UpdateClientInfoAsync(global::Vanguard.VCS.Client.Network.ClientInfo request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_UpdateClientInfo, null, options, request);
       }
@@ -267,7 +267,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse UpdateRadioInfo(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse UpdateRadioInfo(global::Vanguard.VCS.Client.Network.RadioInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return UpdateRadioInfo(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -278,7 +278,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse UpdateRadioInfo(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse UpdateRadioInfo(global::Vanguard.VCS.Client.Network.RadioInfo request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_UpdateRadioInfo, null, options, request);
       }
@@ -291,7 +291,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> UpdateRadioInfoAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> UpdateRadioInfoAsync(global::Vanguard.VCS.Client.Network.RadioInfo request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return UpdateRadioInfoAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -302,7 +302,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> UpdateRadioInfoAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.RadioInfo request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> UpdateRadioInfoAsync(global::Vanguard.VCS.Client.Network.RadioInfo request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_UpdateRadioInfo, null, options, request);
       }
@@ -315,7 +315,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse SyncClient(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerSyncResponse SyncClient(global::Vanguard.VCS.Client.Network.ClientSyncRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return SyncClient(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -326,7 +326,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse SyncClient(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerSyncResponse SyncClient(global::Vanguard.VCS.Client.Network.ClientSyncRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_SyncClient, null, options, request);
       }
@@ -339,7 +339,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse> SyncClientAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerSyncResponse> SyncClientAsync(global::Vanguard.VCS.Client.Network.ClientSyncRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return SyncClientAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -350,7 +350,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSyncResponse> SyncClientAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientSyncRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerSyncResponse> SyncClientAsync(global::Vanguard.VCS.Client.Network.ClientSyncRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_SyncClient, null, options, request);
       }
@@ -363,7 +363,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse DisconnectClient(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse DisconnectClient(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return DisconnectClient(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -374,7 +374,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse DisconnectClient(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse DisconnectClient(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_DisconnectClient, null, options, request);
       }
@@ -387,7 +387,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> DisconnectClientAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectClientAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return DisconnectClientAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -398,7 +398,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerResponse> DisconnectClientAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectClientAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_DisconnectClient, null, options, request);
       }
@@ -411,7 +411,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings GetServerSettings(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerSettings GetServerSettings(global::Vanguard.VCS.Client.Network.Empty request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return GetServerSettings(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -422,7 +422,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings GetServerSettings(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerSettings GetServerSettings(global::Vanguard.VCS.Client.Network.Empty request, grpc::CallOptions options)
       {
         return CallInvoker.BlockingUnaryCall(__Method_GetServerSettings, null, options, request);
       }
@@ -435,7 +435,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings> GetServerSettingsAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerSettings> GetServerSettingsAsync(global::Vanguard.VCS.Client.Network.Empty request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return GetServerSettingsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -446,7 +446,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerSettings> GetServerSettingsAsync(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.Empty request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerSettings> GetServerSettingsAsync(global::Vanguard.VCS.Client.Network.Empty request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetServerSettings, null, options, request);
       }
@@ -459,7 +459,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncServerStreamingCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate> SubscribeToUpdates(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncServerStreamingCall<global::Vanguard.VCS.Client.Network.ServerUpdate> SubscribeToUpdates(global::Vanguard.VCS.Client.Network.SubscribeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return SubscribeToUpdates(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
@@ -470,7 +470,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncServerStreamingCall<global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.ServerUpdate> SubscribeToUpdates(global::Ciribob.DCS.SimpleRadio.Standalone.Client.Network.SubscribeRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncServerStreamingCall<global::Vanguard.VCS.Client.Network.ServerUpdate> SubscribeToUpdates(global::Vanguard.VCS.Client.Network.SubscribeRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncServerStreamingCall(__Method_SubscribeToUpdates, null, options, request);
       }

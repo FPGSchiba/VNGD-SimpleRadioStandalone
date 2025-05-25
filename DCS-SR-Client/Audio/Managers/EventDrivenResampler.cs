@@ -3,6 +3,7 @@ using System.Diagnostics;
 using NAudio.Dmo;
 using NAudio.Dsp;
 using NAudio.Wave;
+using NAudio.Wave.WaveFormats;
 using NAudio.Wave.SampleProviders;
 
 namespace Vanguard.VCS.Client.Audio.Managers
