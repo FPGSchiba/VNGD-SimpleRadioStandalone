@@ -2,9 +2,11 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
+using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {
@@ -15,44 +17,52 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
     {
         private MainWindow mainWindow;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private SrsTeam _selectedTeam = SrsTeam.BlueTeam;
-
+        public delegate void ServerInformationFetchedCallback(ServerInformation serverInformation);
+        
+        
         public LoginPage()
         {
             InitializeComponent();
 
-            SelectedTeamInit();
-
             mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
-            
         }
-
-        private void SelectedTeamInit()
+        
+        private static void GetServerInformation(ServerInformationFetchedCallback callback)
         {
-            switch (_selectedTeam)
+            WebsiteClient.GetServerInformation().ContinueWith((task =>
             {
-                case SrsTeam.BlueTeam:
-                    BlueTeamRadio.IsChecked = true;
-                    break;
-                case SrsTeam.RedTeam:
-                    RedTeamRadio.IsChecked = true;
-                    break;
-            }
+                if (task.IsCompletedSuccessfully)
+                {
+                    callback(task.Result);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to retrieve server information.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }));
+        }
+        
+        public void LoginFailed()
+        {
+            Login.IsEnabled = true;
+            Progress.Visibility = Visibility.Hidden;
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
-            Logger.Info($"Login pressed with following Information: \nEmail: {EmailInput.Text}, Password: {PasswordInput.Password}, Code: {FleetCodeInput.Text}, Team: {_selectedTeam}");
-            // process hostname
-            var resolvedAddresses = Dns.GetHostAddresses(GetAddressFromBackend());
-            var loginType = GetLoginTypeFromBackend();
+            Login.IsEnabled = false;
+            Progress.Visibility = Visibility.Visible;
+            GetServerInformation(ServerInformationFetched);
+        }
+
+        private void ServerInformationFetched(ServerInformation serverInformation)
+        {
+            var resolvedAddresses = Dns.GetHostAddresses(serverInformation.Address);
             var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-
-            var playerName = $"[{FleetCodeInput.Text}] {GetPlayerNameFromBackend()}";
-
+            
             if (ip != null)
             {
-                mainWindow.On_LoginLoginClicked(ip, GetPortFrombackend(), playerName, "vngd", loginType);
+                mainWindow.On_LoginLoginClicked(ip, serverInformation.ControlPort);
             }
             else
             {
@@ -67,57 +77,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             mainWindow.On_LoginBackClicked();
-        }
-
-        private void BlueTeamRadio_OnChecked(object sender, RoutedEventArgs e)
-        {
-            _selectedTeam = SrsTeam.BlueTeam;
-        }
-
-        private void RedTeamRadio_OnChecked(object sender, RoutedEventArgs e)
-        {
-            _selectedTeam = SrsTeam.RedTeam;
-        }
-
-        private static string GetAddressFromBackend()
-        {
-            var addr = "";
-
-            if (addr.Contains(":"))
-            {
-                return addr.Split(':')[0];
-            }
-
-            return addr;
-        }
-
-        private static int GetPortFrombackend()
-        {
-            var addr = "";
-
-            if (addr.Contains(":"))
-            {
-                int port;
-                if (int.TryParse(addr.Split(':')[1], out port))
-                {
-                    return port;
-                }
-                throw new ArgumentException("specified port is not valid");
-            }
-
-            return 5002;
-        }
-
-        private static string GetPlayerNameFromBackend()
-        {
-            var playerName = "";
-
-            return playerName;
-        }
-
-        private static LoginType GetLoginTypeFromBackend()
-        {
-            return LoginType.Member;
         }
     }
 }

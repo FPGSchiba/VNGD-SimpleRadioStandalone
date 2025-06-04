@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="70" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
@@ -56,25 +56,23 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="38" />
+                <RowDefinition Height="90" />
                 <RowDefinition Height="20" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="25" />
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
             <StackPanel
                 Grid.Row="0"
-                Height="38"
+                Height="140"
                 HorizontalAlignment="Center"
-                Orientation="Horizontal"
+                Orientation="Vertical"
                 VerticalAlignment="Top">
                 <TextBox
                     AcceptsReturn="False"
                     FontSize="16"
                     Height="38"
                     HorizontalAlignment="Center"
-                    Margin="0,0,50,0"
+                    Margin="0,0,0,10"
                     Name="EmailInput"
                     Padding="8"
                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
@@ -103,59 +101,6 @@
                 Grid.Row="2"
                 HorizontalAlignment="Center"
                 Orientation="Horizontal">
-                <TextBox
-                    AcceptsReturn="False"
-                    FontSize="16"
-                    Height="38"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
-                    Margin="70,5,50,0"
-                    Name="FleetCodeInput"
-                    Padding="8"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                    TextWrapping="NoWrap"
-                    VerticalAlignment="Top"
-                    Width="130"
-                    materialDesign:HintAssist.Hint="Fleet ID Code" />
-
-                <Grid VerticalAlignment="Top" Width="200">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-
-                    <Label
-                        Content="Select Team:"
-                        FontSize="12"
-                        Grid.ColumnSpan="2" />
-
-                    <RadioButton
-                        Checked="BlueTeamRadio_OnChecked"
-                        Content="Blue Team"
-                        Foreground="Blue"
-                        Grid.Column="0"
-                        Grid.Row="1"
-                        Name="BlueTeamRadio"
-                        Style="{StaticResource MaterialDesignDarkRadioButton}" />
-                    <RadioButton
-                        Checked="RedTeamRadio_OnChecked"
-                        Content="Red Team"
-                        Foreground="Red"
-                        Grid.Column="1"
-                        Grid.Row="1"
-                        Name="RedTeamRadio"
-                        Style="{StaticResource MaterialDesignDarkRadioButton}" />
-                </Grid>
-            </StackPanel>
-
-            <StackPanel
-                Grid.Row="4"
-                HorizontalAlignment="Center"
-                Orientation="Horizontal">
                 <Button
                     Click="Login_Click"
                     Content="LOGIN"
@@ -163,8 +108,17 @@
                     IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                     Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                     Width="90"
+                    Margin="30,0,0,0"
                     materialDesign:ButtonAssist.CornerRadius="15"
                     x:Name="Login" />
+                <ProgressBar
+                    Margin="10,0,0,0"
+                    IsIndeterminate="True"
+                    Visibility="Hidden"
+                    
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0"
+                    x:Name="Progress" />
             </StackPanel>
 
         </Grid>

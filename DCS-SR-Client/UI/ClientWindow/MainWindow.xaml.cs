@@ -43,19 +43,6 @@ using Vanguard.VCS.Client.UI.RadioOverlayWindow;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {
-    enum SrsTeam
-    {
-        RedTeam,
-        BlueTeam
-    }
-
-    public enum LoginType
-    {
-        Guest,
-        Member,
-        Officer,
-        Administrator
-    }
 
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
@@ -278,8 +265,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Title = "VCS-SRS - v" + version; //UpdaterChecker.VERSION
             SRSVersionText.Text = "VCS-SRS v" + version;
 
-            this.Loaded +=  MainWindow_Loaded;
-
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.StartMinimised))
             {
                 Hide();
@@ -296,6 +281,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Analytics.Log("Client", "Startup", _globalSettings.GetClientSetting(GlobalSettingsKeys.ClientIdLong).RawValue);
 
             InitSettingsScreen();
+            
+            CheckWindowVisibility();
 
             InitSettingsProfiles();
             ReloadProfile();
@@ -342,11 +329,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             return null;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            CheckWindowVisibility();
-        }
-
         private void CheckWindowVisibility()
         {
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.DisableWindowVisibilityCheck))
@@ -378,25 +360,26 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private bool CheckWindowVisibilityForPanels(int mainWindowX, int mainWindowY, ref bool radioWindowVisible)
         {
             bool mainWindowVisible = false;
-        
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            var monitors = MonitorHelper.GetAllMonitors();
+            
+            foreach (MonitorInfo screen in monitors)
             {
                 var primary = "primary ";
-                _logger.Trace($"Checking {(screen.Primary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
-        
+                _logger.Trace($"Checking {(screen.IsPrimary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+    
                 if (screen.Bounds.Contains(mainWindowX, mainWindowY))
                 {
-                    _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.IsPrimary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     mainWindowVisible = true;
                 }
-        
+    
                 radioWindowVisible = CheckRadioWindowVisibility(screen, radioWindowVisible);
             }
         
             return mainWindowVisible;
         }
         
-        private bool CheckRadioWindowVisibility(System.Windows.Forms.Screen screen, bool radioWindowVisible)
+        private bool CheckRadioWindowVisibility(MonitorInfo screen, bool radioWindowVisible)
         {
             int[] radioWindowX = {
                 (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX).DoubleValue,
@@ -442,7 +425,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 if (screen.Bounds.Contains(radioWindowX[i], radioWindowY[i]))
                 {
-                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.IsPrimary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
             }
@@ -956,14 +939,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             OpenPageByIndex(GuestIndex);
         }
 
-        public void On_LoginLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword, LoginType loginType)
+        public void On_LoginLoginClicked(IPAddress ip, int port)
         {
             _resolvedIp = ip;
             _port = port;
-            _coalitionPassword = coalitionPassword;
-            _playerName = playerName;
-            LoginType = loginType;
-            Connect(ip, port);
+            Connect(ip, port, "internal");
         }
 
         public void On_LoginBackClicked()
@@ -978,7 +958,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _coalitionPassword = coalitionPassword;
             _playerName = playerName;
             LoginType = LoginType.Guest;
-            Connect(ip, port);
+            Connect(ip, port, "guest");
         }
 
         public void On_GuestBackClicked()
@@ -1433,7 +1413,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _logger.Info($"{type}: {message}");
         }
 
-        private void Connect(IPAddress ip, int port)
+        private void Connect(IPAddress ip, int port, string loginType)
         {
             if (ClientState.IsConnected)
             {
@@ -1460,9 +1440,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _guestPage.Login.IsEnabled = false;
 
                     _guestPage.LoginInProgress.Opacity = 1;
-
-                    // _srsClient.TryConnect(new IPEndPoint(_resolvedIp, _port), ConnectCallback);
-                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName});
+                    
+                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName, LoginType = loginType});
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -1530,6 +1509,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             ClientState.DcsPlayerRadioInfo.Reset();
             ClientState.PlayerCoaltionLocationMetadata.Reset();
+            
+            _loginPage.LoginFailed();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -3002,7 +2983,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _coalitionPassword = ExternalAWACSModePassword.Password.Trim();
             _playerName = ExternalAWACSModeName.Text;
             LoginType = LoginType.Guest;
-            Connect(ip, port);
+            Connect(ip, port, "guest");
         }
 
         private string GetAddressFromTextBox()

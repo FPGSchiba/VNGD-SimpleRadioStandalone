@@ -14,6 +14,15 @@ namespace Vanguard.VCS.Client.Network
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string LoginType { get; set; } // "guest" or "internal"
+    }
+    
+    public enum LoginType
+    {
+        Guest,
+        Member,
+        Officer,
+        Administrator
     }
     
     public enum VcsUiUpdateType
@@ -68,12 +77,13 @@ namespace Vanguard.VCS.Client.Network
                     {
                         if (!string.IsNullOrEmpty(userLogin.Username) && !string.IsNullOrEmpty(userLogin.Password))
                         {
+                            metadata.Add("loginType", userLogin.LoginType); // Defines the login type (can be "guest" or "internal")
                             metadata.Add("username", userLogin.Username);
                             metadata.Add("unitId", "DEV"); // Example unit ID, replace with actual logic if needed
                             metadata.Add("password", HashPassword(userLogin.Password)); // Defines the coalition for the user
                         }
                         return System.Threading.Tasks.Task.CompletedTask;
-                    })))
+                    }))),
             };
             var channel = GrpcChannel.ForAddress($"https://{endpoint.Address}:{endpoint.Port}", channelOptions);
             _client = new SRSService.SRSServiceClient(channel);
@@ -83,7 +93,12 @@ namespace Vanguard.VCS.Client.Network
                 Version = "0.1.0",
             };
             
-            Connect(connectRequest);
+            var response = Connect(connectRequest);
+            if (response == null)
+            {
+                Logger.Error("Failed to connect to VCS server: response is null");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Failed to connect to VCS server.");
+            }
         }
     }
 }

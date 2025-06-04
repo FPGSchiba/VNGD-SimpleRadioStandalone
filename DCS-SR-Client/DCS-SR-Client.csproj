@@ -19,9 +19,9 @@
     <Version>0.0.0</Version>
     <Authors>Modified by: Vanguard | Original: Ciribob - GitHub.com/Ciribob</Authors>
     <Company>Modified by: Vanguard | Original: Ciribob - GitHub.com/Ciribob</Company>
-    <Product>SimpleRadio Standalone</Product>
-    <Description>Client for SimpleRadio Standalone</Description>
-    <Copyright>Copyright © 2016 - Ciribob</Copyright>
+    <Product>Vanguard Communication System Client</Product>
+    <Description>Client for the VCS</Description>
+    <Copyright>Copyright © 2025 - Vanguard</Copyright>
     <TreatAsLocalProperty>Version</TreatAsLocalProperty>
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>

@@ -43,25 +43,24 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal"
             VerticalAlignment="Bottom">
-            <!-- Login is not yet implemented via vngd.net, so we're using the Guest button for now
+            <!-- Login via vngd.net -->
             <Button
                 Width="90"
                 Height="30"
                 Content="LOGIN"
+                Margin="0,0,15,0"
                 x:Name="Login"
                 materialDesign:ButtonAssist.CornerRadius="15"
                 IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                 Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                 Click="Login_Click"
             />
-            -->
-            <!--  Change this to Guest in the future  -->
+            
             <Button
                 Click="Guest_Click"
-                Content="LOGIN"
+                Content="GUEST"
                 Height="30"
                 IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                Margin="0,0,0,0"
                 Style="{StaticResource MaterialDesignFlatDarkBgButton}"
                 Width="90"
                 materialDesign:ButtonAssist.CornerRadius="15"
