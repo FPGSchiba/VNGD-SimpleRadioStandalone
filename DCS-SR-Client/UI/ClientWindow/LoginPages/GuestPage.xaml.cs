@@ -51,6 +51,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                 {
                     System.Windows.Forms.MessageBox.Show("Please enter a password. It is needed to connect to VCS-SRS.", "Missing Password",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    LoginFailed();
                     return;
                 }
                 var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
@@ -75,6 +76,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
                     _mainWindow.ClientState.IsConnected = false;
+                    LoginFailed();
                 }
             }
             else
@@ -82,6 +84,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                 System.Windows.Forms.MessageBox.Show(
                     $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2-4 uppercase Letters", "Invalid Fleet-Code",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LoginFailed();
             }
         }
 
@@ -126,6 +129,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
         {
             _ffidInformation = new FFIDInformation();
             _ffidInformation.ShowDialog(); // ShowDialog blocks the main window
+        }
+
+        public void LoginFailed()
+        {
+            Login.IsEnabled = true;
+            LoginInProgress.Visibility = Visibility.Hidden;
+            _logger.Error("Login failed, re-enabling login button.");
         }
     }
 }

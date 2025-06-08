@@ -49,9 +49,17 @@ namespace Vanguard.VCS.Client.Network {
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientConnectRequest> __Marshaller_srspb_ClientConnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientConnectRequest.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest> __Marshaller_srspb_ClientGuestLoginRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerConnectResponse> __Marshaller_srspb_ServerConnectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerConnectResponse.Parser));
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse> __Marshaller_srspb_ServerGuestLoginResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest> __Marshaller_srspb_ClientVanguardLoginRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse> __Marshaller_srspb_ServerVanguardLoginResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest> __Marshaller_srspb_ClientVanguardUnitSelectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> __Marshaller_srspb_ServerVanguardUnitSelectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientInfo> __Marshaller_srspb_ClientInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientInfo.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
@@ -74,12 +82,28 @@ namespace Vanguard.VCS.Client.Network {
     static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerUpdate> __Marshaller_srspb_ServerUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerUpdate.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientConnectRequest, global::Vanguard.VCS.Client.Network.ServerConnectResponse> __Method_Connect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientConnectRequest, global::Vanguard.VCS.Client.Network.ServerConnectResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest, global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse> __Method_GuestLogin = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest, global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Connect",
-        __Marshaller_srspb_ClientConnectRequest,
-        __Marshaller_srspb_ServerConnectResponse);
+        "GuestLogin",
+        __Marshaller_srspb_ClientGuestLoginRequest,
+        __Marshaller_srspb_ServerGuestLoginResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest, global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse> __Method_VanguardLogin = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest, global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "VanguardLogin",
+        __Marshaller_srspb_ClientVanguardLoginRequest,
+        __Marshaller_srspb_ServerVanguardLoginResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest, global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> __Method_VanguardUnitSelect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest, global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "VanguardUnitSelect",
+        __Marshaller_srspb_ClientVanguardUnitSelectRequest,
+        __Marshaller_srspb_ServerVanguardUnitSelectResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateClientInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
@@ -106,10 +130,10 @@ namespace Vanguard.VCS.Client.Network {
         __Marshaller_srspb_ServerSyncResponse);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_DisconnectClient = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse>(
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_Disconnect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "DisconnectClient",
+        "Disconnect",
         __Marshaller_srspb_ClientDisconnectRequest,
         __Marshaller_srspb_ServerResponse);
 
@@ -163,7 +187,7 @@ namespace Vanguard.VCS.Client.Network {
       }
 
       /// <summary>
-      /// Initial client connection and authentication (metadata)
+      /// Guest login (Using Coalition Password and self chosen name)
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -171,23 +195,23 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Vanguard.VCS.Client.Network.ServerConnectResponse Connect(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse GuestLogin(global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Connect(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return GuestLogin(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
-      /// Initial client connection and authentication (metadata)
+      /// Guest login (Using Coalition Password and self chosen name)
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Vanguard.VCS.Client.Network.ServerConnectResponse Connect(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse GuestLogin(global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Connect, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_GuestLogin, null, options, request);
       }
       /// <summary>
-      /// Initial client connection and authentication (metadata)
+      /// Guest login (Using Coalition Password and self chosen name)
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
@@ -195,20 +219,116 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerConnectResponse> ConnectAsync(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse> GuestLoginAsync(global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return ConnectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return GuestLoginAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
-      /// Initial client connection and authentication (metadata)
+      /// Guest login (Using Coalition Password and self chosen name)
       /// </summary>
       /// <param name="request">The request to send to the server.</param>
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerConnectResponse> ConnectAsync(global::Vanguard.VCS.Client.Network.ClientConnectRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse> GuestLoginAsync(global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Connect, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_GuestLogin, null, options, request);
+      }
+      /// <summary>
+      /// Vanguard login (Using email and password > Connects to Wix backend)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse VanguardLogin(global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return VanguardLogin(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Vanguard login (Using email and password > Connects to Wix backend)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse VanguardLogin(global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_VanguardLogin, null, options, request);
+      }
+      /// <summary>
+      /// Vanguard login (Using email and password > Connects to Wix backend)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse> VanguardLoginAsync(global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return VanguardLoginAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Vanguard login (Using email and password > Connects to Wix backend)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerVanguardLoginResponse> VanguardLoginAsync(global::Vanguard.VCS.Client.Network.ClientVanguardLoginRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_VanguardLogin, null, options, request);
+      }
+      /// <summary>
+      /// Vanguard unit selection (Using client GUID and selected unit ID)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse VanguardUnitSelect(global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return VanguardUnitSelect(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Vanguard unit selection (Using client GUID and selected unit ID)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse VanguardUnitSelect(global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_VanguardUnitSelect, null, options, request);
+      }
+      /// <summary>
+      /// Vanguard unit selection (Using client GUID and selected unit ID)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> VanguardUnitSelectAsync(global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return VanguardUnitSelectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Vanguard unit selection (Using client GUID and selected unit ID)
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> VanguardUnitSelectAsync(global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_VanguardUnitSelect, null, options, request);
       }
       /// <summary>
       /// Client update (metadata, client info, position)
@@ -363,9 +483,9 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Vanguard.VCS.Client.Network.ServerResponse DisconnectClient(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse Disconnect(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return DisconnectClient(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return Disconnect(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// Client disconnect (metadata)
@@ -374,9 +494,9 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The response received from the server.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::Vanguard.VCS.Client.Network.ServerResponse DisconnectClient(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse Disconnect(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_DisconnectClient, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_Disconnect, null, options, request);
       }
       /// <summary>
       /// Client disconnect (metadata)
@@ -387,9 +507,9 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="cancellationToken">An optional token for canceling the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectClientAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return DisconnectClientAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return DisconnectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
       /// <summary>
       /// Client disconnect (metadata)
@@ -398,9 +518,9 @@ namespace Vanguard.VCS.Client.Network {
       /// <param name="options">The options for the call.</param>
       /// <returns>The call object.</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectClientAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> DisconnectAsync(global::Vanguard.VCS.Client.Network.ClientDisconnectRequest request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_DisconnectClient, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_Disconnect, null, options, request);
       }
       /// <summary>
       /// Server settings request

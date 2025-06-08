@@ -7,8 +7,14 @@ option csharp_namespace = "Vanguard.VCS.Client.Network";
 
 // Service definition
 service SRSService {
-  // Initial client connection and authentication (metadata)
-  rpc Connect(ClientConnectRequest) returns (ServerConnectResponse);
+  // Guest login (Using Coalition Password and self chosen name)
+  rpc GuestLogin(ClientGuestLoginRequest) returns (ServerGuestLoginResponse);
+
+  // Vanguard login (Using email and password > Connects to Wix backend)
+  rpc VanguardLogin(ClientVanguardLoginRequest) returns (ServerVanguardLoginResponse);
+
+  // Vanguard unit selection (Using client GUID and selected unit ID)
+  rpc VanguardUnitSelect(ClientVanguardUnitSelectRequest) returns (ServerVanguardUnitSelectResponse);
 
   // Client update (metadata, client info, position)
   rpc UpdateClientInfo(ClientInfo) returns (ServerResponse);
@@ -20,7 +26,7 @@ service SRSService {
   rpc SyncClient(ClientSyncRequest) returns (ServerSyncResponse);
 
   // Client disconnect (metadata)
-  rpc DisconnectClient(ClientDisconnectRequest) returns (ServerResponse);
+  rpc Disconnect(ClientDisconnectRequest) returns (ServerResponse);
 
   // Server settings request
   rpc GetServerSettings(Empty) returns (ServerSettings);
@@ -31,6 +37,73 @@ service SRSService {
 
 // Empty message for requests that don't need parameters
 message Empty {}
+
+message ClientGuestLoginRequest {
+  string name = 1; // Name of the guest client
+  string password = 2; // Password for the guest client
+  string unit_id = 3; // unit ID for the guest
+  string version = 4; // Version of the client
+}
+
+message ClientVanguardLoginRequest {
+  string email = 1; // Email of the vanguard member
+  string password = 2; // Password of the vanguard member
+  string version = 3; // Version of the client
+}
+
+message ClientVanguardUnitSelectRequest {
+  string client_guid = 1; // Unique identifier for the client
+  string unit_id = 2; // Selected unit ID
+  optional string role = 3; // Optional role (If user has permissions to select roles)
+}
+
+message ServerGuestLoginResponse {
+  bool success = 1;
+  oneof login_result {
+    GuestLoginResult result = 2; // Token for the guest client after successful login
+    string error_message = 3; // Error message if login failed
+  }
+}
+
+message GuestLoginResult {
+  string token = 1; // Token for the guest client after successful login
+  string client_guid = 2; // Unique identifier for the guest client
+  string coalition = 3; // Coalition of the guest client
+}
+
+message ServerVanguardLoginResponse {
+  bool success = 1;
+  oneof login_result {
+    VanguardLoginResult result = 2; // Result of the vanguard login
+    string error_message = 3; // Error message if login failed
+  }
+}
+
+message VanguardLoginResult {
+  string token = 1; // Token for the vanguard client after successful login
+  string client_guid = 2; // Unique identifier for the vanguard client
+  repeated UnitSelection available_unit_ids = 3; // List of available unit IDs for the vanguard client
+  repeated RoleSelection available_roles = 4; // Optional list of roles if the user has permissions to select roles
+}
+
+message UnitSelection {
+  string unit_id = 1; // The selected unit ID
+  string unit_name = 2; // The name of the selected unit
+}
+
+message RoleSelection {
+  string role = 1; // The selected role
+  string role_name = 2; // The name of the selected role
+  int32 priority = 3; // Priority of the role (lower number means higher priority)
+}
+
+message ServerVanguardUnitSelectResponse {
+  bool success = 1;
+  oneof result {
+    string unit_id = 2; // The selected unit ID after successful selection
+    string error_message = 3; // Error message if selection failed
+  }
+}
 
 // Subscribe request
 message SubscribeRequest {
@@ -78,18 +151,6 @@ message ServerAction {
     MUTE = 3;
     UNMUTE = 4;
   }
-}
-
-// Initial client connection request
-message ClientConnectRequest {
-  string version = 1;
-}
-
-// Initial server connection response
-message ServerConnectResponse {
-  bool success = 1;
-  string error_message = 2;
-  optional string client_guid = 3; // Server sets the Client GUID
 }
 
 // Client information

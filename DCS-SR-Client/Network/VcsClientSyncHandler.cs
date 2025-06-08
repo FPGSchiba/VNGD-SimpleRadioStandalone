@@ -28,14 +28,15 @@ namespace Vanguard.VCS.Client.Network
     public enum VcsUiUpdateType
     {
         ConnectionError,
-        ConnectionSuccess,
+        GuestLoginSuccess,
+        InternalLoginSuccess,
+        InternalUnitSelectionSuccess,
+        InternalUnitSelectionError,
         ConnectionLost,
         ConnectionRestored,
-        AuthenticationSuccess,
-        AuthenticationFailed,
     }
     
-    public class VcsClientSyncHandler : SRSService.SRSServiceClient
+    public class VcsClientSyncHandler
     {
         public delegate void UpdateUiCallback(VcsUiUpdateType updateType, string message);
         
@@ -49,6 +50,8 @@ namespace Vanguard.VCS.Client.Network
         
         private DCSRadioSyncManager _radioDCSSync = null;
         private SRSService.SRSServiceClient _client;
+        private static readonly string _vcsVersion = "0.1.0";
+        private string _token = string.Empty;
 
         public VcsClientSyncHandler(UpdateUiCallback uiCallback)
         {
@@ -65,40 +68,72 @@ namespace Vanguard.VCS.Client.Network
             }
         }
 
-        public async void ConnectVcs(IPEndPoint endpoint, UserLogin userLogin)
+        public void ConnectVcs(IPEndPoint endpoint, UserLogin userLogin)
         {
             Logger.Info("Starting gRPC connection to VCS server");
             var channelOptions = new GrpcChannelOptions
             {
                 MaxReceiveMessageSize = 10 * 1024 * 1024, // 10 MB
                 MaxSendMessageSize = 10 * 1024 * 1024, // 10 MB
-                Credentials = ChannelCredentials.Create(ChannelCredentials.SecureSsl, CallCredentials.FromInterceptor((
-                    (context, metadata) =>
-                    {
-                        if (!string.IsNullOrEmpty(userLogin.Username) && !string.IsNullOrEmpty(userLogin.Password))
-                        {
-                            metadata.Add("loginType", userLogin.LoginType); // Defines the login type (can be "guest" or "internal")
-                            metadata.Add("username", userLogin.Username);
-                            metadata.Add("unitId", "DEV"); // Example unit ID, replace with actual logic if needed
-                            metadata.Add("password", HashPassword(userLogin.Password)); // Defines the coalition for the user
-                        }
-                        return System.Threading.Tasks.Task.CompletedTask;
-                    }))),
+                Credentials = ChannelCredentials.Insecure,
             };
-            var channel = GrpcChannel.ForAddress($"https://{endpoint.Address}:{endpoint.Port}", channelOptions);
+            var channel = GrpcChannel.ForAddress($"http://{endpoint.Address}:{endpoint.Port}", channelOptions);
             _client = new SRSService.SRSServiceClient(channel);
 
-            var connectRequest = new ClientConnectRequest()
+            if (userLogin.LoginType == "guest")
             {
-                Version = "0.1.0",
+                GuestLogin(userLogin);
+            }
+            else if (userLogin.LoginType == "internal")
+            {
+                InternalLogin(userLogin);
+            }
+            else
+            {
+                Logger.Error("Invalid login type specified: {0}", userLogin.LoginType);
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Invalid login type specified.");
+            }
+        }
+
+        private void GuestLogin(UserLogin userLogin)
+        {
+            var connectRequest = new ClientGuestLoginRequest()
+            {
+                Version = _vcsVersion,
+                Name = userLogin.Username,
+                Password = HashPassword(userLogin.Password),
+                UnitId = "DEV"
             };
             
-            var response = Connect(connectRequest);
-            if (response == null)
+            var response = _client.GuestLogin(connectRequest);
+            if (!response.Success)
             {
-                Logger.Error("Failed to connect to VCS server: response is null");
-                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Failed to connect to VCS server.");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
             }
+            else
+            {
+                _token = response.Result.Token;
+                _connectedAt = DateTime.Now;
+                _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, "");
+            }
+        }
+
+        private void InternalLogin(UserLogin userLogin)
+        {
+            var loginRequest = new ClientVanguardLoginRequest()
+            {
+                Version = _vcsVersion,
+                Email = userLogin.Username,
+                Password = HashPassword(userLogin.Password),
+            };
+            
+            var response = _client.VanguardLogin(loginRequest);
+            if (!response.Success)
+            {
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
+                return;
+            }
+            Logger.Info($"Vanguard login response: {response}");
         }
     }
 }

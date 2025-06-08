@@ -1410,7 +1410,20 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         
         private void VcsUiUpdate(VcsUiUpdateType type, string message)
         {
-            _logger.Info($"{type}: {message}");
+            switch (type)
+            {
+                case VcsUiUpdateType.ConnectionError:
+                    MessageBox.Show(message, "Connection Error", MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    _guestPage.LoginFailed();
+                    break;
+                case VcsUiUpdateType.GuestLoginSuccess:
+                    HandleGuestLoginSuccess();
+                    break;
+                default:
+                    _logger.Info($"{type} - {message}");
+                    break;
+            }
         }
 
         private void Connect(IPAddress ip, int port, string loginType)
@@ -1447,9 +1460,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 {
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
+                    
+                    _logger.Error(ex, "Failed to connect to server");
 
                     ClientState.IsConnected = false;
                     ToggleServerSettings.IsEnabled = false;
+                    _guestPage.LoginFailed();
                 }
             }
         }
@@ -1563,6 +1579,104 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 MessageBox.Show("Mic Output and Speaker Output should not be set to the same device!\n\nMic Output is just for recording and not for use as a sidetone. You will hear yourself with a small delay!\n\nHit disconnect and change Mic Output / Passthrough", "Warning", MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+            }
+        }
+        
+        private void HandleGuestLoginSuccess(int coalition = 0)
+        {
+            if (!ClientState.IsConnected)
+            {
+                try
+                {
+                    StartStop.Content = "disconnect";
+                    StartStop.IsEnabled = true;
+
+                    ConnectionStatus.Fill = Brushes.Orange;
+
+                    ClientState.IsConnected = true;
+                    ClientState.IsVoipConnected = false;
+
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ServerIp.Text);
+
+                    AudioManager.StartEncoding(_guid, InputManager,
+                        _resolvedIp, _port);
+                    
+                    _connectioNetworkSpan.Finish();
+                        
+                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                    {
+                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+                    }
+
+
+                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                    {
+                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+                    }
+                    
+                    _connectionTransaction.User = new SentryUser
+                    {
+                        Username = _playerName
+                    };
+                    _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
+
+                    ClientState.LastSeenName = _playerName;
+                    ClientState.ExternalAWACSModelSelected = true;
+                    ClientState.PlayerCoaltionLocationMetadata.side = coalition;
+                    ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
+                    ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
+
+                    StartStop.Content = "disconnect";
+                
+                    _guestPage.LoginInProgress.Opacity = 0;
+                    ConnectionStatus.Fill = Brushes.Green;
+
+                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+                    {
+                        try
+                        {
+                            Sounds.BeepConnected.Play();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Warn(ex, "Failed to play connect sound");
+                        }
+                    }
+
+                    LoggedIn = true;
+                    ConnectedAt = DateTime.UtcNow;
+                    _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
+                    OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
+                
+                    ExternalAWACSModeName.Text = ClientState.LastSeenName;
+
+                    _connectionAwacsSpan.Finish();
+                
+                    SentrySdk.ConfigureScope(scope =>
+                    {
+                        scope.User = new SentryUser
+                        {
+                            Username = ClientState.LastSeenName
+                        };
+                    });
+                
+                    _connectionTransaction.Finish();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex,
+                        "Unable to get audio device - likely output device error - Pick another. Error:" +
+                        ex.Message);
+                    Stop();
+                        
+                    var messageBoxResult = MessageBox.Show(
+                        "Problem initialising Audio Output!\n\nTry a different Output device and please post your clientlog.txt to the support Discord server.\n\nJoin support Discord server now?",
+                        "Audio Output Error",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Error);
+
+                    if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/PMKtQsSk");
+                }
             }
         }
 
