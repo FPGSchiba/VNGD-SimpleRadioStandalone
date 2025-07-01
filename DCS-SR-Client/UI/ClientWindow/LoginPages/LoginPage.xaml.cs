@@ -4,8 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
+using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
@@ -17,7 +20,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
     {
         private MainWindow mainWindow;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public delegate void ServerInformationFetchedCallback(ServerInformation serverInformation);
+        public delegate void ServerInformationFetchedCallback(ServerInformation serverInformation, string email, string password);
+        private readonly GlobalSettingsStore _settingsStore = GlobalSettingsStore.Instance;
         
         
         public LoginPage()
@@ -25,15 +29,18 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             InitializeComponent();
 
             mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            EmailInput.Text = _settingsStore.ProfileSettingsStore.GetClientSettingString(ProfileSettingsKeys.VngdEmail);
         }
         
-        private static void GetServerInformation(ServerInformationFetchedCallback callback)
+        private void GetServerInformation(ServerInformationFetchedCallback callback)
         {
+            var password = PasswordInput.Password;
+            var email = EmailInput.Text;
             WebsiteClient.GetServerInformation().ContinueWith((task =>
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    callback(task.Result);
+                    callback(task.Result, email, password);
                 }
                 else
                 {
@@ -52,25 +59,41 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
         {
             Login.IsEnabled = false;
             Progress.Visibility = Visibility.Visible;
+            Logger.Info("Beginning to fetch Server Information.");
             GetServerInformation(ServerInformationFetched);
         }
 
-        private void ServerInformationFetched(ServerInformation serverInformation)
+        private void ServerInformationFetched(ServerInformation serverInformation, string email, string password)
         {
-            var resolvedAddresses = Dns.GetHostAddresses(serverInformation.Address);
-            var ip = resolvedAddresses.FirstOrDefault(xa => xa.AddressFamily == AddressFamily.InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+            Logger.Info("Server Information fetched successfully: \n\tAddress: {0}\n\tControlPort: {1}", serverInformation.Address, serverInformation.ControlPort);
             
-            if (ip != null)
+            try
             {
-                mainWindow.On_LoginLoginClicked(ip, serverInformation.ControlPort);
+                var resolvedAddresses = Dns.GetHostAddresses(serverInformation.Address);
+                var ip = resolvedAddresses.FirstOrDefault(xa =>
+                    xa.AddressFamily ==
+                    AddressFamily
+                        .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
+                Dispatcher.Invoke(() =>
+                {
+                    mainWindow.ServerIp.Text = serverInformation.Address;
+                    _settingsStore.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.VngdEmail, EmailInput.Text);
+                    mainWindow.On_LoginLoginClicked(ip, serverInformation.ControlPort, email, password);
+                });
+                
             }
-            else
+            catch (SocketException ex)
             {
-                //Invalid IP
                 MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                     MessageBoxImage.Error);
-
                 mainWindow.ClientState.IsConnected = false;
+                LoginFailed();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "An error occurred while fetching server information.");
+                MessageBox.Show("An unexpected error occurred. Please try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LoginFailed();
             }
         }
 

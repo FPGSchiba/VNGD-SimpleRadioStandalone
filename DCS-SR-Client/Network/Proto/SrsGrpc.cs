@@ -8,12 +8,9 @@
 using grpc = global::Grpc.Core;
 
 namespace Vanguard.VCS.Client.Network {
-  /// <summary>
-  /// Service definition
-  /// </summary>
-  public static partial class SRSService
+  public static partial class AuthService
   {
-    static readonly string __ServiceName = "srspb.SRSService";
+    static readonly string __ServiceName = "srspb.AuthService";
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static void __Helper_SerializeMessage(global::Google.Protobuf.IMessage message, grpc::SerializationContext context)
@@ -60,26 +57,6 @@ namespace Vanguard.VCS.Client.Network {
     static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest> __Marshaller_srspb_ClientVanguardUnitSelectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> __Marshaller_srspb_ServerVanguardUnitSelectResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientInfo> __Marshaller_srspb_ClientInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientInfo.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerResponse> __Marshaller_srspb_ServerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerResponse.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.RadioInfo> __Marshaller_srspb_RadioInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.RadioInfo.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientSyncRequest> __Marshaller_srspb_ClientSyncRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientSyncRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Marshaller_srspb_ServerSyncResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSyncResponse.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest> __Marshaller_srspb_ClientDisconnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientDisconnectRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.Empty> __Marshaller_srspb_Empty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.Empty.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSettings> __Marshaller_srspb_ServerSettings = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSettings.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.SubscribeRequest> __Marshaller_srspb_SubscribeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.SubscribeRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerUpdate> __Marshaller_srspb_ServerUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerUpdate.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest, global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse> __Method_GuestLogin = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientGuestLoginRequest, global::Vanguard.VCS.Client.Network.ServerGuestLoginResponse>(
@@ -105,84 +82,36 @@ namespace Vanguard.VCS.Client.Network {
         __Marshaller_srspb_ClientVanguardUnitSelectRequest,
         __Marshaller_srspb_ServerVanguardUnitSelectResponse);
 
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateClientInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "UpdateClientInfo",
-        __Marshaller_srspb_ClientInfo,
-        __Marshaller_srspb_ServerResponse);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateRadioInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "UpdateRadioInfo",
-        __Marshaller_srspb_RadioInfo,
-        __Marshaller_srspb_ServerResponse);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Method_SyncClient = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "SyncClient",
-        __Marshaller_srspb_ClientSyncRequest,
-        __Marshaller_srspb_ServerSyncResponse);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_Disconnect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "Disconnect",
-        __Marshaller_srspb_ClientDisconnectRequest,
-        __Marshaller_srspb_ServerResponse);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings> __Method_GetServerSettings = new grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "GetServerSettings",
-        __Marshaller_srspb_Empty,
-        __Marshaller_srspb_ServerSettings);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate> __Method_SubscribeToUpdates = new grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate>(
-        grpc::MethodType.ServerStreaming,
-        __ServiceName,
-        "SubscribeToUpdates",
-        __Marshaller_srspb_SubscribeRequest,
-        __Marshaller_srspb_ServerUpdate);
-
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
     {
       get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.Services[0]; }
     }
 
-    /// <summary>Client for SRSService</summary>
-    public partial class SRSServiceClient : grpc::ClientBase<SRSServiceClient>
+    /// <summary>Client for AuthService</summary>
+    public partial class AuthServiceClient : grpc::ClientBase<AuthServiceClient>
     {
-      /// <summary>Creates a new client for SRSService</summary>
+      /// <summary>Creates a new client for AuthService</summary>
       /// <param name="channel">The channel to use to make remote calls.</param>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public SRSServiceClient(grpc::ChannelBase channel) : base(channel)
+      public AuthServiceClient(grpc::ChannelBase channel) : base(channel)
       {
       }
-      /// <summary>Creates a new client for SRSService that uses a custom <c>CallInvoker</c>.</summary>
+      /// <summary>Creates a new client for AuthService that uses a custom <c>CallInvoker</c>.</summary>
       /// <param name="callInvoker">The callInvoker to use to make remote calls.</param>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public SRSServiceClient(grpc::CallInvoker callInvoker) : base(callInvoker)
+      public AuthServiceClient(grpc::CallInvoker callInvoker) : base(callInvoker)
       {
       }
       /// <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      protected SRSServiceClient() : base()
+      protected AuthServiceClient() : base()
       {
       }
       /// <summary>Protected constructor to allow creation of configured clients.</summary>
       /// <param name="configuration">The client configuration.</param>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      protected SRSServiceClient(ClientBaseConfiguration configuration) : base(configuration)
+      protected AuthServiceClient(ClientBaseConfiguration configuration) : base(configuration)
       {
       }
 
@@ -329,6 +258,215 @@ namespace Vanguard.VCS.Client.Network {
       public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerVanguardUnitSelectResponse> VanguardUnitSelectAsync(global::Vanguard.VCS.Client.Network.ClientVanguardUnitSelectRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_VanguardUnitSelect, null, options, request);
+      }
+      /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      protected override AuthServiceClient NewInstance(ClientBaseConfiguration configuration)
+      {
+        return new AuthServiceClient(configuration);
+      }
+    }
+
+  }
+  /// <summary>
+  /// Service definition
+  /// </summary>
+  public static partial class SRSService
+  {
+    static readonly string __ServiceName = "srspb.SRSService";
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static void __Helper_SerializeMessage(global::Google.Protobuf.IMessage message, grpc::SerializationContext context)
+    {
+      #if !GRPC_DISABLE_PROTOBUF_BUFFER_SERIALIZATION
+      if (message is global::Google.Protobuf.IBufferMessage)
+      {
+        context.SetPayloadLength(message.CalculateSize());
+        global::Google.Protobuf.MessageExtensions.WriteTo(message, context.GetBufferWriter());
+        context.Complete();
+        return;
+      }
+      #endif
+      context.Complete(global::Google.Protobuf.MessageExtensions.ToByteArray(message));
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static class __Helper_MessageCache<T>
+    {
+      public static readonly bool IsBufferMessage = global::System.Reflection.IntrospectionExtensions.GetTypeInfo(typeof(global::Google.Protobuf.IBufferMessage)).IsAssignableFrom(typeof(T));
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static T __Helper_DeserializeMessage<T>(grpc::DeserializationContext context, global::Google.Protobuf.MessageParser<T> parser) where T : global::Google.Protobuf.IMessage<T>
+    {
+      #if !GRPC_DISABLE_PROTOBUF_BUFFER_SERIALIZATION
+      if (__Helper_MessageCache<T>.IsBufferMessage)
+      {
+        return parser.ParseFrom(context.PayloadAsReadOnlySequence());
+      }
+      #endif
+      return parser.ParseFrom(context.PayloadAsNewBuffer());
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientUpdate> __Marshaller_srspb_ClientUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientUpdate.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerResponse> __Marshaller_srspb_ServerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientInfo> __Marshaller_srspb_ClientInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientInfo.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.RadioInfo> __Marshaller_srspb_RadioInfo = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.RadioInfo.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientSyncRequest> __Marshaller_srspb_ClientSyncRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientSyncRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Marshaller_srspb_ServerSyncResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSyncResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest> __Marshaller_srspb_ClientDisconnectRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ClientDisconnectRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.Empty> __Marshaller_srspb_Empty = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.Empty.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerSettings> __Marshaller_srspb_ServerSettings = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerSettings.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.SubscribeRequest> __Marshaller_srspb_SubscribeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.SubscribeRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Vanguard.VCS.Client.Network.ServerUpdate> __Marshaller_srspb_ServerUpdate = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Vanguard.VCS.Client.Network.ServerUpdate.Parser));
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientUpdate, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_Initialize = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientUpdate, global::Vanguard.VCS.Client.Network.ServerResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Initialize",
+        __Marshaller_srspb_ClientUpdate,
+        __Marshaller_srspb_ServerResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateClientInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UpdateClientInfo",
+        __Marshaller_srspb_ClientInfo,
+        __Marshaller_srspb_ServerResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_UpdateRadioInfo = new grpc::Method<global::Vanguard.VCS.Client.Network.RadioInfo, global::Vanguard.VCS.Client.Network.ServerResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "UpdateRadioInfo",
+        __Marshaller_srspb_RadioInfo,
+        __Marshaller_srspb_ServerResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse> __Method_SyncClient = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientSyncRequest, global::Vanguard.VCS.Client.Network.ServerSyncResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "SyncClient",
+        __Marshaller_srspb_ClientSyncRequest,
+        __Marshaller_srspb_ServerSyncResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse> __Method_Disconnect = new grpc::Method<global::Vanguard.VCS.Client.Network.ClientDisconnectRequest, global::Vanguard.VCS.Client.Network.ServerResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "Disconnect",
+        __Marshaller_srspb_ClientDisconnectRequest,
+        __Marshaller_srspb_ServerResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings> __Method_GetServerSettings = new grpc::Method<global::Vanguard.VCS.Client.Network.Empty, global::Vanguard.VCS.Client.Network.ServerSettings>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "GetServerSettings",
+        __Marshaller_srspb_Empty,
+        __Marshaller_srspb_ServerSettings);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate> __Method_SubscribeToUpdates = new grpc::Method<global::Vanguard.VCS.Client.Network.SubscribeRequest, global::Vanguard.VCS.Client.Network.ServerUpdate>(
+        grpc::MethodType.ServerStreaming,
+        __ServiceName,
+        "SubscribeToUpdates",
+        __Marshaller_srspb_SubscribeRequest,
+        __Marshaller_srspb_ServerUpdate);
+
+    /// <summary>Service descriptor</summary>
+    public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
+    {
+      get { return global::Vanguard.VCS.Client.Network.SrsReflection.Descriptor.Services[1]; }
+    }
+
+    /// <summary>Client for SRSService</summary>
+    public partial class SRSServiceClient : grpc::ClientBase<SRSServiceClient>
+    {
+      /// <summary>Creates a new client for SRSService</summary>
+      /// <param name="channel">The channel to use to make remote calls.</param>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public SRSServiceClient(grpc::ChannelBase channel) : base(channel)
+      {
+      }
+      /// <summary>Creates a new client for SRSService that uses a custom <c>CallInvoker</c>.</summary>
+      /// <param name="callInvoker">The callInvoker to use to make remote calls.</param>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public SRSServiceClient(grpc::CallInvoker callInvoker) : base(callInvoker)
+      {
+      }
+      /// <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      protected SRSServiceClient() : base()
+      {
+      }
+      /// <summary>Protected constructor to allow creation of configured clients.</summary>
+      /// <param name="configuration">The client configuration.</param>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      protected SRSServiceClient(ClientBaseConfiguration configuration) : base(configuration)
+      {
+      }
+
+      /// <summary>
+      /// Initialize the connection to the voice server as well as this service
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse Initialize(global::Vanguard.VCS.Client.Network.ClientUpdate request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return Initialize(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Initialize the connection to the voice server as well as this service
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The response received from the server.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Vanguard.VCS.Client.Network.ServerResponse Initialize(global::Vanguard.VCS.Client.Network.ClientUpdate request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_Initialize, null, options, request);
+      }
+      /// <summary>
+      /// Initialize the connection to the voice server as well as this service
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+      /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+      /// <param name="cancellationToken">An optional token for canceling the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> InitializeAsync(global::Vanguard.VCS.Client.Network.ClientUpdate request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return InitializeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      /// <summary>
+      /// Initialize the connection to the voice server as well as this service
+      /// </summary>
+      /// <param name="request">The request to send to the server.</param>
+      /// <param name="options">The options for the call.</param>
+      /// <returns>The call object.</returns>
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Vanguard.VCS.Client.Network.ServerResponse> InitializeAsync(global::Vanguard.VCS.Client.Network.ClientUpdate request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_Initialize, null, options, request);
       }
       /// <summary>
       /// Client update (metadata, client info, position)

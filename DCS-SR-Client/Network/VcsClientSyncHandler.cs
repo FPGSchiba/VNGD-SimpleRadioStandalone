@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
+using Google.Protobuf.Collections;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
@@ -14,10 +16,25 @@ namespace Vanguard.VCS.Client.Network
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public string LoginType { get; set; } // "guest" or "internal"
+        public LoginRequestType LoginType { get; set; } // "guest" or "internal"
+        
+        public string UnitId { get; set; } // Optional, used for guest login
+    }
+
+    public class InternalLoginResult
+    {
+        public RepeatedField<CoalitionSelection> AvailableCoalitions { get; set; }
+        public RepeatedField<UnitSelection> AvailableUnits { get; set; }
+        public RepeatedField<RoleSelection> AvailableRoles { get; set; }
     }
     
-    public enum LoginType
+    public enum LoginRequestType
+    {
+        Guest,
+        Internal
+    }
+    
+    public enum VcsRole
     {
         Guest,
         Member,
@@ -30,6 +47,7 @@ namespace Vanguard.VCS.Client.Network
         ConnectionError,
         GuestLoginSuccess,
         InternalLoginSuccess,
+        InternalLoginError,
         InternalUnitSelectionSuccess,
         InternalUnitSelectionError,
         ConnectionLost,
@@ -38,7 +56,7 @@ namespace Vanguard.VCS.Client.Network
     
     public class VcsClientSyncHandler
     {
-        public delegate void UpdateUiCallback(VcsUiUpdateType updateType, string message);
+        public delegate void UpdateUiCallback(VcsUiUpdateType updateType, object message);
         
         private UpdateUiCallback _callback;
         private DateTime _connectedAt;
@@ -49,9 +67,11 @@ namespace Vanguard.VCS.Client.Network
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         
         private DCSRadioSyncManager _radioDCSSync = null;
-        private SRSService.SRSServiceClient _client;
+        private SRSService.SRSServiceClient _srsServiceClient;
+        private AuthService.AuthServiceClient _authServiceClient;
         private static readonly string _vcsVersion = "0.1.0";
         private string _token = string.Empty;
+        private string _tempSecret = string.Empty;
 
         public VcsClientSyncHandler(UpdateUiCallback uiCallback)
         {
@@ -75,23 +95,24 @@ namespace Vanguard.VCS.Client.Network
             {
                 MaxReceiveMessageSize = 10 * 1024 * 1024, // 10 MB
                 MaxSendMessageSize = 10 * 1024 * 1024, // 10 MB
-                Credentials = ChannelCredentials.Insecure,
+                Credentials = ChannelCredentials.Insecure, // Use insecure credentials for local development
             };
             var channel = GrpcChannel.ForAddress($"http://{endpoint.Address}:{endpoint.Port}", channelOptions);
-            _client = new SRSService.SRSServiceClient(channel);
+            _srsServiceClient = new SRSService.SRSServiceClient(channel);
+            _authServiceClient = new AuthService.AuthServiceClient(channel);
 
-            if (userLogin.LoginType == "guest")
+            switch (userLogin.LoginType)
             {
-                GuestLogin(userLogin);
-            }
-            else if (userLogin.LoginType == "internal")
-            {
-                InternalLogin(userLogin);
-            }
-            else
-            {
-                Logger.Error("Invalid login type specified: {0}", userLogin.LoginType);
-                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Invalid login type specified.");
+                case LoginRequestType.Guest:
+                    GuestLogin(userLogin);
+                    break;
+                case LoginRequestType.Internal:
+                    InternalLogin(userLogin);
+                    break;
+                default:
+                    Logger.Error("Invalid login type specified: {0}", userLogin.LoginType);
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Invalid login type specified.");
+                    break;
             }
         }
 
@@ -99,13 +120,17 @@ namespace Vanguard.VCS.Client.Network
         {
             var connectRequest = new ClientGuestLoginRequest()
             {
-                Version = _vcsVersion,
+                Capabilities = new ClientCapabilities()
+                {
+                    SupportedFeatures = { ClientFeature.Standalone }, // This Client only supports standalone mode
+                    Version = _vcsVersion,
+                },
                 Name = userLogin.Username,
                 Password = HashPassword(userLogin.Password),
-                UnitId = "DEV"
+                UnitId = userLogin.UnitId
             };
             
-            var response = _client.GuestLogin(connectRequest);
+            var response = _authServiceClient.GuestLogin(connectRequest);
             if (!response.Success)
             {
                 _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
@@ -114,24 +139,42 @@ namespace Vanguard.VCS.Client.Network
             {
                 _token = response.Result.Token;
                 _connectedAt = DateTime.Now;
+                _clientStateSingleton.RegisterClientGuid(response.Result.ClientGuid);
                 _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, "");
             }
         }
 
         private void InternalLogin(UserLogin userLogin)
         {
+            Logger.Info("Beginning internal login process for user: {0}", userLogin.Username);
             var loginRequest = new ClientVanguardLoginRequest()
             {
-                Version = _vcsVersion,
+                Capabilities = new ClientCapabilities()
+                {
+                    SupportedFeatures = { ClientFeature.Standalone }, // This Client only supports standalone mode
+                    Version = _vcsVersion,
+                },
                 Email = userLogin.Username,
-                Password = HashPassword(userLogin.Password),
+                Password = userLogin.Password, // Password cannot be hashed here, as the Website expects the plain text password
             };
             
-            var response = _client.VanguardLogin(loginRequest);
+            var response = _authServiceClient.VanguardLogin(loginRequest);
             if (!response.Success)
             {
                 _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
                 return;
+            }
+            else
+            {
+                _tempSecret = response.Result.Secret;
+                _clientStateSingleton.RegisterClientGuid(response.Result.ClientGuid);
+                _connectedAt = DateTime.Now;
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
+                {
+                    AvailableCoalitions = response.Result.AvailableCoalitions,
+                    AvailableUnits = response.Result.AvailableUnits,
+                    AvailableRoles = response.Result.AvailableRoles
+                });
             }
             Logger.Info($"Vanguard login response: {response}");
         }

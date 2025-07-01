@@ -19,7 +19,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
             if (_mainWindow != null)
             {
                 ConnectedAsBlock.Text += ClientStateSingleton.Instance.LastSeenName;
-                LoginTypeBlock.Text += _mainWindow.LoginType;
+                LoginTypeBlock.Text += _mainWindow.ClientRole;
                 On_TimerTick(null, null);
                 System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
                 dispatcherTimer.Tick += On_TimerTick;
@@ -63,7 +63,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
             }
             
             ConnectedAsBlock.Text = $"Connected as: {ClientStateSingleton.Instance.LastSeenName}";
-            LoginTypeBlock.Text = $"Login Type: {_mainWindow.LoginType}";
+            LoginTypeBlock.Text = $"Login Type: {_mainWindow.ClientRole}";
         }
         
         private void Logout_OnClick(object sender, RoutedEventArgs e)

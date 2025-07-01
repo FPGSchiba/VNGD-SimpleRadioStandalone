@@ -77,8 +77,13 @@ namespace Vanguard.VCS.Client.Singletons
         }
 
         private bool isConnectionErrored;
-        public string ShortGUID { get; }
+        public string ShortGUID { get; private set; }
 
+        public void RegisterClientGuid(string guid)
+        {
+            ShortGUID = guid;
+        }
+        
         public bool IsConnectionErrored
         {
             get

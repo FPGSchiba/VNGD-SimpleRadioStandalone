@@ -40,6 +40,7 @@ using Vanguard.VCS.Client.UI.ClientWindow.LoginPages;
 using Vanguard.VCS.Client.UI.ClientWindow.SettingPages;
 using Vanguard.VCS.Client.UI.ClientWindow.WelcomePages;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow;
+using UnitSelection = Vanguard.VCS.Client.Network.UnitSelection;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {
@@ -76,7 +77,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         }
         private string _playerName = "";
         private string _coalitionPassword = "";
-        public LoginType LoginType { get; private set; }
+        public VcsRole ClientRole { get; private set; }
         public DateTime ConnectedAt { get; private set; }
 
         private int OpenPage
@@ -132,6 +133,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         
         private SettingsPage _settingsPage;
         private const int SettingsIndex = 6;
+
+        private UnitSelectionPage _unitSelectionPage;
+        private const int UnitSelectionIndex = 7;
 
         // Sentry Transactions
         private ITransactionTracer _connectionTransaction;
@@ -847,6 +851,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _guestSuccessPage = new GuestSuccess();
             _homePage = new HomePage();
             _settingsPage = new SettingsPage();
+            _unitSelectionPage = new UnitSelectionPage();
             OpenPage = WelcomeIndex;
             
             HomeNavigation.IsEnabled = false;
@@ -889,6 +894,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     DisplayFrame.Content = _settingsPage;
                     SettingsNavigation.IsEnabled = false;
                     break;
+                case UnitSelectionIndex:
+                    DisplayFrame.Content = _unitSelectionPage;
+                    break;
                 default:
                     _logger.Error($"Page: {index} could not be found.");
                     break;
@@ -922,6 +930,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                         break;
                     case SettingsIndex:
                         break;
+                    case UnitSelectionIndex:
+                        break;
                     default:
                         mainWindow._logger.Error($"Page: {newValue} could not be found.");
                         break;
@@ -939,11 +949,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             OpenPageByIndex(GuestIndex);
         }
 
-        public void On_LoginLoginClicked(IPAddress ip, int port)
+        public void On_LoginLoginClicked(IPAddress ip, int port, string email, string password)
         {
+            _logger.Info($"Login attempt with email: {email} and password: {password}");
             _resolvedIp = ip;
             _port = port;
-            Connect(ip, port, "internal");
+            Connect(ip, port, new UserLogin() { Username = email, Password = password, LoginType = LoginRequestType.Internal});
         }
 
         public void On_LoginBackClicked()
@@ -951,14 +962,19 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             OpenPageByIndex(WelcomeIndex);
         }
 
-        public void On_GuestLoginClicked(IPAddress ip, int port, string playerName, string coalitionPassword)
+        public void On_GuestLoginClicked(IPAddress ip, int port, string playerName, string fleetCode, string coalitionPassword)
         {
             _resolvedIp = ip;
             _port = port;
             _coalitionPassword = coalitionPassword;
             _playerName = playerName;
-            LoginType = LoginType.Guest;
-            Connect(ip, port, "guest");
+            ClientRole = VcsRole.Guest;
+            Connect(ip, port, new UserLogin() { 
+                Username = playerName, 
+                Password = coalitionPassword,
+                LoginType = LoginRequestType.Guest,
+                UnitId = fleetCode
+            });
         }
 
         public void On_GuestBackClicked()
@@ -1408,17 +1424,56 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             HFEffectVolume.IsEnabled = true;
         }
         
-        private void VcsUiUpdate(VcsUiUpdateType type, string message)
+        private void VcsUiUpdate(VcsUiUpdateType type, object message)
         {
             switch (type)
             {
                 case VcsUiUpdateType.ConnectionError:
-                    MessageBox.Show(message, "Connection Error", MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    if (message is string guestErrorMessage)
+                    {
+                        _logger.Error($"Connection error: {guestErrorMessage}");
+                        Stop(true);
+                        MessageBox.Show(guestErrorMessage, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        _logger.Error("Connection error with no message provided.");
+                        Stop(true);
+                        MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                     _guestPage.LoginFailed();
                     break;
                 case VcsUiUpdateType.GuestLoginSuccess:
                     HandleGuestLoginSuccess();
+                    break;
+                case VcsUiUpdateType.InternalLoginError:
+                    if (message is string loginErrorMessage)
+                    {
+                        _logger.Error($"Connection error: {loginErrorMessage}");
+                        Stop(true);
+                        MessageBox.Show(loginErrorMessage, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        _logger.Error("Connection error with no message provided.");
+                        Stop(true);
+                        MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    _loginPage.LoginFailed();
+                    break;
+                case VcsUiUpdateType.InternalLoginSuccess:
+                    if (message is InternalLoginResult internalLoginResult)
+                    {
+                        _unitSelectionPage.SetSelectionData(internalLoginResult);
+                        OpenPageByIndex(UnitSelectionIndex);
+                    }
+                    else
+                    {
+                        _logger.Error("Connection error with no message provided.");
+                        Stop(true);
+                        MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        _loginPage.LoginFailed();
+                    }
                     break;
                 default:
                     _logger.Info($"{type} - {message}");
@@ -1426,7 +1481,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
         }
 
-        private void Connect(IPAddress ip, int port, string loginType)
+        private void Connect(IPAddress ip, int port, UserLogin loginInformation)
         {
             if (ClientState.IsConnected)
             {
@@ -1454,7 +1509,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                     _guestPage.LoginInProgress.Opacity = 1;
                     
-                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port), new UserLogin{Password = _coalitionPassword, Username = _playerName, LoginType = loginType});
+                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port), loginInformation);
                 }
                 catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
                 {
@@ -3096,8 +3151,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _port = port;
             _coalitionPassword = ExternalAWACSModePassword.Password.Trim();
             _playerName = ExternalAWACSModeName.Text;
-            LoginType = LoginType.Guest;
-            Connect(ip, port, "guest");
+            ClientRole = VcsRole.Guest;
+            Connect(ip, port, new UserLogin()
+            {
+                Username = _playerName,
+                Password = _coalitionPassword,
+                LoginType = LoginRequestType.Guest,
+                UnitId = string.Empty // Not used for the old UI, which is kinda bad.
+            });
         }
 
         private string GetAddressFromTextBox()

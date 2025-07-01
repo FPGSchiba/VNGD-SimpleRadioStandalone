@@ -5,8 +5,7 @@ package srspb;
 option go_package = "github.com/FPGSchiba/vcs-srs-server/srspb";
 option csharp_namespace = "Vanguard.VCS.Client.Network";
 
-// Service definition
-service SRSService {
+service AuthService {
   // Guest login (Using Coalition Password and self chosen name)
   rpc GuestLogin(ClientGuestLoginRequest) returns (ServerGuestLoginResponse);
 
@@ -15,6 +14,12 @@ service SRSService {
 
   // Vanguard unit selection (Using client GUID and selected unit ID)
   rpc VanguardUnitSelect(ClientVanguardUnitSelectRequest) returns (ServerVanguardUnitSelectResponse);
+}
+
+// Service definition
+service SRSService {
+  // Initialize the connection to the voice server as well as this service
+  rpc Initialize(ClientUpdate) returns (ServerResponse);
 
   // Client update (metadata, client info, position)
   rpc UpdateClientInfo(ClientInfo) returns (ServerResponse);
@@ -38,23 +43,26 @@ service SRSService {
 // Empty message for requests that don't need parameters
 message Empty {}
 
+// Authentication messages
 message ClientGuestLoginRequest {
   string name = 1; // Name of the guest client
   string password = 2; // Password for the guest client
   string unit_id = 3; // unit ID for the guest
-  string version = 4; // Version of the client
+  ClientCapabilities capabilities = 4; // Version and distribution information of the client
 }
 
 message ClientVanguardLoginRequest {
   string email = 1; // Email of the vanguard member
   string password = 2; // Password of the vanguard member
-  string version = 3; // Version of the client
+  ClientCapabilities capabilities = 3; // Version and distribution information of the client
 }
 
 message ClientVanguardUnitSelectRequest {
   string client_guid = 1; // Unique identifier for the client
-  string unit_id = 2; // Selected unit ID
-  optional string role = 3; // Optional role (If user has permissions to select roles)
+  string secret = 2; // Secret for the vanguard client after successful login
+  string unit_id = 3; // Selected unit ID
+  string coalition = 4; // Coalition of the client
+  int32  role = 5; // Optional role (If user has permissions to select roles)
 }
 
 message ServerGuestLoginResponse {
@@ -80,10 +88,11 @@ message ServerVanguardLoginResponse {
 }
 
 message VanguardLoginResult {
-  string token = 1; // Token for the vanguard client after successful login
+  string secret = 1; // Secret for the vanguard client after successful login for selecting the Unit and the Coalition
   string client_guid = 2; // Unique identifier for the vanguard client
-  repeated UnitSelection available_unit_ids = 3; // List of available unit IDs for the vanguard client
-  repeated RoleSelection available_roles = 4; // Optional list of roles if the user has permissions to select roles
+  repeated CoalitionSelection available_coalitions = 3; // List of available coalitions for the vanguard client
+  repeated UnitSelection available_units = 4; // List of available unit IDs for the vanguard client
+  repeated RoleSelection available_roles = 5; // Optional list of roles if the user has permissions to select roles
 }
 
 message UnitSelection {
@@ -92,22 +101,57 @@ message UnitSelection {
 }
 
 message RoleSelection {
-  string role = 1; // The selected role
-  string role_name = 2; // The name of the selected role
-  int32 priority = 3; // Priority of the role (lower number means higher priority)
+  string name = 1; // The selected role
+  uint32 id = 3; // Priority of the role (lower number means higher priority)
+}
+
+message CoalitionSelection {
+  string name = 1; // The selected coalition
+  string color = 2; // The name of the selected coalition
+  string description = 3; // The description of the selected coalition
 }
 
 message ServerVanguardUnitSelectResponse {
   bool success = 1;
   oneof result {
-    string unit_id = 2; // The selected unit ID after successful selection
+    string token = 2; // The selected unit ID after successful selection
     string error_message = 3; // Error message if selection failed
   }
+}
+
+message ClientCapabilities {
+  string version = 1; // Version of the client
+  repeated ClientFeature supported_features = 2; // List of features supported by the client
+}
+
+enum ClientFeature {
+  STANDALONE = 0; // Standalone client
+  DISTRIBUTED = 1; // Distribution of Voice servers supported by client
 }
 
 // Subscribe request
 message SubscribeRequest {
   string client_guid = 1;
+}
+
+// Distribution preparation here
+message ServerInitializationResponse {
+  string client_guid = 1; // Unique identifier for the client
+  repeated VoiceHostDetails voice_hosts = 2; // Details of the voice server to connect to
+  ClientCapabilities capabilities = 3; // Version and distribution information of the client
+}
+
+message VoiceHostDetails {
+  string host = 1; // Host address for the voice server
+  int32 port = 2; // Port for the voice server
+  repeated FrequencyRange frequencies = 3; // List of frequencies assigned to the voice server with these details
+  optional string secret = 4; // The secret for the voice server
+}
+
+message FrequencyRange {
+  string coalition = 1; // Coalition for which the frequency range applies
+  double start_frequency = 2; // Minimum frequency
+  double end_frequency = 3; // Maximum frequency
 }
 
 // Server update message
@@ -117,6 +161,7 @@ message ServerUpdate {
     ClientUpdate client_update = 2;
     ServerAction server_action = 3;
     ServerSettings settings_update = 4;
+    DistributionUpdate voice_hosts = 5; // For distribution updates
   }
 
   enum UpdateType {
@@ -127,7 +172,13 @@ message ServerUpdate {
     CLIENT_INFO_UPDATE = 4;
     SERVER_SETTINGS_CHANGED = 5;
     SERVER_ACTION = 6;
+    DISTRIBUTION_UPDATE = 7; // For distribution updates
   }
+}
+
+message DistributionUpdate {
+  repeated VoiceHostDetails voice_hosts = 2; // Details of the voice server to connect to
+  optional string secret = 4; // The secret for the voice server
 }
 
 // Client update information

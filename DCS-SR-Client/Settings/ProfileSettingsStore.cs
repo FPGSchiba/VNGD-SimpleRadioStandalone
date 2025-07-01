@@ -67,6 +67,9 @@ namespace Vanguard.VCS.Client.Settings
         IntercomTransmissionStartSelection,
         IntercomTransmissionEndSelection,
         AMCollisionVolume,
+        
+        // Vanguard specific settings
+        VngdEmail,
     }
 
     public class ProfileSettingsStore
@@ -143,6 +146,8 @@ namespace Vanguard.VCS.Client.Settings
             {ProfileSettingsKeys.AMCollisionVolume.ToString(), "1.0"},
 
             {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), FalseDefault},
+            
+            {ProfileSettingsKeys.VngdEmail.ToString(), string.Empty},
         };
 
 

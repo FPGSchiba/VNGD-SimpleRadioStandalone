@@ -54,7 +54,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                     LoginFailed();
                     return;
                 }
-                var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
+
+                var playerName = PlayerNameInput.Text;
+                var fleetCode = FleetCodeInput.Text;
                 _logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: {playerName}, Password: {coalitionPassword}");
             
                 // process hostname
@@ -69,7 +71,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                         AddressFamily
                             .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
                     _mainWindow.ServerIp.Text = address;
-                    _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
+                    _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, fleetCode, coalitionPassword);
                 }
                 catch (SocketException ex)
                 {
