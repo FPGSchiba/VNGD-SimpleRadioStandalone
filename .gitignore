@@ -265,3 +265,5 @@ install-build/
 sign.bat
 
 .leu
+# Ignore the generated files from the SRS-Client build
+**/Network/Proto/**
