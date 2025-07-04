@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
+using Vanguard.VCS.Server.Network;
 using NLog;
+using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
+namespace Vanguard.VCS.Server.UI.ClientAdmin
 {
     public sealed class ClientAdminViewModel : Screen, IHandle<ServerStateMessage>
     {
@@ -29,21 +32,20 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
 
         public ObservableCollection<ClientViewModel> Clients { get; } = new ObservableCollection<ClientViewModel>();
 
-        protected override void OnActivate()
+        protected override void OnViewLoaded(object view)
         {
+            base.OnViewLoaded(view);
             _updateTimer?.Start();
-
-            base.OnActivate();
         }
-
-        protected override void OnDeactivate(bool close)
+        
+        protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             if (close)
             {
                 _updateTimer?.Stop();
             }
-
-            base.OnDeactivate(close);
+        
+            return base.OnDeactivateAsync(close, cancellationToken);
         }
 
         public void Handle(ServerStateMessage message)
@@ -51,6 +53,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
             Clients.Clear();
 
             message.Clients.Apply(client => Clients.Add(new ClientViewModel(client, _eventAggregator)));
+        }
+        
+        public async Task HandleAsync(ServerStateMessage message, CancellationToken cancellationToken)
+        {
+            Handle(message);
         }
 
         private void _updateTimer_Tick(object sender, EventArgs e)

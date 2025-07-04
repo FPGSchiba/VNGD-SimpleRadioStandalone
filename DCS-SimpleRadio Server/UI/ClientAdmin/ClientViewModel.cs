@@ -2,13 +2,14 @@
 using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Server.Network;
 using NLog;
+using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
+namespace Vanguard.VCS.Server.UI.ClientAdmin
 {
     public class ClientViewModel : Screen
     {
@@ -66,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
                 MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                _eventAggregator.PublishOnBackgroundThread(new KickClientMessage(Client));
+                _eventAggregator.PublishOnBackgroundThreadAsync(new KickClientMessage(Client));
             }
         }
 
@@ -76,7 +77,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin
                 MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                _eventAggregator.PublishOnBackgroundThread(new BanClientMessage(Client));
+                _eventAggregator.PublishOnBackgroundThreadAsync(new BanClientMessage(Client));
             }
         }
 

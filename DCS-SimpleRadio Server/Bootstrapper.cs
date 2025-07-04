@@ -12,15 +12,15 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.API;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Network;
+using Vanguard.VCS.Server.Settings;
+using Vanguard.VCS.Server.UI.ClientAdmin;
+using Vanguard.VCS.Server.UI.MainWindow;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -28,7 +28,7 @@ using NLog.Targets.Wrappers;
 using Sentry;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server
+namespace Vanguard.VCS.Server
 {
     public class Bootstrapper : BootstrapperBase
     {
@@ -171,7 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server
 
             Console.WriteLine("This thread is not blocking.");
 
-            DisplayRootViewFor<MainViewModel>(settings);
+            DisplayRootViewForAsync<MainViewModel>(settings);
 
             UpdaterChecker.CheckForUpdate(Settings.ServerSettingsStore.Instance.GetServerSetting(Common.Setting.ServerSettingsKeys.CHECK_FOR_BETA_UPDATES).BoolValue);
         }

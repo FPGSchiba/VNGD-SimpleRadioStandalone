@@ -9,17 +9,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Settings;
 using Newtonsoft.Json;
 using NLog;
+using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network
 {
     public class ServerState : IHandle<StartServerMessage>, IHandle<StopServerMessage>, IHandle<KickClientMessage>,
         IHandle<BanClientMessage>
@@ -46,31 +47,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             StartServer();
         }
 
-        public void Handle(BanClientMessage message)
+        public Task HandleAsync(BanClientMessage message, CancellationToken token)
         {
             WriteBanIP(message.Client);
-
             KickClient(message.Client);
+            return Task.CompletedTask;
         }
 
-        public void Handle(KickClientMessage message)
+        public Task HandleAsync(KickClientMessage message, CancellationToken cancellationToken)
         {
             var client = message.Client;
             KickClient(client);
+            return Task.CompletedTask;
         }
-
-        public void Handle(StartServerMessage message)
+        
+        public async Task HandleAsync(StartServerMessage message, CancellationToken token)
         {
             StartServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
-                new List<SRClient>(_connectedClients.Values)));
+            await _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
+                new List<SRClient>(_connectedClients.Values)), token);
         }
 
-        public void Handle(StopServerMessage message)
+        public async Task HandleAsync(StopServerMessage message, CancellationToken token)
         {
             StopServer();
-            _eventAggregator.PublishOnUIThread(new ServerStateMessage(false,
-                new List<SRClient>(_connectedClients.Values)));
+            await _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(false,
+                new List<SRClient>(_connectedClients.Values)), token);
         }
 
         private void StartExport()

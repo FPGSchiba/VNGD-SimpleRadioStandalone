@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
+namespace Vanguard.VCS.Server.Network.Models
 {
     public class ConnectionStateObject
     {

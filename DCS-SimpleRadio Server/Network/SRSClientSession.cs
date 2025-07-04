@@ -1,4 +1,4 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+﻿using Vanguard.VCS.Common.Network;
 using NetCoreServer;
 using System;
 using System.Collections.Concurrent;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network
 {
     public class SRSClientSession : TcpSession
     {

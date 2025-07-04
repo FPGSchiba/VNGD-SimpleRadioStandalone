@@ -1,7 +1,7 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+﻿using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Settings;
+using Vanguard.VCS.Common.Helpers;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
+namespace Vanguard.VCS.Server.Network.Models
 {
     class TransmissionLoggingQueue
     {

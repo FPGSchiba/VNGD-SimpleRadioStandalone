@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network.Models
 {
     public class PendingPacket
     {

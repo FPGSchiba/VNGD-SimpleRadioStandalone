@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models
+namespace Vanguard.VCS.Server.Network.Models
 {
     class TransmissionLog
     {
