@@ -376,14 +376,16 @@ public partial class MainWindow
     {
         bool mainWindowVisible = false;
         
-        foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+        var monitors = MonitorHelper.GetAllMonitors();
+        
+        foreach (MonitorInfo screen in monitors)
         {
             var primary = "primary ";
-            _logger.Trace($"Checking {(screen.Primary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
+            _logger.Trace($"Checking {(screen.IsPrimary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds} for window visibility");
         
             if (screen.Bounds.Contains(mainWindowX, mainWindowY))
             {
-                _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.Primary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                _logger.Trace($"Main client window {{X={mainWindowX},Y={mainWindowY}}} is visible on {(screen.IsPrimary ? primary : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                 mainWindowVisible = true;
             }
         
@@ -393,7 +395,7 @@ public partial class MainWindow
         return mainWindowVisible;
     }
         
-    private bool CheckRadioWindowVisibility(System.Windows.Forms.Screen screen, bool radioWindowVisible)
+    private bool CheckRadioWindowVisibility(MonitorInfo screen, bool radioWindowVisible)
     {
         int[] radioWindowX = {
             (int)_globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioMenuSelectX).DoubleValue,
@@ -439,7 +441,7 @@ public partial class MainWindow
         {
             if (screen.Bounds.Contains(radioWindowX[i], radioWindowY[i]))
             {
-                _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.IsPrimary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                 radioWindowVisible = true;
             }
         }
@@ -950,7 +952,6 @@ public partial class MainWindow
 
     public void On_WelcomeGuestCLicked()
     {
-        throw new NotImplementedException("This method is deprecated, use On_GuestLoginClicked with IPAddress instead.");
         OpenPageByIndex(GuestIndex);
     }
 

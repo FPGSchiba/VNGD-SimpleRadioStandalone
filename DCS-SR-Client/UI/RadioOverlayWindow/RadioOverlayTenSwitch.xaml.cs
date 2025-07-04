@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -157,7 +158,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
                     _lastUnitId = dcsPlayerRadioInfo.unitId;
                 }
 
-                var availableRadios = dcsPlayerRadioInfo.radios.Count(r => r.modulation != RadioInformation.Modulation.DISABLED);
+                var availableRadios = dcsPlayerRadioInfo.radios.Select(r => r.modulation != RadioInformation.Modulation.DISABLED).Count();
 
                 ControlText.Text = availableRadios > 1
                     ? "Compact Radio Panel - New"

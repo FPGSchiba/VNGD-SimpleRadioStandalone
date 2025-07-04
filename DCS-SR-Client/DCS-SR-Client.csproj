@@ -8,7 +8,7 @@
     <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion> <!-- or at least 10.0.17763.0 -->
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Vanguard.VCS.Client</RootNamespace>
-    <AssemblyName>Vanguard.VCS.Client</AssemblyName>
+    <AssemblyName>VCS-RadioClient</AssemblyName>
     <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
     <StartupObject>DCS_SR_Client.App</StartupObject>
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>

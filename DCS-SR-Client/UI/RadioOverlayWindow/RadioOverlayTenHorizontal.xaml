@@ -94,7 +94,7 @@
                 Style="{StaticResource DarkStyle-Button}"
                 ToolTip="Swap to vertical orientation">
                 <Grid Height="10" Width="10">
-                    <Image Source="pack://application:,,,/SR-ClientRadio;component/SRS_Orientation_Toggle.png" />
+                    <Image Source="pack://application:,,,/VCS-RadioClient;component/SRS_Orientation_Toggle.png" />
                 </Grid>
             </Button>
 
