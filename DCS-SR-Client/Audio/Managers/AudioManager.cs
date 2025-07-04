@@ -24,7 +24,6 @@ using NAudio.Wave.SampleProviders;
 using NLog;
 using Vanguard.VCS.Common.DCSState;
 using WebRtcVadSharp;
-using static Vanguard.VCS.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
 
 namespace Vanguard.VCS.Client.Audio.Managers

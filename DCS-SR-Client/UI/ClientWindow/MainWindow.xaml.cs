@@ -432,7 +432,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 if (screen.Bounds.Contains(radioWindowX[i], radioWindowY[i]))
                 {
-                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.IsPrimary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
             }
@@ -2555,9 +2555,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _serverSettingsWindow?.Close();
 
-                _serverSettingsWindow = new ServerSettingsWindow.ServerSettingsWindow();
-                _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                _serverSettingsWindow.Owner = this;
+                _serverSettingsWindow = new ServerSettingsWindow
+                {
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
                 _serverSettingsWindow.Show();
             }
             else

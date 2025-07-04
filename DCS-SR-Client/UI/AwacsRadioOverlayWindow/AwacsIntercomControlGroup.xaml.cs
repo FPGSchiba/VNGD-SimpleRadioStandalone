@@ -162,8 +162,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                     _clientStateSingleton.IntercomOffset = 1;
 
 
-                    Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
-                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxicDisabled;
+                    Radio1Enabled.Background = RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
                 }
 
                 if (_dragging == false)

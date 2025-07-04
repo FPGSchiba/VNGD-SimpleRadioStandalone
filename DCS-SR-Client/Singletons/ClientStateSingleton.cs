@@ -8,6 +8,7 @@ using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Settings.RadioChannels;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Network;
 
 namespace Vanguard.VCS.Client.Singletons

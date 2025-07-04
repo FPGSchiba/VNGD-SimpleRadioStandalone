@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NAudio.CoreAudioApi;
+using Vanguard.VCS.Client.UI.ClientWindow;
 
 namespace Vanguard.VCS.Client.Singletons
 {
