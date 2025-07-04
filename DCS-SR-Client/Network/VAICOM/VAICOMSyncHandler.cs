@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using NLog;
 using Vanguard.VCS.Client.Network.VAICOM.Models;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using Newtonsoft.Json;
-using NLog;
 
 namespace Vanguard.VCS.Client.Network.VAICOM
 {

@@ -1,5 +1,5 @@
-﻿using Vanguard.VCS.Common.Helpers;
-using NAudio.Wave;
+﻿using NAudio.Wave;
+using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {

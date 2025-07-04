@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
+using MathNet.Filtering;
+using NAudio.Dsp;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Setting;
-using MathNet.Filtering;
-using NAudio.Dsp;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
@@ -44,7 +45,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         private long lastRefresh = 0; //last refresh of settings
 
-        private readonly Settings.ProfileSettingsStore profileSettings;
+        private readonly ProfileSettingsStore profileSettings;
 
         private bool radioEffects;
         private bool radioBackgroundNoiseEffect;
@@ -60,7 +61,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         public ClientEffectsPipeline()
         {
-            profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+            profileSettings = GlobalSettingsStore.Instance.ProfileSettingsStore;
             serverSettings =  SyncedServerSettings.Instance;
 
             _filters = new OnlineFilter[2];

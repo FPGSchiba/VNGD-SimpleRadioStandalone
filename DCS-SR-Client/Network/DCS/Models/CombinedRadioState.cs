@@ -1,5 +1,5 @@
 ﻿using Vanguard.VCS.Client.Network.Models;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Network.DCS.Models
 {

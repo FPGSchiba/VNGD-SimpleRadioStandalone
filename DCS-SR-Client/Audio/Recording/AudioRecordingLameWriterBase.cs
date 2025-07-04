@@ -1,10 +1,9 @@
-﻿using NAudio.Wave;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Vanguard.VCS.Client.Audio.Models;
-using Vanguard.VCS.Common;
+using NAudio.Wave;
+using NLog;
+using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Recording
 {

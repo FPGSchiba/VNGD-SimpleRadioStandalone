@@ -4,8 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common;
-using IntercomUtils = Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {
@@ -27,8 +26,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         {
             InitializeComponent();
 
-            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? IntercomUtils.IntercomControlGroup.voxEnabled : IntercomUtils.IntercomControlGroup.voxDisabled;
-            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? IntercomUtils.IntercomControlGroup.voxEnabled : IntercomUtils.IntercomControlGroup.voxicDisabled;
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
             _intercomInformation = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
             IntercomNumberSpinner.Maximum = (int)Math.Round(_intercomInformation.freqMax, 0);
             IntercomNumberSpinner.Minimum = 1;
@@ -193,25 +192,25 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
 
 
             if (spinnervalue == 1)
             {
                 IntercomEnabled.IsEnabled = false;
-                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxicDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
             }
             else
             {
                 IntercomEnabled.IsEnabled = true;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
-                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 }
                 else
                 {
-                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
             }
 
@@ -232,16 +231,16 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
             {
-                Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
+                Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
-                    IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
         }
 
@@ -251,16 +250,16 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
-                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxEnabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
-                    Radio1Enabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                    Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                IntercomEnabled.Background = IntercomUtils.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
         }
     }

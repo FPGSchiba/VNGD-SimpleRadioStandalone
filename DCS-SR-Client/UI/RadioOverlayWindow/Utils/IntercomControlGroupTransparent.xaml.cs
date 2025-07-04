@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 {

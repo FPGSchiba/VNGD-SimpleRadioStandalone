@@ -1,4 +1,4 @@
-﻿using Vanguard.VCS.Common;
+﻿using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Audio.Models
 {

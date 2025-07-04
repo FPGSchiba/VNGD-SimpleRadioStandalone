@@ -2,11 +2,11 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
+using NLog;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.Setting;
-using MahApps.Metro.Controls;
-using NLog;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {

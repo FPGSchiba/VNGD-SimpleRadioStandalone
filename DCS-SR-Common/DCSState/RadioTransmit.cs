@@ -1,4 +1,4 @@
-﻿namespace Vanguard.VCS
+namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioTransmit
     {

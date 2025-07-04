@@ -7,11 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime;
 using System.Text.RegularExpressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -303,9 +304,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Mic_VU.Value = -100;
 
             ExternalAWACSModeName.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
-
-            AudioManager = new AudioManager(AudioOutput.WindowsN, _hub);
-            AudioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
+            
+            AudioManager = new AudioManager(AudioOutput.WindowsN, _hub)
+            {
+                SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value)
+            };
 
             if (SpeakerBoostLabel != null)
             {
@@ -379,10 +382,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
     
                 radioWindowVisible = CheckRadioWindowVisibility(screen, radioWindowVisible);
             }
-        
+            
             return mainWindowVisible;
         }
-        
+            
         private bool CheckRadioWindowVisibility(MonitorInfo screen, bool radioWindowVisible)
         {
             int[] radioWindowX = {
@@ -429,7 +432,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 if (screen.Bounds.Contains(radioWindowX[i], radioWindowY[i]))
                 {
-                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.IsPrimary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
+                    _logger.Trace($"Radio overlay {{X={radioWindowX[i]},Y={radioWindowY[i]}}} is visible on {(screen.Primary ? "primary " : "")}screen {screen.DeviceName} with bounds {screen.Bounds}");
                     radioWindowVisible = true;
                 }
             }
@@ -483,7 +486,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 GlobalSettingsKeys.RadioTenHorizontalX,
                 GlobalSettingsKeys.RadioTenWideHorizontalX
             };
-        
+            
             GlobalSettingsKeys[] radioWindowY = {
                 GlobalSettingsKeys.RadioMenuSelectY,
                 GlobalSettingsKeys.RadioDraggableY,
@@ -503,16 +506,16 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 GlobalSettingsKeys.RadioTenHorizontalY,
                 GlobalSettingsKeys.RadioTenWideHorizontalY
             };
-        
+            
             for (int i = 0; i < radioWindowX.Length; i++)
             {
                 _globalSettings.SetPositionSetting(radioWindowX[i], 300);
                 _globalSettings.SetPositionSetting(radioWindowY[i], 300);
             }
-        
+            
             ResetRadioWindowPositionsToDefault();
         }
-        
+            
         private void ResetRadioWindowPositionsToDefault()
         {
             ResetWindowPosition(_radioOverlayMenuSelect);
@@ -533,7 +536,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             ResetWindowPosition(_radioOverlayWindowTenHorizontal);
             ResetWindowPosition(_radioOverlayWindowTenHorizontalWide);
         }
-        
+            
         private static void ResetWindowPosition(Window window)
         {
             if (window != null)
@@ -763,7 +766,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             RadioSwap.InputName = "Swap Standby Frequency (WIP)";   //Dabble Added
             RadioSwap.ControlInputBinding = InputBinding.RadioSwap;
             RadioSwap.InputDeviceManager = InputManager;
-            
+                
             // Audio Balancing
             LeftBalance.InputName = "Left Balance (WIP)";   //Dabble Added
             LeftBalance.ControlInputBinding = InputBinding.LeftBalance;
@@ -853,7 +856,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _settingsPage = new SettingsPage();
             _unitSelectionPage = new UnitSelectionPage();
             OpenPage = WelcomeIndex;
-            
+                
             HomeNavigation.IsEnabled = false;
             HomeNavigation.Visibility = Visibility.Hidden;
         }
@@ -868,7 +871,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 SettingsNavigation.IsEnabled = true;
             }
-            
+                
             switch (index)
             {
                 case WelcomeIndex:
@@ -1007,12 +1010,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _oldOpenSettingsPage = OpenPage == SupportIndex ? _oldOpenSupportPage : OpenPage;
             OpenPageByIndex(SettingsIndex);
         }
-        
+            
         public void On_SettingsBackClicked()
         {
             OpenPageByIndex(_oldOpenSettingsPage);
         }
-        
+            
         public void On_SupportBackClicked()
         {
             OpenPageByIndex(_oldOpenSupportPage);
@@ -1126,7 +1129,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             Radio9Config.Reload();
             Radio10Config.Reload();
             IntercomConfig.Reload();
-            
+                
             _settingsPage.ReloadRadioAudioChannelSettings();
         }
 
@@ -1492,7 +1495,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _connectionTransaction = SentrySdk.StartTransaction("network", "connection");
                 SentrySdk.ConfigureScope(scope => scope.Transaction = _connectionTransaction);
                 _connectionTransaction.SetTag("server-address", $"{ip}:{port}");
-                
+                    
                 SaveSelectedInputAndOutput();
 
                 try
@@ -1764,7 +1767,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                         _logger.Debug("Starting AWACS Mode connection.");
                         _connectioNetworkSpan.Finish();
-                        
+                            
                         ConnectAwacsMode();
                     }
                     catch (Exception ex)
@@ -2072,7 +2075,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 }
             }
         }
-        
+            
         private bool ShouldDebounce(bool uiButton)
         {
             return (DateTime.Now.Ticks - _toggleShowHide > 6000000) || uiButton;
@@ -2087,7 +2090,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
             return false;
         }
-        
+            
         private void OpenNewWindow(int switchTo)
         {
             switch (switchTo)
@@ -2146,7 +2149,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
             ShowWindow(switchTo);
         }
-        
+            
         private void ShowWindow(int switchTo)
         {
             try
@@ -2161,7 +2164,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 MessageBox.Show($"Window could not Open (Window-ID: {switchTo}).\nPlease give this Information to the SRS Development Team!", "Error Opening Panel", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        
+            
         private void CloseAllWindows()
         {
             for (int i = 0; i < _windows.Count(); i++)
@@ -2174,7 +2177,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 }
             }
         }
-        
+            
         private void PanelWindow_Closed(object sender, EventArgs e)
         {
             // No window open -> A window was closed and Only 1 Window can be active
@@ -2196,13 +2199,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             string connection = $"{address}:{port}";
             _logger.Info($"Received AutoConnect VCS @ {connection}");
-        
+            
             if (!_globalSettings.GetClientSetting(GlobalSettingsKeys.AutoConnect).BoolValue)
             {
                 _logger.Info($"Ignored Autoconnect - not Enabled");
                 return;
             }
-        
+            
             if (ClientState.IsConnected)
             {
                 HandleConnectedState(address, port, connection);
@@ -2212,52 +2215,52 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 HandleDisconnectedState(address, port, connection);
             }
         }
-        
+            
         private void HandleConnectedState(string address, int port, string connection)
         {
             string[] currentConnectionParts = ServerIp.Text.Trim().Split(':');
             string currentAddress = currentConnectionParts[0];
             int currentPort = ParsePort(currentConnectionParts);
-        
+            
             if (string.Equals(address, currentAddress, StringComparison.OrdinalIgnoreCase) && port == currentPort)
             {
                 _logger.Info($"Current SRS connection {currentAddress}:{currentPort} matches advertised server {connection}, ignoring autoconnect");
                 return;
             }
-        
+            
             if (port != currentPort)
             {
                 _ = HandleAutoConnectMismatch($"{currentAddress}:{currentPort}", connection);
                 return;
             }
-        
+            
             List<string> currentIPs = ResolveHostToIPs(currentAddress);
             List<string> advertisedIPs = ResolveHostToIPs(address);
-        
+            
             if (!currentIPs.Intersect(advertisedIPs).Any())
             {
                 _ = HandleAutoConnectMismatch($"{currentAddress}:{currentPort}", connection);
             }
         }
-        
+            
         private void HandleDisconnectedState(string address, int port, string connection)
         {
             bool showPrompt = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AutoConnectPrompt);
             bool connectToServer = !showPrompt;
-        
+            
             if (showPrompt)
             {
                 WindowHelper.BringProcessToFront(Process.GetCurrentProcess());
                 var result = MessageBox.Show(this, $"Would you like to try to auto-connect to VCS @ {address}:{port}? ", "Auto Connect", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 connectToServer = (result == MessageBoxResult.Yes) && (StartStop.Content.ToString().ToLower() == "connect");
             }
-        
+            
             if (connectToServer)
             {
                 ServerIp.Text = connection;
             }
         }
-        
+            
         private int ParsePort(string[] connectionParts)
         {
             if (connectionParts.Length >= 2 && int.TryParse(connectionParts[1], out int port))
@@ -2267,11 +2270,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _logger.Warn($"Failed to parse port {connectionParts[1]} of current connection, falling back to 5002 for autoconnect comparison");
             return 5002;
         }
-        
+            
         private List<string> ResolveHostToIPs(string host)
         {
             List<string> ips = new List<string>();
-        
+            
             if (IPAddress.TryParse(host, out IPAddress ip))
             {
                 ips.Add(ip.ToString());
@@ -2293,7 +2296,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _logger.Warn(e, $"Failed to resolve host {host} to IP addresses, ignoring autoconnect advertisement");
                 }
             }
-        
+            
             return ips;
         }
 
@@ -2552,7 +2555,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _serverSettingsWindow?.Close();
 
-                _serverSettingsWindow = new ServerSettingsWindow();
+                _serverSettingsWindow = new ServerSettingsWindow.ServerSettingsWindow();
                 _serverSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 _serverSettingsWindow.Owner = this;
                 _serverSettingsWindow.Show();
@@ -2757,7 +2760,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
 
                 StartStop.Content = "disconnect";
-                
+                    
                 _guestPage.LoginInProgress.Opacity = 0;
                 ConnectionStatus.Fill = Brushes.Green;
 
@@ -2777,11 +2780,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 ConnectedAt = DateTime.UtcNow;
                 _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
                 OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
-                
+                    
                 ExternalAWACSModeName.Text = ClientState.LastSeenName;
 
                 _connectionAwacsSpan.Finish();
-                
+                    
                 SentrySdk.ConfigureScope(scope =>
                 {
                     scope.User = new SentryUser
@@ -2789,7 +2792,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                         Username = ClientState.LastSeenName
                     };
                 });
-                
+                    
                 _connectionTransaction.Finish();
             }
             else
@@ -2803,7 +2806,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 _coalitionPassword = "";
                 _playerName = "";
-                
+                    
                 ConnectionStatus.Fill = Brushes.Orange;
 
                 StartStop.Content = "Connect";
@@ -2820,7 +2823,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _logger.Warn("Stopping server connection...");
                     Stop(true);
                 }
-                
+                    
                 SentrySdk.ConfigureScope(scope =>
                 {
                     scope.User = new SentryUser();
@@ -2861,14 +2864,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private void CreateProfile(object sender, RoutedEventArgs e)
         {
             var inputProfileWindow = new InputProfileWindow.InputProfileWindow(name =>
+            {
+                if (name.Trim().Length > 0)
                 {
-                    if (name.Trim().Length > 0)
-                    {
-                        _globalSettings.ProfileSettingsStore.AddNewProfile(name);
-                        InitSettingsProfiles();
+                    _globalSettings.ProfileSettingsStore.AddNewProfile(name);
+                    InitSettingsProfiles();
 
-                    }
-                });
+                }
+            });
             inputProfileWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             inputProfileWindow.Owner = this;
             inputProfileWindow.ShowDialog();

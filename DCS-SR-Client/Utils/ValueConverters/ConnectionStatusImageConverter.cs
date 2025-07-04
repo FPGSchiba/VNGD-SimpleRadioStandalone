@@ -1,7 +1,7 @@
-﻿using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Client.UI;
-using System;
+﻿using System;
 using System.Windows.Data;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI;
 
 namespace Vanguard.VCS.Client.Utils.ValueConverters
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.Helpers
 {
     public static class ListHelper
     {

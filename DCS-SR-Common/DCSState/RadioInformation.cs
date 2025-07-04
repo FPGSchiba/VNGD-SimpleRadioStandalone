@@ -2,7 +2,7 @@
 using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioInformation
     {

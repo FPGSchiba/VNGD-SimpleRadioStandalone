@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using Vanguard.VCS.Client.Audio.Managers;
-using Vanguard.VCS.Common;
 using NAudio.Wave;
 using NLog;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Models
 {

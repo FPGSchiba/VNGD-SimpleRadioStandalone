@@ -4,7 +4,7 @@
     Width="172"
     x:Class="Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:presetChannels="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels"
+    xmlns:presetChannels1="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
@@ -57,7 +57,7 @@
                 </Grid>
             </Button.Content>
         </Button>-->
-        <presetChannels:PresetChannelsViewTransparent1
+        <presetChannels1:PresetChannelsViewTransparent1
             Background="#444"
             DataContext="{Binding ChannelViewModel, Mode=TwoWay}"
             HorizontalAlignment="Center"

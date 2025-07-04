@@ -1,6 +1,6 @@
-﻿using Vanguard.VCS.Client.Settings;
-using MathNet.Filtering;
+﻿using MathNet.Filtering;
 using NAudio.Wave;
+using Vanguard.VCS.Client.Settings;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
@@ -11,7 +11,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
         private OnlineFilter[] _filters;
         //    private Stopwatch _stopwatch;
 
-        private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
+        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {

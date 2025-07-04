@@ -1,7 +1,7 @@
-﻿using Vanguard.VCS.Client.Audio.Managers;
+﻿using NAudio.Wave;
+using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Common;
-using NAudio.Wave;
+using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {

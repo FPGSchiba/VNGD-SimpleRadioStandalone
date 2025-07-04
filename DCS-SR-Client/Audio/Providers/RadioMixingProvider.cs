@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
+using NAudio.Utils;
+using NAudio.Wave;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Audio.Recording;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Common;
-using NAudio.Utils;
-using NAudio.Wave;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
@@ -18,8 +20,8 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
-        private readonly Settings.ProfileSettingsStore profileSettings =
-            Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+        private readonly ProfileSettingsStore profileSettings =
+            GlobalSettingsStore.Instance.ProfileSettingsStore;
 
         private float[] mixBuffer;
         private float[] secondaryMixBuffer;

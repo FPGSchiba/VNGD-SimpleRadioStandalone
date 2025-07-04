@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Providers;
 using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Helpers;
 using Vanguard.VCS.Common.Network;
 
 namespace Vanguard.VCS.Client.Audio.Recording

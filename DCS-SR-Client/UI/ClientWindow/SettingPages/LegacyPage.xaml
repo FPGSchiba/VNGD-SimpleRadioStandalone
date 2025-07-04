@@ -5,7 +5,7 @@
     mc:Ignorable="d"
     x:Class="Vanguard.VCS.Client.UI.ClientWindow.SettingPages.LegacyPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:components="clr-namespace:Vanguard.VCS.Client.UI.Components"
+    xmlns:components1="clr-namespace:Vanguard.VCS.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -28,11 +28,11 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="RadioOverlayTaskbarHide"
                 Title="Hide Overlay Taskbar Item" />
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="RefocusDCS"
                 Title="Auto Refocus DCS" />
@@ -54,11 +54,11 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="AutoSelectSettingsProfile"
                 Title="Auto select Profile for Aircraft" />
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="CheckForBetaUpdates"
                 Title="Check for Beta updates" />
@@ -89,15 +89,15 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="RequireAdmin"
                 Title="Require Admin" />
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="VAICOMTXInhibitEnabled"
                 Title="Allow VAICOM TX Inhibit" />
-            <components:ToggleGlobalSetting
+            <components1:ToggleGlobalSetting
                 Height="50"
                 SettingKey="PlayConnectionSounds"
                 Title="Play connection sounds" />
@@ -119,23 +119,23 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="AutoSelectPresetChannel"
                 Title="Auto Select First Channel Presets" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="AlwaysAllowHotasControls"
                 Title="ALWAYS allow SRS Hotkeys" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="AlwaysAllowTransponderOverlay"
                 Title="ALWAYS allow Transponder Overlay Controls" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="AllowDCSPTT"
                 Title="Allow INCOCKPIT DCS Controlled PTT" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="RotaryStyleIncrement"
                 Title="Rotary Style Frequency Increment/Decrement" />
@@ -157,7 +157,7 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="MIDSRadioEffect"
                 SubTitle="Requires Tx or Rx Effects on"
@@ -290,7 +290,7 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="RadioBackgroundNoiseEffect"
                 SubTitle="(UHF/VHF/HF/FM)"

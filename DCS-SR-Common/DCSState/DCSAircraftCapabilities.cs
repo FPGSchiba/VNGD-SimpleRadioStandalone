@@ -1,4 +1,4 @@
-﻿namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public struct DCSAircraftCapabilities
     {

@@ -6,11 +6,11 @@
     mc:Ignorable="d"
     x:Class="Vanguard.VCS.Client.UI.ClientWindow.Favourites.FavouriteServersView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:clientWindow="clr-namespace:Vanguard.VCS.Client.UI.ClientWindow"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:favourites="clr-namespace:Vanguard.VCS.Client.UI.ClientWindow.Favourites"
     xmlns:favourites1="clr-namespace:Vanguard.VCS.Client.Settings.Favourites"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="clr-namespace:Vanguard.VCS.Client.UI"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
@@ -116,7 +116,7 @@
                 <DataGridTextColumn Binding="{Binding Path=EAMCoalitionPassword}" Header="Op. Password" />
                 <DataGridTemplateColumn Header="Is Default">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type favourites1:ServerAddress}">
+                        <DataTemplate DataType="favourites1:ServerAddress">
 
                             <Button
                                 Command="{Binding ElementName=FavouritesGrid, Path=DataContext.OnDefaultChangedCommand}"

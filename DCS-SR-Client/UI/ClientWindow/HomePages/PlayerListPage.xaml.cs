@@ -7,10 +7,10 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common.Network;
 using NLog;
 using Sentry;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Network;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Client.Utils;
 using NLog;
 using SharpDX.DirectInput;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.Input
 {

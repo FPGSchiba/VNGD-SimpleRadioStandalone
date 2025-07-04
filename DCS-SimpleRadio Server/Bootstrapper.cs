@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using Ciribob.DCS.SimpleRadio.Standalone.Server.API;
+using Vanguard.VCS.Server.UI.ClientAdmin;
 using Vanguard.VCS.Common;
 using Vanguard.VCS.Common.Helpers;
 using Vanguard.VCS.Common.Network;

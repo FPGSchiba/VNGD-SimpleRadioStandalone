@@ -1,7 +1,7 @@
 ﻿using System;
 using Vanguard.VCS.Common.DCSState;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.Helpers
 {
     public class RadioCalculator
     {

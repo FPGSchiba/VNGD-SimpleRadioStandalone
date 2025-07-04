@@ -3,14 +3,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using NLog;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
-using NLog;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {

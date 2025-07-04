@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using NLog;
 using SharpConfig;
 using Vanguard.VCS.Client.Audio.Models;

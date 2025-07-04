@@ -2,17 +2,18 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Threading;
+using NLog;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using NLog;
-using Vanguard.VCS.Common;
-using System.Windows.Forms;
-using System.Windows.Media;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -24,8 +25,8 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[] radioControlGroupSwitch =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[10];
+        private readonly RadioControlGroupSwitch[] radioControlGroupSwitch =
+            new RadioControlGroupSwitch[10];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -157,7 +158,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
                     _lastUnitId = dcsPlayerRadioInfo.unitId;
                 }
 
-                var availableRadios = dcsPlayerRadioInfo.radios.Count(r => r.modulation != RadioInformation.Modulation.DISABLED);
+                var availableRadios = dcsPlayerRadioInfo.radios.Select(r => r.modulation != RadioInformation.Modulation.DISABLED).Count();
 
                 ControlText.Text = availableRadios > 1
                     ? "Compact Radio Panel - New"

@@ -1,19 +1,18 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Threading;
+using NLog;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Client.UI;
-using NLog;
-using Vanguard.VCS.Common;
-using System.Windows.Forms;
-using System.Windows.Media;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -25,8 +24,8 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[] radioControlGroupTransparent =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupTransparent[10];
+        private readonly RadioControlGroupTransparent[] radioControlGroupTransparent =
+            new RadioControlGroupTransparent[10];
 
         private readonly DispatcherTimer _updateTimer;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
-using Vanguard.VCS.Client.Input;
-using Vanguard.VCS.Client.Settings;
 using NLog;
 using SharpDX.DirectInput;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Settings;
 
 namespace Vanguard.VCS.Client.UI.Components
 {

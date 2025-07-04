@@ -1,11 +1,11 @@
-﻿using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Client.Singletons;
-using MahApps.Metro.Controls;
-using NLog;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
+using NLog;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using Vanguard.VCS.Client.Audio.Models;
 
 namespace Vanguard.VCS.Client.Audio.Recording

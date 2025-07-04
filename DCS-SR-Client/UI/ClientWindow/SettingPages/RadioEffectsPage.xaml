@@ -5,7 +5,7 @@
     mc:Ignorable="d"
     x:Class="Vanguard.VCS.Client.UI.ClientWindow.SettingPages.RadioEffectsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:components="clr-namespace:Vanguard.VCS.Client.UI.Components"
+    xmlns:components1="clr-namespace:Vanguard.VCS.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -262,22 +262,21 @@
                 BorderThickness="1"
                 VerticalAlignment="Bottom" />
 
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="RadioEncryptionEffects"
                 SubTitle="Requires Tx or Rx effects on"
                 Title="Radio Encryption Effects" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="RadioEffects"
                 SubTitle="Client Side Only"
                 Title="Enable Radio Voice Effect" />
-            <components:ToggleProfileSetting
+            <components1:ToggleProfileSetting
                 Height="50"
                 SettingKey="RadioEffectsClipping"
                 SubTitle="Requires Radio Effects On!"
                 Title="Enable Clipping Effect" />
-
             <Separator
                 BorderBrush="White"
                 BorderThickness="25"

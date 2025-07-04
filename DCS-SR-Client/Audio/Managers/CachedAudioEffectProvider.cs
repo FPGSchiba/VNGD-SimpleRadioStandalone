@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Common;
 
 namespace Vanguard.VCS.Client.Audio.Managers
 {

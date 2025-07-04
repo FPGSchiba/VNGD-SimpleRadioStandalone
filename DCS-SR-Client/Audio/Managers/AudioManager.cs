@@ -22,6 +22,7 @@ using NAudio.Utils;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using Vanguard.VCS.Common.DCSState;
 using WebRtcVadSharp;
 using static Vanguard.VCS.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
@@ -693,12 +694,12 @@ namespace Vanguard.VCS.Client.Audio.Managers
             return false;
         }
 
-        public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, Modulation modulation)
+        public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, RadioInformation.Modulation modulation)
         {
             _radioMixingProvider[sendingOn]?.PlaySoundEffectStartTransmit(enc,volume,modulation);
         }
 
-        public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, Modulation radioModulation)
+        public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, RadioInformation.Modulation radioModulation)
         {
             _radioMixingProvider[sendingOn]?.PlaySoundEffectEndTransmit(radioVolume,radioModulation);
         }

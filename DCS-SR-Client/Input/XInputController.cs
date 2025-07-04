@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Vanguard.VCS.Client.Input
 {

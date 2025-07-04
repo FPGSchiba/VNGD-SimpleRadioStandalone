@@ -1,6 +1,6 @@
-﻿using NLog;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using NLog;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
 {

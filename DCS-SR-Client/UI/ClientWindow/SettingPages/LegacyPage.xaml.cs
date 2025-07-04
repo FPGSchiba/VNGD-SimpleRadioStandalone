@@ -2,8 +2,8 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using Vanguard.VCS.Client.Settings;
 using Microsoft.Win32;
+using Vanguard.VCS.Client.Settings;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {

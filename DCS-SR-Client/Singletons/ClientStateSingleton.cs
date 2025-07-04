@@ -155,7 +155,7 @@ namespace Vanguard.VCS.Client.Singletons
             IsConnected = false;
             ExternalAWACSModelSelected = false;
 
-            LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).RawValue;
+            LastSeenName = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
         }
 
         public static ClientStateSingleton Instance

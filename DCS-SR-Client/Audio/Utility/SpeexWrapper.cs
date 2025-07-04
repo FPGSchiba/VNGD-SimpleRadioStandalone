@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Vanguard.VCS.Client.Settings;
 using NAudio.Wave;
+using Vanguard.VCS.Client.Settings;
 
 namespace Vanguard.VCS.Client.Audio.Utility
 {

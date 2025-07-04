@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Net.Sockets;
+using NLog;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common;
-using Vanguard.VCS.Common.Setting;
 using Vanguard.VCS.Common.DCSState;
-using NLog;
+using Vanguard.VCS.Common.Setting;
 
 namespace Vanguard.VCS.Client.Network.DCS
 {
@@ -39,8 +38,7 @@ namespace Vanguard.VCS.Client.Network.DCS
         {
             _radioUpdate = radioUpdate;
         }
-
-
+        
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
           

@@ -5,47 +5,47 @@
     mc:Ignorable="d"
     x:Class="Vanguard.VCS.Client.UI.ClientWindow.SettingPages.GeneralPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:components="clr-namespace:Vanguard.VCS.Client.UI.Components"
+    xmlns:components1="clr-namespace:Vanguard.VCS.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <ScrollViewer>
             <StackPanel>
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="StartMinimised"
                     Title="Start Minimized" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="MinimiseToTray"
                     Title="Minimize to Tray" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="ShowTransmitterName"
                     SubTitle="Requires Server Setting ON too"
                     Title="Show Transmitter Name" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="PlayConnectionSounds"
                     Title="Play Connection Sounds" />
-                <components:ToggleProfileSetting
+                <components1:ToggleProfileSetting
                     Height="50"
                     SettingKey="RadioSwitchIsPTT"
                     Title="Radio Switch works as Push to Talk (PTT)" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="AllowRecording"
                     Title="Allow Anonymous Usage Stats" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="AutoConnect"
                     Title="Auto Connect" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="AutoConnectPrompt"
                     Title="Auto Connect Prompt" />
-                <components:ToggleGlobalSetting
+                <components1:ToggleGlobalSetting
                     Height="50"
                     SettingKey="AutoConnectMismatchPrompt"
                     Title="Auto Connect Mismatch Prompt" />

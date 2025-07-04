@@ -1,5 +1,5 @@
 ﻿<UserControl
-    d:DataContext="{d:DesignInstance presetChannels:PresetChannelsViewModel,
+    d:DataContext="{d:DesignInstance presetChannels1:PresetChannelsViewModel,
                                      IsDesignTimeCreatable=False}"
     d:DesignHeight="100"
     d:DesignWidth="120"
@@ -10,7 +10,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
-    xmlns:presetChannels="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels"
+    xmlns:presetChannels1="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel
         Background="#444"

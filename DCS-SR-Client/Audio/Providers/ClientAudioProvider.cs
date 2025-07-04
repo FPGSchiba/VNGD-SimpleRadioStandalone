@@ -1,12 +1,11 @@
 ﻿using System;
-using Vanguard.VCS.Client.Audio.Managers;
-using NAudio.Wave;
 using FragLabs.Audio.Codecs;
+using NAudio.Wave;
 using NLog;
+using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
-using static Vanguard.VCS.Common.RadioInformation;
 using Vanguard.VCS.Client.Singletons;
-using WaveFormat = SharpDX.Multimedia.WaveFormat;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
@@ -138,7 +137,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         Audio = audio.PcmAudioFloat,
                         PacketNumber = audio.PacketNumber,
                         Decryptable = decrytable,
-                        Modulation = (Modulation)audio.Modulation,
+                        Modulation = (RadioInformation.Modulation)audio.Modulation,
                         ReceivedRadio = audio.ReceivedRadio,
                         Volume = audio.Volume,
                         IsSecondary = audio.IsSecondary,
@@ -162,7 +161,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.PacketNumber,
                     Decryptable = decrytable,
-                    Modulation = (Modulation) audio.Modulation,
+                    Modulation = (RadioInformation.Modulation) audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
@@ -183,7 +182,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.PacketNumber,
                     Decryptable = decrytable,
-                    Modulation = (Modulation)audio.Modulation,
+                    Modulation = (RadioInformation.Modulation)audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
@@ -200,7 +199,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)
         {
-            if (clientAudio.Modulation == (short)Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
+            if (clientAudio.Modulation == (short)RadioInformation.Modulation.MIDS || clientAudio.Modulation == (short)RadioInformation.Modulation.SATCOM)
             {
                 return;
             }

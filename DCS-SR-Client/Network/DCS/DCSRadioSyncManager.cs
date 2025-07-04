@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common;
-using Vanguard.VCS.Common.DCSState;
-using Vanguard.VCS.Common.Network;
 using Newtonsoft.Json;
 using NLog;
-
-/**
-Keeps radio information in Sync Between DCS and
-**/
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Network.DCS
 {

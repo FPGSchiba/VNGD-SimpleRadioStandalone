@@ -1,8 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Vanguard.VCS.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Vanguard.VCS.Common.Network;
 
-namespace Vanguard.VCS.Common.Tests
+namespace Vanguard.VCS.Common.Tests.Network
 {
     [TestClass()]
     public class UDPVoicePacketTests

@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Vanguard.VCS.Client.Settings;
 using NLog;
+using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.UI.ClientWindow;
 
 namespace Vanguard.VCS.Client.Network.DCS

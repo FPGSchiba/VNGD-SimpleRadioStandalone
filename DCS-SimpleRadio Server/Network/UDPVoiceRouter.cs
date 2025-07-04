@@ -15,6 +15,7 @@ using Vanguard.VCS.Common.Setting;
 using Vanguard.VCS.Server.Network.Models;
 using Vanguard.VCS.Server.Settings;
 using NLog;
+using Vanguard.VCS.Common.DCSState;
 using LogManager = NLog.LogManager;
 
 namespace Vanguard.VCS.Server.Network

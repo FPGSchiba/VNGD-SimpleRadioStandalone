@@ -4,7 +4,7 @@ using Vanguard.VCS.Common.Network;
 using Newtonsoft.Json;
 using NLog.Layouts;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioReceivingState
     {

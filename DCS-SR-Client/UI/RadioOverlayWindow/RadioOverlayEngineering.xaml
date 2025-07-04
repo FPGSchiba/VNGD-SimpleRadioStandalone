@@ -15,8 +15,7 @@
     WindowStyle="None"
     x:Class="Vanguard.VCS.Client.UI.RadioOverlayWindow.RadioOverlayWindowEngineering"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:awacsOverlayWindow="clr-namespace:Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow"
-    xmlns:local="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow"
+    xmlns:awacsRadioOverlayWindow="clr-namespace:Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow"
     xmlns:utils="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -122,17 +121,17 @@
             SnapsToDevicePixels="True"
             VerticalAlignment="Center"
             Width="180">
-            <awacsOverlayWindow:RadioControlGroupSwitch
+            <awacsRadioOverlayWindow:RadioControlGroupSwitch
                 Margin="0,0,0,0"
                 RadioId="1"
                 Visibility="Visible"
                 x:Name="Radio1" />
-            <awacsOverlayWindow:RadioControlGroupSwitch
+            <awacsRadioOverlayWindow:RadioControlGroupSwitch
                 Margin="0,0,0,0"
                 RadioId="2"
                 Visibility="Visible"
                 x:Name="Radio2" />
-            <awacsOverlayWindow:RadioControlGroupSwitch
+            <awacsRadioOverlayWindow:RadioControlGroupSwitch
                 Margin="0,0,0,0"
                 RadioId="3"
                 Visibility="Visible"

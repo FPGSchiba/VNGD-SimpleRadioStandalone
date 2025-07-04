@@ -1,13 +1,13 @@
-﻿using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common.Network;
-using MahApps.Metro.Controls;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
+using NLog;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Network;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {

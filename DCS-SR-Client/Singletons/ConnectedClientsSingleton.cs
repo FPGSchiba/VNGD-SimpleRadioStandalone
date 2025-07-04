@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Network;
 using Vanguard.VCS.Common.Setting;
 

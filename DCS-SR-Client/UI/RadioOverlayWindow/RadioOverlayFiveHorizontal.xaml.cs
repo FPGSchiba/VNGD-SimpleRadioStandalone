@@ -2,13 +2,13 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
-using Vanguard.VCS.Client.Network;
+using NLog;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
-using Vanguard.VCS.Common;
-using NLog;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {

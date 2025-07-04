@@ -2,10 +2,10 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using NLog;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.Setting;
-using NLog;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {

@@ -16,6 +16,7 @@ using NetCoreServer;
 using Newtonsoft.Json;
 using NLog;
 using Open.Nat;
+using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 

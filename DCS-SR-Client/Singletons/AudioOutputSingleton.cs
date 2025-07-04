@@ -1,9 +1,9 @@
-﻿using Vanguard.VCS.Client.Settings;
+﻿using System;
+using System.Collections.Generic;
 using NAudio.CoreAudioApi;
 using NAudio.Dmo;
 using NLog;
-using System;
-using System.Collections.Generic;
+using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.UI.ClientWindow;
 
 namespace Vanguard.VCS.Client.Singletons

@@ -9,7 +9,7 @@ using NLog;
 using Octokit;
 using Application = System.Windows.Application;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.Network
 {
     //Quick and dirty update checker based on GitHub Published Versions
     public class UpdaterChecker

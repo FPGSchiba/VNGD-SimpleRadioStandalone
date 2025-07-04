@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.Helpers
 {
     public class ConversionHelpers
     {

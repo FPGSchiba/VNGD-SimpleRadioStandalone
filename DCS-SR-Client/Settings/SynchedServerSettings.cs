@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Vanguard.VCS.Common.Setting;
 using NLog;
+using Vanguard.VCS.Common.Setting;
 
 namespace Vanguard.VCS.Client.Settings
 {

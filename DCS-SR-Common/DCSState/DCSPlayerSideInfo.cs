@@ -1,6 +1,4 @@
-﻿using Vanguard.VCS.Common.DCSState;
-
-namespace Vanguard.VCS.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public class DCSPlayerSideInfo
     {

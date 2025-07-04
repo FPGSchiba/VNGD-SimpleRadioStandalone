@@ -7,18 +7,18 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
+using NLog;
 using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
 using Vanguard.VCS.Common.Network;
 using Vanguard.VCS.Common.Setting;
-using NLog;
-using Vanguard.VCS.Client.Audio.Models;
-using Vanguard.VCS.Client.Network.Models;
-using static Vanguard.VCS.Common.RadioInformation;
 
 namespace Vanguard.VCS.Client.Network
 {
@@ -675,7 +675,7 @@ namespace Vanguard.VCS.Client.Network
             //anything below 30 MHz and AM ignore (AM stand-in for actual HF modulations)
             for (int i = 0; i < udpVoicePacket.Frequencies.Length; i++)
             {
-                if (udpVoicePacket.Modulations[i] == (int)Modulation.AM 
+                if (udpVoicePacket.Modulations[i] == (int)RadioInformation.Modulation.AM 
                     && udpVoicePacket.Frequencies[i] <= RadioCalculator.HF_FREQUENCY_LOS_IGNORED)
                 {
                     //assume HF is bouncing off the sky for now
@@ -895,7 +895,7 @@ namespace Vanguard.VCS.Client.Network
                 if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
                 {
                     //dont transmit on all if the INTERCOM is selected & AWACS
-                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM)
+                    if (currentSelected == 0 && currentlySelectedRadio.modulation == RadioInformation.Modulation.INTERCOM)
                     {
                         //even if simul transmission is enabled - if we're an AWACS we probably dont want this
                         var intercom = new List<RadioInformation>();

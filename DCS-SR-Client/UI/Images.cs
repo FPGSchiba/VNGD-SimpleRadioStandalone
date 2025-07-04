@@ -15,17 +15,17 @@ namespace Vanguard.VCS.Client.UI
         public static void Init()
         {
             // Image taken from https://icons8.com/icon/set/computer/metro @ 2018-08-01
-            IconConnected = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/status-connected.png"));
+            IconConnected = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/status-connected.png"));
             // Image taken from https://icons8.com/icon/set/computer/metro @ 2018-08-01
-            IconDisconnected = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/status-disconnected.png"));
+            IconDisconnected = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/status-disconnected.png"));
             // Image taken from https://icons8.com/icon/set/computer/metro @ 2018-08-01
-            IconDisconnectedError = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/status-disconnected-error.png"));
+            IconDisconnectedError = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/status-disconnected-error.png"));
             // Image taken from https://icons8.com/icon/set/computer/metro @ 2018-08-01
-            IconDisconnectedGame = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/status-disconnected-game.png"));
+            IconDisconnectedGame = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/status-disconnected-game.png"));
             // Expand Icon
-            IconExpand = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/ContractIcon.png"));
+            IconExpand = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/ContractIcon.png"));
             // Contract Icon
-            IconContract = new BitmapImage(new Uri("pack://application:,,,/Vanguard.VCS.Client;component/ExpandIcon.png"));
+            IconContract = new BitmapImage(new Uri("pack://application:,,,/VCS-RadioClient;component/ExpandIcon.png"));
         }
     }
 }
