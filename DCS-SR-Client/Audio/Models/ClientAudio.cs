@@ -1,6 +1,6 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client.Audio.Models
 {
     public class ClientAudio
     {

@@ -6,9 +6,9 @@ using System.Net;
 using System.Windows;
 using NLog;
 using SharpConfig;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Settings
+namespace Vanguard.VCS.Server.Settings
 {
     public class ServerSettingsStore
     {

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
-using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages
+namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {
     public partial class CommunicationsPage : Page
     {

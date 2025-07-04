@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
+namespace Vanguard.VCS.Client.Settings.Favourites
 {
     public class MockFavouriteServerStore : IFavouriteServerStore
     {

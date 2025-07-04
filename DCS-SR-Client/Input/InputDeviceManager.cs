@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
 using NLog;
 using SharpDX.DirectInput;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Client.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Input
+namespace Vanguard.VCS.Client.Input
 {
     public class InputDeviceManager : IDisposable
     {

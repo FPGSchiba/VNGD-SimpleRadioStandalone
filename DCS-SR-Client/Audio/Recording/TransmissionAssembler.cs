@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
+using Vanguard.VCS.Client.Audio.Models;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     internal class TransmissionAssembler
     {

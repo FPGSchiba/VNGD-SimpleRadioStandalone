@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -8,8 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Vanguard.VCS.Client.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -17,8 +18,9 @@ using NLog.Targets.Wrappers;
 using Sentry;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client
 {
     /// <summary>
     ///     Interaction logic for App.xaml
@@ -300,29 +302,27 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 return;
             }
-            MenuItem notifyIconContextMenuShow = new MenuItem
-            {
-                Index = 0,
-                Text = "Show"
-            };
+            // Create a ContextMenuStrip instead of ContextMenu
+            ContextMenuStrip notifyIconContextMenu = new ContextMenuStrip();
+
+            // Add menu items using ToolStripMenuItem instead of MenuItem
+            ToolStripMenuItem notifyIconContextMenuShow = new ToolStripMenuItem("Show");
             notifyIconContextMenuShow.Click += NotifyIcon_Show;
 
-            MenuItem notifyIconContextMenuQuit = new MenuItem
-            {
-                Index = 1,
-                Text = "Quit"
-            };
+            ToolStripMenuItem notifyIconContextMenuQuit = new ToolStripMenuItem("Quit");
             notifyIconContextMenuQuit.Click += NotifyIcon_Quit;
 
-            ContextMenu notifyIconContextMenu = new ContextMenu();
-            notifyIconContextMenu.MenuItems.AddRange(new [] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
+            // Add items to the context menu
+            notifyIconContextMenu.Items.Add(notifyIconContextMenuShow);
+            notifyIconContextMenu.Items.Add(notifyIconContextMenuQuit);
 
+            // Create and configure the NotifyIcon
             _notifyIcon = new NotifyIcon
             {
                 Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
-                Visible = true
+                Visible = true,
+                ContextMenuStrip = notifyIconContextMenu // Use ContextMenuStrip instead of ContextMenu
             };
-            _notifyIcon.ContextMenu = notifyIconContextMenu;
             _notifyIcon.DoubleClick += NotifyIcon_Show;
 
         }

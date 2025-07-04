@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Common.Network;
 using Newtonsoft.Json;
 using NLog.Layouts;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioReceivingState
     {

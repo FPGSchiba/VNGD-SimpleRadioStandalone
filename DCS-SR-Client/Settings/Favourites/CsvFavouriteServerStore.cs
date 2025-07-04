@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Preferences
+namespace Vanguard.VCS.Client.Settings.Favourites
 {
     public class CsvFavouriteServerStore : IFavouriteServerStore
     {

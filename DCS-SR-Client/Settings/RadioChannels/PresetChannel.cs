@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels
+﻿namespace Vanguard.VCS.Client.Settings.RadioChannels
 {
     public class PresetChannel
     {

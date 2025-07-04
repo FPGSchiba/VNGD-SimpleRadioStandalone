@@ -1,11 +1,8 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using MathNet.Filtering;
-using MathNet.Filtering.FIR;
-using MathNet.Filtering.Windowing;
-using NAudio.Dsp;
+﻿using MathNet.Filtering;
 using NAudio.Wave;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class RadioFilter : ISampleProvider
     {
@@ -14,7 +11,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.DSP
         private OnlineFilter[] _filters;
         //    private Stopwatch _stopwatch;
 
-        private Settings.GlobalSettingsStore _globalSettings = Settings.GlobalSettingsStore.Instance;
+        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public RadioFilter(ISampleProvider sampleProvider)
         {

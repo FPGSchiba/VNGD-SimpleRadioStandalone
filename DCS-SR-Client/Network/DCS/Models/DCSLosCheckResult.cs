@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models
+﻿namespace Vanguard.VCS.Client.Network.DCS.Models
 {
     public struct DCSLosCheckResult
     {

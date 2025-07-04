@@ -1,21 +1,17 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+﻿﻿using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 using NLog;
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Models;
 using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Providers;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     class AudioRecordingManager
     {
@@ -165,7 +161,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             _logger.Info("Transmission recording started.");
 
             _audioRecordingWriter?.Stop();
-
+            
+            /*
             if(GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.SingleFileMixdown))
             {
                 _audioRecordingWriter = new MixDownLameRecordingWriter(_sampleRate);
@@ -174,6 +171,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
             {
                 _audioRecordingWriter = new PerRadioLameRecordingWriter(_sampleRate);
             }
+            */
          
             _stop = false;
 

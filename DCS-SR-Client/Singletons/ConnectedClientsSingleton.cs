@@ -3,12 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
+namespace Vanguard.VCS.Client.Singletons
 {
     public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {

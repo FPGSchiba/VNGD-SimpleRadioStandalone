@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils
+namespace Vanguard.VCS.Client.Utils
 {
     public static class AxisTuningHelper
     {

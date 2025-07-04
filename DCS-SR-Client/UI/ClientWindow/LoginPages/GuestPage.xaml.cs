@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -7,12 +6,12 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using MaterialDesignThemes.Wpf;
+using NLog;
+using Vanguard.VCS.Client.Settings;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.LoginPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {
     /// <summary>
     /// Interaction logic for GuestPage.xaml

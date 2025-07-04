@@ -3,7 +3,7 @@ using System.Text;
 using System.Windows.Documents;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     /**
        * UDP PACKET LAYOUT

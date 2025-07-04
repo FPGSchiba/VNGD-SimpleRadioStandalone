@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using NAudio.Utils;
 using NAudio.Wave;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Recording;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class RadioMixingProvider : ISampleProvider
     {
@@ -19,8 +20,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
-        private readonly Settings.ProfileSettingsStore profileSettings =
-            Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+        private readonly ProfileSettingsStore profileSettings =
+            GlobalSettingsStore.Instance.ProfileSettingsStore;
 
         private float[] mixBuffer;
         private float[] secondaryMixBuffer;

@@ -1,20 +1,13 @@
 ﻿using System;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using MathNet.Filtering;
-using NAudio.Dsp;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
 using FragLabs.Audio.Codecs;
+using NAudio.Wave;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class ClientAudioProvider : AudioProvider
     {
@@ -144,7 +137,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                         Audio = audio.PcmAudioFloat,
                         PacketNumber = audio.PacketNumber,
                         Decryptable = decrytable,
-                        Modulation = (Modulation)audio.Modulation,
+                        Modulation = (RadioInformation.Modulation)audio.Modulation,
                         ReceivedRadio = audio.ReceivedRadio,
                         Volume = audio.Volume,
                         IsSecondary = audio.IsSecondary,
@@ -168,7 +161,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.PacketNumber,
                     Decryptable = decrytable,
-                    Modulation = (Modulation) audio.Modulation,
+                    Modulation = (RadioInformation.Modulation) audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
@@ -189,7 +182,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.PacketNumber,
                     Decryptable = decrytable,
-                    Modulation = (Modulation)audio.Modulation,
+                    Modulation = (RadioInformation.Modulation)audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
@@ -206,7 +199,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)
         {
-            if (clientAudio.Modulation == (short)Modulation.MIDS || clientAudio.Modulation == (short)Modulation.SATCOM)
+            if (clientAudio.Modulation == (short)RadioInformation.Modulation.MIDS || clientAudio.Modulation == (short)RadioInformation.Modulation.SATCOM)
             {
                 return;
             }

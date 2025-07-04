@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using Vanguard.VCS.Client.Network.Models;
+using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models
+namespace Vanguard.VCS.Client.Network.DCS.Models
 {
     public struct CombinedRadioState
     {

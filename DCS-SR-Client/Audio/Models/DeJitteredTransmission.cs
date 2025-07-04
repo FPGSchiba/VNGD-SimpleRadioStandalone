@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models
+namespace Vanguard.VCS.Client.Audio.Models
 {
     //TODO profile if its better as class or struct
     public struct DeJitteredTransmission

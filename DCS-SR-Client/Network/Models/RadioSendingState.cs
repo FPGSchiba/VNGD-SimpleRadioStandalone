@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Vanguard.VCS.Client.Network.Models
 {
     public class RadioSendingState
     {

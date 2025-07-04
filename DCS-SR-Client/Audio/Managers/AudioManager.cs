@@ -5,16 +5,16 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Utility;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Recording;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Providers;
+using Vanguard.VCS.Client.Audio.Utility;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Audio.Recording;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
 using Easy.MessageHub;
 using FragLabs.Audio.Codecs;
 using NAudio.CoreAudioApi;
@@ -22,12 +22,11 @@ using NAudio.Utils;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NLog;
+using Vanguard.VCS.Common.DCSState;
 using WebRtcVadSharp;
-using WPFCustomMessageBox;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
 using Application = FragLabs.Audio.Codecs.Opus.Application;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
+namespace Vanguard.VCS.Client.Audio.Managers
 {
     public class AudioManager
     {
@@ -39,20 +38,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         public static readonly int OUTPUT_SEGMENT_FRAMES = (OUTPUT_SAMPLE_RATE / 1000) * OUTPUT_AUDIO_LENGTH_MS;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly CachedAudioEffectProvider _cachedAudioEffectsProvider;
-
         private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
             new ConcurrentDictionary<string, ClientAudioProvider>();
 
         //TEMP
         private List<RadioMixingProvider> _radioMixingProvider;
-
         private MixingSampleProvider _finalMixdown;
-
-
         private OpusEncoder _encoder;
-
         private readonly Queue<short> _micInputQueue = new Queue<short>(MIC_SEGMENT_FRAMES * 3);
 
         //buffers intialised once for use repeatedly
@@ -87,14 +80,14 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         private readonly bool windowsN;
 
         private ClientAudioProvider _passThroughAudioProvider;
-
         private ClientEffectsPipeline _clientEffectsPipeline;
-
+        private IMessageHub  _hub;
         private string _guid;
 
-        public AudioManager(bool windowsN)
+        public AudioManager(bool windowsN, IMessageHub hub)
         {
             this.windowsN = windowsN;
+            _hub = hub;
 
             _cachedAudioEffectsProvider = CachedAudioEffectProvider.Instance;
             _clientEffectsPipeline = new ClientEffectsPipeline();
@@ -278,7 +271,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                     _wasapiCapture.StartRecording();
 
-                    MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
+                    _hub.Subscribe<SRClient>(RemoveClientBuffer);
                 }
                 catch (Exception ex)
                 {
@@ -294,7 +287,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
                 //no mic....
                 _udpVoiceHandler =
                     new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
-                MessageHub.Instance.Subscribe<SRClient>(RemoveClientBuffer);
+                _hub.Subscribe<SRClient>(RemoveClientBuffer);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();
             }
@@ -471,14 +464,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
         {
             if (Environment.OSVersion.Version.Major == 10)
             {
-                var messageBoxResult = CustomMessageBox.ShowYesNoCancel(
+                var messageBoxResult = MessageBox.Show(
                     $"{message}\n\n" +
-                    $"If you are using Windows 10, this could be caused by your privacy settings (make sure to allow apps to access your microphone)." +
-                    $"\nAlternatively, try a different Input device and please post your client log to the support Discord server.",
+                    "If you are using Windows 10, this could be caused by your privacy settings (make sure to allow apps to access your microphone)." +
+                    "\nAlternatively, try a different Input device and please post your client log to the support Discord server.",
                     "Audio Input Error",
-                    "OPEN PRIVACY SETTINGS",
-                    "JOIN DISCORD SERVER",
-                    "CLOSE",
+                    MessageBoxButton.YesNoCancel,
                     MessageBoxImage.Error);
 
                 if (messageBoxResult == MessageBoxResult.Yes)
@@ -492,12 +483,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             }
             else
             {
-                var messageBoxResult = CustomMessageBox.ShowYesNo(
+                var messageBoxResult = MessageBox.Show(
                     $"{message}\n\n" +
                     "Try a different Input device and please post your client log to the support Discord server.",
                     "Audio Input Error",
-                    "JOIN DISCORD SERVER",
-                    "CLOSE",
+                    MessageBoxButton.YesNo,
                     MessageBoxImage.Error);
 
                 if (messageBoxResult == MessageBoxResult.Yes)
@@ -509,12 +499,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
         private void ShowOutputError(string message)
         {
-            var messageBoxResult = CustomMessageBox.ShowYesNo(
+            var messageBoxResult = MessageBox.Show(
                 $"{message}\n\n" +
                 "Try a different output device and please post your client log to the support Discord server.",
                 "Audio Output Error",
-                "JOIN DISCORD SERVER",
-                "CLOSE",
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Error);
 
             if (messageBoxResult == MessageBoxResult.Yes)
@@ -617,7 +606,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
 
                 AudioRecordingManager.Instance.Stop();
 
-                MessageHub.Instance.ClearSubscriptions();
+                _hub.ClearSubscriptions();
             }
         }
 
@@ -704,12 +693,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers
             return false;
         }
 
-        public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, Modulation modulation)
+        public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, RadioInformation.Modulation modulation)
         {
             _radioMixingProvider[sendingOn]?.PlaySoundEffectStartTransmit(enc,volume,modulation);
         }
 
-        public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, Modulation radioModulation)
+        public void PlaySoundEffectEndTransmit(int sendingOn, float radioVolume, RadioInformation.Modulation radioModulation)
         {
             _radioMixingProvider[sendingOn]?.PlaySoundEffectEndTransmit(radioVolume,radioModulation);
         }

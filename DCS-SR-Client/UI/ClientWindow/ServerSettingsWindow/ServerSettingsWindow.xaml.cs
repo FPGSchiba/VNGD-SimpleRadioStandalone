@@ -2,13 +2,13 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
 using MahApps.Metro.Controls;
 using NLog;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Vanguard.VCS.Client.UI.ClientWindow.ServerSettingsWindow
 {
     /// <summary>
     ///     Interaction logic for ServerSettingsWindow.xaml

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Vanguard
+namespace Vanguard.VCS.Client.Vanguard
 {
     public class Unit : INotifyPropertyChanged
     {

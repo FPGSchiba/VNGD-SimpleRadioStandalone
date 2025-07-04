@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models
+namespace Vanguard.VCS.Client.Network.VAICOM.Models
 {
     public class VAICOMMessageWrapper
     {

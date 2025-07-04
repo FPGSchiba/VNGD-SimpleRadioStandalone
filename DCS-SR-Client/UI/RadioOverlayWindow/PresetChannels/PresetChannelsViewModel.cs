@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
+using Vanguard.VCS.Client.Settings.RadioChannels;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels
 {
     public class PresetChannelsViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPage
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class BalancingPage : Page
     {

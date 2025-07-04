@@ -1,26 +1,13 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Newtonsoft.Json;
 using NLog;
-using System.Threading;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
+namespace Vanguard.VCS.Client.Network.DCS
 {
     public class DCSRadioSyncHandler
     {
@@ -51,8 +38,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS
         {
             _radioUpdate = radioUpdate;
         }
-
-
+        
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
           

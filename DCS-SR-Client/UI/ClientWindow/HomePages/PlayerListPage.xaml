@@ -1,77 +1,100 @@
-﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages.PlayerListPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.HomePages"
-      mc:Ignorable="d"
-      Title="PlayerListPage" Height="270" Width="415">
+﻿<Page
+    Height="270"
+    Title="PlayerListPage"
+    Width="415"
+    mc:Ignorable="d"
+    x:Class="Vanguard.VCS.Client.UI.ClientWindow.HomePages.PlayerListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:homePages="clr-namespace:Vanguard.VCS.Client.UI.ClientWindow.HomePages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ListView.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="CustomHeaderStyle" TargetType="GridViewColumnHeader" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+            <Style
+                BasedOn="{StaticResource {x:Type GridViewColumnHeader}}"
+                TargetType="GridViewColumnHeader"
+                x:Key="CustomHeaderStyle">
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="#E9E9E9"/>
+                <Setter Property="Background" Value="#E9E9E9" />
                 <Setter Property="Foreground" Value="Lime" />
                 <Setter Property="BorderBrush" Value="Black" />
                 <Setter Property="BorderThickness" Value="1" />
             </Style>
         </ResourceDictionary>
     </Page.Resources>
-    <ListView Name="ClientList" HorizontalContentAlignment="Stretch" Padding="5,0,0,5">
+    <ListView
+        HorizontalContentAlignment="Stretch"
+        Name="ClientList"
+        Padding="5,0,0,5">
         <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+            <Style BasedOn="{StaticResource MaterialDesignGridViewItem}" TargetType="ListViewItem">
                 <Setter Property="MaxWidth" Value="415" />
             </Style>
         </ListView.ItemContainerStyle>
         <ListView.View>
-            <GridView >
+            <GridView>
                 <GridViewColumn HeaderContainerStyle="{StaticResource CustomHeaderStyle}">
                     <GridViewColumn.Header>
-                        <Label Height="30" Content="FFID" FontSize="11" />
+                        <Label
+                            Content="FFID"
+                            FontSize="11"
+                            Height="30" />
                     </GridViewColumn.Header>
                     <GridViewColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type local:PlayerListItem}">
-                            <TextBlock Text="{Binding Path=FfId}" />                 
+                        <DataTemplate DataType="{x:Type homePages:PlayerListItem}">
+                            <TextBlock Text="{Binding Path=FfId}" />
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>
                 <GridViewColumn HeaderContainerStyle="{StaticResource CustomHeaderStyle}">
                     <GridViewColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type local:PlayerListItem}">
-                            <TextBlock Text="{Binding Path=Name}" />                 
+                        <DataTemplate DataType="{x:Type homePages:PlayerListItem}">
+                            <TextBlock Text="{Binding Path=Name}" />
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                     <GridViewColumn.Header>
-                        <Label Height="30" VerticalAlignment="Center" Content="Connected Player Name" FontSize="11" />
+                        <Label
+                            Content="Connected Player Name"
+                            FontSize="11"
+                            Height="30"
+                            VerticalAlignment="Center" />
                     </GridViewColumn.Header>
                 </GridViewColumn>
-                <GridViewColumn HeaderContainerStyle="{StaticResource CustomHeaderStyle}" >
+                <GridViewColumn HeaderContainerStyle="{StaticResource CustomHeaderStyle}">
                     <GridViewColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type local:PlayerListItem}">
-                            <TextBlock Text="{Binding Path=AllowsRecording}" HorizontalAlignment="Center" />                 
+                        <DataTemplate DataType="{x:Type homePages:PlayerListItem}">
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding Path=AllowsRecording}" />
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                     <GridViewColumn.Header>
-                        <Label Height="30" Content="Player Allows Recording" FontSize="11" />
+                        <Label
+                            Content="Player Allows Recording"
+                            FontSize="11"
+                            Height="30" />
                     </GridViewColumn.Header>
                 </GridViewColumn>
                 <GridViewColumn HeaderContainerStyle="{StaticResource CustomHeaderStyle}">
                     <GridViewColumn.Header>
-                        <Label Height="30" Content="Team" FontSize="11" />
+                        <Label
+                            Content="Team"
+                            FontSize="11"
+                            Height="30" />
                     </GridViewColumn.Header>
                     <GridViewColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type local:PlayerListItem}">
-                            <Ellipse Width="12"
-                                     Height="12"
-                                     Margin="2"
-                                     HorizontalAlignment="Center"
-                                     VerticalAlignment="Center"
-                                     Fill="{Binding TeamColor}"
-                                     Stroke="Black" />
+                        <DataTemplate DataType="{x:Type homePages:PlayerListItem}">
+                            <Ellipse
+                                Fill="{Binding TeamColor}"
+                                Height="12"
+                                HorizontalAlignment="Center"
+                                Margin="2"
+                                Stroke="Black"
+                                VerticalAlignment="Center"
+                                Width="12" />
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>

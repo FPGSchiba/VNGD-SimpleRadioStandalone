@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.DSP;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using MathNet.Filtering;
 using NAudio.Dsp;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class ClientEffectsPipeline
     {
@@ -48,7 +45,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         private long lastRefresh = 0; //last refresh of settings
 
-        private readonly Settings.ProfileSettingsStore profileSettings;
+        private readonly ProfileSettingsStore profileSettings;
 
         private bool radioEffects;
         private bool radioBackgroundNoiseEffect;
@@ -64,7 +61,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
 
         public ClientEffectsPipeline()
         {
-            profileSettings = Settings.GlobalSettingsStore.Instance.ProfileSettingsStore;
+            profileSettings = GlobalSettingsStore.Instance.ProfileSettingsStore;
             serverSettings =  SyncedServerSettings.Instance;
 
             _filters = new OnlineFilter[2];

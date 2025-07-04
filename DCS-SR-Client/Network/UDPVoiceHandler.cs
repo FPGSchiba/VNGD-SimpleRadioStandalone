@@ -1,31 +1,26 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Utils;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using FragLabs.Audio.Codecs;
 using NLog;
-using static Ciribob.DCS.SimpleRadio.Standalone.Common.RadioInformation;
-using Timer = Cabhishek.Timers.Timer;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.Network.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Vanguard.VCS.Client.Network
 {
     internal class UdpVoiceHandler
     {
@@ -680,7 +675,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
             //anything below 30 MHz and AM ignore (AM stand-in for actual HF modulations)
             for (int i = 0; i < udpVoicePacket.Frequencies.Length; i++)
             {
-                if (udpVoicePacket.Modulations[i] == (int)Modulation.AM 
+                if (udpVoicePacket.Modulations[i] == (int)RadioInformation.Modulation.AM 
                     && udpVoicePacket.Frequencies[i] <= RadioCalculator.HF_FREQUENCY_LOS_IGNORED)
                 {
                     //assume HF is bouncing off the sky for now
@@ -900,7 +895,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
                 if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission)
                 {
                     //dont transmit on all if the INTERCOM is selected & AWACS
-                    if (currentSelected == 0 && currentlySelectedRadio.modulation == Modulation.INTERCOM)
+                    if (currentSelected == 0 && currentlySelectedRadio.modulation == RadioInformation.Modulation.INTERCOM)
                     {
                         //even if simul transmission is enabled - if we're an AWACS we probably dont want this
                         var intercom = new List<RadioInformation>();

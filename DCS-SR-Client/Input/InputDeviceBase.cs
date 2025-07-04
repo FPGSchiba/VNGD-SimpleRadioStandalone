@@ -1,6 +1,7 @@
 ﻿using System;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Input
 {
     abstract public class InputDeviceBase
     {

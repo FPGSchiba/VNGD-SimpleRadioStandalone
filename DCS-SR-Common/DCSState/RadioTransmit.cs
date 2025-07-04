@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone
+﻿namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioTransmit
     {

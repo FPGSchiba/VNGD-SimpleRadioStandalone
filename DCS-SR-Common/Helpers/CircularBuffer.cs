@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common.Helpers
 {
     /// <summary>
     /// A very basic circular buffer implementation based off NAudio's Buffer

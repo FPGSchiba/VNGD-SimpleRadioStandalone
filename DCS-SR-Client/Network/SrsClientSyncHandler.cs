@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.DCS;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Vanguard.VCS.Client.Network.DCS;
+using Vanguard.VCS.Client.Network.VAICOM;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 using Easy.MessageHub;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
+namespace Vanguard.VCS.Client.Network
 {
     public class SrsClientSyncHandler
     {
@@ -31,6 +29,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private volatile bool _stop = false;
+        private readonly IMessageHub _hub;
 
         public static string ServerVersion { get; private set; }
         private readonly string _guid;
@@ -55,10 +54,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         private long _lastSent = -1;
         private readonly DispatcherTimer _idleTimeout;
 
-        public SrsClientSyncHandler(string guid, UpdateUICallback uiCallback)
+        public SrsClientSyncHandler(string guid, UpdateUICallback uiCallback, IMessageHub hub)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
+            _hub = hub;
 
             _idleTimeout = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher) { Interval = TimeSpan.FromSeconds(1) };
             _idleTimeout.Tick += CheckIfIdleTimeOut;
@@ -519,7 +519,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network
         
             if (outClient != null)
             {
-                MessageHub.Instance.Publish(outClient);
+                _hub.Publish(outClient);
             }
         }
         

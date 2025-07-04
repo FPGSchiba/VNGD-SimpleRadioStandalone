@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
 using Newtonsoft.Json;
 using NLog;
+using Vanguard.VCS.Client.Network.VAICOM.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM
+namespace Vanguard.VCS.Client.Network.VAICOM
 {
     public class VAICOMSyncHandler
     {
