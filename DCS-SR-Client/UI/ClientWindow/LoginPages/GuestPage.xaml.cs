@@ -1,15 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using NLog;
 using Vanguard.VCS.Client.Settings;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {
@@ -34,7 +29,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             FleetCodeInput.Text = fleetCode;
             var playerName = Regex.Replace(lastSeenName, "\\[[A-Z0-9]{2,4}\\]\\s", "");
             PlayerNameInput.Text = playerName;
-            IpInput.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).RawValue;
         }
 
         private void Back_OnClick(object sender, RoutedEventArgs e)
@@ -57,29 +51,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 
                 var playerName = PlayerNameInput.Text;
                 var fleetCode = FleetCodeInput.Text;
-                _logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: {playerName}, Password: {coalitionPassword}");
+                _logger.Info($"Guest Login with following Params: \nPlayer Name: {playerName}, Password: {coalitionPassword}");
             
                 // process hostname
-                string address = GetAddressFromTextBox();
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, address);
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, playerName);
-                try
-                {
-                    var resolvedAddresses = Dns.GetHostAddresses(address);
-                    var ip = resolvedAddresses.FirstOrDefault(xa =>
-                        xa.AddressFamily ==
-                        AddressFamily
-                            .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-                    _mainWindow.ServerIp.Text = address;
-                    _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, fleetCode, coalitionPassword);
-                }
-                catch (SocketException ex)
-                {
-                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    _mainWindow.ClientState.IsConnected = false;
-                    LoginFailed();
-                }
+                _mainWindow.On_GuestLoginClicked(playerName, fleetCode, coalitionPassword);
             }
             else
             {
@@ -88,35 +64,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LoginFailed();
             }
-        }
-
-        private string GetAddressFromTextBox()
-        {
-            var addr = this.IpInput.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                return addr.Split(':')[0];
-            }
-
-            return addr;
-        }
-
-        private int GetPortFromTextBox()
-        {
-            var addr = this.IpInput.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                int port;
-                if (int.TryParse(addr.Split(':')[1], out port))
-                {
-                    return port;
-                }
-                throw new ArgumentException("specified port is not valid");
-            }
-
-            return 5002;
         }
 
         private void OnButtonPressed(object sender, KeyEventArgs e)

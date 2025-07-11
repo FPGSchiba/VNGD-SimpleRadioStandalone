@@ -158,6 +158,15 @@ namespace Vanguard.VCS.Client.Singletons
 
             LastSeenName = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
         }
+        
+        public void SetGuid(string guid)
+        {
+            if (string.IsNullOrEmpty(guid))
+                throw new ArgumentException("GUID cannot be null or empty.", nameof(guid));
+
+            ShortGUID = guid;
+            NotifyPropertyChanged(nameof(ShortGUID));
+        }
 
         public static ClientStateSingleton Instance
         {

@@ -6,14 +6,17 @@ option go_package = "github.com/FPGSchiba/vcs-srs-server/srspb";
 option csharp_namespace = "Vanguard.VCS.Client.Network";
 
 service AuthService {
+  // Get Available Plugins
+  rpc InitAuth(ClientAuthInitRequest) returns (ServerAuthInitResponse);
+
   // Guest login (Using Coalition Password and self chosen name)
   rpc GuestLogin(ClientGuestLoginRequest) returns (ServerGuestLoginResponse);
 
   // Vanguard login (Using email and password > Connects to Wix backend)
-  rpc VanguardLogin(ClientVanguardLoginRequest) returns (ServerVanguardLoginResponse);
+  rpc Login(ClientLoginRequest) returns (ServerLoginResponse);
 
   // Vanguard unit selection (Using client GUID and selected unit ID)
-  rpc VanguardUnitSelect(ClientVanguardUnitSelectRequest) returns (ServerVanguardUnitSelectResponse);
+  rpc UnitSelect(ClientUnitSelectRequest) returns (ServerUnitSelectResponse);
 }
 
 // Service definition
@@ -43,26 +46,45 @@ service SRSService {
 // Empty message for requests that don't need parameters
 message Empty {}
 
+message ClientAuthInitRequest {
+  ClientCapabilities capabilities = 1; // Version and distribution information of the client
+}
+
+message ServerAuthInitResponse {
+  bool success = 1; // Indicates if the initialization was successful
+  oneof init_result {
+    string error_message = 2; // Error message if initialization failed
+    AuthInitResult result = 3; // List of available authentication plugins
+  }
+}
+
+message AuthInitResult {
+  repeated string available_plugins = 1; // List of available authentication plugins
+  bool has_guest_login = 2; // Indicates if guest login is supported
+  DistributionMode distribution_mode = 3; // Distribution mode of the server
+  string client_guid = 4; // Unique identifier for the client
+}
+
 // Authentication messages
 message ClientGuestLoginRequest {
   string name = 1; // Name of the guest client
   string password = 2; // Password for the guest client
   string unit_id = 3; // unit ID for the guest
-  ClientCapabilities capabilities = 4; // Version and distribution information of the client
+  string client_guid = 4; // Unique identifier for the client (To make sure the client is initialized)
 }
 
-message ClientVanguardLoginRequest {
-  string email = 1; // Email of the vanguard member
-  string password = 2; // Password of the vanguard member
-  ClientCapabilities capabilities = 3; // Version and distribution information of the client
+message ClientLoginRequest {
+  map<string, string> credentials = 1; // Map of credentials
+  string authentication_plugin = 2; // Name of the authentication plugin to use
+  string client_guid = 3; // Unique identifier for the client (To make sure the client is initialized)
 }
 
-message ClientVanguardUnitSelectRequest {
+message ClientUnitSelectRequest {
   string client_guid = 1; // Unique identifier for the client
   string secret = 2; // Secret for the vanguard client after successful login
   string unit_id = 3; // Selected unit ID
   string coalition = 4; // Coalition of the client
-  int32  role = 5; // Optional role (If user has permissions to select roles)
+  uint32  role = 5; // Optional role (If user has permissions to select roles)
 }
 
 message ServerGuestLoginResponse {
@@ -75,23 +97,21 @@ message ServerGuestLoginResponse {
 
 message GuestLoginResult {
   string token = 1; // Token for the guest client after successful login
-  string client_guid = 2; // Unique identifier for the guest client
-  string coalition = 3; // Coalition of the guest client
+  string coalition = 2; // Coalition of the guest client
 }
 
-message ServerVanguardLoginResponse {
+message ServerLoginResponse {
   bool success = 1;
   oneof login_result {
-    VanguardLoginResult result = 2; // Result of the vanguard login
+    LoginResult result = 2; // Result of the vanguard login
     string error_message = 3; // Error message if login failed
   }
 }
 
-message VanguardLoginResult {
-  string secret = 1; // Secret for the vanguard client after successful login for selecting the Unit and the Coalition
-  string client_guid = 2; // Unique identifier for the vanguard client
-  repeated CoalitionSelection available_coalitions = 3; // List of available coalitions for the vanguard client
-  repeated UnitSelection available_units = 4; // List of available unit IDs for the vanguard client
+message LoginResult {
+  string secret = 1; // Secret for the client after successful login for selecting the Unit and the Coalition
+  repeated CoalitionSelection available_coalitions = 3; // List of available coalitions for the client
+  repeated UnitSelection available_units = 4; // List of available unit IDs for the client
   repeated RoleSelection available_roles = 5; // Optional list of roles if the user has permissions to select roles
 }
 
@@ -111,7 +131,7 @@ message CoalitionSelection {
   string description = 3; // The description of the selected coalition
 }
 
-message ServerVanguardUnitSelectResponse {
+message ServerUnitSelectResponse {
   bool success = 1;
   oneof result {
     string token = 2; // The selected unit ID after successful selection
@@ -121,10 +141,10 @@ message ServerVanguardUnitSelectResponse {
 
 message ClientCapabilities {
   string version = 1; // Version of the client
-  repeated ClientFeature supported_features = 2; // List of features supported by the client
+  repeated DistributionMode supported_distribution_modes = 2; // List of features supported by the client
 }
 
-enum ClientFeature {
+enum DistributionMode {
   STANDALONE = 0; // Standalone client
   DISTRIBUTED = 1; // Distribution of Voice servers supported by client
 }

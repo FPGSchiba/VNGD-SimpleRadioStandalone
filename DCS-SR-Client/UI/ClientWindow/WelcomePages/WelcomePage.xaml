@@ -21,8 +21,9 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1.3*" />
+            <RowDefinition Height="1.0*" />
             <RowDefinition Height="70" />
+            <RowDefinition Height="120" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
@@ -37,39 +38,87 @@
                 FontSize="16"
                 HorizontalAlignment="Center" />
         </StackPanel>
-
-        <StackPanel
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal"
-            VerticalAlignment="Bottom">
-            <!-- Login is not yet implemented via vngd.net, so we're using the Guest button for now -->
-            <Button
-                Width="90"
-                Height="30"
-                Content="LOGIN"
-                Margin="0,0,15,0"
-                x:Name="Login"
-                materialDesign:ButtonAssist.CornerRadius="15"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                Click="Login_Click"
+        
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical"
+                    VerticalAlignment="Center">
+            <Label 
+                Content="Establishing Connection to the Vanguard VCS Server..."
+                FontSize="10"
+                FontWeight="Light"
+                Name="LoadLabel"/>
+            <ProgressBar
+                IsIndeterminate="True"
+                Style="{StaticResource MaterialDesignCircularProgressBar}"
+                Value="0"
+                Width="25"
+                Height="25"
+                Name="ServerInfoProgress"
             />
-            <!--  Change this to Guest in the future  -->
-            <Button
-                Click="Guest_Click"
-                Content="GUEST"
-                Height="30"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                Margin="0,0,0,0"
-                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                Width="90"
-                materialDesign:ButtonAssist.CornerRadius="15"
-                x:Name="Guest" />
+            
         </StackPanel>
 
         <StackPanel
             Grid.Row="2"
+            HorizontalAlignment="Center"
+            Orientation="Vertical"
+            VerticalAlignment="Bottom">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                VerticalAlignment="Bottom">
+                <Button
+                    Width="90"
+                    Height="30"
+                    Content="LOGIN"
+                    Margin="0,0,15,0"
+                    x:Name="Login"
+                    materialDesign:ButtonAssist.CornerRadius="15"
+                    IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                    Click="Login_Click"
+                />
+                <!--  Change this to Guest in the future  -->
+                <Button
+                    Click="Guest_Click"
+                    Content="GUEST"
+                    Height="30"
+                    IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    Margin="0,0,0,0"
+                    Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                    Width="90"
+                    materialDesign:ButtonAssist.CornerRadius="15"
+                    x:Name="Guest" />
+            </StackPanel>
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                VerticalAlignment="Bottom">
+                <Button Width="190"
+                        Height="30"
+                        Content="CUSTOM SERVER"
+                        Margin="0,10,0,0"
+                        x:Name="Server"
+                        materialDesign:ButtonAssist.CornerRadius="15"
+                        IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                        Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                        Click="Custom_Click"/>
+                <Button Width="90"
+                        Height="30"
+                        Content="REFRESH"
+                        Margin="0,10,0,0"
+                        x:Name="Refresh"
+                        Visibility="Hidden"
+                        materialDesign:ButtonAssist.CornerRadius="15"
+                        IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                        Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                        Click="Refresh_Click"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="3"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom">
             <Button

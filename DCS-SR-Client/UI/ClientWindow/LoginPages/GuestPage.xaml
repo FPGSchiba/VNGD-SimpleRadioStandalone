@@ -65,21 +65,6 @@
                 HorizontalAlignment="Center"
                 Orientation="Horizontal"
                 VerticalAlignment="Top">
-                <TextBox
-                    AcceptsReturn="False"
-                    FontSize="16"
-                    Height="38"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
-                    Margin="0,0,50,0"
-                    Name="IpInput"
-                    Padding="7"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                    TextWrapping="NoWrap"
-                    VerticalAlignment="Top"
-                    Width="200"
-                    materialDesign:HintAssist.Hint="IP Address" />
-
                 <PasswordBox
                     FontSize="16"
                     Height="38"
