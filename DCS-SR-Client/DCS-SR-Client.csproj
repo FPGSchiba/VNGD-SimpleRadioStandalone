@@ -180,6 +180,10 @@
     </Protobuf>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Network\Proto\" />
+  </ItemGroup>
+
   <!-- Custom MSBuild targets and tasks -->
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />

@@ -42,33 +42,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             Login.IsEnabled = false;
             Progress.Visibility = Visibility.Visible;
             Logger.Info("Beginning to fetch Server Information.");
-            ServerInformationFetched(EmailInput.Text, PasswordInput.Password);
-        }
-
-        private void ServerInformationFetched(string email, string password)
-        {
-            try
+            Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    _settingsStore.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.VngdEmail, EmailInput.Text);
-                    mainWindow.On_LoginLoginClicked(email, password);
-                });
-                
-            }
-            catch (SocketException ex)
-            {
-                MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                mainWindow.ClientState.IsConnected = false;
-                LoginFailed();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "An error occurred while fetching server information.");
-                MessageBox.Show("An unexpected error occurred. Please try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                LoginFailed();
-            }
+                _settingsStore.ProfileSettingsStore.SetClientSettingString(ProfileSettingsKeys.VngdEmail, EmailInput.Text);
+                mainWindow.On_LoginLoginClicked(EmailInput.Text, PasswordInput.Password);
+            });
         }
 
         private void Back_Click(object sender, RoutedEventArgs e)

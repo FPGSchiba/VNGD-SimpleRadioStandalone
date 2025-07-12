@@ -113,6 +113,7 @@ message LoginResult {
   repeated CoalitionSelection available_coalitions = 3; // List of available coalitions for the client
   repeated UnitSelection available_units = 4; // List of available unit IDs for the client
   repeated RoleSelection available_roles = 5; // Optional list of roles if the user has permissions to select roles
+  string player_name = 6; // Name of the player
 }
 
 message UnitSelection {

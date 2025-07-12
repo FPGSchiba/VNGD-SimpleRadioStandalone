@@ -8,6 +8,8 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -704,6 +706,17 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             OpenPageByIndex(GuestIndex);
         }
+        
+        public void On_UnitSelectionBackClicked()
+        {
+            Stop();
+            OpenPageByIndex(WelcomeIndex);
+        }
+        
+        public void On_UnitSelectionContinueClicked(string unitId, string coalition, uint roleId)
+        {
+            SelectUnit(unitId, coalition, roleId);
+        }
 
         public void On_HomeLogOutClicked()
         {
@@ -771,26 +784,143 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             switch (type)
             {
                 case VcsUiUpdateType.ConnectionError:
-                    HandleConnectionError(message, isGuest: true);
+                    Dispatcher.Invoke(() => HandleConnectionError(message, isGuest: true));
                     break;
                 case VcsUiUpdateType.InitializationError:
-                    HandleInitializationError(message);
+                    Dispatcher.Invoke(() => HandleInitializationError(message));
                     break;
                 case VcsUiUpdateType.InitializationSuccess:
-                    HandleInitializationSuccessEvent(message);
+                    Dispatcher.Invoke(() => HandleInitializationSuccessEvent(message));
                     break;
                 case VcsUiUpdateType.GuestLoginSuccess:
-                    HandleGuestLoginSuccess();
+                    Dispatcher.Invoke(HandleGuestLoginSuccess);
                     break;
                 case VcsUiUpdateType.InternalLoginError:
-                    HandleConnectionError(message, isGuest: false);
+                    Dispatcher.Invoke(() => HandleConnectionError(message, isGuest: false));
                     break;
                 case VcsUiUpdateType.InternalLoginSuccess:
-                    HandleInternalLoginSuccessEvent(message);
+                    Dispatcher.Invoke(() => HandleInternalLoginSuccessEvent(message));
+                    break;
+                case VcsUiUpdateType.InternalUnitSelectionError:
+                    Dispatcher.Invoke(() => HandleUnitSelectError(message));
+                    break;
+                case VcsUiUpdateType.InternalUnitSelectionSuccess:
+                    Dispatcher.Invoke(() => HandleUnitSelectSuccess(message));
                     break;
                 default:
                     _logger.Info($"{type} - {message}");
                     break;
+            }
+        }
+
+        private void HandleUnitSelectSuccess(object message)
+        {
+            if (message is UnitSelectionResult unitSelectionResult)
+            {
+                _logger.Info($"Unit selection successful. Selected Role: {unitSelectionResult.SelectedRole}, Unit ID: {unitSelectionResult.SelectedUnitId}, Coalition: {unitSelectionResult.SelectedCoalition}");
+                ClientRole = unitSelectionResult.SelectedRole;
+                // ClientState.Coalition = unitSelectionResult.SelectedCoalition; TODO: Implement coalition handling with new VCS
+                HandleConnectionSuccess();
+            }
+            else
+            {
+                _logger.Error("Unit selection error with no message provided.");
+                Stop(true);
+                MessageBox.Show("An unknown unit selection error occurred.", "Unit Selection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
+        }
+        
+        private void HandleConnectionSuccess()
+        {
+            if (ClientState.IsConnected) return;
+            try
+            {
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
+                }
+
+
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
+                {
+                    _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
+                }
+                    
+                _connectionTransaction.User = new SentryUser
+                {
+                    Username = _playerName
+                };
+                _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
+                
+                ClientState.LastSeenName = _playerName;
+                ClientState.ExternalAWACSModelSelected = true;
+                ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
+                ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
+                
+                _guestPage.LoginInProgress.Opacity = 0;
+                ConnectionStatus.Fill = Brushes.Green;
+
+                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
+                {
+                    try
+                    {
+                        Sounds.BeepConnected.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Warn(ex, "Failed to play connect sound");
+                    }
+                }
+
+                LoggedIn = true;
+                ConnectedAt = DateTime.UtcNow;
+                OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
+
+                _connectionAwacsSpan.Finish();
+                
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new SentryUser
+                    {
+                        Username = ClientState.LastSeenName
+                    };
+                });
+                ClientState.IsConnected = true;
+                ClientState.IsConnected = true;
+                _connectionTransaction.Finish();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex,
+                    "Unable to get audio device - likely output device error - Pick another. Error:" +
+                    ex.Message);
+                Stop();
+                        
+                var messageBoxResult = MessageBox.Show(
+                    "Problem initialising Audio Output!\n\nTry a different Output device and please post your clientlog.txt to the support Discord server.\n\nJoin support Discord server now?",
+                    "Audio Output Error",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Error);
+
+                if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/PMKtQsSk");
+            }
+        }
+        
+        private void HandleUnitSelectError(object message)
+        {
+            var errorMsg = message as string;
+            if (!string.IsNullOrEmpty(errorMsg))
+            {
+                _logger.Error($"Unit selection error: {errorMsg}");
+                Stop(true);
+                _unitSelectionPage.SelectionFailed(errorMsg);
+            }
+            else
+            {
+                _logger.Error("Unit selection error with no message provided.");
+                Stop(true);
+                MessageBox.Show("An unknown unit selection error occurred.", "Unit Selection Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
@@ -854,6 +984,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             if (message is InternalLoginResult internalLoginResult)
             {
                 _unitSelectionPage.SetSelectionData(internalLoginResult);
+                _playerName = internalLoginResult.PlayerName;
+                ClientState.LastSeenName = internalLoginResult.PlayerName;
                 OpenPageByIndex(UnitSelectionIndex);
             }
             else
@@ -904,7 +1036,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void Login(UserLogin loginInformation)
         {
-            _vcsClient.VcsLogin(loginInformation);
+            // Not on the main thread blocking the UI
+            Task.Run(() => _vcsClient.VcsLogin(loginInformation));
+        }
+
+        private void SelectUnit(string unitId, string coalition, uint roleId)
+        {
+            // Not on the main thread blocking the UI
+            Task.Run(() => _vcsClient.SelectUnit(unitId, coalition, roleId));
         }
 
         private void Stop(bool connectionError = false)
@@ -1030,83 +1169,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
         }
         
-        private void HandleGuestLoginSuccess(int coalition = 0)
+        private void HandleGuestLoginSuccess()
         {
-            if (!ClientState.IsConnected)
-            {
-                try
-                {
-                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
-                    {
-                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-                    }
-
-
-                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
-                    {
-                        _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
-                    }
-                    
-                    _connectionTransaction.User = new SentryUser
-                    {
-                        Username = _playerName
-                    };
-                    _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
-
-                    ClientState.LastSeenName = _playerName;
-                    ClientState.ExternalAWACSModelSelected = true;
-                    ClientState.PlayerCoaltionLocationMetadata.side = coalition;
-                    ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
-                    ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
-                
-                    _guestPage.LoginInProgress.Opacity = 0;
-                    ConnectionStatus.Fill = Brushes.Green;
-
-                    if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
-                    {
-                        try
-                        {
-                            Sounds.BeepConnected.Play();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Warn(ex, "Failed to play connect sound");
-                        }
-                    }
-
-                    LoggedIn = true;
-                    ConnectedAt = DateTime.UtcNow;
-                    _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
-                    OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
-
-                    _connectionAwacsSpan.Finish();
-                
-                    SentrySdk.ConfigureScope(scope =>
-                    {
-                        scope.User = new SentryUser
-                        {
-                            Username = ClientState.LastSeenName
-                        };
-                    });
-                
-                    _connectionTransaction.Finish();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex,
-                        "Unable to get audio device - likely output device error - Pick another. Error:" +
-                        ex.Message);
-                    Stop();
-                        
-                    var messageBoxResult = MessageBox.Show(
-                        "Problem initialising Audio Output!\n\nTry a different Output device and please post your clientlog.txt to the support Discord server.\n\nJoin support Discord server now?",
-                        "Audio Output Error",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Error);
-
-                    if (messageBoxResult == MessageBoxResult.Yes) Process.Start("https://discord.gg/PMKtQsSk");
-                }
-            }
+            ClientRole = VcsRole.Guest;
+            HandleConnectionSuccess();
         }
 
         protected override void OnClosing(CancelEventArgs e)

@@ -8,6 +8,7 @@ using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Grpc.Core;
 using Grpc.Net.Client;
+using MathNet.Numerics.Distributions;
 using NLog;
 using Vanguard.VCS.Client.Network.DCS;
 
@@ -27,6 +28,7 @@ namespace Vanguard.VCS.Client.Network
         public RepeatedField<CoalitionSelection> AvailableCoalitions { get; set; }
         public RepeatedField<UnitSelection> AvailableUnits { get; set; }
         public RepeatedField<RoleSelection> AvailableRoles { get; set; }
+        public string PlayerName { get; set; }
     }
     
     public struct InitializationResult
@@ -34,6 +36,14 @@ namespace Vanguard.VCS.Client.Network
         public string ClientGuid { get; set; }
         public bool IsVanguardLoginAvailable { get; set; }
         public bool IsGuestLoginAvailable { get; set; }
+    }
+
+    public struct UnitSelectionResult
+    {
+        public VcsRole SelectedRole { get; set; }
+        public string SelectedUnitId { get; set; }
+        public string SelectedCoalition { get; set; }
+        public string PlayerName { get; set; }
     }
     
     public enum LoginRequestType
@@ -126,8 +136,7 @@ namespace Vanguard.VCS.Client.Network
                     GuestLogin(userLogin);
                     break;
                 case LoginRequestType.Internal:
-                    // InternalLogin(userLogin);
-                    Logger.Warn("Internal login is not yet implemented. Please use guest login for now.");
+                    InternalLogin(userLogin);
                     break;
                 default:
                     Logger.Error("Invalid login type specified: {0}", userLogin.LoginType);
@@ -156,6 +165,7 @@ namespace Vanguard.VCS.Client.Network
             _clientGuid = initResponse.Result.ClientGuid;
             _serverDistributionMode = initResponse.Result.DistributionMode;
             _serverAuthPlugins = new List<string>(initResponse.Result.AvailablePlugins);
+            _clientStateSingleton.RegisterClientGuid(_clientGuid);
             _callback?.Invoke(VcsUiUpdateType.InitializationSuccess, new InitializationResult
             {
                 ClientGuid = _clientGuid,
@@ -183,44 +193,71 @@ namespace Vanguard.VCS.Client.Network
             {
                 _token = response.Result.Token;
                 _connectedAt = DateTime.Now;
-                // _clientStateSingleton.RegisterClientGuid(response.Result.ClientGuid);
                 _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, "");
             }
         }
-        /*
+        
         private void InternalLogin(UserLogin userLogin)
         {
             Logger.Info("Beginning internal login process for user: {0}", userLogin.Username);
-            var loginRequest = new ClientVanguardLoginRequest()
+            var loginRequest = new ClientLoginRequest()
             {
-                Capabilities = new ClientCapabilities()
-                {
-                    SupportedFeatures = { ClientFeature.Standalone }, // This Client only supports standalone mode
-                    Version = _vcsVersion,
-                },
-                Email = userLogin.Username,
-                Password = userLogin.Password, // Password cannot be hashed here, as the Website expects the plain text password
+                ClientGuid = _clientGuid,
+                AuthenticationPlugin = "profile-vanguard",
+                Credentials = { { "email", userLogin.Username }, { "password", userLogin.Password } }
             };
             
-            var response = _authServiceClient.VanguardLogin(loginRequest);
+            var response = _authServiceClient.Login(loginRequest);
             if (!response.Success)
             {
-                _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, response.ErrorMessage);
                 return;
             }
-            else
+
+            _tempSecret = response.Result.Secret;
+            _clientStateSingleton.LastSeenName = response.Result.PlayerName;
+            _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
             {
-                _tempSecret = response.Result.Secret;
-                _clientStateSingleton.RegisterClientGuid(response.Result.ClientGuid);
-                _connectedAt = DateTime.Now;
-                _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
-                {
-                    AvailableCoalitions = response.Result.AvailableCoalitions,
-                    AvailableUnits = response.Result.AvailableUnits,
-                    AvailableRoles = response.Result.AvailableRoles
-                });
+                AvailableCoalitions = response.Result.AvailableCoalitions,
+                AvailableUnits = response.Result.AvailableUnits,
+                AvailableRoles = response.Result.AvailableRoles,
+                PlayerName = response.Result.PlayerName,
+            });
+        }
+
+        public void SelectUnit(string unitId, string coalition, uint roleId)
+        {
+            if (string.IsNullOrEmpty(_tempSecret))
+            {
+                Logger.Error("Cannot select unit without a valid temp secret.");
+                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, "No valid session found.");
+                return;
             }
-            Logger.Info($"Vanguard login response: {response}");
-        }*/
+
+            var selectionRequest = new ClientUnitSelectRequest()
+            {
+                ClientGuid = _clientGuid,
+                Secret = _tempSecret,
+                UnitId = unitId,
+                Coalition = coalition,
+                Role = roleId
+            };
+
+            var response = _authServiceClient.UnitSelect(selectionRequest);
+            if (!response.Success)
+            {
+                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, response.ErrorMessage);
+                return;
+            }
+
+            _connectedAt = DateTime.Now;
+            _token = response.Token;
+            _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionSuccess, new UnitSelectionResult()
+            {
+                SelectedCoalition = coalition,
+                SelectedUnitId = unitId,
+                SelectedRole = (VcsRole)roleId + 1
+            });
+        }
     }
 }
