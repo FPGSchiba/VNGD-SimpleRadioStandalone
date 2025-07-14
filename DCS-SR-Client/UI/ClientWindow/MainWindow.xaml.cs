@@ -875,6 +875,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
+                AudioManager.StartEncoding(InputManager, _resolvedIp, _port);
+                
                 OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
 
                 _connectionAwacsSpan.Finish();
@@ -886,7 +888,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                         Username = ClientState.LastSeenName
                     };
                 });
-                ClientState.IsConnected = true;
                 ClientState.IsConnected = true;
                 _connectionTransaction.Finish();
             }
@@ -1020,9 +1021,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _srsClient = new SrsClientSyncHandler(_guid, UpdateUiCallback, _hub);
                     _vcsClient = new VcsClientSyncHandler(VcsUiUpdate);
                     
-                    _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port));
+                    Task.Run(() => _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port)));
                 }
-                catch (Exception ex) when (ex is SocketException || ex is ArgumentException)
+                catch (Exception ex) when (ex is SocketException or ArgumentException)
                 {
                     MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                         MessageBoxImage.Error);
@@ -1092,6 +1093,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _srsClient = null;
             }
 
+            if (_vcsClient != null)
+            {
+                Task.Run(() => _vcsClient.Disconnect());
+                _vcsClient = null;
+            }
+            
             ClientState.DcsPlayerRadioInfo.Reset();
             ClientState.PlayerCoaltionLocationMetadata.Reset();
             

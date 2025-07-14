@@ -94,16 +94,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
                             {
                                 Modulation = audio.Modulation,
                                 Frequency = audio.Frequency,
-                                Decryptable = audio.Decryptable,
                                 IsSecondary = audio.IsSecondary,
                                 ReceivedRadio = audio.ReceivedRadio,
                                 Volume = audio.Volume,
                                 NoAudioEffects = audio.NoAudioEffects,
                                 Guid = audio.Guid,
-                                OriginalClientGuid = audio.OriginalClientGuid,
-                                Encryption = audio.Encryption
-
-
                             };
 
                             if (_lastRead == 0)

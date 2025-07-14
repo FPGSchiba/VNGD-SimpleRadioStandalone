@@ -12,8 +12,6 @@ namespace Vanguard.VCS.Client.Audio.Models
 
         public RadioInformation.Modulation Modulation { get; internal set; }
 
-        public bool Decryptable { get; internal set; }
-
         public float Volume { get; internal set; }
         public bool IsSecondary { get; set; }
 
@@ -21,7 +19,5 @@ namespace Vanguard.VCS.Client.Audio.Models
         public bool NoAudioEffects { get; set; }
 
         public string Guid { get; set; }
-        public string OriginalClientGuid { get; set; }
-        public short Encryption { get; set; }
     }
 }

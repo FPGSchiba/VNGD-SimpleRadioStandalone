@@ -94,25 +94,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
             //TODO reuse this buffer
             var tmp = new float[decodedLength/4];
             Buffer.BlockCopy(decoded, 0, tmp, 0, decodedLength);
-
-            //convert the byte buffer to a wave buffer
-         //   var waveBuffer = new WaveBuffer(tmp);
-
-       
             
             audio.PcmAudioFloat = tmp;
+            
+            AdjustVolumeForLoss(audio);
 
-            var decrytable = audio.Decryptable /* || (audio.Encryption == 0) <--- this test has already been performed by all callers and would require another call to check for STRICT_AUDIO_ENCRYPTION */;
-
-            if (decrytable)
-            {
-                //adjust for LOS + Distance + Volume
-                AdjustVolumeForLoss(audio);
-            }
-            else
-            {
-                AddEncryptionFailureEffect(audio);
-            }
 
             if (newTransmission)
             {
@@ -126,7 +112,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             LastUpdate = DateTime.Now.Ticks;
 
-            if (audio.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID)
+            if (audio.ClientGuid.ToString() == ClientStateSingleton.Instance.ShortGUID)
             {
                 // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough
                 if (passThrough)
@@ -135,17 +121,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     return new JitterBufferAudio
                     {
                         Audio = audio.PcmAudioFloat,
-                        PacketNumber = audio.PacketNumber,
-                        Decryptable = decrytable,
+                        PacketNumber = audio.Sequence,
                         Modulation = (RadioInformation.Modulation)audio.Modulation,
                         ReceivedRadio = audio.ReceivedRadio,
                         Volume = audio.Volume,
                         IsSecondary = audio.IsSecondary,
                         Frequency = audio.Frequency,
                         NoAudioEffects = audio.NoAudioEffects,
-                        Guid = audio.ClientGuid,
-                        OriginalClientGuid = audio.OriginalClientGuid,
-                        Encryption = audio.Encryption
+                        Guid = audio.ClientGuid.ToString(),
                     };
                 }
                 else
@@ -159,17 +142,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 JitterBufferProviderInterface[audio.ReceivedRadio].AddSamples(new JitterBufferAudio
                 {
                     Audio = audio.PcmAudioFloat,
-                    PacketNumber = audio.PacketNumber,
-                    Decryptable = decrytable,
+                    PacketNumber = audio.Sequence,
                     Modulation = (RadioInformation.Modulation) audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
-                    Guid = audio.ClientGuid,
-                    OriginalClientGuid = audio.OriginalClientGuid,
-                    Encryption = audio.Encryption
+                    Guid = audio.ClientGuid.ToString(),
                 });
 
                 return null;
@@ -180,17 +160,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 return new JitterBufferAudio
                 {
                     Audio = audio.PcmAudioFloat,
-                    PacketNumber = audio.PacketNumber,
-                    Decryptable = decrytable,
+                    PacketNumber = audio.Sequence,
                     Modulation = (RadioInformation.Modulation)audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
-                    Guid = audio.ClientGuid,
-                    OriginalClientGuid = audio.OriginalClientGuid,
-                    Encryption = audio.Encryption
+                    Guid = audio.ClientGuid.ToString()
                 };
             }
 
@@ -199,41 +176,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)
         {
-            if (clientAudio.Modulation == (short)RadioInformation.Modulation.MIDS || clientAudio.Modulation == (short)RadioInformation.Modulation.SATCOM)
-            {
-                return;
-            }
-
-            var audio = clientAudio.PcmAudioFloat;
-            for (var i = 0; i < audio.Length; i++)
-            {
-                var audioFloat = audio[i];
-
-                //add in radio loss
-                //if less than loss reduce volume
-                if (clientAudio.RecevingPower > 0.85) // less than 20% or lower left
-                {
-                    //gives linear signal loss from 15% down to 0%
-                    audioFloat = (float)(audioFloat * (1.0f - clientAudio.RecevingPower));
-                }
-
-                //0 is no loss so if more than 0 reduce volume
-                if (clientAudio.LineOfSightLoss > 0)
-                {
-                    audioFloat = (audioFloat * (1.0f - clientAudio.LineOfSightLoss));
-                }
-
-                audio[i] = audioFloat;
-            }
-        }
-        private void AddEncryptionFailureEffect(ClientAudio clientAudio)
-        {
-            var mixedAudio = clientAudio.PcmAudioFloat;
-
-            for (var i = 0; i < mixedAudio.Length; i++)
-            {
-                mixedAudio[i] = RandomFloat();
-            }
+            return;
         }
 
 

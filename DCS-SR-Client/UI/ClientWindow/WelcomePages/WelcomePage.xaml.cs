@@ -94,13 +94,20 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
                 MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 mainWindow.ClientState.IsConnected = false;
-                ConnectionFailed();
+                Dispatcher.Invoke(() =>
+                {
+                    ConnectionFailed();
+                });
+                
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "An error occurred while fetching server information.");
-                MessageBox.Show("An unexpected error occurred. Please try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                ConnectionFailed();
+                MessageBox.Show("Could not connect to the Server, please try again by reloading with the button below.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Dispatcher.Invoke(() =>
+                {
+                    ConnectionFailed();
+                });
             }
         }
         
@@ -117,6 +124,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             Login.IsEnabled = false;
             Guest.IsEnabled = false;
             Refresh.Visibility = Visibility.Visible;
+            Logger.Info("Button re-enabled after connection failure.");
         }
         
         public void Refresh_Click(object sender, RoutedEventArgs e)

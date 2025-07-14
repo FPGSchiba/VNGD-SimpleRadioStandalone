@@ -90,6 +90,7 @@ namespace Vanguard.VCS.Client.Network
         private DCSRadioSyncManager _radioDCSSync = null;
         private SRSService.SRSServiceClient _srsServiceClient;
         private AuthService.AuthServiceClient _authServiceClient;
+        private GrpcChannel _channel;
         private static readonly string _vcsVersion = "0.1.0";
         private string _clientGuid = string.Empty;
         private DistributionMode _serverDistributionMode = DistributionMode.Standalone; // Default to standalone mode
@@ -121,9 +122,9 @@ namespace Vanguard.VCS.Client.Network
                 MaxSendMessageSize = 10 * 1024 * 1024, // 10 MB
                 Credentials = ChannelCredentials.Insecure, // Use insecure credentials for local development
             };
-            var channel = GrpcChannel.ForAddress($"http://{endpoint.Address}:{endpoint.Port}", channelOptions);
-            _srsServiceClient = new SRSService.SRSServiceClient(channel);
-            _authServiceClient = new AuthService.AuthServiceClient(channel);
+            _channel = GrpcChannel.ForAddress($"http://{endpoint.Address}:{endpoint.Port}", channelOptions);
+            _srsServiceClient = new SRSService.SRSServiceClient(_channel);
+            _authServiceClient = new AuthService.AuthServiceClient(_channel);
             
             InitializeRadioSync();
         }
@@ -258,6 +259,29 @@ namespace Vanguard.VCS.Client.Network
                 SelectedUnitId = unitId,
                 SelectedRole = (VcsRole)roleId + 1
             });
+        }
+        
+        public void Disconnect()
+        {
+            Logger.Info("Disconnecting from VCS server");
+            try
+            {
+                var request = new ClientDisconnectRequest()
+                {
+                    ClientGuid = _clientGuid,
+                };
+                _srsServiceClient.Disconnect(request);
+                _channel?.ShutdownAsync().Wait();
+                _channel?.Dispose();
+                _channel = null;
+                _srsServiceClient = null;
+                _authServiceClient = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error during VCS disconnection");
+            }
+            _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
         }
     }
 }

@@ -108,10 +108,9 @@ namespace Vanguard.VCS.Client.Audio.Managers
             }
         }
 
-        public void StartEncoding(string guid, InputDeviceManager inputManager,
-            IPAddress ipAddress, int port)
+        public void StartEncoding(InputDeviceManager inputManager, IPAddress ipAddress, int port)
         {
-            guid = ClientStateSingleton.Instance.ShortGUID;
+            string guid = ClientStateSingleton.Instance.ShortGUID;
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
@@ -263,8 +262,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
                     _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
 
-                    _udpVoiceHandler =
-                        new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
+                    _udpVoiceHandler = new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
                     var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
@@ -618,22 +616,13 @@ namespace Vanguard.VCS.Client.Audio.Managers
             //TODO: Clean  - remove if we havent received audio in a while?
             // If we have recieved audio, create a new buffered audio and read it
             ClientAudioProvider client = null;
-            if (_clientsBufferedAudio.ContainsKey(audio.OriginalClientGuid))
-            {
-                client = _clientsBufferedAudio[audio.OriginalClientGuid];
-            }
-            else
-            {
-                client = new ClientAudioProvider();
-                _clientsBufferedAudio[audio.OriginalClientGuid] = client;
+            client = new ClientAudioProvider();
 
-                foreach (var mixer in _radioMixingProvider)
-                {
-                    mixer.AddMixerInput(client);
-                }
-               
+            foreach (var mixer in _radioMixingProvider)
+            {
+                mixer.AddMixerInput(client);
             }
-
+            
             client.AddClientAudioSamples(audio);
         }
 

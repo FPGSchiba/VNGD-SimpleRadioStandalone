@@ -27,7 +27,7 @@ namespace Vanguard.VCS.Client.Audio.Recording
 
         public void AddTransmission(ClientAudio audio)
         {
-            string guid = audio.OriginalClientGuid;
+            string guid = audio.ClientGuid.ToString();
 
             if (!_clientAudioBuffers.ContainsKey(guid))
             {

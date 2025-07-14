@@ -31,19 +31,19 @@ namespace Vanguard.VCS.Client.Audio.Recording
                 {
                     var next = it.Next;
 
-                    if (it.Value.PacketNumber == clientAudio.PacketNumber)
+                    if (it.Value.Sequence == clientAudio.Sequence)
                     {
                         return;
                     }
 
-                    if (clientAudio.PacketNumber < it.Value.PacketNumber)
+                    if (clientAudio.Sequence < it.Value.Sequence)
                     {
                         currentLinkedList.AddBefore(it, clientAudio);
                         return;
                     }
 
-                    if ((clientAudio.PacketNumber > it.Value.PacketNumber) &&
-                        ((next == null) || (clientAudio.PacketNumber < next.Value.PacketNumber)))
+                    if ((clientAudio.Sequence > it.Value.Sequence) &&
+                        ((next == null) || (clientAudio.Sequence < next.Value.Sequence)))
                     {
                         currentLinkedList.AddAfter(it, clientAudio);
                         return;

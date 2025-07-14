@@ -111,7 +111,6 @@ namespace Vanguard.VCS.Client.Singletons
                 return 0;
             }
             var currentClientPos = ClientStateSingleton.Instance.PlayerCoaltionLocationMetadata;
-            var currentUnitId = ClientStateSingleton.Instance.DcsPlayerRadioInfo.unitId;
             var coalitionSecurity = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY);
             var globalFrequencies = _serverSettings.GlobalFrequencies;
             var global = globalFrequencies.Contains(freq);
@@ -130,15 +129,9 @@ namespace Vanguard.VCS.Client.Singletons
                         if (radioInfo != null)
                         {
                             RadioReceivingState radioReceivingState = null;
-                            bool decryptable;
                             var receivingRadio = radioInfo.CanHearTransmission(freq,
                                 modulation,
-                                0,
-                                false,
-                                currentUnitId,
-                                new List<int>(),
-                                out radioReceivingState,
-                                out decryptable);
+                                out radioReceivingState);
 
                             //only send if we can hear!
                             if (receivingRadio != null)

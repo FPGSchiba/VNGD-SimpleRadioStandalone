@@ -12,7 +12,6 @@ namespace Vanguard.VCS.Common.DCSState
         public long LastReceviedAt { get; set; }
 
         public bool IsSecondary { get; set; }
-        public bool IsSimultaneous { get; set; }
         public int ReceivedOn { get; set; }
 
         public string SentBy { get; set; }
