@@ -243,7 +243,7 @@ namespace Vanguard.VCS.Client.Audio.Recording
                 if (_connectedClientsSingleton.TryGetValue(transmission.OriginalClientGuid, out SRClient client))
                 {
                     if (client.AllowRecord
-                        || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ShortGUID) // Assume that client intends to record their outgoing transmissions
+                        || transmission.OriginalClientGuid == ClientStateSingleton.Instance.ClientId) // Assume that client intends to record their outgoing transmissions
                     {
                         filteredTransmisions.Add(transmission);
                     }

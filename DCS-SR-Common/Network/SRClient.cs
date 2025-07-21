@@ -16,7 +16,7 @@ namespace Vanguard.VCS.Common.Network
         [JsonIgnore] 
         private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
-        public string ClientGuid { get; set; }
+        public Guid ClientGuid { get; set; }
         private string _name= "";
 
         public string Name

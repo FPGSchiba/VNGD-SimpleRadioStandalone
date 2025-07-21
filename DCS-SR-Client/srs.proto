@@ -21,26 +21,23 @@ service AuthService {
 
 // Service definition
 service SRSService {
-  // Initialize the connection to the voice server as well as this service
-  rpc Initialize(ClientUpdate) returns (ServerResponse);
+  // Client synchronization request
+  rpc SyncClient(Empty) returns (ServerSyncResponse);
 
-  // Client update (metadata, client info, position)
+  // Client update (metadata, client info)
   rpc UpdateClientInfo(ClientInfo) returns (ServerResponse);
 
   // Client radio update (metadata, radio info)
   rpc UpdateRadioInfo(RadioInfo) returns (ServerResponse);
 
-  // Client synchronization request
-  rpc SyncClient(ClientSyncRequest) returns (ServerSyncResponse);
-
   // Client disconnect (metadata)
-  rpc Disconnect(ClientDisconnectRequest) returns (ServerResponse);
+  rpc Disconnect(Empty) returns (ServerResponse);
 
   // Server settings request
   rpc GetServerSettings(Empty) returns (ServerSettings);
 
   // Server-to-client updates stream
-  rpc SubscribeToUpdates(SubscribeRequest) returns (stream ServerUpdate);
+  rpc SubscribeToUpdates(Empty) returns (stream ServerUpdate);
 }
 
 // Empty message for requests that don't need parameters
@@ -150,11 +147,6 @@ enum DistributionMode {
   DISTRIBUTED = 1; // Distribution of Voice servers supported by client
 }
 
-// Subscribe request
-message SubscribeRequest {
-  string client_guid = 1;
-}
-
 // Distribution preparation here
 message ServerInitializationResponse {
   string client_guid = 1; // Unique identifier for the client
@@ -204,7 +196,7 @@ message DistributionUpdate {
 
 // Client update information
 message ClientUpdate {
-  string client_guid = 1;
+  optional string client_guid = 1;
   optional ClientInfo client_info = 2;
   optional RadioInfo radio_info = 3;
 }
@@ -227,57 +219,60 @@ message ServerAction {
 
 // Client information
 message ClientInfo {
-  string client_guid = 1;
-  string name = 2;
-  string coalition = 3;
-  int64 last_update = 4;
+  string name = 1;
+  string coalition = 2;
+  string unit_id = 3;
+  uint32 role_id = 4; // Optional role ID if the user has permissions to select roles
+  optional int64 last_update = 5;
 }
 
 // Radio information
 message RadioInfo {
-  string client_guid = 1;
-  int64 last_update = 2;
-  repeated Radio radios = 3;
-  bool muted = 4;
+  optional int64 last_update = 1;
+  repeated Radio radios = 2;
+  bool muted = 3;
 }
 
 message Radio {
-  int32 id = 1;
+  uint32 id = 1;
   string name = 2;
   float frequency = 3;
   bool enabled = 6;
+  bool is_intercom = 7;
 }
 
 // Server settings
 message ServerSettings {
-  map<string, ServerSetting> settings = 1;
+  repeated Coalition coalitions = 1; // List of coalitions available on the server
+  repeated float test_frequencies = 2; // List of test frequencies available on the server
+  repeated float global_frequencies = 3; // List of global frequencies available on the server
+  GeneralServerSettings general_settings = 4; // General server settings
 }
 
-// Individual server setting
-message ServerSetting {
-  oneof value {
-    string string_value = 1;
-    bool bool_value = 2;
-    int32 int_value = 3;
-    float float_value = 4;
-  }
+message GeneralServerSettings {
+  int32 max_radios_per_client = 1; // Maximum number of radios per client
 }
 
-// Client synchronization request
-message ClientSyncRequest {
-  string client_guid = 1;
+message Coalition {
+  string name = 1; // Name of the coalition
+  string color = 2; // Color of the coalition
+  string description = 3; // Description of the coalition
 }
 
 // Server synchronization response
 message ServerSyncResponse {
-  repeated ClientInfo connected_clients = 1;
-  ServerSettings server_settings = 2;
-  string version = 3;
+  bool success = 1;
+  oneof sync_result {
+    string error_message = 2; // Error message if synchronization failed
+    ServerSyncResult data = 3; // Data for successful synchronization
+  }
+  string version = 4; // Version of the server
 }
 
-// Client disconnect request
-message ClientDisconnectRequest {
-  string client_guid = 1;
+message ServerSyncResult {
+  map<string, ClientInfo> clients = 1; // List of clients currently connected
+  map<string, RadioInfo> radios = 2; // List of radio information
+  ServerSettings settings = 3; // Current server settings
 }
 
 // Generic server response

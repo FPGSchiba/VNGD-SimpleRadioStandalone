@@ -32,7 +32,7 @@ namespace Vanguard.VCS.Client.Network
         private readonly IMessageHub _hub;
 
         public static string ServerVersion { get; private set; }
-        private readonly string _guid;
+        private readonly Guid _guid;
         private ConnectCallback _callback;
         private ExternalAWACSModeConnectCallback _externalAWACSModeCallback;
         private readonly UpdateUICallback _updateUICallback;
@@ -54,7 +54,7 @@ namespace Vanguard.VCS.Client.Network
         private long _lastSent = -1;
         private readonly DispatcherTimer _idleTimeout;
 
-        public SrsClientSyncHandler(string guid, UpdateUICallback uiCallback, IMessageHub hub)
+        public SrsClientSyncHandler(Guid guid, UpdateUICallback uiCallback, IMessageHub hub)
         {
             _guid = guid;
             _updateUICallback = uiCallback;
@@ -427,24 +427,18 @@ namespace Vanguard.VCS.Client.Network
         {
             var srClient = _clients[serverMessage.Client.ClientGuid];
             var updatedSrClient = serverMessage.Client;
-        
-            if (srClient != null)
-            {
-                srClient.LastUpdate = DateTime.Now.Ticks;
-                srClient.Name = updatedSrClient.Name;
-                srClient.Coalition = updatedSrClient.Coalition;
-                srClient.LatLngPosition = updatedSrClient.LatLngPosition;
-        
-                if (updatedSrClient.RadioInfo != null)
-                {
-                    srClient.RadioInfo = updatedSrClient.RadioInfo;
-                    srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
-                }
-                else if (serverMessage.MsgType == NetworkMessage.MessageType.RADIO_UPDATE && srClient.RadioInfo != null)
-                {
-                    srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
-                }
-            }
+
+            if (srClient == null) return;
+            
+            srClient.LastUpdate = DateTime.Now.Ticks;
+            srClient.Name = updatedSrClient.Name;
+            srClient.Coalition = updatedSrClient.Coalition;
+            srClient.LatLngPosition = updatedSrClient.LatLngPosition;
+
+            if (updatedSrClient.RadioInfo == null) return;
+            
+            srClient.RadioInfo = updatedSrClient.RadioInfo;
+            srClient.RadioInfo.LastUpdate = DateTime.Now.Ticks;
         }
         
         private void AddNewClient(NetworkMessage serverMessage)

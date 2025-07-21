@@ -90,9 +90,9 @@ namespace Vanguard.VCS.Common.Network
         /// Sets the frequency from MHz (converts to kHz internally)
         /// </summary>
         /// <param name="freqMHz">Frequency in MHz</param>
-        public void SetFrequencyMHz(double freqMHz)
+        public void SetFrequencyHz(double freqHz)
         {
-            Frequency = (uint)(freqMHz * 1000);
+            Frequency = (uint)(freqHz / 1000.0);
         }
 
         /// <summary>
@@ -147,10 +147,21 @@ namespace Vanguard.VCS.Common.Network
                 packet[9] = (byte)(Frequency >> 8);
                 packet[10] = (byte)Frequency;
 
-                // Session ID (16 bytes)
+                // Session ID (16 bytes, RFC 4122/Golang compatible)
                 var sessionBytes = ClientId.ToByteArray();
+                if (BitConverter.IsLittleEndian)
+                {
+                    // Convert .NET Guid to RFC 4122 (big-endian) for Go compatibility
+                    // .NET Guid: [uint32][uint16][uint16][8 bytes]
+                    // RFC 4122: 4-2-2-8, but first three fields are big-endian
+                    byte[] rfcBytes = new byte[16];
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.HostToNetworkOrder(BitConverter.ToInt32(sessionBytes, 0))), 0, rfcBytes, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.HostToNetworkOrder(BitConverter.ToInt16(sessionBytes, 4))), 0, rfcBytes, 4, 2);
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.HostToNetworkOrder(BitConverter.ToInt16(sessionBytes, 6))), 0, rfcBytes, 6, 2);
+                    Array.Copy(sessionBytes, 8, rfcBytes, 8, 8);
+                    sessionBytes = rfcBytes;
+                }
                 Array.Copy(sessionBytes, 0, packet, 11, 16);
-
                 // Payload (variable)
                 if (Payload != null && Payload.Length > 0)
                 {
@@ -248,12 +259,12 @@ namespace Vanguard.VCS.Common.Network
         /// Creates a VOICE packet
         /// </summary>
         /// <param name="sessionId">Client session ID</param>
-        /// <param name="frequencyMHz">Transmission frequency in MHz</param>
+        /// <param name="frequencyHz">Transmission frequency in Hz</param>
         /// <param name="opusFrame">Opus audio frame</param>
         /// <param name="sequence">Sequence number</param>
         /// <param name="pttActive">PTT state</param>
         /// <returns>VOICE packet</returns>
-        public static VcsVoicePacket CreateVoicePacket(Guid sessionId, double frequencyMHz, byte[] opusFrame, uint sequence, bool pttActive = true)
+        public static VcsVoicePacket CreateVoicePacket(Guid sessionId, double frequencyHz, byte[] opusFrame, uint sequence, bool pttActive = true)
         {
             var packet = new VcsVoicePacket
             {
@@ -261,10 +272,9 @@ namespace Vanguard.VCS.Common.Network
                 ClientId = sessionId,
                 Sequence = sequence,
                 Payload = opusFrame ?? new byte[0],
-                IsPttActive = pttActive
+                IsPttActive = pttActive,
             };
-
-            packet.SetFrequencyMHz(frequencyMHz);
+            packet.SetFrequencyHz(frequencyHz);
             return packet;
         }
 

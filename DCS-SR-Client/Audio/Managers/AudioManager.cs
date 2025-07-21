@@ -39,8 +39,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly CachedAudioEffectProvider _cachedAudioEffectsProvider;
-        private readonly ConcurrentDictionary<string, ClientAudioProvider> _clientsBufferedAudio =
-            new ConcurrentDictionary<string, ClientAudioProvider>();
+        private readonly ConcurrentDictionary<Guid, ClientAudioProvider> _clientsBufferedAudio = new();
 
         //TEMP
         private List<RadioMixingProvider> _radioMixingProvider;
@@ -82,7 +81,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
         private ClientAudioProvider _passThroughAudioProvider;
         private ClientEffectsPipeline _clientEffectsPipeline;
         private IMessageHub  _hub;
-        private string _guid;
+        private Guid _guid;
 
         public AudioManager(bool windowsN, IMessageHub hub)
         {
@@ -110,7 +109,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
 
         public void StartEncoding(InputDeviceManager inputManager, IPAddress ipAddress, int port)
         {
-            string guid = ClientStateSingleton.Instance.ShortGUID;
+            var guid = ClientStateSingleton.Instance.ClientId;
 
             MMDevice speakers = null;
             if (_audioOutputSingleton.SelectedAudioOutput.Value == null)
@@ -549,7 +548,14 @@ namespace Vanguard.VCS.Client.Audio.Managers
             lock(lockObj)
             {
                 _wasapiCapture?.StopRecording();
-                _wasapiCapture?.Dispose();
+                try
+                {
+                    _wasapiCapture?.Dispose();
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    Logger.Warn(ex, "WasapiCapture.Dispose() failed due to unsupported Thread.Abort.");
+                }
                 _wasapiCapture = null;
 
                 _voxDectection?.Dispose();
@@ -558,11 +564,8 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 _resampler?.Dispose(true);
                 _resampler = null;
 
-                //Debug Wav
-                // _afterFileWriter?.Close();
-                // _afterFileWriter?.Dispose();
-                // _beforeWaveFile?.Close();
-                // _beforeWaveFile?.Dispose();
+                _udpVoiceHandler?.RequestStop();
+                _udpVoiceHandler = null;
 
                 _waveOut?.Stop();
                 _waveOut?.Dispose();

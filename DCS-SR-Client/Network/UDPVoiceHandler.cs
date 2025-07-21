@@ -31,8 +31,8 @@ namespace Vanguard.VCS.Client.Network
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         private readonly AudioInputSingleton _audioInputSingleton = AudioInputSingleton.Instance;
 
-        private readonly BlockingCollection<byte[]> _encodedAudio = new BlockingCollection<byte[]>();
-        private readonly string _guid;
+        private readonly BlockingCollection<VcsVoicePacket> _encodedAudio = new BlockingCollection<VcsVoicePacket>();
+        private readonly Guid _guid;
         private readonly byte[] _guidAsciiBytes;
         private readonly InputDeviceManager _inputManager;
         private readonly CancellationTokenSource _pingStop = new CancellationTokenSource();
@@ -50,7 +50,7 @@ namespace Vanguard.VCS.Client.Network
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private UdpClient _listener;
 
-        private ulong _packetNumber = 1;
+        private uint _packetNumber = 1;
 
         public volatile bool _ptt;
         private long _lastPTTPress; // to handle dodgy PTT - release time
@@ -73,13 +73,12 @@ namespace Vanguard.VCS.Client.Network
 
         private RadioReceivingState[] _radioReceivingState;
 
-        public UdpVoiceHandler(string guid, IPAddress address, int port, AudioManager audioManager,
+        public UdpVoiceHandler(Guid guid, IPAddress address, int port, AudioManager audioManager,
             InputDeviceManager inputManager)
         {
             _radioReceivingState = _clientStateSingleton.RadioReceivingState;
 
             _audioManager = audioManager;
-            _guidAsciiBytes = Encoding.ASCII.GetBytes(guid);
 
             _guid = guid;
             _address = address;
@@ -241,7 +240,11 @@ namespace Vanguard.VCS.Client.Network
                             break;
                         case > 22:
                             _udpLastReceived = DateTime.Now.Ticks;
-                            _encodedAudio.Add(bytes);
+                            if (bytes.Length < VcsVoicePacket.HeaderSize) continue;
+                            var myClient = IsClientMetaDataValid(_guid);
+                            if (myClient == null || !_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()) continue;
+                            var udpVoicePacket = VcsVoicePacket.DecodePacket(bytes);
+                            _encodedAudio.Add(udpVoicePacket);
                             break;
                     }
                 }
@@ -261,9 +264,20 @@ namespace Vanguard.VCS.Client.Network
         public void RequestStop()
         {
             _stop = true;
+
+            var byePacket = VcsVoicePacket.CreateByePacket(_guid, _packetNumber).EncodePacket();
             try
             {
-                _listener.Close();
+                _listener?.Send(byePacket, byePacket.Length, _serverEndpoint);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Exception Sending Bye Packet! " + e.Message);
+            }
+            
+            try
+            {
+                _listener?.Close();
             }
             catch (Exception e)
             {
@@ -276,7 +290,7 @@ namespace Vanguard.VCS.Client.Network
             _inputManager.StopPtt();
         }
 
-        private SRClient IsClientMetaDataValid(string clientGuid)
+        private SRClient IsClientMetaDataValid(Guid clientGuid)
         {
             if (_clients.ContainsKey(clientGuid))
             {
@@ -299,107 +313,76 @@ namespace Vanguard.VCS.Client.Network
                 {
                     try
                     {
-                        var encodedOpusAudio = new byte[0];
-                        _encodedAudio.TryTake(out encodedOpusAudio, 100000, _stopFlag.Token);
+                        _encodedAudio.TryTake(out var udpVoicePacket, 100000, _stopFlag.Token);
 
-                        if (encodedOpusAudio == null || encodedOpusAudio.Length < VcsVoicePacket.HeaderSize) continue;
-
-                        var myClient = IsClientMetaDataValid(_guid);
-
-                        if ((myClient != null) && _clientStateSingleton.DcsPlayerRadioInfo.IsCurrent())
-                        {
-                            //Decode bytes
-                            var udpVoicePacket = VcsVoicePacket.DecodePacket(encodedOpusAudio);
-
-                            if (udpVoicePacket != null)
-                            {
-                                var globalFrequencies = _serverSettings.GlobalFrequencies;
-
-
-                                List<int> blockedRadios = CurrentlyBlockedRadios();
-
-                                //Check if Global
-                                bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequency);
-                            
-                                var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(
-                                    udpVoicePacket.Frequency,
-                                    RadioInformation.Modulation.AM,
-                                    out var state);
-                                RadioReceivingPriority radioReceivingPriority = null;
-                                if (radio != null && state != null)
-                                {
-                                    if (
-                                        radio.modulation == RadioInformation.Modulation.INTERCOM
-                                        || globalFrequency
-                                        || !blockedRadios.Contains(state.ReceivedOn)
-                                    )
-                                    {
-                                        radioReceivingPriority = new RadioReceivingPriority()
-                                        {
-                                            Frequency = udpVoicePacket.Frequency,
-                                            Modulation = udpVoicePacket.IsIntercom ? (short)RadioInformation.Modulation.INTERCOM : (short)radio.modulation,
-                                            ReceivingRadio = radio,
-                                            ReceivingState = state
-                                        };
-                                    }
-                                }
+                        if (udpVoicePacket == null) continue;
+                        
+                        Logger.Info($"Received Audio Packet from {udpVoicePacket.ClientId} on Frequency {udpVoicePacket.Frequency} with Sequence {udpVoicePacket.Sequence}");
+                        
+                        var globalFrequencies = _serverSettings.GlobalFrequencies;
                                 
+                        List<int> blockedRadios = CurrentlyBlockedRadios();
 
-                                if (radioReceivingPriority != null)
-                                {
-                                    var destinationRadio = radioReceivingPriority;
-
-                                    var audio = new ClientAudio
-                                    {
-                                        ClientGuid = udpVoicePacket.ClientId,
-                                        EncodedAudio = udpVoicePacket.Payload,
-                                        //Convert to Shorts!
-                                        ReceiveTime = DateTime.Now.Ticks,
-                                        Frequency = destinationRadio.Frequency,
-                                        Modulation = destinationRadio.Modulation,
-                                        Volume = destinationRadio.ReceivingRadio.volume,
-                                        ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
-                                        // mark if we can decrypt it
-                                        RadioReceivingState = destinationRadio.ReceivingState,
-                                        Sequence = udpVoicePacket.Sequence,
-                                        IsSecondary = destinationRadio.ReceivingState.IsSecondary
-                                    };
-
-                                    var transmitterName = "";
-                                    if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
-                                        && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName)
-                                        && _clients.TryGetValue(udpVoicePacket.ClientId.ToString(), out var transmittingClient))
-
-                                    {
-                                        transmitterName = transmittingClient.Name;
-                                    }
-
-                                    var newRadioReceivingState =  new RadioReceivingState
-                                    {
-                                        IsSecondary = destinationRadio.ReceivingState.IsSecondary,
-                                        LastReceviedAt = DateTime.Now.Ticks,
-                                        ReceivedOn = destinationRadio.ReceivingState.ReceivedOn,
-                                        SentBy = transmitterName
-                                    };
-
-                                    _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
-
-                                    
-                                    //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
-                                    //this is a nice optimisation to save duplicated audio on servers without that setting 
-                                    if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE))
-                                    {
-                                        if (_serverSettings.GetSettingAsBool(ServerSettingsKeys
-                                                .RADIO_EFFECT_OVERRIDE))
-                                        {
-                                            audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency); ;
-                                        }
-
-                                        _audioManager.AddClientAudio(audio);
-                                    }
-                                }
-                            }
+                        //Check if Global
+                        bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequency);
+                            
+                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency, RadioInformation.Modulation.AM, out var state);
+                        RadioReceivingPriority radioReceivingPriority = null;
+                        if (radio != null && state != null && (radio.modulation == RadioInformation.Modulation.INTERCOM || globalFrequency || !blockedRadios.Contains(state.ReceivedOn)))
+                        {
+                            radioReceivingPriority = new RadioReceivingPriority()
+                            {
+                                Frequency = udpVoicePacket.Frequency,
+                                Modulation = udpVoicePacket.IsIntercom ? (short)RadioInformation.Modulation.INTERCOM : (short)radio.modulation,
+                                ReceivingRadio = radio,
+                                ReceivingState = state
+                            };
                         }
+                        
+                        if (radioReceivingPriority == null) continue;
+                        var destinationRadio = radioReceivingPriority;
+
+                        var audio = new ClientAudio
+                        {
+                            ClientGuid = udpVoicePacket.ClientId,
+                            EncodedAudio = udpVoicePacket.Payload,
+                            //Convert to Shorts!
+                            ReceiveTime = DateTime.Now.Ticks,
+                            Frequency = destinationRadio.Frequency,
+                            Modulation = destinationRadio.Modulation,
+                            Volume = destinationRadio.ReceivingRadio.volume,
+                            ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
+                            // mark if we can decrypt it
+                            RadioReceivingState = destinationRadio.ReceivingState,
+                            Sequence = udpVoicePacket.Sequence,
+                            IsSecondary = destinationRadio.ReceivingState.IsSecondary
+                        };
+
+                        var transmitterName = "";
+                        if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName) && _clients.TryGetValue(udpVoicePacket.ClientId, out var transmittingClient))
+                        {
+                            transmitterName = transmittingClient.Name;
+                        }
+
+                        var newRadioReceivingState =  new RadioReceivingState
+                        {
+                            IsSecondary = destinationRadio.ReceivingState.IsSecondary,
+                            LastReceviedAt = DateTime.Now.Ticks,
+                            ReceivedOn = destinationRadio.ReceivingState.ReceivedOn,
+                            SentBy = transmitterName
+                        };
+
+                        _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
+                                    
+                        //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
+                        //this is a nice optimisation to save duplicated audio on servers without that setting 
+                        if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE)) continue;
+                        if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE))
+                        {
+                            audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
+                        }
+
+                        _audioManager.AddClientAudio(audio);
                     }
                     catch (Exception ex)
                     {
@@ -635,30 +618,34 @@ namespace Vanguard.VCS.Client.Network
                 {
                     if (transmittingRadios.Count > 0)
                     {
-                        List<double> frequencies = new List<double>(transmittingRadios.Count);
-                        List<byte> encryptions = new List<byte>(transmittingRadios.Count);
-                        List<byte> modulations = new List<byte>(transmittingRadios.Count);
+                        List<double> frequencies = [];
+                        List<short> modulations = [];
 
                         foreach (var radio in transmittingRadios)
                         {
                             // Further deduplicate transmitted frequencies if they have the same freq./modulation/encryption (caused by differently named radios)
                             var radio1 = radio;
-                            var alreadyIncluded = frequencies.Where((t, j) => t == radio1.freq && modulations[j] == (byte)radio1.modulation && encryptions[j] == (radio1.enc ? radio1.encKey : (byte)0)).Any();
+                            var alreadyIncluded = frequencies.Where((t, j) => t == radio1.freq && modulations[j] == (byte)radio1.modulation).Any();
 
                             if (alreadyIncluded)
                             {
                                 continue;
                             }
+                            
+                            frequencies.Add(radio.freq);
+                            modulations.Add((byte)radio.modulation);
 
                             //generate packet
                             var udpVoicePacket =
-                                VcsVoicePacket.CreateVoicePacket(Guid.Parse(_guid), radio.freq, bytes, 1);
+                                VcsVoicePacket.CreateVoicePacket(_guid, radio.freq, bytes, _packetNumber);
+                            Logger.Info($"Sending voide packet on Frequency {udpVoicePacket.Frequency} with Sequence {_packetNumber} to {radio.name} with origintal frequency {radio.freq}");
                             udpVoicePacket.IsIntercom = radio.modulation == RadioInformation.Modulation.INTERCOM;
                             udpVoicePacket.IsPttActive = _ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt;
 
                             var encodedUdpVoicePacket = udpVoicePacket.EncodePacket();
                             // sending UDP Package here:
                             _listener.Send(encodedUdpVoicePacket, encodedUdpVoicePacket.Length, new IPEndPoint(_address, _port));
+                            _packetNumber++;
                         }
                         
                         var currentlySelectedRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[sendingOn];
@@ -691,6 +678,7 @@ namespace Vanguard.VCS.Client.Network
                             Sequence = _packetNumber,
                             ReceiveTime = DateTime.Now.Ticks,
                         };
+                        _packetNumber++;
 
                         return send;
                     }
@@ -722,7 +710,7 @@ namespace Vanguard.VCS.Client.Network
         {
             Logger.Info("Pinging Server - Starting");
 
-            var message = VcsVoicePacket.CreateKeepalivePacket(Guid.Parse(_guid)).EncodePacket();
+            var message = VcsVoicePacket.CreateKeepalivePacket(_guid).EncodePacket();
 
             // Force immediate ping once to avoid race condition before starting to listen
             _listener.Send(message, message.Length, _serverEndpoint);
@@ -817,7 +805,7 @@ namespace Vanguard.VCS.Client.Network
                 Logger.Warn(e, "Failed to set NAT Traversal on UDP Client");
             }
 
-            var helloMessage = VcsVoicePacket.CreateHelloPacket(Guid.Parse(_guid)).EncodePacket();
+            var helloMessage = VcsVoicePacket.CreateHelloPacket(_guid).EncodePacket();
             try
             {
                 _listener.Send(helloMessage, helloMessage.Length, _serverEndpoint);

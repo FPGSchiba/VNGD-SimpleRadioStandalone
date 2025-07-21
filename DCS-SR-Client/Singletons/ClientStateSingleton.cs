@@ -78,11 +78,11 @@ namespace Vanguard.VCS.Client.Singletons
         }
 
         private bool isConnectionErrored;
-        public string ShortGUID { get; private set; }
+        public Guid ClientId { get; private set; }
 
-        public void RegisterClientGuid(string guid)
+        public void RegisterClientGuid(Guid guid)
         {
-            ShortGUID = guid;
+            ClientId = guid;
         }
         
         public bool IsConnectionErrored
@@ -128,7 +128,7 @@ namespace Vanguard.VCS.Client.Singletons
             RadioSendingState = new RadioSendingState();
             RadioReceivingState = new RadioReceivingState[11];
 
-            ShortGUID = ShortGuid.NewGuid();
+            ClientId = ShortGuid.NewGuid();
             DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
             PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
 
@@ -159,13 +159,13 @@ namespace Vanguard.VCS.Client.Singletons
             LastSeenName = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
         }
         
-        public void SetGuid(string guid)
+        public void SetGuid(Guid guid)
         {
-            if (string.IsNullOrEmpty(guid))
+            if (guid == Guid.Empty)
                 throw new ArgumentException("GUID cannot be null or empty.", nameof(guid));
 
-            ShortGUID = guid;
-            NotifyPropertyChanged(nameof(ShortGUID));
+            ClientId = guid;
+            NotifyPropertyChanged(nameof(ClientId));
         }
 
         public static ClientStateSingleton Instance

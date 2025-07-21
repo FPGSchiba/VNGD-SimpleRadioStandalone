@@ -12,10 +12,10 @@ namespace Vanguard.VCS.Client.Singletons
 {
     public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
-        private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
+        private readonly ConcurrentDictionary<Guid, SRClient> _clients = new ConcurrentDictionary<Guid, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
-        private readonly string _guid = ClientStateSingleton.Instance.ShortGUID;
+        private readonly Guid _guid = ClientStateSingleton.Instance.ClientId;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -49,7 +49,7 @@ namespace Vanguard.VCS.Client.Singletons
             NotifyPropertyChanged("Total");
         }
 
-        public SRClient this[string key]
+        public SRClient this[Guid key]
         {
             get
             {
@@ -78,7 +78,7 @@ namespace Vanguard.VCS.Client.Singletons
             }
         }
 
-        public bool TryRemove(string key, out SRClient value)
+        public bool TryRemove(Guid key, out SRClient value)
         {
             bool result = _clients.TryRemove(key, out value);
             if (result)
@@ -94,12 +94,12 @@ namespace Vanguard.VCS.Client.Singletons
             NotifyPropertyChanged("Total");
         }
 
-        public bool TryGetValue(string key, out SRClient value)
+        public bool TryGetValue(Guid key, out SRClient value)
         {
             return _clients.TryGetValue(key, out value);
         }
 
-        public bool ContainsKey(string key)
+        public bool ContainsKey(Guid key)
         {
             return _clients.ContainsKey(key);
         }

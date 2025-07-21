@@ -63,6 +63,7 @@ namespace Vanguard.VCS.Client.Network.DCS
 
         public void Start()
         {
+            Logger.Info("Starting Radio Sync Manager");
             DcsListener();
             IsListening = true;
         }

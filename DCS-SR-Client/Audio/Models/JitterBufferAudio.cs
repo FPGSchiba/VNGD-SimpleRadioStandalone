@@ -1,4 +1,5 @@
-﻿using Vanguard.VCS.Common.DCSState;
+﻿using System;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Audio.Models
 {
@@ -18,6 +19,6 @@ namespace Vanguard.VCS.Client.Audio.Models
         public double Frequency { get; set; }
         public bool NoAudioEffects { get; set; }
 
-        public string Guid { get; set; }
+        public Guid Guid { get; set; }
     }
 }

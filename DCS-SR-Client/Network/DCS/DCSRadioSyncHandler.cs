@@ -41,7 +41,6 @@ namespace Vanguard.VCS.Client.Network.DCS
         
         public void ProcessRadioInfo(DCSPlayerRadioInfo message)
         {
-          
             // determine if its changed by comparing old to new
             var update = UpdateRadio(message);
 
@@ -400,9 +399,6 @@ namespace Vanguard.VCS.Client.Network.DCS
             {
                 _identStart = 0;
             }
-
-            //                }
-            //            }
 
             //update
             playerRadioInfo.LastUpdate = DateTime.Now.Ticks;

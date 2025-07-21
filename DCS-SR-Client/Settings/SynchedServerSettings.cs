@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using NLog;
+using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Common.Setting;
 
 namespace Vanguard.VCS.Client.Settings
@@ -103,6 +105,11 @@ namespace Vanguard.VCS.Client.Settings
             }
             //cache will be refilled 
             _settingsBool.Clear();
+        }
+
+        public void DecodeVcs(ServerSettings serverSettings)
+        {
+            GlobalFrequencies = serverSettings.GlobalFrequencies.Select(freq => (double)freq).ToList();
         }
     }
 }

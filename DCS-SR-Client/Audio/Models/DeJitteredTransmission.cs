@@ -1,4 +1,5 @@
-﻿using Vanguard.VCS.Common.DCSState;
+﻿using System;
+using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Audio.Models
 {
@@ -22,8 +23,8 @@ namespace Vanguard.VCS.Client.Audio.Models
         public int PCMAudioLength { get; set; }
         public bool NoAudioEffects { get; set; }
 
-        public string Guid { get; set; }
+        public Guid Guid { get; set; }
 
-        public string OriginalClientGuid { get; set; }
+        public Guid OriginalClientGuid { get; set; }
     }
 }

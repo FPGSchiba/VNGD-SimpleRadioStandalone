@@ -76,8 +76,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
             //  Window_Loaded(null, null);
             CalculateScale();
 
-            LocationChanged += Location_Changed;
-
             RadioRefresh(null, null);
 
             //init radio refresh
@@ -85,10 +83,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
             _updateTimer.Tick += RadioRefresh;
             _updateTimer.Start();
             this._toggleOverlay = ToggleOverlay;
-        }
-
-        private void Location_Changed(object sender, EventArgs e)
-        {
         }
 
         private void RadioRefresh(object sender, EventArgs eventArgs)

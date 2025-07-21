@@ -50,7 +50,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public readonly AudioManager AudioManager;
         private IMessageHub _hub = new MessageHub();
 
-        private string _guid;
+        private Guid _guid;
         private bool _usingCustomServer;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
@@ -738,7 +738,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _oldOpenSettingsPage = OpenPage == SupportIndex ? _oldOpenSupportPage : OpenPage;
             OpenPageByIndex(SettingsIndex);
         }
-            
+        
         public void On_SettingsBackClicked()
         {
             OpenPageByIndex(_oldOpenSettingsPage);

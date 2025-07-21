@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NLog;
@@ -112,7 +113,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             LastUpdate = DateTime.Now.Ticks;
 
-            if (audio.ClientGuid.ToString() == ClientStateSingleton.Instance.ShortGUID)
+            if (audio.ClientGuid == ClientStateSingleton.Instance.ClientId)
             {
                 // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough
                 if (passThrough)
@@ -128,7 +129,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         IsSecondary = audio.IsSecondary,
                         Frequency = audio.Frequency,
                         NoAudioEffects = audio.NoAudioEffects,
-                        Guid = audio.ClientGuid.ToString(),
+                        Guid = audio.ClientGuid,
                     };
                 }
                 else
@@ -143,13 +144,13 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 {
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.Sequence,
-                    Modulation = (RadioInformation.Modulation) audio.Modulation,
+                    Modulation = (RadioInformation.Modulation)audio.Modulation,
                     ReceivedRadio = audio.ReceivedRadio,
                     Volume = audio.Volume,
                     IsSecondary = audio.IsSecondary,
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
-                    Guid = audio.ClientGuid.ToString(),
+                    Guid = audio.ClientGuid,
                 });
 
                 return null;
@@ -167,7 +168,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     IsSecondary = audio.IsSecondary,
                     Frequency = audio.Frequency,
                     NoAudioEffects = audio.NoAudioEffects,
-                    Guid = audio.ClientGuid.ToString()
+                    Guid = audio.ClientGuid
                 };
             }
 
