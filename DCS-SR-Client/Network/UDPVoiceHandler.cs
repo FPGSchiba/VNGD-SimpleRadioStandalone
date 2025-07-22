@@ -231,26 +231,38 @@ namespace Vanguard.VCS.Client.Network
                     var groupEp = new IPEndPoint(IPAddress.Any, _port);
                     
                     var bytes = _listener.Receive(ref groupEp);
-
-                    switch (bytes?.Length)
+                    
+                    _udpLastReceived = DateTime.Now.Ticks;
+                    if (bytes.Length < VcsVoicePacket.HeaderSize) continue;
+                    var myClient = IsClientMetaDataValid(_guid);
+                    if (myClient == null || !_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()) continue;
+                    var udpVoicePacket = VcsVoicePacket.DecodePacket(bytes);
+                    switch (udpVoicePacket.Type)
                     {
-                        case 22:
-                            _udpLastReceived = DateTime.Now.Ticks;
-                            Logger.Info("Received Ping Back from Server");
+                        case VcsVoicePacketType.Keepalive:
+                            Logger.Debug("Received Keepalive Packet from Server");
                             break;
-                        case > 22:
-                            _udpLastReceived = DateTime.Now.Ticks;
-                            if (bytes.Length < VcsVoicePacket.HeaderSize) continue;
-                            var myClient = IsClientMetaDataValid(_guid);
-                            if (myClient == null || !_clientStateSingleton.DcsPlayerRadioInfo.IsCurrent()) continue;
-                            var udpVoicePacket = VcsVoicePacket.DecodePacket(bytes);
-                            _encodedAudio.Add(udpVoicePacket);
+                        case VcsVoicePacketType.Hello:
+                        case VcsVoicePacketType.HelloAck:
+                            // This should not happen here, but we can log it if needed
+                            Logger.Warn("Received unexpected Hello or HelloAck packet from server.");
+                            break;
+                        case VcsVoicePacketType.Voice:
+                            Logger.Debug("Received VoicePacket from Server");
+                            _encodedAudio.Add(udpVoicePacket); // Push the packet to the audio decode queue if the packet is a voice packet
+                            break;
+                        case VcsVoicePacketType.Bye:
+                            Logger.Debug("Received Bye Packet from Server");
+                            RequestStop();
+                            break;
+                        default:
+                            Logger.Error("Received unexpected Packet from Server");
                             break;
                     }
                 }
                 catch
                 {
-                    //IGNORE
+                    // IGNORE AS WE GET THIS WHEN THE UDP LISTENER IS TIMING OUT EVERY 3 SECONDS
                 }
             }
 
@@ -292,17 +304,9 @@ namespace Vanguard.VCS.Client.Network
 
         private SRClient IsClientMetaDataValid(Guid clientGuid)
         {
-            if (_clients.ContainsKey(clientGuid))
-            {
-                var client = _clients[_guid];
-
-                if (client != null)
-                {
-                    return client;
-                }
-            }
-
-            return null;
+            if (!_clients.ContainsKey(clientGuid)) return null;
+            var client = _clients[_guid];
+            return client ?? null;
         }
 
         private void UdpAudioDecode()
@@ -317,22 +321,20 @@ namespace Vanguard.VCS.Client.Network
 
                         if (udpVoicePacket == null) continue;
                         
-                        Logger.Info($"Received Audio Packet from {udpVoicePacket.ClientId} on Frequency {udpVoicePacket.Frequency} with Sequence {udpVoicePacket.Sequence}");
-                        
                         var globalFrequencies = _serverSettings.GlobalFrequencies;
-                                
-                        List<int> blockedRadios = CurrentlyBlockedRadios();
+                        var blockedRadios = CurrentlyBlockedRadios();
 
                         //Check if Global
-                        bool globalFrequency = globalFrequencies.Contains(udpVoicePacket.Frequency);
-                            
-                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(udpVoicePacket.Frequency, RadioInformation.Modulation.AM, out var state);
+                        var listeningFrequency = udpVoicePacket.FrequencyMHz * 1000000; // Convert to Hz
+                        var globalFrequency = globalFrequencies.Contains(listeningFrequency);
+                        
+                        var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(listeningFrequency, RadioInformation.Modulation.AM, out var state);
                         RadioReceivingPriority radioReceivingPriority = null;
                         if (radio != null && state != null && (radio.modulation == RadioInformation.Modulation.INTERCOM || globalFrequency || !blockedRadios.Contains(state.ReceivedOn)))
                         {
                             radioReceivingPriority = new RadioReceivingPriority()
                             {
-                                Frequency = udpVoicePacket.Frequency,
+                                Frequency = listeningFrequency,
                                 Modulation = udpVoicePacket.IsIntercom ? (short)RadioInformation.Modulation.INTERCOM : (short)radio.modulation,
                                 ReceivingRadio = radio,
                                 ReceivingState = state
@@ -340,7 +342,6 @@ namespace Vanguard.VCS.Client.Network
                         }
                         
                         if (radioReceivingPriority == null) continue;
-                        var destinationRadio = radioReceivingPriority;
 
                         var audio = new ClientAudio
                         {
@@ -348,14 +349,14 @@ namespace Vanguard.VCS.Client.Network
                             EncodedAudio = udpVoicePacket.Payload,
                             //Convert to Shorts!
                             ReceiveTime = DateTime.Now.Ticks,
-                            Frequency = destinationRadio.Frequency,
-                            Modulation = destinationRadio.Modulation,
-                            Volume = destinationRadio.ReceivingRadio.volume,
-                            ReceivedRadio = destinationRadio.ReceivingState.ReceivedOn,
+                            Frequency = radioReceivingPriority.Frequency,
+                            Modulation = radioReceivingPriority.Modulation,
+                            Volume = radioReceivingPriority.ReceivingRadio.volume,
+                            ReceivedRadio = radioReceivingPriority.ReceivingState.ReceivedOn,
                             // mark if we can decrypt it
-                            RadioReceivingState = destinationRadio.ReceivingState,
+                            RadioReceivingState = radioReceivingPriority.ReceivingState,
                             Sequence = udpVoicePacket.Sequence,
-                            IsSecondary = destinationRadio.ReceivingState.IsSecondary
+                            IsSecondary = radioReceivingPriority.ReceivingState.IsSecondary
                         };
 
                         var transmitterName = "";
@@ -363,17 +364,17 @@ namespace Vanguard.VCS.Client.Network
                         {
                             transmitterName = transmittingClient.Name;
                         }
-
+                        
                         var newRadioReceivingState =  new RadioReceivingState
                         {
-                            IsSecondary = destinationRadio.ReceivingState.IsSecondary,
+                            IsSecondary = radioReceivingPriority.ReceivingState.IsSecondary,
                             LastReceviedAt = DateTime.Now.Ticks,
-                            ReceivedOn = destinationRadio.ReceivingState.ReceivedOn,
+                            ReceivedOn = radioReceivingPriority.ReceivingState.ReceivedOn,
                             SentBy = transmitterName
                         };
-
+            
                         _radioReceivingState[audio.ReceivedRadio] = newRadioReceivingState;
-                                    
+                        
                         //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
                         //this is a nice optimisation to save duplicated audio on servers without that setting 
                         if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE)) continue;
@@ -381,7 +382,7 @@ namespace Vanguard.VCS.Client.Network
                         {
                             audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
                         }
-
+                        
                         _audioManager.AddClientAudio(audio);
                     }
                     catch (Exception ex)
@@ -638,7 +639,7 @@ namespace Vanguard.VCS.Client.Network
                             //generate packet
                             var udpVoicePacket =
                                 VcsVoicePacket.CreateVoicePacket(_guid, radio.freq, bytes, _packetNumber);
-                            Logger.Info($"Sending voide packet on Frequency {udpVoicePacket.Frequency} with Sequence {_packetNumber} to {radio.name} with origintal frequency {radio.freq}");
+                            // Logger.Trace($"Sending voide packet on Frequency {udpVoicePacket.Frequency} with Sequence {_packetNumber} to {radio.name} with origintal frequency {radio.freq}");
                             udpVoicePacket.IsIntercom = radio.modulation == RadioInformation.Modulation.INTERCOM;
                             udpVoicePacket.IsPttActive = _ptt || _clientStateSingleton.DcsPlayerRadioInfo.ptt;
 
@@ -826,7 +827,7 @@ namespace Vanguard.VCS.Client.Network
                 try
                 {
                     var groupEp = new IPEndPoint(IPAddress.Any, _port);
-                    _listener.Client.ReceiveTimeout = 1500 * 2 * attempts; // 3 seconds timeout for receiving hello ack
+                    _listener.Client.ReceiveTimeout = 1500 * 2 * attempts; // 3 seconds timeout for all communication
                     var bytes = _listener.Receive(ref groupEp);
 
                     if (bytes.Length > 0)

@@ -84,6 +84,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
+            // TODO: This crashes when stopping the preview
             if (_audioPreview == null)
             {
                 if (!AudioInput.MicrophoneAvailable)

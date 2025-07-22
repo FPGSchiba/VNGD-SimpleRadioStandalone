@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Vanguard.VCS.Common.DCSState
 {
@@ -182,9 +183,7 @@ namespace Vanguard.VCS.Common.DCSState
             return diff < 500;
         }
 
-        public RadioInformation CanHearTransmission(double frequency,
-            RadioInformation.Modulation modulation,
-            out RadioReceivingState receivingState)
+        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation, out RadioReceivingState receivingState)
         {
 
             RadioInformation bestMatchingRadio = null;

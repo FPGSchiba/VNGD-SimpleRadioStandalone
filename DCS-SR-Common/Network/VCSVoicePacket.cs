@@ -220,6 +220,16 @@ namespace Vanguard.VCS.Common.Network
                 // Session ID (16 bytes)
                 var sessionBytes = new byte[16];
                 Array.Copy(data, 11, sessionBytes, 0, 16);
+                if (BitConverter.IsLittleEndian)
+                {
+                    // Convert RFC 4122 (big-endian) to .NET Guid (little-endian)
+                    byte[] netBytes = new byte[16];
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.NetworkToHostOrder(BitConverter.ToInt32(sessionBytes, 0))), 0, netBytes, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sessionBytes, 4))), 0, netBytes, 4, 2);
+                    Array.Copy(BitConverter.GetBytes(System.Net.IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sessionBytes, 6))), 0, netBytes, 6, 2);
+                    Array.Copy(sessionBytes, 8, netBytes, 8, 8);
+                    sessionBytes = netBytes;
+                }
                 packet.ClientId = new Guid(sessionBytes);
 
                 // Payload (remaining bytes)

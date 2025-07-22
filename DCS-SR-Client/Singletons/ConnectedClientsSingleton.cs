@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Google.Protobuf.Collections;
+using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Network;
@@ -144,6 +146,51 @@ namespace Vanguard.VCS.Client.Singletons
             }
 
             return count;
+        }
+
+        public void DecodeVcs(MapField<string, ClientInfo> clients, MapField<string, RadioInfo> radios)
+        {
+            foreach (var clientId in clients.Keys)
+            {
+                var clientGuid = Guid.Parse(clientId);
+                var clientInfo = clients[clientId];
+                var srClient = new SRClient()
+                {
+                    ClientGuid = clientGuid,
+                    Name = clientInfo.Name,
+                    Coalition = 0, // Default to 0, will be set later as we refactor coalition handling
+                    AllowRecord = true,
+                    Muted = radios[clientId].Muted,
+                    LastUpdate = clientInfo.LastUpdate,
+                    Seat = 0,
+                    RadioInfo = new DCSPlayerRadioInfo()
+                    {
+                        radios = radios[clientId].Radios.Select(r => new RadioInformation
+                        {
+                            freq = r.Frequency,
+                            modulation = r.Enabled ? RadioInformation.Modulation.DISABLED : r.IsIntercom ? RadioInformation.Modulation.INTERCOM : RadioInformation.Modulation.AM,
+                            name = r.Name,
+                            enc = false,
+                            freqMax = 9999999999,
+                            freqMin = 1,
+                        }).ToArray()
+                    }
+                };
+                if (_clients.TryGetValue(clientGuid, out var existingClient))
+                {
+                    // Update existing client
+                    existingClient.Name = srClient.Name;
+                    existingClient.RadioInfo = srClient.RadioInfo;
+                    existingClient.Muted = srClient.Muted;
+                    existingClient.LastUpdate = srClient.LastUpdate;
+                    existingClient.RadioInfo = srClient.RadioInfo;
+                }
+                else
+                {
+                    // Add new client
+                    _clients.TryAdd(clientGuid, srClient);
+                }
+            }
         }
     }
 }

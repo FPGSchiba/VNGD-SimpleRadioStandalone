@@ -1095,7 +1095,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             if (_vcsClient != null)
             {
-                Task.Run(() => _vcsClient.Disconnect());
+                _vcsClient.Disconnect();
                 _vcsClient = null;
             }
             

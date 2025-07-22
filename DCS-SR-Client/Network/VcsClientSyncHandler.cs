@@ -299,8 +299,7 @@ namespace Vanguard.VCS.Client.Network
                 {
                     Logger.Info("Client sync successful.");
                     _serverSettings.DecodeVcs(syncResponse.Data.Settings);
-                    // TODO: Set Clients
-                    // TODO: Update radios
+                    _clients.DecodeVcs(syncResponse.Data.Clients, syncResponse.Data.Radios);
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncSuccess, null);
                 }
                 else
@@ -337,7 +336,7 @@ namespace Vanguard.VCS.Client.Network
             try
             {
                 var request = new Empty();
-                _srsServiceClient.Disconnect(request);
+                _srsServiceClient.Disconnect(request, _authenticationMetadata);
                 _channel?.ShutdownAsync().Wait();
                 _channel?.Dispose();
                 _channel = null;
