@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NLog;
@@ -14,14 +13,15 @@ namespace Vanguard.VCS.Client.Audio.Providers
     {
         private readonly Random _random = new Random();
 
-        public static readonly int SILENCE_PAD = 200;
+        // Silence pad on new transmission adds latency and perceived slowdown; keep 0
+        public static readonly int SILENCE_PAD = 0;
 
         private OpusDecoder _decoder;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private bool passThrough;
-       // private readonly WaveFileWriter waveWriter;
+        private readonly bool passThrough;
+
         public ClientAudioProvider(bool passThrough = false)
         {
             this.passThrough = passThrough;
@@ -29,22 +29,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
             if (!passThrough)
             {
                 var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios.Length;
-                JitterBufferProviderInterface =
-                    new JitterBufferProviderInterface[radios];
+                JitterBufferProviderInterface = new JitterBufferProviderInterface[radios];
 
-                for (int i = 0;  i < radios; i++)
+                for (int i = 0; i < radios; i++)
                 {
+                    // Ensure float @ 48k mono throughout the mixing/jitter pipeline
                     JitterBufferProviderInterface[i] =
-                        new JitterBufferProviderInterface(new NAudio.Wave.WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
-
+                        new JitterBufferProviderInterface(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
                 }
-                
             }
-           // waveWriter = new NAudio.Wave.WaveFileWriter($@"C:\\temp\\output{RandomFloat()}.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
-            
+
             _decoder = OpusDecoder.Create(AudioManager.OUTPUT_SAMPLE_RATE, 1);
-            _decoder.ForwardErrorCorrection = false;
-            _decoder.MaxDataBytes = AudioManager.OUTPUT_SAMPLE_RATE * 4;
+            _decoder.ForwardErrorCorrection = false; // keep off unless using FEC properly
+            // Increase decoded output buffer to safely hold up to 120ms of float audio
+            _decoder.MaxDataBytes = (int)(AudioManager.OUTPUT_SAMPLE_RATE * 0.12 * sizeof(float) * _decoder.OutputChannels);
         }
 
         public JitterBufferProviderInterface[] JitterBufferProviderInterface { get; }
@@ -59,55 +57,51 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 return false;
             }
 
-            //400 ms since last update
             long now = DateTime.Now.Ticks;
-            if ((now - LastUpdate) > 4000000) //400 ms since last update
-            {
-                return true;
-            }
-
-            return false;
+            // 400 ms since last update
+            return (now - LastUpdate) > 4000000;
         }
 
         public JitterBufferAudio AddClientAudioSamples(ClientAudio audio)
         {
-
-            //sort out volume
-            //            var timer = new Stopwatch();
-            //            timer.Start();
-
             bool newTransmission = LikelyNewTransmission();
 
-            //TODO reduce the size of this buffer
-            var decoded = _decoder.DecodeFloat(audio.EncodedAudio,
-                audio.EncodedAudio.Length, out var decodedLength, newTransmission);
+            // Proper handling of DecodeFloat: returns byte[] containing floats; decodedLength is in bytes
+            var decodedBytes = _decoder.DecodeFloat(
+                audio.EncodedAudio,
+                audio.EncodedAudio.Length,
+                out var decodedLength,
+                false
+            );
 
-            if (decodedLength <= 0)
+            if (decodedBytes == null || decodedLength <= 0 || (decodedLength % sizeof(float)) != 0)
             {
-                Logger.Info("Failed to decode audio from Packet for client");
+                Logger.Warn($"Failed to decode or misaligned length: decodedLength={decodedLength}");
                 return null;
             }
 
-            // for some reason if this is removed then it lags?!
-            //guess it makes a giant buffer and only uses a little?
-            //Answer: makes a buffer of 4000 bytes - so throw away most of it
+            int sampleCount = decodedLength / sizeof(float);
+            var tmp = new float[sampleCount];
+            Buffer.BlockCopy(decodedBytes, 0, tmp, 0, decodedLength);
 
-            //TODO reuse this buffer
-            var tmp = new float[decodedLength/4];
-            Buffer.BlockCopy(decoded, 0, tmp, 0, decodedLength);
-            
+            // sanitize
+            for (int i = 0; i < tmp.Length; i++)
+            {
+                var s = tmp[i];
+                if (float.IsNaN(s) || float.IsInfinity(s)) tmp[i] = 0f;
+                else if (s > 1f) tmp[i] = 1f;
+                else if (s < -1f) tmp[i] = -1f;
+            }
+
             audio.PcmAudioFloat = tmp;
-            
+
             AdjustVolumeForLoss(audio);
 
-
-            if (newTransmission)
+            if (newTransmission && SILENCE_PAD > 0)
             {
-                // System.Diagnostics.Debug.WriteLine(audio.ClientGuid+"ADDED");
-                //append ms of silence - this functions as our jitter buffer??
-                var silencePad = (AudioManager.OUTPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
-                var newAudio = new float[audio.PcmAudioFloat.Length + silencePad];
-                Buffer.BlockCopy(audio.PcmAudioFloat, 0, newAudio, silencePad, audio.PcmAudioFloat.Length);
+                int silencePadSamples = (AudioManager.OUTPUT_SAMPLE_RATE / 1000) * SILENCE_PAD;
+                var newAudio = new float[audio.PcmAudioFloat.Length + silencePadSamples];
+                Array.Copy(audio.PcmAudioFloat, 0, newAudio, silencePadSamples, audio.PcmAudioFloat.Length);
                 audio.PcmAudioFloat = newAudio;
             }
 
@@ -115,10 +109,8 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             if (audio.ClientGuid == ClientStateSingleton.Instance.ClientId)
             {
-                // catch own transmissions and prevent them from being added to JitterBuffer unless its passthrough
                 if (passThrough)
                 {
-                    //return MONO PCM 16 as bytes
                     return new JitterBufferAudio
                     {
                         Audio = audio.PcmAudioFloat,
@@ -132,13 +124,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         Guid = audio.ClientGuid,
                     };
                 }
-                else
-                {
-                    return null;
-                }
 
+                return null;
             }
-            else if (!passThrough)
+
+            if (!passThrough)
             {
                 JitterBufferProviderInterface[audio.ReceivedRadio].AddSamples(new JitterBufferAudio
                 {
@@ -153,26 +143,23 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     Guid = audio.ClientGuid,
                 });
 
+                Logger.Debug($"Added to jitter buffer[{audio.ReceivedRadio}]: {audio.PcmAudioFloat.Length} samples, first: {audio.PcmAudioFloat[0]:0.000}");
+
                 return null;
             }
-            else
-            {
-                //return MONO PCM 32 as bytes
-                return new JitterBufferAudio
-                {
-                    Audio = audio.PcmAudioFloat,
-                    PacketNumber = audio.Sequence,
-                    Modulation = (RadioInformation.Modulation)audio.Modulation,
-                    ReceivedRadio = audio.ReceivedRadio,
-                    Volume = audio.Volume,
-                    IsSecondary = audio.IsSecondary,
-                    Frequency = audio.Frequency,
-                    NoAudioEffects = audio.NoAudioEffects,
-                    Guid = audio.ClientGuid
-                };
-            }
 
-            //timer.Stop();
+            return new JitterBufferAudio
+            {
+                Audio = audio.PcmAudioFloat,
+                PacketNumber = audio.Sequence,
+                Modulation = (RadioInformation.Modulation)audio.Modulation,
+                ReceivedRadio = audio.ReceivedRadio,
+                Volume = audio.Volume,
+                IsSecondary = audio.IsSecondary,
+                Frequency = audio.Frequency,
+                NoAudioEffects = audio.NoAudioEffects,
+                Guid = audio.ClientGuid
+            };
         }
 
         private void AdjustVolumeForLoss(ClientAudio clientAudio)
@@ -180,26 +167,18 @@ namespace Vanguard.VCS.Client.Audio.Providers
             return;
         }
 
-
         private float RandomFloat()
         {
-            //random float at max volume at eights
-            float f = ((float)_random.Next(-32768 / 8, 32768 / 8)) / (float)32768;
+            float f = ((float)_random.Next(-32768 / 8, 32768 / 8)) / 32768f;
             if (f > 1) f = 1;
             if (f < -1) f = -1;
-         
             return f;
         }
 
-
-        //destructor to clear up opus
         ~ClientAudioProvider()
         {
-            // waveWriter.Flush();
-            // waveWriter.Dispose();
             _decoder?.Dispose();
             _decoder = null;
         }
-
     }
 }

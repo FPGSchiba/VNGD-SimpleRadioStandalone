@@ -9,13 +9,14 @@ using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
-    public class JitterBufferProviderInterface 
+    public class JitterBufferProviderInterface
     {
         private readonly CircularFloatBuffer _circularBuffer;
 
         public static readonly int MAXIMUM_BUFFER_SIZE_MS = 2500;
 
-        private readonly float[] _silence = new float[AudioManager.OUTPUT_SEGMENT_FRAMES]; 
+        // FIXED: Use correct frame size for 20ms at 48kHz = 960 samples
+        private readonly float[] _silence = new float[AudioManager.OUTPUT_SAMPLE_RATE * 20 / 1000]; // 20ms silence
 
         private readonly LinkedList<JitterBufferAudio> _bufferedAudio = new LinkedList<JitterBufferAudio>();
 
@@ -25,8 +26,13 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        //  private const int INITIAL_DELAY_MS = 200;
-        //   private long _delayedUntil = -1; //holds audio for a period of time
+        // Throttled logging counters to reduce spam
+        private int _logWriteCounter;
+        private int _logReadCounter;
+
+        private const int PrimingMs = 50; // 50ms priming time
+        private bool _primed = false;
+        private int _availableSamples = 0; // How many samples are currently available in the buffer
 
         private DeJitteredTransmission lastTransmission;
 
@@ -39,137 +45,164 @@ namespace Vanguard.VCS.Client.Audio.Providers
             _circularBuffer = new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 3);//3 seconds worth of audio
 
             Array.Clear(_silence, 0, _silence.Length);
+
+            // Debug log to verify silence buffer size
+            Logger.Debug($"JitterBuffer initialized: silence buffer = {_silence.Length} samples ({_silence.Length * 1000.0 / AudioManager.OUTPUT_SAMPLE_RATE:0.0}ms)");
         }
 
         public WaveFormat WaveFormat { get; }
 
         public DeJitteredTransmission Read(int count)
         {
-          //  int now = Environment.TickCount;
-
+            _logReadCounter++;
+            if (_primed)
+            {
+                Logger.Debug($"JitterBuffer Read called: count={count}, available={_availableSamples}, primed={_primed}");
+                _logReadCounter = 0;
+            }
+            
             returnBuffer = BufferHelpers.Ensure(returnBuffer, count);
-
-            //other implementation of waiting
-            //            if(_delayedUntil > now)
-            //            {
-            //                //wait
-            //                return 0;
-            //            }
-
+            
             var read = 0;
             lock (_lock)
             {
-                //need to return read equal to count
-
-                //do while loop
-                //break when read == count
-                //each time round increment read
-                //read becomes read + last Read
-
                 do
                 {
-                    read = read + _circularBuffer.Read(returnBuffer,  read, count - read);
+                    // 1) Try to read what’s already buffered
+                    var took = _circularBuffer.Read(returnBuffer, read, count - read);
+                    if (took > 0)
+                    {
+                        read += took;
+                        _availableSamples = Math.Max(0, _availableSamples - took);
+                    }
 
+                    // 2) If we still need more
                     if (read < count)
                     {
-                        //now read in from the jitterbuffer
+                        // If we are not primed yet, fill the remainder with silence and return.
+                        if (!_primed)
+                        {
+                            Array.Clear(returnBuffer, read, count - read);
+                            read = count;
+                            break;
+                        }
+
                         if (_bufferedAudio.Count == 0)
                         {
-                            //goes to a mixer so we just return what we've read which could be 0!
-                            //Mixer Handles this OK
+                            // Nothing queued: zero-fill remainder to avoid stale repetition
+                            Array.Clear(returnBuffer, read, count - read);
+                            read = count;
                             break;
-                            //
-                            // zero the end of the buffer
-                            //      Array.Clear(buffer, offset + read, count - read);
-                            //     read = count;
-                            //  Console.WriteLine("Buffer Empty");
                         }
+
+                        // Pull next packet, write to circular buffer
+                        var audio = _bufferedAudio.First.Value;
+                        _bufferedAudio.RemoveFirst();
+
+                        lastTransmission = new DeJitteredTransmission()
+                        {
+                            Modulation = audio.Modulation,
+                            Frequency = audio.Frequency,
+                            IsSecondary = audio.IsSecondary,
+                            ReceivedRadio = audio.ReceivedRadio,
+                            Volume = audio.Volume,
+                            NoAudioEffects = audio.NoAudioEffects,
+                            Guid = audio.Guid,
+                        };
+
+                        if (_lastRead == 0)
+                            _lastRead = audio.PacketNumber;
                         else
                         {
-                            var audio = _bufferedAudio.First.Value;
-                            //no Pop?
-                            _bufferedAudio.RemoveFirst();
-
-                            lastTransmission = new DeJitteredTransmission()
+                            if (_lastRead + 1 < audio.PacketNumber)
                             {
-                                Modulation = audio.Modulation,
-                                Frequency = audio.Frequency,
-                                IsSecondary = audio.IsSecondary,
-                                ReceivedRadio = audio.ReceivedRadio,
-                                Volume = audio.Volume,
-                                NoAudioEffects = audio.NoAudioEffects,
-                                Guid = audio.Guid,
-                            };
+                                var missing = audio.PacketNumber - (_lastRead + 1);
 
-                            if (_lastRead == 0)
-                                _lastRead = audio.PacketNumber;
-                            else
-                            {
-                                //TODO deal with looping packet number
-                                if (_lastRead + 1 < audio.PacketNumber)
+                                if (missing <= 4)
                                 {
-                                    //fill with missing silence - will only add max of 5x Packet length but it could be a bunch of missing?
-                                    var missing = audio.PacketNumber - (_lastRead + 1);
-
-                                    // packet number is always discontinuous at the start of a transmission if you didnt receive a transmission for a while i.e different radio channel
-                                    // if the gap is more than 4 assume its just a new transmission
-
-                                    if (missing <= 4)
+                                    var fill = Math.Min(missing, 4);
+                                    for (var i = 0; i < (int)fill; i++)
                                     {
-                                        var fill = Math.Min(missing, 4);
-
-                                        for (var i = 0; i < (int)fill; i++)
-                                        {
-                                            _circularBuffer.Write(_silence, 0, _silence.Length);
-                                        }
+                                        _circularBuffer.Write(_silence, 0, _silence.Length);
+                                        _availableSamples += _silence.Length;
                                     }
-                                  
                                 }
+                            }
+                            _lastRead = audio.PacketNumber;
+                        }
 
-                                _lastRead = audio.PacketNumber;
+                        if (audio.Audio != null && audio.Audio.Length > 0)
+                        {
+                            // sanitize
+                            for (int i = 0; i < audio.Audio.Length; i++)
+                            {
+                                float s = audio.Audio[i];
+                                if (float.IsNaN(s) || float.IsInfinity(s)) audio.Audio[i] = 0f;
+                                else if (s > 1f) audio.Audio[i] = 1f;
+                                else if (s < -1f) audio.Audio[i] = -1f;
                             }
 
                             _circularBuffer.Write(audio.Audio, 0, audio.Audio.Length);
+                            _availableSamples += audio.Audio.Length;
+
+                            _logWriteCounter++;
+                            if (audio.Audio.Length >= 4 && (_logWriteCounter % 100) == 0)
+                            {
+                                Logger.Debug($"Wrote to circular buffer: {audio.Audio.Length} samples, first: {audio.Audio[0]:0.000}, {audio.Audio[1]:0.000}, {audio.Audio[2]:0.000}, {audio.Audio[3]:0.000}");
+                            }
                         }
+
+                        // Priming check: once we’ve buffered enough, mark primed
+                        // Priming check: count both queued and circular buffer samples
+                        if (_primed) continue;
+                        var primingTarget = 960; // Just 1 packet = immediate priming
+                        var totalAvailable = _availableSamples + (_bufferedAudio.Count * 960);
+                        if (totalAvailable < primingTarget) continue;
+                        _primed = true;
+                        Logger.Debug($"Jitter buffer primed in AddSamples: total={totalAvailable}, target={primingTarget}, queue={_bufferedAudio.Count}");
+
+                        // Loop to try reading again (now that we wrote more)
                     }
                 } while (read < count);
-
-//                if (read == 0)
-//                {
-//                    _delayedUntil = Environment.TickCount + INITIAL_DELAY_MS;
-//                }
             }
 
-            lastTransmission.PCMAudioLength = read;
+            var result = new DeJitteredTransmission
+            {
+                Modulation = lastTransmission.Modulation,
+                Frequency = lastTransmission.Frequency,
+                IsSecondary = lastTransmission.IsSecondary,
+                ReceivedRadio = lastTransmission.ReceivedRadio,
+                Volume = lastTransmission.Volume,
+                NoAudioEffects = lastTransmission.NoAudioEffects,
+                Guid = lastTransmission.Guid
+            };
 
+            result.PCMAudioLength = read;
             if (read > 0)
             {
-                lastTransmission.PCMMonoAudio = returnBuffer;
+                var outCopy = new float[read];
+                Array.Copy(returnBuffer, 0, outCopy, 0, read);
+                result.PCMMonoAudio = outCopy;
             }
             else
             {
-                lastTransmission.PCMMonoAudio = null;
+                result.PCMMonoAudio = null;
             }
-          
-            return lastTransmission;
+
+            return result;
         }
 
         public void AddSamples(JitterBufferAudio jitterBufferAudio)
         {
             lock (_lock)
             {
-                //re-order if we can or discard
-
-                //add to linked list
-                //add front to back
                 if (_bufferedAudio.Count == 0)
                 {
                     _bufferedAudio.AddFirst(jitterBufferAudio);
                 }
                 else if (jitterBufferAudio.PacketNumber > _lastRead)
-                { 
-                    //TODO CHECK THIS
-                    var time = _bufferedAudio.Count * AudioManager.OUTPUT_AUDIO_LENGTH_MS; // this isnt quite true as there can be padding audio but good enough
+                {
+                    var time = _bufferedAudio.Count * AudioManager.OUTPUT_AUDIO_LENGTH_MS;
 
                     if (time > MAXIMUM_BUFFER_SIZE_MS)
                     {
@@ -179,23 +212,9 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
                     for (var it = _bufferedAudio.First; it != null;)
                     {
-                        //iterate list
-                        //if packetNumber == curentItem
-                        // discard
-                        //else if packetNumber < _currentItem
-                        //add before
-                        //else if packetNumber > _currentItem
-                        //add before
-
-                        //if not added - add to end?
-
                         var next = it.Next;
 
-                        if (it.Value.PacketNumber == jitterBufferAudio.PacketNumber)
-                        {
-                            //discard! Duplicate packet
-                            return;
-                        }
+                        if (it.Value.PacketNumber == jitterBufferAudio.PacketNumber) return;
 
                         if (jitterBufferAudio.PacketNumber < it.Value.PacketNumber)
                         {
@@ -211,6 +230,18 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         }
 
                         it = next;
+                    }
+                }
+
+                // Add priming check in AddSamples - this is where packets actually arrive
+                if (!_primed)
+                {
+                    int primingTarget = 960; // Just 1 packet = immediate priming
+                    int totalAvailable = _availableSamples + (_bufferedAudio.Count * 960);
+                    if (totalAvailable >= primingTarget)
+                    {
+                        _primed = true;
+                        Logger.Debug($"Jitter buffer primed in AddSamples: total={totalAvailable}, target={primingTarget}, queue={_bufferedAudio.Count}");
                     }
                 }
             }

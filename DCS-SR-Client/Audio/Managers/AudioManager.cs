@@ -30,11 +30,11 @@ namespace Vanguard.VCS.Client.Audio.Managers
 {
     public class AudioManager
     {
-        public static readonly int MIC_SAMPLE_RATE = 16000;
-        public static readonly int MIC_INPUT_AUDIO_LENGTH_MS = 40;
+        public static readonly int MIC_SAMPLE_RATE = 48000;
+        public static readonly int MIC_INPUT_AUDIO_LENGTH_MS = 20;
         public static readonly int MIC_SEGMENT_FRAMES = (MIC_SAMPLE_RATE / 1000) * MIC_INPUT_AUDIO_LENGTH_MS;
         public static readonly int OUTPUT_SAMPLE_RATE = 48000;
-        public static readonly int OUTPUT_AUDIO_LENGTH_MS = 40;
+        public static readonly int OUTPUT_AUDIO_LENGTH_MS = 20;
         public static readonly int OUTPUT_SEGMENT_FRAMES = (OUTPUT_SAMPLE_RATE / 1000) * OUTPUT_AUDIO_LENGTH_MS;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -116,7 +116,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
             {
                 speakers = WasapiOut.GetDefaultAudioEndpoint();
             }
-            else 
+            else
             {
                 speakers = (MMDevice)_audioOutputSingleton.SelectedAudioOutput.Value;
             }
@@ -174,8 +174,9 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 _waveOut.Play();
 
                 //opus
-                _encoder = OpusEncoder.Create(MIC_SAMPLE_RATE, 1, Application.Voip);
+                _encoder = OpusEncoder.Create(48000, 1, Application.Audio);
                 _encoder.ForwardErrorCorrection = false;
+                _encoder.Bitrate = 48000;
 
                 //speex
                 _speex = new Preprocessor(AudioManager.MIC_SEGMENT_FRAMES, AudioManager.MIC_SAMPLE_RATE);
@@ -295,7 +296,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
         {
             Logger.Error(e.Exception, "Recording Stopped");
         }
-        
+
         Stopwatch _stopwatch = new Stopwatch();
         // private WaveFileWriter _beforeWaveFile;
         // private WaveFileWriter _afterFileWriter;
@@ -307,7 +308,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
             {
                 //create and use in the same thread or COM issues
                 _resampler = new EventDrivenResampler(windowsN, _wasapiCapture.WaveFormat, new WaveFormat(AudioManager.MIC_SAMPLE_RATE, 16, 1));
-                 
+
                 // _afterFileWriter = new WaveFileWriter(@"C:\Temp\Test-Preview-after.wav", new WaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 16, 1));
             }
 
@@ -343,7 +344,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                             Buffer.BlockCopy(_pcmShort, 0, _pcmBytes, 0, _pcmBytes.Length);
                             voice = DoesFrameContainSpeech(_pcmBytes, _pcmShort);
                         }
-                        
+
                         //process with Speex
                         _speex.Process(new ArraySegment<short>(_pcmShort));
 
@@ -366,6 +367,11 @@ namespace Vanguard.VCS.Client.Audio.Managers
                         //encode as opus bytes
                         int len;
                         var buff = _encoder.Encode(_pcmBytes, _pcmBytes.Length, out len);
+                        
+                        byte toc = buff[0];
+                        int config = toc >> 3; // top 5 bits
+                        bool celtOnly = config >= 16;
+                        Logger.Debug($"Opus TOC config={config} (CELT-only={celtOnly}) len={len}");
 
                         if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                         {
@@ -375,18 +381,18 @@ namespace Vanguard.VCS.Client.Audio.Managers
                             Buffer.BlockCopy(buff, 0, encoded, 0, len);
 
                             // Console.WriteLine("Sending: " + e.BytesRecorded);
-                            var clientAudio = _udpVoiceHandler.Send(encoded, len, voice);                         
+                            var clientAudio = _udpVoiceHandler.Send(encoded, len, voice);
 
                             // _beforeWaveFile.Write(pcmBytes, 0, pcmBytes.Length);
 
-                            if (clientAudio != null && (_micWaveOutBuffer != null 
+                            if (clientAudio != null && (_micWaveOutBuffer != null
                                                         || GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio)))
                             {
 
                                 //todo see if we can fix the resample / opus decode
                                 //send audio so play over local too
                                 var jitterBufferAudio = _passThroughAudioProvider?.AddClientAudioSamples(clientAudio);
-                                
+
                                 // //process bytes and add effects
                                 if (jitterBufferAudio!=null)
                                 {
@@ -406,20 +412,44 @@ namespace Vanguard.VCS.Client.Audio.Managers
                                     };
 
                                     //process audio
-                                    float[] tempFloat = _clientEffectsPipeline.ProcessClientAudioSamples(jitterBufferAudio.Audio,
-                                        jitterBufferAudio.Audio.Length, 0, deJittered);
+                                    float[] tempFloat = jitterBufferAudio.Audio;
 
-                                    if (_micWaveOut != null)
+                                    // Optional: very low volume while debugging to save ears
+                                    const float debugGain = 0.1f; // try 0.05 if it’s still loud
+
+                                    // Sanitize + apply simple gain + clamp to [-1, 1]
+                                    for (int i = 0; i < tempFloat.Length; i++)
                                     {
-                                       
-                                        //now its a processed Mono audio
+                                        float s = tempFloat[i];
+                                        if (float.IsNaN(s) || float.IsInfinity(s)) s = 0f;
+                                        s *= debugGain;
+                                        if (s > 1f) s = 1f;
+                                        else if (s < -1f) s = -1f;
+                                        tempFloat[i] = s;
+                                    }
+
+                                    // Debug a few sample values
+                                    if (tempFloat.Length >= 4)
+                                    {
+                                        Logger.Debug($"Post-bypass first samples: {tempFloat[0]:0.000}, {tempFloat[1]:0.000}, {tempFloat[2]:0.000}, {tempFloat[3]:0.000}");
+                                    }
+
+                                    if (_micWaveOut != null && ShouldMonitorSidetone())
+                                    {
+                                        // Very low sidetone to avoid feedback (-26 dB)
+                                        const float sidetoneGain = 0.05f;
+
+                                        for (int i = 0; i < tempFloat.Length; i++)
+                                        {
+                                            float s = tempFloat[i];
+                                            if (float.IsNaN(s) || float.IsInfinity(s)) s = 0f;
+                                            s *= sidetoneGain;
+                                            if (s > 1f) s = 1f; else if (s < -1f) s = -1f;
+                                            tempFloat[i] = s;
+                                        }
+
                                         _tempMicOutputBuffer = BufferHelpers.Ensure(_tempMicOutputBuffer, tempFloat.Length * 4);
                                         Buffer.BlockCopy(tempFloat, 0, _tempMicOutputBuffer, 0, tempFloat.Length * 4);
-
-                                        //_beforeWaveFile?.WriteSamples(jitterBufferAudio.Audio,0,jitterBufferAudio.Audio.Length);
-                                        //_beforeWaveFile?.Write(pcm32, 0, pcm32.Length);
-                                        //_beforeWaveFile?.Flush();
-
                                         _micWaveOutBuffer.AddSamples(_tempMicOutputBuffer, 0, tempFloat.Length * 4);
                                     }
 
@@ -429,10 +459,10 @@ namespace Vanguard.VCS.Client.Audio.Managers
                                         ///TODO cache this to avoid the contant lookup
                                         _audioRecordingManager.AppendPlayerAudio(tempFloat, jitterBufferAudio.ReceivedRadio);
                                     }
-                                   
+
                                 }
                             }
-                         
+
                         }
                         else
                         {
@@ -613,20 +643,41 @@ namespace Vanguard.VCS.Client.Audio.Managers
 
         public void AddClientAudio(ClientAudio audio)
         {
-            //sort out effects!
-
-            //16bit PCM Audio
-            //TODO: Clean  - remove if we havent received audio in a while?
-            // If we have recieved audio, create a new buffered audio and read it
-            ClientAudioProvider client = null;
-            client = new ClientAudioProvider();
-
-            foreach (var mixer in _radioMixingProvider)
+            // Reuse a per-client audio provider instead of creating one per packet
+            if (audio == null)
             {
-                mixer.AddMixerInput(client);
+                return;
             }
-            
-            client.AddClientAudioSamples(audio);
+
+            var key = audio.ClientGuid;
+            if (key == Guid.Empty)
+            {
+                // Fall back to original behavior if no guid is present
+                var fallback = new ClientAudioProvider();
+                foreach (var mix in _radioMixingProvider)
+                {
+                    mix.AddMixerInput(fallback);
+                }
+                fallback.AddClientAudioSamples(audio);
+                return;
+            }
+
+            // Get or create the ClientAudioProvider for this client
+            if (!_clientsBufferedAudio.TryGetValue(key, out var provider))
+            {
+                provider = new ClientAudioProvider();
+
+                // Attach to all radio mixers once
+                foreach (var mix in _radioMixingProvider)
+                {
+                    mix.AddMixerInput(provider);
+                }
+
+                _clientsBufferedAudio[key] = provider;
+            }
+
+            // Feed decoded samples into the client’s jitter buffer / stream
+            provider.AddClientAudioSamples(audio);
         }
 
         private void RemoveClientBuffer(SRClient srClient)
@@ -655,12 +706,11 @@ namespace Vanguard.VCS.Client.Audio.Managers
         //MIC SEGMENT FRAMES IS SHORTS not bytes - which is two bytes
         //however we only want half of a frame IN BYTES not short - so its MIC_SEGMENT_FRAMES *2 (for bytes) then / 2 for bytes again
         //declare here to save on garbage collection
-        byte[] tempBuffferFirst20ms = new byte[MIC_SEGMENT_FRAMES];
-        byte[] tempBuffferSecond20ms = new byte[MIC_SEGMENT_FRAMES];
+        byte[] tempBufffer20ms = new byte[MIC_SEGMENT_FRAMES];
         bool DoesFrameContainSpeech(byte[] audioFrame, short[] pcmShort)
         {
-            Buffer.BlockCopy(audioFrame,0,tempBuffferFirst20ms,0, MIC_SEGMENT_FRAMES);
-            Buffer.BlockCopy(audioFrame, MIC_SEGMENT_FRAMES, tempBuffferSecond20ms, 0, MIC_SEGMENT_FRAMES);
+            // Single 20 ms frame at 16 kHz mono is 320 samples = 640 bytes
+            Buffer.BlockCopy(audioFrame, 0, tempBufffer20ms, 0, MIC_SEGMENT_FRAMES);
 
             OperatingMode mode = (OperatingMode)_globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
 
@@ -669,20 +719,32 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 InitVox();
             }
 
-            //frame size is 40 - this only supports 20
-            bool voice = _voxDectection.HasSpeech(tempBuffferFirst20ms) || _voxDectection.HasSpeech(tempBuffferSecond20ms);
+            // Run VAD on this single 20 ms buffer
+            bool voice = _voxDectection.HasSpeech(tempBufffer20ms);
 
             if (voice)
             {
-                //calculate the RMS and see if we're over it
-                //voice run first as it ignores background hums very well
+                // Gate with RMS threshold if configured
                 double rms = VolumeConversionHelper.CalculateRMS(pcmShort);
                 double min = _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
-
                 return rms > min;
             }
-            //no voice so dont bother with RMS
             return false;
+        }
+        
+        private bool ShouldMonitorSidetone()
+        {
+            // Must have PTT active to monitor sidetone (prevents open-loop howl)
+            if (_udpVoiceHandler == null || !_udpVoiceHandler._ptt) return false;
+
+            // Only allow sidetone if mic monitor device is not the same as main speakers
+            var speakers = _audioOutputSingleton.SelectedAudioOutput.Value as MMDevice ?? WasapiOut.GetDefaultAudioEndpoint();
+            var micOut = _audioOutputSingleton.SelectedMicAudioOutput.Value as MMDevice;
+            if (micOut == null) return false;
+
+            // If the same endpoint, don’t monitor to avoid feedback
+            bool sameEndpoint = (speakers != null) && (speakers.ID == micOut.ID);
+            return !sameEndpoint;
         }
 
         public void PlaySoundEffectStartTransmit(int sendingOn, bool enc, float volume, RadioInformation.Modulation modulation)

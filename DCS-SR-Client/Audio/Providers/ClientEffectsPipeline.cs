@@ -112,16 +112,19 @@ namespace Vanguard.VCS.Client.Audio.Providers
         {
             RefreshSettings();
             DeJitteredTransmission lastTransmission = transmissions[0];
+            Array.Clear(tempBuffer, 0, tempBuffer.Length);
+            // Prevent accumulation from previous calls; stale content can create a steady whine
 
             clientTransmissionLength = 0;
             foreach (var transmission in transmissions)
             {
-                for (int i = 0; i < transmission.PCMAudioLength; i++)
+                var mixCount = Math.Min(transmission.PCMAudioLength, tempBuffer.Length);
+                for (var i = 0; i < mixCount; i++)
                 {
                     tempBuffer[i] += transmission.PCMMonoAudio[i];
                 }
 
-                clientTransmissionLength = Math.Max(clientTransmissionLength, transmission.PCMAudioLength);
+                clientTransmissionLength = Math.Max(clientTransmissionLength, mixCount);
             }
 
             bool process = true;
@@ -181,13 +184,33 @@ namespace Vanguard.VCS.Client.Audio.Providers
             if (process)
                 tempBuffer = ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
 
-
+            if (clientTransmissionLength >= 4)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Effects out first samples: {tempBuffer[0]:0.000}, {tempBuffer[1]:0.000}, {tempBuffer[2]:0.000}, {tempBuffer[3]:0.000}");
+            }
+            
             return tempBuffer;
         }
 
         public float[] ProcessClientAudioSamples(float[] buffer, int count, int offset, DeJitteredTransmission transmission)
         {
-            if (!transmission.NoAudioEffects)
+            if (buffer == null || count <= 0) return buffer;
+
+            // Ensure we don’t read/write past the buffer
+            if (offset < 0) offset = 0;
+            if (offset > buffer.Length) return buffer;
+            if (offset + count > buffer.Length) count = buffer.Length - offset;
+
+            // QUICK BYPASS to isolate the effects layer during debugging
+            // Toggle this to true to skip effects and just apply volume
+            #if DEBUG
+            var bypassEffectsForDebug = false;
+            #else
+            var bypassEffectsForDebug = true;
+            #endif
+            
+            if (!transmission.NoAudioEffects && !bypassEffectsForDebug)
             {
                 if (transmission.Modulation == RadioInformation.Modulation.MIDS
                     || transmission.Modulation == RadioInformation.Modulation.SATCOM
@@ -206,6 +229,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             //final adjust
             AdjustVolume(buffer, count, offset, transmission.Volume);
+            var end = offset + count;
+            for (var i = offset; i < end; i++)
+            {
+                var s = buffer[i];
+                if (float.IsNaN(s) || float.IsInfinity(s)) { buffer[i] = 0f; continue; }
+                if (s > 1f) buffer[i] = 1f;
+                else if (s < -1f) buffer[i] = -1f;
+            }
 
             return buffer;
         }

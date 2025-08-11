@@ -377,7 +377,7 @@ namespace Vanguard.VCS.Client.Network
                         
                         //we now WANT to duplicate through multiple pipelines ONLY if AM blocking is on
                         //this is a nice optimisation to save duplicated audio on servers without that setting 
-                        if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE)) continue;
+                        // if (!_serverSettings.GetSettingAsBool(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE)) continue;
                         if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE))
                         {
                             audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
@@ -387,10 +387,7 @@ namespace Vanguard.VCS.Client.Network
                     }
                     catch (Exception ex)
                     {
-                        if (!_stop)
-                        {
-                            Logger.Warn(ex, "Failed to decode audio from Packet");
-                        }
+                        Logger.Warn(ex, "Failed to decode audio from Packet - this is expected if the packet is malformed or not a voice packet");
                     }
                 }
             }
