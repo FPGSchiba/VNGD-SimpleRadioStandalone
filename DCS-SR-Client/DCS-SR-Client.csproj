@@ -73,6 +73,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="Dragablz" Version="0.0.3.234" />
     <PackageReference Include="Easy.MessageHub" Version="5.1.0" />

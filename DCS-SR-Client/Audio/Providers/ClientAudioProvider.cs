@@ -64,6 +64,12 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         public JitterBufferAudio AddClientAudioSamples(ClientAudio audio)
         {
+            if (audio.EncodedAudio == null || audio.EncodedAudio.Length < 5)
+            {
+                Logger.Warn($"Dropping too-small opus packet: len={audio.EncodedAudio?.Length ?? 0}");
+                return null;
+            }
+            
             bool newTransmission = LikelyNewTransmission();
 
             // Proper handling of DecodeFloat: returns byte[] containing floats; decodedLength is in bytes
@@ -80,12 +86,19 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 return null;
             }
 
+            int expected = AudioManager.OUTPUT_SEGMENT_FRAMES; // 960 for 20ms@48k
             int sampleCount = decodedLength / sizeof(float);
+            if (sampleCount <= 0)
+            {
+                Logger.Warn("Decoded zero samples; dropping packet");
+                return null;
+            }
+
             var tmp = new float[sampleCount];
             Buffer.BlockCopy(decodedBytes, 0, tmp, 0, decodedLength);
 
             // sanitize
-            for (int i = 0; i < tmp.Length; i++)
+            for (var i = 0; i < tmp.Length; i++)
             {
                 var s = tmp[i];
                 if (float.IsNaN(s) || float.IsInfinity(s)) tmp[i] = 0f;
@@ -93,7 +106,19 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 else if (s < -1f) tmp[i] = -1f;
             }
 
-            audio.PcmAudioFloat = tmp;
+            // Normalize exactly to 960 samples
+            var normalized = new float[expected];
+            if (sampleCount >= expected)
+            {
+                Array.Copy(tmp, 0, normalized, 0, expected);
+            }
+            else
+            {
+                Array.Copy(tmp, 0, normalized, 0, sampleCount);
+                Array.Clear(normalized, sampleCount, expected - sampleCount);
+            }
+
+            audio.PcmAudioFloat = normalized;
 
             AdjustVolumeForLoss(audio);
 

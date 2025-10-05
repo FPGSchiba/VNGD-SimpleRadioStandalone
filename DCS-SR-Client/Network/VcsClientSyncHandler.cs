@@ -14,6 +14,7 @@ using NLog;
 using Vanguard.VCS.Client.Network.DCS;
 using Vanguard.VCS.Client.UI.ClientWindow;
 using Vanguard.VCS.Common.DCSState;
+using DevOne.Security.Cryptography.BCrypt;
 
 namespace Vanguard.VCS.Client.Network
 {
@@ -113,12 +114,7 @@ namespace Vanguard.VCS.Client.Network
 
         private static string HashPassword(string password)
         {
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                var bytes = System.Text.Encoding.UTF8.GetBytes(password);
-                var hash = sha256.ComputeHash(bytes);
-                return BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
-            }
+            return BCryptHelper.HashPassword(password,BCryptHelper.GenerateSalt(12));
         }
 
         public void ConnectVcs(IPEndPoint endpoint)
@@ -164,22 +160,36 @@ namespace Vanguard.VCS.Client.Network
                     Version = VcsVersion,
                 },
             };
-            var initResponse = _authServiceClient.InitAuth(initRequest);
-            if (!initResponse.Success)
+            try
             {
-                Logger.Error("Failed to initialize radio sync: {0}", initResponse.ErrorMessage);
-                _callback?.Invoke(VcsUiUpdateType.InitializationError, initResponse.ErrorMessage);
-                return;
+                var callOptions = new CallOptions(deadline: DateTime.UtcNow.AddSeconds(10));
+                var initResponse = _authServiceClient.InitAuth(initRequest, callOptions);
+                if (!initResponse.Success)
+                {
+                    Logger.Error("Failed to initialize radio sync: {0}", initResponse.ErrorMessage);
+                    _callback?.Invoke(VcsUiUpdateType.InitializationError, initResponse.ErrorMessage);
+                    return;
+                }
+                _clientGuid = Guid.Parse(initResponse.Result.ClientGuid);
+                _clientStateSingleton.RegisterClientGuid(_clientGuid);
+                _callback?.Invoke(VcsUiUpdateType.InitializationSuccess, new InitializationResult
+                {
+                    ClientGuid = _clientGuid,
+                    IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
+                    IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
+                });
+                _radioDcsSync = new DCSRadioSyncManager(UpdateRadioInformation, ClientCoalitionUpdate);
             }
-            _clientGuid = Guid.Parse(initResponse.Result.ClientGuid);
-            _clientStateSingleton.RegisterClientGuid(_clientGuid);
-            _callback?.Invoke(VcsUiUpdateType.InitializationSuccess, new InitializationResult
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
             {
-                ClientGuid = _clientGuid,
-                IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
-                IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
-            });
-            _radioDcsSync = new DCSRadioSyncManager(UpdateRadioInformation, ClientCoalitionUpdate);
+                Logger.Error(ex, "gRPC call timed out.");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Connection timed out.");
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during initialization");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, ex.Message);
+            }
         }
 
         private void GuestLogin(UserLogin userLogin)

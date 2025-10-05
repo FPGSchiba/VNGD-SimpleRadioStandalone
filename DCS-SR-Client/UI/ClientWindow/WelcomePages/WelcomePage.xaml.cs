@@ -86,7 +86,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
                 Dispatcher.Invoke(() =>
                 {
                     mainWindow.On_FetchedServerInformation(endpoint);
-                    ConnectionSuccessful();
                 });
             }
             catch (SocketException ex)
@@ -111,20 +110,27 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             }
         }
         
-        private void ConnectionSuccessful()
+        public void ConnectionSuccessful()
         {
             ServerInfoProgress.Visibility = Visibility.Hidden;
             LoadLabel.Visibility = Visibility.Hidden;
             Refresh.Visibility = Visibility.Visible;
         }
         
-        private void ConnectionFailed()
+        public void ConnectionFailed()
         {
             ServerInfoProgress.Visibility = Visibility.Hidden;
+            LoadLabel.Visibility = Visibility.Hidden;
             Login.IsEnabled = false;
             Guest.IsEnabled = false;
             Refresh.Visibility = Visibility.Visible;
-            Logger.Info("Button re-enabled after connection failure.");
+        }
+
+        public void ConnectionReset()
+        {
+            ServerInfoProgress.Visibility = Visibility.Visible;
+            LoadLabel.Visibility = Visibility.Visible;
+            Refresh.Visibility = Visibility.Visible; // As we already tried to connect once, show the refresh button
         }
         
         public void Refresh_Click(object sender, RoutedEventArgs e)

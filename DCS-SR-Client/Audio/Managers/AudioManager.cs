@@ -371,7 +371,6 @@ namespace Vanguard.VCS.Client.Audio.Managers
                         byte toc = buff[0];
                         int config = toc >> 3; // top 5 bits
                         bool celtOnly = config >= 16;
-                        Logger.Debug($"Opus TOC config={config} (CELT-only={celtOnly}) len={len}");
 
                         if ((_udpVoiceHandler != null) && (buff != null) && (len > 0))
                         {
@@ -487,6 +486,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 }
             }
         }
+        
         private void ShowInputError(string message)
         {
             if (Environment.OSVersion.Version.Major == 10)
@@ -648,6 +648,8 @@ namespace Vanguard.VCS.Client.Audio.Managers
             {
                 return;
             }
+            
+            Logger.Debug($"AddClientAudio: ClientGuid={audio.ClientGuid}, ReceivedRadio={audio.ReceivedRadio}, Sequence={audio.Sequence}");
 
             var key = audio.ClientGuid;
             if (key == Guid.Empty)
@@ -658,6 +660,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 {
                     mix.AddMixerInput(fallback);
                 }
+                Logger.Info($"Created and attached ClientAudioProvider for client {key} to {_radioMixingProvider.Count} radio mixers");
                 fallback.AddClientAudioSamples(audio);
                 return;
             }
@@ -672,6 +675,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                 {
                     mix.AddMixerInput(provider);
                 }
+                Logger.Info($"Created audio buffer for client {key} for client: {_guid.ToString()}");
 
                 _clientsBufferedAudio[key] = provider;
             }

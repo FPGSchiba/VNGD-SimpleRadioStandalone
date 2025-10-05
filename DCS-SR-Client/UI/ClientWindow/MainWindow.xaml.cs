@@ -795,6 +795,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 case VcsUiUpdateType.GuestLoginSuccess:
                     Dispatcher.Invoke(HandleGuestLoginSuccess);
                     break;
+                case VcsUiUpdateType.GuestLoginError:
+                    Dispatcher.Invoke(() => HandleGuestLoginError(message));
+                    break;
                 case VcsUiUpdateType.InternalLoginError:
                     Dispatcher.Invoke(() => HandleConnectionError(message, isGuest: false));
                     break;
@@ -859,6 +862,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
                 
                 _guestPage.LoginInProgress.Opacity = 0;
+                _welcomePage.ConnectionSuccessful();
                 ConnectionStatus.Fill = Brushes.Green;
 
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
@@ -914,13 +918,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 _logger.Error($"Unit selection error: {errorMsg}");
-                Stop(true);
                 _unitSelectionPage.SelectionFailed(errorMsg);
             }
             else
             {
                 _logger.Error("Unit selection error with no message provided.");
-                Stop(true);
                 MessageBox.Show("An unknown unit selection error occurred.", "Unit Selection Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -944,6 +946,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _guestPage.LoginFailed();
             else
                 _loginPage.LoginFailed();
+            _welcomePage.ConnectionFailed();
         }
         
         private void HandleInitializationError(object message)
@@ -996,6 +999,22 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 _loginPage.LoginFailed();
             }
+        }
+        
+        private void HandleGuestLoginError(object message)
+        {
+            var errorMsg = message as string;
+            if (!string.IsNullOrEmpty(errorMsg))
+            {
+                _logger.Error($"Guest login error: {errorMsg}");
+                MessageBox.Show(errorMsg, "Guest Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                _logger.Error("Guest login error with no message provided.");
+                MessageBox.Show("An unknown guest login error occurred.", "Guest Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            _guestPage.LoginFailed();
         }
 
         private void Connect(IPAddress ip, int port)
@@ -1069,6 +1088,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _guestPage.Login.IsEnabled = true;
 
             _guestPage.LoginInProgress.Opacity = 0;
+            
+            _welcomePage.SetLoginEnabled(false);
+            _welcomePage.SetGuestEnabled(false);
+            _welcomePage.ConnectionReset();
 
             ConnectionStatus.Fill = Brushes.Red;
 
@@ -1103,6 +1126,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             ClientState.PlayerCoaltionLocationMetadata.Reset();
             
             _loginPage.LoginFailed();
+            _guestPage.LoginFailed();
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1163,7 +1187,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _logger.Info("Initialization successful, setting up UI");
 
             ConnectionStatus.Fill = Brushes.Orange;
-
+            _welcomePage.ConnectionSuccessful();
+            
             if (_usingCustomServer)
             {
                 OpenPageByIndex(CustomServerIndex);

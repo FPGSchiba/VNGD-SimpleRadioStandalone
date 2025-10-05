@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using NAudio.Utils;
 using NAudio.Wave;
+using NLog;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Audio.Recording;
@@ -12,11 +13,18 @@ using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
+    internal class SourceResidueBuffer
+    {
+        public float[] Buffer;
+        public int Count;
+    }
+    
     public class RadioMixingProvider : ISampleProvider
     {
         private readonly int radioId;
         private readonly List<ClientAudioProvider> sources;
-
+        
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
@@ -41,6 +49,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
         private long lastReceivedAt = 0;
         private bool hasPlayedTransmissionStart = false;
         private float lastVolume = 1;
+        
+        // Mixer-level output residue (mono)
+        private float[] _outResidue;
+        private int _outResidueCount = 0;
+        
+        private Dictionary<ClientAudioProvider, SourceResidueBuffer> _sourceResidues = new Dictionary<ClientAudioProvider, SourceResidueBuffer>();
+        private float[] _monoAccum;
+        private float[] _tempMono;
 
         //  private readonly WaveFileWriter waveWriter;
         public RadioMixingProvider(WaveFormat waveFormat, int radioId)
@@ -124,94 +140,100 @@ namespace Vanguard.VCS.Client.Audio.Providers
         /// <returns>Number of samples read</returns>
         public int Read(float[] buffer, int offset, int count)
         {
-            _mainAudio.Clear();
-            _secondaryAudio.Clear();
-            int primarySamples = 0;
-            int secondarySamples = 0;
+            Logger.Debug("RadioMixingProvider Read called");
+            int monoNeeded = count / 2;
 
-            mixBuffer = BufferHelpers.Ensure(mixBuffer, count);
-            secondaryMixBuffer = BufferHelpers.Ensure(secondaryMixBuffer, count);
+            // Ensure mixBuffer large enough for monoNeeded
+            mixBuffer = BufferHelpers.Ensure(mixBuffer, monoNeeded);
+            Array.Clear(mixBuffer, 0, monoNeeded);
 
-            ClearArray(mixBuffer);
-            ClearArray(secondaryMixBuffer);
+            Logger.Debug($"Read START: monoNeeded={monoNeeded}, sources.Count={sources.Count}, _outResidueCount={_outResidueCount}");
 
-            bool ky58Tone = false;
-
-            lock (sources)
+            // 1) Serve from output residue first
+            int monoWrittenOut = 0;
+            if (_outResidueCount > 0)
             {
-                int index = sources.Count - 1;
-                while (index >= 0)
+                int take = Math.Min(_outResidueCount, monoNeeded);
+                Array.Copy(_outResidue, 0, mixBuffer, 0, take);
+                monoWrittenOut += take;
+
+                // shift residue
+                int remain = _outResidueCount - take;
+                if (remain > 0)
                 {
-                    var source = sources[index];
+                    Array.Copy(_outResidue, take, _outResidue, 0, remain);
+                }
+                _outResidueCount = remain;
+                Logger.Debug($"Served {take} from residue, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}");
+            }
 
-                    //ask for count/2 as the source is MONO but the request for this is STEREO
-                    var transmission = source.JitterBufferProviderInterface[radioId].Read(count / 2);
+            // 2) Produce new 960-sample blocks as needed to fill monoNeeded
+            int loopCount = 0;
+            while (monoWrittenOut < monoNeeded)
+            {
+                loopCount++;
+                if (loopCount > 10)
+                {
+                    Logger.Error($"Infinite loop detected in Read(), breaking. monoWrittenOut={monoWrittenOut}, monoNeeded={monoNeeded}");
+                    break;
+                }
 
-                    if (transmission.PCMAudioLength > 0)
+                // Produce exactly 960 mono samples (20 ms) into a fresh block, then append to output residue.
+                const int block = 960;
+
+                Logger.Debug($"Calling ProduceOneMonoBlock, loop={loopCount}");
+                // Build a 960-sample mixed mono block
+                float[] produced = ProduceOneMonoBlock(block, out int producedCount, out bool anyTx, out bool ky58ToneLocal, out int outSamplesAfterEffects);
+                Logger.Debug($"ProduceOneMonoBlock returned: producedCount={producedCount}, anyTx={anyTx}");
+
+                // Append producedCount to residue FIFO
+                if (producedCount > 0)
+                {
+                    int neededCapacity = _outResidueCount + producedCount;
+                    _outResidue = BufferHelpers.Ensure(_outResidue, neededCapacity);
+                    Array.Copy(produced, 0, _outResidue, _outResidueCount, producedCount);
+                    _outResidueCount += producedCount;
+                    Logger.Debug($"Appended {producedCount} to residue, new residue count={_outResidueCount}");
+                }
+
+                // 3) Consume from residue into mixBuffer to reach monoNeeded
+                int need = monoNeeded - monoWrittenOut;
+                int take2 = Math.Min(_outResidueCount, need);
+                if (take2 > 0)
+                {
+                    Array.Copy(_outResidue, 0, mixBuffer, monoWrittenOut, take2);
+                    monoWrittenOut += take2;
+
+                    // shift residue
+                    int remain2 = _outResidueCount - take2;
+                    if (remain2 > 0)
                     {
-                        if (transmission.IsSecondary)
-                        {
-                            _secondaryAudio.Add(transmission);
-                        }
-                        else
-                        {
-                            _mainAudio.Add(transmission);
-                        }
-
-                        if (transmission.Decryptable && transmission.Encryption > 0)
-                        {
-                            ky58Tone = true;
-                        }
-
-                        lastModulation = transmission.Modulation;
-                        lastVolume = transmission.Volume;
+                        Array.Copy(_outResidue, take2, _outResidue, 0, remain2);
                     }
+                    _outResidueCount = remain2;
+                    Logger.Debug($"Consumed {take2} from residue into mixBuffer, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}");
+                }
 
-                    index--;
+                // If we produced nothing (under-run) and residue is empty, break to avoid infinite loop
+                if (producedCount == 0 && _outResidueCount == 0)
+                {
+                    Logger.Debug($"Under-run detected: producedCount=0, residue=0, padding {monoNeeded - monoWrittenOut} zeros");
+                    // pad remaining with zeros
+                    int rest = monoNeeded - monoWrittenOut;
+                    if (rest > 0)
+                    {
+                        Array.Clear(mixBuffer, monoWrittenOut, rest);
+                        monoWrittenOut = monoNeeded;
+                    }
+                    break;
                 }
             }
 
-            //copy to the recording service - as we have everything we need to know about the audio
-            //at this point
-            if (_mainAudio.Count > 0 || _secondaryAudio.Count > 0)
-            {
-                lastReceivedAt = DateTime.Now.Ticks;
-                hasPlayedTransmissionEnd = false;
-                _audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
-            }
+            Logger.Debug($"Read END: monoNeeded={monoNeeded}, monoWrittenOut={monoWrittenOut}, residue={_outResidueCount}");
 
-            if (_mainAudio.Count > 0)
-            {
-                mixBuffer = pipeline.ProcessClientTransmissions(mixBuffer, _mainAudio, out primarySamples);
-            }
-
-            //handle guard
-            if (_secondaryAudio.Count > 0)
-            {
-                secondaryMixBuffer =
-                    pipeline.ProcessClientTransmissions(secondaryMixBuffer, _secondaryAudio, out secondarySamples);
-            }
-
-            //reuse mix buffer
-            mixBuffer = AudioManipulationHelper.MixArraysNoClipping(mixBuffer, primarySamples, secondaryMixBuffer,
-                secondarySamples, out int outputSamples);
-
-            //Now mix in start and end tones, Beeps etc
-            mixBuffer = HandleStartEndTones(mixBuffer, count / 2, _mainAudio.Count > 0 || _secondaryAudio.Count > 0,
-                lastModulation, ky58Tone, out int effectOutputSamples); //divide by 2 as we're not yet in stereo
-
-            //now clip post all mixing
-            mixBuffer = AudioManipulationHelper.ClipArray(mixBuffer, count/2);
-
-            //figure out number of samples to return
-            outputSamples = Math.Max(outputSamples, effectOutputSamples);
-
-            buffer = SeparateAudio(mixBuffer, outputSamples, 0, buffer, offset, radioId);
-
-            //we're now stereo - double the samples
-            outputSamples = outputSamples * 2;
-
-            return EnsureFullBuffer(buffer, outputSamples, offset, count);
+            // Convert to stereo using monoWrittenOut (should equal monoNeeded)
+            buffer = SeparateAudio(mixBuffer, monoWrittenOut, 0, buffer, offset, radioId);
+            return EnsureFullBuffer(buffer, monoWrittenOut * 2, offset, count);
         }
 
         private float[] HandleStartEndTones(float[] mixBuffer, int count, bool transmisson,
@@ -537,6 +559,173 @@ namespace Vanguard.VCS.Client.Audio.Providers
         public bool IsEndOfTransmission
         {
             get { return (DateTime.Now.Ticks - lastReceivedAt) < 3500000; }
+        }
+        
+        private float[] _blockMono;
+        private float[] _blockSecondary;
+
+        private float[] ProduceOneMonoBlock(int block, out int producedCount, out bool anyTransmission, out bool ky58Tone, out int outSamplesAfterEffects)
+        {
+            anyTransmission = false;
+            ky58Tone = false;
+            producedCount = 0;
+            outSamplesAfterEffects = 0;
+
+            _mainAudio.Clear();
+            _secondaryAudio.Clear();
+
+            _blockMono = BufferHelpers.Ensure(_blockMono, block);
+            Array.Clear(_blockMono, 0, block);
+
+            _blockSecondary = BufferHelpers.Ensure(_blockSecondary, block);
+            Array.Clear(_blockSecondary, 0, block);
+
+            // Mix sources into _blockMono exactly 'block' samples
+            lock (sources)
+            {
+                // Accumulator for all sources (mono, block-sized)
+                float[] accum = _blockMono;
+
+                int idx = sources.Count - 1;
+                while (idx >= 0)
+                {
+                    var source = sources[idx];
+
+                    // Per-source residue
+                    if (!_sourceResidues.ContainsKey(source))
+                        _sourceResidues[source] = new SourceResidueBuffer();
+                    var residue = _sourceResidues[source];
+
+                    // Temp mono for this source
+                    _tempMono = BufferHelpers.Ensure(_tempMono, block);
+                    Array.Clear(_tempMono, 0, block);
+
+                    int written = 0;
+
+                    // 1) residue first
+                    if (residue.Count > 0)
+                    {
+                        int take = Math.Min(residue.Count, block);
+                        Array.Copy(residue.Buffer, 0, _tempMono, 0, take);
+                        written += take;
+
+                        int remain = residue.Count - take;
+                        if (remain > 0)
+                            Array.Copy(residue.Buffer, take, residue.Buffer, 0, remain);
+                        residue.Count = remain;
+                    }
+
+                    // 2) pull full 960s (here block is 960, so while rarely runs; kept for clarity)
+                    while (written + 960 <= block)
+                    {
+                        var t = source.JitterBufferProviderInterface[radioId].Read(960);
+                        if (t.PCMAudioLength > 0 && t.PCMMonoAudio != null)
+                        {
+                            Array.Copy(t.PCMMonoAudio, 0, _tempMono, written, t.PCMAudioLength);
+                            written += t.PCMAudioLength;
+
+                            if (t.IsSecondary) _secondaryAudio.Add(t);
+                            else _mainAudio.Add(t);
+
+                            lastModulation = t.Modulation;
+                            lastVolume = t.Volume;
+                        }
+                        else
+                        {
+                            Array.Clear(_tempMono, written, 960);
+                            written += 960;
+                        }
+                    }
+
+                    // 3) tail (should be zero because block==960, but keep robust)
+                    int tail = block - written;
+                    if (tail > 0)
+                    {
+                        var t = source.JitterBufferProviderInterface[radioId].Read(960);
+                        int got = (t.PCMAudioLength > 0 && t.PCMMonoAudio != null) ? t.PCMAudioLength : 0;
+
+                        if (got >= tail)
+                        {
+                            Array.Copy(t.PCMMonoAudio, 0, _tempMono, written, tail);
+                            written += tail;
+
+                            int leftover = got - tail;
+                            if (leftover > 0)
+                            {
+                                if (leftover > 960) leftover = 960;
+                                residue.Buffer = BufferHelpers.Ensure(residue.Buffer, leftover);
+                                Array.Copy(t.PCMMonoAudio, tail, residue.Buffer, 0, leftover);
+                                residue.Count = leftover;
+                            }
+
+                            if (got > 0)
+                            {
+                                if (t.IsSecondary) _secondaryAudio.Add(t);
+                                else _mainAudio.Add(t);
+
+                                lastModulation = t.Modulation;
+                                lastVolume = t.Volume;
+                            }
+                        }
+                        else
+                        {
+                            Array.Clear(_tempMono, written, tail);
+                            written += tail;
+                            residue.Count = 0;
+                        }
+                    }
+
+                    // Mix this source into accumulator
+                    for (int i = 0; i < block; i++)
+                        accum[i] += _tempMono[i];
+
+                    idx--;
+                }
+            }
+
+            if (_mainAudio.Count > 0 || _secondaryAudio.Count > 0)
+            {
+                lastReceivedAt = DateTime.Now.Ticks;
+                hasPlayedTransmissionEnd = false;
+                _audioRecordingManager.AppendClientAudio(_mainAudio, _secondaryAudio, radioId);
+                anyTransmission = true;
+            }
+
+            // Soft clip before pipeline
+            for (int i = 0; i < block; i++)
+            {
+                float x = _blockMono[i];
+                if (x > 1f) x = 1f;
+                else if (x < -1f) x = -1f;
+                _blockMono[i] = x;
+            }
+
+            // Process primary and secondary
+            int primarySamples = 0;
+            int secondarySamples = 0;
+
+            var procMain = pipeline.ProcessClientTransmissions(_blockMono, _mainAudio, out primarySamples);
+
+            Array.Clear(_blockSecondary, 0, block);
+            var procSec = pipeline.ProcessClientTransmissions(_blockSecondary, _secondaryAudio, out secondarySamples);
+
+            // Mix main + secondary
+            var mixed = AudioManipulationHelper.MixArraysNoClipping(procMain, primarySamples, procSec, secondarySamples, out int outputSamples);
+
+            // Start/end tones
+            bool transmitting = (_mainAudio.Count > 0 || _secondaryAudio.Count > 0);
+            mixed = HandleStartEndTones(mixed, outputSamples, transmitting, lastModulation, ky58Tone, out int effectOut);
+
+            producedCount = Math.Max(outputSamples, effectOut);
+            if (producedCount < block)
+            {
+                // pad to full block so downstream logic can assume 960 available
+                mixed = AudioManipulationHelper.ClipArray(mixed, block); // ensures capacity
+                Array.Clear(mixed, producedCount, block - producedCount);
+                producedCount = block;
+            }
+
+            return mixed;
         }
     }
 }

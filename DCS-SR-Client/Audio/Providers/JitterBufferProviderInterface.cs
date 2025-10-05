@@ -5,6 +5,7 @@ using NAudio.Wave;
 using NLog;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Helpers;
 
 namespace Vanguard.VCS.Client.Audio.Providers
@@ -41,12 +42,21 @@ namespace Vanguard.VCS.Client.Audio.Providers
         public JitterBufferProviderInterface(WaveFormat waveFormat)
         {
             WaveFormat = waveFormat;
-
-            _circularBuffer = new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 3);//3 seconds worth of audio
-
+            _circularBuffer = new CircularFloatBuffer(AudioManager.OUTPUT_SAMPLE_RATE * 3);
             Array.Clear(_silence, 0, _silence.Length);
+    
+            // Initialize lastTransmission with safe defaults
+            lastTransmission = new DeJitteredTransmission()
+            {
+                Modulation = RadioInformation.Modulation.DISABLED,
+                Frequency = 0,
+                Volume = 1.0f,
+                IsSecondary = false,
+                ReceivedRadio = 0,
+                NoAudioEffects = false,
+                Guid = Guid.Empty
+            };
 
-            // Debug log to verify silence buffer size
             Logger.Debug($"JitterBuffer initialized: silence buffer = {_silence.Length} samples ({_silence.Length * 1000.0 / AudioManager.OUTPUT_SAMPLE_RATE:0.0}ms)");
         }
 
@@ -54,6 +64,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         public DeJitteredTransmission Read(int count)
         {
+            if (_logReadCounter % 50 == 0) // throttle to every 50th call
+            {
+                Logger.Debug($"JBP[radio?] Read: count={count}, primed={_primed}, avail={_availableSamples}, queued={_bufferedAudio.Count}");
+            }
+            
             _logReadCounter++;
             if (_primed)
             {
@@ -82,6 +97,10 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         // If we are not primed yet, fill the remainder with silence and return.
                         if (!_primed)
                         {
+                            if (_bufferedAudio.Count > 0)
+                            {
+                                TryPrimeIfNeeded();
+                            }
                             Array.Clear(returnBuffer, read, count - read);
                             read = count;
                             break;
@@ -117,15 +136,12 @@ namespace Vanguard.VCS.Client.Audio.Providers
                             if (_lastRead + 1 < audio.PacketNumber)
                             {
                                 var missing = audio.PacketNumber - (_lastRead + 1);
-
-                                if (missing <= 4)
+                                var fill = (int)Math.Min(missing, 2);
+                                if (_availableSamples >= 960 * 6) fill = 0;
+                                for (var i = 0; i < fill; i++)
                                 {
-                                    var fill = Math.Min(missing, 4);
-                                    for (var i = 0; i < (int)fill; i++)
-                                    {
-                                        _circularBuffer.Write(_silence, 0, _silence.Length);
-                                        _availableSamples += _silence.Length;
-                                    }
+                                    _circularBuffer.Write(_silence, 0, _silence.Length);
+                                    _availableSamples += _silence.Length;
                                 }
                             }
                             _lastRead = audio.PacketNumber;
@@ -152,20 +168,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
                             }
                         }
 
-                        // Priming check: once we’ve buffered enough, mark primed
-                        // Priming check: count both queued and circular buffer samples
-                        if (_primed) continue;
-                        var primingTarget = 960; // Just 1 packet = immediate priming
-                        var totalAvailable = _availableSamples + (_bufferedAudio.Count * 960);
-                        if (totalAvailable < primingTarget) continue;
-                        _primed = true;
-                        Logger.Debug($"Jitter buffer primed in AddSamples: total={totalAvailable}, target={primingTarget}, queue={_bufferedAudio.Count}");
-
                         // Loop to try reading again (now that we wrote more)
                     }
                 } while (read < count);
             }
-
+            
             var result = new DeJitteredTransmission
             {
                 Modulation = lastTransmission.Modulation,
@@ -214,11 +221,17 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     {
                         var next = it.Next;
 
-                        if (it.Value.PacketNumber == jitterBufferAudio.PacketNumber) return;
+                        if (it.Value.PacketNumber == jitterBufferAudio.PacketNumber)
+                        {
+                            // Check priming before returning on duplicate
+                            TryPrimeIfNeeded();
+                            return;
+                        }
 
                         if (jitterBufferAudio.PacketNumber < it.Value.PacketNumber)
                         {
                             _bufferedAudio.AddBefore(it, jitterBufferAudio);
+                            TryPrimeIfNeeded();
                             return;
                         }
 
@@ -226,6 +239,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                             ((next == null) || (jitterBufferAudio.PacketNumber < next.Value.PacketNumber)))
                         {
                             _bufferedAudio.AddAfter(it, jitterBufferAudio);
+                            TryPrimeIfNeeded();
                             return;
                         }
 
@@ -233,17 +247,68 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     }
                 }
 
-                // Add priming check in AddSamples - this is where packets actually arrive
-                if (!_primed)
+                // Check priming after any successful add
+                TryPrimeIfNeeded();
+            }
+        }
+
+        private void TryPrimeIfNeeded()
+        {
+            if (_primed) return;
+
+            // Target 120 ms (6 frames) – adjust as you like
+            int primingTargetSamples = 960 * 6;
+
+            // Move packets from _bufferedAudio into _circularBuffer until we reach target
+            while (_availableSamples < primingTargetSamples && _bufferedAudio.Count > 0)
+            {
+                var audio = _bufferedAudio.First.Value;
+                _bufferedAudio.RemoveFirst();
+
+                // Missing packet handling (cap to 2 frames)
+                if (_lastRead == 0)
                 {
-                    int primingTarget = 960; // Just 1 packet = immediate priming
-                    int totalAvailable = _availableSamples + (_bufferedAudio.Count * 960);
-                    if (totalAvailable >= primingTarget)
-                    {
-                        _primed = true;
-                        Logger.Debug($"Jitter buffer primed in AddSamples: total={totalAvailable}, target={primingTarget}, queue={_bufferedAudio.Count}");
-                    }
+                    _lastRead = audio.PacketNumber;
                 }
+                else
+                {
+                    if (_lastRead + 1 < audio.PacketNumber)
+                    {
+                        var missing = audio.PacketNumber - (_lastRead + 1);
+                        int fill = (int)Math.Min(missing, 2);
+                        if (_availableSamples >= 960 * 6) fill = 0;
+
+                        for (int i = 0; i < fill; i++)
+                        {
+                            _circularBuffer.Write(_silence, 0, _silence.Length);
+                            _availableSamples += _silence.Length;
+                        }
+                    }
+                    _lastRead = audio.PacketNumber;
+                }
+
+                if (audio.Audio != null && audio.Audio.Length > 0)
+                {
+                    _circularBuffer.Write(audio.Audio, 0, audio.Audio.Length);
+                    _availableSamples += audio.Audio.Length;
+
+                    lastTransmission = new DeJitteredTransmission()
+                    {
+                        Modulation = audio.Modulation,
+                        Frequency = audio.Frequency,
+                        IsSecondary = audio.IsSecondary,
+                        ReceivedRadio = audio.ReceivedRadio,
+                        Volume = audio.Volume,
+                        NoAudioEffects = audio.NoAudioEffects,
+                        Guid = audio.Guid,
+                    };
+                }
+            }
+
+            if (_availableSamples >= primingTargetSamples)
+            {
+                _primed = true;
+                Logger.Info($"Jitter buffer PRIMED: avail={_availableSamples}, target={primingTargetSamples}, queue={_bufferedAudio.Count}");
             }
         }
     }
