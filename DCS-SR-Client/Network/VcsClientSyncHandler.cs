@@ -156,7 +156,7 @@ namespace Vanguard.VCS.Client.Network
         
         private void InitializeConnection()
         {
-            var initRequest = new ClientAuthInitRequest()
+            var initRequest = new AuthInitRequest()
             {
                 Capabilities = new ClientCapabilities()
                 {
@@ -184,7 +184,7 @@ namespace Vanguard.VCS.Client.Network
 
         private void GuestLogin(UserLogin userLogin)
         {
-            var connectRequest = new ClientGuestLoginRequest()
+            var connectRequest = new GuestLoginRequest()
             {
                 ClientGuid = _clientGuid.ToString(),
                 Name = userLogin.Username,
@@ -212,28 +212,29 @@ namespace Vanguard.VCS.Client.Network
         private void InternalLogin(UserLogin userLogin)
         {
             Logger.Info("Beginning internal login process for user: {0}", userLogin.Username);
-            var loginRequest = new ClientLoginRequest()
+            var loginRequest = new StartAuthRequest()
             {
                 ClientGuid = _clientGuid.ToString(),
                 AuthenticationPlugin = "profile-vanguard",
-                Credentials = { { "email", userLogin.Username }, { "password", userLogin.Password } }
+                FlowId = "vanguard_email_password",
+                FirstStepInput = { { "email", userLogin.Username }, { "password", userLogin.Password } }
             };
             
-            var response = _authServiceClient.Login(loginRequest);
+            var response = _authServiceClient.StartAuth(loginRequest);
             if (!response.Success)
             {
                 _callback?.Invoke(VcsUiUpdateType.InternalLoginError, response.ErrorMessage);
                 return;
             }
 
-            _tempSecret = response.Result.Secret;
-            _clientStateSingleton.LastSeenName = response.Result.PlayerName;
+            _tempSecret = response.Complete.Secret;
+            _clientStateSingleton.LastSeenName = response.Complete.PlayerName;
             _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
             {
-                AvailableCoalitions = response.Result.AvailableCoalitions,
-                AvailableUnits = response.Result.AvailableUnits,
-                AvailableRoles = response.Result.AvailableRoles,
-                PlayerName = response.Result.PlayerName,
+                AvailableCoalitions = response.Complete.AvailableCoalitions,
+                AvailableUnits = response.Complete.AvailableUnits,
+                AvailableRoles = response.Complete.AvailableRoles,
+                PlayerName = response.Complete.PlayerName,
             });
         }
 
@@ -246,7 +247,7 @@ namespace Vanguard.VCS.Client.Network
                 return;
             }
 
-            var selectionRequest = new ClientUnitSelectRequest()
+            var selectionRequest = new UnitSelectRequest()
             {
                 ClientGuid = _clientGuid.ToString(),
                 Secret = _tempSecret,
