@@ -327,6 +327,20 @@ namespace Vanguard.VCS.Client.Network
                         //Check if Global
                         var listeningFrequency = udpVoicePacket.FrequencyMHz * 1000000; // Convert to Hz
                         var globalFrequency = globalFrequencies.Contains(listeningFrequency);
+
+                        // Allow test frequencies from server to bypass blocking only if the sender is ourselves (echo test)
+                        var testFrequencies = _serverSettings.TestFrequencies ?? new List<double>();
+                        var isTestFrequency = testFrequencies.Contains(listeningFrequency);
+                        var isSenderUs = udpVoicePacket.ClientId == _guid;
+                        if (isTestFrequency && isSenderUs)
+                        {
+                            // Treat as global for this receive so that it will bypass CurrentlyBlockedRadios
+                            globalFrequency = true;
+                            Logger.Debug($"UdpAudioDecode: Test frequency match and sender is local. Freq={listeningFrequency/1e6:F6} MHz, Client={udpVoicePacket.ClientId}");
+                        }
+
+                        // Debug log the important packet metadata and blocking state for troubleshooting
+                        Logger.Debug($"UdpAudioDecode: Packet from {udpVoicePacket.ClientId} freq={listeningFrequency/1e6:F6} MHz, IsIntercom={udpVoicePacket.IsIntercom}, IsPTTActive={udpVoicePacket.IsPttActive}, globalFrequency={globalFrequency}, isTestFrequency={isTestFrequency}, isSenderUs={isSenderUs}, blockedRadios=[{string.Join(',', blockedRadios)}]");
                         
                         var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(listeningFrequency, RadioInformation.Modulation.AM, out var state);
                         RadioReceivingPriority radioReceivingPriority = null;
@@ -341,7 +355,23 @@ namespace Vanguard.VCS.Client.Network
                             };
                         }
                         
-                        if (radioReceivingPriority == null) continue;
+                        if (radioReceivingPriority == null)
+                        {
+                            // Log why the packet was dropped for tracing
+                            if (radio == null || state == null)
+                            {
+                                Logger.Debug($"UdpAudioDecode: Dropping packet - no tunable radio for freq {listeningFrequency/1e6:F6} MHz");
+                            }
+                            else if (blockedRadios.Contains(state.ReceivedOn) && !_serverSettings.GlobalFrequencies.Contains(listeningFrequency) && !(isTestFrequency && isSenderUs))
+                            {
+                                Logger.Debug($"UdpAudioDecode: Dropping packet - radio {state.ReceivedOn} blocked while transmitting (PTT/VOX)");
+                            }
+                            else
+                            {
+                                Logger.Debug($"UdpAudioDecode: Dropping packet - unknown reason for freq {listeningFrequency/1e6:F6} MHz");
+                            }
+                            continue;
+                        }
 
                         var audio = new ClientAudio
                         {
@@ -381,6 +411,7 @@ namespace Vanguard.VCS.Client.Network
                         if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE))
                         {
                             audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
+                            Logger.Debug($"UdpAudioDecode: Setting NoAudioEffects={audio.NoAudioEffects} for freq={audio.Frequency/1e6:F6} MHz");
                         }
                         
                         _audioManager.AddClientAudio(audio);
@@ -851,3 +882,4 @@ namespace Vanguard.VCS.Client.Network
         }
     }
 }
+

@@ -619,6 +619,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     while (written + 960 <= block)
                     {
                         var t = source.JitterBufferProviderInterface[radioId].Read(960);
+                        Logger.Debug($"RadioMixingProvider: Read from jitterBuffer[{radioId}] for source, got PCMAudioLength={t.PCMAudioLength}, IsSecondary={t.IsSecondary}");
                         if (t.PCMAudioLength > 0 && t.PCMMonoAudio != null)
                         {
                             Array.Copy(t.PCMMonoAudio, 0, _tempMono, written, t.PCMAudioLength);
@@ -626,6 +627,8 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
                             if (t.IsSecondary) _secondaryAudio.Add(t);
                             else _mainAudio.Add(t);
+
+                            Logger.Debug($"RadioMixingProvider: Added jitter entry to {(t.IsSecondary ? "secondary" : "main")} audio lists. Count main={_mainAudio.Count}, secondary={_secondaryAudio.Count}");
 
                             lastModulation = t.Modulation;
                             lastVolume = t.Volume;
@@ -729,3 +732,4 @@ namespace Vanguard.VCS.Client.Audio.Providers
         }
     }
 }
+

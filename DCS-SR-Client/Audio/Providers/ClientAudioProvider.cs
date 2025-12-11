@@ -64,6 +64,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
         public JitterBufferAudio AddClientAudioSamples(ClientAudio audio)
         {
+            Logger.Debug($"ClientAudioProvider.AddClientAudioSamples: client={audio.ClientGuid}, seq={audio.Sequence}, passThrough={passThrough}, receivedRadio={audio.ReceivedRadio}, encodedLen={audio.EncodedAudio?.Length ?? 0}");
             if (audio.EncodedAudio == null || audio.EncodedAudio.Length < 5)
             {
                 Logger.Warn($"Dropping too-small opus packet: len={audio.EncodedAudio?.Length ?? 0}");
@@ -134,8 +135,10 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             if (audio.ClientGuid == ClientStateSingleton.Instance.ClientId)
             {
+                Logger.Debug($"ClientAudioProvider: packet is from local client {audio.ClientGuid}. passThrough={passThrough}");
                 if (passThrough)
                 {
+                    Logger.Debug($"ClientAudioProvider: returning JitterBufferAudio for pass-through local packet seq={audio.Sequence}");
                     return new JitterBufferAudio
                     {
                         Audio = audio.PcmAudioFloat,
@@ -150,6 +153,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     };
                 }
 
+                Logger.Debug($"ClientAudioProvider: dropping local packet because provider is not passThrough seq={audio.Sequence}");
                 return null;
             }
 
@@ -173,6 +177,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 return null;
             }
 
+            Logger.Debug($"ClientAudioProvider: passThrough provider returning audio for client {audio.ClientGuid} seq={audio.Sequence}");
             return new JitterBufferAudio
             {
                 Audio = audio.PcmAudioFloat,

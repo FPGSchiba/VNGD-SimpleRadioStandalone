@@ -22,6 +22,9 @@ namespace Vanguard.VCS.Client.Settings
 
         public List<double> GlobalFrequencies { get; set; } = new List<double>();
 
+        // List of test frequencies provided by the server (Hz)
+        public List<double> TestFrequencies { get; set; } = new List<double>();
+
         // Node Limit of 0 means no retransmission
         public int RetransmitNodeLimit { get; set; } = 0;
 
@@ -109,7 +112,10 @@ namespace Vanguard.VCS.Client.Settings
 
         public void DecodeVcs(ServerSettings serverSettings)
         {
-            GlobalFrequencies = serverSettings.GlobalFrequencies.Select(freq => (double)freq).ToList();
+            // VCS provides frequencies as MHz floats; convert to Hz for client comparisons
+            GlobalFrequencies = serverSettings.GlobalFrequencies.Select(freq => (double)freq * 1e+6).ToList();
+            // Populate test frequencies from VCS server settings as Hz
+            TestFrequencies = serverSettings.TestFrequencies.Select(freq => (double)freq * 1e+6).ToList();
         }
     }
 }

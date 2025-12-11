@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -650,6 +651,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
             }
             
             Logger.Debug($"AddClientAudio: ClientGuid={audio.ClientGuid}, ReceivedRadio={audio.ReceivedRadio}, Sequence={audio.Sequence}");
+            Logger.Debug($"AddClientAudio Meta: Frequency={audio.Frequency/1e6:F6} MHz, NoAudioEffects={audio.NoAudioEffects}, IsSecondary={audio.IsSecondary}, Volume={audio.Volume}");
 
             var key = audio.ClientGuid;
             if (key == Guid.Empty)
@@ -682,6 +684,73 @@ namespace Vanguard.VCS.Client.Audio.Managers
 
             // Feed decoded samples into the client’s jitter buffer / stream
             provider.AddClientAudioSamples(audio);
+
+            // If this packet is an echo (from our own ClientId) and is on a server test frequency,
+            // decode it via the pass-through provider and inject into the per-client provider's jitter buffer
+            try
+            {
+                if (audio.ClientGuid == ClientStateSingleton.Instance.ClientId)
+                {
+                    var testFreqs = SyncedServerSettings.Instance.TestFrequencies;
+                    if (testFreqs != null && testFreqs.Any(f => Math.Abs(f - audio.Frequency) <= 1.0))
+                    {
+                        // Decode using pass-through provider
+                        var jitterBufferAudio = _passThroughAudioProvider?.AddClientAudioSamples(audio);
+                        if (jitterBufferAudio != null)
+                        {
+                            // If the per-client provider exists and has jitter buffers, inject the decoded samples into it
+                            if (provider != null && provider.JitterBufferProviderInterface != null && provider.JitterBufferProviderInterface.Length > jitterBufferAudio.ReceivedRadio)
+                            {
+                                try
+                                {
+                                    provider.JitterBufferProviderInterface[jitterBufferAudio.ReceivedRadio].AddSamples(jitterBufferAudio);
+                                    Logger.Debug($"Injected echo into provider jitter buffer for radio {jitterBufferAudio.ReceivedRadio}, seq={jitterBufferAudio.PacketNumber}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Warn(ex, "Failed injecting echo into provider jitter buffer");
+                                }
+                            }
+
+                            // Also keep previous mic-monitor behavior (optional) if sidetone is enabled
+                            try
+                            {
+                                if (_micWaveOut != null && ShouldMonitorSidetone())
+                                {
+                                    float[] tempFloat = jitterBufferAudio.Audio;
+                                    const float sidetoneGain = 0.05f;
+                                    for (int i = 0; i < tempFloat.Length; i++)
+                                    {
+                                        float s = tempFloat[i];
+                                        if (float.IsNaN(s) || float.IsInfinity(s)) s = 0f;
+                                        s *= sidetoneGain;
+                                        if (s > 1f) s = 1f; else if (s < -1f) s = -1f;
+                                        tempFloat[i] = s;
+                                    }
+
+                                    _tempMicOutputBuffer = BufferHelpers.Ensure(_tempMicOutputBuffer, tempFloat.Length * 4);
+                                    Buffer.BlockCopy(tempFloat, 0, _tempMicOutputBuffer, 0, tempFloat.Length * 4);
+                                    _micWaveOutBuffer.AddSamples(_tempMicOutputBuffer, 0, tempFloat.Length * 4);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Warn(ex, "Failed to write pass-through samples to mic monitor");
+                            }
+
+                            if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.RecordAudio))
+                            {
+                                _audioRecordingManager.AppendPlayerAudio(jitterBufferAudio.Audio, jitterBufferAudio.ReceivedRadio);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Failed to handle pass-through echo audio");
+            }
+
         }
 
         private void RemoveClientBuffer(SRClient srClient)
@@ -762,3 +831,4 @@ namespace Vanguard.VCS.Client.Audio.Managers
         }
     }
 }
+

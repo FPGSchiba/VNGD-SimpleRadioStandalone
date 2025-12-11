@@ -354,21 +354,55 @@ namespace NAudio.CoreAudioApi
         /// </summary>
         public void Dispose()
         {
-            StopRecording();
-            if (captureThread != null)
+            // Request stop
+            try
             {
-                if (captureThread.IsAlive)
+                StopRecording();
+
+                // If using event sync, wake the wait handle so the capture thread can exit promptly
+                try
                 {
-                    captureThread.Abort();
-                    captureThread.Join();
+                    frameEventWaitHandle?.Set();
                 }
-                captureThread = null;
+                catch { }
+
+                if (captureThread != null)
+                {
+                    if (captureThread.IsAlive)
+                    {
+                        // Wait for the capture thread to finish gracefully
+                        captureThread.Join(TimeSpan.FromSeconds(2));
+
+                        // If still alive after waiting, log a warning but do not abort
+                        if (captureThread.IsAlive)
+                        {
+                            // captureThread still alive; leave it to finish. Avoid Thread.Abort which is not supported.
+                            // Optionally we could escalate, but safest is to continue cleanup.
+                            // Consider increasing the join timeout if necessary in environments where disposing takes longer.
+                            // No further action here.
+                        }
+                    }
+                    captureThread = null;
+                }
             }
+            catch (PlatformNotSupportedException)
+            {
+                // Thread operations may not be supported on some platforms; ensure we still dispose audio client
+            }
+
             if (audioClient != null)
             {
                 audioClient.Dispose();
                 audioClient = null;
             }
+
+            // Clean up wait handle
+            try
+            {
+                frameEventWaitHandle?.Dispose();
+                frameEventWaitHandle = null;
+            }
+            catch { }
         }
     }
 }
