@@ -5,14 +5,18 @@ using MathNet.Filtering;
 using NAudio.Dsp;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Utility;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Setting;
+using NLog;
 
 namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class ClientEffectsPipeline
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly Random _random = new Random();
 
         private OnlineFilter[] _filters;
@@ -77,6 +81,28 @@ namespace Vanguard.VCS.Client.Audio.Providers
             amCollisionEffect = CachedAudioEffectProvider.Instance.AMCollision;
            
         }
+        
+        // In-process throttle for debug logs to prevent log spam from tight audio loops
+        private static readonly Dictionary<string, long> _rmThrottleLastMs = new Dictionary<string, long>();
+        private static readonly object _rmThrottleLock = new object();
+        
+        private void DebugThrottledRm(string key, Func<string> messageFactory, int minMs = 200)
+        {
+            var now = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+            var should = false;
+            lock (_rmThrottleLock)
+            {
+                if (!_rmThrottleLastMs.TryGetValue(key, out var last) || (now - last) >= minMs)
+                {
+                    _rmThrottleLastMs[key] = now;
+                    should = true;
+                }
+            }
+            if (should && messageFactory != null && Logger.IsDebugEnabled)
+            {
+                Logger.Debug(messageFactory());
+            }
+        }
 
         private void RefreshSettings()
         {
@@ -111,14 +137,61 @@ namespace Vanguard.VCS.Client.Audio.Providers
         public float[] ProcessClientTransmissions(float[] tempBuffer, List<DeJitteredTransmission> transmissions, out int clientTransmissionLength)
         {
             RefreshSettings();
+
+            // Defensive guard: transmissions can be null or empty (observed in logs leading to OOR when accessing [0])
+            if (Logger.IsTraceEnabled)
+            {
+                Logger.Trace("ProcessClientTransmissions START: tempBufferLen={0}, transmissionsCount={1}", tempBuffer == null ? 0 : tempBuffer.Length, transmissions == null ? 0 : transmissions.Count);
+            }
+
+            if (transmissions == null || transmissions.Count == 0)
+            {
+                clientTransmissionLength = 0;
+                if (tempBuffer != null && tempBuffer.Length > 0)
+                    Array.Clear(tempBuffer, 0, tempBuffer.Length);
+                DebugThrottledRm("Transmission-Cleared", () => "ProcessClientTransmissions: no transmissions - returning cleared buffer");
+                return tempBuffer;
+            }
+
+            // New debug: log per-transmission lengths to detect doubled frame sizes
+            // keep a coarse count log, but avoid spamming per-packet detail every frame by
+            // only emitting the first transmission's details (if present) and relying on
+            // the aggregated message for the rest.
+            DebugThrottledRm("Transmission",  () => $"ProcessClientTransmissions: transmissions.Count={transmissions.Count}");
+            if (transmissions.Count > 0)
+            {
+                var tr0 = transmissions[0];
+                DebugThrottledRm("Transmission-First", () => $"  tx[0] Guid={tr0.Guid}, PCMAudioLength={tr0.PCMAudioLength}, PCMMonoLen={(tr0.PCMMonoAudio==null?0:tr0.PCMMonoAudio.Length)}, Volume={tr0.Volume}");
+            }
+
             DeJitteredTransmission lastTransmission = transmissions[0];
-            Array.Clear(tempBuffer, 0, tempBuffer.Length);
+            if (tempBuffer != null && tempBuffer.Length > 0)
+                Array.Clear(tempBuffer, 0, tempBuffer.Length);
             // Prevent accumulation from previous calls; stale content can create a steady whine
 
             clientTransmissionLength = 0;
+            int skippedCount = 0;
             foreach (var transmission in transmissions)
             {
-                var mixCount = Math.Min(transmission.PCMAudioLength, tempBuffer.Length);
+                // DeJitteredTransmission is a struct; it cannot be null. Validate its PCMMonoAudio array instead.
+                var mixCount = Math.Min(transmission.PCMAudioLength, (tempBuffer==null?0:tempBuffer.Length));
+
+                if (transmission.PCMMonoAudio == null)
+                {
+                    Logger.Warn($"ProcessClientTransmissions: SKIPPED - PCMMonoAudio is NULL for Guid={transmission.Guid}, PCMAudioLength={transmission.PCMAudioLength}");
+                    skippedCount++;
+                    continue;
+                }
+
+                // Clamp mixCount to the actual array length to avoid OOR
+                mixCount = Math.Min(mixCount, transmission.PCMMonoAudio.Length);
+                if (mixCount <= 0)
+                {
+                    Logger.Warn($"ProcessClientTransmissions: SKIPPED - mixCount={mixCount} for Guid={transmission.Guid}, PCMAudioLength={transmission.PCMAudioLength}, PCMMonoLen={transmission.PCMMonoAudio.Length}, tempBufferLen={tempBuffer?.Length ?? 0}");
+                    skippedCount++;
+                    continue;
+                }
+
                 for (var i = 0; i < mixCount; i++)
                 {
                     tempBuffer[i] += transmission.PCMMonoAudio[i];
@@ -126,6 +199,15 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
                 clientTransmissionLength = Math.Max(clientTransmissionLength, mixCount);
             }
+            
+            var transmissionCount = clientTransmissionLength;
+
+            if (skippedCount > 0 || clientTransmissionLength == 0)
+            {
+                Logger.Warn($"ProcessClientTransmissions: transmissions={transmissions.Count}, skipped={skippedCount}, finalLength={clientTransmissionLength}");
+            }
+
+            DebugThrottledRm("Aggregated-Transmission", () => $"ProcessClientTransmissions: aggregated clientTransmissionLength={transmissionCount}");
 
             bool process = true;
 
@@ -147,19 +229,31 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     {
                         //replace the buffer with our own
                         int outIndex = 0;
-                        while (outIndex < clientTransmissionLength)
+
+                        var af = amCollisionEffect?.AudioEffectFloat;
+                        if (af == null || af.Length == 0)
                         {
-                            var amByte = this.amCollisionEffect.AudioEffectFloat[amEffectPosition++];
-
-                            tempBuffer[outIndex++] = (amByte *amCollisionVol) * lastTransmission.Volume;
-
-                            if (amEffectPosition == amCollisionEffect.AudioEffectFloat.Length)
-                            {
-                                amEffectPosition = 0;
-                            }
+                            DebugThrottledRm("AF-Null", () => "ProcessClientTransmissions: AM collision effect buffer missing or empty - skipping AM collision replacement");
                         }
+                        else
+                        {
+                            while (outIndex < clientTransmissionLength)
+                            {
+                                // ensure position always valid
+                                if (amEffectPosition >= af.Length) amEffectPosition = 0;
 
-                        process = false;
+                                var amByte = af[amEffectPosition++];
+
+                                tempBuffer[outIndex++] = (amByte * amCollisionVol) * lastTransmission.Volume;
+
+                                if (amEffectPosition == af.Length)
+                                {
+                                    amEffectPosition = 0;
+                                }
+                            }
+
+                            process = false;
+                        }
                     }
                     else if (lastTransmission.Modulation == RadioInformation.Modulation.FM)
                     {
@@ -169,12 +263,22 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         int index = _random.Next(transmissions.Count);
                         var transmission = transmissions[index];
 
-                        for (int i = 0; i < transmission.PCMAudioLength; i++)
+                        if (transmission.PCMMonoAudio == null)
                         {
-                            tempBuffer[i] = transmission.PCMMonoAudio[i];
+                            DebugThrottledRm("PCMMono-Null", () => $"ProcessClientTransmissions: FM pick selected transmission index={index} but PCMMonoAudio is null, skipping picketing copy");
                         }
+                        else
+                        {
+                            int copyLen = Math.Min(transmission.PCMAudioLength, transmission.PCMMonoAudio.Length);
+                            copyLen = Math.Min(copyLen, (tempBuffer==null?0:tempBuffer.Length));
 
-                        clientTransmissionLength = transmission.PCMMonoAudio.Length;
+                            for (int i = 0; i < copyLen; i++)
+                            {
+                                tempBuffer[i] = transmission.PCMMonoAudio[i];
+                            }
+
+                            clientTransmissionLength = copyLen;
+                        }
                     }
 
                 }
@@ -184,12 +288,32 @@ namespace Vanguard.VCS.Client.Audio.Providers
             if (process)
                 tempBuffer = ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
 
-            if (clientTransmissionLength >= 4)
+            // Capture audio after effects processing
+            try
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Effects out first samples: {tempBuffer[0]:0.000}, {tempBuffer[1]:0.000}, {tempBuffer[2]:0.000}, {tempBuffer[3]:0.000}");
+                if (AudioDiagnosticLogger.Instance.IsRunning && tempBuffer != null && clientTransmissionLength > 0)
+                {
+                    AudioDiagnosticLogger.Instance.CaptureEffectsOutput(
+                        lastTransmission.ReceivedRadio, 
+                        tempBuffer, 
+                        clientTransmissionLength
+                    );
+                }
             }
-            
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error capturing after-effects audio");
+            }
+
+            // Only log the first samples when we actually have a buffer and enough samples
+            if (tempBuffer != null && clientTransmissionLength >= 4)
+            {
+                if (Logger.IsTraceEnabled)
+                {
+                    Logger.Trace("Effects out first samples: {0:0.000}, {1:0.000}, {2:0.000}, {3:0.000}", tempBuffer[0], tempBuffer[1], tempBuffer[2], tempBuffer[3]);
+                }
+            }
+
             return tempBuffer;
         }
 
@@ -323,12 +447,15 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     && natoToneEnabled)
                 {
                     var natoTone = effectProvider.NATOTone.AudioEffectFloat;
-                    audio += ((natoTone[natoPosition]) * natoToneVolume);
-                    natoPosition++;
-
-                    if (natoPosition == natoTone.Length)
+                    if (natoTone != null && natoTone.Length > 0)
                     {
-                        natoPosition = 0;
+                        if (natoPosition >= natoTone.Length) natoPosition = 0;
+                        audio += ((natoTone[natoPosition]) * natoToneVolume);
+                        natoPosition++;
+                    }
+                    else
+                    {
+                        DebugThrottledRm("Nato-Tune", () => "AddRadioEffect: NATOTone buffer missing or empty");
                     }
                 }
 
@@ -337,23 +464,31 @@ namespace Vanguard.VCS.Client.Audio.Providers
                      && hqToneEnabled)
                 {
                     var hqTone = effectProvider.HAVEQUICKTone.AudioEffectFloat;
-
-                    audio += ((hqTone[hqTonePosition]) * hqToneVolume);
-                    hqTonePosition++;
-
-                    if (hqTonePosition == hqTone.Length)
+                    if (hqTone != null && hqTone.Length > 0)
                     {
-                        var reset = _random.NextDouble();
+                        if (hqTonePosition >= hqTone.Length) hqTonePosition = 0;
 
-                        if (reset > HQ_RESET_CHANCE)
+                        audio += ((hqTone[hqTonePosition]) * hqToneVolume);
+                        hqTonePosition++;
+
+                        if (hqTonePosition == hqTone.Length)
                         {
-                            hqTonePosition = 0;
+                            var reset = _random.NextDouble();
+
+                            if (reset > HQ_RESET_CHANCE)
+                            {
+                                hqTonePosition = 0;
+                            }
+                            else
+                            {
+                                //one back to try again
+                                hqTonePosition += -1;
+                            }
                         }
-                        else
-                        {
-                            //one back to try again
-                            hqTonePosition += -1;
-                        }
+                    }
+                    else
+                    {
+                        DebugThrottledRm("HQ-Tune", () => "AddRadioEffect: HAVEQUICKTone buffer missing or empty");
                     }
                 }
 
@@ -383,13 +518,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         if (effectProvider.UHFNoise.Loaded)
                         {
                             var noise = effectProvider.UHFNoise.AudioEffectFloat;
-                            //UHF Band?
-                            audio += ((noise[uhfNoisePosition]) * uhfVol);
-                            uhfNoisePosition++;
-
-                            if (uhfNoisePosition == noise.Length)
+                            if (noise != null && noise.Length > 0)
                             {
-                                uhfNoisePosition = 0;
+                                if (uhfNoisePosition >= noise.Length) uhfNoisePosition = 0;
+                                audio += ((noise[uhfNoisePosition]) * uhfVol);
+                                uhfNoisePosition++;
+
+                                if (uhfNoisePosition == noise.Length)
+                                {
+                                    uhfNoisePosition = 0;
+                                }
+                            }
+                            else
+                            {
+                                DebugThrottledRm("UHF-Noise", () => "AddRadioBackgroundNoiseEffect: UHFNoise buffer missing or empty");
                             }
                         }
                     }
@@ -399,12 +541,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         {
                             //VHF Band? - Very rough
                             var noise = effectProvider.VHFNoise.AudioEffectFloat;
-                            audio += ((noise[vhfNoisePosition]) * vhfVol);
-                            vhfNoisePosition++;
-
-                            if (vhfNoisePosition == noise.Length)
+                            if (noise != null && noise.Length > 0)
                             {
-                                vhfNoisePosition = 0;
+                                if (vhfNoisePosition >= noise.Length) vhfNoisePosition = 0;
+                                audio += ((noise[vhfNoisePosition]) * vhfVol);
+                                vhfNoisePosition++;
+
+                                if (vhfNoisePosition == noise.Length)
+                                {
+                                    vhfNoisePosition = 0;
+                                }
+                            }
+                            else
+                            {
+                                DebugThrottledRm("Noise",  () => "AddRadioBackgroundNoiseEffect: VHFNoise buffer missing or empty");
                             }
                         }
                     }
@@ -414,12 +564,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         {
                             //HF!
                             var noise = effectProvider.HFNoise.AudioEffectFloat;
-                            audio += ((noise[hfNoisePosition]) * hfVol);
-                            hfNoisePosition++;
-
-                            if (hfNoisePosition == noise.Length)
+                            if (noise != null && noise.Length > 0)
                             {
-                                hfNoisePosition = 0;
+                                if (hfNoisePosition >= noise.Length) hfNoisePosition = 0;
+                                audio += ((noise[hfNoisePosition]) * hfVol);
+                                hfNoisePosition++;
+
+                                if (hfNoisePosition == noise.Length)
+                                {
+                                    hfNoisePosition = 0;
+                                }
+                            }
+                            else
+                            {
+                                DebugThrottledRm("HF-Noise", () => "AddRadioBackgroundNoiseEffect: HFNoise buffer missing or empty");
                             }
                         }
                     }
@@ -432,13 +590,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         //FM picks up most of the 20-60 ish range + has a different effect
                         //HF!
                         var noise = effectProvider.FMNoise.AudioEffectFloat;
-                        //UHF Band?
-                        audio += ((noise[fmNoisePosition]) * fmVol);
-                        fmNoisePosition++;
-
-                        if (fmNoisePosition == noise.Length)
+                        if (noise != null && noise.Length > 0)
                         {
-                            fmNoisePosition = 0;
+                            if (fmNoisePosition >= noise.Length) fmNoisePosition = 0;
+                            audio += ((noise[fmNoisePosition]) * fmVol);
+                            fmNoisePosition++;
+
+                            if (fmNoisePosition == noise.Length)
+                            {
+                                fmNoisePosition = 0;
+                            }
+                        }
+                        else
+                        {
+                            DebugThrottledRm("FM-Noise", () => "AddRadioBackgroundNoiseEffect: FMNoise buffer missing or empty");
                         }
                     }
                 }

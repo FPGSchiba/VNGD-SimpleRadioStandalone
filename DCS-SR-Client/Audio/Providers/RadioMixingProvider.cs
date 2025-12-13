@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using NAudio.Utils;
 using NAudio.Wave;
@@ -8,6 +9,7 @@ using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
 using Vanguard.VCS.Client.Audio.Recording;
 using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Helpers;
 
@@ -25,6 +27,27 @@ namespace Vanguard.VCS.Client.Audio.Providers
         private readonly List<ClientAudioProvider> sources;
         
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        // In-process throttle for debug logs to prevent log spam from tight audio loops
+        private static readonly Dictionary<string, long> _rmThrottleLastMs = new Dictionary<string, long>();
+        private static readonly object _rmThrottleLock = new object();
+        private void DebugThrottledRm(string key, Func<string> messageFactory, int minMs = 200)
+        {
+            var now = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+            var should = false;
+            lock (_rmThrottleLock)
+            {
+                if (!_rmThrottleLastMs.TryGetValue(key, out var last) || (now - last) >= minMs)
+                {
+                    _rmThrottleLastMs[key] = now;
+                    should = true;
+                }
+            }
+            if (should && messageFactory != null && Logger.IsDebugEnabled)
+            {
+                Logger.Debug(messageFactory());
+            }
+        }
 
         private ClientEffectsPipeline pipeline = new ClientEffectsPipeline();
 
@@ -94,6 +117,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
             lock (sources)
             {
                 sources.Add(mixerInput);
+                DebugThrottledRm($"RM_AddMixerInput_{radioId}", () => $"RadioMixingProvider[{radioId}]: AddMixerInput called. new sources count={sources.Count}", 2000);
             }
         }
 
@@ -102,6 +126,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
             lock (sources)
             {
                 sources.Remove(mixerInput);
+                DebugThrottledRm($"RM_RemoveMixerInput_{radioId}", () => $"RadioMixingProvider[{radioId}]: RemoveMixerInput called. new sources count={sources.Count}", 2000);
             }
         }
 
@@ -140,65 +165,120 @@ namespace Vanguard.VCS.Client.Audio.Providers
         /// <returns>Number of samples read</returns>
         public int Read(float[] buffer, int offset, int count)
         {
-            Logger.Debug("RadioMixingProvider Read called");
+            // Throttle the very hot "Read called" message
+            DebugThrottledRm("RM_Read_Called", () => "RadioMixingProvider Read called", 1000);
             int monoNeeded = count / 2;
 
             // Ensure mixBuffer large enough for monoNeeded
             mixBuffer = BufferHelpers.Ensure(mixBuffer, monoNeeded);
             Array.Clear(mixBuffer, 0, monoNeeded);
 
-            Logger.Debug($"Read START: monoNeeded={monoNeeded}, sources.Count={sources.Count}, _outResidueCount={_outResidueCount}");
+            DebugThrottledRm("RM_Read_Start", () => $"Read START: monoNeeded={monoNeeded}, sources.Count={sources.Count}, _outResidueCount={_outResidueCount}, _outResidueLen={(_outResidue==null?0:_outResidue.Length)}", 500);
 
             // 1) Serve from output residue first
             int monoWrittenOut = 0;
             if (_outResidueCount > 0)
             {
                 int take = Math.Min(_outResidueCount, monoNeeded);
-                Array.Copy(_outResidue, 0, mixBuffer, 0, take);
-                monoWrittenOut += take;
-
-                // shift residue
-                int remain = _outResidueCount - take;
-                if (remain > 0)
+                // Defensive clamp against mismatched array sizes
+                int safeOutLen = _outResidue == null ? 0 : _outResidue.Length;
+                int safeMixLen = mixBuffer == null ? 0 : mixBuffer.Length;
+                int safeTake = Math.Min(take, Math.Min(safeOutLen, safeMixLen));
+                if (safeTake != take)
                 {
-                    Array.Copy(_outResidue, take, _outResidue, 0, remain);
+                    Logger.Warn($"Adjusted residue take from {take} to {safeTake} due to buffer sizes (outResidueLen={safeOutLen}, mixBufferLen={safeMixLen})");
+                    take = safeTake;
                 }
-                _outResidueCount = remain;
-                Logger.Debug($"Served {take} from residue, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}");
+
+                if (take > 0)
+                {
+                    Array.Copy(_outResidue, 0, mixBuffer, 0, take);
+                    monoWrittenOut += take;
+
+                    // shift residue
+                    int remain = _outResidueCount - take;
+                    if (remain > 0)
+                    {
+                        // clamp remain to array lengths
+                        int safeRemain = Math.Min(remain, safeOutLen - take);
+                        if (safeRemain > 0)
+                            Array.Copy(_outResidue, take, _outResidue, 0, safeRemain);
+
+                        _outResidueCount = safeRemain;
+                    }
+                    else
+                    {
+                        _outResidueCount = 0;
+                    }
+                    DebugThrottledRm("RM_ServedResidue", () => $"Served {take} from residue, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}", 1000);
+                }
+                else
+                {
+                    // nothing safe to copy
+                    _outResidueCount = 0;
+                }
             }
 
-            // 2) Produce new 960-sample blocks as needed to fill monoNeeded
-            int loopCount = 0;
-            while (monoWrittenOut < monoNeeded)
+            // 2) Produce new 960-sample blocks as needed to fill monoNeeded, but produce in whole 960 blocks
+            const int block = 960;
+            // Figure how many additional mono samples we must produce (in whole 960-blocks).
+            // Use the remaining need (monoNeeded minus what we've already written out) so we don't produce extra
+            // when residue already satisfied the request.
+            int produceSamples = 0;
+            int remainingNeed = monoNeeded - monoWrittenOut; // how many mono samples we still need in mixBuffer
+            int neededAgainstResidue = remainingNeed - _outResidueCount; // how many samples we must produce beyond current residue
+            if (neededAgainstResidue > 0)
             {
-                loopCount++;
-                if (loopCount > 10)
-                {
-                    Logger.Error($"Infinite loop detected in Read(), breaking. monoWrittenOut={monoWrittenOut}, monoNeeded={monoNeeded}");
-                    break;
-                }
+                produceSamples = ((neededAgainstResidue + block - 1) / block) * block; // round up to whole 960 blocks
+            }
 
-                // Produce exactly 960 mono samples (20 ms) into a fresh block, then append to output residue.
-                const int block = 960;
+            int blocksToProduce = (produceSamples / block);
+            DebugThrottledRm("RM_ProducePlan", () => $"Produce plan: monoNeeded={monoNeeded}, monoWrittenOut={monoWrittenOut}, _outResidueCount={_outResidueCount}, remainingNeed={remainingNeed}, produceSamples={produceSamples}, blocksToProduce={blocksToProduce}", 500);
 
-                Logger.Debug($"Calling ProduceOneMonoBlock, loop={loopCount}");
-                // Build a 960-sample mixed mono block
+            // Produce the required number of whole blocks (or until we detect under-run)
+            for (int b = 0; b < blocksToProduce; b++)
+            {
+                DebugThrottledRm("RM_CallProduce", () => $"Calling ProduceOneMonoBlock, blockIndex={b+1}/{blocksToProduce}", 500);
                 float[] produced = ProduceOneMonoBlock(block, out int producedCount, out bool anyTx, out bool ky58ToneLocal, out int outSamplesAfterEffects);
-                Logger.Debug($"ProduceOneMonoBlock returned: producedCount={producedCount}, anyTx={anyTx}");
+                DebugThrottledRm("RM_ProducedResult", () => $"ProduceOneMonoBlock returned: producedCount={producedCount}, anyTx={anyTx}", 500);
 
-                // Append producedCount to residue FIFO
                 if (producedCount > 0)
                 {
                     int neededCapacity = _outResidueCount + producedCount;
                     _outResidue = BufferHelpers.Ensure(_outResidue, neededCapacity);
-                    Array.Copy(produced, 0, _outResidue, _outResidueCount, producedCount);
-                    _outResidueCount += producedCount;
-                    Logger.Debug($"Appended {producedCount} to residue, new residue count={_outResidueCount}");
+                    int safeProducedLen = produced == null ? 0 : produced.Length;
+                    int safeCopy = Math.Min(producedCount, safeProducedLen);
+                    if (safeCopy != producedCount)
+                    {
+                        Logger.Warn($"Adjusted producedCount from {producedCount} to {safeCopy} due to produced array length");
+                    }
+                    Array.Copy(produced, 0, _outResidue, _outResidueCount, safeCopy);
+                    _outResidueCount += safeCopy;
+                    DebugThrottledRm("RM_AppendedResidue", () => $"Appended {safeCopy} to residue, new residue count={_outResidueCount}", 1000);
                 }
 
-                // 3) Consume from residue into mixBuffer to reach monoNeeded
-                int need = monoNeeded - monoWrittenOut;
-                int take2 = Math.Min(_outResidueCount, need);
+                // If we produced nothing and residue is empty, stop producing and fallthrough to padding
+                if (producedCount == 0 && _outResidueCount == 0)
+                {
+                    DebugThrottledRm("RM_Underrun", () => $"Under-run detected during production: producedCount=0, residue=0, will pad later", 2000);
+                    break;
+                }
+            }
+
+            // 3) Consume from residue into mixBuffer to reach monoNeeded
+            int need = monoNeeded - monoWrittenOut;
+            int take2 = Math.Min(_outResidueCount, need);
+            if (take2 > 0)
+            {
+                int safeOutLen2 = _outResidue == null ? 0 : _outResidue.Length;
+                int safeMixLen2 = mixBuffer == null ? 0 : mixBuffer.Length;
+                int safeTake2 = Math.Min(take2, Math.Min(safeOutLen2, safeMixLen2 - monoWrittenOut));
+                if (safeTake2 != take2)
+                {
+                    Logger.Warn($"Adjusted residue->mix take from {take2} to {safeTake2} due to buffer sizes (outResidueLen={safeOutLen2}, mixBufferLen={safeMixLen2}, monoWrittenOut={monoWrittenOut})");
+                    take2 = safeTake2;
+                }
+
                 if (take2 > 0)
                 {
                     Array.Copy(_outResidue, 0, mixBuffer, monoWrittenOut, take2);
@@ -211,28 +291,41 @@ namespace Vanguard.VCS.Client.Audio.Providers
                         Array.Copy(_outResidue, take2, _outResidue, 0, remain2);
                     }
                     _outResidueCount = remain2;
-                    Logger.Debug($"Consumed {take2} from residue into mixBuffer, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}");
-                }
-
-                // If we produced nothing (under-run) and residue is empty, break to avoid infinite loop
-                if (producedCount == 0 && _outResidueCount == 0)
-                {
-                    Logger.Debug($"Under-run detected: producedCount=0, residue=0, padding {monoNeeded - monoWrittenOut} zeros");
-                    // pad remaining with zeros
-                    int rest = monoNeeded - monoWrittenOut;
-                    if (rest > 0)
-                    {
-                        Array.Clear(mixBuffer, monoWrittenOut, rest);
-                        monoWrittenOut = monoNeeded;
-                    }
-                    break;
+                    DebugThrottledRm("RM_ConsumedResidue", () => $"Consumed {take2} from residue into mixBuffer, monoWrittenOut={monoWrittenOut}, residue remaining={_outResidueCount}", 1000);
                 }
             }
 
-            Logger.Debug($"Read END: monoNeeded={monoNeeded}, monoWrittenOut={monoWrittenOut}, residue={_outResidueCount}");
+            // If after production and consumption we still don't have enough, pad remaining with zeros
+            if (monoWrittenOut < monoNeeded)
+            {
+                int rest = monoNeeded - monoWrittenOut;
+                DebugThrottledRm("RM_Padding", () => $"Padding {rest} zeros into mixBuffer (monoWrittenOut={monoWrittenOut}, monoNeeded={monoNeeded})", 1000);
+                Array.Clear(mixBuffer, monoWrittenOut, rest);
+                monoWrittenOut = monoNeeded;
+            }
+
+            DebugThrottledRm("RM_Read_End", () => $"Read END: monoNeeded={monoNeeded}, monoWrittenOut={monoWrittenOut}, residue={_outResidueCount}", 500);
 
             // Convert to stereo using monoWrittenOut (should equal monoNeeded)
             buffer = SeparateAudio(mixBuffer, monoWrittenOut, 0, buffer, offset, radioId);
+            
+            // Capture final mixed stereo output
+            try
+            {
+                if (Utility.AudioDiagnosticLogger.Instance.IsRunning && monoWrittenOut > 0)
+                {
+                    // Create a copy of the stereo buffer segment for capture
+                    int stereoCount = monoWrittenOut * 2;
+                    float[] stereoCapture = new float[stereoCount];
+                    Array.Copy(buffer, offset, stereoCapture, 0, stereoCount);
+                    Utility.AudioDiagnosticLogger.Instance.CaptureFinalMix(radioId, stereoCapture, stereoCount);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error capturing final mix to diagnostic WAV");
+            }
+            
             return EnsureFullBuffer(buffer, monoWrittenOut * 2, offset, count);
         }
 
@@ -256,6 +349,14 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 //We used to have this logic https://github.com/ciribob/DCS-SimpleRadioStandalone/blob/cd8fcbf7e2b2fafcf30875fc958276e3083e0ebb/DCS-SR-Client/Network/UDPVoiceHandler.cs#L135
                 //if (!radioReceivingState.IsSimultaneous)
                 PlaySoundEffectEndReceive(modulation);
+                
+                // Close diagnostic WAV files for all transmissions on this radio
+                if (Utility.AudioDiagnosticLogger.Instance.IsRunning)
+                {
+                    // Note: We don't have direct client GUID access here, but transmissions ending
+                    // will be captured by timeout logic in the diagnostic logger
+                    Logger.Debug($"RadioMixingProvider: Transmission end detected on radio {radioId}");
+                }
             }
 
             //read
@@ -606,35 +707,93 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     if (residue.Count > 0)
                     {
                         int take = Math.Min(residue.Count, block);
-                        Array.Copy(residue.Buffer, 0, _tempMono, 0, take);
-                        written += take;
+                        int safeResBufLen = residue.Buffer == null ? 0 : residue.Buffer.Length;
+                        int safeTake = Math.Min(take, safeResBufLen);
+                        if (safeTake != take)
+                        {
+                            Logger.Warn($"Adjusted residue take for source from {take} to {safeTake} due to residue buffer length");
+                            take = safeTake;
+                        }
 
-                        int remain = residue.Count - take;
-                        if (remain > 0)
-                            Array.Copy(residue.Buffer, take, residue.Buffer, 0, remain);
-                        residue.Count = remain;
+                        if (take > 0)
+                        {
+                            Array.Copy(residue.Buffer, 0, _tempMono, 0, take);
+                            written += take;
+
+                            int remain = residue.Count - take;
+                            if (remain > 0)
+                                Array.Copy(residue.Buffer, take, residue.Buffer, 0, remain);
+                            residue.Count = remain;
+
+                            DebugThrottledRm("RM_UsedResidue", () => $"RadioMixingProvider: used {take} samples from residue for source (written={written}, residueRemaining={residue.Count})", 2000);
+                        }
                     }
 
                     // 2) pull full 960s (here block is 960, so while rarely runs; kept for clarity)
                     while (written + 960 <= block)
                     {
                         var t = source.JitterBufferProviderInterface[radioId].Read(960);
-                        Logger.Debug($"RadioMixingProvider: Read from jitterBuffer[{radioId}] for source, got PCMAudioLength={t.PCMAudioLength}, IsSecondary={t.IsSecondary}");
+                        // compute packet age for diagnostics (may be -1 if not stamped)
+                        long ageMsRead = -1;
+                        try { ageMsRead = (t.ReceivedAtTicks > 0) ? (DateTime.UtcNow.Ticks - t.ReceivedAtTicks) / TimeSpan.TicksPerMillisecond : -1; } catch { ageMsRead = -1; }
+                        DebugThrottledRm("RM_ReadFromJitter", () => $"RadioMixingProvider: Read from jitterBuffer[{radioId}] for source, got PCMAudioLength={t.PCMAudioLength}, PCMMonoLen={(t.PCMMonoAudio==null?0:t.PCMMonoAudio.Length)}, IsSecondary={t.IsSecondary}, Guid={t.Guid}, ageMs={ageMsRead}, lastReadState={source?.LastUpdate}", 500);
+                        // Additional, sparser log when we get a short frame / underflow to highlight issues
+                        if ((t.PCMAudioLength <= 0) || (t.PCMMonoAudio == null) || (t.PCMAudioLength < 960))
+                        {
+                            DebugThrottledRm("RM_ReadFromJitter_Short", () => $"RadioMixingProvider: jitter Read returned short/empty for radio[{radioId}] guid={t.Guid} pcmlen={t.PCMAudioLength} expected=960 ageMs={ageMsRead}", 2000);
+                        }
                         if (t.PCMAudioLength > 0 && t.PCMMonoAudio != null)
                         {
-                            Array.Copy(t.PCMMonoAudio, 0, _tempMono, written, t.PCMAudioLength);
-                            written += t.PCMAudioLength;
+                            // compute quick stats for this transmission
+                            double sumSqT = 0; float maxAbsT = 0f;
+                            int actualLen = Math.Min(t.PCMAudioLength, t.PCMMonoAudio.Length);
+                            for (int s = 0; s < actualLen; s++)
+                            {
+                                var v = t.PCMMonoAudio[s];
+                                sumSqT += v * v;
+                                var a = Math.Abs(v);
+                                if (a > maxAbsT) maxAbsT = a;
+                            }
+                            var rmsT = Math.Sqrt(actualLen>0?sumSqT/actualLen:0);
+                            DebugThrottledRm("RM_TransmissionStats", () => $"RadioMixingProvider: Transmission stats guid={t.Guid}, pktLen={t.PCMAudioLength}, actualLen={actualLen}, rms={rmsT:0.000}, max={maxAbsT:0.000}, ageMs={ageMsRead}", 1000);
+
+                            // Clamp copy length to avoid OOR
+                            int copyLen = Math.Min(actualLen, block - written);
+                            if (copyLen < actualLen)
+                            {
+                                DebugThrottledRm("RM_CopyClamp", () => $"RadioMixingProvider: clamped copyLen from {actualLen} to {copyLen} due to block/written constraints", 2000);
+                            }
+                            if (copyLen > 0)
+                            {
+                                Array.Copy(t.PCMMonoAudio, 0, _tempMono, written, copyLen);
+                                written += copyLen;
+                            }
 
                             if (t.IsSecondary) _secondaryAudio.Add(t);
                             else _mainAudio.Add(t);
 
-                            Logger.Debug($"RadioMixingProvider: Added jitter entry to {(t.IsSecondary ? "secondary" : "main")} audio lists. Count main={_mainAudio.Count}, secondary={_secondaryAudio.Count}");
+                            DebugThrottledRm("RM_AddedJitterEntry", () => $"RadioMixingProvider: Added jitter entry to {(t.IsSecondary ? "secondary" : "main")} audio lists. Count main={_mainAudio.Count}, secondary={_secondaryAudio.Count}, guid={t.Guid}, pkt={t.PCMAudioLength}", 1000);
 
-                            lastModulation = t.Modulation;
-                            lastVolume = t.Volume;
+                            // Log if this is local client's own echo
+                            try
+                            {
+                                var localGuid = ClientStateSingleton.Instance.ClientId;
+                                if (t.Guid == localGuid)
+                                {
+                                    DebugThrottledRm("RM_LocalGuidDetected", () => $"RadioMixingProvider: Detected local-guid transmission in {(t.IsSecondary?"secondary":"main")} audio. guid={t.Guid}", 5000);
+                                }
+                            }
+                            catch (Exception) { }
+                            DebugThrottledRm("RM_LastModulation", () => $"RadioMixingProvider: lastModulation set to {t.Modulation}, lastVolume={t.Volume}", 1000);
                         }
                         else
                         {
+                            // jitter buffer returned no data -> zero-fill this frame. Log sparsely with age if available.
+                            DebugThrottledRm("RM_ZeroFill", () =>
+                            {
+                                var ageMsg = ageMsRead >= 0 ? $"ageMs={ageMsRead}" : "ageMs=unknown";
+                                return $"RadioMixingProvider: jitter read returned empty for radio[{radioId}] - zero-filling 960 samples ({ageMsg})";
+                            }, 2000);
                             Array.Clear(_tempMono, written, 960);
                             written += 960;
                         }
@@ -645,7 +804,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     if (tail > 0)
                     {
                         var t = source.JitterBufferProviderInterface[radioId].Read(960);
-                        int got = (t.PCMAudioLength > 0 && t.PCMMonoAudio != null) ? t.PCMAudioLength : 0;
+                        int got = (t.PCMAudioLength > 0 && t.PCMMonoAudio != null) ? Math.Min(t.PCMAudioLength, t.PCMMonoAudio.Length) : 0;
 
                         if (got >= tail)
                         {
@@ -666,6 +825,10 @@ namespace Vanguard.VCS.Client.Audio.Providers
                                 if (t.IsSecondary) _secondaryAudio.Add(t);
                                 else _mainAudio.Add(t);
 
+                                // compute age for tail-entry logging
+                                long ageMsTail = -1;
+                                try { ageMsTail = (t.ReceivedAtTicks > 0) ? (DateTime.UtcNow.Ticks - t.ReceivedAtTicks) / TimeSpan.TicksPerMillisecond : -1; } catch { ageMsTail = -1; }
+                                DebugThrottledRm("RM_AddedTailEntry", () => $"RadioMixingProvider: Added jitter tail entry to {(t.IsSecondary?"secondary":"main")} lists. guid={t.Guid}, got={got}, ageMs={ageMsTail}", 1000);
                                 lastModulation = t.Modulation;
                                 lastVolume = t.Volume;
                             }
@@ -682,6 +845,8 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     for (int i = 0; i < block; i++)
                         accum[i] += _tempMono[i];
 
+                    DebugThrottledRm("RM_MixedSource", () => $"RadioMixingProvider: mixed source idx={idx} into accumulator (block={block}, written={written})", 1000);
+
                     idx--;
                 }
             }
@@ -695,25 +860,81 @@ namespace Vanguard.VCS.Client.Audio.Providers
             }
 
             // Soft clip before pipeline
-            for (int i = 0; i < block; i++)
-            {
-                float x = _blockMono[i];
-                if (x > 1f) x = 1f;
-                else if (x < -1f) x = -1f;
-                _blockMono[i] = x;
-            }
+             for (int i = 0; i < block; i++)
+             {
+                 float x = _blockMono[i];
+                 if (x > 1f) x = 1f;
+                 else if (x < -1f) x = -1f;
+                 _blockMono[i] = x;
+             }
 
-            // Process primary and secondary
-            int primarySamples = 0;
-            int secondarySamples = 0;
+             // Detect if clipping actually modified values
+             bool clipped = false;
+             for (int i = 0; i < block; i++)
+             {
+                 var v = _blockMono[i];
+                 if (v >= 1f || v <= -1f)
+                 {
+                     clipped = true;
+                     break;
+                 }
+             }
+             
+             // Capture raw mixed audio BEFORE effects processing
+             try
+             {
+                 if (Utility.AudioDiagnosticLogger.Instance.IsRunning && (_mainAudio.Count > 0 || _secondaryAudio.Count > 0))
+                 {
+                     bool containsLocal = false;
+                     try
+                     {
+                         var localGuid = ClientStateSingleton.Instance.ClientId;
+                         containsLocal = _mainAudio.Any(t => t.Guid == localGuid) || _secondaryAudio.Any(t => t.Guid == localGuid);
+                     }
+                     catch { }
+                     
+                     Utility.AudioDiagnosticLogger.Instance.CaptureMixedOutput(
+                         radioId, 
+                         _blockMono, 
+                         block,
+                         _mainAudio.Count + _secondaryAudio.Count,
+                         containsLocal,
+                         $"BeforeEffects, Clipped={clipped}"
+                     );
+                 }
+             }
+             catch (Exception ex)
+             {
+                 Logger.Warn(ex, "Error capturing mixed audio before effects");
+             }
 
-            var procMain = pipeline.ProcessClientTransmissions(_blockMono, _mainAudio, out primarySamples);
+             // Process primary and secondary
+             int primarySamples = 0;
+             int secondarySamples = 0;
+
+             var procMain = pipeline.ProcessClientTransmissions(_blockMono, _mainAudio, out primarySamples);
+             DebugThrottledRm("RM_ProcessPrimary", () => $"RadioMixingProvider: pipeline.ProcessClientTransmissions returned primarySamples={primarySamples}", 500);
 
             Array.Clear(_blockSecondary, 0, block);
-            var procSec = pipeline.ProcessClientTransmissions(_blockSecondary, _secondaryAudio, out secondarySamples);
+             var procSec = pipeline.ProcessClientTransmissions(_blockSecondary, _secondaryAudio, out secondarySamples);
+             DebugThrottledRm("RM_ProcessSecondary", () => $"RadioMixingProvider: pipeline.ProcessClientTransmissions (secondary) returned secondarySamples={secondarySamples}", 500);
 
             // Mix main + secondary
             var mixed = AudioManipulationHelper.MixArraysNoClipping(procMain, primarySamples, procSec, secondarySamples, out int outputSamples);
+
+            // Capture audio after effects but before tones
+            try
+            {
+                if (Utility.AudioDiagnosticLogger.Instance.IsRunning && outputSamples > 0)
+                {
+                    string effectsInfo = $"Primary={primarySamples}, Secondary={secondarySamples}, Modulation={lastModulation}";
+                    Utility.AudioDiagnosticLogger.Instance.CaptureEffectsOutput(radioId, mixed, outputSamples, effectsInfo);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error capturing after-effects audio to diagnostic WAV");
+            }
 
             // Start/end tones
             bool transmitting = (_mainAudio.Count > 0 || _secondaryAudio.Count > 0);
@@ -728,8 +949,46 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 producedCount = block;
             }
 
-            return mixed;
-        }
-    }
-}
+            try
+             {
+                 var localGuid = ClientStateSingleton.Instance.ClientId;
+                 bool containsLocal = _mainAudio.Any(t => t.Guid == localGuid) || _secondaryAudio.Any(t => t.Guid == localGuid);
+                 if (producedCount > 0)
+                 {
+                     var firstSample = (mixed != null && mixed.Length > 0) ? mixed[0].ToString("0.000") : "0.000";
+                     // copy values to locals to avoid capturing out/ref parameters inside lambda
+                     int producedCountLocal = producedCount;
+                     int mainCountLocal = _mainAudio.Count;
+                     int secondaryCountLocal = _secondaryAudio.Count;
+                     bool containsLocalLocal = containsLocal;
+                     string firstSampleLocal = firstSample;
+                     DebugThrottledRm("RM_ProduceSummary", () => $"ProduceOneMonoBlock: producedCount={producedCountLocal}, mainCount={mainCountLocal}, secondaryCount={secondaryCountLocal}, containsLocal={containsLocalLocal}, firstSample={firstSampleLocal}, clipped={clipped}", 500);
+
+                     // compute RMS of mixed block for debug
+                     double sumSqM = 0;
+                     float maxAbsM = 0f;
+                     int sampleLen = Math.Min(mixed.Length, producedCount);
+                     for (int i = 0; i < sampleLen; i++)
+                     {
+                         var v = mixed[i];
+                         sumSqM += v * v;
+                         var a = Math.Abs(v);
+                         if (a > maxAbsM) maxAbsM = a;
+                     }
+                     var rmsM = Math.Sqrt(sampleLen > 0 ? sumSqM / sampleLen : 0);
+                     DebugThrottledRm("RM_ProduceStats", () => $"ProduceOneMonoBlock: mixed stats rms={rmsM:0.000}, max={maxAbsM:0.000}", 1000);
+                 }
+                 else
+                 {
+                    DebugThrottledRm("RM_ProduceZero", () => $"ProduceOneMonoBlock: producedCount=0, mainCount={_mainAudio.Count}, secondaryCount={_secondaryAudio.Count}, containsLocal={containsLocal}", 1000);
+                 }
+             }
+             catch (Exception ex)
+             {
+                 Logger.Warn(ex, "ProduceOneMonoBlock: error logging local presence");
+             }
+             return mixed;
+          }
+      }
+  }
 

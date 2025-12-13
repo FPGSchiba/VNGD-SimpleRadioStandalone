@@ -20,5 +20,8 @@ namespace Vanguard.VCS.Client.Audio.Models
         public bool NoAudioEffects { get; set; }
 
         public Guid Guid { get; set; }
+
+        // Timestamp (Utc ticks) when this packet was added to the jitter buffer (diagnostic only)
+        public long ReceivedAtTicks { get; set; }
     }
 }

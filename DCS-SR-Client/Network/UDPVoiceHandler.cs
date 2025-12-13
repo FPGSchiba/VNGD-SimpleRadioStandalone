@@ -26,6 +26,24 @@ namespace Vanguard.VCS.Client.Network
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        // Simple throttling for hot UDP debug logs
+        private static readonly Dictionary<string, long> _udpThrottleLastMs = new Dictionary<string, long>();
+        private static readonly object _udpThrottleLock = new object();
+        private void DebugThrottledUdp(string key, string message, int minMs = 500)
+        {
+            var now = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+            var should = false;
+            lock (_udpThrottleLock)
+            {
+                if (!_udpThrottleLastMs.TryGetValue(key, out var last) || (now - last) >= minMs)
+                {
+                    _udpThrottleLastMs[key] = now;
+                    should = true;
+                }
+            }
+            if (should) Logger.Debug(message);
+        }
+
         private readonly IPAddress _address;
         private readonly AudioManager _audioManager;
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
@@ -336,11 +354,11 @@ namespace Vanguard.VCS.Client.Network
                         {
                             // Treat as global for this receive so that it will bypass CurrentlyBlockedRadios
                             globalFrequency = true;
-                            Logger.Debug($"UdpAudioDecode: Test frequency match and sender is local. Freq={listeningFrequency/1e6:F6} MHz, Client={udpVoicePacket.ClientId}");
+                            DebugThrottledUdp("UDP_TestFreqLocal", $"UdpAudioDecode: Test frequency match and sender is local. Freq={listeningFrequency/1e6:F6} MHz, Client={udpVoicePacket.ClientId}", 2000);
                         }
 
                         // Debug log the important packet metadata and blocking state for troubleshooting
-                        Logger.Debug($"UdpAudioDecode: Packet from {udpVoicePacket.ClientId} freq={listeningFrequency/1e6:F6} MHz, IsIntercom={udpVoicePacket.IsIntercom}, IsPTTActive={udpVoicePacket.IsPttActive}, globalFrequency={globalFrequency}, isTestFrequency={isTestFrequency}, isSenderUs={isSenderUs}, blockedRadios=[{string.Join(',', blockedRadios)}]");
+                        DebugThrottledUdp("UDP_PacketMeta", $"UdpAudioDecode: Packet from {udpVoicePacket.ClientId} freq={listeningFrequency/1e6:F6} MHz, IsIntercom={udpVoicePacket.IsIntercom}, IsPTTActive={udpVoicePacket.IsPttActive}, globalFrequency={globalFrequency}, isTestFrequency={isTestFrequency}, isSenderUs={isSenderUs}, blockedRadios=[{string.Join(',', blockedRadios)}]", 2000);
                         
                         var radio = _clientStateSingleton.DcsPlayerRadioInfo.CanHearTransmission(listeningFrequency, RadioInformation.Modulation.AM, out var state);
                         RadioReceivingPriority radioReceivingPriority = null;
@@ -360,15 +378,15 @@ namespace Vanguard.VCS.Client.Network
                             // Log why the packet was dropped for tracing
                             if (radio == null || state == null)
                             {
-                                Logger.Debug($"UdpAudioDecode: Dropping packet - no tunable radio for freq {listeningFrequency/1e6:F6} MHz");
+                                DebugThrottledUdp("UDP_Drop_NoRadio", $"UdpAudioDecode: Dropping packet - no tunable radio for freq {listeningFrequency/1e6:F6} MHz", 2000);
                             }
                             else if (blockedRadios.Contains(state.ReceivedOn) && !_serverSettings.GlobalFrequencies.Contains(listeningFrequency) && !(isTestFrequency && isSenderUs))
                             {
-                                Logger.Debug($"UdpAudioDecode: Dropping packet - radio {state.ReceivedOn} blocked while transmitting (PTT/VOX)");
+                                DebugThrottledUdp("UDP_Drop_Blocked", $"UdpAudioDecode: Dropping packet - radio {state.ReceivedOn} blocked while transmitting (PTT/VOX)", 2000);
                             }
                             else
                             {
-                                Logger.Debug($"UdpAudioDecode: Dropping packet - unknown reason for freq {listeningFrequency/1e6:F6} MHz");
+                                DebugThrottledUdp("UDP_Drop_Unknown", $"UdpAudioDecode: Dropping packet - unknown reason for freq {listeningFrequency/1e6:F6} MHz", 2000);
                             }
                             continue;
                         }
@@ -411,7 +429,7 @@ namespace Vanguard.VCS.Client.Network
                         if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE))
                         {
                             audio.NoAudioEffects = _serverSettings.GlobalFrequencies.Contains(audio.Frequency);
-                            Logger.Debug($"UdpAudioDecode: Setting NoAudioEffects={audio.NoAudioEffects} for freq={audio.Frequency/1e6:F6} MHz");
+                            DebugThrottledUdp("UDP_SetNoAudioEffects", $"UdpAudioDecode: Setting NoAudioEffects={audio.NoAudioEffects} for freq={audio.Frequency/1e6:F6} MHz", 2000);
                         }
                         
                         _audioManager.AddClientAudio(audio);

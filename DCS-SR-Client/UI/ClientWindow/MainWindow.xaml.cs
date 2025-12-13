@@ -879,6 +879,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
+                
+                // Enable audio diagnostics automatically
+                AudioManager.StartDiagnostics(captureWav: true);
+                
                 AudioManager.StartEncoding(InputManager, _resolvedIp, _port);
                 
                 OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);

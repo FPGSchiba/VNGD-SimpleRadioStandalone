@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using FragLabs.Audio.Codecs;
 using NAudio.Wave;
 using NLog;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Audio.Utility;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Common.DCSState;
 
@@ -19,12 +21,20 @@ namespace Vanguard.VCS.Client.Audio.Providers
         private OpusDecoder _decoder;
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        
+        // Diagnostic wav recording
+        private static readonly string DiagnosticsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VCS_AudioDiagnostics");
+        private WaveFileWriter _diagnosticWriter;
+        private object _diagnosticLock = new object();
+        private DateTime _transmissionStartTime;
 
         private readonly bool passThrough;
 
         public ClientAudioProvider(bool passThrough = false)
         {
             this.passThrough = passThrough;
+
+            Logger.Debug($"ClientAudioProvider ctor: hash={this.GetHashCode()}, passThrough={passThrough}");
 
             if (!passThrough)
             {
@@ -34,8 +44,11 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 for (int i = 0; i < radios; i++)
                 {
                     // Ensure float @ 48k mono throughout the mixing/jitter pipeline
+                    // Use a slightly smaller priming target (3 frames = 60ms) to reduce startup latency. This is configurable in the JBP ctor.
                     JitterBufferProviderInterface[i] =
-                        new JitterBufferProviderInterface(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1));
+                        new JitterBufferProviderInterface(WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1), 3);
+                    JitterBufferProviderInterface[i].SetRadioId(i); // Set radio ID for diagnostics
+                    Logger.Debug($"ClientAudioProvider ctor: hash={this.GetHashCode()} created JBP for radio {i} -> jbpHash={JitterBufferProviderInterface[i].GetHashCode()}");
                 }
             }
 
@@ -67,11 +80,17 @@ namespace Vanguard.VCS.Client.Audio.Providers
             Logger.Debug($"ClientAudioProvider.AddClientAudioSamples: client={audio.ClientGuid}, seq={audio.Sequence}, passThrough={passThrough}, receivedRadio={audio.ReceivedRadio}, encodedLen={audio.EncodedAudio?.Length ?? 0}");
             if (audio.EncodedAudio == null || audio.EncodedAudio.Length < 5)
             {
-                Logger.Warn($"Dropping too-small opus packet: len={audio.EncodedAudio?.Length ?? 0}");
                 return null;
             }
             
             bool newTransmission = LikelyNewTransmission();
+            
+            // Start diagnostic recording on new transmission
+            if (newTransmission)
+            {
+                StopDiagnosticRecording(); // Stop any previous recording
+                StartDiagnosticRecording(audio);
+            }
 
             // Proper handling of DecodeFloat: returns byte[] containing floats; decodedLength is in bytes
             var decodedBytes = _decoder.DecodeFloat(
@@ -107,6 +126,8 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 else if (s < -1f) tmp[i] = -1f;
             }
 
+            Logger.Debug($"ClientAudioProvider: decoded sampleCount={sampleCount}, expected={expected}, sequence={audio.Sequence}, client={audio.ClientGuid}");
+
             // Normalize exactly to 960 samples
             var normalized = new float[expected];
             if (sampleCount >= expected)
@@ -122,6 +143,35 @@ namespace Vanguard.VCS.Client.Audio.Providers
             audio.PcmAudioFloat = normalized;
 
             AdjustVolumeForLoss(audio);
+
+            Logger.Debug($"ClientAudioProvider: normalized to {audio.PcmAudioFloat.Length} samples, firstSamples={audio.PcmAudioFloat[0]:0.000},{audio.PcmAudioFloat[1]:0.000}");
+            
+            // Diagnostic logging: Log decoded packet
+            if (AudioDiagnosticLogger.Instance.IsRunning)
+            {
+                AudioDiagnosticLogger.Instance.LogPacketDecoded(
+                    audio.ClientGuid,
+                    audio.Sequence,
+                    audio.ReceivedRadio,
+                    audio.PcmAudioFloat,
+                    audio.PcmAudioFloat.Length
+                );
+            }
+            
+            // Capture transmission audio to WAV file (happens automatically when diagnostics are running)
+            if (AudioDiagnosticLogger.Instance.IsRunning && AudioDiagnosticLogger.Instance.IsCapturingWav)
+            {
+                AudioDiagnosticLogger.Instance.CaptureTransmissionAudio(
+                    audio.ClientGuid.ToString(),
+                    audio.ReceivedRadio,
+                    (int)audio.Sequence,
+                    audio.PcmAudioFloat,
+                    audio.PcmAudioFloat.Length
+                );
+            }
+            
+            // Write decoded and normalized samples to diagnostic wav file
+            WriteDiagnosticSamples(audio.PcmAudioFloat, audio.PcmAudioFloat.Length);
 
             if (newTransmission && SILENCE_PAD > 0)
             {
@@ -159,7 +209,24 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             if (!passThrough)
             {
-                JitterBufferProviderInterface[audio.ReceivedRadio].AddSamples(new JitterBufferAudio
+                var jbp = JitterBufferProviderInterface[audio.ReceivedRadio];
+                
+                // Diagnostic logging: Log before adding to jitter buffer
+                if (AudioDiagnosticLogger.Instance.IsRunning)
+                {
+                    AudioDiagnosticLogger.Instance.LogAddedToJitter(
+                        audio.ClientGuid,
+                        audio.Sequence,
+                        audio.ReceivedRadio,
+                        audio.PcmAudioFloat,
+                        audio.PcmAudioFloat.Length,
+                        jbp.GetQueueDepth(),
+                        jbp.IsPrimed(),
+                        jbp.GetAvailableSamples()
+                    );
+                }
+                
+                jbp.AddSamples(new JitterBufferAudio
                 {
                     Audio = audio.PcmAudioFloat,
                     PacketNumber = audio.Sequence,
@@ -205,8 +272,78 @@ namespace Vanguard.VCS.Client.Audio.Providers
             return f;
         }
 
+        private void StartDiagnosticRecording(ClientAudio audio)
+        {
+            try
+            {
+                lock (_diagnosticLock)
+                {
+                    // Create diagnostics folder if it doesn't exist
+                    if (!Directory.Exists(DiagnosticsFolder))
+                    {
+                        Directory.CreateDirectory(DiagnosticsFolder);
+                    }
+
+                    _transmissionStartTime = DateTime.Now;
+                    var filename = $"TX_{_transmissionStartTime:yyyyMMdd_HHmmss_fff}_Client_{audio.ClientGuid.ToString().Substring(0, 8)}_Radio_{audio.ReceivedRadio}_Seq_{audio.Sequence}.wav";
+                    var filepath = Path.Combine(DiagnosticsFolder, filename);
+
+                    // Create wave file writer: mono float @ 48kHz
+                    var waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(AudioManager.OUTPUT_SAMPLE_RATE, 1);
+                    _diagnosticWriter = new WaveFileWriter(filepath, waveFormat);
+
+                    Logger.Info($"Started diagnostic recording: {filepath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to start diagnostic recording");
+            }
+        }
+
+        private void WriteDiagnosticSamples(float[] samples, int sampleCount)
+        {
+            try
+            {
+                lock (_diagnosticLock)
+                {
+                    if (_diagnosticWriter != null && samples != null && sampleCount > 0)
+                    {
+                        _diagnosticWriter.WriteSamples(samples, 0, sampleCount);
+                        _diagnosticWriter.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to write diagnostic samples");
+            }
+        }
+
+        private void StopDiagnosticRecording()
+        {
+            try
+            {
+                lock (_diagnosticLock)
+                {
+                    if (_diagnosticWriter != null)
+                    {
+                        var duration = DateTime.Now - _transmissionStartTime;
+                        Logger.Info($"Stopped diagnostic recording. Duration: {duration.TotalSeconds:F2}s");
+                        _diagnosticWriter.Dispose();
+                        _diagnosticWriter = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to stop diagnostic recording");
+            }
+        }
+
         ~ClientAudioProvider()
         {
+            StopDiagnosticRecording();
             _decoder?.Dispose();
             _decoder = null;
         }

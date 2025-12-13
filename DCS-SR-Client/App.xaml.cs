@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -242,7 +242,8 @@ namespace Vanguard.VCS.Client
             };
             var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncConsoleTarget", consoleWrapper);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, consoleWrapper));
+            // Reduce console verbosity: show Info and above
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, consoleWrapper));
 
             var fileTarget = new FileTarget
             {
@@ -256,9 +257,8 @@ namespace Vanguard.VCS.Client
 
             var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", fileWrapper);
-            
-            // Default Log Level for File Logging is: Warning (LogLevel.Warn)
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Warn, fileWrapper));
+            // Set file logging to Info and above to reduce debug noise while still capturing operational events
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, fileWrapper));
 
             config.AddSentry(options =>
             {
@@ -267,7 +267,8 @@ namespace Vanguard.VCS.Client
                 options.BreadcrumbLayout = "${logger}: ${message}";
 
                 // Debug and higher are stored as breadcrumbs (default is Info)
-                options.MinimumBreadcrumbLevel = LogLevel.Debug;
+                // Reduce breadcrumbs noise: store Info and higher as breadcrumbs
+                options.MinimumBreadcrumbLevel = LogLevel.Info;
                 // Error and higher is sent as event (default is Error)
                 options.MinimumEventLevel = LogLevel.Error;
 
@@ -417,3 +418,4 @@ namespace Vanguard.VCS.Client
         internal static extern int FreeConsole();
     }
 }
+

@@ -26,5 +26,8 @@ namespace Vanguard.VCS.Client.Audio.Models
         public Guid Guid { get; set; }
 
         public Guid OriginalClientGuid { get; set; }
+
+        // Diagnostic: when the original packet was received into the jitter buffer (Utc ticks)
+        public long ReceivedAtTicks { get; set; }
     }
 }
