@@ -472,6 +472,12 @@ namespace Vanguard.VCS.Client.Network
 
         public bool UpdateClientInfo(string name, string coalition, string unitId, uint roleId)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Logger.Warn("UpdateClientInfo called with null or empty name");
+                return false;
+            }
+
             var info = new ClientInfo
             {
                 Name = name,

@@ -154,5 +154,16 @@ namespace Vanguard.VCS.Client.Tests.Network
 
             Assert.IsFalse(result);
         }
+
+        [TestMethod]
+        public void UpdateClientInfo_RpcError_ReturnsFalse()
+        {
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            var result = _handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
     }
 }
