@@ -13,10 +13,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Easy.MessageHub;
 using Vanguard.VCS.Client.Audio.Managers;
 using Vanguard.VCS.Client.Network;
-using Vanguard.VCS.Client.Network.DCS;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Input;
 using Vanguard.VCS.Client.Singletons;
@@ -48,15 +46,12 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public delegate void UpdateChannelCallback(ProfileSettingsKeys channel, float balance);
 
         public readonly AudioManager AudioManager;
-        private IMessageHub _hub = new MessageHub();
 
         private Guid _guid;
         private bool _usingCustomServer;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
-        private SrsClientSyncHandler _srsClient;
         private VcsClientSyncHandler _vcsClient;
-        private DCSAutoConnectHandler _dcsAutoConnectListener;
         private int _port = 5002;
 
         private const int NoWindowOpen = 17;  // Update when adding new panel
@@ -717,7 +712,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         public void On_HomeLogOutClicked()
         {
-            ConnectAwacsMode();
             Stop();
             OpenPageByIndex(WelcomeIndex);
         }
@@ -854,10 +848,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                 
                 ClientState.LastSeenName = _playerName;
-                ClientState.ExternalAWACSModelSelected = true;
-                ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
-                ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
-                
+
                 _guestPage.LoginInProgress.Opacity = 0;
                 _welcomePage.ConnectionSuccessful();
                 ConnectionStatus.Fill = Brushes.Green;
@@ -1035,7 +1026,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _resolvedIp = ip;
                     _port = port;
 
-                    _srsClient = new SrsClientSyncHandler(_guid, UpdateUiCallback, _hub);
                     _vcsClient = new VcsClientSyncHandler(VcsUiUpdate);
                     
                     Task.Run(() => _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port)));
@@ -1108,20 +1098,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _logger.Error(e, "Failed to stop audio encoding");
             }
 
-            if (_srsClient != null)
-            {
-                _srsClient.Disconnect();
-                _srsClient = null;
-            }
-
             if (_vcsClient != null)
             {
                 _vcsClient.Disconnect();
                 _vcsClient = null;
             }
-            
-            ClientState.DcsPlayerRadioInfo.Reset();
-            ClientState.PlayerCoaltionLocationMetadata.Reset();
             
             _loginPage.LoginFailed();
             _guestPage.LoginFailed();
@@ -1222,7 +1203,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             //stop timer
             _updateTimer?.Stop();
 
-            ConnectAwacsMode();
             Stop();
 
             _audioPreview?.StopEncoding();
@@ -1273,8 +1253,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _radioOverlayWindowTenHorizontalWide?.Close();
             _radioOverlayWindowTenHorizontalWide = null;
 
-            _dcsAutoConnectListener?.Stop();
-            _dcsAutoConnectListener = null;
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -1285,14 +1263,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
 
             base.OnStateChanged(e);
-        }
-
-        private void UpdateUiCallback()
-        {
-            if (ClientState.IsConnected)
-            {
-                _serverSettings.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-            }
         }
 
         public void ToggleOverlay(bool uiButton, int switchTo)
@@ -1645,120 +1615,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.RadioThreeHorizontalOpacity, 1.0);
 
-        }
-
-        private void ConnectAwacsMode()
-        {
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-            }
-
-
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
-            {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1));
-            }
-
-
-            if (_srsClient == null ||
-                !ClientState.IsConnected ||
-                (!ClientState.ExternalAWACSModelSelected &&
-                 string.IsNullOrWhiteSpace(_coalitionPassword)))
-            {
-                return;
-            }
-
-            // Already connected, disconnect
-            if (ClientState.ExternalAWACSModelSelected)
-            {
-                _srsClient.DisconnectExternalAWACSMode();
-            }
-            else
-            {
-                _connectionTransaction.User = new SentryUser
-                {
-                    Username = _playerName
-                };
-                _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
-                _logger.Debug("Init AWACS Connection now...");
-                ClientState.LastSeenName = _playerName;
-                _srsClient.ConnectExternalAWACSMode(_coalitionPassword, ExternalAwacsModeConnectionChanged);
-            }
-        }
-
-        private void ExternalAwacsModeConnectionChanged(bool result, int coalition, bool error = false)
-        {
-            if (result)
-            {
-                ClientState.ExternalAWACSModelSelected = true;
-                ClientState.PlayerCoaltionLocationMetadata.side = coalition;
-                ClientState.PlayerCoaltionLocationMetadata.name = ClientState.LastSeenName;
-                ClientState.DcsPlayerRadioInfo.name = ClientState.LastSeenName;
-                    
-                _guestPage.LoginInProgress.Opacity = 0;
-                ConnectionStatus.Fill = Brushes.Green;
-
-                if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
-                {
-                    try
-                    {
-                        Sounds.BeepConnected.Play();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warn(ex, "Failed to play connect sound");
-                    }
-                }
-
-                LoggedIn = true;
-                ConnectedAt = DateTime.UtcNow;
-                _connectionTransaction.SetTag("coalition", coalition == 0 ? "red" : "blue");
-                OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
-
-                _connectionAwacsSpan.Finish();
-                    
-                SentrySdk.ConfigureScope(scope =>
-                {
-                    scope.User = new SentryUser
-                    {
-                        Username = ClientState.LastSeenName
-                    };
-                });
-                    
-                _connectionTransaction.Finish();
-            }
-            else
-            {
-                ClientState.ExternalAWACSModelSelected = false;
-                ClientState.PlayerCoaltionLocationMetadata.side = 0;
-                ClientState.PlayerCoaltionLocationMetadata.name = "";
-                ClientState.DcsPlayerRadioInfo.name = "";
-                ClientState.DcsPlayerRadioInfo.LastUpdate = 0;
-                ClientState.LastSent = 0;
-
-                _coalitionPassword = "";
-                _playerName = "";
-                    
-                ConnectionStatus.Fill = Brushes.Orange;
-                
-                LoggedIn = false;
-                ConnectedAt = DateTime.Now;
-
-                if (error)
-                {
-                    MessageBox.Show("Incorrect Password to connect to VCS-SRS.", "Auth Error", MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-
-                    _logger.Warn("Stopping server connection...");
-                    Stop(true);
-                }
-                    
-                SentrySdk.ConfigureScope(scope =>
-                {
-                    scope.User = new SentryUser();
-                });
-            }
         }
 
         private void HomeNavigation_OnClick(object sender, RoutedEventArgs e)
