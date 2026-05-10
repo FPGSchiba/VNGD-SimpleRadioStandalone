@@ -111,6 +111,7 @@ namespace Vanguard.VCS.Client.Network
             _callback = uiCallback;
         }
 
+        // For unit testing only: skips channel and radio-sync initialisation.
         internal VcsClientSyncHandler(
             UpdateUiCallback uiCallback,
             IAuthServiceClient authClient,

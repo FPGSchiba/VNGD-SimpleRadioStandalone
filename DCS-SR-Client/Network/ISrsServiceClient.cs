@@ -1,5 +1,5 @@
+using System;
 using Grpc.Core;
-using Vanguard.VCS.Client.Network;
 
 namespace Vanguard.VCS.Client.Network
 {
@@ -19,6 +19,7 @@ namespace Vanguard.VCS.Client.Network
 
         public SrsServiceClientAdapter(SRSService.SRSServiceClient inner)
         {
+            ArgumentNullException.ThrowIfNull(inner);
             _inner = inner;
         }
 
