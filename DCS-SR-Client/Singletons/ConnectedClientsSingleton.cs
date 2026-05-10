@@ -175,20 +175,7 @@ namespace Vanguard.VCS.Client.Singletons
                         }).ToArray()
                     }
                 };
-                if (_clients.TryGetValue(clientGuid, out var existingClient))
-                {
-                    // Update existing client
-                    existingClient.Name = srClient.Name;
-                    existingClient.RadioInfo = srClient.RadioInfo;
-                    existingClient.Muted = srClient.Muted;
-                    existingClient.LastUpdate = srClient.LastUpdate;
-                    existingClient.RadioInfo = srClient.RadioInfo;
-                }
-                else
-                {
-                    // Add new client
-                    _clients.TryAdd(clientGuid, srClient);
-                }
+                _clients.AddOrUpdate(clientGuid, srClient, (_, _) => srClient);
             }
         }
     }
