@@ -111,6 +111,7 @@ namespace Vanguard.VCS.Client.Network
         private string _tempSecret = string.Empty;
         public string ServerVersion { get; private set; } = "0.0.0"; // Default version
         private CancellationTokenSource _streamCts;
+        private Task _subscriptionTask;
 
         public VcsClientSyncHandler(UpdateUiCallback uiCallback)
         {
@@ -592,6 +593,7 @@ namespace Vanguard.VCS.Client.Network
                 Logger.Warn(ex, "Error cancelling subscription stream");
             }
             _streamCts = null;
+            _subscriptionTask = null;
 
             try
             {
@@ -733,11 +735,14 @@ namespace Vanguard.VCS.Client.Network
         private void StartSubscription()
         {
             _streamCts = new CancellationTokenSource();
-            Task.Factory.StartNew(
+            _subscriptionTask = Task.Factory.StartNew(
                 () => RunSubscriptionLoop(_streamCts.Token),
-                _streamCts.Token,
+                CancellationToken.None,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
+            _subscriptionTask.ContinueWith(
+                t => Logger.Error(t.Exception, "Subscription loop faulted unexpectedly"),
+                TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private void RunSubscriptionLoop(CancellationToken cancellationToken)

@@ -345,6 +345,25 @@ namespace Vanguard.VCS.Client.Tests.Network
         }
 
         [TestMethod]
+        public void ProcessServerUpdate_ServerActionUnmute_DoesNotPublishConnectionLost()
+        {
+            _lastUpdateType = null;
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Unmute,
+                    TargetClientGuid = Guid.NewGuid().ToString()
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.IsNull(_lastUpdateType);
+        }
+
+        [TestMethod]
         public void ProcessServerUpdate_Unknown_DoesNotPublishAnyUpdate()
         {
             _lastUpdateType = null;
