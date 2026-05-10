@@ -302,6 +302,36 @@ namespace Vanguard.VCS.Client.Network
             }
         }
 
+        public FlowDiscoveryResult DiscoverAuthenticationFlows(string pluginName)
+        {
+            try
+            {
+                var response = _authServiceClient.DiscoverAuthenticationFlows(
+                    new FlowDiscoveryRequest { AuthenticationPlugin = pluginName },
+                    DefaultCallOptions(10));
+
+                if (!response.Success)
+                {
+                    Logger.Error("Flow discovery failed: {0}", response.ErrorMessage);
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionError, response.ErrorMessage);
+                    return null;
+                }
+                return response.Result;
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Error(ex, "Flow discovery timed out");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Flow discovery timed out.");
+                return null;
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during flow discovery");
+                _callback?.Invoke(VcsUiUpdateType.ConnectionError, ex.Status.Detail);
+                return null;
+            }
+        }
+
         public void SelectUnit(string unitId, string coalition, uint roleId)
         {
             if (string.IsNullOrEmpty(_tempSecret))
