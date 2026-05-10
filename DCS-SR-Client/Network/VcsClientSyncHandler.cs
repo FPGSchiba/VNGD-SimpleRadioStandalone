@@ -208,8 +208,8 @@ namespace Vanguard.VCS.Client.Network
                         IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
                         IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
                     });
-                    _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connecting));
                     _radioStateManager = new RadioStateManager(UpdateRadioInformation, _eventBus);
+                    _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connecting));
                     return;
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unavailable)
@@ -671,8 +671,8 @@ namespace Vanguard.VCS.Client.Network
                     if (update.SettingsUpdate != null)
                     {
                         _serverSettings.DecodeVcs(update.SettingsUpdate);
+                        _eventBus?.Publish(new ServerSettingsChangedEvent(update.SettingsUpdate));
                     }
-                    _eventBus?.Publish(new ServerSettingsChangedEvent(update.SettingsUpdate));
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
                     break;
 
