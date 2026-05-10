@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,12 +26,9 @@ namespace Vanguard.VCS.Client.Tests.Network
                 new { name = "Primary", frequencyHz = 127500000.0, enabled = true, isIntercom = false },
                 new { name = "Intercom", frequencyHz = 0.0, enabled = true, isIntercom = true }
             };
-            var tmpDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tmpDir);
-            File.WriteAllText(Path.Combine(tmpDir, "radio-config.json"), JsonConvert.SerializeObject(radios));
-
-            var originalDir = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(tmpDir);
+            // RadioStateManager resolves the config file relative to AppContext.BaseDirectory
+            var configPath = Path.Combine(AppContext.BaseDirectory, "radio-config.json");
+            File.WriteAllText(configPath, JsonConvert.SerializeObject(radios));
             try
             {
                 var state = RadioStateManager.LoadRadioConfig();
@@ -40,8 +38,7 @@ namespace Vanguard.VCS.Client.Tests.Network
             }
             finally
             {
-                Directory.SetCurrentDirectory(originalDir);
-                Directory.Delete(tmpDir, recursive: true);
+                File.Delete(configPath);
             }
         }
 

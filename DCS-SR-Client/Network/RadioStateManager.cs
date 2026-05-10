@@ -14,11 +14,14 @@ namespace Vanguard.VCS.Client.Network
         public delegate void SendRadioUpdate();
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string RadioConfigFile = "radio-config.json";
+        private static readonly string RadioConfigFile =
+            Path.Combine(AppContext.BaseDirectory, "radio-config.json");
         private const int UpdateIntervalSeconds = 60;
 
         private readonly SendRadioUpdate _radioUpdate;
+        private readonly ManualResetEventSlim _stopEvent = new ManualResetEventSlim(false);
         private volatile bool _stop;
+        private Task _loopTask;
 
         public ClientRadioState CurrentState { get; private set; }
 
@@ -31,25 +34,43 @@ namespace Vanguard.VCS.Client.Network
         public void Start()
         {
             _stop = false;
-            Task.Factory.StartNew(RunLoop, TaskCreationOptions.LongRunning);
+            _stopEvent.Reset();
+            _loopTask = Task.Factory.StartNew(
+                RunLoop,
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
         public void Stop()
         {
             _stop = true;
+            _stopEvent.Set();
         }
 
         private void RunLoop()
         {
             Logger.Info("RadioStateManager loop started");
-            _radioUpdate();
+            InvokeUpdate();
             while (!_stop)
             {
-                Thread.Sleep(UpdateIntervalSeconds * 1000);
+                _stopEvent.Wait(TimeSpan.FromSeconds(UpdateIntervalSeconds));
                 if (!_stop)
-                    _radioUpdate();
+                    InvokeUpdate();
             }
             Logger.Info("RadioStateManager loop stopped");
+        }
+
+        private void InvokeUpdate()
+        {
+            try
+            {
+                _radioUpdate();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "RadioStateManager: _radioUpdate threw unexpectedly; loop continues");
+            }
         }
 
         internal static ClientRadioState LoadRadioConfig()
@@ -63,7 +84,7 @@ namespace Vanguard.VCS.Client.Network
                     if (radios != null && radios.Count > 0)
                     {
                         Logger.Info($"Loaded {radios.Count} radios from {RadioConfigFile}");
-                        return new ClientRadioState(radios);
+                        return new ClientRadioState(radios.AsReadOnly());
                     }
                 }
             }
@@ -79,7 +100,7 @@ namespace Vanguard.VCS.Client.Network
             var radios = new List<ClientRadio>(11);
             for (int i = 0; i < 11; i++)
                 radios.Add(new ClientRadio($"Radio {i + 1}", 1.0, false, false));
-            return new ClientRadioState(radios);
+            return new ClientRadioState(radios.AsReadOnly());
         }
     }
 }
