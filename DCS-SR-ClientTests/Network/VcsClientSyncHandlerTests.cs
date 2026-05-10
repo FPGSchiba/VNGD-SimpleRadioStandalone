@@ -165,5 +165,40 @@ namespace Vanguard.VCS.Client.Tests.Network
 
             Assert.IsFalse(result);
         }
+
+        [TestMethod]
+        public void FetchServerSettings_Success_PublishesServerSettingsFetched()
+        {
+            var settings = new ServerSettings();
+            settings.TestFrequencies.Add(121.5f);
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Returns(settings);
+
+            _handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsFetched, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void FetchServerSettings_Timeout_PublishesServerSettingsError()
+        {
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            _handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void FetchServerSettings_RpcError_PublishesServerSettingsError()
+        {
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            _handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsError, _lastUpdateType);
+        }
     }
 }

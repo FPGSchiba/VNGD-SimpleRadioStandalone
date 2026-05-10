@@ -82,6 +82,8 @@ namespace Vanguard.VCS.Client.Network
         ClientSyncUpdate,
         ConnectionLost,
         ConnectionRestored,
+        ServerSettingsFetched,
+        ServerSettingsError,
     }
     
     public class VcsClientSyncHandler
@@ -537,6 +539,26 @@ namespace Vanguard.VCS.Client.Network
             }
         }
         
+        public void FetchServerSettings()
+        {
+            try
+            {
+                var settings = _srsServiceClient.GetServerSettings(new Empty(), AuthCallOptions(10));
+                _serverSettings.DecodeVcs(settings);
+                _callback?.Invoke(VcsUiUpdateType.ServerSettingsFetched, settings);
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Warn(ex, "GetServerSettings timed out");
+                _callback?.Invoke(VcsUiUpdateType.ServerSettingsError, "Settings fetch timed out.");
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during GetServerSettings");
+                _callback?.Invoke(VcsUiUpdateType.ServerSettingsError, ex.Status.Detail);
+            }
+        }
+
         public void Disconnect()
         {
             Logger.Info("Disconnecting from VCS server");
