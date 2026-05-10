@@ -302,6 +302,53 @@ namespace Vanguard.VCS.Client.Network
             }
         }
 
+        public AuthStepResponse ContinueAuth(string sessionId, System.Collections.Generic.Dictionary<string, string> stepData)
+        {
+            var request = new ContinueAuthRequest
+            {
+                SessionId = sessionId,
+                ClientGuid = _clientGuid.ToString()
+            };
+            foreach (var kv in stepData)
+                request.StepData[kv.Key] = kv.Value;
+
+            try
+            {
+                var response = _authServiceClient.ContinueAuth(request, DefaultCallOptions(15));
+                if (!response.Success)
+                {
+                    _callback?.Invoke(VcsUiUpdateType.InternalLoginError, response.ErrorMessage);
+                    return null;
+                }
+
+                if (response.ResultCase == AuthStepResponse.ResultOneofCase.Complete)
+                {
+                    _tempSecret = response.Complete.Secret;
+                    _clientStateSingleton.LastSeenName = response.Complete.PlayerName;
+                    _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult
+                    {
+                        AvailableCoalitions = response.Complete.AvailableCoalitions,
+                        AvailableUnits = response.Complete.AvailableUnits,
+                        AvailableRoles = response.Complete.AvailableRoles,
+                        PlayerName = response.Complete.PlayerName,
+                    });
+                }
+                return response;
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Error(ex, "ContinueAuth timed out");
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, "Login timed out — server did not respond.");
+                return null;
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during ContinueAuth");
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, ex.Status.Detail);
+                return null;
+            }
+        }
+
         public FlowDiscoveryResult DiscoverAuthenticationFlows(string pluginName)
         {
             try

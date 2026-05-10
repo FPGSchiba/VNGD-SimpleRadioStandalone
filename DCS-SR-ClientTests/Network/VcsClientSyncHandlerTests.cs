@@ -55,5 +55,58 @@ namespace Vanguard.VCS.Client.Tests.Network
             Assert.IsNull(result);
             Assert.AreEqual(VcsUiUpdateType.ConnectionError, _lastUpdateType);
         }
+
+        [TestMethod]
+        public void ContinueAuth_Success_ReturnsResponse()
+        {
+            var loginResult = new LoginResult { PlayerName = "Pilot1", Secret = "abc" };
+            var authResponse = new AuthStepResponse { Success = true, Complete = loginResult };
+            _authMock.Setup(a => a.ContinueAuth(
+                It.Is<ContinueAuthRequest>(r => r.SessionId == "sess1"),
+                It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            var result = _handler.ContinueAuth("sess1", new System.Collections.Generic.Dictionary<string, string> { { "otp", "123456" } });
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Failure_ReturnsNull_AndPublishesLoginError()
+        {
+            var authResponse = new AuthStepResponse { Success = false, ErrorMessage = "bad credentials" };
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            var result = _handler.ContinueAuth("sess1", new System.Collections.Generic.Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Timeout_ReturnsNull_AndPublishesLoginError()
+        {
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            var result = _handler.ContinueAuth("sess1", new System.Collections.Generic.Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_RpcError_ReturnsNull_AndPublishesLoginError()
+        {
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            var result = _handler.ContinueAuth("sess1", new System.Collections.Generic.Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
     }
 }
