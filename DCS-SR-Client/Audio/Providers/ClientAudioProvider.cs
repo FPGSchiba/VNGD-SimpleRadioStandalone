@@ -146,30 +146,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             Logger.Debug($"ClientAudioProvider: normalized to {audio.PcmAudioFloat.Length} samples, firstSamples={audio.PcmAudioFloat[0]:0.000},{audio.PcmAudioFloat[1]:0.000}");
             
-            // Diagnostic logging: Log decoded packet
-            if (AudioDiagnosticLogger.Instance.IsRunning)
-            {
-                AudioDiagnosticLogger.Instance.LogPacketDecoded(
-                    audio.ClientGuid,
-                    audio.Sequence,
-                    audio.ReceivedRadio,
-                    audio.PcmAudioFloat,
-                    audio.PcmAudioFloat.Length
-                );
-            }
-            
-            // Capture transmission audio to WAV file (happens automatically when diagnostics are running)
-            if (AudioDiagnosticLogger.Instance.IsRunning && AudioDiagnosticLogger.Instance.IsCapturingWav)
-            {
-                AudioDiagnosticLogger.Instance.CaptureTransmissionAudio(
-                    audio.ClientGuid.ToString(),
-                    audio.ReceivedRadio,
-                    (int)audio.Sequence,
-                    audio.PcmAudioFloat,
-                    audio.PcmAudioFloat.Length
-                );
-            }
-            
             // Write decoded and normalized samples to diagnostic wav file
             WriteDiagnosticSamples(audio.PcmAudioFloat, audio.PcmAudioFloat.Length);
 
@@ -210,21 +186,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
             if (!passThrough)
             {
                 var jbp = JitterBufferProviderInterface[audio.ReceivedRadio];
-                
-                // Diagnostic logging: Log before adding to jitter buffer
-                if (AudioDiagnosticLogger.Instance.IsRunning)
-                {
-                    AudioDiagnosticLogger.Instance.LogAddedToJitter(
-                        audio.ClientGuid,
-                        audio.Sequence,
-                        audio.ReceivedRadio,
-                        audio.PcmAudioFloat,
-                        audio.PcmAudioFloat.Length,
-                        jbp.GetQueueDepth(),
-                        jbp.IsPrimed(),
-                        jbp.GetAvailableSamples()
-                    );
-                }
                 
                 jbp.AddSamples(new JitterBufferAudio
                 {

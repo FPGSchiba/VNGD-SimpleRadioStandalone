@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using Google.Protobuf.Collections;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
@@ -117,6 +118,12 @@ namespace Vanguard.VCS.Client.Network
             return BCryptHelper.HashPassword(password,BCryptHelper.GenerateSalt(12));
         }
 
+        private static CallOptions DefaultCallOptions(int timeoutSeconds = 10)
+            => new CallOptions(deadline: DateTime.UtcNow.AddSeconds(timeoutSeconds));
+
+        private CallOptions AuthCallOptions(int timeoutSeconds = 10)
+            => new CallOptions(headers: _authenticationMetadata, deadline: DateTime.UtcNow.AddSeconds(timeoutSeconds));
+
         public void ConnectVcs(IPEndPoint endpoint)
         {
             Logger.Info("Starting gRPC connection to VCS server");
@@ -156,39 +163,51 @@ namespace Vanguard.VCS.Client.Network
             {
                 Capabilities = new ClientCapabilities()
                 {
-                    SupportedDistributionModes = { DistributionMode.Standalone }, // This Client only supports standalone mode
+                    SupportedDistributionModes = { DistributionMode.Standalone },
                     Version = VcsVersion,
                 },
             };
-            try
+
+            const int maxAttempts = 3;
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
             {
-                var callOptions = new CallOptions(deadline: DateTime.UtcNow.AddSeconds(10));
-                var initResponse = _authServiceClient.InitAuth(initRequest, callOptions);
-                if (!initResponse.Success)
+                try
                 {
-                    Logger.Error("Failed to initialize radio sync: {0}", initResponse.ErrorMessage);
-                    _callback?.Invoke(VcsUiUpdateType.InitializationError, initResponse.ErrorMessage);
+                    var callOptions = DefaultCallOptions(10);
+                    var initResponse = _authServiceClient.InitAuth(initRequest, callOptions);
+                    if (!initResponse.Success)
+                    {
+                        Logger.Error("Failed to initialize radio sync: {0}", initResponse.ErrorMessage);
+                        _callback?.Invoke(VcsUiUpdateType.InitializationError, initResponse.ErrorMessage);
+                        return;
+                    }
+                    _clientGuid = Guid.Parse(initResponse.Result.ClientGuid);
+                    _clientStateSingleton.RegisterClientGuid(_clientGuid);
+                    _callback?.Invoke(VcsUiUpdateType.InitializationSuccess, new InitializationResult
+                    {
+                        ClientGuid = _clientGuid,
+                        IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
+                        IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
+                    });
+                    _radioDcsSync = new DCSRadioSyncManager(UpdateRadioInformation, ClientCoalitionUpdate);
                     return;
                 }
-                _clientGuid = Guid.Parse(initResponse.Result.ClientGuid);
-                _clientStateSingleton.RegisterClientGuid(_clientGuid);
-                _callback?.Invoke(VcsUiUpdateType.InitializationSuccess, new InitializationResult
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unavailable)
                 {
-                    ClientGuid = _clientGuid,
-                    IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
-                    IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
-                });
-                _radioDcsSync = new DCSRadioSyncManager(UpdateRadioInformation, ClientCoalitionUpdate);
-            }
-            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
-            {
-                Logger.Error(ex, "gRPC call timed out.");
-                _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Connection timed out.");
-            }
-            catch (RpcException ex)
-            {
-                Logger.Error(ex, "gRPC error during initialization");
-                _callback?.Invoke(VcsUiUpdateType.ConnectionError, ex.Message);
+                    Logger.Warn(ex, $"Init attempt {attempt}/{maxAttempts} failed ({ex.StatusCode})");
+                    if (attempt == maxAttempts)
+                    {
+                        _callback?.Invoke(VcsUiUpdateType.ConnectionError, "Connection timed out — server unreachable.");
+                        return;
+                    }
+                    Thread.Sleep(attempt * 1000);
+                }
+                catch (RpcException ex)
+                {
+                    Logger.Error(ex, "gRPC error during initialization");
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionError, ex.Status.Detail);
+                    return;
+                }
             }
         }
 
@@ -201,21 +220,34 @@ namespace Vanguard.VCS.Client.Network
                 Password = HashPassword(userLogin.Password),
                 UnitId = userLogin.UnitId
             };
-            
-            var response = _authServiceClient.GuestLogin(connectRequest);
-            if (!response.Success)
+
+            try
             {
-                _callback?.Invoke(VcsUiUpdateType.GuestLoginError, response.ErrorMessage);
-            }
-            else
-            {
-                _authenticationMetadata = new Metadata
+                var response = _authServiceClient.GuestLogin(connectRequest, DefaultCallOptions(15));
+                if (!response.Success)
                 {
-                    { "authorization", $"Bearer {response.Result.Token}" },
-                };
-                _connectedAt = DateTime.Now;
-                _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, null);
-                InitializeRadioSync();
+                    _callback?.Invoke(VcsUiUpdateType.GuestLoginError, response.ErrorMessage);
+                }
+                else
+                {
+                    _authenticationMetadata = new Metadata
+                    {
+                        { "authorization", $"Bearer {response.Result.Token}" },
+                    };
+                    _connectedAt = DateTime.Now;
+                    _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, null);
+                    InitializeRadioSync();
+                }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Error(ex, "Guest login timed out");
+                _callback?.Invoke(VcsUiUpdateType.GuestLoginError, "Login timed out — server did not respond.");
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during guest login");
+                _callback?.Invoke(VcsUiUpdateType.GuestLoginError, ex.Status.Detail);
             }
         }
         
@@ -229,23 +261,36 @@ namespace Vanguard.VCS.Client.Network
                 FlowId = "vanguard_email_password",
                 FirstStepInput = { { "email", userLogin.Username }, { "password", userLogin.Password } }
             };
-            
-            var response = _authServiceClient.StartAuth(loginRequest);
-            if (!response.Success)
-            {
-                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, response.ErrorMessage);
-                return;
-            }
 
-            _tempSecret = response.Complete.Secret;
-            _clientStateSingleton.LastSeenName = response.Complete.PlayerName;
-            _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
+            try
             {
-                AvailableCoalitions = response.Complete.AvailableCoalitions,
-                AvailableUnits = response.Complete.AvailableUnits,
-                AvailableRoles = response.Complete.AvailableRoles,
-                PlayerName = response.Complete.PlayerName,
-            });
+                var response = _authServiceClient.StartAuth(loginRequest, DefaultCallOptions(15));
+                if (!response.Success)
+                {
+                    _callback?.Invoke(VcsUiUpdateType.InternalLoginError, response.ErrorMessage);
+                    return;
+                }
+
+                _tempSecret = response.Complete.Secret;
+                _clientStateSingleton.LastSeenName = response.Complete.PlayerName;
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginSuccess, new InternalLoginResult()
+                {
+                    AvailableCoalitions = response.Complete.AvailableCoalitions,
+                    AvailableUnits = response.Complete.AvailableUnits,
+                    AvailableRoles = response.Complete.AvailableRoles,
+                    PlayerName = response.Complete.PlayerName,
+                });
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Error(ex, "Internal login timed out");
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, "Login timed out — server did not respond.");
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during internal login");
+                _callback?.Invoke(VcsUiUpdateType.InternalLoginError, ex.Status.Detail);
+            }
         }
 
         public void SelectUnit(string unitId, string coalition, uint roleId)
@@ -266,25 +311,38 @@ namespace Vanguard.VCS.Client.Network
                 Role = roleId
             };
 
-            var response = _authServiceClient.UnitSelect(selectionRequest);
-            if (!response.Success)
+            try
             {
-                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, response.ErrorMessage);
-                return;
-            }
+                var response = _authServiceClient.UnitSelect(selectionRequest, DefaultCallOptions(15));
+                if (!response.Success)
+                {
+                    _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, response.ErrorMessage);
+                    return;
+                }
 
-            _connectedAt = DateTime.Now;
-            _authenticationMetadata = new Metadata
+                _connectedAt = DateTime.Now;
+                _authenticationMetadata = new Metadata
+                {
+                    { "authorization", $"Bearer {response.Token}" },
+                };
+                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionSuccess, new UnitSelectionResult()
+                {
+                    SelectedCoalition = coalition,
+                    SelectedUnitId = unitId,
+                    SelectedRole = (VcsRole)roleId + 1
+                });
+                InitializeRadioSync();
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
             {
-                { "authorization", $"Bearer {response.Token}" },
-            };
-            _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionSuccess, new UnitSelectionResult()
+                Logger.Error(ex, "Unit selection timed out");
+                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, "Selection timed out — server did not respond.");
+            }
+            catch (RpcException ex)
             {
-                SelectedCoalition = coalition,
-                SelectedUnitId = unitId,
-                SelectedRole = (VcsRole)roleId + 1
-            });
-            InitializeRadioSync();
+                Logger.Error(ex, "gRPC error during unit selection");
+                _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionError, ex.Status.Detail);
+            }
         }
 
         private void InitializeRadioSync()
@@ -305,7 +363,7 @@ namespace Vanguard.VCS.Client.Network
             var syncRequest = new Empty();
             try
             {
-                var syncResponse = _srsServiceClient.SyncClient(syncRequest, _authenticationMetadata);
+                var syncResponse = _srsServiceClient.SyncClient(syncRequest, AuthCallOptions(10));
                 if (syncResponse.Success)
                 {
                     Logger.Info("Client sync successful.");
@@ -319,6 +377,11 @@ namespace Vanguard.VCS.Client.Network
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncError, syncResponse.ErrorMessage);
                 }
             }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Error(ex, "Client sync timed out");
+                _callback?.Invoke(VcsUiUpdateType.ClientSyncError, "Sync timed out — server did not respond.");
+            }
             catch (RpcException ex)
             {
                 Logger.Error(ex, "gRPC error during client sync");
@@ -328,16 +391,29 @@ namespace Vanguard.VCS.Client.Network
 
         public void UpdateRadioInformation()
         {
-            var response = _srsServiceClient.UpdateRadioInfo(GetRadioInfoFromState(), _authenticationMetadata);
-            if (response.Success)
+            try
             {
-                Logger.Info("Radio information updated successfully.");
-                _callback?.Invoke(VcsUiUpdateType.RadioSyncSuccess, null);
+                var response = _srsServiceClient.UpdateRadioInfo(GetRadioInfoFromState(), AuthCallOptions(5));
+                if (response.Success)
+                {
+                    Logger.Info("Radio information updated successfully.");
+                    _callback?.Invoke(VcsUiUpdateType.RadioSyncSuccess, null);
+                }
+                else
+                {
+                    Logger.Error("Failed to update radio information: {0}", response.ErrorMessage);
+                    _callback?.Invoke(VcsUiUpdateType.RadioSyncError, response.ErrorMessage);
+                }
             }
-            else
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
             {
-                Logger.Error("Failed to update radio information: {0}", response.ErrorMessage);
-                _callback?.Invoke(VcsUiUpdateType.RadioSyncError, response.ErrorMessage);
+                Logger.Warn(ex, "Radio update timed out");
+                _callback?.Invoke(VcsUiUpdateType.RadioSyncError, "Radio update timed out.");
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during radio update");
+                _callback?.Invoke(VcsUiUpdateType.RadioSyncError, ex.Status.Detail);
             }
         }
         
@@ -347,19 +423,37 @@ namespace Vanguard.VCS.Client.Network
             try
             {
                 var request = new Empty();
-                _srsServiceClient.Disconnect(request, _authenticationMetadata);
-                _channel?.ShutdownAsync().Wait();
-                _channel?.Dispose();
-                _channel = null;
-                _radioDcsSync.Stop();
-                _srsServiceClient = null;
-                _authServiceClient = null;
-                _radioDcsSync = null;
+                _srsServiceClient.Disconnect(request, AuthCallOptions(5));
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error during VCS disconnection");
+                Logger.Warn(ex, "Error sending Disconnect RPC (proceeding with local cleanup)");
             }
+
+            try
+            {
+                _channel?.ShutdownAsync().Wait(TimeSpan.FromSeconds(5));
+                _channel?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error shutting down gRPC channel");
+            }
+
+            try
+            {
+                _radioDcsSync?.Stop();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error stopping DCS radio sync");
+            }
+
+            _channel = null;
+            _srsServiceClient = null;
+            _authServiceClient = null;
+            _radioDcsSync = null;
+
             _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
         }
 

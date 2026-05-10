@@ -155,12 +155,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
             var read = 0;
             lock (_lock)
             {
-                // DIAGNOSTIC: Log circular buffer state at start of read
-                if (Utility.AudioDiagnosticLogger.Instance.IsRunning && _primed)
-                {
-                    Logger.Debug($"JBP Read START: count={count}, availSamples={_availableSamples}, " +
-                               $"queuedPackets={_bufferedAudio.Count}, primed={_primed}, lastRead={_lastRead}");
-                }
                 
                 do
                 {
@@ -170,14 +164,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
                     {
                         read += took;
                         _availableSamples = Math.Max(0, _availableSamples - took);
-                        
-                        // DIAGNOSTIC: Log every read from circular buffer
-                        if (Utility.AudioDiagnosticLogger.Instance.IsRunning)
-                        {
-                            var firstSamples = took >= 2 ? $"{returnBuffer[read-took]:F4},{returnBuffer[read-took+1]:F4}" : "N/A";
-                            Logger.Debug($"JBP Read: took={took} from circular, total_read={read}/{count}, " +
-                                       $"avail_after={_availableSamples}, firstSamples=[{firstSamples}]");
-                        }
                         
                         // Read-from-buffer events are common; only log occasionally.
                         DebugThrottled("JBP_Read_Took", () => $"JBP Read: read {took} samples from circular buffer, new avail={_availableSamples}", 5000);
@@ -302,19 +288,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
                             int wrote = _circularBuffer.Write(audio.Audio, 0, audio.Audio.Length);
                             
-                            // Log detailed timing info to diagnostic logger
-                            if (Utility.AudioDiagnosticLogger.Instance.IsRunning)
-                            {
-                                var now = DateTime.Now;
-                                var latencyMs = audio.ReceivedAtTicks > 0 ? 
-                                    (DateTime.UtcNow.Ticks - audio.ReceivedAtTicks) / TimeSpan.TicksPerMillisecond : -1;
-                                var firstSamples = audio.Audio.Length >= 2 ? 
-                                    $"{audio.Audio[0]:F4},{audio.Audio[1]:F4}" : "N/A";
-                                Logger.Debug($"JBP WRITE: pkt={audio.PacketNumber}, wrote={wrote}/{audio.Audio.Length}, " +
-                                           $"latency={latencyMs}ms, queueDepth={_bufferedAudio.Count}, " +
-                                           $"avail_before={_availableSamples}, firstSamples=[{firstSamples}]");
-                            }
-                            
                             DebugThrottled("JBP_WriteResult", () => $"JBP Read: circular buffer write result pkt={audio.PacketNumber}, requested={audio.Audio.Length}, wrote={wrote}, availAfterWrite={_availableSamples}", 5000);
                             try { _availableSamples = _circularBuffer.Count; } catch { _availableSamples = Math.Min(_availableSamples + wrote, AudioManager.OUTPUT_SAMPLE_RATE * 3); }
                             if (wrote < audio.Audio.Length)
@@ -355,14 +328,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
              // Entry/exit debug for Read: report requested vs returned and queue state
              DebugThrottled("JBP_Read_Exit", () => $"JBP Read EXIT: requested={count}, returned={result.PCMAudioLength}, primed={_primed}, avail={_availableSamples}, queued={_bufferedAudio.Count}", 3000);
-
-             // DIAGNOSTIC: Log circular buffer state at end of read
-             if (Utility.AudioDiagnosticLogger.Instance.IsRunning && read > 0)
-             {
-                 Logger.Debug($"JBP Read END: requested={count}, returned={read}, avail_after={_availableSamples}, " +
-                            $"queued_after={_bufferedAudio.Count}, primed={_primed}");
-             }
-
+            
              result.PCMAudioLength = read;
              if (read > 0)
              {
@@ -374,56 +340,17 @@ namespace Vanguard.VCS.Client.Audio.Providers
                  WriteJitterDiagnosticSamples(outCopy, read);
 
                  // Capture jitter buffer output to WAV if diagnostics are enabled
-                 double sumSq;
-                 float maxAbs;
-                 float rms;
-                 try
-                 {
-                     if (Utility.AudioDiagnosticLogger.Instance.IsRunning)
-                     {
-                         // Compute audio stats for diagnostics
-                         sumSq = 0;
-                         maxAbs = 0f;
-                         for (int i = 0; i < read; i++)
-                         {
-                             var val = outCopy[i];
-                             sumSq += val * val;
-                             var absVal = Math.Abs(val);
-                             if (absVal > maxAbs) maxAbs = absVal;
-                         }
-                         rms = read > 0 ? (float)Math.Sqrt(sumSq / read) : 0f;
-                         
-                         string notes = $"Queued={_bufferedAudio.Count}, Avail={_availableSamples}, RMS={rms:F4}, Max={maxAbs:F4}";
-                         
-                         Utility.AudioDiagnosticLogger.Instance.CaptureJitterBufferOutput(
-                             result.Guid.ToString(), 
-                             _radioId, 
-                             (int)_lastRead, 
-                             outCopy, 
-                             read,
-                             _bufferedAudio.Count,
-                             _availableSamples
-                         );
-                         
-                         Logger.Debug($"JBP Read: pkt={_lastRead}, radio={_radioId}, samples={read}, {notes}");
-                     }
-                 }
-                 catch (Exception ex)
-                 {
-                     Logger.Warn(ex, "Error capturing jitter buffer output to diagnostic WAV");
-                 }
+                 double sumSq = 0;
+                 float maxAbs = 0f;
+                 float rms = (float)Math.Sqrt(sumSq / outCopy.Length);
 
                  // compute quick audio stats for debug (RMS, max)
-                 sumSq = 0;
-                 maxAbs = 0f;
-                 for (int i = 0; i < outCopy.Length; i++)
+                 foreach (var v in outCopy)
                  {
-                     var v = outCopy[i];
                      sumSq += v * v;
                      var a = Math.Abs(v);
                      if (a > maxAbs) maxAbs = a;
                  }
-                 rms = (float)Math.Sqrt(sumSq / outCopy.Length);
                  // Return-stream stats are useful but can be noisy; raise interval.
                  DebugThrottled("JBP_ReturningSamples", () =>
                  {

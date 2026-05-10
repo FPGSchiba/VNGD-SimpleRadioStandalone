@@ -722,10 +722,9 @@ namespace Vanguard.VCS.Client.Network
                             EncodedAudio = bytes,
                             Volume = 1,
                             ReceivedRadio = sendingOn,
-                            Sequence = _packetNumber,
+                            Sequence = _packetNumber - 1, // last sequence actually sent on the wire; don't burn another number
                             ReceiveTime = DateTime.Now.Ticks,
                         };
-                        _packetNumber++;
 
                         return send;
                     }
@@ -853,27 +852,27 @@ namespace Vanguard.VCS.Client.Network
             }
 
             var helloMessage = VcsVoicePacket.CreateHelloPacket(_guid).EncodePacket();
-            try
-            {
-                _listener.Send(helloMessage, helloMessage.Length, _serverEndpoint);
-                Logger.Info("Sent Hello Packet to Server");
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to send Hello Packet to Server");
-                throw;
-            }
-            
-            // wait for helloAck Answer from Server and only proceed if we get it
-            // Exponential backoff here with more hello messages
             var helloAckReceived = false;
-            var attempts = 1;
-            while (!helloAckReceived && attempts < 6)
+
+            for (int attempt = 1; attempt <= 5 && !helloAckReceived; attempt++)
             {
+                // (Re)send Hello on each attempt so the server can reply even after packet loss
+                try
+                {
+                    _listener.Send(helloMessage, helloMessage.Length, _serverEndpoint);
+                    Logger.Info($"Sent Hello Packet to Server (attempt {attempt}/5)");
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to send Hello Packet (attempt {attempt}/5)");
+                    continue;
+                }
+
+                // Wait for HelloAck with a per-attempt timeout (1.5 s, 3 s, 4.5 s, 6 s, 7.5 s)
                 try
                 {
                     var groupEp = new IPEndPoint(IPAddress.Any, _port);
-                    _listener.Client.ReceiveTimeout = 1500 * 2 * attempts; // 3 seconds timeout for all communication
+                    _listener.Client.ReceiveTimeout = 1500 * attempt;
                     var bytes = _listener.Receive(ref groupEp);
 
                     if (bytes.Length > 0)
@@ -886,16 +885,19 @@ namespace Vanguard.VCS.Client.Network
                         }
                     }
                 }
-                catch (SocketException e)
+                catch (SocketException e) when (e.SocketErrorCode == SocketError.TimedOut)
                 {
-                    Logger.Warn(e, "SocketException while waiting for Hello Ack");
+                    Logger.Warn($"Timeout waiting for Hello Ack (attempt {attempt}/5)");
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Exception while waiting for Hello Ack");
+                    Logger.Error(e, $"Exception waiting for Hello Ack (attempt {attempt}/5)");
                 }
+            }
 
-                attempts++;
+            if (!helloAckReceived)
+            {
+                Logger.Error("Failed to receive Hello Ack after 5 attempts — UDP handshake incomplete, proceeding with keepalive path");
             }
         }
     }

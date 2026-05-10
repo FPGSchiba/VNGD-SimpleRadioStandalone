@@ -288,23 +288,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
             if (process)
                 tempBuffer = ProcessClientAudioSamples(tempBuffer, clientTransmissionLength, 0, lastTransmission);
 
-            // Capture audio after effects processing
-            try
-            {
-                if (AudioDiagnosticLogger.Instance.IsRunning && tempBuffer != null && clientTransmissionLength > 0)
-                {
-                    AudioDiagnosticLogger.Instance.CaptureEffectsOutput(
-                        lastTransmission.ReceivedRadio, 
-                        tempBuffer, 
-                        clientTransmissionLength
-                    );
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(ex, "Error capturing after-effects audio");
-            }
-
             // Only log the first samples when we actually have a buffer and enough samples
             if (tempBuffer != null && clientTransmissionLength >= 4)
             {

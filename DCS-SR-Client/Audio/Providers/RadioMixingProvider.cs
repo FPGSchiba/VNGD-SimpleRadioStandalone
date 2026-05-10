@@ -309,23 +309,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
             // Convert to stereo using monoWrittenOut (should equal monoNeeded)
             buffer = SeparateAudio(mixBuffer, monoWrittenOut, 0, buffer, offset, radioId);
             
-            // Capture final mixed stereo output
-            try
-            {
-                if (Utility.AudioDiagnosticLogger.Instance.IsRunning && monoWrittenOut > 0)
-                {
-                    // Create a copy of the stereo buffer segment for capture
-                    int stereoCount = monoWrittenOut * 2;
-                    float[] stereoCapture = new float[stereoCount];
-                    Array.Copy(buffer, offset, stereoCapture, 0, stereoCount);
-                    Utility.AudioDiagnosticLogger.Instance.CaptureFinalMix(radioId, stereoCapture, stereoCount);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(ex, "Error capturing final mix to diagnostic WAV");
-            }
-            
             return EnsureFullBuffer(buffer, monoWrittenOut * 2, offset, count);
         }
 
@@ -349,14 +332,6 @@ namespace Vanguard.VCS.Client.Audio.Providers
                 //We used to have this logic https://github.com/ciribob/DCS-SimpleRadioStandalone/blob/cd8fcbf7e2b2fafcf30875fc958276e3083e0ebb/DCS-SR-Client/Network/UDPVoiceHandler.cs#L135
                 //if (!radioReceivingState.IsSimultaneous)
                 PlaySoundEffectEndReceive(modulation);
-                
-                // Close diagnostic WAV files for all transmissions on this radio
-                if (Utility.AudioDiagnosticLogger.Instance.IsRunning)
-                {
-                    // Note: We don't have direct client GUID access here, but transmissions ending
-                    // will be captured by timeout logic in the diagnostic logger
-                    Logger.Debug($"RadioMixingProvider: Transmission end detected on radio {radioId}");
-                }
             }
 
             //read
@@ -880,61 +855,16 @@ namespace Vanguard.VCS.Client.Audio.Providers
                  }
              }
              
-             // Capture raw mixed audio BEFORE effects processing
-             try
-             {
-                 if (Utility.AudioDiagnosticLogger.Instance.IsRunning && (_mainAudio.Count > 0 || _secondaryAudio.Count > 0))
-                 {
-                     bool containsLocal = false;
-                     try
-                     {
-                         var localGuid = ClientStateSingleton.Instance.ClientId;
-                         containsLocal = _mainAudio.Any(t => t.Guid == localGuid) || _secondaryAudio.Any(t => t.Guid == localGuid);
-                     }
-                     catch { }
-                     
-                     Utility.AudioDiagnosticLogger.Instance.CaptureMixedOutput(
-                         radioId, 
-                         _blockMono, 
-                         block,
-                         _mainAudio.Count + _secondaryAudio.Count,
-                         containsLocal,
-                         $"BeforeEffects, Clipped={clipped}"
-                     );
-                 }
-             }
-             catch (Exception ex)
-             {
-                 Logger.Warn(ex, "Error capturing mixed audio before effects");
-             }
-
              // Process primary and secondary
-             int primarySamples = 0;
-             int secondarySamples = 0;
-
-             var procMain = pipeline.ProcessClientTransmissions(_blockMono, _mainAudio, out primarySamples);
+             var procMain = pipeline.ProcessClientTransmissions(_blockMono, _mainAudio, out var primarySamples);
              DebugThrottledRm("RM_ProcessPrimary", () => $"RadioMixingProvider: pipeline.ProcessClientTransmissions returned primarySamples={primarySamples}", 500);
 
             Array.Clear(_blockSecondary, 0, block);
-             var procSec = pipeline.ProcessClientTransmissions(_blockSecondary, _secondaryAudio, out secondarySamples);
+             var procSec = pipeline.ProcessClientTransmissions(_blockSecondary, _secondaryAudio, out var secondarySamples);
              DebugThrottledRm("RM_ProcessSecondary", () => $"RadioMixingProvider: pipeline.ProcessClientTransmissions (secondary) returned secondarySamples={secondarySamples}", 500);
 
             // Mix main + secondary
             var mixed = AudioManipulationHelper.MixArraysNoClipping(procMain, primarySamples, procSec, secondarySamples, out int outputSamples);
-
-            // Capture audio after effects but before tones
-            try
-            {
-                if (Utility.AudioDiagnosticLogger.Instance.IsRunning && outputSamples > 0)
-                {
-                    string effectsInfo = $"Primary={primarySamples}, Secondary={secondarySamples}, Modulation={lastModulation}";
-                    Utility.AudioDiagnosticLogger.Instance.CaptureEffectsOutput(radioId, mixed, outputSamples, effectsInfo);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(ex, "Error capturing after-effects audio to diagnostic WAV");
-            }
 
             // Start/end tones
             bool transmitting = (_mainAudio.Count > 0 || _secondaryAudio.Count > 0);
@@ -952,7 +882,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
             try
              {
                  var localGuid = ClientStateSingleton.Instance.ClientId;
-                 bool containsLocal = _mainAudio.Any(t => t.Guid == localGuid) || _secondaryAudio.Any(t => t.Guid == localGuid);
+                 var containsLocal = _mainAudio.Any(t => t.Guid == localGuid) || _secondaryAudio.Any(t => t.Guid == localGuid);
                  if (producedCount > 0)
                  {
                      var firstSample = (mixed != null && mixed.Length > 0) ? mixed[0].ToString("0.000") : "0.000";

@@ -283,11 +283,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             FavouriteServersViewModel = new FavouriteServersViewModel(new CsvFavouriteServerStore());
 
             InitDefaultAddress();
-            
-            AudioManager = new AudioManager(AudioOutput.WindowsN, _hub)
-            {
-                SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)_globalSettings.GetClientSetting(GlobalSettingsKeys.SpeakerBoost).DoubleValue)
-            };
+
+            AudioManager = new AudioManager();
 
             // Use Update Checker for automatic Updates, needs rewrite of the UpdateCheker
 
@@ -879,9 +876,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
-                
-                // Enable audio diagnostics automatically
-                AudioManager.StartDiagnostics(captureWav: true);
                 
                 AudioManager.StartEncoding(InputManager, _resolvedIp, _port);
                 
