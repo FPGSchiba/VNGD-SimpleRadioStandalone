@@ -31,6 +31,7 @@ using Vanguard.VCS.Client.UI.ClientWindow.LoginPages;
 using Vanguard.VCS.Client.UI.ClientWindow.SettingPages;
 using Vanguard.VCS.Client.UI.ClientWindow.WelcomePages;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow;
+using Vanguard.VCS.Client.Events;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {
@@ -286,6 +287,15 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _updateTimer.Tick += UpdatePlayerLocationAndVuMeters;
             _updateTimer.Start();
+
+            App.EventBus.Subscribe<ConnectionStateChangedEvent>(e =>
+                Dispatcher.Invoke(() => HandleConnectionStateChanged(e.State)));
+
+            App.EventBus.Subscribe<ServerActionEvent>(e =>
+            {
+                if (e.Type == ServerAction.Types.ActionType.Kick || e.Type == ServerAction.Types.ActionType.Ban)
+                    Dispatcher.Invoke(() => HandleForcedDisconnect(e.Reason));
+            });
         }
 
         public String GetPlayerName()
@@ -594,37 +604,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private static void OpenPagePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            // lets see if we still need this - Schiba (08/21/2024)
-            MainWindow mainWindow = source as MainWindow;
-            int newValue = Convert.ToInt32(e.NewValue);
-            if (mainWindow != null)
+            if (source is MainWindow mainWindow && Convert.ToInt32(e.NewValue) == WelcomeIndex)
             {
-                switch (newValue)
-                {
-                    case WelcomeIndex:
-                        mainWindow.HomeNavigation.IsEnabled = false;
-                        mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
-                        break;
-                    case SupportIndex:
-                        break;
-                    case LoginIndex:
-                        break;
-                    case GuestIndex:
-                        break;
-                    case GuestSuccessIndex:
-                        break;
-                    case HomePageIndex:
-                        break;
-                    case SettingsIndex:
-                        break;
-                    case UnitSelectionIndex:
-                        break;
-                    case CustomServerIndex:
-                        break;
-                    default:
-                        mainWindow._logger.Error($"Page: {newValue} could not be found.");
-                        break;
-                }
+                mainWindow.HomeNavigation.IsEnabled = false;
+                mainWindow.HomeNavigation.Visibility = Visibility.Hidden;
             }
         }
 
@@ -769,7 +752,24 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             ConnectedClientsSingleton.Instance.NotifyAll();
         }
-        
+
+        private void HandleConnectionStateChanged(ConnectionState state)
+        {
+            ConnectionStatus.Fill = state switch
+            {
+                ConnectionState.Connected => Brushes.Green,
+                ConnectionState.Connecting => Brushes.Orange,
+                ConnectionState.Error => Brushes.Red,
+                _ => Brushes.Red
+            };
+        }
+
+        private void HandleForcedDisconnect(string reason)
+        {
+            Stop(connectionError: true);
+            MessageBox.Show($"Disconnected by server: {reason}", "Server Action", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
         private void VcsUiUpdate(VcsUiUpdateType type, object message)
         {
             switch (type)
