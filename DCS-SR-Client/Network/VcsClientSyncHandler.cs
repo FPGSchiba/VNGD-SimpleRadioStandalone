@@ -425,7 +425,7 @@ namespace Vanguard.VCS.Client.Network
 
             try
             {
-                _channel?.ShutdownAsync().Wait(TimeSpan.FromSeconds(5));
+                _ = _channel?.ShutdownAsync();
                 _channel?.Dispose();
             }
             catch (Exception ex)
