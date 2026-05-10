@@ -121,5 +121,38 @@ namespace Vanguard.VCS.Client.Tests.Network
 
             Assert.AreEqual(VcsUiUpdateType.InternalLoginSuccess, _lastUpdateType);
         }
+
+        [TestMethod]
+        public void UpdateClientInfo_Success_ReturnsTrue()
+        {
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Returns(new ServerResponse { Success = true });
+
+            var result = _handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_Failure_ReturnsFalse()
+        {
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Returns(new ServerResponse { Success = false, ErrorMessage = "not authenticated" });
+
+            var result = _handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_Timeout_ReturnsFalse()
+        {
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            var result = _handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
     }
 }

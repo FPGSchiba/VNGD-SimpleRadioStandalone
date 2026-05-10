@@ -470,6 +470,38 @@ namespace Vanguard.VCS.Client.Network
             }
         }
 
+        public bool UpdateClientInfo(string name, string coalition, string unitId, uint roleId)
+        {
+            var info = new ClientInfo
+            {
+                Name = name,
+                Coalition = coalition,
+                UnitId = unitId,
+                RoleId = roleId,
+            };
+            try
+            {
+                var response = _srsServiceClient.UpdateClientInfo(info, AuthCallOptions(5));
+                if (!response.Success)
+                {
+                    Logger.Error("UpdateClientInfo failed: {0}", response.ErrorMessage);
+                    return false;
+                }
+                Logger.Info("Client info updated successfully.");
+                return true;
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                Logger.Warn(ex, "UpdateClientInfo timed out");
+                return false;
+            }
+            catch (RpcException ex)
+            {
+                Logger.Error(ex, "gRPC error during UpdateClientInfo");
+                return false;
+            }
+        }
+
         public void UpdateRadioInformation()
         {
             try
