@@ -12,9 +12,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using MathNet.Numerics.Distributions;
 using NLog;
-using Vanguard.VCS.Client.Network.DCS;
 using Vanguard.VCS.Client.UI.ClientWindow;
-using Vanguard.VCS.Common.DCSState;
 using DevOne.Security.Cryptography.BCrypt;
 
 namespace Vanguard.VCS.Client.Network
@@ -98,7 +96,7 @@ namespace Vanguard.VCS.Client.Network
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         
-        private DCSRadioSyncManager _radioDcsSync = null;
+        private RadioStateManager _radioStateManager;
         private SRSService.SRSServiceClient _srsServiceClient;
         private AuthService.AuthServiceClient _authServiceClient;
         private GrpcChannel _channel;
@@ -189,7 +187,7 @@ namespace Vanguard.VCS.Client.Network
                         IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
                         IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
                     });
-                    _radioDcsSync = new DCSRadioSyncManager(UpdateRadioInformation, ClientCoalitionUpdate);
+                    _radioStateManager = new RadioStateManager(UpdateRadioInformation);
                     return;
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unavailable)
@@ -347,17 +345,10 @@ namespace Vanguard.VCS.Client.Network
 
         private void InitializeRadioSync()
         {
-            _radioDcsSync.Start();
-            _radioDcsSync.StartExternalAWACSModeLoop(); // The radio information will be updated here so we need to call this first
+            _radioStateManager.Start();
             SyncClient();
         }
 
-        private void ClientCoalitionUpdate()
-        {
-            // TODO: implement this better to really choose the coalition not just red and blue
-            Logger.Info("Client coalition update triggered");
-        }
-        
         private void SyncClient()
         {
             var syncRequest = new Empty();
@@ -442,34 +433,35 @@ namespace Vanguard.VCS.Client.Network
 
             try
             {
-                _radioDcsSync?.Stop();
+                _radioStateManager?.Stop();
             }
             catch (Exception ex)
             {
-                Logger.Warn(ex, "Error stopping DCS radio sync");
+                Logger.Warn(ex, "Error stopping radio state manager");
             }
 
             _channel = null;
             _srsServiceClient = null;
             _authServiceClient = null;
-            _radioDcsSync = null;
+            _radioStateManager = null;
 
             _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
         }
 
         private RadioInfo GetRadioInfoFromState()
         {
-            var radios = _clientStateSingleton.DcsPlayerRadioInfo.radios.Select((radio, i) => new Radio()
+            var radios = _radioStateManager.CurrentState.Radios
+                .Select((radio, i) => new Radio
                 {
                     Id = (uint)i,
-                    Name = radio.name,
-                    Frequency = (float)(radio.freq / 1000000.0), // Convert to MHz
-                    Enabled = radio.modulation == RadioInformation.Modulation.AM,
-                    IsIntercom = radio.modulation == RadioInformation.Modulation.INTERCOM,
+                    Name = radio.Name,
+                    Frequency = (float)(radio.FrequencyHz / 1_000_000.0),
+                    Enabled = radio.Enabled,
+                    IsIntercom = radio.IsIntercom,
                 })
                 .ToList();
-            
-            Logger.Info($"Preparing radios for sync: {radios.Count} radios found. Radio details: {string.Join(", ", radios.Select(r => $"{r.Name} ({r.Frequency} kHz)"))}");
+
+            Logger.Info($"Preparing radios for sync: {radios.Count} radios. Details: {string.Join(", ", radios.Select(r => $"{r.Name} ({r.Frequency} MHz)"))}");
 
             return new RadioInfo
             {
