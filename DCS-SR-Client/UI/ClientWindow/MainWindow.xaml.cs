@@ -53,6 +53,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AudioPreview _audioPreview;
         private VcsClientSyncHandler _vcsClient;
+        private IDisposable _connectionStateSubscription;
+        private IDisposable _serverActionSubscription;
         private int _port = 5002;
 
         private const int NoWindowOpen = 17;  // Update when adding new panel
@@ -288,10 +290,10 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _updateTimer.Tick += UpdatePlayerLocationAndVuMeters;
             _updateTimer.Start();
 
-            App.EventBus.Subscribe<ConnectionStateChangedEvent>(e =>
+            _connectionStateSubscription = App.EventBus.Subscribe<ConnectionStateChangedEvent>(e =>
                 Dispatcher.Invoke(() => HandleConnectionStateChanged(e.State)));
 
-            App.EventBus.Subscribe<ServerActionEvent>(e =>
+            _serverActionSubscription = App.EventBus.Subscribe<ServerActionEvent>(e =>
             {
                 if (e.Type == ServerAction.Types.ActionType.Kick || e.Type == ServerAction.Types.ActionType.Ban)
                     Dispatcher.Invoke(() => HandleForcedDisconnect(e.Reason));
@@ -759,7 +761,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 ConnectionState.Connected => Brushes.Green,
                 ConnectionState.Connecting => Brushes.Orange,
-                ConnectionState.Error => Brushes.Red,
                 _ => Brushes.Red
             };
         }
@@ -1188,6 +1189,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            _connectionStateSubscription?.Dispose();
+            _connectionStateSubscription = null;
+            _serverActionSubscription?.Dispose();
+            _serverActionSubscription = null;
+
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, Top);
 
