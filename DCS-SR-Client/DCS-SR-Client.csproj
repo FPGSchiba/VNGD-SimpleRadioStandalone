@@ -132,6 +132,9 @@
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="radio-config.json" Condition="Exists('radio-config.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </None>
