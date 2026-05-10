@@ -81,7 +81,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
 
         private ClientAudioProvider _passThroughAudioProvider;
         private ClientEffectsPipeline _clientEffectsPipeline;
-        private IMessageHub  _hub;
+        private IMessageHub _hub = new MessageHub();
         private Guid _guid;
 
         public float SpeakerBoost
