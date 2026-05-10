@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Easy.MessageHub;
 
 namespace Vanguard.VCS.Client.Events
@@ -13,19 +14,29 @@ namespace Vanguard.VCS.Client.Events
             _hub = hub;
         }
 
-        public void Publish<T>(T message) where T : class => _hub.Publish(message);
+        public void Publish<T>(T message) where T : class
+        {
+            ArgumentNullException.ThrowIfNull(message);
+            _hub.Publish(message);
+        }
 
         public IDisposable Subscribe<T>(Action<T> handler) where T : class
         {
+            ArgumentNullException.ThrowIfNull(handler);
             var token = _hub.Subscribe(handler);
             return new SubscriptionToken(() => _hub.Unsubscribe(token));
         }
 
         private sealed class SubscriptionToken : IDisposable
         {
-            private readonly Action _unsubscribe;
+            private Action _unsubscribe;
+
             public SubscriptionToken(Action unsubscribe) => _unsubscribe = unsubscribe;
-            public void Dispose() => _unsubscribe();
+
+            public void Dispose()
+            {
+                Interlocked.Exchange(ref _unsubscribe, null)?.Invoke();
+            }
         }
     }
 }

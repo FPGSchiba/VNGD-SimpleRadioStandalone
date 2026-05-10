@@ -37,5 +37,13 @@ namespace Vanguard.VCS.Client.Tests.Events
         {
             _bus.Publish("orphan");
         }
+
+        [TestMethod]
+        public void Subscribe_DisposeCalledTwice_DoesNotThrow()
+        {
+            var subscription = _bus.Subscribe<string>(_ => { });
+            subscription.Dispose();
+            subscription.Dispose();
+        }
     }
 }
