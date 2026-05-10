@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.Collections;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
@@ -94,6 +95,7 @@ namespace Vanguard.VCS.Client.Network
         public delegate void UpdateUiCallback(VcsUiUpdateType updateType, object message);
         
         private readonly UpdateUiCallback _callback;
+        private readonly IEventBus _eventBus;
         private DateTime _connectedAt;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         
@@ -113,9 +115,10 @@ namespace Vanguard.VCS.Client.Network
         private CancellationTokenSource _streamCts;
         private Task _subscriptionTask;
 
-        public VcsClientSyncHandler(UpdateUiCallback uiCallback)
+        public VcsClientSyncHandler(UpdateUiCallback uiCallback, IEventBus eventBus)
         {
             _callback = uiCallback;
+            _eventBus = eventBus;
         }
 
         // For unit testing only: skips channel and radio-sync initialisation.
@@ -205,7 +208,8 @@ namespace Vanguard.VCS.Client.Network
                         IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
                         IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
                     });
-                    _radioStateManager = new RadioStateManager(UpdateRadioInformation);
+                    _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connecting));
+                    _radioStateManager = new RadioStateManager(UpdateRadioInformation, _eventBus);
                     return;
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unavailable)
@@ -252,6 +256,7 @@ namespace Vanguard.VCS.Client.Network
                     };
                     _connectedAt = DateTime.Now;
                     _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, null);
+                    _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connected));
                     InitializeRadioSync();
                 }
             }
@@ -425,6 +430,7 @@ namespace Vanguard.VCS.Client.Network
                     SelectedUnitId = unitId,
                     SelectedRole = (VcsRole)roleId + 1
                 });
+                _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connected));
                 InitializeRadioSync();
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
@@ -619,6 +625,7 @@ namespace Vanguard.VCS.Client.Network
             _authServiceClient = null;
             _radioStateManager = null;
 
+            _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Disconnected));
             _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
         }
 
@@ -627,9 +634,27 @@ namespace Vanguard.VCS.Client.Network
             switch (update.Type)
             {
                 case ServerUpdate.Types.UpdateType.ClientJoined:
+                    ApplyClientUpdate(update.ClientUpdate);
+                    _eventBus?.Publish(new ClientJoinedEvent(
+                        update.ClientUpdate.ClientGuid,
+                        update.ClientUpdate.ClientInfo,
+                        update.ClientUpdate.RadioInfo));
+                    _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
+                    break;
+
                 case ServerUpdate.Types.UpdateType.ClientRadioUpdate:
+                    ApplyClientUpdate(update.ClientUpdate);
+                    _eventBus?.Publish(new ClientRadioUpdatedEvent(
+                        update.ClientUpdate.ClientGuid,
+                        update.ClientUpdate.RadioInfo));
+                    _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
+                    break;
+
                 case ServerUpdate.Types.UpdateType.ClientInfoUpdate:
                     ApplyClientUpdate(update.ClientUpdate);
+                    _eventBus?.Publish(new ClientInfoUpdatedEvent(
+                        update.ClientUpdate.ClientGuid,
+                        update.ClientUpdate.ClientInfo));
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
                     break;
 
@@ -638,6 +663,7 @@ namespace Vanguard.VCS.Client.Network
                     {
                         _clients.TryRemove(leftGuid, out _);
                     }
+                    _eventBus?.Publish(new ClientLeftEvent(update.ClientUpdate?.ClientGuid ?? string.Empty));
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
                     break;
 
@@ -646,6 +672,7 @@ namespace Vanguard.VCS.Client.Network
                     {
                         _serverSettings.DecodeVcs(update.SettingsUpdate);
                     }
+                    _eventBus?.Publish(new ServerSettingsChangedEvent(update.SettingsUpdate));
                     _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
                     break;
 

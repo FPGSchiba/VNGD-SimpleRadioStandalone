@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Network.Models;
 
 namespace Vanguard.VCS.Client.Network
@@ -19,15 +20,17 @@ namespace Vanguard.VCS.Client.Network
         private const int UpdateIntervalSeconds = 60;
 
         private readonly SendRadioUpdate _radioUpdate;
+        private readonly IEventBus _eventBus;
         private readonly ManualResetEventSlim _stopEvent = new ManualResetEventSlim(false);
         private volatile bool _stop;
         private Task _loopTask;
 
         public ClientRadioState CurrentState { get; private set; }
 
-        public RadioStateManager(SendRadioUpdate radioUpdate)
+        public RadioStateManager(SendRadioUpdate radioUpdate, IEventBus eventBus = null)
         {
             _radioUpdate = radioUpdate;
+            _eventBus = eventBus;
             CurrentState = LoadRadioConfig();
         }
 
@@ -66,6 +69,7 @@ namespace Vanguard.VCS.Client.Network
             try
             {
                 _radioUpdate();
+                _eventBus?.Publish(new LocalRadioStateChangedEvent(CurrentState));
             }
             catch (Exception ex)
             {

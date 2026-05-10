@@ -10,7 +10,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using Easy.MessageHub;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Stores;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -27,6 +30,11 @@ namespace Vanguard.VCS.Client
     /// </summary>
     public class App : Application
     {
+        public static IEventBus EventBus { get; private set; }
+        public static ClientStateStore ClientStateStore { get; private set; }
+        public static ConnectedClientsStore ConnectedClientsStore { get; private set; }
+        public static ServerSettingsStore ServerSettingsStore { get; private set; }
+
         private NotifyIcon _notifyIcon;
         private bool _loggingReady;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -341,8 +349,20 @@ namespace Vanguard.VCS.Client
             MainWindow.Close();
         }
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            EventBus = new EventBus(new MessageHub());
+            ClientStateStore = new ClientStateStore(EventBus);
+            ConnectedClientsStore = new ConnectedClientsStore(EventBus);
+            ServerSettingsStore = new ServerSettingsStore(EventBus);
+        }
+
         protected override void OnExit(ExitEventArgs e)
         {
+            ClientStateStore?.Dispose();
+            ConnectedClientsStore?.Dispose();
+            ServerSettingsStore?.Dispose();
             if (_notifyIcon != null)
                 _notifyIcon.Visible = false;
             base.OnExit(e);
