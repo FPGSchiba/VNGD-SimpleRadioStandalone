@@ -200,5 +200,162 @@ namespace Vanguard.VCS.Client.Tests.Network
 
             Assert.AreEqual(VcsUiUpdateType.ServerSettingsError, _lastUpdateType);
         }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ClientJoined_PublishesClientSyncUpdate()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ClientJoined,
+                ClientUpdate = new ClientUpdate
+                {
+                    ClientGuid = Guid.NewGuid().ToString(),
+                    ClientInfo = new ClientInfo { Name = "Pilot1" },
+                    RadioInfo = new RadioInfo { Muted = false },
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ClientSyncUpdate, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ClientLeft_PublishesClientSyncUpdate()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ClientLeft,
+                ClientUpdate = new ClientUpdate
+                {
+                    ClientGuid = Guid.NewGuid().ToString(),
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ClientSyncUpdate, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ClientRadioUpdate_PublishesClientSyncUpdate()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ClientRadioUpdate,
+                ClientUpdate = new ClientUpdate
+                {
+                    ClientGuid = Guid.NewGuid().ToString(),
+                    RadioInfo = new RadioInfo { Muted = false },
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ClientSyncUpdate, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ClientInfoUpdate_PublishesClientSyncUpdate()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ClientInfoUpdate,
+                ClientUpdate = new ClientUpdate
+                {
+                    ClientGuid = Guid.NewGuid().ToString(),
+                    ClientInfo = new ClientInfo { Name = "Pilot2" },
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ClientSyncUpdate, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ServerSettingsChanged_PublishesClientSyncUpdate()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerSettingsChanged,
+                SettingsUpdate = new ServerSettings(),
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ClientSyncUpdate, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionKick_PublishesConnectionLost()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Kick,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                    Reason = "Kicked by admin",
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ConnectionLost, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionBan_PublishesConnectionLost()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Ban,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                    Reason = "Banned by admin",
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.AreEqual(VcsUiUpdateType.ConnectionLost, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionMute_DoesNotPublishConnectionLost()
+        {
+            _lastUpdateType = null;
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Mute,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.IsNull(_lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_Unknown_DoesNotPublishAnyUpdate()
+        {
+            _lastUpdateType = null;
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.Unknown,
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            Assert.IsNull(_lastUpdateType);
+        }
     }
 }

@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Google.Protobuf.Collections;
 using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
 using Grpc.Core;
 using Grpc.Net.Client;
 using MathNet.Numerics.Distributions;
@@ -107,6 +110,7 @@ namespace Vanguard.VCS.Client.Network
         private Metadata _authenticationMetadata = new Metadata();
         private string _tempSecret = string.Empty;
         public string ServerVersion { get; private set; } = "0.0.0"; // Default version
+        private CancellationTokenSource _streamCts;
 
         public VcsClientSyncHandler(UpdateUiCallback uiCallback)
         {
@@ -439,6 +443,7 @@ namespace Vanguard.VCS.Client.Network
             _radioStateManager.Start();
             _clientStateSingleton.CurrentRadioState = _radioStateManager.CurrentState;
             SyncClient();
+            StartSubscription();
         }
 
         private void SyncClient()
@@ -579,6 +584,17 @@ namespace Vanguard.VCS.Client.Network
 
             try
             {
+                _streamCts?.Cancel();
+                _streamCts?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "Error cancelling subscription stream");
+            }
+            _streamCts = null;
+
+            try
+            {
                 _ = _channel?.ShutdownAsync();
                 _channel?.Dispose();
             }
@@ -602,6 +618,173 @@ namespace Vanguard.VCS.Client.Network
             _radioStateManager = null;
 
             _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
+        }
+
+        internal void ProcessServerUpdate(ServerUpdate update)
+        {
+            switch (update.Type)
+            {
+                case ServerUpdate.Types.UpdateType.ClientJoined:
+                case ServerUpdate.Types.UpdateType.ClientRadioUpdate:
+                case ServerUpdate.Types.UpdateType.ClientInfoUpdate:
+                    ApplyClientUpdate(update.ClientUpdate);
+                    _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
+                    break;
+
+                case ServerUpdate.Types.UpdateType.ClientLeft:
+                    if (update.ClientUpdate != null && Guid.TryParse(update.ClientUpdate.ClientGuid, out var leftGuid))
+                    {
+                        _clients.TryRemove(leftGuid, out _);
+                    }
+                    _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
+                    break;
+
+                case ServerUpdate.Types.UpdateType.ServerSettingsChanged:
+                    if (update.SettingsUpdate != null)
+                    {
+                        _serverSettings.DecodeVcs(update.SettingsUpdate);
+                    }
+                    _callback?.Invoke(VcsUiUpdateType.ClientSyncUpdate, null);
+                    break;
+
+                case ServerUpdate.Types.UpdateType.ServerAction:
+                    if (update.ServerAction != null)
+                    {
+                        HandleServerAction(update.ServerAction);
+                    }
+                    break;
+
+                default:
+                    Logger.Warn("Received unknown ServerUpdate type: {0}", update.Type);
+                    break;
+            }
+        }
+
+        private void ApplyClientUpdate(ClientUpdate clientUpdate)
+        {
+            if (clientUpdate == null || !Guid.TryParse(clientUpdate.ClientGuid, out var clientGuid))
+            {
+                return;
+            }
+
+            var clientInfo = clientUpdate.ClientInfo;
+            var radioInfo = clientUpdate.RadioInfo;
+
+            var srClient = new SRClient
+            {
+                ClientGuid = clientGuid,
+                Name = clientInfo?.Name ?? "---",
+                Coalition = 0,
+                AllowRecord = true,
+                Muted = radioInfo?.Muted ?? false,
+                LastUpdate = clientInfo?.LastUpdate ?? 0,
+                Seat = 0,
+                RadioInfo = radioInfo != null
+                    ? new DCSPlayerRadioInfo
+                    {
+                        radios = radioInfo.Radios.Select(r => new RadioInformation
+                        {
+                            freq = r.Frequency,
+                            modulation = r.Enabled
+                                ? RadioInformation.Modulation.DISABLED
+                                : r.IsIntercom
+                                    ? RadioInformation.Modulation.INTERCOM
+                                    : RadioInformation.Modulation.AM,
+                            name = r.Name,
+                            enc = false,
+                            freqMax = 9999999999,
+                            freqMin = 1,
+                        }).ToArray()
+                    }
+                    : null,
+            };
+
+            _clients[clientGuid] = srClient;
+        }
+
+        private void HandleServerAction(ServerAction action)
+        {
+            switch (action.Type)
+            {
+                case ServerAction.Types.ActionType.Kick:
+                    Logger.Warn("Kicked from server. Reason: {0}", action.Reason);
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionLost, action.Reason);
+                    break;
+
+                case ServerAction.Types.ActionType.Ban:
+                    Logger.Warn("Banned from server. Reason: {0}", action.Reason);
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionLost, action.Reason);
+                    break;
+
+                case ServerAction.Types.ActionType.Mute:
+                    Logger.Info("Muted by server.");
+                    break;
+
+                case ServerAction.Types.ActionType.Unmute:
+                    Logger.Info("Unmuted by server.");
+                    break;
+
+                default:
+                    Logger.Warn("Received unknown ServerAction type: {0}", action.Type);
+                    break;
+            }
+        }
+
+        private void StartSubscription()
+        {
+            _streamCts = new CancellationTokenSource();
+            Task.Factory.StartNew(
+                () => RunSubscriptionLoop(_streamCts.Token),
+                _streamCts.Token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
+        }
+
+        private void RunSubscriptionLoop(CancellationToken cancellationToken)
+        {
+            var backoffSeconds = 1;
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var callOptions = new CallOptions(
+                        headers: _authenticationMetadata,
+                        cancellationToken: cancellationToken);
+
+                    using var call = _srsServiceClient.SubscribeToUpdates(new Empty(), callOptions);
+                    backoffSeconds = 1;
+                    Logger.Info("SubscribeToUpdates stream connected");
+
+                    var stream = call.ResponseStream;
+                    while (stream.MoveNext(cancellationToken).GetAwaiter().GetResult())
+                    {
+                        ProcessServerUpdate(stream.Current);
+                    }
+
+                    Logger.Info("SubscribeToUpdates stream ended cleanly");
+                }
+                catch (OperationCanceledException)
+                {
+                    Logger.Info("SubscribeToUpdates cancelled");
+                    return;
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+                {
+                    Logger.Info("SubscribeToUpdates RPC cancelled");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    Logger.Warn(ex, $"SubscribeToUpdates stream dropped, reconnecting in {backoffSeconds}s");
+                    _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
+                    Thread.Sleep(backoffSeconds * 1000);
+                    backoffSeconds = Math.Min(backoffSeconds * 2, 30);
+                }
+            }
         }
 
         private RadioInfo GetRadioInfoFromState()
