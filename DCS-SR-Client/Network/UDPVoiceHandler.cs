@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows;
 using System.Windows.Threading;
 using NLog;
 using Vanguard.VCS.Client.Audio.Managers;
@@ -66,7 +67,7 @@ namespace Vanguard.VCS.Client.Network
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
 
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
-        private UdpClient _listener;
+        private volatile UdpClient _listener;
 
         private uint _packetNumber = 1;
 
@@ -86,7 +87,7 @@ namespace Vanguard.VCS.Client.Network
 
       //  private Timer _timer;
 
-        private long _udpLastReceived = 0;
+        private long _udpLastReceived = 0; // accessed via Interlocked
         private DispatcherTimer _updateTimer;
 
         private RadioReceivingState[] _radioReceivingState;
@@ -113,7 +114,7 @@ namespace Vanguard.VCS.Client.Network
 
         private void UpdateVOIPStatus(object sender, EventArgs e)
         {
-            TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
+            TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - Interlocked.Read(ref _udpLastReceived));
 
             //ping every 10 so after 40 seconds VoIP UDP issue
             _clientStateSingleton.IsVoipConnected = !(diff.TotalSeconds > UDP_VOIP_TIMEOUT);
@@ -233,10 +234,12 @@ namespace Vanguard.VCS.Client.Network
                 try
                 {
                     var groupEp = new IPEndPoint(IPAddress.Any, _port);
-                    
-                    var bytes = _listener.Receive(ref groupEp);
-                    
-                    _udpLastReceived = DateTime.Now.Ticks;
+
+                    var sock = _listener;
+                    if (sock == null) break;
+                    var bytes = sock.Receive(ref groupEp);
+
+                    Interlocked.Exchange(ref _udpLastReceived, DateTime.Now.Ticks);
                     if (bytes.Length < VcsVoicePacket.HeaderSize) continue;
                     var myClient = IsClientMetaDataValid(_guid);
                     if (myClient == null) continue;
@@ -264,16 +267,25 @@ namespace Vanguard.VCS.Client.Network
                             break;
                     }
                 }
-                catch
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.TimedOut
+                                                  || ex.SocketErrorCode == SocketError.Interrupted)
                 {
-                    // IGNORE AS WE GET THIS WHEN THE UDP LISTENER IS TIMING OUT EVERY 3 SECONDS
+                    // expected: receive timeout
+                }
+                catch (ObjectDisposedException)
+                {
+                    break; // socket was intentionally closed
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Unexpected error in UDP receive loop");
                 }
             }
 
             _ready = false;
 
             //stop UI Refreshing
-            _updateTimer.Stop();
+            Application.Current?.Dispatcher.Invoke(() => _updateTimer?.Stop());
 
             _clientStateSingleton.IsVoipConnected = false;
         }
@@ -506,7 +518,7 @@ namespace Vanguard.VCS.Client.Network
                         return;
                     }
 
-                    TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - _udpLastReceived);
+                    TimeSpan diff = TimeSpan.FromTicks(DateTime.Now.Ticks - Interlocked.Read(ref _udpLastReceived));
 
                     //reconnect to UDP - port is no good!
                     if (diff.TotalSeconds > UDP_VOIP_TIMEOUT)
@@ -524,7 +536,7 @@ namespace Vanguard.VCS.Client.Network
 
                         _listener = null;
 
-                        _udpLastReceived = 0;
+                        Interlocked.Exchange(ref _udpLastReceived, 0);
 
                         _listener = new UdpClient();
                         try
@@ -556,7 +568,7 @@ namespace Vanguard.VCS.Client.Network
 
         private void EstablishConnection()
         {
-            _udpLastReceived = 0;
+            Interlocked.Exchange(ref _udpLastReceived, 0);
             _ready = false;
             _listener = new UdpClient();
             try
