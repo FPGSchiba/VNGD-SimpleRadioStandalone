@@ -108,5 +108,18 @@ namespace Vanguard.VCS.Client.Tests.Network
             Assert.IsNull(result);
             Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
         }
+
+        [TestMethod]
+        public void ContinueAuth_Complete_PublishesInternalLoginSuccess()
+        {
+            var loginResult = new LoginResult { PlayerName = "Pilot1", Secret = "mysecret" };
+            var authResponse = new AuthStepResponse { Success = true, Complete = loginResult };
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            _handler.ContinueAuth("sess1", new System.Collections.Generic.Dictionary<string, string>());
+
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginSuccess, _lastUpdateType);
+        }
     }
 }

@@ -309,8 +309,9 @@ namespace Vanguard.VCS.Client.Network
                 SessionId = sessionId,
                 ClientGuid = _clientGuid.ToString()
             };
-            foreach (var kv in stepData)
-                request.StepData[kv.Key] = kv.Value;
+            if (stepData != null)
+                foreach (var kv in stepData)
+                    request.StepData[kv.Key] = kv.Value;
 
             try
             {
