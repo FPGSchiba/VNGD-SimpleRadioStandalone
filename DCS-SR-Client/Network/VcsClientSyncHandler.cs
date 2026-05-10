@@ -97,8 +97,8 @@ namespace Vanguard.VCS.Client.Network
         private readonly ConnectedClientsSingleton _clients = ConnectedClientsSingleton.Instance;
         
         private RadioStateManager _radioStateManager;
-        private SRSService.SRSServiceClient _srsServiceClient;
-        private AuthService.AuthServiceClient _authServiceClient;
+        private ISrsServiceClient _srsServiceClient;
+        private IAuthServiceClient _authServiceClient;
         private GrpcChannel _channel;
         private static readonly string VcsVersion = "0.1.0";
         private Guid _clientGuid;
@@ -109,6 +109,16 @@ namespace Vanguard.VCS.Client.Network
         public VcsClientSyncHandler(UpdateUiCallback uiCallback)
         {
             _callback = uiCallback;
+        }
+
+        internal VcsClientSyncHandler(
+            UpdateUiCallback uiCallback,
+            IAuthServiceClient authClient,
+            ISrsServiceClient srsClient)
+        {
+            _callback = uiCallback;
+            _authServiceClient = authClient;
+            _srsServiceClient = srsClient;
         }
 
         private static string HashPassword(string password)
@@ -132,8 +142,8 @@ namespace Vanguard.VCS.Client.Network
                 Credentials = ChannelCredentials.Insecure, // Use insecure credentials for local development
             };
             _channel = GrpcChannel.ForAddress($"http://{endpoint.Address}:{endpoint.Port}", channelOptions);
-            _srsServiceClient = new SRSService.SRSServiceClient(_channel);
-            _authServiceClient = new AuthService.AuthServiceClient(_channel);
+            _srsServiceClient = new SrsServiceClientAdapter(new SRSService.SRSServiceClient(_channel));
+            _authServiceClient = new AuthServiceClientAdapter(new AuthService.AuthServiceClient(_channel));
             
             InitializeConnection();
         }
