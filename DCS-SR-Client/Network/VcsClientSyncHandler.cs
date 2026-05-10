@@ -557,6 +557,11 @@ namespace Vanguard.VCS.Client.Network
                 Logger.Error(ex, "gRPC error during GetServerSettings");
                 _callback?.Invoke(VcsUiUpdateType.ServerSettingsError, ex.Status.Detail);
             }
+            catch (Exception ex) when (ex is not RpcException)
+            {
+                Logger.Error(ex, "Unexpected error processing server settings");
+                _callback?.Invoke(VcsUiUpdateType.ServerSettingsError, "Failed to apply server settings.");
+            }
         }
 
         public void Disconnect()
