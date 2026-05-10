@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using NLog;
 using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Client.Singletons;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 {
@@ -31,87 +30,15 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 
         private void UpdateUI(object sender, EventArgs e)
         {
-            var radioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
-
             var profile = GlobalSettingsStore.Instance.ProfileSettingsStore;
 
             try
             {
-                if (radioInfo.IsCurrent())
-                {
-
-                    Desc.Text = radioInfo.capabilities.desc;
-
-                    if (radioInfo.capabilities.dcsPtt)
-                    {
-                        DCSPTT.Content = "Available in Cockpit";
-
-                        if (!profile.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))
-                        {
-                            DCSPTT.Content += " - Disabled in SRS";
-                        }
-                        
-                    }
-                    else
-                    {
-                        DCSPTT.Content = "Not Available - SRS Controls Only ";
-                    }
-
-                    if (radioInfo.capabilities.dcsRadioSwitch)
-                    {
-                        DCSRadioSwitch.Content = "Available in Cockpit";
-
-                        if (profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
-                        {
-                            DCSRadioSwitch.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        DCSRadioSwitch.Content = "Not Available - SRS Controls Only";
-                    }
-
-                    if (radioInfo.capabilities.dcsIFF)
-                    {
-                        DCSIFF.Content = "Available in Cockpit";
-
-                        if (profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay))
-                        {
-                            DCSIFF.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        DCSIFF.Content = "Not Available - SRS Controls Only";
-                    }
-
-                    if (radioInfo.capabilities.intercomHotMic)
-                    {
-                        IntercomHotMic.Content = "Available in Cockpit";
-
-                        if (!profile.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT) || profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
-                        {
-                            IntercomHotMic.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        IntercomHotMic.Content = "Not Available";
-                    }
-
-                }
-                else
-                {
-                    Desc.Text = "";
-                    DCSPTT.Content = "Unknown";
-                    DCSRadioSwitch.Content = "Unknown";
-                    DCSIFF.Content = "Unknown";
-                    IntercomHotMic.Content = "Unknown";
-
-                }
+                Desc.Text = "";
+                DCSPTT.Content = "Not Available - SRS Controls Only ";
+                DCSRadioSwitch.Content = "Not Available - SRS Controls Only";
+                DCSIFF.Content = "Not Available - SRS Controls Only";
+                IntercomHotMic.Content = "Not Available";
             }
             catch (Exception ex)
             {

@@ -7,7 +7,6 @@ using NLog;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
@@ -74,15 +73,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
-                RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
-            {
-                //remove focus to somewhere else
-                this.RadioVolume.Focus();
-                Keyboard.ClearFocus(); //then clear altogether
-            }
+            this.RadioVolume.Focus();
+            Keyboard.ClearFocus();
         }
 
         private void RadioFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -146,40 +138,19 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-            {
-                var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-                clientRadio.volume = (float) RadioVolume.Value / 100.0f;
-            }
-
             _dragging = false;
         }
 
-        // This function produces a Crash with a NullReference (https://github.com/FPGSchiba/VNGD-SimpleRadioStandalone/issues/128)
         private void ToggleButtons()
         {
-
-            if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
+            if (_clientStateSingleton.IsConnected)
             {
-                var radio = RadioHelper.GetRadio(RadioId);
-
-                if (radio != null)
+                RadioEnabled.Background = RadioOn;
+                RadioEnabled.Content = new TextBlock
                 {
-                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? RadioOn : RadioOff;
-                    RadioEnabled.Content = new TextBlock
-                    {
-                        FontSize = 5,
-                        Text = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off",
-                    };
-                }
-                else
-                {
-                    Logger.Warn($"Radio with ID: {RadioId} was not found. And could not Toggle.");
-                }
-                
+                    FontSize = 5,
+                    Text = "On",
+                };
             }
             else
             {
@@ -194,247 +165,80 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         internal void RepaintRadioStatus()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (!_clientStateSingleton.IsConnected || (dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
-                RadioId > dcsPlayerRadioInfo.radios.Length - 1)
+            if (!_clientStateSingleton.IsConnected)
             {
-                //Color and settings for disconnected radio
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
-                RadioFrequency.Text = "Unknown";
-
+                RadioFrequency.Text = "No Conn";
                 RadioMetaData.Text = "";
-
                 RadioVolume.IsEnabled = false;
-
                 ToggleButtons();
                 RadioEnabled.IsEnabled = false;
-
-                //reset dragging just incase
                 _dragging = false;
             }
             else
             {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
                 var transmitting = _clientStateSingleton.RadioSendingState;
-                                
-                if (transmitting.IsSending)
+
+                if (transmitting.IsSending && transmitting.SendingOn == RadioId)
                 {
-                    if (transmitting.SendingOn == RadioId)
-                    {
-                        //Color for user transmitting - dabble
-                        RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
-                    }
-                    else if (currentRadio != null && currentRadio.simul)
-                    {
-                        //Color for simultaneous transmissions - dabble
-                        RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
-                    }
-                    else
-                    {
-                        //unknown purposes yet - dabble
-                        RadioActive.Fill = RadioId == dcsPlayerRadioInfo.selected ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Orange);
-                    }
+                    RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
                 }
                 else
                 {
-                    if (RadioId == dcsPlayerRadioInfo.selected)
-                    {
-                        //Color for selected radio, not transmitting - dabble
-                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                    }
-                    else if (currentRadio != null && currentRadio.simul)
-                    {
-                        //Color for deselected radio that is setup for simultaneous transmissions - dabble
-                        RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                    }
-                    else
-                    {
-                        //Color for unselected radio that is powered on - dabble
-                        RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                    }
+                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
                 }
 
-                if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
-                {
-                    RadioActive.Fill = RadioOff;
-                    RadioLabel.Text = "OFF";
-                    RadioFrequency.Text = "";
-                    RadioMetaData.Text = "";
-
-                    RadioVolume.IsEnabled = true; // volume slider works even when radio is turned off.
-
-                    ToggleButtons();
-                    RadioEnabled.IsEnabled = true;
-
-                    return;
-                }
-                if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
-                {
-                    RadioFrequency.Text = "INTERCOM";
-                    RadioMetaData.Text = "";
-                }
-                else if (currentRadio.modulation == RadioInformation.Modulation.MIDS) //MIDS
-                {
-                    RadioFrequency.Text = "MIDS";
-                    if (currentRadio.channel >= 0)
-                    {
-                        RadioMetaData.Text = " CHN " + currentRadio.channel;
-                    }
-                    else
-                    {
-                        RadioMetaData.Text = " OFF";
-                    }
-  
-                }
-                else
-                {
-                    if (!RadioFrequency.IsFocused
-                        || currentRadio.freqMode == RadioInformation.FreqMode.COCKPIT
-                        || currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-                    {
-                        RadioFrequency.Text =
-                            (currentRadio.freq / MHz).ToString("0.000",
-                                CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
-                    }
-
-                    if (currentRadio.modulation == RadioInformation.Modulation.AM)
-                    {
-                        //Dabble updated this
-                        //Changed Text to remove AM from here as AM is the default Modulation.
-                        //We are keeping the other modulations for better troubleshooting should anyone
-                        //change the modulation in the future
-                        RadioMetaData.Text = "";
-                    }
-                    else if (currentRadio.modulation == RadioInformation.Modulation.FM)
-                    {
-                        RadioMetaData.Text = "FM";
-                    }
-                    else if (currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
-                    {
-                        RadioMetaData.Text = "HQ";
-                    }
-                    else
-                    {
-                        RadioMetaData.Text += "";
-                    }
-
-                    if (currentRadio.secFreq > 100)
-                    {
-                        //Dabble updated this
-                        //Because are not using the secondary radios, we don't need to identify "Guard".
-                        //Original text here " G"
-                        RadioMetaData.Text += "";
-                    }
-
-                    if (currentRadio.channel > -1)
-                    {
-                        RadioMetaData.Text += (" C" + currentRadio.channel);
-                    }
-                    if (currentRadio.enc && (currentRadio.encKey > 0))
-                    {
-                        RadioMetaData.Text += " E" + currentRadio.encKey; // ENCRYPTED
-                    }
-
-                 
-                }
-                RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
-
-                int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-
-                if (count > 0)
-                {
-                    RadioMetaData.Text += " 👤" + count;
-                }
-
+                RadioLabel.Text = "Radio " + RadioId;
+                RadioFrequency.Text = "Connected";
+                RadioMetaData.Text = "";
+                RadioVolume.IsEnabled = false;
                 ToggleButtons();
-                RadioEnabled.IsEnabled = currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY;
-
-                if (!_dragging)
-                {
-                    RadioVolume.Value = currentRadio.volume * 100.0;
-                }
+                RadioEnabled.IsEnabled = false;
             }
-
-            
         }
-        
+
         internal void RepaintRadioReceive()
         {
             TransmitterName.Visibility = Visibility.Collapsed;
             RadioFrequency.Visibility = Visibility.Visible;
             RadioMetaData.Visibility = Visibility.Visible;
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo == null)
+            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+
+            if (receiveState == null || !receiveState.IsReceiving)
             {
                 RadioFrequency.Foreground = GreenForeground;
                 RadioMetaData.Foreground = GreenForeground;
-                
             }
             else
             {
-                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
-                //check if current
-                
-                if (receiveState != null && receiveState.IsReceiving)
+                if (receiveState.SentBy.Length > 0)
                 {
-                    if (receiveState.SentBy.Length > 0)
-                    {
-                        TransmitterName.Text = receiveState.SentBy;
+                    TransmitterName.Text = receiveState.SentBy;
+                    TransmitterName.Visibility = Visibility.Visible;
+                    RadioFrequency.Visibility = Visibility.Collapsed;
+                    RadioMetaData.Visibility = Visibility.Collapsed;
+                }
 
-                        TransmitterName.Visibility = Visibility.Visible;
-                        RadioFrequency.Visibility = Visibility.Collapsed;
-                        RadioMetaData.Visibility = Visibility.Collapsed;
-
-                    }
-                    if (receiveState.IsSecondary)
-                    {
-                        TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
-                        RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
-                        RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
-                    }
-                    else
-                    {
-                        TransmitterName.Foreground = new SolidColorBrush(Colors.White);
-                        RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
-                        RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
-                    }
+                if (receiveState.IsSecondary)
+                {
+                    TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
+                    RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
+                    RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
                 }
                 else
                 {
-                    RadioFrequency.Foreground = GreenForeground;
-                    RadioMetaData.Foreground = GreenForeground;
+                    TransmitterName.Foreground = new SolidColorBrush(Colors.White);
+                    RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
+                    RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
                 }
             }
         }
 
-
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioHelper.GetRadio(RadioId);
-            // Radio is disabled and exists
-            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-            {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioEnabled.Background = RadioOn;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "On",
-                };
-            }
-            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-                RadioEnabled.Background = RadioOff;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "Off",
-                };
-            }
+            // Radio toggle not available without DCS radio info
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,7 +8,6 @@ using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
@@ -26,7 +25,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private static readonly Brush RadioOff = Brushes.IndianRed;
         private static readonly Brush GreenForeground = (Brush)new BrushConverter().ConvertFromString("#0F0");
-        
+
         public bool IsRadioEnabled
         {
             get => this.RadioEnabled.Background == RadioOn;
@@ -34,7 +33,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         public PresetChannelsViewModel ChannelViewModel { get; set; }
         public PresetStandbyChannelsViewModel StandbyChannelViewModel { get; set; }
-        
+
         public RadioControlGroupSwitch()
         {
             this.DataContext = this; // set data context
@@ -43,7 +42,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
             RadioFrequency.MaxLines = 1;
             RadioFrequency.MaxLength = 7;
-            
+
             StandbyRadioFrequency.MaxLines = 1;
             StandbyRadioFrequency.MaxLength = 7;
 
@@ -83,10 +82,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
-                RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
+            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+            if (radios == null || RadioId > radios.Count - 1 || RadioId < 0)
             {
                 //remove focus to somewhere else
                 RadioVolume.Focus();
@@ -177,97 +174,70 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-            {
-                var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-                clientRadio.volume = (float) RadioVolume.Value / 100.0f;
-            }
-
             _dragging = false;
         }
-        
+
         private void ToggleButtons()
         {
-
-            if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
+            RadioEnabled.Background = RadioOff;
+            RadioEnabled.Content = new TextBlock
             {
-                var radio = RadioHelper.GetRadio(RadioId);
-
-                if (radio != null)
-                {
-                    RadioEnabled.Background = radio.modulation != RadioInformation.Modulation.DISABLED ? RadioOn : RadioOff;
-                    RadioEnabled.Content = new TextBlock
-                    {
-                        FontSize = 5,
-                        Text = radio.modulation != RadioInformation.Modulation.DISABLED ? "On" : "Off",
-                    };
-                }
-                else
-                {
-                    Logger.Warn($"Radio with ID: {RadioId} was not found. And could not Toggle.");
-                }
-                
-            }
-            else
-            {
-                RadioEnabled.Background = RadioOff;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "Off",
-                };
-            }
+                FontSize = 5,
+                Text = "Off",
+            };
         }
 
         internal void RepaintRadioStatus()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-        
-            if (!_clientStateSingleton.IsConnected || dcsPlayerRadioInfo == null || !dcsPlayerRadioInfo.IsCurrent() || RadioId > dcsPlayerRadioInfo.radios.Length - 1)
+            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+
+            if (!_clientStateSingleton.IsConnected || radios == null || RadioId > radios.Count - 1)
             {
                 SetDisconnectedRadioStatus();
+                return;
+            }
+
+            var currentRadio = radios[RadioId];
+
+            if (!currentRadio.Enabled)
+            {
+                SetDisabledRadioStatus();
+                return;
+            }
+
+            var transmitting = _clientStateSingleton.RadioSendingState;
+
+            if (transmitting.IsSending && transmitting.SendingOn == RadioId)
+            {
+                RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
             }
             else
             {
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-                var transmitting = _clientStateSingleton.RadioSendingState;
-        
-                SetRadioActiveFill(transmitting, currentRadio, dcsPlayerRadioInfo);
-        
-                if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                RadioActive.Fill = new SolidColorBrush(System.Windows.Media.Colors.Orange);
+            }
+
+            RadioLabel.Text = currentRadio.Name;
+
+            if (currentRadio.IsIntercom)
+            {
+                RadioFrequency.Text = "INTERCOM";
+                RadioMetaData.Text = "";
+            }
+            else
+            {
+                if (!RadioFrequency.IsFocused)
                 {
-                    SetDisabledRadioStatus();
-                    return;
-                }
-        
-                SetRadioFrequencyAndMetaData(currentRadio);
-        
-                RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
-        
-                int freqCount = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-                int standbyCount = _connectClientsSingleton.ClientsOnFreq(currentRadio.standbyfreq, currentRadio.modulation);
-        
-                RadioMetaData.Text = "👤" + freqCount;
-                StandbyRadioMetaData.Text = "👤" + standbyCount;
-        
-                RadioVolume.IsEnabled = true;
-        
-                ToggleButtons();
-                RadioEnabled.IsEnabled = currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY;
-        
-                if (!_dragging)
-                {
-                    RadioVolume.Value = currentRadio.volume * 100.0;
+                    RadioFrequency.Text = (currentRadio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
                 }
             }
+
+            RadioVolume.IsEnabled = true;
+            ToggleButtons();
         }
-        
+
         private void SetDisconnectedRadioStatus()
         {
-            RadioActive.Fill = new SolidColorBrush(Colors.Red);
+            RadioActive.Fill = new SolidColorBrush(System.Windows.Media.Colors.Red);
             RadioLabel.Text = "No Radio";
             RadioFrequency.Text = "Unknown";
             StandbyRadioFrequency.Text = "Unknown";
@@ -278,41 +248,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             RadioEnabled.IsEnabled = false;
             _dragging = false;
         }
-        
-        private void SetRadioActiveFill(RadioSendingState transmitting, RadioInformation currentRadio, DCSPlayerRadioInfo dcsPlayerRadioInfo)
-        {
-            if (transmitting.IsSending)
-            {
-                if (transmitting.SendingOn == RadioId)
-                {
-                    RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
-                }
-                else if (currentRadio != null && currentRadio.simul)
-                {
-                    RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
-                }
-                else
-                {
-                    RadioActive.Fill = RadioId == dcsPlayerRadioInfo.selected ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Orange);
-                }
-            }
-            else
-            {
-                if (RadioId == dcsPlayerRadioInfo.selected)
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                }
-                else if (currentRadio != null && currentRadio.simul)
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                }
-                else
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                }
-            }
-        }
-        
+
         private void SetDisabledRadioStatus()
         {
             RadioActive.Fill = RadioOff;
@@ -326,44 +262,15 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             ToggleButtons();
             RadioEnabled.IsEnabled = true;
         }
-        
-        private void SetRadioFrequencyAndMetaData(RadioInformation currentRadio)
-        {
-            if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM)
-            {
-                this.RadioFrequency.Text = "INTERCOM";
-                RadioMetaData.Text = "";
-            }
-            else if (currentRadio.modulation == RadioInformation.Modulation.MIDS)
-            {
-                RadioFrequency.Text = "MIDS";
-                RadioMetaData.Text = currentRadio.channel >= 0 ? " CHN " + currentRadio.channel : " OFF";
-            }
-            else
-            {
-                if (currentRadio.freqMode != RadioInformation.FreqMode.COCKPIT && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-                {
-                    SwapRadio.Visibility = Visibility.Visible;
-                    if (!RadioFrequency.IsFocused)
-                    {
-                        RadioFrequency.Text = (currentRadio.freq / MHz).ToString("0.000", CultureInfo.InvariantCulture);
-                    }
-                    if (!StandbyRadioFrequency.IsFocused)
-                    {
-                        StandbyRadioFrequency.Text = (currentRadio.standbyfreq / MHz).ToString("0.000", CultureInfo.InvariantCulture);
-                    }
-                }
-            }
-        }
-        
+
         internal void RepaintRadioReceive()
         {
             TransmitterName.Visibility = Visibility.Collapsed;
             RadioFrequency.Visibility = Visibility.Visible;
             RadioMetaData.Visibility = Visibility.Visible;
 
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo == null)
+            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+            if (radios == null)
             {
                 RadioFrequency.Foreground = GreenForeground;
                 RadioMetaData.Foreground = GreenForeground;
@@ -371,8 +278,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             else
             {
                 var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
-                //check if current
-                
+
                 if (receiveState != null && receiveState.IsReceiving)
                 {
                     if (receiveState.SentBy.Length > 0)
@@ -386,15 +292,15 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                     }
                     if (receiveState.IsSecondary)
                     {
-                        TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
-                        RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
-                        RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
+                        TransmitterName.Foreground = new SolidColorBrush(System.Windows.Media.Colors.Red);
+                        RadioFrequency.Foreground = new SolidColorBrush(System.Windows.Media.Colors.Red);
+                        RadioMetaData.Foreground = new SolidColorBrush(System.Windows.Media.Colors.Red);
                     }
                     else
                     {
-                        TransmitterName.Foreground = new SolidColorBrush(Colors.White);
-                        RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
-                        RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
+                        TransmitterName.Foreground = new SolidColorBrush(System.Windows.Media.Colors.White);
+                        RadioFrequency.Foreground = new SolidColorBrush(System.Windows.Media.Colors.White);
+                        RadioMetaData.Foreground = new SolidColorBrush(System.Windows.Media.Colors.White);
                     }
                 }
                 else
@@ -407,29 +313,9 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioHelper.GetRadio(RadioId);
-            // Radio is disabled and exists
-            if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-            {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-                RadioEnabled.Background = RadioOn;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "On" ,
-                };
-            }
-            else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-                RadioEnabled.Background = RadioOff;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "Off",
-                };
-            }
+            // Toggle not supported in new model
         }
+
         private void SwapStandbyFrequency_Click(object sender, RoutedEventArgs e)
         {
             if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
@@ -448,7 +334,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             {
                 StandbyRadioFrequency.Text = "";
             }
-            
+
             RadioHelper.UpdateStandbyRadioFrequency(freq, RadioId, false);
             RadioHelper.UpdateRadioFrequency(standbyFreq, RadioId, false);
         }

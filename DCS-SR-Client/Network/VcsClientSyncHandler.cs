@@ -346,6 +346,7 @@ namespace Vanguard.VCS.Client.Network
         private void InitializeRadioSync()
         {
             _radioStateManager.Start();
+            _clientStateSingleton.CurrentRadioState = _radioStateManager.CurrentState;
             SyncClient();
         }
 
@@ -384,6 +385,7 @@ namespace Vanguard.VCS.Client.Network
         {
             try
             {
+                _clientStateSingleton.CurrentRadioState = _radioStateManager.CurrentState;
                 var response = _srsServiceClient.UpdateRadioInfo(GetRadioInfoFromState(), AuthCallOptions(5));
                 if (response.Success)
                 {

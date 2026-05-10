@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Input;
 using Vanguard.VCS.Client.Settings.RadioChannels;
-using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels
@@ -69,8 +68,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels
         public void Reload()
         {
             PresetChannels.Clear();
-
-            var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios;
 
             string vngdFileName = "vngd-channels";
 

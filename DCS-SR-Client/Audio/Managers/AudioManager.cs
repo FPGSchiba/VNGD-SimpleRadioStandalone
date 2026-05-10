@@ -532,13 +532,15 @@ namespace Vanguard.VCS.Client.Audio.Managers
             }
         }
 
+        private const int RadioMixerCount = 11; // 10 radios + 1 intercom
+
         private void InitMixers()
         {
             _finalMixdown = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2));
             _finalMixdown.ReadFully = true;
 
             _radioMixingProvider = new List<RadioMixingProvider>();
-            for (int i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
+            for (int i = 0; i < RadioMixerCount; i++)
             {
                 var mix = new RadioMixingProvider(WaveFormat.CreateIeeeFloatWaveFormat(OUTPUT_SAMPLE_RATE, 2), i);
                 _radioMixingProvider.Add(mix);

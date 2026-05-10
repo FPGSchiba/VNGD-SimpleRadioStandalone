@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using NLog;
-using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.Setting;
 
@@ -66,7 +65,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 ShowTransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? "ON" : "OFF";
 
-                ServerVersion.Content = SrsClientSyncHandler.ServerVersion;
+                ServerVersion.Content = "";
 
                 NodeLimit.Content = settings.RetransmitNodeLimit;
             }

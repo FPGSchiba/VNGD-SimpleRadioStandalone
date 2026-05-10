@@ -7,7 +7,6 @@ using NLog;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
-using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -58,15 +57,8 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
     {
-        var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-        if ((dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
-            RadioId > dcsPlayerRadioInfo.radios.Length - 1 || RadioId < 0)
-        {
-            //remove focus to somewhere else
-            RadioVolume.Focus();
-            Keyboard.ClearFocus(); //then clear altogether
-        }
+        RadioVolume.Focus();
+        Keyboard.ClearFocus();
     }
 
     private
@@ -170,37 +162,22 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
     {
-        var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-        if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-        {
-            var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            clientRadio.volume = (float) RadioVolume.Value / 100.0f;
-        }
-
         _dragging = false;
     }
 
     private void ToggleButtons(bool enable)
     {
-
-        if (_clientStateSingleton.IsConnected && _clientStateSingleton.ExternalAWACSModeConnected)
+        if (_clientStateSingleton.IsConnected)
         {
-            RadioEnabled.Background =
-                RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                    ? radioOn
-                    : radioOff;
-            RadioEnabled.Content = RadioHelper.GetRadio(RadioId).modulation != RadioInformation.Modulation.DISABLED
-                ? "On"
-                : "Off";
+            RadioEnabled.Background = radioOn;
+            RadioEnabled.Content = "On";
         }
         else
         {
             RadioEnabled.Background = radioOff;
             RadioEnabled.Content = "Off";
         }
-            
+
         if (enable)
         {
             Up10.Visibility = Visibility.Visible;
@@ -230,27 +207,6 @@ public partial class RadioControlGroupDragable : UserControl
             PresetChannelsView.IsEnabled = true;
 
             ChannelTab.Visibility = Visibility.Visible;
-
-            if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl ==
-                DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
-            {
-                if (_clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmission 
-                    && _clientStateSingleton.DcsPlayerRadioInfo.simultaneousTransmissionControl == DCSPlayerRadioInfo.SimultaneousTransmissionControl.ENABLED_INTERNAL_SRS_CONTROLS)
-                {
-                    int simulTransmission = 0;
-                    for (int i = 0; i < _clientStateSingleton.DcsPlayerRadioInfo.radios.Length; i++)
-                    {
-                        if (_clientStateSingleton.DcsPlayerRadioInfo.radios[i].simul)
-                        {
-                            if (i != RadioId)
-                            {
-                                simulTransmission++;
-                            }
-                        }
-                    }
-
-                }
-            }
         }
         else
         {
@@ -268,184 +224,42 @@ public partial class RadioControlGroupDragable : UserControl
 
             ChannelTab.Visibility = Visibility.Collapsed;
         }
-
-                
     }
 
     internal void RepaintRadioStatus()
     {
         SetupEncryption();
 
-        var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-        if (!_clientStateSingleton.IsConnected || (dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent() ||
-            RadioId > dcsPlayerRadioInfo.radios.Length - 1)
+        if (!_clientStateSingleton.IsConnected)
         {
             RadioActive.Fill = new SolidColorBrush(Colors.Red);
             RadioLabel.Text = "No Radio";
-            RadioFrequency.Text = "Off";
-
+            RadioFrequency.Text = "No Conn";
             RadioMetaData.Text = "";
-
             RadioVolume.IsEnabled = false;
-
             ToggleButtons(false);
             RadioEnabled.IsEnabled = false;
-
-            //reset dragging just incase
             _dragging = false;
         }
         else
         {
-            var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
             var transmitting = _clientStateSingleton.RadioSendingState;
 
-            if (transmitting.IsSending)
+            if (transmitting.IsSending && transmitting.SendingOn == RadioId)
             {
-                if (transmitting.SendingOn == RadioId)
-                {
-                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                }
-                else if (currentRadio != null && currentRadio.simul)
-                {
-                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4F86FF"));
-                }
-                else
-                {
-                    RadioActive.Fill = RadioId == dcsPlayerRadioInfo.selected ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Orange);
-                }
+                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
             else
             {
-                if (RadioId == dcsPlayerRadioInfo.selected)
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                }
-                else if (currentRadio != null && currentRadio.simul)
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                }
-                else
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                }
+                RadioActive.Fill = new SolidColorBrush(Colors.Orange);
             }
 
-            if (currentRadio == null || currentRadio.modulation == RadioInformation.Modulation.DISABLED) // disabled
-            {
-                RadioActive.Fill = radioOff;
-                RadioLabel.Text = "No Radio";
-                RadioFrequency.Text = "Off";
-                RadioMetaData.Text = "";
-
-
-                RadioVolume.IsEnabled = false;
-
-                ToggleButtons(false);
-                RadioEnabled.IsEnabled = true;
-
-                return;
-            }
-            if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
-            {
-                RadioFrequency.Text = "INTERCOM";
-                RadioMetaData.Text = "";
-            }
-            else if (currentRadio.modulation == RadioInformation.Modulation.MIDS) //MIDS
-            {
-                RadioFrequency.Text = "MIDS";
-                if (currentRadio.channel >= 0)
-                {
-                    RadioMetaData.Text = " CHN " + currentRadio.channel;
-                }
-                else
-                {
-                    RadioMetaData.Text = " OFF";
-                }
-  
-            }
-            else
-            {
-                if (!RadioFrequency.IsFocused
-                    || currentRadio.freqMode == RadioInformation.FreqMode.COCKPIT
-                    || currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-                {
-                    RadioFrequency.Text =
-                        (currentRadio.freq / MHz).ToString("0.000",
-                            CultureInfo.InvariantCulture); //make number UK / US style with decimals not commas!
-                }
-
-                if (currentRadio.modulation == RadioInformation.Modulation.AM)
-                {
-                    //Dabble updated this
-                    //Changed Text to remove AM from here as AM is the default Modulation.
-                    //We are keeping the other modulations for better troubleshooting should anyone
-                    //change the modulation in the future
-                    RadioMetaData.Text = "";
-                }
-                else if (currentRadio.modulation == RadioInformation.Modulation.FM)
-                {
-                    RadioMetaData.Text = "FM";
-                }
-                else if (currentRadio.modulation == RadioInformation.Modulation.HAVEQUICK)
-                {
-                    RadioMetaData.Text = "HQ";
-                }
-                else
-                {
-                    RadioMetaData.Text += "";
-                }
-
-                if (currentRadio.secFreq > 100)
-                {
-                    //Dabble updated this
-                    //Because are not using the secondary radios, we don't need to identify "Guard".
-                    //Original text here " G"
-                    RadioMetaData.Text += "";
-                }
-
-                if (currentRadio.channel > -1)
-                {
-                    RadioMetaData.Text += (" C" + currentRadio.channel);
-                }
-                if (currentRadio.enc && (currentRadio.encKey > 0))
-                {
-                    RadioMetaData.Text += " E" + currentRadio.encKey; // ENCRYPTED
-                }
-
-                 
-            }
-            RadioLabel.Text = dcsPlayerRadioInfo.radios[RadioId].name;
-
-            int count = _connectClientsSingleton.ClientsOnFreq(currentRadio.freq, currentRadio.modulation);
-
-            if (count > 0)
-            {
-                RadioMetaData.Text += " 👤" + count;
-            }
-
-            if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-            {
-                RadioVolume.IsEnabled = true;
-
-                //reset dragging just incase
-                //    _dragging = false;
-            }
-            else
-            {
-                RadioVolume.IsEnabled = false;
-
-                //reset dragging just incase
-                //  _dragging = false;
-            }
-
-            ToggleButtons(currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY);
-            RadioEnabled.IsEnabled = currentRadio.freqMode == RadioInformation.FreqMode.OVERLAY;
-
-            if (_dragging == false)
-            {
-                RadioVolume.Value = currentRadio.volume * 100.0;
-            }
+            RadioLabel.Text = "Radio " + RadioId;
+            RadioFrequency.Text = "Connected";
+            RadioMetaData.Text = "";
+            RadioVolume.IsEnabled = false;
+            ToggleButtons(false);
+            RadioEnabled.IsEnabled = false;
         }
 
         TabItem item = TabControl.SelectedItem as TabItem;
@@ -458,69 +272,13 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void SetupEncryption()
     {
-        var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-        if (((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            && RadioId <= dcsPlayerRadioInfo.radios.Length - 1)
-        {
-            var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-
-            EncryptionKeySpinner.Value = currentRadio.encKey;
-
-            //update stuff
-            if ((currentRadio.encMode == RadioInformation.EncryptionMode.NO_ENCRYPTION)
-                || (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_FULL)
-                || (currentRadio.modulation == RadioInformation.Modulation.INTERCOM))
-            {
-                //Disable everything
-                EncryptionKeySpinner.IsEnabled = false;
-                EncryptionButton.IsEnabled = false;
-                EncryptionButton.Visibility = Visibility.Hidden;
-                EncryptionButton.Content = "Enable";
-
-                EncryptionTab.Visibility = Visibility.Collapsed;
-            }
-            else if (currentRadio.encMode ==
-                     RadioInformation.EncryptionMode.ENCRYPTION_COCKPIT_TOGGLE_OVERLAY_CODE)
-            {
-                //allow spinner
-                EncryptionKeySpinner.IsEnabled = true;
-
-                //disallow encryption toggle
-                EncryptionButton.IsEnabled = false;
-                EncryptionButton.Content = "Enable";
-                EncryptionButton.Visibility = Visibility.Visible;
-                EncryptionTab.Visibility = Visibility.Visible;
-            }
-            else if (currentRadio.encMode ==
-                     RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-            {
-                EncryptionKeySpinner.IsEnabled = true;
-                EncryptionButton.IsEnabled = true;
-                EncryptionButton.Visibility = Visibility.Visible;
-
-                if (currentRadio.enc)
-                {
-                    EncryptionButton.Content = "Disable";
-                }
-                else
-                {
-                    EncryptionButton.Content = "Enable";
-                }
-                EncryptionTab.Visibility = Visibility.Visible;
-            }
-        }
-        else
-        {
-            //Disable everything
-            EncryptionKeySpinner.IsEnabled = false;
-            EncryptionButton.IsEnabled = false;
-            EncryptionButton.Visibility = Visibility.Hidden;
-            EncryptionButton.Content = "Enable";
-            EncryptionTab.Visibility = Visibility.Collapsed;
-        }
+        // Without DCS radio info, disable all encryption controls
+        EncryptionKeySpinner.IsEnabled = false;
+        EncryptionButton.IsEnabled = false;
+        EncryptionButton.Visibility = Visibility.Hidden;
+        EncryptionButton.Content = "Enable";
+        EncryptionTab.Visibility = Visibility.Collapsed;
     }
-
 
     internal void RepaintRadioReceive()
     {
@@ -528,54 +286,34 @@ public partial class RadioControlGroupDragable : UserControl
         RadioFrequency.Visibility = Visibility.Visible;
         RadioMetaData.Visibility = Visibility.Visible;
 
-        var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-        if (dcsPlayerRadioInfo == null)
+        var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+
+        if (receiveState == null || !receiveState.IsReceiving)
         {
-            RadioFrequency.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-            RadioMetaData.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                
+            RadioFrequency.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
+            RadioMetaData.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00FF00"));
         }
         else
         {
-            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
-            //check if current
-
-            if ((receiveState == null) || !receiveState.IsReceiving)
+            if (receiveState.SentBy.Length > 0)
             {
-                RadioFrequency.Foreground =
-                    new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                RadioMetaData.Foreground = new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                TransmitterName.Text = receiveState.SentBy;
+                TransmitterName.Visibility = Visibility.Visible;
+                RadioFrequency.Visibility = Visibility.Collapsed;
+                RadioMetaData.Visibility = Visibility.Collapsed;
             }
-            else if ((receiveState != null) && receiveState.IsReceiving)
+
+            if (receiveState.IsSecondary)
             {
-                if (receiveState.SentBy.Length > 0)
-                {
-                    TransmitterName.Text = receiveState.SentBy;
-
-                    TransmitterName.Visibility = Visibility.Visible;
-                    RadioFrequency.Visibility = Visibility.Collapsed;
-                    RadioMetaData.Visibility = Visibility.Collapsed;
-
-                }
-                if (receiveState.IsSecondary)
-                {
-                    TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
-                    RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
-                    RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    TransmitterName.Foreground = new SolidColorBrush(Colors.White);
-                    RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
-                    RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
-                }
+                TransmitterName.Foreground = new SolidColorBrush(Colors.Red);
+                RadioFrequency.Foreground = new SolidColorBrush(Colors.Red);
+                RadioMetaData.Foreground = new SolidColorBrush(Colors.Red);
             }
             else
             {
-                RadioFrequency.Foreground =
-                    new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
-                RadioMetaData.Foreground =
-                    new SolidColorBrush((Color) ColorConverter.ConvertFromString("#00FF00"));
+                TransmitterName.Foreground = new SolidColorBrush(Colors.White);
+                RadioFrequency.Foreground = new SolidColorBrush(Colors.White);
+                RadioMetaData.Foreground = new SolidColorBrush(Colors.White);
             }
         }
     }
@@ -583,50 +321,16 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
     {
-        var currentRadio = RadioHelper.GetRadio(RadioId);
-
-        if (currentRadio != null &&
-            currentRadio.modulation != RadioInformation.Modulation.DISABLED) // disabled
-        {
-            //update stuff
-            if (currentRadio.encMode == RadioInformation.EncryptionMode.ENCRYPTION_JUST_OVERLAY)
-            {
-                RadioHelper.ToggleEncryption(RadioId);
-
-                if (currentRadio.enc)
-                {
-                    EncryptionButton.Content = "Enable";
-                }
-                else
-                {
-                    EncryptionButton.Content = "Disable";
-                }
-            }
-        }
+        // Encryption not available without DCS radio info
     }
 
     private void EncryptionKeySpinner_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        if (EncryptionKeySpinner?.Value != null)
-            RadioHelper.SetEncryptionKey(RadioId, (byte) EncryptionKeySpinner.Value);
+        // Encryption key not available without DCS radio info
     }
 
     private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
     {
-        var currentRadio = RadioHelper.GetRadio(RadioId);
-        // Radio is disabled and exists
-        if (currentRadio != null && currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-        {
-            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
-            RadioEnabled.Background = radioOn;
-            RadioEnabled.Content = "On";
-
-        }
-        else if (currentRadio != null && currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-        {
-            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
-            RadioEnabled.Background = radioOff;
-            RadioEnabled.Content = "Off";
-        }
+        // Radio toggle not available without DCS radio info
     }
 }

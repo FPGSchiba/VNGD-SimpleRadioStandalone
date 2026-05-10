@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -12,7 +11,6 @@ using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
-using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -137,33 +135,12 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            
             int numVisibleRadios = getNumVisibleRadios();
             CalculateHeight(numVisibleRadios);
-        
+
             Intercom.RepaintRadioStatus();
-        
-            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
-            {
-                HandleCurrentDcsPlayerRadioInfo(dcsPlayerRadioInfo);
-            }
-            else
-            {
-                ControlText.Text = "Compact Radio Panel - Original (Disconnected)";
-            }
-        }
-        
-        private void HandleCurrentDcsPlayerRadioInfo(DCSPlayerRadioInfo dcsPlayerRadioInfo)
-        {
-            var availableRadios = GetAvailableRadiosCount(dcsPlayerRadioInfo);
-        
-            ControlText.Text = availableRadios > 1 ? "Compact Radio Panel - Original" : "Compact Radio Panel - Original (Disconnected)";
-        }
-        
-        private static int GetAvailableRadiosCount(DCSPlayerRadioInfo dcsPlayerRadioInfo)
-        {
-            return dcsPlayerRadioInfo.radios.Select(t => t.modulation).Count(mod => mod != RadioInformation.Modulation.DISABLED);
+
+            ControlText.Text = "Compact Radio Panel - Original";
         }
 
         private void CalculateHeight(int numVisibleRadios)

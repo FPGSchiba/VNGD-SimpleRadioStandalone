@@ -38,7 +38,7 @@ namespace Vanguard.VCS.Client.Audio.Providers
 
             if (!passThrough)
             {
-                var radios = ClientStateSingleton.Instance.DcsPlayerRadioInfo.radios.Length;
+                const int radios = 11; // 10 radios + 1 intercom
                 JitterBufferProviderInterface = new JitterBufferProviderInterface[radios];
 
                 for (int i = 0; i < radios; i++)

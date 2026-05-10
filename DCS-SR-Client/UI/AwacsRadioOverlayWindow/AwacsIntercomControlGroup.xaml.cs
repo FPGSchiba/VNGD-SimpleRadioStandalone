@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {
@@ -18,9 +17,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-        private RadioInformation _intercomInformation;
-        
-        
 
         public IntercomControlGroup()
         {
@@ -28,8 +24,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
-            _intercomInformation = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-            IntercomNumberSpinner.Maximum = (int)Math.Round(_intercomInformation.freqMax, 0);
+            IntercomNumberSpinner.Maximum = 100;
             IntercomNumberSpinner.Minimum = 1;
         }
 
@@ -37,14 +32,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (_intercomInformation.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                if (_clientStateSingleton.DcsPlayerRadioInfo.control ==
-                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                {
-                    _clientStateSingleton.DcsPlayerRadioInfo.selected = (short) RadioId;
-                }
-            }
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -55,133 +42,48 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-                {
-                    var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-                    clientRadio.volume = (float) RadioVolume.Value / 100.0f;
-                }
-            }
-
             _dragging = false;
         }
 
         internal void RepaintRadioStatus()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (!_clientStateSingleton.IsConnected || (dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent())
+            if (!_clientStateSingleton.IsConnected)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
-
                 RadioVolume.IsEnabled = false;
-
-                //reset dragging just incase
                 _dragging = false;
-
                 IntercomNumberSpinner.IsEnabled = false;
+                return;
+            }
+
+            var transmitting = _clientStateSingleton.RadioSendingState;
+            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+
+            if ((receiveState != null) && receiveState.IsReceiving)
+            {
+                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+            }
+            else if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
+            {
+                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
             else
             {
-                var transmitting = _clientStateSingleton.RadioSendingState;
-                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
-
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-                if ((receiveState != null) && receiveState.IsReceiving)
-                {
-                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                }
-                else if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
-                {
-
-                    if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
-                    {
-                        RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                    }
-                    else
-                    {
-                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                    }
-                }
-                else
-                {
-                    if (currentRadio.simul && dcsPlayerRadioInfo.simultaneousTransmission)
-                    {
-                        // if (transmitting.IsSending)
-                        // {
-                        //     RadioActive.Fill = new SolidColorBrush(Colors.LightBlue);
-                        // }
-                        // else
-                        // {
-                        RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                        // }
-
-                    }
-                    else
-                    {
-                        RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                    }
-
-                }
-
-
-
-                if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
-                {
-                    RadioLabel.Text = "INTERCOM";
-
-                    RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
-
-                    Radio1Enabled.IsEnabled = true;
-
-                    if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
-                    {
-                        IntercomNumberSpinner.IsEnabled = true;
-                        IntercomNumberSpinner.Value = _clientStateSingleton.IntercomOffset;
-                    }
-                    else
-                    {
-                        IntercomNumberSpinner.IsEnabled = false;
-                        IntercomNumberSpinner.Value = 1;
-                        _clientStateSingleton.IntercomOffset = 1;
-                    }
-                }
-                else
-                {
-                    RadioLabel.Text = "NO INTERCOM";
-                    RadioActive.Fill = new SolidColorBrush(Colors.Red);
-                    Radio1Enabled.IsEnabled = false;
-                    IntercomEnabled.IsEnabled = false;
-                    RadioVolume.IsEnabled = false;
-                    IntercomNumberSpinner.Value = 1;
-                    IntercomNumberSpinner.IsEnabled = false;
-                    _clientStateSingleton.IntercomOffset = 1;
-
-
-                    Radio1Enabled.Background = RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
-                    IntercomEnabled.Background = RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
-                }
-
-                if (_dragging == false)
-                {
-                    RadioVolume.Value = currentRadio.volume * 100.0;
-                }
+                RadioActive.Fill = new SolidColorBrush(Colors.Orange);
             }
+
+            RadioLabel.Text = "INTERCOM";
+            Radio1Enabled.IsEnabled = true;
+            IntercomNumberSpinner.IsEnabled = true;
         }
 
         private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (_init)
             {
-                //ignore
                 _init = false;
                 return;
             }
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             int spinnervalue;
             if (!int.TryParse(IntercomNumberSpinner.Value.ToString(), out spinnervalue))
@@ -194,7 +96,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
                 IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
-
 
             if (spinnervalue == 1)
             {
@@ -212,15 +113,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                 {
                     IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
-            }
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
-            {
-                _clientStateSingleton.IntercomOffset = (int) IntercomNumberSpinner.Value;
-                dcsPlayerRadioInfo.unitId =
-                    (uint) (DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
-                _clientStateSingleton.LastSent = 0; //force refresh
             }
         }
 

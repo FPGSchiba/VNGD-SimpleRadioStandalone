@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Network.VAICOM.Models;
 using Vanguard.VCS.Client.Settings;
@@ -94,6 +95,8 @@ namespace Vanguard.VCS.Client.Singletons
         public string LastSeenName { get; set; }
 
         public VAICOMMessageWrapper InhibitTX { get; set; } = new VAICOMMessageWrapper(); //used to temporarily stop PTT for VAICOM
+
+        public ClientRadioState CurrentRadioState { get; set; } = RadioStateManager.CreateDefaultState();
 
         private ClientStateSingleton()
         {

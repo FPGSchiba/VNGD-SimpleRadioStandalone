@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -13,7 +12,6 @@ using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
-using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -87,8 +85,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
             foreach (var radio in _radioControlGroups)
             {
                 radio.RepaintRadioStatus();
@@ -97,36 +93,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
             Intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                    ResetHeight();
-                }
-
-                var availableRadios = dcsPlayerRadioInfo.radios.Count(t => t.modulation != RadioInformation.Modulation.DISABLED);
-
-                if ((availableRadios == 2
-                    || dcsPlayerRadioInfo.radios.Length >= 2
-                    && dcsPlayerRadioInfo.radios[1].modulation != RadioInformation.Modulation.DISABLED) && MinHeight != _originalMinHeight)
-                {
-                    MinHeight = _originalMinHeight;
-                    Recalculate();
-                }
-                else
-                {
-                    ResetHeight();
-                }
-                
-                ControlText.Text = availableRadios > 1 ? "2 Radio Panel" : "2 Radio Panel (Disconnected)";
-            }
-            else
-            {
-                ResetHeight();
-                ControlText.Text = "2 Radio Panel (Disconnected)";
-            }
+            ControlText.Text = "2 Radio Panel";
 
             FocusDCS();
         }
