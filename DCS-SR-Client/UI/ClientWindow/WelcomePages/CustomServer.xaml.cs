@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using NLog;
 using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
@@ -71,7 +72,7 @@ public partial class CustomServer : Page
         {
             MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                 MessageBoxImage.Error);
-            _mainWindow.ClientState.IsConnected = false;
+            ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
             ConnectionFailed();
         }
         catch (Exception ex)

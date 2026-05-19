@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using NLog;
 using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
@@ -92,7 +93,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             {
                 MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                mainWindow.ClientState.IsConnected = false;
+                ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
                 Dispatcher.Invoke(() =>
                 {
                     ConnectionFailed();

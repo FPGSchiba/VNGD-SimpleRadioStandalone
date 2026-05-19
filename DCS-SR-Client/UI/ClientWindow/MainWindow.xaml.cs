@@ -18,6 +18,7 @@ using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Input;
 using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.Stores;
 using Vanguard.VCS.Client.UI.ClientWindow.HomePages;
 using Vanguard.VCS.Client.UI.ClientWindow.Favourites;
 using Vanguard.VCS.Client.Utils;
@@ -197,18 +198,16 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         /// <remarks>Used in the XAML for DataBinding many things</remarks>
-        public ClientStateSingleton ClientState { get; } = ClientStateSingleton.Instance;
+        public ClientStateStore ClientState => App.ClientStateStore;
 
         /// <remarks>Used in the XAML for DataBinding the connected client count</remarks>
-        public ConnectedClientsSingleton Clients { get; } = ConnectedClientsSingleton.Instance;
+        public ConnectedClientsStore Clients => App.ConnectedClientsStore;
 
         /// <remarks>Used in the XAML for DataBinding input audio related UI elements</remarks>
         public AudioInputSingleton AudioInput { get; } = AudioInputSingleton.Instance;
 
         /// <remarks>Used in the XAML for DataBinding output audio related UI elements</remarks>
         public AudioOutputSingleton AudioOutput { get; } = AudioOutputSingleton.Instance;
-
-        private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public MainWindow()
         {
@@ -848,7 +847,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 };
                 _connectionAwacsSpan = _connectionTransaction.StartChild("awacs-connection");
                 
-                ClientState.LastSeenName = _playerName;
+                ClientStateSingleton.Instance.LastSeenName = _playerName; // TODO: implement LastSeenName on ClientStateStore
 
                 _guestPage.LoginInProgress.Opacity = 0;
                 _welcomePage.ConnectionSuccessful();
@@ -868,21 +867,21 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 LoggedIn = true;
                 ConnectedAt = DateTime.UtcNow;
-                
+
                 AudioManager.StartEncoding(InputManager, _resolvedIp, _port);
-                
+
                 OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
 
                 _connectionAwacsSpan.Finish();
-                
+
                 SentrySdk.ConfigureScope(scope =>
                 {
                     scope.User = new SentryUser
                     {
-                        Username = ClientState.LastSeenName
+                        Username = ClientStateSingleton.Instance.LastSeenName // TODO: implement LastSeenName on ClientStateStore
                     };
                 });
-                ClientState.IsConnected = true;
+                ClientStateSingleton.Instance.IsConnected = true; // TODO: drive IsConnected via event bus on ClientStateStore
                 _connectionTransaction.Finish();
             }
             catch (Exception ex)
@@ -979,7 +978,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _unitSelectionPage.SetSelectionData(internalLoginResult);
                 _playerName = internalLoginResult.PlayerName;
-                ClientState.LastSeenName = internalLoginResult.PlayerName;
+                ClientStateSingleton.Instance.LastSeenName = internalLoginResult.PlayerName; // TODO: implement LastSeenName on ClientStateStore
                 OpenPageByIndex(UnitSelectionIndex);
             }
             else
@@ -1038,7 +1037,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     
                     _logger.Warn(ex, "Failed to connect to server");
 
-                    ClientState.IsConnected = false;
+                    ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
                 }
             }
         }
@@ -1069,9 +1068,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 }
             }
 
-            ClientState.IsConnectionErrored = connectionError;
-            
-            ClientState.IsConnected = false;
+            ClientStateSingleton.Instance.IsConnectionErrored = connectionError; // TODO: implement IsConnectionErrored on ClientStateStore
+
+            ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
 
             _loginPage.Login.IsEnabled = true;
             _guestPage.Login.IsEnabled = true;
@@ -1084,10 +1083,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             ConnectionStatus.Fill = Brushes.Red;
 
-            if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
-                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
+            // TODO: implement LastSeenName on ClientStateStore
+            if (!string.IsNullOrWhiteSpace(ClientStateSingleton.Instance.LastSeenName) &&
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientStateSingleton.Instance.LastSeenName)
             {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientState.LastSeenName);
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientStateSingleton.Instance.LastSeenName);
             }
 
             try
@@ -1197,10 +1197,11 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, Top);
 
-            if (!string.IsNullOrWhiteSpace(ClientState.LastSeenName) &&
-                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientState.LastSeenName)
+            // TODO: implement LastSeenName on ClientStateStore
+            if (!string.IsNullOrWhiteSpace(ClientStateSingleton.Instance.LastSeenName) &&
+                _globalSettings.GetClientSetting(GlobalSettingsKeys.LastSeenName).StringValue != ClientStateSingleton.Instance.LastSeenName)
             {
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientState.LastSeenName);
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, ClientStateSingleton.Instance.LastSeenName);
             }
 
             //save window position
