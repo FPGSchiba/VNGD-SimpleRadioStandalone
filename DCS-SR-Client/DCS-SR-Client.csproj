@@ -10,7 +10,7 @@
     <RootNamespace>Vanguard.VCS.Client</RootNamespace>
     <AssemblyName>VCS-RadioClient</AssemblyName>
     <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
-    <StartupObject>DCS_SR_Client.App</StartupObject>
+    <StartupObject>Vanguard.VCS.Client.App</StartupObject>
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>

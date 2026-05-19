@@ -28,7 +28,7 @@ namespace Vanguard.VCS.Client
     /// <summary>
     ///     Interaction logic for App.xaml
     /// </summary>
-    public class App : Application
+    public partial class App : Application
     {
         public static IEventBus EventBus { get; private set; }
         public static ClientStateStore ClientStateStore { get; private set; }
