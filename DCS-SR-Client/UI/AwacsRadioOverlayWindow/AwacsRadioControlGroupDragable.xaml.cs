@@ -7,6 +7,7 @@ using NLog;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -169,8 +170,8 @@ public partial class RadioControlGroupDragable : UserControl
     {
         if (_clientStateSingleton.IsConnected)
         {
-            RadioEnabled.Background = radioOn;
-            RadioEnabled.Content = "On";
+            RadioEnabled.Background = enable ? radioOn : radioOff;
+            RadioEnabled.Content = enable ? "On" : "Off";
         }
         else
         {
@@ -230,7 +231,9 @@ public partial class RadioControlGroupDragable : UserControl
     {
         SetupEncryption();
 
-        if (!_clientStateSingleton.IsConnected)
+        var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+
+        if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
         {
             RadioActive.Fill = new SolidColorBrush(Colors.Red);
             RadioLabel.Text = "No Radio";
@@ -240,34 +243,35 @@ public partial class RadioControlGroupDragable : UserControl
             ToggleButtons(false);
             RadioEnabled.IsEnabled = false;
             _dragging = false;
+            TabItem item = TabControl.SelectedItem as TabItem;
+            if (item?.Visibility != Visibility.Visible) TabControl.SelectedIndex = 0;
+            return;
         }
-        else
+
+        var radio = radios[RadioId - 1];
+        var transmitting = _clientStateSingleton.RadioSendingState;
+        RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == RadioId
+            ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"))
+            : new SolidColorBrush(Colors.Orange);
+
+        RadioLabel.Text = radio.Name;
+        RadioMetaData.Text = "";
+
+        if (radio.IsIntercom)
         {
-            var transmitting = _clientStateSingleton.RadioSendingState;
-
-            if (transmitting.IsSending && transmitting.SendingOn == RadioId)
-            {
-                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-            }
-            else
-            {
-                RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-            }
-
-            RadioLabel.Text = "Radio " + RadioId;
-            RadioFrequency.Text = "Connected";
-            RadioMetaData.Text = "";
-            RadioVolume.IsEnabled = false;
-            ToggleButtons(false);
-            RadioEnabled.IsEnabled = false;
+            RadioFrequency.Text = "INTERCOM";
         }
-
-        TabItem item = TabControl.SelectedItem as TabItem;
-
-        if (item?.Visibility != Visibility.Visible)
+        else if (!RadioFrequency.IsFocused)
         {
-            TabControl.SelectedIndex = 0;
+            RadioFrequency.Text = (radio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
         }
+
+        RadioVolume.IsEnabled = radio.Enabled;
+        ToggleButtons(radio.Enabled);
+        RadioEnabled.IsEnabled = true;
+
+        TabItem tabItem = TabControl.SelectedItem as TabItem;
+        if (tabItem?.Visibility != Visibility.Visible) TabControl.SelectedIndex = 0;
     }
 
     private void SetupEncryption()
@@ -331,6 +335,11 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
     {
-        // Radio toggle not available without DCS radio info
+        var currentRadio = RadioHelper.GetRadio(RadioId);
+        if (currentRadio == null) return;
+        if (currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+        else
+            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
     }
 }

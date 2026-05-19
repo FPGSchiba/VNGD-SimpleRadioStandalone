@@ -83,7 +83,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
             var radios = _clientStateSingleton.CurrentRadioState?.Radios;
-            if (radios == null || RadioId > radios.Count - 1 || RadioId < 0)
+            if (radios == null || RadioId < 1 || RadioId > radios.Count)
             {
                 //remove focus to somewhere else
                 RadioVolume.Focus();
@@ -177,27 +177,39 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             _dragging = false;
         }
 
-        private void ToggleButtons()
+        private void ToggleButtons(bool enable)
         {
-            RadioEnabled.Background = RadioOff;
-            RadioEnabled.Content = new TextBlock
+            if (_clientStateSingleton.IsConnected)
             {
-                FontSize = 5,
-                Text = "Off",
-            };
+                RadioEnabled.Background = enable ? RadioOn : RadioOff;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = enable ? "On" : "Off",
+                };
+            }
+            else
+            {
+                RadioEnabled.Background = RadioOff;
+                RadioEnabled.Content = new TextBlock
+                {
+                    FontSize = 5,
+                    Text = "Off",
+                };
+            }
         }
 
         internal void RepaintRadioStatus()
         {
             var radios = _clientStateSingleton.CurrentRadioState?.Radios;
 
-            if (!_clientStateSingleton.IsConnected || radios == null || RadioId > radios.Count - 1)
+            if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
             {
                 SetDisconnectedRadioStatus();
                 return;
             }
 
-            var currentRadio = radios[RadioId];
+            var currentRadio = radios[RadioId - 1];
 
             if (!currentRadio.Enabled)
             {
@@ -232,7 +244,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             }
 
             RadioVolume.IsEnabled = true;
-            ToggleButtons();
+            ToggleButtons(true);
+            RadioEnabled.IsEnabled = true;
         }
 
         private void SetDisconnectedRadioStatus()
@@ -244,7 +257,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             RadioMetaData.Text = "";
             StandbyRadioMetaData.Text = "";
             RadioVolume.IsEnabled = false;
-            ToggleButtons();
+            ToggleButtons(false);
             RadioEnabled.IsEnabled = false;
             _dragging = false;
         }
@@ -259,7 +272,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             StandbyRadioMetaData.Text = "";
             SwapRadio.Visibility = Visibility.Hidden;
             RadioVolume.IsEnabled = true;
-            ToggleButtons();
+            ToggleButtons(false);
             RadioEnabled.IsEnabled = true;
         }
 

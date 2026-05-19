@@ -7,6 +7,7 @@ using NLog;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
+using Vanguard.VCS.Common.DCSState;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
@@ -141,15 +142,15 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             _dragging = false;
         }
 
-        private void ToggleButtons()
+        private void ToggleButtons(bool enable)
         {
             if (_clientStateSingleton.IsConnected)
             {
-                RadioEnabled.Background = RadioOn;
+                RadioEnabled.Background = enable ? RadioOn : RadioOff;
                 RadioEnabled.Content = new TextBlock
                 {
                     FontSize = 5,
-                    Text = "On",
+                    Text = enable ? "On" : "Off",
                 };
             }
             else
@@ -165,37 +166,42 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         internal void RepaintRadioStatus()
         {
-            if (!_clientStateSingleton.IsConnected)
+            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+
+            if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
                 RadioFrequency.Text = "No Conn";
                 RadioMetaData.Text = "";
                 RadioVolume.IsEnabled = false;
-                ToggleButtons();
+                ToggleButtons(false);
                 RadioEnabled.IsEnabled = false;
                 _dragging = false;
+                return;
             }
-            else
+
+            var radio = radios[RadioId - 1];
+            var transmitting = _clientStateSingleton.RadioSendingState;
+            RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == RadioId
+                ? (Brush)new BrushConverter().ConvertFromString("#96FF6D")
+                : new SolidColorBrush(Colors.Orange);
+
+            RadioLabel.Text = radio.Name;
+            RadioMetaData.Text = "";
+
+            if (radio.IsIntercom)
             {
-                var transmitting = _clientStateSingleton.RadioSendingState;
-
-                if (transmitting.IsSending && transmitting.SendingOn == RadioId)
-                {
-                    RadioActive.Fill = (Brush)new BrushConverter().ConvertFromString("#96FF6D");
-                }
-                else
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                }
-
-                RadioLabel.Text = "Radio " + RadioId;
-                RadioFrequency.Text = "Connected";
-                RadioMetaData.Text = "";
-                RadioVolume.IsEnabled = false;
-                ToggleButtons();
-                RadioEnabled.IsEnabled = false;
+                RadioFrequency.Text = "INTERCOM";
             }
+            else if (!RadioFrequency.IsFocused)
+            {
+                RadioFrequency.Text = (radio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
+            }
+
+            RadioVolume.IsEnabled = radio.Enabled;
+            ToggleButtons(radio.Enabled);
+            RadioEnabled.IsEnabled = true;
         }
 
         internal void RepaintRadioReceive()
@@ -238,7 +244,12 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            // Radio toggle not available without DCS radio info
+            var currentRadio = RadioHelper.GetRadio(RadioId);
+            if (currentRadio == null) return;
+            if (currentRadio.modulation == RadioInformation.Modulation.DISABLED)
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+            else
+                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
         }
     }
 }
