@@ -37,7 +37,23 @@ namespace Vanguard.VCS.Client.Utils
 
         public static RadioInformation GetRadio(int radio)
         {
-            return null;
+            var radios = ClientStateSingleton.Instance.CurrentRadioState.Radios;
+            if (radio < 1 || radio > radios.Count)
+                return null;
+
+            var r = radios[radio - 1];
+            return new RadioInformation
+            {
+                name = r.Name,
+                freq = r.FrequencyHz,
+                modulation = r.Enabled
+                    ? (r.IsIntercom
+                        ? RadioInformation.Modulation.INTERCOM
+                        : RadioInformation.Modulation.AM)
+                    : RadioInformation.Modulation.DISABLED,
+                freqMax = 9999999999,
+                freqMin = 1,
+            };
         }
 
         public static void ToggleEncryption(int radioId)
