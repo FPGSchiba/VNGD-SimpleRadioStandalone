@@ -136,8 +136,6 @@ namespace Vanguard.VCS.Client
 #endif
 
             RequireAdmin();
-
-            InitNotificationIcon();
         }
 
         private void ListArgs()
@@ -352,6 +350,7 @@ namespace Vanguard.VCS.Client
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            InitNotificationIcon();
             EventBus = new EventBus(new MessageHub());
             ClientStateStore = new ClientStateStore(EventBus);
             ConnectedClientsStore = new ConnectedClientsStore(EventBus);
