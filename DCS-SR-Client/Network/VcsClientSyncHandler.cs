@@ -253,7 +253,6 @@ namespace Vanguard.VCS.Client.Network
                     _authenticationMetadata = new Metadata
                     {
                         { "authorization", $"Bearer {response.Result.Token}" },
-                        { "x-client-id", _clientGuid.ToString() },
                     };
                     _connectedAt = DateTime.Now;
                     _callback?.Invoke(VcsUiUpdateType.GuestLoginSuccess, null);
@@ -424,7 +423,6 @@ namespace Vanguard.VCS.Client.Network
                 _authenticationMetadata = new Metadata
                 {
                     { "authorization", $"Bearer {response.Token}" },
-                    { "x-client-id", _clientGuid.ToString() },
                 };
                 _callback?.Invoke(VcsUiUpdateType.InternalUnitSelectionSuccess, new UnitSelectionResult()
                 {
