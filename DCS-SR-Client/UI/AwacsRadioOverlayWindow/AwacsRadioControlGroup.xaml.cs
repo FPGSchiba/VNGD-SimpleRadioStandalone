@@ -264,49 +264,51 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         {
             SetupEncryption();
 
-            if (!_clientStateSingleton.IsConnected)
+            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+
+            if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
                 RadioFrequency.Text = "No Conn";
-
                 RadioMetaData.Text = "";
-
                 RadioVolume.IsEnabled = false;
-
                 ToggleButtons(false);
                 RadioEnabled.IsEnabled = false;
-
-                //reset dragging just incase
                 _dragging = false;
-            }
-            else
-            {
-                var transmitting = _clientStateSingleton.RadioSendingState;
 
-                if (transmitting.IsSending && transmitting.SendingOn == RadioId)
-                {
-                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                }
-                else
-                {
-                    RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                }
-
-                RadioLabel.Text = "Radio " + RadioId;
-                RadioFrequency.Text = "Connected";
-                RadioMetaData.Text = "";
-                RadioVolume.IsEnabled = false;
-                ToggleButtons(false);
-                RadioEnabled.IsEnabled = false;
+                TabItem item = TabControl.SelectedItem as TabItem;
+                if (item?.Visibility != Visibility.Visible)
+                    TabControl.SelectedIndex = 0;
+                return;
             }
 
-            TabItem item = TabControl.SelectedItem as TabItem;
+            var radio = radios[RadioId - 1];
 
-            if (item?.Visibility != Visibility.Visible)
+            var transmitting = _clientStateSingleton.RadioSendingState;
+            RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == RadioId
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"))
+                : new SolidColorBrush(Colors.Orange);
+
+            RadioLabel.Text = radio.Name;
+            RadioMetaData.Text = "";
+
+            if (radio.IsIntercom)
             {
+                RadioFrequency.Text = "INTERCOM";
+            }
+            else if (!RadioFrequency.IsFocused)
+            {
+                RadioFrequency.Text = (radio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
+            }
+
+            RadioVolume.IsEnabled = radio.Enabled;
+            ToggleButtons(radio.Enabled);
+            RadioEnabled.IsEnabled = true;
+
+            TabItem tabItem = TabControl.SelectedItem as TabItem;
+            if (tabItem?.Visibility != Visibility.Visible)
                 TabControl.SelectedIndex = 0;
-            }
         }
 
         private void SetupEncryption()
