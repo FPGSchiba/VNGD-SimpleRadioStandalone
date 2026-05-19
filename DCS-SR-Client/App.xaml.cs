@@ -312,7 +312,7 @@ namespace Vanguard.VCS.Client
 
             _notifyIcon = new NotifyIcon
             {
-                Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
+                Icon = Vanguard.VCS.Client.Properties.Resources.audio_headset,
                 Visible = true
             };
             _notifyIcon.DoubleClick += NotifyIcon_Show;
