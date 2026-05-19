@@ -674,8 +674,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             Stop();
             OpenPageByIndex(WelcomeIndex);
-            // Simulate refresh so the official server is reloaded and no weird issues happen
-            _welcomePage.Refresh_Click(null, null);
         }
 
         public void On_CustomServerContinueClicked()

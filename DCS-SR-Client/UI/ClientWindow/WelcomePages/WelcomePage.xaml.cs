@@ -29,11 +29,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             InitializeComponent();
 
             mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
-            // per default, disabled and check which Login types are available
-            Guest.IsEnabled = false;
-            Login.IsEnabled = false;
-            
-            GetServerInformation(ServerInformationFetched);
+            // Server discovery is disabled until the endpoint is configured; show Refresh immediately
+            ConnectionFailed();
         }
         
         private void GetServerInformation(ServerInformationFetchedCallback callback)
