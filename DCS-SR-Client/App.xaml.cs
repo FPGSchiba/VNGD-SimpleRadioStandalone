@@ -309,29 +309,32 @@ namespace Vanguard.VCS.Client
             {
                 return;
             }
-            // Create a ContextMenuStrip instead of ContextMenu
-            ContextMenuStrip notifyIconContextMenu = new ContextMenuStrip();
 
-            // Add menu items using ToolStripMenuItem instead of MenuItem
-            ToolStripMenuItem notifyIconContextMenuShow = new ToolStripMenuItem("Show");
-            notifyIconContextMenuShow.Click += NotifyIcon_Show;
-
-            ToolStripMenuItem notifyIconContextMenuQuit = new ToolStripMenuItem("Quit");
-            notifyIconContextMenuQuit.Click += NotifyIcon_Quit;
-
-            // Add items to the context menu
-            notifyIconContextMenu.Items.Add(notifyIconContextMenuShow);
-            notifyIconContextMenu.Items.Add(notifyIconContextMenuQuit);
-
-            // Create and configure the NotifyIcon
             _notifyIcon = new NotifyIcon
             {
                 Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
-                Visible = true,
-                ContextMenuStrip = notifyIconContextMenu // Use ContextMenuStrip instead of ContextMenu
+                Visible = true
             };
             _notifyIcon.DoubleClick += NotifyIcon_Show;
+            _notifyIcon.MouseClick += OnNotifyIconMouseClick;
+        }
 
+        private void OnNotifyIconMouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button != System.Windows.Forms.MouseButtons.Right) return;
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                var menu = new System.Windows.Controls.ContextMenu();
+                var showItem = new System.Windows.Controls.MenuItem { Header = "Show" };
+                showItem.Click += (s, args) => NotifyIcon_Show(s, args);
+                var quitItem = new System.Windows.Controls.MenuItem { Header = "Quit" };
+                quitItem.Click += (s, args) => NotifyIcon_Quit(s, args);
+                menu.Items.Add(showItem);
+                menu.Items.Add(quitItem);
+                menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+                menu.IsOpen = true;
+            });
         }
 
         private void NotifyIcon_Show(object sender, EventArgs args)
