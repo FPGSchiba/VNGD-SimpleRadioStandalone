@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using Easy.MessageHub;
 using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Stores;
 using NLog;
@@ -34,6 +35,7 @@ namespace Vanguard.VCS.Client
         public static ClientStateStore ClientStateStore { get; private set; }
         public static ConnectedClientsStore ConnectedClientsStore { get; private set; }
         public static ServerSettingsStore ServerSettingsStore { get; private set; }
+        public static RadioStateManager RadioStateManager { get; private set; }
 
         private NotifyIcon _notifyIcon;
         private bool _loggingReady;
@@ -358,10 +360,12 @@ namespace Vanguard.VCS.Client
             ClientStateStore = new ClientStateStore(EventBus);
             ConnectedClientsStore = new ConnectedClientsStore(EventBus);
             ServerSettingsStore = new ServerSettingsStore(EventBus);
+            RadioStateManager = new RadioStateManager(null, EventBus);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
+            RadioStateManager?.Stop();
             ClientStateStore?.Dispose();
             ConnectedClientsStore?.Dispose();
             ServerSettingsStore?.Dispose();
