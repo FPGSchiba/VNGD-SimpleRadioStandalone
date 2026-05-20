@@ -443,15 +443,48 @@ namespace Vanguard.VCS.Client.Network
         private List<RadioInformation> CheckVOXActivation(out int sendingOn, bool voice)
         {
             sendingOn = -1;
-            // Without DCS radio info, VOX activation is not available
-            return new List<RadioInformation>();
+            var voxIndex = getCurrentSelected();
+            if (voxIndex < 0) return new List<RadioInformation>();
+
+            var ri = RadioHelper.GetRadio(voxIndex + 1);
+            if (ri == null || ri.modulation == RadioInformation.Modulation.DISABLED)
+                return new List<RadioInformation>();
+
+            sendingOn = voxIndex + 1;
+            return new List<RadioInformation> { ri };
         }
 
         private List<RadioInformation> CheckPTTActivation(out int sendingOn)
         {
             sendingOn = -1;
-            // Without DCS radio info, PTT activation is not available
-            return new List<RadioInformation>();
+
+            if (_intercomPtt)
+            {
+                var state = _clientStateSingleton.CurrentRadioState;
+                for (int i = 0; i < state.Radios.Count; i++)
+                {
+                    if (state.Radios[i].Enabled && state.Radios[i].IsIntercom)
+                    {
+                        var ri = RadioHelper.GetRadio(i + 1);
+                        if (ri == null) continue;
+                        sendingOn = i + 1;
+                        return new List<RadioInformation> { ri };
+                    }
+                }
+                return new List<RadioInformation>();
+            }
+
+            if (!_ptt) return new List<RadioInformation>();
+
+            var radioIndex = _clientStateSingleton.SelectedRadioIndex;
+            if (radioIndex < 0) return new List<RadioInformation>();
+
+            var selected = RadioHelper.GetRadio(radioIndex + 1);
+            if (selected == null || selected.modulation == RadioInformation.Modulation.DISABLED)
+                return new List<RadioInformation>();
+
+            sendingOn = radioIndex + 1;
+            return new List<RadioInformation> { selected };
         }
         
         
@@ -472,11 +505,44 @@ namespace Vanguard.VCS.Client.Network
 
         public ClientAudio Send(byte[] bytes, int len, bool voice)
         {
-            // Without DCS radio info, PTT-driven transmission is not available
-            if (_clientStateSingleton.RadioSendingState.IsSending)
+            var radios = PTTPressed(out int sendingOn, voice);
+
+            if (radios.Count == 0)
             {
-                _clientStateSingleton.RadioSendingState.IsSending = false;
+                if (_clientStateSingleton.RadioSendingState.IsSending)
+                    _clientStateSingleton.RadioSendingState.IsSending = false;
+                return null;
             }
+
+            foreach (var radio in radios)
+            {
+                try
+                {
+                    var audioBytes = new byte[len];
+                    Buffer.BlockCopy(bytes, 0, audioBytes, 0, len);
+
+                    var packet = VcsVoicePacket.CreateVoicePacket(
+                        _guid,
+                        radio.freq,
+                        audioBytes,
+                        _packetNumber++);
+
+                    packet.IsIntercom = radio.modulation == RadioInformation.Modulation.INTERCOM;
+
+                    var encoded = packet.EncodePacket();
+                    _listener?.Send(encoded, encoded.Length, _serverEndpoint);
+
+                    Logger.Debug($"Sent voice on {radio.name} ({radio.freq / 1_000_000.0:F3} MHz) seq={packet.Sequence}");
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Exception sending voice packet");
+                }
+            }
+
+            _clientStateSingleton.RadioSendingState.IsSending = true;
+            _clientStateSingleton.RadioSendingState.SendingOn = sendingOn;
+            _clientStateSingleton.RadioSendingState.LastSentAt = DateTime.Now.Ticks;
 
             return null;
         }

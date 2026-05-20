@@ -821,7 +821,7 @@ namespace Vanguard.VCS.Client.Network
 
         private RadioInfo GetRadioInfoFromState()
         {
-            var radios = _radioStateManager.CurrentState.Radios
+            var radios = _clientStateSingleton.CurrentRadioState.Radios
                 .Select((radio, i) => new Radio
                 {
                     Id = (uint)i,
