@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
 using NLog;
-using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Settings.RadioChannels;
-using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.Utils
@@ -23,19 +19,14 @@ namespace Vanguard.VCS.Client.Utils
 
         public static bool UpdateRadioFrequency(double frequency, int radioId, bool delta = true, bool inMHz = true)
         {
-            var state = ClientStateSingleton.Instance.CurrentRadioState;
-            if (radioId < 1 || radioId > state.Radios.Count) return false;
-
-            var updated = state.Radios.ToList();
-            var r = updated[radioId - 1];
+            var manager = App.RadioStateManager;
+            if (manager == null) return false;
+            if (radioId < 1 || radioId > manager.CurrentState.Radios.Count) return false;
 
             double freqHz = inMHz ? frequency * 1_000_000.0 : frequency;
-            double newFreq = delta ? r.FrequencyHz + freqHz : freqHz;
-            newFreq = Math.Max(1.0, Math.Min(9_999_999_999.0, newFreq));
-
-            updated[radioId - 1] = r with { FrequencyHz = newFreq };
-            ClientStateSingleton.Instance.CurrentRadioState =
-                new ClientRadioState(updated.AsReadOnly());
+            double currentHz = manager.CurrentState.Radios[radioId - 1].FrequencyHz;
+            double deltaHz = delta ? freqHz : freqHz - currentHz;
+            manager.UpdateRadioFrequency(radioId, deltaHz);
             return true;
         }
 
@@ -47,33 +38,18 @@ namespace Vanguard.VCS.Client.Utils
         public static bool SelectRadio(int radioId)
         {
             // radioId is 0-based (InputBinding value - 100)
-            var state = ClientStateSingleton.Instance.CurrentRadioState;
-            if (radioId < 0 || radioId >= state.Radios.Count) return false;
-            var radio = state.Radios[radioId];
+            var manager = App.RadioStateManager;
+            if (manager == null) return false;
+            if (radioId < 0 || radioId >= manager.CurrentState.Radios.Count) return false;
+            var radio = manager.CurrentState.Radios[radioId];
             if (!radio.Enabled) return false;
-            ClientStateSingleton.Instance.SelectedRadioIndex = radioId;
+            manager.SelectedRadioIndex = radioId;
             return true;
         }
 
         public static RadioInformation GetRadio(int radio)
         {
-            var radios = ClientStateSingleton.Instance.CurrentRadioState.Radios;
-            if (radio < 1 || radio > radios.Count)
-                return null;
-
-            var r = radios[radio - 1];
-            return new RadioInformation
-            {
-                name = r.Name,
-                freq = r.FrequencyHz,
-                modulation = r.Enabled
-                    ? (r.IsIntercom
-                        ? RadioInformation.Modulation.INTERCOM
-                        : RadioInformation.Modulation.AM)
-                    : RadioInformation.Modulation.DISABLED,
-                freqMax = 9999999999,
-                freqMin = 1,
-            };
+            return App.RadioStateManager?.GetRadio(radio);
         }
 
         public static void ToggleEncryption(int radioId)
@@ -134,19 +110,14 @@ namespace Vanguard.VCS.Client.Utils
 
         public static void SetRadioModulation(int RadioId, RadioInformation.Modulation modulation)
         {
-            // RadioId is 1-based (UI convention)
-            var state = ClientStateSingleton.Instance.CurrentRadioState;
-            if (RadioId < 1 || RadioId > state.Radios.Count) return;
-
-            var updated = state.Radios.ToList();
-            var r = updated[RadioId - 1];
-            updated[RadioId - 1] = r with
-            {
-                Enabled = modulation != RadioInformation.Modulation.DISABLED,
-                IsIntercom = modulation == RadioInformation.Modulation.INTERCOM,
-            };
-            ClientStateSingleton.Instance.CurrentRadioState =
-                new ClientRadioState(updated.AsReadOnly());
+            var manager = App.RadioStateManager;
+            if (manager == null) return;
+            if (RadioId < 1 || RadioId > manager.CurrentState.Radios.Count) return;
+            manager.SetRadioModulation(
+                RadioId,
+                modulation != RadioInformation.Modulation.DISABLED,
+                modulation == RadioInformation.Modulation.INTERCOM);
         }
     }
 }
+
