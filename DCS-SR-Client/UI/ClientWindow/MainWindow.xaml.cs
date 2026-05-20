@@ -1024,7 +1024,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _resolvedIp = ip;
                     _port = port;
 
-                    _vcsClient = new VcsClientSyncHandler(VcsUiUpdate, App.EventBus);
+                    _vcsClient = new VcsClientSyncHandler(VcsUiUpdate, App.EventBus, App.RadioStateManager);
                     
                     Task.Run(() => _vcsClient.ConnectVcs(new IPEndPoint(_resolvedIp, _port)));
                 }

@@ -115,10 +115,11 @@ namespace Vanguard.VCS.Client.Network
         private CancellationTokenSource _streamCts;
         private Task _subscriptionTask;
 
-        public VcsClientSyncHandler(UpdateUiCallback uiCallback, IEventBus eventBus)
+        public VcsClientSyncHandler(UpdateUiCallback uiCallback, IEventBus eventBus, RadioStateManager radioStateManager)
         {
             _callback = uiCallback;
             _eventBus = eventBus;
+            _radioStateManager = radioStateManager;
         }
 
         // For unit testing only: skips channel and radio-sync initialisation.
@@ -208,7 +209,7 @@ namespace Vanguard.VCS.Client.Network
                         IsVanguardLoginAvailable = initResponse.Result.AvailablePlugins.Contains("profile-vanguard"),
                         IsGuestLoginAvailable = initResponse.Result.HasGuestLogin,
                     });
-                    _radioStateManager = new RadioStateManager(UpdateRadioInformation, _eventBus);
+                    _radioStateManager.SetUpdateCallback(UpdateRadioInformation);
                     _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Connecting));
                     return;
                 }
@@ -448,7 +449,6 @@ namespace Vanguard.VCS.Client.Network
         private void InitializeRadioSync()
         {
             _radioStateManager.Start();
-            _clientStateSingleton.CurrentRadioState = _radioStateManager.CurrentState;
             SyncClient();
             StartSubscription();
         }
@@ -526,7 +526,6 @@ namespace Vanguard.VCS.Client.Network
         {
             try
             {
-                _clientStateSingleton.CurrentRadioState = _radioStateManager.CurrentState;
                 var response = _srsServiceClient.UpdateRadioInfo(GetRadioInfoFromState(), AuthCallOptions(5));
                 if (response.Success)
                 {
@@ -614,6 +613,7 @@ namespace Vanguard.VCS.Client.Network
             try
             {
                 _radioStateManager?.Stop();
+                _radioStateManager?.SetUpdateCallback(null);
             }
             catch (Exception ex)
             {
@@ -623,7 +623,6 @@ namespace Vanguard.VCS.Client.Network
             _channel = null;
             _srsServiceClient = null;
             _authServiceClient = null;
-            _radioStateManager = null;
 
             _eventBus?.Publish(new ConnectionStateChangedEvent(ConnectionState.Disconnected));
             _callback?.Invoke(VcsUiUpdateType.ConnectionLost, null);
@@ -821,7 +820,7 @@ namespace Vanguard.VCS.Client.Network
 
         private RadioInfo GetRadioInfoFromState()
         {
-            var radios = _clientStateSingleton.CurrentRadioState.Radios
+            var radios = _radioStateManager.CurrentState.Radios
                 .Select((radio, i) => new Radio
                 {
                     Id = (uint)i,
