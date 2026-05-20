@@ -1,9 +1,11 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using NLog;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
@@ -22,6 +24,7 @@ public partial class RadioControlGroupDragable : UserControl
     private const int MaxSimultaneousTransmissions = 1;
     private bool _dragging;
     private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+    private IDisposable _radioStateSub;
     private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private static Brush radioOn = (Brush)new BrushConverter().ConvertFromString("#666");
@@ -34,6 +37,9 @@ public partial class RadioControlGroupDragable : UserControl
     {
 
         InitializeComponent();
+        _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
+            Dispatcher.Invoke(RepaintRadioStatus));
+        Unloaded += (_, _) => _radioStateSub?.Dispose();
 
         RadioFrequency.MaxLines = 1;
         RadioFrequency.MaxLength = 7;
@@ -231,7 +237,7 @@ public partial class RadioControlGroupDragable : UserControl
     {
         SetupEncryption();
 
-        var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+        var radios = App.RadioStateManager?.CurrentState?.Radios;
 
         if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
         {

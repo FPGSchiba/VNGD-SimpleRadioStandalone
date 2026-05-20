@@ -1,9 +1,11 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using NLog;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
@@ -20,6 +22,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         private const double MHz = 1000000;
         private bool _dragging;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private IDisposable _radioStateSub;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
@@ -39,6 +42,9 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             this.DataContext = this; // set data context
 
             InitializeComponent();
+            _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
+                Dispatcher.Invoke(RepaintRadioStatus));
+            Unloaded += (_, _) => _radioStateSub?.Dispose();
 
             RadioFrequency.MaxLines = 1;
             RadioFrequency.MaxLength = 7;
@@ -166,7 +172,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         internal void RepaintRadioStatus()
         {
-            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+            var radios = App.RadioStateManager?.CurrentState?.Radios;
 
             if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 
@@ -16,6 +17,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private IDisposable _radioStateSub;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
         // Color for Vox Button
         public static Brush voxEnabled = Brushes.MediumSeaGreen;
@@ -25,6 +27,9 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
         public IntercomControlGroup2Horizontal()
         {
             InitializeComponent();
+            _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
+                Dispatcher.Invoke(RepaintRadioStatus));
+            Unloaded += (_, _) => _radioStateSub?.Dispose();
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? voxEnabled : voxDisabled;
             IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? voxEnabled : voxicDisabled;
@@ -53,7 +58,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 
         internal void RepaintRadioStatus()
         {
-            var radios = _clientStateSingleton.CurrentRadioState?.Radios;
+            var radios = App.RadioStateManager?.CurrentState?.Radios;
 
             if (radios == null || RadioId >= radios.Count)
             {
