@@ -255,7 +255,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
                     _wasapiCapture.DataAvailable += WasapiCaptureOnDataAvailable;
                     _wasapiCapture.RecordingStopped += WasapiCaptureOnRecordingStopped;
 
-                    _udpVoiceHandler = new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
+                    _udpVoiceHandler = new UdpVoiceHandler(guid, ipAddress, port, this, inputManager, App.RadioStateManager);
                     var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
 
                     voiceSenderThread.Start();
@@ -277,7 +277,7 @@ namespace Vanguard.VCS.Client.Audio.Managers
             {
                 //no mic....
                 _udpVoiceHandler =
-                    new UdpVoiceHandler(guid, ipAddress, port, this, inputManager);
+                    new UdpVoiceHandler(guid, ipAddress, port, this, inputManager, App.RadioStateManager);
                 _hub.Subscribe<SRClient>(RemoveClientBuffer);
                 var voiceSenderThread = new Thread(_udpVoiceHandler.Listen);
                 voiceSenderThread.Start();

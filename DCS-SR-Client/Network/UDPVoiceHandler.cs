@@ -65,6 +65,7 @@ namespace Vanguard.VCS.Client.Network
         private readonly int UDP_VOIP_TIMEOUT = 42; // seconds for timeout before redoing VoIP
 
         private ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private readonly RadioStateManager _radioStateManager;
 
         //    private readonly JitterBuffer _jitterBuffer = new JitterBuffer();
         private volatile UdpClient _listener;
@@ -93,7 +94,7 @@ namespace Vanguard.VCS.Client.Network
         private RadioReceivingState[] _radioReceivingState;
 
         public UdpVoiceHandler(Guid guid, IPAddress address, int port, AudioManager audioManager,
-            InputDeviceManager inputManager)
+            InputDeviceManager inputManager, RadioStateManager radioStateManager = null)
         {
             _radioReceivingState = _clientStateSingleton.RadioReceivingState;
 
@@ -106,6 +107,7 @@ namespace Vanguard.VCS.Client.Network
             _serverEndpoint = new IPEndPoint(_address, _port);
 
             _inputManager = inputManager;
+            _radioStateManager = radioStateManager;
 
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
             _updateTimer.Tick += UpdateVOIPStatus;
@@ -443,10 +445,11 @@ namespace Vanguard.VCS.Client.Network
         private List<RadioInformation> CheckVOXActivation(out int sendingOn, bool voice)
         {
             sendingOn = -1;
+            if (_radioStateManager == null) return new List<RadioInformation>();
             var voxIndex = getCurrentSelected();
             if (voxIndex < 0) return new List<RadioInformation>();
 
-            var ri = RadioHelper.GetRadio(voxIndex + 1);
+            var ri = _radioStateManager.GetRadio(voxIndex + 1);
             if (ri == null || ri.modulation == RadioInformation.Modulation.DISABLED)
                 return new List<RadioInformation>();
 
@@ -457,15 +460,16 @@ namespace Vanguard.VCS.Client.Network
         private List<RadioInformation> CheckPTTActivation(out int sendingOn)
         {
             sendingOn = -1;
+            if (_radioStateManager == null) return new List<RadioInformation>();
 
             if (_intercomPtt)
             {
-                var state = _clientStateSingleton.CurrentRadioState;
+                var state = _radioStateManager.CurrentState;
                 for (int i = 0; i < state.Radios.Count; i++)
                 {
                     if (state.Radios[i].Enabled && state.Radios[i].IsIntercom)
                     {
-                        var ri = RadioHelper.GetRadio(i + 1);
+                        var ri = _radioStateManager.GetRadio(i + 1);
                         if (ri == null) continue;
                         sendingOn = i + 1;
                         return new List<RadioInformation> { ri };
@@ -476,10 +480,10 @@ namespace Vanguard.VCS.Client.Network
 
             if (!_ptt) return new List<RadioInformation>();
 
-            var radioIndex = _clientStateSingleton.SelectedRadioIndex;
+            var radioIndex = _radioStateManager.SelectedRadioIndex;
             if (radioIndex < 0) return new List<RadioInformation>();
 
-            var selected = RadioHelper.GetRadio(radioIndex + 1);
+            var selected = _radioStateManager.GetRadio(radioIndex + 1);
             if (selected == null || selected.modulation == RadioInformation.Modulation.DISABLED)
                 return new List<RadioInformation>();
 
