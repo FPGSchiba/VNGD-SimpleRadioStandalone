@@ -715,10 +715,10 @@ namespace Vanguard.VCS.Client.Network
                         {
                             freq = r.Frequency,
                             modulation = r.Enabled
-                                ? RadioInformation.Modulation.DISABLED
-                                : r.IsIntercom
+                                ? (r.IsIntercom
                                     ? RadioInformation.Modulation.INTERCOM
-                                    : RadioInformation.Modulation.AM,
+                                    : RadioInformation.Modulation.AM)
+                                : RadioInformation.Modulation.DISABLED,
                             name = r.Name,
                             enc = false,
                             freqMax = 9999999999,
