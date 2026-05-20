@@ -23,13 +23,14 @@ namespace Vanguard.VCS.Client.Network
             Path.Combine(AppContext.BaseDirectory, "awacs-radios.json");
         private const int UpdateIntervalSeconds = 60;
 
-        private SendRadioUpdate _radioUpdate;
+        private volatile SendRadioUpdate _radioUpdate;
         private readonly IEventBus _eventBus;
         private readonly ManualResetEventSlim _stopEvent = new ManualResetEventSlim(false);
         private volatile bool _stop;
         private Task _loopTask;
 
-        public ClientRadioState CurrentState { get; private set; }
+        private volatile ClientRadioState _currentState;
+        public ClientRadioState CurrentState => _currentState;
 
         public int SelectedRadioIndex { get; set; } = -1;
 
@@ -37,7 +38,7 @@ namespace Vanguard.VCS.Client.Network
         {
             _radioUpdate = radioUpdate;
             _eventBus = eventBus;
-            CurrentState = LoadRadioConfig();
+            _currentState = LoadRadioConfig();
         }
 
         public void SetUpdateCallback(SendRadioUpdate callback)
@@ -64,7 +65,7 @@ namespace Vanguard.VCS.Client.Network
 
         public void SetState(ClientRadioState state)
         {
-            CurrentState = state;
+            _currentState = state;
             _eventBus?.Publish(new LocalRadioStateChangedEvent(state));
         }
 
