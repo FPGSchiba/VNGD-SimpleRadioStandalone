@@ -77,6 +77,7 @@ namespace Vanguard.VCS.Client.Network
         private long _firstPTTPress; // to delay start PTT time
 
         private long _lastVOXSend;
+        private RadioInformation.Modulation _lastTransmitModulation = RadioInformation.Modulation.AM;
 
         private volatile bool _intercomPtt;
 
@@ -358,7 +359,7 @@ namespace Vanguard.VCS.Client.Network
                         }
 
                         // Check if frequency matches any of the client's enabled radios
-                        const int defaultReceiveSlot = 1;
+                        const int defaultReceiveSlot = 0; // 0-based: INTERCOM channel as fallback for unmatched global packets
                         var radioMatchSlot = defaultReceiveSlot;
                         var radioFrequency = false;
                         if (_radioStateManager != null)
@@ -369,9 +370,9 @@ namespace Vanguard.VCS.Client.Network
                                 if (radios[i].Enabled && Math.Abs(radios[i].FrequencyHz - listeningFrequency) < 1.0)
                                 {
                                     radioFrequency = true;
-                                    var candidateSlot = i + 1;
-                                    if (candidateSlot < _radioReceivingState.Length)
-                                        radioMatchSlot = candidateSlot;
+                                    // 0-based: matches JitterBufferProviderInterface[i], RadioMixingProvider[i], and UI _actualRadioIndex
+                                    if (i < _radioReceivingState.Length)
+                                        radioMatchSlot = i;
                                     break;
                                 }
                             }
@@ -530,12 +531,18 @@ namespace Vanguard.VCS.Client.Network
 
         public ClientAudio Send(byte[] bytes, int len, bool voice)
         {
+            var wasSending = _clientStateSingleton.RadioSendingState.IsSending;
+            var prevSendingOn = _clientStateSingleton.RadioSendingState.SendingOn;
+
             var radios = PTTPressed(out int sendingOn, voice);
 
             if (radios.Count == 0)
             {
-                if (_clientStateSingleton.RadioSendingState.IsSending)
+                if (wasSending)
+                {
                     _clientStateSingleton.RadioSendingState.IsSending = false;
+                    _audioManager?.PlaySoundEffectEndTransmit(prevSendingOn - 1, 1.0f, _lastTransmitModulation);
+                }
                 return null;
             }
 
@@ -568,6 +575,14 @@ namespace Vanguard.VCS.Client.Network
             _clientStateSingleton.RadioSendingState.IsSending = true;
             _clientStateSingleton.RadioSendingState.SendingOn = sendingOn;
             _clientStateSingleton.RadioSendingState.LastSentAt = DateTime.Now.Ticks;
+
+            if (!wasSending)
+            {
+                var mod = radios[0].modulation;
+                _lastTransmitModulation = mod;
+                // sendingOn is 1-based for UI; mixer array is 0-based, so subtract 1
+                _audioManager?.PlaySoundEffectStartTransmit(sendingOn - 1, radios[0].enc, 1.0f, mod);
+            }
 
             return null;
         }
