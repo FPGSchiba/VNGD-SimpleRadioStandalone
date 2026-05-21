@@ -59,8 +59,9 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
         internal void RepaintRadioStatus()
         {
             var radios = App.RadioStateManager?.CurrentState?.Radios;
+            int intercomIndex = radios != null ? FindIntercomIndex(radios) : -1;
 
-            if (radios == null || RadioId >= radios.Count)
+            if (intercomIndex < 0)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioVolume.IsEnabled = false;
@@ -69,15 +70,15 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
                 return;
             }
 
-            var currentRadio = radios[RadioId];
+            var currentRadio = radios[intercomIndex];
             var transmitting = _clientStateSingleton.RadioSendingState;
-            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+            var receiveState = _clientStateSingleton.RadioReceivingState[intercomIndex];
 
             if ((receiveState != null) && receiveState.IsReceiving)
             {
                 RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
-            else if (RadioId == transmitting.SendingOn && transmitting.IsSending)
+            else if (transmitting.IsSending && transmitting.SendingOn == intercomIndex + 1)
             {
                 RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
@@ -111,6 +112,14 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
                 Radio1Enabled.Background = voxicDisabled;
                 IntercomEnabled.Background = voxicDisabled;
             }
+        }
+
+        private static int FindIntercomIndex(System.Collections.Generic.IReadOnlyList<Vanguard.VCS.Client.Network.Models.ClientRadio> radios)
+        {
+            for (int i = 0; i < radios.Count; i++)
+                if (radios[i].IsIntercom)
+                    return i;
+            return -1;
         }
 
         private void VoxR1Enabled_OnClick(object sender, RoutedEventArgs e)

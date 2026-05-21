@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using NLog;
 using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
@@ -21,6 +23,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
     {
         private const double MHz = 1000000;
         private bool _dragging;
+        private int _actualRadioIndex = -1;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
         private IDisposable _radioStateSub;
         private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
@@ -28,12 +31,12 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         private static readonly Brush RadioOn = (Brush)new BrushConverter().ConvertFromString("#666");
         private static readonly Brush RadioOff = Brushes.IndianRed;
         private static readonly Brush GreenForeground = (Brush)new BrushConverter().ConvertFromString("#0F0");
-        
+
         public bool IsRadioEnabled
         {
             get => this.RadioEnabled.Background == RadioOn;
         }
-        
+
         public PresetChannelsViewModel ChannelViewModel { get; set; }
 
 
@@ -50,9 +53,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             RadioFrequency.MaxLength = 7;
 
             RadioFrequency.LostFocus += RadioFrequencyOnLostFocus;
-
             RadioFrequency.KeyDown += RadioFrequencyOnKeyDown;
-
             RadioFrequency.GotFocus += RadioFrequencyOnGotFocus;
         }
 
@@ -68,7 +69,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             }
         }
 
-        //updates the binding so the changes are picked up for the linked FixedChannelsModel
         private void UpdateBinding()
         {
             ChannelViewModel = _clientStateSingleton.FixedChannels[_radioId - 1];
@@ -76,7 +76,6 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             var bindingExpression = PresetChannelsView.GetBindingExpression(DataContextProperty);
             bindingExpression?.UpdateTarget();
         }
-
 
         private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
         {
@@ -88,9 +87,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         {
             if (keyEventArgs.Key == Key.Enter)
             {
-                //remove focus to somewhere else
                 this.RadioVolume.Focus();
-                Keyboard.ClearFocus(); //then clear altogher
+                Keyboard.ClearFocus();
             }
         }
 
@@ -100,7 +98,7 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
             if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double freq))
             {
-                RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
+                RadioHelper.UpdateRadioFrequency(freq, _actualRadioIndex + 1, false);
             }
             else
             {
@@ -108,65 +106,36 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             }
         }
 
-        private void RadioSelectSwitch(object sender, RoutedEventArgs e)
-        {
-            RadioHelper.SelectRadio(RadioId);
-        }
+        private void RadioSelectSwitch(object sender, RoutedEventArgs e) { RadioHelper.SelectRadio(_actualRadioIndex); }
 
         private void RadioFrequencyText_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            // TODO functionality to use scroll wheel to change frequency using scroll wheel
             if (e.Delta > 0)
-            {
                 Logger.Info("MouseWheel radio frequency Up");
-            }
             else if (e.Delta < 0)
-            {
                 Logger.Info("MouseWheel radio frequency Down");
-            }
             e.Handled = true;
         }
 
-        private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
-        {
-            RadioHelper.SelectRadio(RadioId);
-        }
+        private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e) { RadioHelper.SelectRadio(_actualRadioIndex); }
 
-        private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
-        {
-            RadioHelper.ToggleGuard(RadioId);
-        }
+        private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e) { RadioHelper.ToggleGuard(_actualRadioIndex + 1); }
 
-        private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
-        {
-            _dragging = true;
-        }
+        private void RadioVolume_DragStarted(object sender, RoutedEventArgs e) { _dragging = true; }
 
-
-        private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
-        {
-            _dragging = false;
-        }
+        private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e) { _dragging = false; }
 
         private void ToggleButtons(bool enable)
         {
             if (_clientStateSingleton.IsConnected)
             {
                 RadioEnabled.Background = enable ? RadioOn : RadioOff;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = enable ? "On" : "Off",
-                };
+                RadioEnabled.Content = new TextBlock { FontSize = 5, Text = enable ? "On" : "Off" };
             }
             else
             {
                 RadioEnabled.Background = RadioOff;
-                RadioEnabled.Content = new TextBlock
-                {
-                    FontSize = 5,
-                    Text = "Off",
-                };
+                RadioEnabled.Content = new TextBlock { FontSize = 5, Text = "Off" };
             }
         }
 
@@ -174,8 +143,9 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
         {
             var radios = App.RadioStateManager?.CurrentState?.Radios;
 
-            if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
+            if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1)
             {
+                _actualRadioIndex = -1;
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
                 RadioLabel.Text = "No Radio";
                 RadioFrequency.Text = "No Conn";
@@ -187,20 +157,31 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                 return;
             }
 
-            var radio = radios[RadioId - 1];
+            var (actualIndex, radio) = FindNthNonIntercomRadio(radios, RadioId);
+            if (actualIndex < 0)
+            {
+                _actualRadioIndex = -1;
+                RadioActive.Fill = new SolidColorBrush(Colors.Red);
+                RadioLabel.Text = "No Radio";
+                RadioFrequency.Text = "No Conn";
+                RadioMetaData.Text = "";
+                RadioVolume.IsEnabled = false;
+                ToggleButtons(false);
+                RadioEnabled.IsEnabled = false;
+                _dragging = false;
+                return;
+            }
+            _actualRadioIndex = actualIndex;
+
             var transmitting = _clientStateSingleton.RadioSendingState;
-            RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == RadioId
+            RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == actualIndex + 1
                 ? (Brush)new BrushConverter().ConvertFromString("#96FF6D")
                 : new SolidColorBrush(Colors.Orange);
 
             RadioLabel.Text = radio.Name;
             RadioMetaData.Text = "";
 
-            if (radio.IsIntercom)
-            {
-                RadioFrequency.Text = "INTERCOM";
-            }
-            else if (!RadioFrequency.IsFocused)
+            if (!RadioFrequency.IsFocused)
             {
                 RadioFrequency.Text = (radio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
             }
@@ -216,7 +197,9 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             RadioFrequency.Visibility = Visibility.Visible;
             RadioMetaData.Visibility = Visibility.Visible;
 
-            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+            var receiveState = _actualRadioIndex >= 0
+                ? _clientStateSingleton.RadioReceivingState[_actualRadioIndex]
+                : null;
 
             if (receiveState == null || !receiveState.IsReceiving)
             {
@@ -250,12 +233,27 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            var currentRadio = RadioHelper.GetRadio(RadioId);
+            var currentRadio = RadioHelper.GetRadio(_actualRadioIndex + 1);
             if (currentRadio == null) return;
             if (currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+                RadioHelper.SetRadioModulation(_actualRadioIndex + 1, RadioInformation.Modulation.AM);
             else
-                RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
+                RadioHelper.SetRadioModulation(_actualRadioIndex + 1, RadioInformation.Modulation.DISABLED);
+        }
+
+        private static (int Index, ClientRadio Radio) FindNthNonIntercomRadio(IReadOnlyList<ClientRadio> radios, int n)
+        {
+            int count = 0;
+            for (int i = 0; i < radios.Count; i++)
+            {
+                if (!radios[i].IsIntercom)
+                {
+                    count++;
+                    if (count == n)
+                        return (i, radios[i]);
+                }
+            }
+            return (-1, null);
         }
     }
 }

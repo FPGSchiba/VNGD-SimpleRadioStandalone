@@ -1,7 +1,10 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Client.Singletons;
 
@@ -16,11 +19,15 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private IDisposable _radioStateSub;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+            _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
+                Dispatcher.Invoke(RepaintRadioStatus));
+            Unloaded += (_, _) => _radioStateSub?.Dispose();
 
             Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
@@ -56,14 +63,19 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
                 return;
             }
 
+            var radios = App.RadioStateManager?.CurrentState?.Radios;
+            int intercomIndex = radios != null ? FindIntercomIndex(radios) : -1;
+
             var transmitting = _clientStateSingleton.RadioSendingState;
-            var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+            var receiveState = intercomIndex >= 0
+                ? _clientStateSingleton.RadioReceivingState[intercomIndex]
+                : null;
 
             if ((receiveState != null) && receiveState.IsReceiving)
             {
                 RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
-            else if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
+            else if (intercomIndex >= 0 && transmitting.IsSending && transmitting.SendingOn == intercomIndex + 1)
             {
                 RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
@@ -73,8 +85,8 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             }
 
             RadioLabel.Text = "INTERCOM";
-            Radio1Enabled.IsEnabled = true;
-            IntercomNumberSpinner.IsEnabled = true;
+            Radio1Enabled.IsEnabled = intercomIndex >= 0;
+            IntercomNumberSpinner.IsEnabled = intercomIndex >= 0;
         }
 
         private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -153,6 +165,14 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
             {
                 IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
+        }
+
+        private static int FindIntercomIndex(IReadOnlyList<ClientRadio> radios)
+        {
+            for (int i = 0; i < radios.Count; i++)
+                if (radios[i].IsIntercom)
+                    return i;
+            return -1;
         }
     }
 }

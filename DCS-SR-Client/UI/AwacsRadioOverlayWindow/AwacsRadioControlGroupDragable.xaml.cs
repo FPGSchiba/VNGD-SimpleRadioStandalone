@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using NLog;
 using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network.Models;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
 using Vanguard.VCS.Client.Utils;
@@ -23,6 +25,7 @@ public partial class RadioControlGroupDragable : UserControl
     private const double MHz = 1000000;
     private const int MaxSimultaneousTransmissions = 1;
     private bool _dragging;
+    private int _actualRadioIndex = -1;
     private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
     private IDisposable _radioStateSub;
     private readonly ConnectedClientsSingleton _connectClientsSingleton = ConnectedClientsSingleton.Instance;
@@ -35,7 +38,6 @@ public partial class RadioControlGroupDragable : UserControl
 
     public RadioControlGroupDragable()
     {
-
         InitializeComponent();
         _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
             Dispatcher.Invoke(RepaintRadioStatus));
@@ -56,10 +58,7 @@ public partial class RadioControlGroupDragable : UserControl
     public int RadioId
     {
         private get { return _radioId; }
-        set
-        {
-            _radioId = value;
-        }
+        set { _radioId = value; }
     }
 
     private void RadioFrequencyOnGotFocus(object sender, RoutedEventArgs routedEventArgs)
@@ -68,14 +67,12 @@ public partial class RadioControlGroupDragable : UserControl
         Keyboard.ClearFocus();
     }
 
-    private
-        void RadioFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
+    private void RadioFrequencyOnKeyDown(object sender, KeyEventArgs keyEventArgs)
     {
         if (keyEventArgs.Key == Key.Enter)
         {
-            //remove focus to somewhere else
             RadioVolume.Focus();
-            Keyboard.ClearFocus(); //then clear altogher
+            Keyboard.ClearFocus();
         }
     }
 
@@ -86,7 +83,7 @@ public partial class RadioControlGroupDragable : UserControl
         // Using an invariant culture makes sure the decimal point is parsed properly for all locales - replacing any commas makes sure people entering numbers in a weird format still get correct results
         if (double.TryParse(RadioFrequency.Text.Replace(',', '.').Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out freq))
         {
-            RadioHelper.UpdateRadioFrequency(freq, RadioId, false);
+            RadioHelper.UpdateRadioFrequency(freq, _actualRadioIndex + 1, false);
         }
         else
         {
@@ -94,83 +91,26 @@ public partial class RadioControlGroupDragable : UserControl
         }
     }
 
+    private void Up0001_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(0.001, _actualRadioIndex + 1); }
+    private void Up001_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(0.01, _actualRadioIndex + 1); }
+    private void Up01_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(0.1, _actualRadioIndex + 1); }
+    private void Up1_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(1, _actualRadioIndex + 1); }
+    private void Up10_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(10, _actualRadioIndex + 1); }
+    private void Down10_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(-10, _actualRadioIndex + 1); }
+    private void Down1_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(-1, _actualRadioIndex + 1); }
+    private void Down01_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(-0.1, _actualRadioIndex + 1); }
+    private void Down001_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(-0.01, _actualRadioIndex + 1); }
+    private void Down0001_Click(object sender, RoutedEventArgs e) { RadioHelper.UpdateRadioFrequency(-0.001, _actualRadioIndex + 1); }
 
-    private void Up0001_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(0.001, RadioId);
-    }
+    private void RadioSelectSwitch(object sender, RoutedEventArgs e) { RadioHelper.SelectRadio(_actualRadioIndex); }
 
-    private void Up001_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(0.01, RadioId);
-    }
+    private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e) { RadioHelper.SelectRadio(_actualRadioIndex); }
 
-    private void Up01_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(0.1, RadioId);
-    }
+    private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e) { RadioHelper.ToggleGuard(_actualRadioIndex + 1); }
 
-    private void Up1_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(1, RadioId);
-    }
+    private void RadioVolume_DragStarted(object sender, RoutedEventArgs e) { _dragging = true; }
 
-    private void Up10_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(10, RadioId);
-    }
-
-    private void Down10_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(-10, RadioId);
-    }
-
-    private void Down1_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(-1, RadioId);
-    }
-
-    private void Down01_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(-0.1, RadioId);
-    }
-
-    private void Down001_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(-0.01, RadioId);
-    }
-
-    private void Down0001_Click(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.UpdateRadioFrequency(-0.001, RadioId);
-    }
-
-
-    private void RadioSelectSwitch(object sender, RoutedEventArgs e)
-    {
-        RadioHelper.SelectRadio(RadioId);
-    }
-
-    private void RadioFrequencyText_Click(object sender, MouseButtonEventArgs e)
-    {
-        RadioHelper.SelectRadio(RadioId);
-    }
-
-    private void RadioFrequencyText_RightClick(object sender, MouseButtonEventArgs e)
-    {
-        RadioHelper.ToggleGuard(RadioId);
-    }
-
-    private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
-    {
-        _dragging = true;
-    }
-
-
-    private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
-    {
-        _dragging = false;
-    }
+    private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e) { _dragging = false; }
 
     private void ToggleButtons(bool enable)
     {
@@ -192,7 +132,6 @@ public partial class RadioControlGroupDragable : UserControl
             Up01.Visibility = Visibility.Visible;
             Up001.Visibility = Visibility.Visible;
             Up0001.Visibility = Visibility.Visible;
-
             Down10.Visibility = Visibility.Visible;
             Down1.Visibility = Visibility.Visible;
             Down01.Visibility = Visibility.Visible;
@@ -204,7 +143,6 @@ public partial class RadioControlGroupDragable : UserControl
             Up01.IsEnabled = true;
             Up001.IsEnabled = true;
             Up0001.IsEnabled = true;
-
             Down10.IsEnabled = true;
             Down1.IsEnabled = true;
             Down01.IsEnabled = true;
@@ -212,7 +150,6 @@ public partial class RadioControlGroupDragable : UserControl
             Down0001.IsEnabled = true;
 
             PresetChannelsView.IsEnabled = true;
-
             ChannelTab.Visibility = Visibility.Visible;
         }
         else
@@ -222,7 +159,6 @@ public partial class RadioControlGroupDragable : UserControl
             Up01.Visibility = Visibility.Hidden;
             Up001.Visibility = Visibility.Hidden;
             Up0001.Visibility = Visibility.Hidden;
-
             Down10.Visibility = Visibility.Hidden;
             Down1.Visibility = Visibility.Hidden;
             Down01.Visibility = Visibility.Hidden;
@@ -239,8 +175,9 @@ public partial class RadioControlGroupDragable : UserControl
 
         var radios = App.RadioStateManager?.CurrentState?.Radios;
 
-        if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1 || RadioId > radios.Count)
+        if (!_clientStateSingleton.IsConnected || radios == null || RadioId < 1)
         {
+            _actualRadioIndex = -1;
             RadioActive.Fill = new SolidColorBrush(Colors.Red);
             RadioLabel.Text = "No Radio";
             RadioFrequency.Text = "No Conn";
@@ -254,20 +191,33 @@ public partial class RadioControlGroupDragable : UserControl
             return;
         }
 
-        var radio = radios[RadioId - 1];
+        var (actualIndex, radio) = FindNthNonIntercomRadio(radios, RadioId);
+        if (actualIndex < 0)
+        {
+            _actualRadioIndex = -1;
+            RadioActive.Fill = new SolidColorBrush(Colors.Red);
+            RadioLabel.Text = "No Radio";
+            RadioFrequency.Text = "No Conn";
+            RadioMetaData.Text = "";
+            RadioVolume.IsEnabled = false;
+            ToggleButtons(false);
+            RadioEnabled.IsEnabled = false;
+            _dragging = false;
+            TabItem noRadioItem = TabControl.SelectedItem as TabItem;
+            if (noRadioItem?.Visibility != Visibility.Visible) TabControl.SelectedIndex = 0;
+            return;
+        }
+        _actualRadioIndex = actualIndex;
+
         var transmitting = _clientStateSingleton.RadioSendingState;
-        RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == RadioId
+        RadioActive.Fill = transmitting.IsSending && transmitting.SendingOn == actualIndex + 1
             ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"))
             : new SolidColorBrush(Colors.Orange);
 
         RadioLabel.Text = radio.Name;
         RadioMetaData.Text = "";
 
-        if (radio.IsIntercom)
-        {
-            RadioFrequency.Text = "INTERCOM";
-        }
-        else if (!RadioFrequency.IsFocused)
+        if (!RadioFrequency.IsFocused)
         {
             RadioFrequency.Text = (radio.FrequencyHz / MHz).ToString("0.000", CultureInfo.InvariantCulture);
         }
@@ -282,7 +232,6 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void SetupEncryption()
     {
-        // Without DCS radio info, disable all encryption controls
         EncryptionKeySpinner.IsEnabled = false;
         EncryptionButton.IsEnabled = false;
         EncryptionButton.Visibility = Visibility.Hidden;
@@ -296,7 +245,9 @@ public partial class RadioControlGroupDragable : UserControl
         RadioFrequency.Visibility = Visibility.Visible;
         RadioMetaData.Visibility = Visibility.Visible;
 
-        var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
+        var receiveState = _actualRadioIndex >= 0
+            ? _clientStateSingleton.RadioReceivingState[_actualRadioIndex]
+            : null;
 
         if (receiveState == null || !receiveState.IsReceiving)
         {
@@ -328,7 +279,6 @@ public partial class RadioControlGroupDragable : UserControl
         }
     }
 
-
     private void Encryption_ButtonClick(object sender, RoutedEventArgs e)
     {
         // Encryption not available without DCS radio info
@@ -341,11 +291,26 @@ public partial class RadioControlGroupDragable : UserControl
 
     private void ToggleSwitch_Click(object sender, RoutedEventArgs e)
     {
-        var currentRadio = RadioHelper.GetRadio(RadioId);
+        var currentRadio = RadioHelper.GetRadio(_actualRadioIndex + 1);
         if (currentRadio == null) return;
         if (currentRadio.modulation == RadioInformation.Modulation.DISABLED)
-            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.AM);
+            RadioHelper.SetRadioModulation(_actualRadioIndex + 1, RadioInformation.Modulation.AM);
         else
-            RadioHelper.SetRadioModulation(RadioId, RadioInformation.Modulation.DISABLED);
+            RadioHelper.SetRadioModulation(_actualRadioIndex + 1, RadioInformation.Modulation.DISABLED);
+    }
+
+    private static (int Index, ClientRadio Radio) FindNthNonIntercomRadio(IReadOnlyList<ClientRadio> radios, int n)
+    {
+        int count = 0;
+        for (int i = 0; i < radios.Count; i++)
+        {
+            if (!radios[i].IsIntercom)
+            {
+                count++;
+                if (count == n)
+                    return (i, radios[i]);
+            }
+        }
+        return (-1, null);
     }
 }
