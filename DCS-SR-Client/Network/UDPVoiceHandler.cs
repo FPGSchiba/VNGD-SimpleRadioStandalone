@@ -357,23 +357,43 @@ namespace Vanguard.VCS.Client.Network
                             DebugThrottledUdp("UDP_TestFreqLocal", $"UdpAudioDecode: Test frequency match and sender is local. Freq={listeningFrequency/1e6:F6} MHz, Client={udpVoicePacket.ClientId}", 2000);
                         }
 
-                        // Debug log the important packet metadata and blocking state for troubleshooting
-                        DebugThrottledUdp("UDP_PacketMeta", $"UdpAudioDecode: Packet from {udpVoicePacket.ClientId} freq={listeningFrequency/1e6:F6} MHz, IsIntercom={udpVoicePacket.IsIntercom}, IsPTTActive={udpVoicePacket.IsPttActive}, globalFrequency={globalFrequency}, isTestFrequency={isTestFrequency}, isSenderUs={isSenderUs}, blockedRadios=[{string.Join(',', blockedRadios)}]", 2000);
-
-                        // Without DCS radio info we accept all packets on global or test frequencies
-                        if (!globalFrequency && !(isTestFrequency && isSenderUs))
+                        // Check if frequency matches any of the client's enabled radios
+                        const int defaultReceiveSlot = 1;
+                        var radioMatchSlot = defaultReceiveSlot;
+                        var radioFrequency = false;
+                        if (_radioStateManager != null)
                         {
-                            DebugThrottledUdp("UDP_Drop_NoRadio", $"UdpAudioDecode: Dropping packet - not a global/test frequency and no radio info. Freq={listeningFrequency/1e6:F6} MHz", 2000);
+                            var radios = _radioStateManager.CurrentState.Radios;
+                            for (int i = 0; i < radios.Count; i++)
+                            {
+                                if (radios[i].Enabled && Math.Abs(radios[i].FrequencyHz - listeningFrequency) < 1.0)
+                                {
+                                    radioFrequency = true;
+                                    var candidateSlot = i + 1;
+                                    if (candidateSlot < _radioReceivingState.Length)
+                                        radioMatchSlot = candidateSlot;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Debug log the important packet metadata and blocking state for troubleshooting
+                        DebugThrottledUdp("UDP_PacketMeta", $"UdpAudioDecode: Packet from {udpVoicePacket.ClientId} freq={listeningFrequency/1e6:F6} MHz, IsIntercom={udpVoicePacket.IsIntercom}, IsPTTActive={udpVoicePacket.IsPttActive}, globalFrequency={globalFrequency}, radioFrequency={radioFrequency}, radioMatchSlot={radioMatchSlot}, isTestFrequency={isTestFrequency}, isSenderUs={isSenderUs}, blockedRadios=[{string.Join(',', blockedRadios)}]", 2000);
+
+                        // Accept packets on global frequencies, client-configured radio frequencies, or self-sent test frequencies
+                        if (!globalFrequency && !radioFrequency && !(isTestFrequency && isSenderUs))
+                        {
+                            DebugThrottledUdp("UDP_Drop_NoRadio", $"UdpAudioDecode: Dropping packet - not a global/radio/test frequency. Freq={listeningFrequency/1e6:F6} MHz", 2000);
                             continue;
                         }
 
-                        // Use radio slot 1 as the default receive slot
-                        const int defaultReceiveSlot = 1;
+                        // Use the matched radio slot for accurate receive-state tracking; fall back to slot 1 for global-only matches
+                        var receiveSlot = radioFrequency ? radioMatchSlot : defaultReceiveSlot;
                         var receiveState = new RadioReceivingState
                         {
                             IsSecondary = false,
                             LastReceviedAt = DateTime.Now.Ticks,
-                            ReceivedOn = defaultReceiveSlot,
+                            ReceivedOn = receiveSlot,
                             SentBy = ""
                         };
 
@@ -385,7 +405,7 @@ namespace Vanguard.VCS.Client.Network
                             Frequency = listeningFrequency,
                             Modulation = udpVoicePacket.IsIntercom ? (short)RadioInformation.Modulation.INTERCOM : (short)RadioInformation.Modulation.AM,
                             Volume = 1.0f,
-                            ReceivedRadio = defaultReceiveSlot,
+                            ReceivedRadio = receiveSlot,
                             RadioReceivingState = receiveState,
                             Sequence = udpVoicePacket.Sequence,
                             IsSecondary = false
@@ -445,6 +465,7 @@ namespace Vanguard.VCS.Client.Network
         private List<RadioInformation> CheckVOXActivation(out int sendingOn, bool voice)
         {
             sendingOn = -1;
+            if (!voice) return new List<RadioInformation>();
             if (_radioStateManager == null) return new List<RadioInformation>();
             var voxIndex = getCurrentSelected();
             if (voxIndex < 0) return new List<RadioInformation>();

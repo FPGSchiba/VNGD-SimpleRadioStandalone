@@ -342,16 +342,16 @@ namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 
             switch (RadioId)
             {
-                case 0: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio1Enabled, enabled); break;
-                case 1: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio2Enabled, enabled); break;
-                case 2: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio3Enabled, enabled); break;
-                case 3: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio4Enabled, enabled); break;
-                case 4: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio5Enabled, enabled); break;
-                case 5: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio6Enabled, enabled); break;
-                case 6: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio7Enabled, enabled); break;
-                case 7: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio8Enabled, enabled); break;
-                case 8: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio9Enabled, enabled); break;
-                case 9: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio10Enabled, enabled); break;
+                case 1: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio1Enabled, enabled); break;
+                case 2: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio2Enabled, enabled); break;
+                case 3: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio3Enabled, enabled); break;
+                case 4: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio4Enabled, enabled); break;
+                case 5: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio5Enabled, enabled); break;
+                case 6: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio6Enabled, enabled); break;
+                case 7: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio7Enabled, enabled); break;
+                case 8: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio8Enabled, enabled); break;
+                case 9: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio9Enabled, enabled); break;
+                case 10: _globalSettings.SetClientSetting(GlobalSettingsKeys.Radio10Enabled, enabled); break;
             }
             RepaintRadioStatus();
         }
