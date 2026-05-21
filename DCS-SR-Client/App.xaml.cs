@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -118,11 +121,11 @@ namespace Vanguard.VCS.Client
 
                 if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowMultipleInstances) || allowMultiple)
                 {
-                    Logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
+                    _logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
                 }
                 else
                 {
-                    Logger.Warn("Another SRS instance is already running, preventing second instance startup");
+                    _logger.Warn("Another SRS instance is already running, preventing second instance startup");
 
                     MessageBoxResult result = MessageBox.Show(
                     "Another instance of the SimpleRadio client is already running!\n\nThis one will now quit. Check your system tray for the SRS Icon",
@@ -148,6 +151,12 @@ namespace Vanguard.VCS.Client
             {
                 _logger.Info(s);
             }
+        }
+
+        private static bool IsClientRunning()
+        {
+            var current = Process.GetCurrentProcess();
+            return Process.GetProcessesByName(current.ProcessName).Length > 1;
         }
 
         private void RequireAdmin()
