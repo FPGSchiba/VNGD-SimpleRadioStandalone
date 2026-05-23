@@ -954,7 +954,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 ClientStateSingleton.Instance.LastSeenName = _playerName; // TODO: implement LastSeenName on ClientStateStore
 
                 _guestPage.LoginInProgress.Opacity = 0;
-                _welcomePage.ConnectionSuccessful();
                 ConnectionStatus.Fill = Brushes.Green;
 
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.PlayConnectionSounds))
@@ -1153,10 +1152,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             _guestPage.LoginInProgress.Opacity = 0;
             
-            _welcomePage.SetLoginEnabled(false);
-            _welcomePage.SetGuestEnabled(false);
-            _welcomePage.ConnectionReset();
-
             ConnectionStatus.Fill = Brushes.Red;
 
             // TODO: implement LastSeenName on ClientStateStore
@@ -1247,7 +1242,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         {
             _logger.Info("Initialization successful, setting up UI");
             ConnectionStatus.Fill = Brushes.Orange;
-            _welcomePage.ConnectionSuccessful();
             if (_usingCustomServer)
             {
                 OpenPageByIndex(CustomServerIndex);

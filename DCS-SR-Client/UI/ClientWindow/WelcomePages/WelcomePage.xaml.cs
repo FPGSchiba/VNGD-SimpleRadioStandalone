@@ -1,134 +1,24 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
+using System.Windows.Input;
 using NLog;
-using Vanguard.VCS.Client.Settings;
-using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Client.Utils;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
 {
-    /// <summary>
-    /// Interaction logic for WelcomePage.xaml
-    /// </summary>
     public partial class WelcomePage : Page
     {
-        private MainWindow mainWindow;
-
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-
-        public delegate void ServerInformationFetchedCallback(ServerInformation serverInformation);
+        private readonly MainWindow _mainWindow;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public WelcomePage()
         {
             InitializeComponent();
-
-            mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
-            // Server discovery is disabled until the endpoint is configured; show Refresh immediately
-            ConnectionFailed();
-        }
-        
-        private void GetServerInformation(ServerInformationFetchedCallback callback)
-        {
-            WebsiteClient.GetServerInformation().ContinueWith((task =>
-            {
-                if (task.IsCompletedSuccessfully)
-                {
-                    callback(task.Result);
-                }
-                else
-                {
-                    Dispatcher.Invoke(() => { ShowError("Failed to retrieve server information."); ConnectionFailed(); });
-                }
-            }));
-        }
-
-        private void Login_Click(object sender, RoutedEventArgs e)
-        {
-            mainWindow.On_WelcomeLoginClicked();
-        }
-
-        private void Guest_Click(object sender, RoutedEventArgs e)
-        {
-            mainWindow.On_WelcomeGuestCLicked();
-        }
-        private void EasterEgg_Click(object sender, RoutedEventArgs e)
-        {
-            EasterEggWindow window = new EasterEggWindow();
-            window.Show();
-        }
-        
-        private void ServerInformationFetched(ServerInformation serverInformation)
-        {
-            Logger.Info("Server Information fetched successfully: \n\tAddress: {0}\n\tControlPort: {1}", serverInformation.Address, serverInformation.ControlPort);
-            
-            try
-            {
-                var resolvedAddresses = Dns.GetHostAddresses(serverInformation.Address);
-                var ip = resolvedAddresses.FirstOrDefault(xa =>
-                    xa.AddressFamily ==
-                    AddressFamily
-                        .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-                if (ip == null)
-                {
-                    throw new SocketException(0, "No valid IPv4 address found for the provided host name.");
-                }
-                var endpoint = new IPEndPoint(ip, serverInformation.ControlPort);
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, endpoint.Address.ToString());
-                Dispatcher.Invoke(() =>
-                {
-                    mainWindow.On_FetchedServerInformation(endpoint);
-                });
-            }
-            catch (SocketException ex)
-            {
-                ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
-                Dispatcher.Invoke(() => { ShowError("Invalid IP or Host Name!"); ConnectionFailed(); });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "An error occurred while fetching server information.");
-                Dispatcher.Invoke(() => { ShowError("Could not connect to the server. Please try again."); ConnectionFailed(); });
-            }
-        }
-        
-        public void ConnectionSuccessful()
-        {
-            ServerInfoProgress.Visibility = Visibility.Hidden;
-            LoadLabel.Visibility = Visibility.Hidden;
-            Refresh.Visibility = Visibility.Visible;
-        }
-        
-        public void ConnectionFailed()
-        {
-            ErrorPanel.Visibility = Visibility.Collapsed;
-            ServerInfoProgress.Visibility = Visibility.Hidden;
-            LoadLabel.Visibility = Visibility.Hidden;
-            Login.IsEnabled = false;
-            Guest.IsEnabled = false;
-            Refresh.Visibility = Visibility.Visible;
-        }
-
-        public void ConnectionReset()
-        {
-            ErrorPanel.Visibility = Visibility.Collapsed;
-            ServerInfoProgress.Visibility = Visibility.Visible;
-            LoadLabel.Visibility = Visibility.Visible;
-            Refresh.Visibility = Visibility.Visible; // As we already tried to connect once, show the refresh button
+            _mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
         }
 
         public void ShowError(string message)
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.InvokeAsync(() => ShowError(message));
-                return;
-            }
+            if (!Dispatcher.CheckAccess()) { Dispatcher.InvokeAsync(() => ShowError(message)); return; }
             ErrorText.Text = message;
             ErrorPanel.Visibility = Visibility.Visible;
         }
@@ -138,28 +28,30 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             var prefix = reason?.Contains("anned") == true ? "You were banned" : "You were kicked";
             ShowError($"{prefix}: {reason}");
         }
-        
-        public void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            ServerInfoProgress.Visibility = Visibility.Visible;
-            LoadLabel.Visibility = Visibility.Visible;
-            Refresh.Visibility = Visibility.Hidden;
-            GetServerInformation(ServerInformationFetched);
-        }
-        
-        private void Custom_Click(object sender, RoutedEventArgs e)
-        {
-            mainWindow.On_WelcomeCustomServerClicked();
-        }
-        
+
         public void SetLoginEnabled(bool enabled)
         {
-            Login.IsEnabled = enabled;
+            LoginCard.IsEnabled = enabled;
+            LoginCard.Opacity = enabled ? 1.0 : 0.4;
         }
-        
+
         public void SetGuestEnabled(bool enabled)
         {
-            Guest.IsEnabled = enabled;
+            GuestCard.IsEnabled = enabled;
+            GuestCard.Opacity = enabled ? 1.0 : 0.4;
         }
+
+        public void ShowServerConnected(string serverAddress)
+        {
+            if (!Dispatcher.CheckAccess()) { Dispatcher.InvokeAsync(() => ShowServerConnected(serverAddress)); return; }
+            ServerAddressText.Text = $"● Connected — {serverAddress}";
+            ErrorPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void LoginCard_Click(object sender, MouseButtonEventArgs e)
+            => _mainWindow?.On_WelcomeLoginClicked();
+
+        private void GuestCard_Click(object sender, MouseButtonEventArgs e)
+            => _mainWindow?.On_WelcomeGuestCLicked();   // typo preserved until Task 3 renames it
     }
 }
