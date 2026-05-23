@@ -703,6 +703,7 @@ namespace Vanguard.VCS.Client.Network
                 ClientGuid = clientGuid,
                 Name = clientInfo?.Name ?? "",
                 Coalition = 0,
+                CoalitionName = clientInfo?.Coalition ?? "",
                 AllowRecord = true,
                 Muted = radioInfo?.Muted ?? false,
                 LastUpdate = clientInfo?.LastUpdate ?? 0,

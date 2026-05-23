@@ -51,6 +51,18 @@ namespace Vanguard.VCS.Common.Network
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
+
+        private string _coalitionName = "";
+        public string CoalitionName
+        {
+            get => _coalitionName;
+            set
+            {
+                _coalitionName = value ?? "";
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CoalitionName)));
+            }
+        }
+
         public bool AllowRecord { get; set; }
 
         [JsonIgnore]
