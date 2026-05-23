@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Grpc.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Vanguard.VCS.Client.Events;
@@ -223,6 +224,212 @@ namespace Vanguard.VCS.Client.Tests.Network
 
             Assert.IsTrue(ConnectedClientsSingleton.Instance.TryGetValue(guid, out var client));
             Assert.AreEqual("", client.Name); // must NOT be "---"
+        }
+
+        // -----------------------------------------------------------------------
+        // gRPC auth / service tests — use the internal constructor
+        // -----------------------------------------------------------------------
+
+        private Mock<IAuthServiceClient> _authMock;
+        private Mock<ISrsServiceClient> _srsMock;
+
+        private VcsClientSyncHandler BuildGrpcHandler()
+        {
+            _authMock = new Mock<IAuthServiceClient>();
+            _srsMock = new Mock<ISrsServiceClient>();
+            return new VcsClientSyncHandler(
+                (type, msg) => _lastUpdateType = type,
+                _authMock.Object,
+                _srsMock.Object);
+        }
+
+        [TestMethod]
+        public void DiscoverFlows_Success_ReturnsFlows()
+        {
+            var handler = BuildGrpcHandler();
+            var expected = new FlowDiscoveryResponse { Success = true };
+            expected.Result = new FlowDiscoveryResult();
+            expected.Result.Flows.Add(new AuthFlowDefinition { FlowId = "vanguard_email_password", Description = "Email + Password" });
+            _authMock.Setup(a => a.DiscoverAuthenticationFlows(
+                It.Is<FlowDiscoveryRequest>(r => r.AuthenticationPlugin == "profile-vanguard"),
+                It.IsAny<CallOptions>()))
+                .Returns(expected);
+
+            var result = handler.DiscoverAuthenticationFlows("profile-vanguard");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Flows.Count);
+            Assert.AreEqual("vanguard_email_password", result.Flows[0].FlowId);
+        }
+
+        [TestMethod]
+        public void DiscoverFlows_Timeout_ReturnsNull_AndPublishesConnectionError()
+        {
+            var handler = BuildGrpcHandler();
+            _authMock.Setup(a => a.DiscoverAuthenticationFlows(It.IsAny<FlowDiscoveryRequest>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            var result = handler.DiscoverAuthenticationFlows("profile-vanguard");
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.ConnectionError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Success_ReturnsResponse()
+        {
+            var handler = BuildGrpcHandler();
+            var loginResult = new LoginResult { PlayerName = "Pilot1", Secret = "abc" };
+            var authResponse = new AuthStepResponse { Success = true, Complete = loginResult };
+            _authMock.Setup(a => a.ContinueAuth(
+                It.Is<ContinueAuthRequest>(r => r.SessionId == "sess1"),
+                It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            var result = handler.ContinueAuth("sess1", new Dictionary<string, string> { { "otp", "123456" } });
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Failure_ReturnsNull_AndPublishesLoginError()
+        {
+            var handler = BuildGrpcHandler();
+            var authResponse = new AuthStepResponse { Success = false, ErrorMessage = "bad credentials" };
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            var result = handler.ContinueAuth("sess1", new Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Timeout_ReturnsNull_AndPublishesLoginError()
+        {
+            var handler = BuildGrpcHandler();
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            var result = handler.ContinueAuth("sess1", new Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_RpcError_ReturnsNull_AndPublishesLoginError()
+        {
+            var handler = BuildGrpcHandler();
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            var result = handler.ContinueAuth("sess1", new Dictionary<string, string>());
+
+            Assert.IsNull(result);
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void ContinueAuth_Complete_PublishesInternalLoginSuccess()
+        {
+            var handler = BuildGrpcHandler();
+            var loginResult = new LoginResult { PlayerName = "Pilot1", Secret = "mysecret" };
+            var authResponse = new AuthStepResponse { Success = true, Complete = loginResult };
+            _authMock.Setup(a => a.ContinueAuth(It.IsAny<ContinueAuthRequest>(), It.IsAny<CallOptions>()))
+                .Returns(authResponse);
+
+            handler.ContinueAuth("sess1", new Dictionary<string, string>());
+
+            Assert.AreEqual(VcsUiUpdateType.InternalLoginSuccess, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_Success_ReturnsTrue()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Returns(new ServerResponse { Success = true });
+
+            var result = handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_Failure_ReturnsFalse()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Returns(new ServerResponse { Success = false, ErrorMessage = "not authenticated" });
+
+            var result = handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_Timeout_ReturnsFalse()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            var result = handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void UpdateClientInfo_RpcError_ReturnsFalse()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.UpdateClientInfo(It.IsAny<ClientInfo>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            var result = handler.UpdateClientInfo("Pilot1", "Blue", "unit-42", 1);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void FetchServerSettings_Success_PublishesServerSettingsFetched()
+        {
+            var handler = BuildGrpcHandler();
+            var settings = new ServerSettings();
+            settings.TestFrequencies.Add(121.5f);
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Returns(settings);
+
+            handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsFetched, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void FetchServerSettings_Timeout_PublishesServerSettingsError()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.DeadlineExceeded, "timeout")));
+
+            handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsError, _lastUpdateType);
+        }
+
+        [TestMethod]
+        public void FetchServerSettings_RpcError_PublishesServerSettingsError()
+        {
+            var handler = BuildGrpcHandler();
+            _srsMock.Setup(s => s.GetServerSettings(It.IsAny<Empty>(), It.IsAny<CallOptions>()))
+                .Throws(new RpcException(new Status(StatusCode.Internal, "server error")));
+
+            handler.FetchServerSettings();
+
+            Assert.AreEqual(VcsUiUpdateType.ServerSettingsError, _lastUpdateType);
         }
     }
 }

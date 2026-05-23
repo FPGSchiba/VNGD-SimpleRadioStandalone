@@ -22,11 +22,6 @@
                     Title="Minimize to Tray" />
                 <components1:ToggleGlobalSetting
                     Height="50"
-                    SettingKey="ShowTransmitterName"
-                    SubTitle="Requires Server Setting ON too"
-                    Title="Show Transmitter Name" />
-                <components1:ToggleGlobalSetting
-                    Height="50"
                     SettingKey="AlwaysShowTransmitterName"
                     SubTitle="Overrides server setting"
                     Title="Always Show Caller Name on Radio" />
