@@ -36,31 +36,36 @@ public partial class ServerSelectPage : Page
     {
         WebsiteClient.GetServerInformation().ContinueWith(task =>
         {
-            if (task.IsCompletedSuccessfully && task.Result != null)
-                Dispatcher.Invoke(() => ShowDiscoveryResult(task.Result.Address, task.Result.ControlPort));
-            else
+            if (!task.IsCompletedSuccessfully || task.Result == null)
+            {
                 Dispatcher.Invoke(ShowDiscoveryFailed);
+                return;
+            }
+
+            try
+            {
+                var resolvedAddresses = Dns.GetHostAddresses(task.Result.Address);
+                var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+                if (ip == null) { Dispatcher.Invoke(ShowDiscoveryFailed); return; }
+
+                var endpoint = new IPEndPoint(ip, task.Result.ControlPort);
+                Dispatcher.Invoke(() => ApplyDiscoveryResult(endpoint));
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to resolve Vanguard server address during discovery.");
+                Dispatcher.Invoke(ShowDiscoveryFailed);
+            }
         });
     }
 
-    private void ShowDiscoveryResult(string address, int port)
+    private void ApplyDiscoveryResult(IPEndPoint endpoint)
     {
-        try
-        {
-            var resolvedAddresses = Dns.GetHostAddresses(address);
-            var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
-            if (ip == null) { ShowDiscoveryFailed(); return; }
-
-            _vanguardEndpoint = new IPEndPoint(ip, port);
-            _vanguardReady = true;
-            VanguardStatusDot.Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80));
-            VanguardStatusLabel.Text = "vcs.vngd.net";
-            UpdateConnectButton();
-        }
-        catch
-        {
-            ShowDiscoveryFailed();
-        }
+        _vanguardEndpoint = endpoint;
+        _vanguardReady = true;
+        VanguardStatusDot.Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80));
+        VanguardStatusLabel.Text = "vcs.vngd.net";
+        UpdateConnectButton();
     }
 
     private void ShowDiscoveryFailed()
@@ -114,6 +119,7 @@ public partial class ServerSelectPage : Page
     public void ShowIdle()
     {
         if (!Dispatcher.CheckAccess()) { Dispatcher.InvokeAsync(ShowIdle); return; }
+        ErrorPanel.Visibility = Visibility.Collapsed;
         ConnectingPanel.Visibility = Visibility.Collapsed;
         UpdateConnectButton();
     }
@@ -142,7 +148,7 @@ public partial class ServerSelectPage : Page
         {
             _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, _vanguardEndpoint.Address.ToString());
             ShowConnecting("vcs.vngd.net");
-            _mainWindow.On_ServerConnectClicked(_vanguardEndpoint, isCustom: false);
+            _mainWindow?.On_ServerConnectClicked(_vanguardEndpoint, isCustom: false);
         }
         else
         {
@@ -154,7 +160,7 @@ public partial class ServerSelectPage : Page
                 var endpoint = new IPEndPoint(ip, (int)PortInput.Value);
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ip.ToString());
                 ShowConnecting(IpInput.Text);
-                _mainWindow.On_ServerConnectClicked(endpoint, isCustom: true);
+                _mainWindow?.On_ServerConnectClicked(endpoint, isCustom: true);
             }
             catch (SocketException)
             {
@@ -170,7 +176,7 @@ public partial class ServerSelectPage : Page
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
-        _mainWindow.On_ServerSelectCancelled();
+        _mainWindow?.On_ServerSelectCancelled();
         ShowIdle();
     }
 }
