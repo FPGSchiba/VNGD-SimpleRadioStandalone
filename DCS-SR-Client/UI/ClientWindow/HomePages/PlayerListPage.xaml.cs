@@ -27,6 +27,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
             set { _name = value ?? ""; Notify(nameof(Name)); }
         }
 
+        public string RawName { get; set; } = "";
         public string CoalitionName { get; set; } = "Unassigned";
         public SolidColorBrush CoalitionColor { get; set; } = new SolidColorBrush(Colors.Gray);
         public string FfId { get; set; } = "";
@@ -88,6 +89,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 
                 _items.Add(new PlayerListItem
                 {
+                    RawName       = client.Name,
                     Name          = playerName,
                     CoalitionName = string.IsNullOrEmpty(client.CoalitionName) ? "Unassigned" : client.CoalitionName,
                     CoalitionColor = client.ClientCoalitionColour,
@@ -107,7 +109,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
                     .Select(s => s.SentBy));
 
             foreach (var item in _items)
-                item.IsTransmitting = activeNames.Contains(item.Name);
+                item.IsTransmitting = activeNames.Contains(item.RawName);
         }
 
         private void UpdateSummary()

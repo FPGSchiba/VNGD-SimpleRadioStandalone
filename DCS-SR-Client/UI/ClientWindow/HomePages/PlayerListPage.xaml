@@ -17,7 +17,7 @@
                    FontSize="11"
                    Margin="8,6,8,4"/>
 
-        <ListView x:Name="ClientList" DockPanel.Dock="Top">
+        <ListView x:Name="ClientList">
             <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
