@@ -15,6 +15,7 @@ namespace Vanguard.VCS.Client.Events
         string TargetGuid,
         string Reason,
         long? DurationSeconds);
+    public sealed record ServerMuteChangedEvent(bool IsMuted);
     public sealed record DistributionUpdatedEvent(IReadOnlyList<VoiceHostDetails> VoiceHosts);
 
     // Internal lifecycle events

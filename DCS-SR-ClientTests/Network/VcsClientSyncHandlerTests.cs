@@ -226,6 +226,45 @@ namespace Vanguard.VCS.Client.Tests.Network
             Assert.AreEqual("", client.Name); // must NOT be "---"
         }
 
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionKick_PublishesServerActionEvent()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Kick,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                    Reason = "AFK for too long",
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            _eventBusMock.Verify(b => b.Publish(It.Is<ServerActionEvent>(e =>
+                e.Type == ServerAction.Types.ActionType.Kick &&
+                e.Reason == "AFK for too long")), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionMute_PublishesServerMuteChangedEvent()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Mute,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            _eventBusMock.Verify(b => b.Publish(It.Is<ServerMuteChangedEvent>(e => e.IsMuted)), Times.Once);
+        }
+
         // -----------------------------------------------------------------------
         // gRPC auth / service tests — use the internal constructor
         // -----------------------------------------------------------------------

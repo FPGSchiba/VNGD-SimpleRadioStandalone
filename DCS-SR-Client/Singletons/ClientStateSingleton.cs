@@ -66,6 +66,17 @@ namespace Vanguard.VCS.Client.Singletons
             }
         }
 
+        private bool _isServerMuted;
+        public bool IsServerMuted
+        {
+            get => _isServerMuted;
+            set
+            {
+                _isServerMuted = value;
+                NotifyPropertyChanged(nameof(IsServerMuted));
+            }
+        }
+
         private bool isConnectionErrored;
         public Guid ClientId { get; private set; }
 

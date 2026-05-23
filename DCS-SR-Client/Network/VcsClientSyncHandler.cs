@@ -736,20 +736,26 @@ namespace Vanguard.VCS.Client.Network
             {
                 case ServerAction.Types.ActionType.Kick:
                     Logger.Warn("Kicked from server. Reason: {0}", action.Reason);
+                    _eventBus?.Publish(new ServerActionEvent(
+                        action.Type, action.TargetClientGuid ?? "", action.Reason ?? "", null));
                     _callback?.Invoke(VcsUiUpdateType.ConnectionLost, action.Reason);
                     break;
 
                 case ServerAction.Types.ActionType.Ban:
                     Logger.Warn("Banned from server. Reason: {0}", action.Reason);
+                    _eventBus?.Publish(new ServerActionEvent(
+                        action.Type, action.TargetClientGuid ?? "", action.Reason ?? "", null));
                     _callback?.Invoke(VcsUiUpdateType.ConnectionLost, action.Reason);
                     break;
 
                 case ServerAction.Types.ActionType.Mute:
                     Logger.Info("Muted by server.");
+                    _eventBus?.Publish(new ServerMuteChangedEvent(IsMuted: true));
                     break;
 
                 case ServerAction.Types.ActionType.Unmute:
                     Logger.Info("Unmuted by server.");
+                    _eventBus?.Publish(new ServerMuteChangedEvent(IsMuted: false));
                     break;
 
                 default:
