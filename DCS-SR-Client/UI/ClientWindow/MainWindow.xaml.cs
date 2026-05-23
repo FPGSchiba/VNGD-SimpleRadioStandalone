@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -36,6 +38,14 @@ using Vanguard.VCS.Client.Events;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow
 {
+    public enum ConnectionStep
+    {
+        Connect,
+        GuestLogin,
+        MemberLogin,
+        UnitSelection,
+        Ready
+    }
 
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
@@ -58,6 +68,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private IDisposable _serverActionSubscription;
         private IDisposable _serverMuteSubscription;
         private int _port = 5002;
+        private string _pendingKickReason = null;
 
         private const int NoWindowOpen = 17;  // Update when adding new panel
         private int _windowOpen = NoWindowOpen;
@@ -616,15 +627,85 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             }
         }
 
-        public void On_WelcomeLoginClicked()
+        private void NavigateToStep(ConnectionStep step)
         {
-            OpenPageByIndex(LoginIndex);
+            UpdateStepperHeader(step);
+            switch (step)
+            {
+                case ConnectionStep.Connect:
+                    if (_pendingKickReason != null)
+                    {
+                        _welcomePage.ShowKickReason(_pendingKickReason);
+                        _pendingKickReason = null;
+                    }
+                    OpenPageByIndex(WelcomeIndex);
+                    break;
+                case ConnectionStep.GuestLogin:
+                    OpenPageByIndex(GuestIndex);
+                    break;
+                case ConnectionStep.MemberLogin:
+                    OpenPageByIndex(LoginIndex);
+                    break;
+                case ConnectionStep.UnitSelection:
+                    OpenPageByIndex(UnitSelectionIndex);
+                    break;
+                case ConnectionStep.Ready:
+                    OpenPageByIndex(HomePageIndex);
+                    break;
+            }
         }
 
-        public void On_WelcomeGuestCLicked()
+        private void UpdateStepperHeader(ConnectionStep step)
         {
-            OpenPageByIndex(GuestIndex);
+            StepperPanel.Children.Clear();
+
+            var steps = (step == ConnectionStep.GuestLogin || step == ConnectionStep.Connect)
+                ? new[] { ("Connect", ConnectionStep.Connect), ("Guest Login", ConnectionStep.GuestLogin), ("Ready", ConnectionStep.Ready) }
+                : new[] { ("Connect", ConnectionStep.Connect), ("Login", ConnectionStep.MemberLogin), ("Select Unit", ConnectionStep.UnitSelection), ("Ready", ConnectionStep.Ready) };
+
+            for (int i = 0; i < steps.Length; i++)
+            {
+                var (label, s) = steps[i];
+                bool isDone = s < step;
+                bool isCurrent = s == step;
+
+                var dot = new Ellipse
+                {
+                    Width = 18, Height = 18,
+                    Fill = isDone ? Brushes.Green : isCurrent ? Brushes.DodgerBlue : new SolidColorBrush(Color.FromRgb(60, 60, 60)),
+                };
+                var text = new TextBlock
+                {
+                    Text = isDone ? "✓" : (i + 1).ToString(),
+                    Foreground = Brushes.White, FontSize = 10, FontWeight = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                var circle = new Grid { Width = 18, Height = 18, Margin = new Thickness(0, 0, 4, 0) };
+                circle.Children.Add(dot);
+                circle.Children.Add(text);
+                StepperPanel.Children.Add(circle);
+                StepperPanel.Children.Add(new TextBlock
+                {
+                    Text = label, FontSize = 11,
+                    Foreground = isCurrent ? Brushes.White : (isDone ? Brushes.LightGreen : new SolidColorBrush(Color.FromRgb(100, 100, 100))),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 10, 0),
+                });
+                if (i < steps.Length - 1)
+                    StepperPanel.Children.Add(new TextBlock
+                    {
+                        Text = "—",
+                        Foreground = new SolidColorBrush(Color.FromRgb(80, 80, 80)),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 10, 0),
+                    });
+            }
         }
+
+        public void On_WelcomeLoginClicked() => NavigateToStep(ConnectionStep.MemberLogin);
+
+        public void On_WelcomeGuestCLicked() => NavigateToStep(ConnectionStep.GuestLogin);
         
         public void On_FetchedServerInformation(IPEndPoint endpoint, bool usingCustomServer = false)
         {
@@ -648,7 +729,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         public void On_LoginBackClicked()
         {
-            OpenPageByIndex(WelcomeIndex);
+            Stop();
+            NavigateToStep(ConnectionStep.Connect);
         }
 
         public void On_GuestLoginClicked(string playerName, string fleetCode, string coalitionPassword)
@@ -688,7 +770,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public void On_UnitSelectionBackClicked()
         {
             Stop();
-            OpenPageByIndex(WelcomeIndex);
+            NavigateToStep(ConnectionStep.Connect);
         }
         
         public void On_UnitSelectionContinueClicked(string unitId, string coalition, uint roleId)
@@ -768,8 +850,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void HandleForcedDisconnect(string reason)
         {
+            _pendingKickReason = reason;
             Stop(connectionError: true);
-            MessageBox.Show($"Disconnected by server: {reason}", "Server Action", MessageBoxButton.OK, MessageBoxImage.Warning);
+            NavigateToStep(ConnectionStep.Connect);
         }
 
         private void HandleServerMuteChanged(bool isMuted)
@@ -829,10 +912,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             else
             {
                 _logger.Error("Unit selection error with no message provided.");
-                Stop(true);
-                MessageBox.Show("An unknown unit selection error occurred.", "Unit Selection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _unitSelectionPage.ShowError("An unknown unit selection error occurred.");
             }
-            
         }
         
         private void HandleConnectionSuccess()
@@ -880,7 +961,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
                 AudioManager.StartEncoding(InputManager, _resolvedIp, _port);
 
-                OpenPageByIndex(OpenPage == GuestIndex ? GuestSuccessIndex : HomePageIndex);
+                StepperHeader.Visibility = Visibility.Collapsed;
+                NavigateToStep(ConnectionStep.Ready);
 
                 _connectionAwacsSpan.Finish();
 
@@ -917,52 +999,31 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 _logger.Error($"Unit selection error: {errorMsg}");
-                _unitSelectionPage.SelectionFailed(errorMsg);
+                _unitSelectionPage.ShowError(errorMsg);
             }
             else
             {
                 _logger.Error("Unit selection error with no message provided.");
-                MessageBox.Show("An unknown unit selection error occurred.", "Unit Selection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _unitSelectionPage.ShowError("An unknown unit selection error occurred.");
             }
         }
-        
+
         private void HandleConnectionError(object message, bool isGuest)
         {
-            var errorMsg = message as string;
-            if (!string.IsNullOrEmpty(errorMsg))
-            {
-                _logger.Error($"Connection error: {errorMsg}");
-                Stop(true);
-                MessageBox.Show(errorMsg, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
-            {
-                _logger.Error("Connection error with no message provided.");
-                Stop(true);
-                MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            if (isGuest)
-                _guestPage.LoginFailed();
-            else
-                _loginPage.LoginFailed();
-            _welcomePage.ConnectionFailed();
+            var errorMsg = message as string ?? "An unknown connection error occurred.";
+            _logger.Error($"Connection error: {errorMsg}");
+            Stop(true);
+            _welcomePage.ShowError(errorMsg);
+            NavigateToStep(ConnectionStep.Connect);
         }
-        
+
         private void HandleInitializationError(object message)
         {
-            var errorMsg = message as string;
-            if (!string.IsNullOrEmpty(errorMsg))
-            {
-                _logger.Error($"Initialization error: {errorMsg}");
-                Stop(true);
-                MessageBox.Show(errorMsg, "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
-            {
-                _logger.Error("Initialization error with no message provided.");
-                Stop(true);
-                MessageBox.Show("An unknown initialization error occurred.", "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            var errorMsg = message as string ?? "An unknown initialization error occurred.";
+            _logger.Error($"Initialization error: {errorMsg}");
+            Stop(true);
+            _welcomePage.ShowError(errorMsg);
+            NavigateToStep(ConnectionStep.Connect);
         }
         
         private void HandleInitializationSuccessEvent(object message)
@@ -978,7 +1039,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _logger.Error("Initialization error with no message provided.");
                 Stop(true);
-                MessageBox.Show("An unknown initialization error occurred.", "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _welcomePage.ShowError("An unknown initialization error occurred.");
+                NavigateToStep(ConnectionStep.Connect);
             }
         }
         
@@ -989,31 +1051,22 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 _unitSelectionPage.SetSelectionData(internalLoginResult);
                 _playerName = internalLoginResult.PlayerName;
                 ClientStateSingleton.Instance.LastSeenName = internalLoginResult.PlayerName; // TODO: implement LastSeenName on ClientStateStore
-                OpenPageByIndex(UnitSelectionIndex);
+                NavigateToStep(ConnectionStep.UnitSelection);
             }
             else
             {
                 _logger.Error("Connection error with no message provided.");
                 Stop(true);
-                MessageBox.Show("An unknown connection error occurred.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                _loginPage.LoginFailed();
+                _welcomePage.ShowError("An unknown connection error occurred.");
+                NavigateToStep(ConnectionStep.Connect);
             }
         }
         
         private void HandleGuestLoginError(object message)
         {
-            var errorMsg = message as string;
-            if (!string.IsNullOrEmpty(errorMsg))
-            {
-                _logger.Error($"Guest login error: {errorMsg}");
-                MessageBox.Show(errorMsg, "Guest Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
-            {
-                _logger.Error("Guest login error with no message provided.");
-                MessageBox.Show("An unknown guest login error occurred.", "Guest Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            _guestPage.LoginFailed();
+            var errorMsg = message as string ?? "An unknown guest login error occurred.";
+            _logger.Error($"Guest login error: {errorMsg}");
+            _guestPage.ShowError(errorMsg);
         }
 
         private void Connect(IPAddress ip, int port)
@@ -1121,6 +1174,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             ClientStateSingleton.Instance.IsServerMuted = false;
             ServerMuteBanner.Visibility = Visibility.Collapsed;
             LoggedIn = false;
+            StepperHeader.Visibility = Visibility.Visible;
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1179,10 +1233,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private void HandleInitializationSuccess(bool isVanguardLoginEnabled, bool isGuestLoginEnabled)
         {
             _logger.Info("Initialization successful, setting up UI");
-
             ConnectionStatus.Fill = Brushes.Orange;
             _welcomePage.ConnectionSuccessful();
-            
             if (_usingCustomServer)
             {
                 OpenPageByIndex(CustomServerIndex);
@@ -1191,7 +1243,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             {
                 _welcomePage.SetLoginEnabled(isVanguardLoginEnabled);
                 _welcomePage.SetGuestEnabled(isGuestLoginEnabled);
-                OpenPageByIndex(WelcomeIndex);
+                StepperHeader.Visibility = Visibility.Visible;
+                NavigateToStep(ConnectionStep.Connect);
             }
         }
         

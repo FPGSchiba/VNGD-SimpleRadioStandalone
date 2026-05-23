@@ -33,8 +33,18 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
         
         public void LoginFailed()
         {
+            ErrorPanel.Visibility = Visibility.Collapsed;
             Login.IsEnabled = true;
             Progress.Visibility = Visibility.Hidden;
+        }
+
+        public void ShowError(string message)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ErrorText.Text = message;
+                ErrorPanel.Visibility = Visibility.Visible;
+            });
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)

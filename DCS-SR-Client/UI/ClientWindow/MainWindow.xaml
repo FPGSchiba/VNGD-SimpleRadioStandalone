@@ -56,6 +56,17 @@
         
         <Frame Grid.Row="1" x:Name="DisplayFrame" />
 
+        <!-- Connection progress stepper — hidden after login -->
+        <Border x:Name="StepperHeader"
+                Grid.Row="1"
+                Background="#1e1e2e"
+                BorderBrush="#333"
+                BorderThickness="0,0,0,1"
+                Padding="12,8"
+                Visibility="Collapsed">
+            <StackPanel x:Name="StepperPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+        </Border>
+
         <!-- Server mute banner — appears when server has muted this client -->
         <Border x:Name="ServerMuteBanner"
                 Grid.Row="1"

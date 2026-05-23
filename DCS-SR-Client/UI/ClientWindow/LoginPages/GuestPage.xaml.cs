@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using NLog;
 using Vanguard.VCS.Client.Settings;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -43,8 +42,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                 var coalitionPassword = PasswordInput.Password;
                 if (string.IsNullOrEmpty(coalitionPassword))
                 {
-                    System.Windows.Forms.MessageBox.Show("Please enter a password. It is needed to connect to VCS-SRS.", "Missing Password",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowError("Please enter a coalition password.");
                     LoginFailed();
                     return;
                 }
@@ -59,9 +57,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show(
-                    $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2-4 uppercase Letters", "Invalid Fleet-Code",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError($"Invalid Fleet Code '{FleetCodeInput.Text}': must be 2–4 uppercase letters.");
                 LoginFailed();
             }
         }
@@ -82,9 +78,19 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 
         public void LoginFailed()
         {
+            ErrorPanel.Visibility = Visibility.Collapsed;
             Login.IsEnabled = true;
             LoginInProgress.Visibility = Visibility.Hidden;
             _logger.Error("Login failed, re-enabling login button.");
+        }
+
+        public void ShowError(string message)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ErrorText.Text = message;
+                ErrorPanel.Visibility = Visibility.Visible;
+            });
         }
     }
 }

@@ -60,21 +60,24 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             if (string.IsNullOrEmpty(_unitSelectionViewModel.UnitText) ||
                 string.IsNullOrEmpty(_unitSelectionViewModel.SelectedCoalition) || selectedRoleId == 100)
             {
-                MessageBox.Show("Please select a unit, coalition and role before continuing.", "Selection Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError("Please select a unit, coalition and role before continuing.");
+                return;
             }
             _mainWindow.On_UnitSelectionContinueClicked(_unitSelectionViewModel.UnitText, _unitSelectionViewModel.SelectedCoalition, selectedRoleId);
         }
 
-        public void SelectionFailed(string message)
+        public void ShowError(string message)
         {
-            Progress.Visibility = Visibility.Hidden;
-            Continue.IsEnabled = true;
-            RoleSelect.IsEnabled = true;
-            UnitSelect.IsEnabled = true;
-            CoalitionSelect.IsEnabled = true;
-            MessageBox.Show(message, "Selection Error",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            Dispatcher.Invoke(() =>
+            {
+                ErrorText.Text = message;
+                ErrorPanel.Visibility = Visibility.Visible;
+                Progress.Visibility = Visibility.Hidden;
+                Continue.IsEnabled = true;
+                RoleSelect.IsEnabled = true;
+                UnitSelect.IsEnabled = true;
+                CoalitionSelect.IsEnabled = true;
+            });
         }
     }
 }

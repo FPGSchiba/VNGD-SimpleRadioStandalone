@@ -117,6 +117,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
         
         public void ConnectionFailed()
         {
+            ErrorPanel.Visibility = Visibility.Collapsed;
             ServerInfoProgress.Visibility = Visibility.Hidden;
             LoadLabel.Visibility = Visibility.Hidden;
             Login.IsEnabled = false;
@@ -126,9 +127,25 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
 
         public void ConnectionReset()
         {
+            ErrorPanel.Visibility = Visibility.Collapsed;
             ServerInfoProgress.Visibility = Visibility.Visible;
             LoadLabel.Visibility = Visibility.Visible;
             Refresh.Visibility = Visibility.Visible; // As we already tried to connect once, show the refresh button
+        }
+
+        public void ShowError(string message)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ErrorText.Text = message;
+                ErrorPanel.Visibility = Visibility.Visible;
+            });
+        }
+
+        public void ShowKickReason(string reason)
+        {
+            var prefix = reason?.Contains("anned") == true ? "You were banned" : "You were kicked";
+            ShowError($"{prefix}: {reason}");
         }
         
         public void Refresh_Click(object sender, RoutedEventArgs e)
