@@ -706,7 +706,20 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         public void On_WelcomeLoginClicked() => NavigateToStep(ConnectionStep.MemberLogin);
 
         public void On_WelcomeGuestCLicked() => NavigateToStep(ConnectionStep.GuestLogin);
-        
+
+        public void On_ServerConnectClicked(IPEndPoint endpoint, bool isCustom)
+        {
+            _usingCustomServer = isCustom;
+            _resolvedIp = endpoint.Address;
+            _port = endpoint.Port;
+            Connect(endpoint.Address, endpoint.Port);
+        }
+
+        public void On_ServerSelectCancelled()
+        {
+            Stop();
+        }
+
         public void On_FetchedServerInformation(IPEndPoint endpoint, bool usingCustomServer = false)
         {
             _usingCustomServer = usingCustomServer;
