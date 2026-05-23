@@ -77,6 +77,7 @@ namespace Vanguard.VCS.Client.Network
         private long _firstPTTPress; // to delay start PTT time
 
         private long _lastVOXSend;
+        private long _voxAttackStart = -1; // ms timestamp when voice first detected in current attack window, -1 = not in window
         private RadioInformation.Modulation _lastTransmitModulation = RadioInformation.Modulation.AM;
 
         private volatile bool _intercomPtt;
@@ -466,10 +467,37 @@ namespace Vanguard.VCS.Client.Network
         private List<RadioInformation> CheckVOXActivation(out int sendingOn, bool voice)
         {
             sendingOn = -1;
-            if (!voice) return new List<RadioInformation>();
             if (_radioStateManager == null) return new List<RadioInformation>();
             var voxIndex = getCurrentSelected();
-            if (voxIndex < 0) return new List<RadioInformation>();
+            if (voxIndex < 0)
+            {
+                _voxAttackStart = -1;
+                _lastVOXSend = 0;
+                return new List<RadioInformation>();
+            }
+
+            var nowMs = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            var holdMs = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
+            var attackMs = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VoxAttackTimeMs);
+
+            if (voice)
+            {
+                if (_voxAttackStart < 0)
+                    _voxAttackStart = nowMs;
+
+                var attackElapsedMs = nowMs - _voxAttackStart;
+                if (attackElapsedMs < attackMs)
+                    return new List<RadioInformation>(); // still in attack window
+
+                _lastVOXSend = nowMs;
+            }
+            else
+            {
+                _voxAttackStart = -1;
+
+                if (_lastVOXSend <= 0 || (nowMs - _lastVOXSend) > holdMs)
+                    return new List<RadioInformation>(); // hold expired
+            }
 
             var ri = _radioStateManager.GetRadio(voxIndex + 1);
             if (ri == null || ri.modulation == RadioInformation.Modulation.DISABLED)

@@ -250,6 +250,7 @@ namespace Vanguard.VCS.Client.Settings
         VOXMode,
         VOXMinimumTime,
         VOXMinimumDB,
+        VoxAttackTimeMs,
 
         AllowXInputController
     }
@@ -849,7 +850,7 @@ namespace Vanguard.VCS.Client.Settings
             {GlobalSettingsKeys.VOXMode.ToString(), "3" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
             {GlobalSettingsKeys.VOXMinimumDB.ToString(), "-59.0" },
-
+            {GlobalSettingsKeys.VoxAttackTimeMs.ToString(), "100"},
 
             {GlobalSettingsKeys.AllowXInputController.ToString(), "false"},
 
