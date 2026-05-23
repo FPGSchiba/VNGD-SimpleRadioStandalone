@@ -43,8 +43,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
                 }
                 else
                 {
-                    MessageBox.Show("Failed to retrieve server information.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ConnectionFailed();
+                    Dispatcher.Invoke(() => { ShowError("Failed to retrieve server information."); ConnectionFailed(); });
                 }
             }));
         }
@@ -88,23 +87,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             }
             catch (SocketException ex)
             {
-                MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
                 ClientStateSingleton.Instance.IsConnected = false; // TODO: drive IsConnected via event bus on ClientStateStore
-                Dispatcher.Invoke(() =>
-                {
-                    ConnectionFailed();
-                });
-                
+                Dispatcher.Invoke(() => { ShowError("Invalid IP or Host Name!"); ConnectionFailed(); });
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "An error occurred while fetching server information.");
-                MessageBox.Show("Could not connect to the Server, please try again by reloading with the button below.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Dispatcher.Invoke(() =>
-                {
-                    ConnectionFailed();
-                });
+                Dispatcher.Invoke(() => { ShowError("Could not connect to the server. Please try again."); ConnectionFailed(); });
             }
         }
         
@@ -135,11 +124,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
 
         public void ShowError(string message)
         {
-            Dispatcher.Invoke(() =>
+            if (!Dispatcher.CheckAccess())
             {
-                ErrorText.Text = message;
-                ErrorPanel.Visibility = Visibility.Visible;
-            });
+                Dispatcher.InvokeAsync(() => ShowError(message));
+                return;
+            }
+            ErrorText.Text = message;
+            ErrorPanel.Visibility = Visibility.Visible;
         }
 
         public void ShowKickReason(string reason)

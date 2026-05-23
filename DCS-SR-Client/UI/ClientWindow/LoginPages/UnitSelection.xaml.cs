@@ -68,16 +68,18 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 
         public void ShowError(string message)
         {
-            Dispatcher.Invoke(() =>
+            if (!Dispatcher.CheckAccess())
             {
-                ErrorText.Text = message;
-                ErrorPanel.Visibility = Visibility.Visible;
-                Progress.Visibility = Visibility.Hidden;
-                Continue.IsEnabled = true;
-                RoleSelect.IsEnabled = true;
-                UnitSelect.IsEnabled = true;
-                CoalitionSelect.IsEnabled = true;
-            });
+                Dispatcher.InvokeAsync(() => ShowError(message));
+                return;
+            }
+            ErrorText.Text = message;
+            ErrorPanel.Visibility = Visibility.Visible;
+            Progress.Visibility = Visibility.Hidden;
+            Continue.IsEnabled = true;
+            RoleSelect.IsEnabled = true;
+            UnitSelect.IsEnabled = true;
+            CoalitionSelect.IsEnabled = true;
         }
     }
 }
