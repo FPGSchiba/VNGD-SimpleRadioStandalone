@@ -27,9 +27,9 @@ namespace Vanguard.VCS.Common.Network
             }
             set
             {
-                if(value == null || value == "")
+                if (value == null)
                 {
-                    value = "---";
+                    value = "";
                 }
 
                 if (_name != value)

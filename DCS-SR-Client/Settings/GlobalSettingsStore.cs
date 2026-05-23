@@ -235,6 +235,7 @@ namespace Vanguard.VCS.Client.Settings
 
         DCSAutoConnectUDP, // 5069
         ShowTransmitterName,
+        AlwaysShowTransmitterName,
 
         IdleTimeOut,
         AutoConnect,
@@ -833,6 +834,7 @@ namespace Vanguard.VCS.Client.Settings
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "false"},
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
+            {GlobalSettingsKeys.AlwaysShowTransmitterName.ToString(), "false"},
 
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 

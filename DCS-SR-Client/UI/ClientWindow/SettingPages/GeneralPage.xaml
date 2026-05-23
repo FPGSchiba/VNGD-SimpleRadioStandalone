@@ -27,6 +27,11 @@
                     Title="Show Transmitter Name" />
                 <components1:ToggleGlobalSetting
                     Height="50"
+                    SettingKey="AlwaysShowTransmitterName"
+                    SubTitle="Overrides server setting"
+                    Title="Always Show Caller Name on Radio" />
+                <components1:ToggleGlobalSetting
+                    Height="50"
                     SettingKey="PlayConnectionSounds"
                     Title="Play Connection Sounds" />
                 <components1:ToggleProfileSetting

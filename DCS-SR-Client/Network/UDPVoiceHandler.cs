@@ -412,11 +412,11 @@ namespace Vanguard.VCS.Client.Network
                             IsSecondary = false
                         };
 
-                        var transmitterName = "";
-                        if (_serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) && _globalSettings.GetClientSettingBool(GlobalSettingsKeys.ShowTransmitterName) && _clients.TryGetValue(udpVoicePacket.ClientId, out var transmittingClient))
+                        var showName = _serverSettings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME)
+                                       || _globalSettings.GetClientSettingBool(GlobalSettingsKeys.AlwaysShowTransmitterName);
+                        if (showName && _clients.TryGetValue(udpVoicePacket.ClientId, out var transmittingClient))
                         {
-                            transmitterName = transmittingClient.Name;
-                            receiveState.SentBy = transmitterName;
+                            receiveState.SentBy = transmittingClient.Name; // empty string if name not yet known
                         }
 
                         _radioReceivingState[audio.ReceivedRadio] = receiveState;

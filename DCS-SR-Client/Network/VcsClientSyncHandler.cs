@@ -701,7 +701,7 @@ namespace Vanguard.VCS.Client.Network
             var srClient = new SRClient
             {
                 ClientGuid = clientGuid,
-                Name = clientInfo?.Name ?? "---",
+                Name = clientInfo?.Name ?? "",
                 Coalition = 0,
                 AllowRecord = true,
                 Muted = radioInfo?.Muted ?? false,

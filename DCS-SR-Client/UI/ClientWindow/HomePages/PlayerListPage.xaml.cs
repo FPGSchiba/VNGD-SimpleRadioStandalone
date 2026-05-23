@@ -25,9 +25,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
             }
             set
             {
-                if(value == null || value == "")
+                if (value == null)
                 {
-                    value = "---";
+                    value = "";
                 }
 
                 if (_name != value)
