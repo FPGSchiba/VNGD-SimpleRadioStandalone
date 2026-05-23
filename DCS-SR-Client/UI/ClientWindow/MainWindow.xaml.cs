@@ -56,6 +56,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private VcsClientSyncHandler _vcsClient;
         private IDisposable _connectionStateSubscription;
         private IDisposable _serverActionSubscription;
+        private IDisposable _serverMuteSubscription;
         private int _port = 5002;
 
         private const int NoWindowOpen = 17;  // Update when adding new panel
@@ -297,6 +298,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 if (e.Type == ServerAction.Types.ActionType.Kick || e.Type == ServerAction.Types.ActionType.Ban)
                     Dispatcher.Invoke(() => HandleForcedDisconnect(e.Reason));
             });
+
+            _serverMuteSubscription = App.EventBus.Subscribe<ServerMuteChangedEvent>(e =>
+                Dispatcher.Invoke(() => HandleServerMuteChanged(e.IsMuted)));
         }
 
         public String GetPlayerName()
@@ -768,6 +772,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             MessageBox.Show($"Disconnected by server: {reason}", "Server Action", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
+        private void HandleServerMuteChanged(bool isMuted)
+        {
+            ClientStateSingleton.Instance.IsServerMuted = isMuted;
+            ServerMuteBanner.Visibility = isMuted && LoggedIn
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
         private void VcsUiUpdate(VcsUiUpdateType type, object message)
         {
             switch (type)
@@ -1105,6 +1117,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             
             _loginPage.LoginFailed();
             _guestPage.LoginFailed();
+
+            ClientStateSingleton.Instance.IsServerMuted = false;
+            ServerMuteBanner.Visibility = Visibility.Collapsed;
         }
 
         private void SaveSelectedInputAndOutput()
@@ -1191,6 +1206,8 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _connectionStateSubscription = null;
             _serverActionSubscription?.Dispose();
             _serverActionSubscription = null;
+            _serverMuteSubscription?.Dispose();
+            _serverMuteSubscription = null;
 
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientX, Left);
             _globalSettings.SetPositionSetting(GlobalSettingsKeys.ClientY, Top);

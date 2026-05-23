@@ -56,6 +56,21 @@
         
         <Frame Grid.Row="1" x:Name="DisplayFrame" />
 
+        <!-- Server mute banner — appears when server has muted this client -->
+        <Border x:Name="ServerMuteBanner"
+                Grid.Row="1"
+                Background="#B45309"
+                Padding="12,8"
+                Visibility="Collapsed"
+                VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="You are muted by the server — your transmissions are blocked."
+                           FontSize="13"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
         <Grid
             Background="#E9E9E9"
             Grid.Row="2"
