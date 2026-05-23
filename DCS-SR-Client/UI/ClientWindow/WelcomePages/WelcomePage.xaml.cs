@@ -1,14 +1,12 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using NLog;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
 {
     public partial class WelcomePage : Page
     {
         private readonly MainWindow _mainWindow;
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public WelcomePage()
         {
@@ -32,12 +30,14 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
         public void SetLoginEnabled(bool enabled)
         {
             LoginCard.IsEnabled = enabled;
+            LoginCard.IsHitTestVisible = enabled;
             LoginCard.Opacity = enabled ? 1.0 : 0.4;
         }
 
         public void SetGuestEnabled(bool enabled)
         {
             GuestCard.IsEnabled = enabled;
+            GuestCard.IsHitTestVisible = enabled;
             GuestCard.Opacity = enabled ? 1.0 : 0.4;
         }
 
