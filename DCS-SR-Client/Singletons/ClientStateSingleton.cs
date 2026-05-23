@@ -66,7 +66,7 @@ namespace Vanguard.VCS.Client.Singletons
             }
         }
 
-        private bool _isServerMuted;
+        private volatile bool _isServerMuted;
         public bool IsServerMuted
         {
             get => _isServerMuted;

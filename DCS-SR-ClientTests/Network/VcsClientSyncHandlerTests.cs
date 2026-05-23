@@ -265,6 +265,24 @@ namespace Vanguard.VCS.Client.Tests.Network
             _eventBusMock.Verify(b => b.Publish(It.Is<ServerMuteChangedEvent>(e => e.IsMuted)), Times.Once);
         }
 
+        [TestMethod]
+        public void ProcessServerUpdate_ServerActionUnmute_PublishesServerMuteChangedEventWithFalse()
+        {
+            var update = new ServerUpdate
+            {
+                Type = ServerUpdate.Types.UpdateType.ServerAction,
+                ServerAction = new ServerAction
+                {
+                    Type = ServerAction.Types.ActionType.Unmute,
+                    TargetClientGuid = Guid.NewGuid().ToString(),
+                }
+            };
+
+            _handler.ProcessServerUpdate(update);
+
+            _eventBusMock.Verify(b => b.Publish(It.Is<ServerMuteChangedEvent>(e => !e.IsMuted)), Times.Once);
+        }
+
         // -----------------------------------------------------------------------
         // gRPC auth / service tests — use the internal constructor
         // -----------------------------------------------------------------------
