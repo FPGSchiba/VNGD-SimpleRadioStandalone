@@ -478,7 +478,7 @@ namespace Vanguard.VCS.Client.Network
 
             var nowMs = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             var holdMs = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
-            var attackMs = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VoxAttackTimeMs);
+            var attackMs = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXAttackTimeMs);
 
             if (voice)
             {
