@@ -1120,6 +1120,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
             ClientStateSingleton.Instance.IsServerMuted = false;
             ServerMuteBanner.Visibility = Visibility.Collapsed;
+            LoggedIn = false;
         }
 
         private void SaveSelectedInputAndOutput()
