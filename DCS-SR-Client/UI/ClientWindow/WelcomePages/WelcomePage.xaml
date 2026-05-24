@@ -80,9 +80,10 @@ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             <Border
                 x:Name="LoginCard"
                 Grid.Column="0"
-                BorderBrush="#222"
-                BorderThickness="2"
+                BorderBrush="#333"
+                BorderThickness="1.5"
                 CornerRadius="6"
+                Background="White"
                 Padding="10"
                 Cursor="Hand"
                 MouseLeftButtonDown="LoginCard_Click">
@@ -106,10 +107,10 @@ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             <Border
                 x:Name="GuestCard"
                 Grid.Column="2"
-                BorderBrush="#e0e0e0"
-                BorderThickness="1"
+                BorderBrush="#333"
+                BorderThickness="1.5"
                 CornerRadius="6"
-                Background="#f7f7f7"
+                Background="White"
                 Padding="10"
                 Cursor="Hand"
                 MouseLeftButtonDown="GuestCard_Click">
@@ -117,13 +118,13 @@ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     <TextBlock
                         Text="GUEST"
                         FontSize="12"
-                        FontWeight="SemiBold"
-                        Foreground="#555"
+                        FontWeight="Bold"
+                        Foreground="#111"
                         TextAlignment="Center" />
                     <TextBlock
                         Text="No account needed"
                         FontSize="9"
-                        Foreground="#aaa"
+                        Foreground="#888"
                         TextAlignment="Center"
                         Margin="0,2,0,0" />
                 </StackPanel>
