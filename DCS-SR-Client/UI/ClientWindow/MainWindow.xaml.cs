@@ -143,7 +143,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private const int UnitSelectionIndex = 7;
         
         private ServerSelectPage _serverSelectPage;
-        private const int ServerSelectPageIndex = 8;
+        private const int ServerSelectPageIndex = 18;
 
         // Sentry Transactions
         private ITransactionTracer _connectionTransaction;
@@ -741,7 +741,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         public void On_LoginBackClicked()
         {
-            Stop();
             NavigateToStep(ConnectionStep.Auth);
         }
 
@@ -854,6 +853,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             _pendingKickReason = reason;
             Stop(connectionError: true);
             NavigateToStep(ConnectionStep.ServerSelect);
+            _serverSelectPage.ShowError(reason);
         }
 
         private void HandleServerMuteChanged(bool isMuted)

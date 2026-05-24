@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -152,25 +153,33 @@ public partial class ServerSelectPage : Page
         }
         else
         {
-            try
+            var hostText = IpInput.Text;
+            var port = (int)PortInput.Value;
+            ShowConnecting(hostText);
+            Task.Run(() =>
             {
-                var resolvedAddresses = Dns.GetHostAddresses(IpInput.Text);
-                var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
-                if (ip == null) throw new SocketException(0, "No valid IPv4 address found.");
-                var endpoint = new IPEndPoint(ip, (int)PortInput.Value);
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ip.ToString());
-                ShowConnecting(IpInput.Text);
-                _mainWindow?.On_ServerConnectClicked(endpoint, isCustom: true);
-            }
-            catch (SocketException)
-            {
-                ShowError("Invalid IP or Host Name!");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Error resolving custom server address.");
-                ShowError("Could not resolve server address. Please try again.");
-            }
+                try
+                {
+                    var resolvedAddresses = Dns.GetHostAddresses(hostText);
+                    var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+                    if (ip == null) throw new SocketException(0, "No valid IPv4 address found.");
+                    var endpoint = new IPEndPoint(ip, port);
+                    Dispatcher.Invoke(() =>
+                    {
+                        _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ip.ToString());
+                        _mainWindow?.On_ServerConnectClicked(endpoint, isCustom: true);
+                    });
+                }
+                catch (SocketException)
+                {
+                    Dispatcher.Invoke(() => ShowError("Invalid IP or Host Name!"));
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error resolving custom server address.");
+                    Dispatcher.Invoke(() => ShowError("Could not resolve server address. Please try again."));
+                }
+            });
         }
     }
 
