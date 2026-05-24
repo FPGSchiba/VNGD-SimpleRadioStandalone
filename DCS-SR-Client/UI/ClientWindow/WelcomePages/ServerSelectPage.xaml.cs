@@ -37,25 +37,29 @@ public partial class ServerSelectPage : Page
     {
         WebsiteClient.GetServerInformation().ContinueWith(task =>
         {
+            if (Dispatcher.HasShutdownStarted) return;
+
             if (!task.IsCompletedSuccessfully || task.Result == null)
             {
-                Dispatcher.Invoke(ShowDiscoveryFailed);
+                Dispatcher.InvokeAsync(ShowDiscoveryFailed);
                 return;
             }
 
             try
             {
                 var resolvedAddresses = Dns.GetHostAddresses(task.Result.Address);
+                if (Dispatcher.HasShutdownStarted) return;
                 var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
-                if (ip == null) { Dispatcher.Invoke(ShowDiscoveryFailed); return; }
+                if (ip == null) { Dispatcher.InvokeAsync(ShowDiscoveryFailed); return; }
 
                 var endpoint = new IPEndPoint(ip, task.Result.ControlPort);
-                Dispatcher.Invoke(() => ApplyDiscoveryResult(endpoint));
+                Dispatcher.InvokeAsync(() => ApplyDiscoveryResult(endpoint));
             }
             catch (Exception ex)
             {
                 _logger.Warn(ex, "Failed to resolve Vanguard server address during discovery.");
-                Dispatcher.Invoke(ShowDiscoveryFailed);
+                if (Dispatcher.HasShutdownStarted) return;
+                Dispatcher.InvokeAsync(ShowDiscoveryFailed);
             }
         });
     }
@@ -159,13 +163,15 @@ public partial class ServerSelectPage : Page
             ShowConnecting(hostText);
             Task.Run(() =>
             {
+                if (Dispatcher.HasShutdownStarted) return;
                 try
                 {
                     var resolvedAddresses = Dns.GetHostAddresses(hostText);
+                    if (Dispatcher.HasShutdownStarted) return;
                     var ip = resolvedAddresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
-                    if (ip == null) throw new SocketException(0, "No valid IPv4 address found.");
+                    if (ip == null) throw new SocketException((int)System.Net.Sockets.SocketError.HostNotFound);
                     var endpoint = new IPEndPoint(ip, port);
-                    Dispatcher.Invoke(() =>
+                    Dispatcher.InvokeAsync(() =>
                     {
                         _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, ip.ToString());
                         _mainWindow?.On_ServerConnectClicked(endpoint, isCustom: true);
@@ -173,12 +179,14 @@ public partial class ServerSelectPage : Page
                 }
                 catch (SocketException)
                 {
-                    Dispatcher.Invoke(() => { ShowIdle(); ShowError("Invalid IP or Host Name!"); });
+                    if (Dispatcher.HasShutdownStarted) return;
+                    Dispatcher.InvokeAsync(() => { ShowIdle(); ShowError("Invalid IP or Host Name!"); });
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "Error resolving custom server address.");
-                    Dispatcher.Invoke(() => { ShowIdle(); ShowError("Could not resolve server address. Please try again."); });
+                    if (Dispatcher.HasShutdownStarted) return;
+                    Dispatcher.InvokeAsync(() => { ShowIdle(); ShowError("Could not resolve server address. Please try again."); });
                 }
             });
         }

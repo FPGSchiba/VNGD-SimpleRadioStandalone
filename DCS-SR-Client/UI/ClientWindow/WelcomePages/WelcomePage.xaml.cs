@@ -21,12 +21,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.WelcomePages
             ErrorPanel.Visibility = Visibility.Visible;
         }
 
-        public void ShowKickReason(string reason)
-        {
-            var prefix = reason?.Contains("anned") == true ? "You were banned" : "You were kicked";
-            ShowError($"{prefix}: {reason}");
-        }
-
         public void SetLoginEnabled(bool enabled)
         {
             LoginCard.IsEnabled = enabled;

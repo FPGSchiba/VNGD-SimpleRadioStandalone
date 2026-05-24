@@ -69,8 +69,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
         private IDisposable _serverActionSubscription;
         private IDisposable _serverMuteSubscription;
         private int _port = 5002;
-        private string _pendingKickReason = null;
-
         private const int NoWindowOpen = 17;  // Update when adding new panel
         private int _windowOpen = NoWindowOpen;
 
@@ -640,11 +638,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     _serverSelectPage.ShowIdle();
                     break;
                 case ConnectionStep.Auth:
-                    if (_pendingKickReason != null)
-                    {
-                        _welcomePage.ShowKickReason(_pendingKickReason);
-                        _pendingKickReason = null;
-                    }
                     OpenPageByIndex(WelcomeIndex);
                     break;
                 case ConnectionStep.GuestLogin:
@@ -1683,7 +1676,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void HomeNavigation_OnClick(object sender, RoutedEventArgs e)
         {
-            OpenPageByIndex(WelcomeIndex);
+            NavigateToStep(ConnectionStep.Auth);
         }
 
         #region Externally Called Methods
