@@ -258,7 +258,8 @@
 
             <Grid Height="40" Margin="5,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="215" />
+                    <ColumnDefinition Width="195" />
+                    <ColumnDefinition Width="30" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
@@ -267,16 +268,17 @@
                         Content="VOX Attack Time (ms)"
                         FontWeight="Bold"
                         VerticalAlignment="Center" />
-                    <Label
-                        Content="ms of continuous voice before transmit starts"
+                    <TextBlock
                         FontSize="10"
-                        Foreground="Gray"
-                        VerticalAlignment="Center" />
+                        FontWeight="Thin"
+                        Margin="5,-8,0,0"
+                        Text="ms of continuous voice before transmit starts" />
                 </StackPanel>
 
                 <Slider
                     AutoToolTipPlacement="TopLeft"
-                    Grid.Column="1"
+                    Grid.Column="2"
+                    Height="40"
                     IsSnapToTickEnabled="True"
                     LargeChange="100"
                     Maximum="500"
