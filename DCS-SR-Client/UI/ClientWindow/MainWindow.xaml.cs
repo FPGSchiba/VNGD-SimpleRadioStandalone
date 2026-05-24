@@ -657,7 +657,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void UpdateStepperHeader(ConnectionStep step)
         {
-            if (step == ConnectionStep.ServerSelect)
+            if (step == ConnectionStep.Ready)
             {
                 StepperHeader.Visibility = Visibility.Collapsed;
                 return;
@@ -666,9 +666,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
             StepperHeader.Visibility = Visibility.Visible;
             StepperPanel.Children.Clear();
 
-            var steps = (step == ConnectionStep.GuestLogin || step == ConnectionStep.Auth)
-                ? new[] { ("Server", ConnectionStep.Auth), ("Guest Login", ConnectionStep.GuestLogin), ("Ready", ConnectionStep.Ready) }
-                : new[] { ("Server", ConnectionStep.Auth), ("Login", ConnectionStep.MemberLogin), ("Select Unit", ConnectionStep.UnitSelection), ("Ready", ConnectionStep.Ready) };
+            var useGuestPath = step == ConnectionStep.ServerSelect
+                || step == ConnectionStep.Auth
+                || step == ConnectionStep.GuestLogin;
+
+            var steps = useGuestPath
+                ? new[] { ("Server", ConnectionStep.ServerSelect), ("Auth", ConnectionStep.Auth), ("Ready", ConnectionStep.Ready) }
+                : new[] { ("Server", ConnectionStep.ServerSelect), ("Login", ConnectionStep.MemberLogin), ("Unit", ConnectionStep.UnitSelection), ("Ready", ConnectionStep.Ready) };
 
             for (int i = 0; i < steps.Length; i++)
             {
@@ -679,7 +683,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 var dot = new Ellipse
                 {
                     Width = 18, Height = 18,
-                    Fill = isDone ? Brushes.Green : isCurrent ? Brushes.DodgerBlue : new SolidColorBrush(Color.FromRgb(60, 60, 60)),
+                    Fill = isDone ? new SolidColorBrush(Color.FromRgb(46, 160, 67))
+                         : isCurrent ? Brushes.DodgerBlue
+                         : new SolidColorBrush(Color.FromRgb(200, 200, 200)),
                 };
                 var text = new TextBlock
                 {
@@ -695,7 +701,9 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                 StepperPanel.Children.Add(new TextBlock
                 {
                     Text = label, FontSize = 11,
-                    Foreground = isCurrent ? Brushes.White : (isDone ? Brushes.LightGreen : new SolidColorBrush(Color.FromRgb(100, 100, 100))),
+                    Foreground = isCurrent ? Brushes.Black
+                               : isDone ? new SolidColorBrush(Color.FromRgb(46, 160, 67))
+                               : new SolidColorBrush(Color.FromRgb(160, 160, 160)),
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 10, 0),
                 });
@@ -703,7 +711,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
                     StepperPanel.Children.Add(new TextBlock
                     {
                         Text = "—",
-                        Foreground = new SolidColorBrush(Color.FromRgb(80, 80, 80)),
+                        Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(0, 0, 10, 0),
                     });

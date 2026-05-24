@@ -21,7 +21,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
-            <RowDefinition Height="365" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
@@ -54,22 +55,22 @@
             </StackPanel>
         </Grid>
         
-        <Frame Grid.Row="1" x:Name="DisplayFrame" />
-
-        <!-- Connection progress stepper — hidden after login -->
+        <!-- Connection progress stepper — its own row, collapses to 0px when hidden -->
         <Border x:Name="StepperHeader"
                 Grid.Row="1"
-                Background="#1e1e2e"
-                BorderBrush="#333"
+                Background="White"
+                BorderBrush="#e0e0e0"
                 BorderThickness="0,0,0,1"
                 Padding="12,8"
                 Visibility="Collapsed">
             <StackPanel x:Name="StepperPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
         </Border>
 
+        <Frame Grid.Row="2" x:Name="DisplayFrame" />
+
         <!-- Server mute banner — appears when server has muted this client -->
         <Border x:Name="ServerMuteBanner"
-                Grid.Row="1"
+                Grid.Row="2"
                 Background="#B45309"
                 Padding="12,8"
                 Visibility="Collapsed"
@@ -84,7 +85,7 @@
 
         <Grid
             Background="#E9E9E9"
-            Grid.Row="2"
+            Grid.Row="3"
             x:Name="BottomBar">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180" />

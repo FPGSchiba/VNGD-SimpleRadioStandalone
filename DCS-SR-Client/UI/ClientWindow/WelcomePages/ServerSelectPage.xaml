@@ -17,10 +17,10 @@
             <SolidColorBrush Color="White" />
         </Grid.Background>
         <Grid.RowDefinitions>
-            <RowDefinition Height="70" />
-            <RowDefinition Height="160" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="210" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="40" />
-            <RowDefinition Height="50" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
@@ -125,7 +125,6 @@
                         <TextBox
                             x:Name="IpInput"
                             Width="160"
-                            Height="32"
                             FontSize="13"
                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
                             materialDesign:HintAssist.Hint="IP Address"
@@ -134,7 +133,6 @@
                         <materialDesign:NumericUpDown
                             x:Name="PortInput"
                             Width="80"
-                            Height="32"
                             FontSize="13"
                             Style="{StaticResource MaterialDesignOutlinedNumericUpDown}"
                             materialDesign:HintAssist.Hint="Port" />
