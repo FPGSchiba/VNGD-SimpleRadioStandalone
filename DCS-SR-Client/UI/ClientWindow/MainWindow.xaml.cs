@@ -850,7 +850,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow
 
         private void HandleForcedDisconnect(string reason)
         {
-            _pendingKickReason = reason;
             Stop(connectionError: true);
             NavigateToStep(ConnectionStep.ServerSelect);
             _serverSelectPage.ShowError(reason);

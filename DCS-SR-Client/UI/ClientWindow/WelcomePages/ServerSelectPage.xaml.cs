@@ -127,6 +127,7 @@ public partial class ServerSelectPage : Page
 
     private void ShowConnecting(string serverAddress)
     {
+        ConnectButton.IsEnabled = false;
         ErrorPanel.Visibility = Visibility.Collapsed;
         ConnectingLabel.Text = $"Connecting to {serverAddress}…";
         ConnectingPanel.Visibility = Visibility.Visible;
@@ -172,12 +173,12 @@ public partial class ServerSelectPage : Page
                 }
                 catch (SocketException)
                 {
-                    Dispatcher.Invoke(() => ShowError("Invalid IP or Host Name!"));
+                    Dispatcher.Invoke(() => { ShowIdle(); ShowError("Invalid IP or Host Name!"); });
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "Error resolving custom server address.");
-                    Dispatcher.Invoke(() => ShowError("Could not resolve server address. Please try again."));
+                    Dispatcher.Invoke(() => { ShowIdle(); ShowError("Could not resolve server address. Please try again."); });
                 }
             });
         }
