@@ -13,3 +13,4 @@
 *.xaml text eol=crlf
 *.conf text eol=crlf
 *.lua text eol=crlf
+*.proto text eol=lf

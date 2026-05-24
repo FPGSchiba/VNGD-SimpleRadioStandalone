@@ -277,7 +277,6 @@
                 SettingKey="RadioEffectsClipping"
                 SubTitle="Requires Radio Effects On!"
                 Title="Enable Clipping Effect" />
-
             <Separator
                 BorderBrush="White"
                 BorderThickness="25"

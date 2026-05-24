@@ -13,7 +13,6 @@ using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
-using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -123,7 +122,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
             int numVisibleRadios = 0;
 
             foreach (var radio in radioControlGroupSwitch)
@@ -136,18 +134,15 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
                 {
                     radio.Visibility = Visibility.Visible;
                     numVisibleRadios++;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set Visible");
                 }
                 else if (((buttonShowText.Text != null) && (buttonShowText.Text == "Show")) && (radio.RadioEnabled.Content == "On"))
                 {
                     radio.Visibility = Visibility.Visible;
                     numVisibleRadios++;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set visible");
                 }
                 else
                 {
                     radio.Visibility = Visibility.Collapsed;
-                    // Console.WriteLine("radio " + radio.RadioLabel.ToString() + " set collapsed");
                 }
             }
 
@@ -155,46 +150,7 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
             Intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "Compact Radio Panel - Engineering";
-                    }
-                    else
-                    {
-                        ControlText.Text = "Compact Radio Panel - Engineering";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "Compact Radio Panel - Engineering (Disconnected)";
-                    
-                }
-            }
-            else
-            {
-                ControlText.Text = "Compact Radio Panel - Engineering (Disconnected)";
-            }
+            ControlText.Text = "Compact Radio Panel - Engineering";
 
             FocusDCS();
         }

@@ -235,6 +235,7 @@ namespace Vanguard.VCS.Client.Settings
 
         DCSAutoConnectUDP, // 5069
         ShowTransmitterName,
+        AlwaysShowTransmitterName,
 
         IdleTimeOut,
         AutoConnect,
@@ -249,6 +250,7 @@ namespace Vanguard.VCS.Client.Settings
         VOXMode,
         VOXMinimumTime,
         VOXMinimumDB,
+        VOXAttackTimeMs,
 
         AllowXInputController
     }
@@ -833,6 +835,7 @@ namespace Vanguard.VCS.Client.Settings
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "false"},
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
+            {GlobalSettingsKeys.AlwaysShowTransmitterName.ToString(), "false"},
 
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 
@@ -847,7 +850,7 @@ namespace Vanguard.VCS.Client.Settings
             {GlobalSettingsKeys.VOXMode.ToString(), "3" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
             {GlobalSettingsKeys.VOXMinimumDB.ToString(), "-59.0" },
-
+            {GlobalSettingsKeys.VOXAttackTimeMs.ToString(), "100"},
 
             {GlobalSettingsKeys.AllowXInputController.ToString(), "false"},
 

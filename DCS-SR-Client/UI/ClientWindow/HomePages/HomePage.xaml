@@ -76,6 +76,12 @@
                 Style="{StaticResource MaterialDesignOverlineTextBlock}"
                 Text="Connection time: "
                 x:Name="ConnectionTimeBlock" />
+            <TextBlock
+                FontSize="8"
+                Margin="10,4,10,2"
+                Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                Text="Ping: --- ms"
+                x:Name="PingBlock" />
             <Separator
                 BorderBrush="Black"
                 BorderThickness="1"

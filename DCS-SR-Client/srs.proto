@@ -1,0 +1,387 @@
+syntax = "proto3";
+
+package srspb;
+
+option go_package = "github.com/FPGSchiba/vcs-srs-server/srspb";
+option csharp_namespace = "Vanguard.VCS.Client.Network";
+
+// -------- Services --------
+
+service AuthService {
+  // Get Available Plugins
+  rpc InitAuth(AuthInitRequest) returns (AuthInitResponse);
+
+  // Discover available authentication flows for a specific plugin
+  rpc DiscoverAuthenticationFlows(FlowDiscoveryRequest) returns (FlowDiscoveryResponse);
+
+  // Guest login (coalition password + user chosen name)
+  rpc GuestLogin(GuestLoginRequest) returns (GuestLoginResponse);
+
+  // Plugin-based authentication (multi-step support)
+  rpc StartAuth(StartAuthRequest) returns (AuthStepResponse);
+  rpc ContinueAuth(ContinueAuthRequest) returns (AuthStepResponse);
+
+  // Vanguard unit selection (after successful login)
+  rpc UnitSelect(UnitSelectRequest) returns (UnitSelectResponse);
+}
+
+// Service definition
+service SRSService {
+  // Client synchronization request
+  rpc SyncClient(Empty) returns (SyncResponse);
+
+  // Client update (metadata, client info)
+  rpc UpdateClientInfo(ClientInfo) returns (ServerResponse);
+
+  // Client radio update (metadata, radio info)
+  rpc UpdateRadioInfo(RadioInfo) returns (ServerResponse);
+
+  // Client disconnect (metadata)
+  rpc Disconnect(Empty) returns (ServerResponse);
+
+  // Server settings request
+  rpc GetServerSettings(Empty) returns (ServerSettings);
+
+  // Latency probe — client calls periodically and reports its measured RTT
+  rpc Ping(PingRequest) returns (PingResponse);
+
+  // Server-to-client updates stream
+  rpc SubscribeToUpdates(Empty) returns (stream ServerUpdate);
+}
+
+// -------- Messages --------
+
+// Empty message for requests without parameters
+message Empty {}
+
+// ----- Auth Init -----
+
+message AuthInitRequest {
+  ClientCapabilities capabilities = 1;
+}
+
+message AuthInitResponse {
+  bool success = 1;
+  oneof init_result {
+    string error_message = 2;
+    AuthInitResult result = 3;
+  }
+}
+
+message AuthInitResult {
+  repeated string available_plugins = 1;
+  bool has_guest_login = 2;
+  DistributionMode distribution_mode = 3;
+  string client_guid = 4;
+}
+
+// ----- Flow Discovery -----
+message FlowDiscoveryRequest {
+  string authentication_plugin = 1; // Which plugin to query
+}
+
+message FlowDiscoveryResponse {
+  bool success = 1;
+  oneof discovery_result {
+    string error_message = 2;
+    FlowDiscoveryResult result = 3;
+  }
+}
+
+message FlowDiscoveryResult {
+  repeated AuthFlowDefinition flows = 1;
+}
+
+message AuthFlowDefinition {
+  string flow_id = 1;                              // Unique flow identifier (e.g., "oidc_mfa")
+  string description = 2;                          // Human-readable description
+  repeated AuthStepDefinition steps = 3;           // Ordered steps in this flow
+}
+
+message AuthStepDefinition {
+  string step_id = 1;                        // Unique ID for this step (e.g., "password_entry")
+  string step_name = 2;                      // Human-readable name (e.g., "Password Login")
+  string step_description = 3;               // Longer description for UI
+  string step_type = 4;                      // Logical type (e.g., "password", "oidc_redirect", "totp")
+  repeated FieldDefinition required_fields = 5; // Structured input field definitions
+  map<string, string> metadata = 6;          // UI hints or extra info (e.g., redirect URL, QR code data)
+}
+
+// ----- Guest Auth -----
+
+message GuestLoginRequest {
+  string name = 1;
+  string password = 2;
+  string unit_id = 3;
+  string client_guid = 4;
+}
+
+message GuestLoginResponse {
+  bool success = 1;
+  oneof login_result {
+    GuestLoginResult result = 2;
+    string error_message = 3;
+  }
+}
+
+message GuestLoginResult {
+  string token = 1;
+  string coalition = 2;
+}
+
+// ----- Plugin Auth (multi-step) -----
+
+message StartAuthRequest {
+  string authentication_plugin = 1;          // Which plugin to use
+  string flow_id = 2;                        // Flow/strategy inside plugin
+  map<string, string> first_step_input = 3;  // Initial user input
+  string client_guid = 4;                    // Ensure init done
+}
+
+message ContinueAuthRequest {
+  string session_id = 1;                     // Session from previous step
+  map<string, string> step_data = 2;         // User-provided input for this step
+  string client_guid = 3;
+}
+
+message AuthStepResponse {
+  bool success = 1;
+  string session_id = 2;                     // Session ID to track flow state
+  oneof result {
+    NextStepRequired next_step = 3;          // More steps needed
+    LoginResult complete = 4;                // Final login result
+    string error_message = 5;                // Authentication failed
+  }
+}
+
+// ----- Step Metadata -----
+
+message NextStepRequired {
+  string step_id = 1;
+  string step_name = 2;
+  string step_description = 3;
+  string step_type = 4;
+  repeated FieldDefinition required_fields = 5;
+  map<string, string> metadata = 6;
+}
+
+message FieldDefinition {
+  string field_id = 1;           // Key for step_data / first_step_input
+  string label = 2;              // UI label
+  string description = 3;        // Help text
+  string type = 4;               // "string", "password", "otp", etc.
+  bool required = 5;
+  string validation_regex = 6;
+  string default_value = 7;
+}
+
+// ----- Login Result -----
+
+message LoginResult {
+  string secret = 1; // Secret for the client after successful login for selecting the Unit and the Coalition
+  repeated CoalitionSelection available_coalitions = 3; // List of available coalitions for the client
+  repeated UnitSelection available_units = 4; // List of available unit IDs for the client
+  repeated RoleSelection available_roles = 5; // Optional list of roles if the user has permissions to select roles
+  string player_name = 6; // Name of the player
+}
+
+// ----- Unit Selection -----
+
+message UnitSelectRequest {
+  string client_guid = 1;
+  string secret = 2;
+  string unit_id = 3;
+  string coalition = 4;
+  uint32 role = 5;
+}
+
+message UnitSelectResponse {
+  bool success = 1;
+  oneof result {
+    string token = 2; // The selected unit ID after successful selection
+    string error_message = 3; // Error message if selection failed
+  }
+}
+
+// ----- Supporting Data -----
+
+message UnitSelection {
+  string unit_id = 1;
+  string unit_name = 2;
+}
+
+message RoleSelection {
+  string name = 1;
+  uint32 id = 3;
+}
+
+message CoalitionSelection {
+  string name = 1;
+  string color = 2;
+  string description = 3;
+}
+
+message ClientCapabilities {
+  string version = 1; // Version of the client
+  repeated DistributionMode supported_distribution_modes = 2; // List of features supported by the client
+}
+
+enum DistributionMode {
+  STANDALONE = 0; // Standalone client
+  DISTRIBUTED = 1; // Distribution of Voice servers supported by client
+}
+
+// Distribution preparation here
+message ServerInitializationResponse {
+  string client_guid = 1; // Unique identifier for the client
+  repeated VoiceHostDetails voice_hosts = 2; // Details of the voice server to connect to
+  ClientCapabilities capabilities = 3; // Version and distribution information of the client
+}
+
+message VoiceHostDetails {
+  string host = 1; // Host address for the voice server
+  int32 port = 2; // Port for the voice server
+  repeated FrequencyRange frequencies = 3; // List of frequencies assigned to the voice server with these details
+  optional string secret = 4; // The secret for the voice server
+}
+
+message FrequencyRange {
+  string coalition = 1; // Coalition for which the frequency range applies
+  double start_frequency = 2; // Minimum frequency
+  double end_frequency = 3; // Maximum frequency
+}
+
+
+// ----- Server Updates -----
+
+// Server update message
+message ServerUpdate {
+  UpdateType type = 1;
+  oneof update {
+    ClientUpdate      client_update        = 2;
+    ServerAction      server_action        = 3;
+    ServerSettings    settings_update      = 4;
+    DistributionUpdate voice_hosts         = 5; // For distribution updates
+    VoiceAddressUpdate voice_address_update = 6; // Per-client voice-server redirect after rebalance
+  }
+
+  enum UpdateType {
+    UNKNOWN = 0;
+    CLIENT_JOINED = 1;
+    CLIENT_LEFT = 2;
+    CLIENT_RADIO_UPDATE = 3;
+    CLIENT_INFO_UPDATE = 4;
+    SERVER_SETTINGS_CHANGED = 5;
+    SERVER_ACTION = 6;
+    DISTRIBUTION_UPDATE = 7;
+    VOICE_ADDRESS_UPDATE = 8; // Tells the client to reconnect to a different voice UDP endpoint
+  }
+}
+
+message VoiceAddressUpdate {
+  string coalition_voice_addr = 1; // new UDP host:port for the client's coalition
+  string global_voice_addr    = 2; // current global voice node address
+}
+
+message DistributionUpdate {
+  repeated VoiceHostDetails voice_hosts = 2; // Details of the voice server to connect to
+  optional string secret = 4; // The secret for the voice server
+}
+
+// Client update information
+message ClientUpdate {
+  optional string client_guid = 1;
+  optional ClientInfo client_info = 2;
+  optional RadioInfo radio_info = 3;
+}
+
+// Server action (kicks, bans, mutes)
+message ServerAction {
+  ActionType type = 1;
+  string target_client_guid = 2;
+  string reason = 3;
+  optional int64 duration = 4; // Duration in seconds for temporary actions
+
+  enum ActionType {
+    UNKNOWN = 0;
+    KICK = 1;
+    BAN = 2;
+    MUTE = 3;
+    UNMUTE = 4;
+  }
+}
+
+// Client information
+message ClientInfo {
+  string name = 1;
+  string coalition = 2;
+  string unit_id = 3;
+  uint32 role_id = 4; // Optional role ID if the user has permissions to select roles
+  optional int64 last_update = 5;
+}
+
+// Radio information
+message RadioInfo {
+  optional int64 last_update = 1;
+  repeated Radio radios = 2;
+  bool muted = 3;
+}
+
+message Radio {
+  uint32 id = 1;
+  string name = 2;
+  float frequency = 3;
+  bool enabled = 6;
+  bool is_intercom = 7;
+}
+
+// Server settings
+message ServerSettings {
+  repeated Coalition coalitions = 1; // List of coalitions available on the server
+  repeated float test_frequencies = 2; // List of test frequencies available on the server
+  repeated float global_frequencies = 3; // List of global frequencies available on the server
+  GeneralServerSettings general_settings = 4; // General server settings
+}
+
+message GeneralServerSettings {
+  int32 max_radios_per_client = 1; // Maximum number of radios per client
+}
+
+message Coalition {
+  string name = 1; // Name of the coalition
+  string color = 2; // Color of the coalition
+  string description = 3; // Description of the coalition
+}
+
+// Server synchronization response
+message SyncResponse {
+  bool success = 1;
+  oneof sync_result {
+    string error_message = 2; // Error message if synchronization failed
+    ServerSyncResult data = 3; // Data for successful synchronization
+  }
+  string version = 4; // Version of the server
+}
+
+message ServerSyncResult {
+  map<string, ClientInfo> clients              = 1; // List of clients currently connected
+  map<string, RadioInfo>  radios               = 2; // List of radio information
+  ServerSettings          settings             = 3; // Current server settings
+  string                  coalition_voice_addr = 4; // UDP host:port for coalition audio
+  string                  global_voice_addr    = 5; // UDP host:port for global freq audio
+}
+
+// Generic server response
+message ServerResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// Latency probe
+message PingRequest {
+  int64 last_rtt_ms = 1; // RTT measured by the client on the previous Ping cycle
+}
+
+message PingResponse {
+  int64 server_time_ms = 1; // server Unix timestamp in ms at time of processing
+}

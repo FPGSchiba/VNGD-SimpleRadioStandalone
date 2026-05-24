@@ -194,7 +194,7 @@ namespace Vanguard.VCS.Server.Network
         private bool HandleConnectedClient(SRSClientSession state, NetworkMessage message)
         {
             var srClient = message.Client;
-            if (!_clients.ContainsKey(srClient.ClientGuid))
+            if (!_clients.ContainsKey(srClient.ClientGuid.ToString()))
             {
                 var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
                 if (message.Version == null)
@@ -223,9 +223,9 @@ namespace Vanguard.VCS.Server.Network
                 srClient.ClientSession = state;
 
                 //add to proper list
-                _clients[srClient.ClientGuid] = srClient;
+                _clients[srClient.ClientGuid.ToString()] = srClient;
 
-                state.SRSGuid = srClient.ClientGuid;
+                state.SRSGuid = srClient.ClientGuid.ToString();
                 
 
                 _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
@@ -260,9 +260,9 @@ namespace Vanguard.VCS.Server.Network
 
         private void HandleClientMetaDataUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
-            if (_clients.ContainsKey(message.Client.ClientGuid))
+            if (_clients.ContainsKey(message.Client.ClientGuid.ToString()))
             {
-                var client = _clients[message.Client.ClientGuid];
+                var client = _clients[message.Client.ClientGuid.ToString()];
 
                 if (client != null)
                 {
@@ -323,9 +323,9 @@ namespace Vanguard.VCS.Server.Network
 
         private void HandleClientRadioUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
-            if (_clients.ContainsKey(message.Client.ClientGuid))
+            if (_clients.ContainsKey(message.Client.ClientGuid.ToString()))
             {
-                var client = _clients[message.Client.ClientGuid];
+                var client = _clients[message.Client.ClientGuid.ToString()];
 
                 if (client != null)
                 {
@@ -446,10 +446,10 @@ namespace Vanguard.VCS.Server.Network
                 }
             }
 
-            if (_clients.ContainsKey(client.ClientGuid))
+            if (_clients.ContainsKey(client.ClientGuid.ToString()))
             {
-                _clients[client.ClientGuid].Coalition = clientCoalition;
-                _clients[client.ClientGuid].Name = client.Name;
+                _clients[client.ClientGuid.ToString()].Coalition = clientCoalition;
+                _clients[client.ClientGuid.ToString()].Name = client.Name;
 
                 _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
@@ -486,10 +486,10 @@ namespace Vanguard.VCS.Server.Network
 
         private void HandleExternalAWACSModeDisconnect(SRSClientSession session, SRClient client)
         {
-            if (_clients.ContainsKey(client.ClientGuid))
+            if (_clients.ContainsKey(client.ClientGuid.ToString()))
             {
-                _clients[client.ClientGuid].Coalition = 0;
-                _clients[client.ClientGuid].Name = "";
+                _clients[client.ClientGuid.ToString()].Coalition = 0;
+                _clients[client.ClientGuid.ToString()].Name = "";
 
                 _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));

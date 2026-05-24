@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "DCS-SimpleRadioStandalone.sln",
+    "projects": [
+      "AutoUpdater\\AutoUpdater.csproj",
+      "DCS-SimpleRadio Server\\DCS-SimpleRadio Server.csproj",
+      "DCS-SR-Client\\DCS-SR-Client.csproj",
+      "DCS-SR-ClientTests\\DCS-SR-ClientTests.csproj",
+      "DCS-SR-Common\\DCS-SR-Common.csproj",
+      "DCS-SR-CommonTests\\DCS-SR-CommonTests.csproj",
+      "NAudio\\NAudio.csproj",
+      "OpusWrapper\\OpusWrapper.csproj"
+    ]
+  }
+}

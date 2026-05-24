@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using NLog;
 using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Common.Network;
 
-namespace Vanguard.VCS.Client.UI.ClientWindow.ClientList
+namespace Vanguard.VCS.Client.UI.ClientWindow
 {
     /// <summary>
     /// Interaction logic for ClientListWindow.xaml

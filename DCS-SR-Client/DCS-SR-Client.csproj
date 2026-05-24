@@ -10,7 +10,7 @@
     <RootNamespace>Vanguard.VCS.Client</RootNamespace>
     <AssemblyName>VCS-RadioClient</AssemblyName>
     <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
-    <StartupObject>DCS_SR_Client.App</StartupObject>
+    <StartupObject>Vanguard.VCS.Client.App</StartupObject>
     <ApplicationIcon>audio-headset.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
@@ -73,11 +73,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="Dragablz" Version="0.0.3.234" />
     <PackageReference Include="Easy.MessageHub" Version="5.1.0" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
     <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="All" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Common" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
@@ -123,6 +132,9 @@
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="radio-config.json" Condition="Exists('radio-config.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </None>
@@ -160,6 +172,21 @@
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="srs.proto">
+      <GrpcServices>Client</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>true</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>$(ProjectDir)Network\Proto</OutputDir>
+    </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
+    <Folder Include="Network\Proto\" />
   </ItemGroup>
 
   <!-- Custom MSBuild targets and tasks -->

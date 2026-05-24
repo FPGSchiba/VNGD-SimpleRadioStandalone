@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using NLog;
-using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Client.Settings;
 using Vanguard.VCS.Common.Setting;
 
@@ -81,7 +80,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
                 TransmitterName.Content = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? "ON" : "OFF";
                 TransmitterName.Background = settings.GetSettingAsBool(ServerSettingsKeys.SHOW_TRANSMITTER_NAME) ? _onColor : _offColor;
                 
-                ServerVersion.Content = SrsClientSyncHandler.ServerVersion;
+                ServerVersion.Content = "";
 
                 RetransmitLimit.Content = settings.RetransmitNodeLimit;
             }

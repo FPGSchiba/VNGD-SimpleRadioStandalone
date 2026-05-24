@@ -1,0 +1,196 @@
+﻿<Page x:Class="Vanguard.VCS.Client.UI.ClientWindow.LoginPages.UnitSelectionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Vanguard.VCS.Client.UI.ClientWindow.LoginPages"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Title="UnitSelection"
+      Height="340"
+      Width="600"
+      d:DesignHeight="340"
+      d:DesignWidth="600">
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="White" />
+        </Grid.Background>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Grid.ColumnSpan="2"
+            Grid.Row="0"
+            VerticalAlignment="Bottom">
+            <Label
+                Content="Vanguard Communications System"
+                FontSize="24"
+                FontWeight="Heavy"
+                HorizontalAlignment="Center" />
+            <Label
+                Content="powered by SRS"
+                FontSize="16"
+                HorizontalAlignment="Center"
+                Margin="0,-10,0,0" />
+            <Label
+                Content="Select your unit, role and coalition to continue"
+                FontSize="10"
+                HorizontalAlignment="Center"
+                Margin="0,-10,0,0" />
+        </StackPanel>
+
+        <Grid
+            Grid.Column="1"
+            Grid.Row="2"
+            Margin="-100,30,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+
+            <StackPanel
+                Grid.Row="0"
+                Height="60"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                VerticalAlignment="Top">
+                <materialDesign:AutoSuggestBox
+                    materialDesign:HintAssist.Hint="Unit FFID"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    DropDownElevation="Dp0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Style="{StaticResource MaterialDesignOutlinedAutoSuggestBox}"
+                    Suggestions="{Binding UnitSuggestions}"
+                    Text="{Binding UnitText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ValueMember="Key"
+                    Width="200"
+                    Height="40"
+                    FontSize="16"
+                    Padding="7"
+                    Margin="0,0,20,0"
+                    Name="UnitSelect"
+                >
+                    <materialDesign:AutoSuggestBox.ItemTemplate>
+                        <DataTemplate
+                        >
+                            <DockPanel>
+                                <Border
+                                    Width="20"
+                                    Height="20"
+                                    CornerRadius="10" />
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    Text="{Binding Key}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </materialDesign:AutoSuggestBox.ItemTemplate>
+                </materialDesign:AutoSuggestBox>
+
+                <ComboBox
+                    ItemsSource="{Binding Coalitions}"
+                    SelectedItem="{Binding SelectedCoalition, Mode=TwoWay}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Width="200"
+                    Height="40"
+                    FontSize="16"
+                    Padding="7"
+                    Margin="0,0,0,20"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    materialDesign:HintAssist.Hint="Coalition"
+                    Name="CoalitionSelect"/>
+            </StackPanel>
+            
+            <StackPanel
+                Grid.Row="1"
+                HorizontalAlignment="Center">
+                <ComboBox
+                    ItemsSource="{Binding Roles}"
+                    SelectedItem="{Binding SelectedRole, Mode=TwoWay}"
+                    Width="200"
+                    Height="40"
+                    FontSize="16"
+                    Padding="7"
+                    Margin="10,0,0,0"
+                    Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                    materialDesign:HintAssist.Hint="VCS Role"
+                    Name="RoleSelect"/>
+            </StackPanel>
+
+            <Border x:Name="ErrorPanel"
+                    Grid.Row="2"
+                    Background="#2a1a1a"
+                    BorderBrush="#ef4444"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="10,8"
+                    Margin="5,0,5,0"
+                    VerticalAlignment="Top"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorText"
+                           Foreground="#ef4444"
+                           FontSize="12"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <StackPanel
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                VerticalAlignment="Bottom">
+                <Button
+                    Click="Continue_Click"
+                    Content="CONTINUE"
+                    Height="30"
+                    IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                    Width="120"
+                    Margin="50,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    materialDesign:ButtonAssist.CornerRadius="15"
+                    x:Name="Continue" />
+                <ProgressBar
+                    Margin="10,0,0,0"
+                    IsIndeterminate="True"
+                    Visibility="Hidden"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0"
+                    x:Name="Progress" />
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel
+            Grid.Column="0"
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Width="100">
+            <Button
+                Click="Back_Click"
+                Content="CANCEL"
+                Height="30"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                Margin="10,0,0,0"
+                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
+                Width="90"
+                materialDesign:ButtonAssist.CornerRadius="15"
+                x:Name="Back" />
+        </StackPanel>
+
+    </Grid>
+</Page>

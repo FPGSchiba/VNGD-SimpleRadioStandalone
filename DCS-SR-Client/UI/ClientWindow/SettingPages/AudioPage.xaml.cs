@@ -52,6 +52,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
             _updateTimer.Start();
             
             VOXMinimimumTXTime.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
+            VOXAttackTime.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXAttackTimeMs);
             VOXMode.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
             VOXMinimumRMS.Value = _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
             PTTReleaseDelay.Value = _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay);
@@ -84,6 +85,7 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
+            // TODO: This crashes when stopping the preview
             if (_audioPreview == null)
             {
                 if (!AudioInput.MicrophoneAvailable)
@@ -204,7 +206,13 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
             if (VOXMinimimumTXTime.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
         }
-        
+
+        private void VOXAttackTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (VOXAttackTime.IsEnabled)
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXAttackTimeMs, (int)e.NewValue);
+        }
+
         private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (VOXMode.IsEnabled)

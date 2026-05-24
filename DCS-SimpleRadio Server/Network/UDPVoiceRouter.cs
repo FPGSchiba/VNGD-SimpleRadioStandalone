@@ -360,15 +360,9 @@ namespace Vanguard.VCS.Server.Network
                                 for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                                 {
                                     RadioReceivingState radioReceivingState = null;
-                                    bool decryptable;
                                     var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
                                         (RadioInformation.Modulation)udpVoice.Modulations[i],
-                                        udpVoice.Encryptions[i],
-                                        strictEncryption,
-                                        udpVoice.UnitId,
-                                        _emptyBlockedRadios,
-                                        out radioReceivingState,
-                                        out decryptable);
+                                        out radioReceivingState);
 
                                     //only send if we can hear!
                                     if (receivingRadio != null)

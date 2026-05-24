@@ -3,11 +3,9 @@
     ResizeMode="NoResize"
     Title="Server Settings"
     Width="300"
-    x:Class="Vanguard.VCS.Client.UI.ClientWindow.ServerSettingsWindow.ServerSettingsWindow"
+    x:Class="Vanguard.VCS.Client.UI.ClientWindow.ServerSettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel Orientation="Vertical">
 

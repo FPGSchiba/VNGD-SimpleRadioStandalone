@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Vanguard.VCS.Common.DCSState;
 using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Vanguard.VCS.Common.DCSState
 {
@@ -182,21 +183,8 @@ namespace Vanguard.VCS.Common.DCSState
             return diff < 500;
         }
 
-        public RadioInformation CanHearTransmission(double frequency,
-            RadioInformation.Modulation modulation,
-            byte encryptionKey,
-            bool strictEncryption,
-            uint sendingUnitId,
-            List<int> blockedRadios,
-            out RadioReceivingState receivingState,
-            out bool decryptable)
+        public RadioInformation CanHearTransmission(double frequency, RadioInformation.Modulation modulation, out RadioReceivingState receivingState)
         {
-        //    if (!IsCurrent())
-       //     {
-       //         receivingState = null;
-        //        decryptable = false;
-         //       return null;
-         //   }
 
             RadioInformation bestMatchingRadio = null;
             RadioReceivingState bestMatchingRadioState = null;
@@ -212,21 +200,13 @@ namespace Vanguard.VCS.Common.DCSState
                     if ((receivingRadio.modulation == RadioInformation.Modulation.INTERCOM) &&
                         (modulation == RadioInformation.Modulation.INTERCOM))
                     {
-                        if ((unitId > 0) && (sendingUnitId > 0)
-                            && (unitId == sendingUnitId) )
+                        receivingState = new RadioReceivingState
                         {
-                            receivingState = new RadioReceivingState
-                            {
-                                IsSecondary = false,
-                                LastReceviedAt = DateTime.Now.Ticks,
-                                ReceivedOn = i
-                            };
-                            decryptable = true;
-                            return receivingRadio;
-                        }
-                        decryptable = false;
-                        receivingState = null;
-                        return null;
+                            IsSecondary = false,
+                            LastReceviedAt = DateTime.Now.Ticks,
+                            ReceivedOn = i
+                        };
+                        return receivingRadio;
                     }
 
                     if (modulation == RadioInformation.Modulation.DISABLED
@@ -240,56 +220,28 @@ namespace Vanguard.VCS.Common.DCSState
                         && (receivingRadio.modulation == modulation)
                         && (receivingRadio.freq > 10000))
                     {
-                        bool isDecryptable = (receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey || (!strictEncryption && encryptionKey == 0);
-
-                        if (isDecryptable && !blockedRadios.Contains(i))
-                        {
-                            receivingState = new RadioReceivingState
-                            {
-                                IsSecondary = false,
-                                LastReceviedAt = DateTime.Now.Ticks,
-                                ReceivedOn = i
-                            };
-                            decryptable = true;
-                            return receivingRadio;
-                        }
-
-                        bestMatchingRadio = receivingRadio;
-                        bestMatchingRadioState = new RadioReceivingState
+                        receivingState = new RadioReceivingState
                         {
                             IsSecondary = false,
                             LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
-                        bestMatchingDecryptable = isDecryptable;
+                        return receivingRadio;
                     }
                     if ((receivingRadio.secFreq == frequency)
                         && (receivingRadio.secFreq > 10000))
                     {
-                        if ((receivingRadio.enc ? receivingRadio.encKey : (byte)0) == encryptionKey || (!strictEncryption && encryptionKey == 0))
-                        {
-                            receivingState = new RadioReceivingState
-                            {
-                                IsSecondary = true,
-                                LastReceviedAt = DateTime.Now.Ticks,
-                                ReceivedOn = i
-                            };
-                            decryptable = true;
-                            return receivingRadio;
-                        }
-
-                        bestMatchingRadio = receivingRadio;
-                        bestMatchingRadioState = new RadioReceivingState
+                        receivingState = new RadioReceivingState
                         {
                             IsSecondary = true,
                             LastReceviedAt = DateTime.Now.Ticks,
                             ReceivedOn = i
                         };
+                        return receivingRadio;
                     }
                 }
             }
-
-            decryptable = bestMatchingDecryptable;
+            
             receivingState = bestMatchingRadioState;
             return bestMatchingRadio;
         }

@@ -65,21 +65,6 @@
                 HorizontalAlignment="Center"
                 Orientation="Horizontal"
                 VerticalAlignment="Top">
-                <TextBox
-                    AcceptsReturn="False"
-                    FontSize="16"
-                    Height="38"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
-                    Margin="0,0,50,0"
-                    Name="IpInput"
-                    Padding="7"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                    TextWrapping="NoWrap"
-                    VerticalAlignment="Top"
-                    Width="200"
-                    materialDesign:HintAssist.Hint="IP Address" />
-
                 <PasswordBox
                     FontSize="16"
                     Height="38"
@@ -154,6 +139,21 @@
                     Width="200"
                     materialDesign:HintAssist.Hint="Player Name" />
             </Grid>
+
+            <Border x:Name="ErrorPanel"
+                    Grid.Row="4"
+                    Background="#2a1a1a"
+                    BorderBrush="#ef4444"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="10,8"
+                    Margin="5,8,5,0"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorText"
+                           Foreground="#ef4444"
+                           FontSize="12"
+                           TextWrapping="Wrap"/>
+            </Border>
 
             <StackPanel
                 Grid.Row="5"

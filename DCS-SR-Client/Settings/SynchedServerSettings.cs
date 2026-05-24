@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using NLog;
+using Vanguard.VCS.Client.Network;
 using Vanguard.VCS.Common.Setting;
 
 namespace Vanguard.VCS.Client.Settings
@@ -19,6 +21,9 @@ namespace Vanguard.VCS.Client.Settings
         private readonly ConcurrentDictionary<string, bool> _settingsBool;
 
         public List<double> GlobalFrequencies { get; set; } = new List<double>();
+
+        // List of test frequencies provided by the server (Hz)
+        public List<double> TestFrequencies { get; set; } = new List<double>();
 
         // Node Limit of 0 means no retransmission
         public int RetransmitNodeLimit { get; set; } = 0;
@@ -103,6 +108,14 @@ namespace Vanguard.VCS.Client.Settings
             }
             //cache will be refilled 
             _settingsBool.Clear();
+        }
+
+        public void DecodeVcs(ServerSettings serverSettings)
+        {
+            // VCS provides frequencies as MHz floats; convert to Hz for client comparisons
+            GlobalFrequencies = serverSettings.GlobalFrequencies.Select(freq => (double)freq * 1e+6).ToList();
+            // Populate test frequencies from VCS server settings as Hz
+            TestFrequencies = serverSettings.TestFrequencies.Select(freq => (double)freq * 1e+6).ToList();
         }
     }
 }

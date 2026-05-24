@@ -676,162 +676,81 @@ namespace Vanguard.VCS.Client.Input
                     {
                         _lastActiveBinding = bindState.MainDevice.InputBind;
 
-                        var dcsPlayerRadioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
-
-                        if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
+                        var currentBalance = 0.0f;
+                        switch (bindState.MainDevice.InputBind)
                         {
-                            var currentChannel = GetCurrentChannel();
-                            var currentBalance = 0.0f;
-                            switch (bindState.MainDevice.InputBind)
+                            case InputBinding.Radio1VToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneVerticalIndex); });
+                                break;
+                            case InputBinding.Radio1HToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneHorizontalIndex); });
+                                break;
+                            case InputBinding.Radio2VToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
+                                break;
+                            case InputBinding.Radio2HToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
+                                break;
+                            case InputBinding.Radio3VToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeVerticalIndex); });
+                                break;
+                            case InputBinding.Radio3HToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeHorizontalIndex); });
+                                break;
+                            case InputBinding.Radio5VToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveVerticalIndex); });
+                                break;
+                            case InputBinding.Radio5HToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveHorizontalIndex); });
+                                break;
+                            case InputBinding.Radio10VToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalIndex); });
+                                break;
+                            case InputBinding.Radio10HToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalIndex); });
+                                break;
+                            case InputBinding.Radio10VLToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalLongIndex); });
+                                break;
+                            case InputBinding.Radio10HWToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalWideIndex); });
+                                break;
+                            case InputBinding.Radio10TToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TransparentIndex); });
+                                break;
+                            case InputBinding.Radio10SToggle:
+                                Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
+                                break;
+                            case InputBinding.LeftBalance:
                             {
-                                case InputBinding.Up100:
-                                    RadioHelper.UpdateRadioFrequency(100, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Up10:
-                                    RadioHelper.UpdateRadioFrequency(10, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Up1:
-                                    RadioHelper.UpdateRadioFrequency(1, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Up01:
-                                    RadioHelper.UpdateRadioFrequency(0.1, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Up001:
-                                    RadioHelper.UpdateRadioFrequency(0.01, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Up0001:
-                                    RadioHelper.UpdateRadioFrequency(0.001, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down100:
-                                    RadioHelper.UpdateRadioFrequency(-100, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down10:
-                                    RadioHelper.UpdateRadioFrequency(-10, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down1:
-                                    RadioHelper.UpdateRadioFrequency(-1, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down01:
-                                    RadioHelper.UpdateRadioFrequency(-0.1, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down001:
-                                    RadioHelper.UpdateRadioFrequency(-0.01, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.Down0001:
-                                    RadioHelper.UpdateRadioFrequency(-0.001, dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.ToggleGuard:
-                                    RadioHelper.ToggleGuard(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.ToggleEncryption:
-                                    RadioHelper.ToggleEncryption(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.NextRadio:
-                                    RadioHelper.SelectNextRadio();
-                                    break;
-                                case InputBinding.PreviousRadio:
-                                    RadioHelper.SelectPreviousRadio();
-                                    break;
-                                case InputBinding.EncryptionKeyIncrease:
-                                    RadioHelper.IncreaseEncryptionKey(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.EncryptionKeyDecrease:
-                                    RadioHelper.DecreaseEncryptionKey(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.RadioChannelUp:
-                                    RadioHelper.RadioChannelUp(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.RadioChannelDown:
-                                    RadioHelper.RadioChannelDown(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.TransponderIDENT:
-                                    TransponderHelper.ToggleIdent();
-                                    break;
-                                case InputBinding.RadioVolumeUp:
-                                    RadioHelper.RadioVolumeUp(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.RadioVolumeDown:
-                                    RadioHelper.RadioVolumeDown(dcsPlayerRadioInfo.selected);
-                                    break;
-                                case InputBinding.RadioSwap:
-                                    var radioId = dcsPlayerRadioInfo.selected;
-                                    var freq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].freq;
-                                    var standbyFreq = dcsPlayerRadioInfo.radios[dcsPlayerRadioInfo.selected].standbyfreq ;
-                                    RadioHelper.UpdateStandbyRadioFrequency(freq, radioId, false, false);
-                                    RadioHelper.UpdateRadioFrequency(standbyFreq, radioId, false, false);
-                                    break;
-                                case InputBinding.Radio1VToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio1HToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.OneHorizontalIndex); });
-                                    break;
-                                case InputBinding.Radio2VToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio2HToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TwoVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio3VToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio3HToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.ThreeHorizontalIndex); });
-                                    break;
-                                case InputBinding.Radio5VToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio5HToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.FiveHorizontalIndex); });
-                                    break;
-                                case InputBinding.Radio10VToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalIndex); });
-                                    break;
-                                case InputBinding.Radio10HToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalIndex); });
-                                    break;
-                                case InputBinding.Radio10VLToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenVerticalLongIndex); });
-                                    break;
-                                case InputBinding.Radio10HWToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TenHorizontalWideIndex); });
-                                    break;
-                                case InputBinding.Radio10TToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.TransparentIndex); });
-                                    break;
-                                case InputBinding.Radio10SToggle:
-                                    Application.Current.Dispatcher.Invoke(() => { _toggleOverlayCallback(false, MainWindow.SwitchIndex); });
-                                    break;
-                                case InputBinding.LeftBalance:
-                                    currentChannel = GetCurrentChannel();
-                                    currentBalance = Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) - 0.1f, -1.0f);
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
-                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
-                                    break;
-                                case InputBinding.RightBalance:
-                                    currentChannel = GetCurrentChannel();
-                                    currentBalance = Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) + 0.1f, 1.0f);
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
-                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
-                                    break;
-                                case InputBinding.CenterBalance:
-                                    currentChannel = GetCurrentChannel();
-                                    currentBalance = 0f;
-                                    _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
-                                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
-                                        new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
-                                    break;
-                                case InputBinding.PanelNightMode:
-                                    // Call back UI for update
-                                    //Select current panel and determine if background opacity is less than .2.
-                                    //If true, then set background opacity and text to 1.0. 
-                                    //Else, set background opacity and text .2
-                                    //needs to be added
-                                    Logger.Debug("Swapped night mode.");
-                                    break;
+                                var currentChannel = GetCurrentChannel();
+                                currentBalance = Math.Max(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) - 0.1f, -1.0f);
+                                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                    new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
+                                break;
                             }
+                            case InputBinding.RightBalance:
+                            {
+                                var currentChannel = GetCurrentChannel();
+                                currentBalance = Math.Min(_globalSettings.ProfileSettingsStore.GetClientSettingFloat(currentChannel) + 0.1f, 1.0f);
+                                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                    new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
+                                break;
+                            }
+                            case InputBinding.CenterBalance:
+                            {
+                                var currentChannel = GetCurrentChannel();
+                                currentBalance = 0f;
+                                _globalSettings.ProfileSettingsStore.SetClientSettingFloat(currentChannel, currentBalance);
+                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                    new ThreadStart(delegate { _updateChannelCallback(currentChannel, currentBalance); }));
+                                break;
+                            }
+                            case InputBinding.PanelNightMode:
+                                Logger.Debug("Swapped night mode.");
+                                break;
                         }
                     }
                 
@@ -846,33 +765,8 @@ namespace Vanguard.VCS.Client.Input
 
         private static ProfileSettingsKeys GetCurrentChannel()
         {
-            switch (ClientStateSingleton.Instance.DcsPlayerRadioInfo.selected)
-            {
-                case 0:
-                    return ProfileSettingsKeys.IntercomChannel;
-                case 1:
-                    return ProfileSettingsKeys.Radio1Channel;
-                case 2:
-                    return ProfileSettingsKeys.Radio2Channel;
-                case 3:
-                    return ProfileSettingsKeys.Radio3Channel;
-                case 4:
-                    return ProfileSettingsKeys.Radio4Channel;
-                case 5:
-                    return ProfileSettingsKeys.Radio5Channel;
-                case 6:
-                    return ProfileSettingsKeys.Radio6Channel;
-                case 7:
-                    return ProfileSettingsKeys.Radio7Channel;
-                case 8:
-                    return ProfileSettingsKeys.Radio8Channel;
-                case 9:
-                    return ProfileSettingsKeys.Radio9Channel;
-                case 10:
-                    return ProfileSettingsKeys.Radio10Channel;
-                default: // This should not happen (we only have 11 radios (10 radios + 1 intercom))
-                    return ProfileSettingsKeys.Radio1Channel;
-            }
+            // Without DCS radio info, default to Radio1 channel
+            return ProfileSettingsKeys.Radio1Channel;
         }
         
         public void StopPtt()

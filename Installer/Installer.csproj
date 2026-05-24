@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>Installer</RootNamespace>
     <AssemblyName>Installer</AssemblyName>
     <ProjectGuid>{57B6F9D9-C410-4EB7-8003-60F894F358A4}</ProjectGuid>

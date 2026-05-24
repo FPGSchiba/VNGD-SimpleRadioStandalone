@@ -1,163 +1,127 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
 using NLog;
-using Sentry;
+using Vanguard.VCS.Client.Events;
 using Vanguard.VCS.Client.Singletons;
-using Vanguard.VCS.Common.Network;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.HomePages
 {
-    class PlayerListItem : INotifyPropertyChanged
+    public class PlayerListItem : INotifyPropertyChanged
     {
-        private string _name;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void Notify(string prop) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+
+        private string _name = "";
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                if(value == null || value == "")
-                {
-                    value = "---";
-                }
-
-                if (_name != value)
-                {
-                    _name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
-                }
-            }
+            get => _name;
+            set { _name = value ?? ""; Notify(nameof(Name)); }
         }
 
-        private string _allowsRecording;
-        
-        public string AllowsRecording {
-            get
-            {
+        public string RawName { get; set; } = "";
+        public string CoalitionName { get; set; } = "Unassigned";
+        public SolidColorBrush CoalitionColor { get; set; } = new SolidColorBrush(Colors.Gray);
+        public string FfId { get; set; } = "";
+        public string AllowsRecording { get; set; } = "N";
 
-                return _allowsRecording;
-            }
-            set
-            {
-                _allowsRecording = String.IsNullOrEmpty(value) ? "N" : value;
-            }
-        }
-
-        private SolidColorBrush _teamColor;
-
-        public SolidColorBrush TeamColor
+        private bool _isTransmitting;
+        public bool IsTransmitting
         {
-            get
-            {
-                return _teamColor;
-            }
-            set
-            {
-                if (value != null)
-                {
-                    _teamColor = value;
-                }
-                else
-                {
-                    _teamColor = new SolidColorBrush(Colors.White);
-                }
-            }
+            get => _isTransmitting;
+            set { _isTransmitting = value; Notify(nameof(IsTransmitting)); }
         }
-        
-        
-        private string _ffId;
-        
-        public string FfId {
-            get
-            {
-
-                return _ffId;
-            }
-            set
-            {
-                _ffId = String.IsNullOrEmpty(value) ? "N" : value;
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"[Name: '{Name}', AllowsRecording: {AllowsRecording}, TeamColor: {TeamColor}, FfId: {FfId} ]";
-        }
-        
-        public event PropertyChangedEventHandler PropertyChanged;
     }
-    
+
     public partial class PlayerListPage : Page
     {
-        private readonly DispatcherTimer _updateTimer;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ObservableCollection<PlayerListItem> _clientList = new ObservableCollection<PlayerListItem>();
+        private readonly ObservableCollection<PlayerListItem> _items = new ObservableCollection<PlayerListItem>();
+        private readonly CollectionViewSource _grouped = new CollectionViewSource();
+        private IDisposable _joinSub, _leftSub, _infoSub;
+        private readonly DispatcherTimer _transmitTimer;
+
         public PlayerListPage()
         {
             InitializeComponent();
-            UpdateList();
-            
-            ClientList.DataContext = _clientList;
-            ClientList.ItemsSource = _clientList;
 
-            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-            _updateTimer.Tick += UpdateTimer_Tick;
-            _updateTimer.Start();
-        }
-        
-        private void UpdateList()
-        {
-            _clientList.Clear();
-        
-            // first create temporary list to sort
-            var tempList = new List<SRClient>();
+            _grouped.Source = _items;
+            _grouped.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PlayerListItem.CoalitionName)));
+            _grouped.SortDescriptions.Add(new SortDescription(nameof(PlayerListItem.CoalitionName), ListSortDirection.Ascending));
+            _grouped.SortDescriptions.Add(new SortDescription(nameof(PlayerListItem.Name), ListSortDirection.Ascending));
 
+            ClientList.ItemsSource = _grouped.View;
 
-            foreach (var srClient in ConnectedClientsSingleton.Instance.Values)
+            _transmitTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+            _transmitTimer.Tick += UpdateTransmitting;
+
+            Loaded += (_, _) =>
             {
-                tempList.Add(srClient);
-            }
+                RebuildList();
+                _joinSub  = App.EventBus.Subscribe<ClientJoinedEvent>(_ => Dispatcher.Invoke(RebuildList));
+                _leftSub  = App.EventBus.Subscribe<ClientLeftEvent>(_ => Dispatcher.Invoke(RebuildList));
+                _infoSub  = App.EventBus.Subscribe<ClientInfoUpdatedEvent>(_ => Dispatcher.Invoke(RebuildList));
+                _transmitTimer.Start();
+            };
 
-            foreach (var clientListModel in tempList.OrderByDescending(model => model.Coalition)
-                         .ThenBy(model => model.Name.ToLower()).ToList())
+            Unloaded += (_, _) =>
             {
-                var fleetCode = Regex.Match(clientListModel.Name, "(?<=\\[)(.+)(?=\\])").Value;
-                var playerName = Regex.Replace(clientListModel.Name, "\\[.+\\]\\s", "");
-                
-                var item = new PlayerListItem
-                {
-                    Name = playerName,
-                    FfId = fleetCode == "" ? "NaFID" : fleetCode,
-                    AllowsRecording = clientListModel.AllowRecord ? "Y" : "N",
-                    TeamColor = clientListModel.ClientCoalitionColour,
-                };
-                _clientList.Add(item);
-            }
+                _joinSub?.Dispose(); _leftSub?.Dispose(); _infoSub?.Dispose();
+                _transmitTimer.Stop();
+            };
         }
 
-        private void UpdateTimer_Tick(object sender, EventArgs e)
+        private void RebuildList()
         {
-            try
+            _items.Clear();
+            foreach (var client in ConnectedClientsSingleton.Instance.Values.OrderBy(c => c.Name))
             {
-                UpdateList();
-            }
-            catch (Exception ex)
-            {
-                _logger.ForExceptionEvent(ex, LogLevel.Error);
-                SentrySdk.CaptureException(ex, scope =>
+                var fleetCode = Regex.Match(client.Name, "(?<=\\[)(.+)(?=\\])").Value;
+                var playerName = Regex.Replace(client.Name, "\\[.+\\]\\s", "");
+
+                _items.Add(new PlayerListItem
                 {
-                    scope.AddAttachment("clientlog.txt");
+                    RawName       = client.Name,
+                    Name          = playerName,
+                    CoalitionName = string.IsNullOrEmpty(client.CoalitionName) ? "Unassigned" : client.CoalitionName,
+                    CoalitionColor = client.ClientCoalitionColour,
+                    FfId          = string.IsNullOrEmpty(fleetCode) ? "NaFID" : fleetCode,
+                    AllowsRecording = client.AllowRecord ? "Y" : "N",
                 });
             }
+            UpdateSummary();
+        }
+
+        private void UpdateTransmitting(object sender, EventArgs e)
+        {
+            var receivingStates = ClientStateSingleton.Instance.RadioReceivingState;
+            var activeNames = new HashSet<string>(
+                receivingStates
+                    .Where(s => s != null && s.IsReceiving && !string.IsNullOrEmpty(s.SentBy))
+                    .Select(s => s.SentBy));
+
+            foreach (var item in _items)
+                item.IsTransmitting = activeNames.Contains(item.RawName);
+        }
+
+        private void UpdateSummary()
+        {
+            var total = _items.Count;
+            var byCoalition = _items
+                .GroupBy(i => i.CoalitionName)
+                .Select(g => $"{g.Key}: {g.Count()}")
+                .ToList();
+            SummaryText.Text = total == 0
+                ? "No players connected"
+                : $"{total} connected ({string.Join(", ", byCoalition)})";
         }
     }
 }

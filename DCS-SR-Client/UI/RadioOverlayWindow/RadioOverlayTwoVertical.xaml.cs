@@ -12,7 +12,6 @@ using Vanguard.VCS.Client.Singletons;
 using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
 using Vanguard.VCS.Client.UI.ClientWindow;
 using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
-using Vanguard.VCS.Common.DCSState;
 
 namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
@@ -22,10 +21,9 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
     public partial class RadioOverlayWindowTwoVertical : Window
     {
         private  double _aspectRatio;
-        private readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly RadioControlGroup[] radioControlGroup =
-            new RadioControlGroup[2];
+        private readonly RadioControlGroup[] _radioControlGroups = new RadioControlGroup[2];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -61,8 +59,8 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
             Opacity = _globalSettings.GetPositionSetting(GlobalSettingsKeys.RadioTwoVerticalOpacity).DoubleValue;
             WindowOpacitySlider.Value = Opacity;
 
-            radioControlGroup[0] = Radio1;
-            radioControlGroup[1] = Radio2;
+            _radioControlGroups[0] = Radio1;
+            _radioControlGroups[1] = Radio2;
 
             //allows click and drag anywhere on the window
             ContainerPanel.MouseLeftButtonDown += WrapPanel_MouseLeftButtonDown;
@@ -76,8 +74,6 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
             //  Window_Loaded(null, null);
             CalculateScale();
 
-            LocationChanged += Location_Changed;
-
             RadioRefresh(null, null);
 
             //init radio refresh
@@ -87,15 +83,9 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
             this._toggleOverlay = ToggleOverlay;
         }
 
-        private void Location_Changed(object sender, EventArgs e)
-        {
-        }
-
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            foreach (var radio in radioControlGroup)
+            foreach (var radio in _radioControlGroups)
             {
                 radio.RepaintRadioStatus();
                 radio.RepaintRadioReceive();
@@ -103,76 +93,16 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
             Intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                    ResetHeight();
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios == 2
-                         || dcsPlayerRadioInfo.radios.Length >= 2
-                         && dcsPlayerRadioInfo.radios[1].modulation != RadioInformation.Modulation.DISABLED)
-                {
-                    if (MinHeight != _originalMinHeight)
-                    {
-                        MinHeight = _originalMinHeight;
-                        Recalculate();
-                    }
-                }
-                else
-                {
-                    ResetHeight();
-                }
-
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "2 Radio Panel";
-                    }
-                    else
-                    {
-                        ControlText.Text = "2 Radio Panel";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "2 Radio Panel (Disconnected)";
-                    
-                }
-            }
-            else
-            {
-                ResetHeight();
-                ControlText.Text = "2 Radio Panel (Disconnected)";
-            }
+            ControlText.Text = "2 Radio Panel";
 
             FocusDCS();
         }
 
         private void ResetHeight()
         {
-
-            if (MinHeight != _originalMinHeight)
-            {
-                MinHeight = _originalMinHeight;
-                Recalculate();
-            }
+            if (MinHeight == _originalMinHeight) return;
+            MinHeight = _originalMinHeight;
+            Recalculate();
         }
 
         private void Recalculate()
@@ -187,28 +117,24 @@ namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 
         private void FocusDCS()
         {
-            if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusDCS))
+            if (!_globalSettings.GetClientSettingBool(GlobalSettingsKeys.RefocusDCS)) return;
+            var overlayWindow = new WindowInteropHelper(this).Handle;
+
+            //focus DCS if needed
+            var foreGround = WindowHelper.GetForegroundWindow();
+
+            Process[] localByName = Process.GetProcessesByName("dcs");
+
+            if (localByName == null || localByName.Length <= 0) return;
+            //either DCS is in focus OR Overlay window is not in focus
+            if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
+                this.IsMouseOver)
             {
-                var overlayWindow = new WindowInteropHelper(this).Handle;
-
-                //focus DCS if needed
-                var foreGround = WindowHelper.GetForegroundWindow();
-
-                Process[] localByName = Process.GetProcessesByName("dcs");
-
-                if (localByName != null && localByName.Length > 0)
-                {
-                    //either DCS is in focus OR Overlay window is not in focus
-                    if (foreGround == localByName[0].MainWindowHandle || overlayWindow != foreGround ||
-                        this.IsMouseOver)
-                    {
-                        _lastFocus = DateTime.Now.Ticks;
-                    }
-                    else if (DateTime.Now.Ticks > _lastFocus + 20000000 && overlayWindow == foreGround)
-                    {
-                        WindowHelper.BringProcessToFront(localByName[0]);
-                    }
-                }
+                _lastFocus = DateTime.Now.Ticks;
+            }
+            else if (DateTime.Now.Ticks > _lastFocus + 20000000 && overlayWindow == foreGround)
+            {
+                WindowHelper.BringProcessToFront(localByName[0]);
             }
         }
 

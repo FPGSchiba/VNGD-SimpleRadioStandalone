@@ -1,15 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using NLog;
 using Vanguard.VCS.Client.Settings;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
 {
@@ -34,7 +28,6 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
             FleetCodeInput.Text = fleetCode;
             var playerName = Regex.Replace(lastSeenName, "\\[[A-Z0-9]{2,4}\\]\\s", "");
             PlayerNameInput.Text = playerName;
-            IpInput.Text = _globalSettings.GetClientSetting(GlobalSettingsKeys.LastServer).RawValue;
         }
 
         private void Back_OnClick(object sender, RoutedEventArgs e)
@@ -49,69 +42,24 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
                 var coalitionPassword = PasswordInput.Password;
                 if (string.IsNullOrEmpty(coalitionPassword))
                 {
-                    System.Windows.Forms.MessageBox.Show("Please enter a password. It is needed to connect to VCS-SRS.", "Missing Password",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowError("Please enter a coalition password.");
+                    LoginFailed();
                     return;
                 }
-                var playerName = $"[{FleetCodeInput.Text}] {PlayerNameInput.Text}";
-                _logger.Info($"Guest Login with following Params: \nIP: {IpInput.Text}, Player Name: {playerName}, Password: {coalitionPassword}");
+
+                var playerName = PlayerNameInput.Text;
+                var fleetCode = FleetCodeInput.Text;
+                _logger.Info($"Guest Login with following Params: \nPlayer Name: {playerName}, Password: {coalitionPassword}");
             
                 // process hostname
-                string address = GetAddressFromTextBox();
-                _globalSettings.SetClientSetting(GlobalSettingsKeys.LastServer, address);
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.LastSeenName, playerName);
-                try
-                {
-                    var resolvedAddresses = Dns.GetHostAddresses(address);
-                    var ip = resolvedAddresses.FirstOrDefault(xa =>
-                        xa.AddressFamily ==
-                        AddressFamily
-                            .InterNetwork); // Ensure we get an IPv4 address in case the host resolves to both IPv6 and IPv4
-                    _mainWindow.ServerIp.Text = address;
-                    _mainWindow.On_GuestLoginClicked(ip, GetPortFromTextBox(), playerName, coalitionPassword);
-                }
-                catch (SocketException ex)
-                {
-                    MessageBox.Show("Invalid IP or Host Name!", "Host Name Error", MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    _mainWindow.ClientState.IsConnected = false;
-                }
+                _mainWindow.On_GuestLoginClicked(playerName, fleetCode, coalitionPassword);
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show(
-                    $"Invalid Fleet-Code: {FleetCodeInput.Text}, must be 2-4 uppercase Letters", "Invalid Fleet-Code",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError($"Invalid Fleet Code '{FleetCodeInput.Text}': must be 2–4 uppercase letters.");
+                LoginFailed();
             }
-        }
-
-        private string GetAddressFromTextBox()
-        {
-            var addr = this.IpInput.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                return addr.Split(':')[0];
-            }
-
-            return addr;
-        }
-
-        private int GetPortFromTextBox()
-        {
-            var addr = this.IpInput.Text.Trim();
-
-            if (addr.Contains(":"))
-            {
-                int port;
-                if (int.TryParse(addr.Split(':')[1], out port))
-                {
-                    return port;
-                }
-                throw new ArgumentException("specified port is not valid");
-            }
-
-            return 5002;
         }
 
         private void OnButtonPressed(object sender, KeyEventArgs e)
@@ -126,6 +74,24 @@ namespace Vanguard.VCS.Client.UI.ClientWindow.LoginPages
         {
             _ffidInformation = new FFIDInformation();
             _ffidInformation.ShowDialog(); // ShowDialog blocks the main window
+        }
+
+        public void LoginFailed()
+        {
+            Login.IsEnabled = true;
+            LoginInProgress.Visibility = Visibility.Hidden;
+            _logger.Error("Login failed, re-enabling login button.");
+        }
+
+        public void ShowError(string message)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.InvokeAsync(() => ShowError(message));
+                return;
+            }
+            ErrorText.Text = message;
+            ErrorPanel.Visibility = Visibility.Visible;
         }
     }
 }

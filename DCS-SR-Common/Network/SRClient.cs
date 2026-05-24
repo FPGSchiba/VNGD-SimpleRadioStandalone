@@ -16,7 +16,7 @@ namespace Vanguard.VCS.Common.Network
         [JsonIgnore] 
         private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
-        public string ClientGuid { get; set; }
+        public Guid ClientGuid { get; set; }
         private string _name= "";
 
         public string Name
@@ -27,9 +27,9 @@ namespace Vanguard.VCS.Common.Network
             }
             set
             {
-                if(value == null || value == "")
+                if (value == null)
                 {
-                    value = "---";
+                    value = "";
                 }
 
                 if (_name != value)
@@ -51,6 +51,18 @@ namespace Vanguard.VCS.Common.Network
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
+
+        private string _coalitionName = "";
+        public string CoalitionName
+        {
+            get => _coalitionName;
+            set
+            {
+                _coalitionName = value ?? "";
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CoalitionName)));
+            }
+        }
+
         public bool AllowRecord { get; set; }
 
         [JsonIgnore]
