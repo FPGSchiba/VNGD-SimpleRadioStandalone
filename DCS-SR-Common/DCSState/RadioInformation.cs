@@ -1,8 +1,8 @@
 ﻿using System;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public class RadioInformation
     {

@@ -1,21 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
-using NLog;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using System.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Threading;
+using NLog;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
+using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
@@ -25,8 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[] radioControlGroupSwitch =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroupSwitch[10];
+        private readonly RadioControlGroupSwitch[] radioControlGroupSwitch =
+            new RadioControlGroupSwitch[10];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -145,29 +143,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            
             int numVisibleRadios = getNumVisibleRadios();
             CalculateHeight(numVisibleRadios);
             Intercom.RepaintRadioStatus();
 
-            if (dcsPlayerRadioInfo != null && dcsPlayerRadioInfo.IsCurrent())
-            {
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = dcsPlayerRadioInfo.radios.Count(r => r.modulation != RadioInformation.Modulation.DISABLED);
-
-                ControlText.Text = availableRadios > 1
-                    ? "Compact Radio Panel - New"
-                    : "Compact Radio Panel - New (Disconnected)";
-            }
-            else
-            {
-                ControlText.Text = "Compact Radio Panel - New (Disconnected)";
-            }
+            ControlText.Text = "Compact Radio Panel - New";
         }
 
         private void CalculateHeight(int numVisibleRadios)

@@ -1,6 +1,7 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Common;
+﻿using System;
+using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
+namespace Vanguard.VCS.Client.Audio.Models
 {
     public class JitterBufferAudio
     {
@@ -12,16 +13,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio
 
         public RadioInformation.Modulation Modulation { get; internal set; }
 
-        public bool Decryptable { get; internal set; }
-
         public float Volume { get; internal set; }
         public bool IsSecondary { get; set; }
 
         public double Frequency { get; set; }
         public bool NoAudioEffects { get; set; }
 
-        public string Guid { get; set; }
-        public string OriginalClientGuid { get; set; }
-        public short Encryption { get; set; }
+        public Guid Guid { get; set; }
+
+        // Timestamp (Utc ticks) when this packet was added to the jitter buffer (diagnostic only)
+        public long ReceivedAtTicks { get; set; }
     }
 }

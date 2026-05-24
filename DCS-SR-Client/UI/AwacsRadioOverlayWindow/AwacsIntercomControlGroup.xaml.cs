@@ -1,14 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Overlay;
+using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
+namespace Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for IntercomControlGroup.xaml
@@ -19,19 +19,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private bool _init = true;
         private readonly ClientStateSingleton _clientStateSingleton = ClientStateSingleton.Instance;
+        private IDisposable _radioStateSub;
         private readonly GlobalSettingsStore _globalSettings = GlobalSettingsStore.Instance;
-        private RadioInformation _intercomInformation;
-        
-        
 
         public IntercomControlGroup()
         {
             InitializeComponent();
+            _radioStateSub = App.EventBus.Subscribe<LocalRadioStateChangedEvent>(_ =>
+                Dispatcher.Invoke(RepaintRadioStatus));
+            Unloaded += (_, _) => _radioStateSub?.Dispose();
 
-            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxDisabled;
-            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? Overlay.IntercomControlGroup.voxEnabled : Overlay.IntercomControlGroup.voxicDisabled;
-            _intercomInformation = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-            IntercomNumberSpinner.Maximum = (int)Math.Round(_intercomInformation.freqMax, 0);
+            Radio1Enabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
+            IntercomEnabled.Background = _globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC) ? global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled : global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
+            IntercomNumberSpinner.Maximum = 100;
             IntercomNumberSpinner.Minimum = 1;
         }
 
@@ -39,14 +39,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioSelectSwitch(object sender, RoutedEventArgs e)
         {
-            if (_intercomInformation.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                if (_clientStateSingleton.DcsPlayerRadioInfo.control ==
-                    DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                {
-                    _clientStateSingleton.DcsPlayerRadioInfo.selected = (short) RadioId;
-                }
-            }
         }
 
         private void RadioVolume_DragStarted(object sender, RoutedEventArgs e)
@@ -57,133 +49,53 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
         private void RadioVolume_DragCompleted(object sender, RoutedEventArgs e)
         {
-            var currentRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-            if (currentRadio.modulation != RadioInformation.Modulation.DISABLED)
-            {
-                if (currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY)
-                {
-                    var clientRadio = _clientStateSingleton.DcsPlayerRadioInfo.radios[RadioId];
-
-                    clientRadio.volume = (float) RadioVolume.Value / 100.0f;
-                }
-            }
-
             _dragging = false;
         }
 
         internal void RepaintRadioStatus()
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
-            if (!_clientStateSingleton.IsConnected || (dcsPlayerRadioInfo == null) || !dcsPlayerRadioInfo.IsCurrent())
+            if (!_clientStateSingleton.IsConnected)
             {
                 RadioActive.Fill = new SolidColorBrush(Colors.Red);
-
                 RadioVolume.IsEnabled = false;
-
-                //reset dragging just incase
                 _dragging = false;
-
                 IntercomNumberSpinner.IsEnabled = false;
+                return;
+            }
+
+            var radios = App.RadioStateManager?.CurrentState?.Radios;
+            int intercomIndex = radios != null ? FindIntercomIndex(radios) : -1;
+
+            var transmitting = _clientStateSingleton.RadioSendingState;
+            var receiveState = intercomIndex >= 0
+                ? _clientStateSingleton.RadioReceivingState[intercomIndex]
+                : null;
+
+            if ((receiveState != null) && receiveState.IsReceiving)
+            {
+                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
+            }
+            else if (intercomIndex >= 0 && transmitting.IsSending && transmitting.SendingOn == intercomIndex + 1)
+            {
+                RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
             }
             else
             {
-                var transmitting = _clientStateSingleton.RadioSendingState;
-                var receiveState = _clientStateSingleton.RadioReceivingState[RadioId];
-
-                var currentRadio = dcsPlayerRadioInfo.radios[RadioId];
-                if ((receiveState != null) && receiveState.IsReceiving)
-                {
-                    RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                }
-                else if (RadioId == dcsPlayerRadioInfo.selected || transmitting.IsSending && (transmitting.SendingOn == RadioId))
-                {
-
-                    if (transmitting.IsSending && (transmitting.SendingOn == RadioId))
-                    {
-                        RadioActive.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#96FF6D"));
-                    }
-                    else
-                    {
-                        RadioActive.Fill = new SolidColorBrush(Colors.Green);
-                    }
-                }
-                else
-                {
-                    if (currentRadio.simul && dcsPlayerRadioInfo.simultaneousTransmission)
-                    {
-                        // if (transmitting.IsSending)
-                        // {
-                        //     RadioActive.Fill = new SolidColorBrush(Colors.LightBlue);
-                        // }
-                        // else
-                        // {
-                        RadioActive.Fill = new SolidColorBrush(Colors.DarkBlue);
-                        // }
-
-                    }
-                    else
-                    {
-                        RadioActive.Fill = new SolidColorBrush(Colors.Orange);
-                    }
-
-                }
-
-
-
-                if (currentRadio.modulation == RadioInformation.Modulation.INTERCOM) //intercom
-                {
-                    RadioLabel.Text = "INTERCOM";
-
-                    RadioVolume.IsEnabled = currentRadio.volMode == RadioInformation.VolumeMode.OVERLAY;
-
-                    Radio1Enabled.IsEnabled = true;
-
-                    if (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset)
-                    {
-                        IntercomNumberSpinner.IsEnabled = true;
-                        IntercomNumberSpinner.Value = _clientStateSingleton.IntercomOffset;
-                    }
-                    else
-                    {
-                        IntercomNumberSpinner.IsEnabled = false;
-                        IntercomNumberSpinner.Value = 1;
-                        _clientStateSingleton.IntercomOffset = 1;
-                    }
-                }
-                else
-                {
-                    RadioLabel.Text = "NO INTERCOM";
-                    RadioActive.Fill = new SolidColorBrush(Colors.Red);
-                    Radio1Enabled.IsEnabled = false;
-                    IntercomEnabled.IsEnabled = false;
-                    RadioVolume.IsEnabled = false;
-                    IntercomNumberSpinner.Value = 1;
-                    IntercomNumberSpinner.IsEnabled = false;
-                    _clientStateSingleton.IntercomOffset = 1;
-
-
-                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
-                }
-
-                if (_dragging == false)
-                {
-                    RadioVolume.Value = currentRadio.volume * 100.0;
-                }
+                RadioActive.Fill = new SolidColorBrush(Colors.Orange);
             }
+
+            RadioLabel.Text = "INTERCOM";
+            Radio1Enabled.IsEnabled = intercomIndex >= 0;
+            IntercomNumberSpinner.IsEnabled = intercomIndex >= 0;
         }
 
         private void IntercomNumber_SpinnerChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (_init)
             {
-                //ignore
                 _init = false;
                 return;
             }
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
 
             int spinnervalue;
             if (!int.TryParse(IntercomNumberSpinner.Value.ToString(), out spinnervalue))
@@ -194,35 +106,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, !_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC));
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
-
 
             if (spinnervalue == 1)
             {
                 IntercomEnabled.IsEnabled = false;
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxicDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxicDisabled;
             }
             else
             {
                 IntercomEnabled.IsEnabled = true;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 }
                 else
                 {
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
-            }
-
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent() &&
-                (dcsPlayerRadioInfo.unitId >= DCSPlayerRadioInfo.UnitIdOffset))
-            {
-                _clientStateSingleton.IntercomOffset = (int) IntercomNumberSpinner.Value;
-                dcsPlayerRadioInfo.unitId =
-                    (uint) (DCSPlayerRadioInfo.UnitIdOffset + _clientStateSingleton.IntercomOffset);
-                _clientStateSingleton.LastSent = 0; //force refresh
             }
         }
 
@@ -233,16 +135,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
             {
-                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXIC, false);
-                    IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
         }
 
@@ -252,17 +154,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow
 
             if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXIC))
             {
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxEnabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxEnabled;
                 if (_globalSettings.GetClientSettingBool(GlobalSettingsKeys.VOXR1))
                 {
                     _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXR1, false);
-                    Radio1Enabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                    Radio1Enabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
                 }
             }
             else
             {
-                IntercomEnabled.Background = Overlay.IntercomControlGroup.voxDisabled;
+                IntercomEnabled.Background = global::Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils.IntercomControlGroup.voxDisabled;
             }
+        }
+
+        private static int FindIntercomIndex(IReadOnlyList<ClientRadio> radios)
+        {
+            for (int i = 0; i < radios.Count; i++)
+                if (radios[i].IsIntercom)
+                    return i;
+            return -1;
         }
     }
 }

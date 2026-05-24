@@ -7,16 +7,18 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Network.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Network.Models;
+using Vanguard.VCS.Server.Settings;
 using NLog;
+using Vanguard.VCS.Common.DCSState;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network
 {
     internal class UDPVoiceRouter: IHandle<ServerFrequenciesChanged>
     {
@@ -358,15 +360,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                                 for (int i = 0; i < udpVoice.Frequencies.Length; i++)
                                 {
                                     RadioReceivingState radioReceivingState = null;
-                                    bool decryptable;
                                     var receivingRadio = radioInfo.CanHearTransmission(udpVoice.Frequencies[i],
                                         (RadioInformation.Modulation)udpVoice.Modulations[i],
-                                        udpVoice.Encryptions[i],
-                                        strictEncryption,
-                                        udpVoice.UnitId,
-                                        _emptyBlockedRadios,
-                                        out radioReceivingState,
-                                        out decryptable);
+                                        out radioReceivingState);
 
                                     //only send if we can hear!
                                     if (receivingRadio != null)
@@ -425,5 +421,10 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             }
         }
 
+        public Task HandleAsync(ServerFrequenciesChanged message, CancellationToken cancellationToken)
+        {
+            Handle(message);
+            return Task.CompletedTask;
+        }
     }
 }

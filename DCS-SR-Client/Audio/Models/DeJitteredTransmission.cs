@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models
+namespace Vanguard.VCS.Client.Audio.Models
 {
     //TODO profile if its better as class or struct
     public struct DeJitteredTransmission
@@ -27,8 +23,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models
         public int PCMAudioLength { get; set; }
         public bool NoAudioEffects { get; set; }
 
-        public string Guid { get; set; }
+        public Guid Guid { get; set; }
 
-        public string OriginalClientGuid { get; set; }
+        public Guid OriginalClientGuid { get; set; }
+
+        // Diagnostic: when the original packet was received into the jitter buffer (Utc ticks)
+        public long ReceivedAtTicks { get; set; }
     }
 }

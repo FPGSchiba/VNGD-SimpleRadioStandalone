@@ -1,24 +1,12 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
+using System;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils
 {
     /// <summary>
     /// Interaction logic for RadioCapabilities.xaml
@@ -42,87 +30,15 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow
 
         private void UpdateUI(object sender, EventArgs e)
         {
-            var radioInfo = ClientStateSingleton.Instance.DcsPlayerRadioInfo;
-
             var profile = GlobalSettingsStore.Instance.ProfileSettingsStore;
 
             try
             {
-                if (radioInfo.IsCurrent())
-                {
-
-                    Desc.Text = radioInfo.capabilities.desc;
-
-                    if (radioInfo.capabilities.dcsPtt)
-                    {
-                        DCSPTT.Content = "Available in Cockpit";
-
-                        if (!profile.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT))
-                        {
-                            DCSPTT.Content += " - Disabled in SRS";
-                        }
-                        
-                    }
-                    else
-                    {
-                        DCSPTT.Content = "Not Available - SRS Controls Only ";
-                    }
-
-                    if (radioInfo.capabilities.dcsRadioSwitch)
-                    {
-                        DCSRadioSwitch.Content = "Available in Cockpit";
-
-                        if (profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
-                        {
-                            DCSRadioSwitch.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        DCSRadioSwitch.Content = "Not Available - SRS Controls Only";
-                    }
-
-                    if (radioInfo.capabilities.dcsIFF)
-                    {
-                        DCSIFF.Content = "Available in Cockpit";
-
-                        if (profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowTransponderOverlay))
-                        {
-                            DCSIFF.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        DCSIFF.Content = "Not Available - SRS Controls Only";
-                    }
-
-                    if (radioInfo.capabilities.intercomHotMic)
-                    {
-                        IntercomHotMic.Content = "Available in Cockpit";
-
-                        if (!profile.GetClientSettingBool(ProfileSettingsKeys.AllowDCSPTT) || profile.GetClientSettingBool(ProfileSettingsKeys.AlwaysAllowHotasControls))
-                        {
-                            IntercomHotMic.Content += " - Disabled in SRS";
-                        }
-
-                    }
-                    else
-                    {
-                        IntercomHotMic.Content = "Not Available";
-                    }
-
-                }
-                else
-                {
-                    Desc.Text = "";
-                    DCSPTT.Content = "Unknown";
-                    DCSRadioSwitch.Content = "Unknown";
-                    DCSIFF.Content = "Unknown";
-                    IntercomHotMic.Content = "Unknown";
-
-                }
+                Desc.Text = "";
+                DCSPTT.Content = "Not Available - SRS Controls Only ";
+                DCSRadioSwitch.Content = "Not Available - SRS Controls Only";
+                DCSIFF.Content = "Not Available - SRS Controls Only";
+                IntercomHotMic.Content = "Not Available";
             }
             catch (Exception ex)
             {

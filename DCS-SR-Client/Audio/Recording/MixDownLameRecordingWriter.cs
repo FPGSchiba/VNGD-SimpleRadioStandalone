@@ -1,17 +1,12 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
-using NAudio.Lame;
-using NAudio.Wave;
-using NLog;
+﻿/* Recording does not work right now
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
+using NAudio.Lame;
+using Vanguard.VCS.Client.Audio.Managers;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     internal class MixDownLameRecordingWriter : AudioRecordingLameWriterBase
     {
@@ -89,3 +84,4 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
         }
     }
 }
+*/

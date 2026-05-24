@@ -5,19 +5,22 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Settings;
 using NetCoreServer;
 using Newtonsoft.Json;
 using NLog;
 using Open.Nat;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network
 {
     public class ServerSync : TcpServer, IHandle<ServerSettingsChangedMessage>
     {
@@ -61,6 +64,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
             {
                 Logger.Error(ex, "Exception Sending Server Settings ");
             }
+        }
+        
+        public Task HandleAsync(ServerSettingsChangedMessage message, CancellationToken cancellationToken)
+        {
+            Handle(message);
+            return Task.CompletedTask;
         }
 
         protected override TcpSession CreateSession() { return new SRSClientSession(this, _clients, _bannedIps); }
@@ -117,7 +126,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
                 try
                 {
-                    _eventAggregator.PublishOnUIThread(
+                    _eventAggregator.PublishOnUIThreadAsync(
                         new ServerStateMessage(true, new List<SRClient>(_clients.Values)));
                 }
                 catch (Exception ex)
@@ -185,7 +194,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
         private bool HandleConnectedClient(SRSClientSession state, NetworkMessage message)
         {
             var srClient = message.Client;
-            if (!_clients.ContainsKey(srClient.ClientGuid))
+            if (!_clients.ContainsKey(srClient.ClientGuid.ToString()))
             {
                 var clientIp = (IPEndPoint)state.Socket.RemoteEndPoint;
                 if (message.Version == null)
@@ -214,12 +223,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 srClient.ClientSession = state;
 
                 //add to proper list
-                _clients[srClient.ClientGuid] = srClient;
+                _clients[srClient.ClientGuid.ToString()] = srClient;
 
-                state.SRSGuid = srClient.ClientGuid;
+                state.SRSGuid = srClient.ClientGuid.ToString();
                 
 
-                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
             }
 
@@ -251,9 +260,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private void HandleClientMetaDataUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
-            if (_clients.ContainsKey(message.Client.ClientGuid))
+            if (_clients.ContainsKey(message.Client.ClientGuid.ToString()))
             {
-                var client = _clients[message.Client.ClientGuid];
+                var client = _clients[message.Client.ClientGuid.ToString()];
 
                 if (client != null)
                 {
@@ -288,7 +297,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                     // Only redraw client admin UI of server if really needed
                     if (redrawClientAdminList)
                     {
-                        _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                        _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                             new List<SRClient>(_clients.Values)));
                     }
                 }
@@ -314,9 +323,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private void HandleClientRadioUpdate(SRSClientSession session, NetworkMessage message, bool send)
         {
-            if (_clients.ContainsKey(message.Client.ClientGuid))
+            if (_clients.ContainsKey(message.Client.ClientGuid.ToString()))
             {
-                var client = _clients[message.Client.ClientGuid];
+                var client = _clients[message.Client.ClientGuid.ToString()];
 
                 if (client != null)
                 {
@@ -437,12 +446,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
                 }
             }
 
-            if (_clients.ContainsKey(client.ClientGuid))
+            if (_clients.ContainsKey(client.ClientGuid.ToString()))
             {
-                _clients[client.ClientGuid].Coalition = clientCoalition;
-                _clients[client.ClientGuid].Name = client.Name;
+                _clients[client.ClientGuid.ToString()].Coalition = clientCoalition;
+                _clients[client.ClientGuid.ToString()].Name = client.Name;
 
-                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
             }
 
@@ -477,12 +486,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
 
         private void HandleExternalAWACSModeDisconnect(SRSClientSession session, SRClient client)
         {
-            if (_clients.ContainsKey(client.ClientGuid))
+            if (_clients.ContainsKey(client.ClientGuid.ToString()))
             {
-                _clients[client.ClientGuid].Coalition = 0;
-                _clients[client.ClientGuid].Name = "";
+                _clients[client.ClientGuid.ToString()].Coalition = 0;
+                _clients[client.ClientGuid.ToString()].Name = "";
 
-                _eventAggregator.PublishOnUIThread(new ServerStateMessage(true,
+                _eventAggregator.PublishOnUIThreadAsync(new ServerStateMessage(true,
                     new List<SRClient>(_clients.Values)));
 
                 var message = new NetworkMessage

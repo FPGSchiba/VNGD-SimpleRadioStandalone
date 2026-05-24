@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI
+namespace Vanguard.VCS.Client.Settings.Favourites
 {
     public class ServerAddress : INotifyPropertyChanged
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
+using Vanguard.VCS.Common.DCSState;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     public class UDPInterfaceCommand
     {

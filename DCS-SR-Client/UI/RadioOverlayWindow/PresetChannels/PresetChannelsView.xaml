@@ -1,50 +1,54 @@
 ﻿<UserControl
-    x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels.PresetChannelsView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.PresetChannels"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
-    xmlns:presetChannels="clr-namespace:Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    d:DataContext="{d:DesignInstance presetChannels:PresetChannelsViewModel,
-                                              IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance presetChannels1:PresetChannelsViewModel,
+                                     IsDesignTimeCreatable=False}"
     d:DesignHeight="100"
     d:DesignWidth="120"
-    mc:Ignorable="d">
-    <StackPanel 
-        HorizontalAlignment="Center"
+    mc:Ignorable="d"
+    x:Class="Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels.PresetChannelsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mvvmEventBinding="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
+    xmlns:presetChannels1="clr-namespace:Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel
         Background="#444"
+        HorizontalAlignment="Center"
         Orientation="Vertical">
-        <ComboBox x:Name="FrequencyDropDown"
-                  MinWidth="110"
-                  MaxWidth="110"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Top"
-                  Height="20"
-                  FontSize="8"
-                  materialDesign:HintAssist.HelperText="Channel Selection"
-                  DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
-                  ItemsSource="{Binding Path=PresetChannels}"
-                  SelectedItem="{Binding Path=SelectedPresetChannel}"
-                  Margin="0,0,0,12">
+        <ComboBox
+            DropDownClosed="{mvvmEventBinding:EventBinding DropDownClosedCommand}"
+            FontSize="8"
+            Height="20"
+            HorizontalAlignment="Center"
+            ItemsSource="{Binding Path=PresetChannels}"
+            Margin="0,0,0,12"
+            MaxWidth="110"
+            MinWidth="110"
+            SelectedItem="{Binding Path=SelectedPresetChannel}"
+            VerticalAlignment="Top"
+            materialDesign:HintAssist.HelperText="Channel Selection"
+            x:Name="FrequencyDropDown">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock  Text="{Binding Path=Text}" FontSize="8" Padding="0" />
+                    <TextBlock
+                        FontSize="8"
+                        Padding="0"
+                        Text="{Binding Path=Text}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <Button Name="ReloadButton"
-                Width="50"
-                Height="20"
-                Margin="0,6,0,0"
-                HorizontalAlignment="Center"
-                Command="{Binding Path=ReloadCommand}"
-                Content="Reload"
-                Padding="0"
-                Style="{x:Null}" />
+        <Button
+            Command="{Binding Path=ReloadCommand}"
+            Content="Reload"
+            Height="20"
+            HorizontalAlignment="Center"
+            Margin="0,6,0,0"
+            Name="ReloadButton"
+            Padding="0"
+            Style="{x:Null}"
+            Width="50" />
 
     </StackPanel>
 </UserControl>

@@ -1,25 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="Version">
-  <Import Project="..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props" Condition="Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Version Condition=" '$(Version)' == '' ">v0.0.0</Version>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion> <!-- or at least 10.0.17763.0 -->
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Vanguard.VCS.Client</RootNamespace>
+    <AssemblyName>VCS-RadioClient</AssemblyName>
     <ProjectGuid>{CFF33E05-1D37-4807-B1F7-5A1488D8EC4F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ciribob.DCS.SimpleRadio.Standalone.Client</RootNamespace>
-    <AssemblyName>SR-ClientRadio</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
+    <StartupObject>Vanguard.VCS.Client.App</StartupObject>
+    <ApplicationIcon>audio-headset.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateManifests>false</GenerateManifests>
+    <Version>0.0.0</Version>
+    <Authors>Modified by: Vanguard | Original: Ciribob - GitHub.com/Ciribob</Authors>
+    <Company>Modified by: Vanguard | Original: Ciribob - GitHub.com/Ciribob</Company>
+    <Product>Vanguard Communication System Client</Product>
+    <Description>Client for the VCS</Description>
+    <Copyright>Copyright © 2025 - Vanguard</Copyright>
+    <TreatAsLocalProperty>Version</TreatAsLocalProperty>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -34,886 +40,160 @@
     <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <WindowsPackageType>None</WindowsPackageType>  <!-- IMPORTANT: Disable MSIX -->
+    <XamlDebuggingInformation>False</XamlDebuggingInformation>
+    <EnableDefaultXamlItems>False</EnableDefaultXamlItems>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
+    <Optimize>false</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>DCS_SR_Client.App</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>
-    </TargetZone>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationIcon>audio-headset.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
     <Optimize>false</Optimize>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-    <UseWinFormsOutOfProcDesigner>False</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Costura, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Costura.Fody.1.6.2\lib\dotnet\Costura.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Dragablz, Version=0.0.3.234, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.234\lib\net45\Dragablz.dll</HintPath>
-    </Reference>
-    <Reference Include="Easy.MessageHub, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Easy.MessageHub.3.2.1\lib\net35\Easy.MessageHub.dll</HintPath>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignColors, Version=3.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignColors.3.0.0\lib\net462\MaterialDesignColors.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=5.0.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.5.0.0\lib\net462\MaterialDesignThemes.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Filtering, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Filtering.0.7.0\lib\net461\MathNet.Filtering.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
-    </Reference>
-    <Reference Include="MvvmEventBinding, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmEventBinding.1.0.0\lib\net45\MvvmEventBinding.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Lame, Version=1.0.8.41605, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Lame.1.0.8\lib\net40\NAudio.Lame.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.5.0.5\lib\net46\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry, Version=4.10.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.4.10.1\lib\net462\Sentry.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.NLog, Version=4.10.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.NLog.4.10.1\lib\net462\Sentry.NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.PlatformAbstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.PlatformAbstractions.1.1.1\lib\net471\Sentry.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Sentry.Protocol, Version=2.1.8.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Protocol.2.1.8\lib\net46\Sentry.Protocol.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpConfig, Version=3.2.9.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpConfig.3.2.9.1\lib\net461\SharpConfig.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DirectInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.DirectInput.4.2.0\lib\net45\SharpDX.DirectInput.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.XInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.4.2.0\lib\net45\SharpDX.XInput.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Collections.Immutable, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.6.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Common, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Drawing.Common.7.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=6.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.6.0.1\lib\net461\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json, Version=6.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.6.0.8\lib\net461\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WebRtcVadSharp, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebRtcVadSharp.1.3.2\lib\netstandard2.0\WebRtcVadSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="Wpf.Ui, Version=3.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPF-UI.3.0.5\lib\net472\Wpf.Ui.dll</HintPath>
-    </Reference>
-    <Reference Include="WPFCustomMessageBox, Version=1.0.7.39267, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFCustomMessageBox.1.0.7\lib\WPFCustomMessageBox.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Platform, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Xaml, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xamarin.Forms.5.0.0.2612\lib\netstandard2.0\Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
+    <PackageReference Include="BCrypt" Version="1.0.0" />
+    <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="Easy.MessageHub" Version="5.1.0" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
+    <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="All" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Common" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+    <PackageReference Include="MathNet.Filtering" Version="0.7.0" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.5" />
+    <PackageReference Include="MvvmEventBinding" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.4.0" />
+    <PackageReference Include="Sentry" Version="5.8.0" />
+    <PackageReference Include="Sentry.NLog" Version="5.8.0" />
+    <PackageReference Include="SharpConfig" Version="3.2.9.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
+    <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
+    <PackageReference Include="System.Buffers" Version="4.6.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.5" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.5" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="9.0.5" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.6.1" />
+    <PackageReference Include="System.Reflection.Metadata" Version="9.0.5" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.5" />
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Include="WebRtcVadSharp" Version="1.3.2" />
+    <PackageReference Include="WPF-UI" Version="4.0.2" />
   </ItemGroup>
+
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Audio\Managers\CachedAudioEffectProvider.cs" />
-    <Compile Include="Audio\Managers\EventDrivenResampler.cs" />
-    <Compile Include="Audio\Models\DeJitteredTransmission.cs" />
-    <Compile Include="Audio\Providers\ClientAudioProvider.cs" />
-    <Compile Include="Audio\Providers\ClientEffectsPipeline.cs" />
-    <Compile Include="Audio\Providers\RadioMixingProvider.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingManager.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingSample.cs" />
-    <Compile Include="Audio\Recording\TransmissionAssembler.cs" />
-    <Compile Include="Audio\Recording\MixDownLameRecordingWriter.cs" />
-    <Compile Include="Audio\Recording\PerRadioLameRecordingWriter.cs" />
-    <Compile Include="Audio\Models\TransmittedAudio.cs" />
-    <Compile Include="Audio\Providers\AudioProvider.cs" />
-    <Compile Include="Audio\Models\CachedAudioEffect.cs" />
-    <Compile Include="Audio\Managers\AudioManager.cs" />
-    <Compile Include="Audio\Managers\AudioPreview.cs" />
-    <Compile Include="Audio\Models\ClientAudio.cs" />
-    <Compile Include="Audio\Providers\CachedLoopingNatoToneAudioProvider.cs" />
-    <Compile Include="Audio\Models\JitterBufferAudio.cs" />
-    <Compile Include="Audio\Providers\JitterBufferProviderInterface.cs" />
-    <Compile Include="Audio\Providers\VolumeSampleProviderWithPeak.cs" />
-    <Compile Include="Audio\Utility\SpeexWrapper.cs" />
-    <Compile Include="Input\InputAxisDevice.cs" />
-    <Compile Include="Input\InputButtonDevice.cs" />
-    <Compile Include="Input\InputDevice.cs" />
-    <Compile Include="Input\InputDeviceBase.cs" />
-    <Compile Include="Input\XInputController.cs" />
-    <Compile Include="Network\VAICOM\Models\VAICOMMessageWrapper.cs" />
-    <Compile Include="Network\VAICOM\VAICOMSyncHandler.cs" />
-    <Compile Include="Audio\Recording\AudioRecordingLameWriterBase.cs" />
-    <Compile Include="Audio\Recording\ClientTransmissionBuffer.cs" />
-    <Compile Include="Settings\ProfileSettingsStore.cs" />
-    <Compile Include="Input\InputBindState.cs" />
-    <Compile Include="Network\DCS\DCSAutoConnectHandler.cs" />
-    <Compile Include="Network\DCS\DCSRadioSyncHandler.cs" />
-    <Compile Include="Network\DCS\Models\CombinedRadioState.cs" />
-    <Compile Include="Network\DCS\Models\DCSLosCheckRequest.cs" />
-    <Compile Include="Network\DCS\Models\DCSLosCheckResult.cs" />
-    <Compile Include="Network\UDPVoiceHandler.cs" />
-    <Compile Include="Settings\SynchedServerSettings.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\Favourites\CsvFavouriteServerStore.cs" />
-    <Compile Include="Settings\Favourites\IFavouriteServerStore.cs" />
-    <Compile Include="Settings\Favourites\MockFavouriteServerStore.cs" />
-    <Compile Include="Settings\RadioChannels\FilePresetChannelsStore.cs" />
-    <Compile Include="Settings\RadioChannels\MockPresetChannelsStore.cs" />
-    <Compile Include="Singletons\AudioOutputSingleton.cs" />
-    <Compile Include="Singletons\ClientStateSingleton.cs" />
-    <Compile Include="Singletons\ConnectedClientsSingleton.cs" />
-    <Compile Include="Singletons\AudioInputSingleton.cs" />
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupDragable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupSwitch.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroupTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\AudioDeviceListItem.cs" />
-    <Compile Include="UI\ClientWindow\ClientList\ClientListWindow.xaml.cs">
-      <DependentUpon>ClientListWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\AdministrationPage.xaml.cs">
-      <DependentUpon>AdministrationPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml.cs">
-      <DependentUpon>CommunicationsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\HomePage.xaml.cs">
-      <DependentUpon>HomePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\PlayerListPage.xaml.cs">
-      <DependentUpon>PlayerListPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml.cs">
-      <DependentUpon>ServerDetailsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\GuestPage.xaml.cs">
-      <DependentUpon>GuestPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml.cs">
-      <DependentUpon>GuestSuccess.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\LoginPages\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\AudioPage.xaml.cs">
-      <DependentUpon>AudioPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\GeneralPage.xaml.cs">
-      <DependentUpon>GeneralPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml.cs">
-      <DependentUpon>KeybindingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\LegacyPage.xaml.cs">
-      <DependentUpon>LegacyPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\BalancingPage.xaml.cs">
-      <DependentUpon>BalancingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml.cs">
-      <DependentUpon>RadioEffectsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SettingPages\SettingsPage.xaml.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\SupportPage.xaml.cs">
-      <DependentUpon>SupportPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\WelcomePages\EasterEggWindow.xaml.cs">
-      <DependentUpon>EasterEggWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml.cs">
-      <DependentUpon>WelcomePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\BalanceControl.xaml.cs">
-      <DependentUpon>BalanceControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\InputBindingControl.xaml.cs">
-      <DependentUpon>InputBindingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\KeybindingControl.xaml.cs">
-      <DependentUpon>KeybindingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\ToggleGlobalSetting.xaml.cs">
-      <DependentUpon>ToggleGlobalSetting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\ToggleProfileSetting.xaml.cs">
-      <DependentUpon>ToggleProfileSetting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml.cs">
-      <DependentUpon>PresetStandbyChannelsViewTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewModel.cs" />
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml.cs">
-      <DependentUpon>PresetChannelsViewTransparent1.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml.cs">
-      <DependentUpon>RadioOverlayMenuSelect.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayOneHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml.cs">
-      <DependentUpon>RadioOverlayDragable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml.cs">
-      <DependentUpon>RadioOverlayTenHorizontalWide.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml.cs">
-      <DependentUpon>RadioOverlayTenSwitch.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml.cs">
-      <DependentUpon>RadioOverlayEngineering.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml.cs">
-      <DependentUpon>RadioOverlayTenVerticalLong.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayTwoHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayThreeHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayFiveHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml.cs">
-      <DependentUpon>RadioOverlayTenVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml.cs">
-      <DependentUpon>RadioOverlayThreeVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml.cs">
-      <DependentUpon>RadioOverlayOneVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml.cs">
-      <DependentUpon>RadioOverlayTenTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml.cs">
-      <DependentUpon>IntercomControlGroupTransparent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml.cs">
-      <DependentUpon>IntercomControlGroup2Horizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml.cs">
-      <DependentUpon>IntercomControlGroup3Horizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml.cs">
-      <DependentUpon>RadioCapabilities.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml.cs">
-      <DependentUpon>RadioOverlayFiveVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml.cs">
-      <DependentUpon>RadioOverlayTwoVertical.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Input\InputDeviceManager.cs" />
-    <Compile Include="Settings\RadioChannels\PresetChannel.cs" />
-    <Compile Include="Settings\RadioChannels\IPresetChannelsStore.cs" />
-    <Compile Include="UI\Images.cs" />
-    <Compile Include="UI\InputProfileWindow\InputProfileWindow.xaml.cs">
-      <DependentUpon>InputProfileWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml.cs">
-      <DependentUpon>PresetChannelsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewModel.cs" />
-    <Compile Include="UI\ClientWindow\RadioChannelConfigUI.xaml.cs">
-      <DependentUpon>RadioChannelConfigUI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml.cs">
-      <DependentUpon>AwacsIntercomControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroup.xaml.cs">
-      <DependentUpon>AwacsRadioControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml.cs">
-      <DependentUpon>RadioOverlayTenHorizontal.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\Favourites\ServerAddress.cs" />
-    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml.cs">
-      <DependentUpon>FavouriteServersView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ClientWindow\Favourites\FavouriteServersViewModel.cs" />
-    <Compile Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml.cs">
-      <DependentUpon>IntercomControlGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Audio\Providers\RadioFilter.cs" />
-    <Compile Include="Network\Models\RadioSendingState.cs" />
-    <Compile Include="Network\DCS\DCSRadioSyncManager.cs" />
-    <Compile Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml.cs">
-      <DependentUpon>ServerSettingsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\GlobalSettingsStore.cs" />
-    <Compile Include="UI\RadioOverlayWindow\WindowHelper.cs" />
-    <Compile Include="UI\Sounds.cs" />
-    <Compile Include="UI\ToolTips.cs" />
-    <Compile Include="Audio\Recording\AudioManipulationHelper.cs" />
-    <Compile Include="Utils\AxisTuningHelper.cs" />
-    <Compile Include="Utils\DelegateCommand.cs" />
-    <Compile Include="Utils\RadioHelper.cs" />
-    <Compile Include="Utils\TransponderHelper.cs" />
-    <Compile Include="Utils\ValueConverters\BooleanInverterConverter.cs" />
-    <Compile Include="Utils\ValueConverters\ConnectionStatusImageConverter.cs" />
-    <Compile Include="Utils\ValueConverters\MicAvailabilityTooltipConverter.cs" />
-    <Compile Include="Utils\WPFElementHelper.cs" />
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupDragable.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupSwitch.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroupTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\ClientList\ClientListWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\HomePages\AdministrationPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\CommunicationsPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\HomePage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\PlayerListPage.xaml" />
-    <Page Include="UI\ClientWindow\HomePages\ServerDetailsPage.xaml" />
-    <Page Include="UI\ClientWindow\LoginPages\GuestPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\LoginPages\GuestSuccess.xaml" />
-    <Page Include="UI\ClientWindow\LoginPages\LoginPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\SettingPages\AudioPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\GeneralPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\KeybindingPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\LegacyPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\BalancingPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\RadioEffectsPage.xaml" />
-    <Page Include="UI\ClientWindow\SettingPages\SettingsPage.xaml" />
-    <Page Include="UI\ClientWindow\SupportPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\WelcomePages\EasterEggWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\WelcomePages\WelcomePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Components\BalanceControl.xaml" />
-    <Page Include="UI\Components\InputBindingControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Components\KeybindingControl.xaml" />
-    <Page Include="UI\Components\ToggleGlobalSetting.xaml" />
-    <Page Include="UI\Components\ToggleProfileSetting.xaml" />
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetStandbyChannelsViewTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsViewTransparent1.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayMenuSelect.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayDragable.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontalWide.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenSwitch.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayEngineering.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVerticalLong.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayThreeVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayOneVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroupTransparent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup2Horizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup3Horizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\RadioCapabilities.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayFiveVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTwoVertical.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Network\SrsClientSyncHandler.cs" />
-    <Compile Include="UI\ClientWindow\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="UI\InputProfileWindow\InputProfileWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\PresetChannels\PresetChannelsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ClientWindow\RadioChannelConfigUI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsIntercomControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\AwacsRadioOverlayWindow\AwacsRadioControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\RadioOverlayTenHorizontal.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\Favourites\FavouriteServersView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\RadioOverlayWindow\Utils\IntercomControlGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ClientWindow\ServerSettingsWindow\ServerSettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Styles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <ProjectReference Include="..\DCS-SR-Common\DCS-SR-Common.csproj" />
+    <ProjectReference Include="..\NAudio\NAudio.csproj" />
+    <ProjectReference Include="..\OpusWrapper\OpusWrapper.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Resource Include="UI\ClientWindow\WelcomePages\easter-egg.png" />
-    <Resource Include="SRS_Orientation_Toggle.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="UI\ClientWindow\vanguardsrsback.png" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <None Include="App.config" />
     <None Include="awacs-radios.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="vngd-channels.txt">
+    <None Include="radio-config.json" Condition="Exists('radio-config.json')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="AudioEffects\AM_COLLISION.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\FM_NOISE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\HAVEQUICK_TONE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\HF_NOISE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\INTERCOM_TRANS_END.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\INTERCOM_TRANS_END_SILENT.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\INTERCOM_TRANS_START.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\INTERCOM_TRANS_START_SILENT.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\KY_58_RX.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\KY_58_TX.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\MIDS_TX.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\MIDS_TX_END.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\NATO_TONE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_END.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_END_ALTERNATE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_END_SILENT.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_START.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_START_ALTERNATE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_START_APACHE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\RADIO_TRANS_START_SILENT.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\UHF_NOISE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="AudioEffects\VHF_NOISE.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="ExpandIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="ContractIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Content Include="NLog.config">
+    <None Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="packages.config" />
+    </None>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DCS-SR-Common\DCS-SR-Common.csproj">
-      <Project>{cf8da5c1-0105-4486-9e28-cb2321d8f122}</Project>
-      <Name>DCS-SR-Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NAudio\NAudio.csproj">
-      <Project>{da4f02e3-0b5e-42cd-b8d9-5583fa51d66e}</Project>
-      <Name>NAudio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpusWrapper\OpusWrapper.csproj">
-      <Project>{838bdb0b-5eb1-4c1e-9026-0a8842ac00c6}</Project>
-      <Name>OpusWrapper</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FodyWeavers.xml">
-      <SubType>Designer</SubType>
+    <None Include="vngd-channels.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="server-10.ico" />
-  </ItemGroup>
+
   <ItemGroup>
     <Resource Include="audio-headset.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="status-disconnected-game.png" />
+    <Resource Include="ContractIcon.png" />
+    <Resource Include="ExpandIcon.png" />
+    <Resource Include="server-10.ico" />
+    <Resource Include="SRS_Orientation_Toggle.png" />
     <Resource Include="status-connected.png" />
     <Resource Include="status-disconnected-error.png" />
+    <Resource Include="status-disconnected-game.png" />
     <Resource Include="status-disconnected.png" />
-    <Content Include="AudioEffects\beep-disconnected.wav">
+    <Resource Include="UI\ClientWindow\vanguardsrsback.png" />
+    <Resource Include="UI\ClientWindow\WelcomePages\easter-egg.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="AudioEffects\**\*.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AudioEffects\beep-connected.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="Resources\ExpandIcon.bmp" />
     <Content Include="speexdsp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <ItemGroup>
+    <Protobuf Include="srs.proto">
+      <GrpcServices>Client</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>true</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>$(ProjectDir)Network\Proto</OutputDir>
+    </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
+    <Folder Include="Network\Proto\" />
+  </ItemGroup>
+
+  <!-- Custom MSBuild targets and tasks -->
   <Target AfterTargets="AfterBuild;NonWinFodyTarget" Name="CleanReferenceCopyLocalPaths">
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
-  <Import Project="..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets" Condition="Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.1.2\build\netstandard1.0\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets'))" />
-    <Error Condition="!Exists('..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets'))" />
-    <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.props'))" />
-    <Error Condition="!Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets'))" />
-    <Error Condition="!Exists('..\packages\Sentry.4.10.1\build\Sentry.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Sentry.4.10.1\build\Sentry.targets'))" />
-  </Target>
-  <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
-  <Import Project="..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.1.0.8\build\NAudio.Lame.targets')" />
-  <Import Project="..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets" Condition="Exists('..\packages\WebRtcVadSharp.1.3.2\build\WebRtcVadSharp.targets')" />
-  <Import Project="..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.5.0.0.2612\build\Xamarin.Forms.targets')" />
+
   <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <InputFilename ParameterType="System.String" Required="true" />
@@ -934,13 +214,16 @@
           ]]></Code>
     </Task>
   </UsingTask>
+
   <Target Name="BeforeBuild">
+    <Message Importance="High" Text="ProjectDir: $(ProjectDir)" />
+    <Message Importance="High" Text="OutputPath: $(OutputPath)" />
+    <Message Importance="High" Text="Grpc_OutDir: $(Grpc_OutDir)" Condition="'$(Grpc_OutDir)' != ''" />
     <Warning Text="Client-Version: $(Version)" />
     <ItemGroup>
       <Version Include="$(Version)" />
     </ItemGroup>
     <PropertyGroup>
-      <!-- Define Constants -->
       <AssemblyInfo>Properties\AssemblyInfo.cs</AssemblyInfo>
       <AssemblyInfoContent>$([System.IO.File]::ReadAllText($(AssemblyInfo)))</AssemblyInfoContent>
       <VersionRegex>(\[\s*assembly\s*:\s*AssemblyVersion\(\s*"(\d+)\.(\d+)\.(\d+)(\.)(\d+)("\)\s*\]))</VersionRegex>
@@ -948,15 +231,9 @@
     <ReplaceFileText InputFilename="$(AssemblyInfo)" OutputFilename="$(AssemblyInfo)" MatchExpression="(\d\.\d\.\d|\d\.\d\.\d\.\d)" ReplacementText="@(Version-&gt;Replace('v', ''))" />
     <Warning Text="Assembly-Client-Version: $(AssemblyVersion)" />
   </Target>
+
   <Target Name="AfterBuild">
     <Warning Text="Client-Version: $(Version)" />
   </Target>
-  <Import Project="..\packages\Sentry.4.10.1\build\Sentry.targets" Condition="Exists('..\packages\Sentry.4.10.1\build\Sentry.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

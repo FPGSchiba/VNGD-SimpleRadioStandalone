@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network.VAICOM.Models;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.RadioChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Client.Network.Models;
+using Vanguard.VCS.Client.Network.VAICOM.Models;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Settings.RadioChannels;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
+namespace Vanguard.VCS.Client.Singletons
 {
     public sealed class ClientStateSingleton : INotifyPropertyChanged
     {
@@ -24,27 +23,17 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public DCSPlayerRadioInfo DcsPlayerRadioInfo { get; }
-        public DCSPlayerSideInfo PlayerCoaltionLocationMetadata { get; set; }
-
         // Timestamp the last UDP Game GUI broadcast was received from DCS, used for determining active game connection
         public long DcsGameGuiLastReceived { get; set; }
 
-        // Timestamp the last UDP Export broadcast was received from DCS, used for determining active game connection
-        public long DcsExportLastReceived { get; set; }
-
-        // Timestamp for the last time 
+        // Timestamp for the last time
         public long LotATCLastReceived { get; set; }
 
         //store radio channels here?
         public PresetChannelsViewModel[] FixedChannels { get; }
         public PresetStandbyChannelsViewModel[] StandbyChannels { get; }
 
-        public long LastSent { get; set; }
-
         public long LastPositionCoalitionSent { get; set; }
-
-        private static readonly DispatcherTimer _timer = new DispatcherTimer();
 
         public RadioSendingState RadioSendingState { get; set; }
         public  RadioReceivingState[] RadioReceivingState { get; }
@@ -77,9 +66,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        private bool isConnectionErrored;
-        public string ShortGUID { get; }
+        private volatile bool _isServerMuted;
+        public bool IsServerMuted
+        {
+            get => _isServerMuted;
+            set
+            {
+                _isServerMuted = value;
+                NotifyPropertyChanged(nameof(IsServerMuted));
+            }
+        }
 
+        private bool isConnectionErrored;
+        public Guid ClientId { get; private set; }
+
+        public void RegisterClientGuid(Guid guid)
+        {
+            ClientId = guid;
+        }
+        
         public bool IsConnectionErrored
         {
             get
@@ -93,26 +98,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        // Indicates the user's desire to be in External Awacs Mode or not
-        public bool ExternalAWACSModelSelected { get; set; }
-
-        // Indicates whether we are *actually* connected in External Awacs Mode
-        // Used by the Name and Password related UI elements to determine if they are editable or not
-        public bool ExternalAWACSModeConnected
-        {
-            get
-            { 
-                bool EamEnabled = SyncedServerSettings.Instance.GetSettingAsBool(Common.Setting.ServerSettingsKeys.EXTERNAL_AWACS_MODE);
-                return IsConnected && EamEnabled && ExternalAWACSModelSelected && !IsGameExportConnected;
-            }
-        }
-
         public bool IsLotATCConnected { get { return LotATCLastReceived >= DateTime.Now.Ticks - 50000000; } }
 
         public bool IsGameGuiConnected { get { return DcsGameGuiLastReceived >= DateTime.Now.Ticks - 100000000; } }
-        public bool IsGameExportConnected { get { return DcsExportLastReceived >= DateTime.Now.Ticks - 100000000; } }
-        // Indicates an active game connection has been detected (1 tick = 100ns, 100000000 ticks = 10s stale timer), not updated by EAM
-        public bool IsGameConnected { get { return IsGameGuiConnected && IsGameExportConnected; } }
 
         public string LastSeenName { get; set; }
 
@@ -123,19 +111,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             RadioSendingState = new RadioSendingState();
             RadioReceivingState = new RadioReceivingState[11];
 
-            ShortGUID = ShortGuid.NewGuid();
-            DcsPlayerRadioInfo = new DCSPlayerRadioInfo();
-            PlayerCoaltionLocationMetadata = new DCSPlayerSideInfo();
+            ClientId = ShortGuid.NewGuid();
 
-            // The following members are not updated due to events. Therefore we need to setup a polling action so that they are
-            // periodically checked.
             DcsGameGuiLastReceived = 0;
-            DcsExportLastReceived = 0;
-            _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += (s, e) => {
-                NotifyPropertyChanged("ExternalAWACSModeConnected");
-            };
-            _timer.Start();
 
             FixedChannels = new PresetChannelsViewModel[10];
             StandbyChannels = new PresetStandbyChannelsViewModel[10];
@@ -146,12 +124,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 StandbyChannels[i] = new PresetStandbyChannelsViewModel(new FilePresetChannelsStore(), i + 1);
             }
 
-            LastSent = 0;
-
             IsConnected = false;
-            ExternalAWACSModelSelected = false;
 
-            LastSeenName = Settings.GlobalSettingsStore.Instance.GetClientSetting(Settings.GlobalSettingsKeys.LastSeenName).RawValue;
+            LastSeenName = GlobalSettingsStore.Instance.GetClientSetting(GlobalSettingsKeys.LastSeenName).RawValue;
+        }
+        
+        public void SetGuid(Guid guid)
+        {
+            if (guid == Guid.Empty)
+                throw new ArgumentException("GUID cannot be null or empty.", nameof(guid));
+
+            ClientId = guid;
+            NotifyPropertyChanged(nameof(ClientId));
         }
 
         public static ClientStateSingleton Instance
@@ -170,8 +154,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                 return _instance;
             }
         }
-
-        public int IntercomOffset { get; set; }
 
         private void NotifyPropertyChanged(string propertyName = "")
         {

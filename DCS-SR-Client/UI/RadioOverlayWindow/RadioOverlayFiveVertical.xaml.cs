@@ -1,22 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using NLog;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using System.Windows.Forms;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
+using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
@@ -26,8 +23,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
         private double _aspectRatio;
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[] radioControlGroup =
-            new Client.UI.AwacsRadioOverlayWindow.RadioControlGroup[5];
+        private readonly RadioControlGroup[] radioControlGroup =
+            new RadioControlGroup[5];
 
         private readonly DispatcherTimer _updateTimer;
 
@@ -102,8 +99,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioStatus();
@@ -112,46 +107,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             Intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "5 Radio Panel";
-                    }
-                    else
-                    {
-                        ControlText.Text = "5 Radio Panel";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "5 Radio Panel (Disconnected)";
-
-                }
-            }
-            else
-            {
-                ControlText.Text = "5 Radio Panel (Disconnected)";
-            }
+            ControlText.Text = "5 Radio Panel";
 
             FocusDCS();
         }

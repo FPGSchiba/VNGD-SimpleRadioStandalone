@@ -3,15 +3,15 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Client.Audio;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Common.Helpers;
 using NAudio.CoreAudioApi;
 using NLog;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class AudioPage : Page
     {
@@ -35,12 +35,16 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             Speaker_VU.Value = -100;
             Mic_VU.Value = -100;
             
-            _audioManager = new AudioManager(AudioOutput.WindowsN);
-            _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
-
-            if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow != null)
             {
-                SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
+                _audioManager = mainWindow.AudioManager;
+                _audioManager.SpeakerBoost = VolumeConversionHelper.ConvertVolumeSliderToScale((float)SpeakerBoost.Value);
+                
+                if ((SpeakerBoostLabel != null) && (SpeakerBoost != null))
+                {
+                    SpeakerBoostLabel.Content = VolumeConversionHelper.ConvertLinearDiffToDB(_audioManager.SpeakerBoost);
+                }
             }
             
             _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
@@ -48,6 +52,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             _updateTimer.Start();
             
             VOXMinimimumTXTime.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMinimumTime);
+            VOXAttackTime.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXAttackTimeMs);
             VOXMode.Value = _globalSettings.GetClientSettingInt(GlobalSettingsKeys.VOXMode);
             VOXMinimumRMS.Value = _globalSettings.GetClientSettingDouble(GlobalSettingsKeys.VOXMinimumDB);
             PTTReleaseDelay.Value = _globalSettings.ProfileSettingsStore.GetClientSettingFloat(ProfileSettingsKeys.PTTReleaseDelay);
@@ -80,6 +85,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
 
         private void PreviewAudio(object sender, RoutedEventArgs e)
         {
+            // TODO: This crashes when stopping the preview
             if (_audioPreview == null)
             {
                 if (!AudioInput.MicrophoneAvailable)
@@ -200,7 +206,13 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
             if (VOXMinimimumTXTime.IsEnabled)
                 _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXMinimumTime, (int)e.NewValue);
         }
-        
+
+        private void VOXAttackTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (VOXAttackTime.IsEnabled)
+                _globalSettings.SetClientSetting(GlobalSettingsKeys.VOXAttackTimeMs, (int)e.NewValue);
+        }
+
         private void VOXMode_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (VOXMode.IsEnabled)

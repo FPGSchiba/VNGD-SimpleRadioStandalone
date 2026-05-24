@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Server.UI.ClientAdmin;
+using Vanguard.VCS.Common;
+using Vanguard.VCS.Common.Setting;
+using Vanguard.VCS.Server.Network;
+using Vanguard.VCS.Server.Settings;
+using Vanguard.VCS.Server.UI.ClientAdmin;
 using NLog;
+using Vanguard.VCS.Server.Network.Models;
 using LogManager = NLog.LogManager;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
+namespace Vanguard.VCS.Server.UI.MainWindow
 {
     public sealed class MainViewModel : Screen, IHandle<ServerStateMessage>
     {
@@ -53,7 +56,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             {
                 ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT,
                     value.ToString());
-                _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+                _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
             }
         }
 
@@ -233,16 +236,25 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             IsServerRunning = message.IsRunning;
             ClientsCount = message.Count;
         }
+        
+        public Task HandleAsync(ServerStateMessage message, CancellationToken cancellationToken)
+        {
+            Handle(message);
+            NotifyOfPropertyChange(() => IsServerRunning);
+            NotifyOfPropertyChange(() => ServerButtonText);
+            NotifyOfPropertyChange(() => ClientsCount);
+            return Task.CompletedTask;
+        }
 
         public void ServerStartStop()
         {
             if (IsServerRunning)
             {
-                _eventAggregator.PublishOnBackgroundThread(new StopServerMessage());
+                _eventAggregator.PublishOnBackgroundThreadAsync(new StopServerMessage());
             }
             else
             {
-                _eventAggregator.PublishOnBackgroundThread(new StartServerMessage());
+                _eventAggregator.PublishOnBackgroundThreadAsync(new StartServerMessage());
             }
         }
 
@@ -253,7 +265,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
                 {"Icon", new BitmapImage(new Uri("pack://application:,,,/SR-Server;component/server-10.ico"))},
                 {"ResizeMode", ResizeMode.CanMinimize}
             };
-            _windowManager.ShowWindow(_clientAdminViewModel, null, settings);
+            _windowManager.ShowWindowAsync(_clientAdminViewModel, null, settings);
         }
 
         public void RadioSecurityToggle()
@@ -262,7 +274,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.COALITION_AUDIO_SECURITY, newSetting);
             NotifyOfPropertyChange(() => RadioSecurityText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void SpectatorAudioToggle()
@@ -271,7 +283,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED, newSetting);
             NotifyOfPropertyChange(() => SpectatorAudioText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void ExportListToggle()
@@ -280,7 +292,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.CLIENT_EXPORT_ENABLED, newSetting);
             NotifyOfPropertyChange(() => ExportListText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void LOSToggle()
@@ -289,7 +301,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOS_ENABLED, newSetting);
             NotifyOfPropertyChange(() => LOSText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void DistanceLimitToggle()
@@ -298,7 +310,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.DISTANCE_ENABLED, newSetting);
             NotifyOfPropertyChange(() => DistanceLimitText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void RealRadioToggle()
@@ -307,7 +319,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.IRL_RADIO_TX, newSetting);
             NotifyOfPropertyChange(() => RealRadioText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void IRLRadioRxBehaviourToggle()
@@ -316,7 +328,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.IRL_RADIO_RX_INTERFERENCE, newSetting);
             NotifyOfPropertyChange(() => IRLRadioRxText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void RadioExpansionToggle()
@@ -325,7 +337,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_EXPANSION, newSetting);
             NotifyOfPropertyChange(() => RadioExpansion);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void AllowRadioEncryptionToggle()
@@ -334,7 +346,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION, newSetting);
             NotifyOfPropertyChange(() => AllowRadioEncryption);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void StrictRadioEncryptionToggle()
@@ -343,7 +355,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.STRICT_RADIO_ENCRYPTION, newSetting);
             NotifyOfPropertyChange(() => StrictRadioEncryption);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void CheckForBetaUpdatesToggle()
@@ -352,7 +364,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetServerSetting(ServerSettingsKeys.CHECK_FOR_BETA_UPDATES, newSetting);
             NotifyOfPropertyChange(() => CheckForBetaUpdates);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void OverrideEffectsOnGlobalToggle()
@@ -361,7 +373,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.RADIO_EFFECT_OVERRIDE, newSetting);
             NotifyOfPropertyChange(() => OverrideEffectsOnGlobal);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void ExternalAWACSModeToggle()
@@ -374,7 +386,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             NotifyOfPropertyChange(() => ExternalAWACSMode);
             NotifyOfPropertyChange(() => IsExternalAWACSModeEnabled);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         private void PasswordDebounceTimerTick(object sender, EventArgs e)
@@ -382,7 +394,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_BLUE_PASSWORD, _externalAWACSModeBluePassword);
             ServerSettingsStore.Instance.SetExternalAWACSModeSetting(ServerSettingsKeys.EXTERNAL_AWACS_MODE_RED_PASSWORD, _externalAWACSModeRedPassword);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
 
             _passwordDebounceTimer.Stop();
             _passwordDebounceTimer.Tick -= PasswordDebounceTimerTick;
@@ -394,7 +406,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         {
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TEST_FREQUENCIES, _testFrequencies);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerFrequenciesChanged()
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerFrequenciesChanged()
             {
                 TestFrequencies = _testFrequencies
             });
@@ -408,7 +420,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
         {
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES, _globalLobbyFrequencies);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerFrequenciesChanged()
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerFrequenciesChanged()
             {
                 GlobalLobbyFrequencies = _globalLobbyFrequencies
             });
@@ -424,7 +436,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SHOW_TUNED_COUNT, newSetting);
             NotifyOfPropertyChange(() => TunedCountText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void LotATCExportToggle()
@@ -433,7 +445,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.LOTATC_EXPORT_ENABLED, newSetting);
             NotifyOfPropertyChange(() => LotATCExportText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void ShowTransmitterNameToggle()
@@ -442,7 +454,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.SHOW_TRANSMITTER_NAME, newSetting);
             NotifyOfPropertyChange(() => ShowTransmitterNameText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public void TransmissionLogEnabledToggle()
@@ -451,7 +463,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
             ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_ENABLED, newSetting);
             NotifyOfPropertyChange(() => TransmissionLogEnabledText);
 
-            _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+            _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
         }
 
         public int ArchiveLimit
@@ -462,7 +474,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Server.UI.MainWindow
                 ServerSettingsStore.Instance.SetGeneralSetting(ServerSettingsKeys.TRANSMISSION_LOG_RETENTION,
                     value.ToString());
 
-                _eventAggregator.PublishOnBackgroundThread(new ServerSettingsChangedMessage());
+                _eventAggregator.PublishOnBackgroundThreadAsync(new ServerSettingsChangedMessage());
             }
         }
     }

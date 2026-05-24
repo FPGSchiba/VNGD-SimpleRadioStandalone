@@ -3,11 +3,11 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Media;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.DCSState;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     public class SRClient : INotifyPropertyChanged
     {
@@ -16,7 +16,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
         [JsonIgnore] 
         private float _lineOfSightLoss; // 0.0 is NO Loss therefore Full line of sight
 
-        public string ClientGuid { get; set; }
+        public Guid ClientGuid { get; set; }
         private string _name= "";
 
         public string Name
@@ -27,9 +27,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
             }
             set
             {
-                if(value == null || value == "")
+                if (value == null)
                 {
-                    value = "---";
+                    value = "";
                 }
 
                 if (_name != value)
@@ -51,6 +51,18 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Coalition"));
             }
         }
+
+        private string _coalitionName = "";
+        public string CoalitionName
+        {
+            get => _coalitionName;
+            set
+            {
+                _coalitionName = value ?? "";
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CoalitionName)));
+            }
+        }
+
         public bool AllowRecord { get; set; }
 
         [JsonIgnore]

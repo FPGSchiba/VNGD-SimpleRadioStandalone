@@ -5,10 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Ciribob.DCS.SimpleRadio.Standalone.Client;
 using NLog;
 using SharpConfig;
+using Vanguard.VCS.Client.Audio.Models;
+using Vanguard.VCS.Client.Input;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Settings
 {
     public enum ProfileSettingsKeys
     {
@@ -65,6 +68,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         IntercomTransmissionStartSelection,
         IntercomTransmissionEndSelection,
         AMCollisionVolume,
+        
+        // Vanguard specific settings
+        VngdEmail,
     }
 
     public class ProfileSettingsStore
@@ -141,6 +147,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {ProfileSettingsKeys.AMCollisionVolume.ToString(), "1.0"},
 
             {ProfileSettingsKeys.RotaryStyleIncrement.ToString(), FalseDefault},
+            
+            {ProfileSettingsKeys.VngdEmail.ToString(), string.Empty},
         };
 
 

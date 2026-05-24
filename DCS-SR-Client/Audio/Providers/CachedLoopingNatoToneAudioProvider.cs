@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Managers;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using NAudio.Wave;
+﻿using NAudio.Wave;
+using Vanguard.VCS.Client.Audio.Managers;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.Helpers;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Providers
+namespace Vanguard.VCS.Client.Audio.Providers
 {
     public class CachedLoopingNatoToneAudioProvider:IWaveProvider
     {

@@ -2,10 +2,10 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
 using Microsoft.Win32;
+using Vanguard.VCS.Client.Settings;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class LegacyPage : Page
     {

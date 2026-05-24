@@ -5,12 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
 using NLog;
 using SharpConfig;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
+namespace Vanguard.VCS.Client.Settings
 {
   
     public enum GlobalSettingsKeys
@@ -237,6 +235,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
 
         DCSAutoConnectUDP, // 5069
         ShowTransmitterName,
+        AlwaysShowTransmitterName,
 
         IdleTimeOut,
         AutoConnect,
@@ -251,6 +250,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
         VOXMode,
         VOXMinimumTime,
         VOXMinimumDB,
+        VOXAttackTimeMs,
 
         AllowXInputController
     }
@@ -835,6 +835,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.VAICOMIncomingUDP.ToString(), "33501"},
             {GlobalSettingsKeys.VAICOMTXInhibitEnabled.ToString(), "false"},
             {GlobalSettingsKeys.ShowTransmitterName.ToString(), "true"},
+            {GlobalSettingsKeys.AlwaysShowTransmitterName.ToString(), "false"},
 
             {GlobalSettingsKeys.IdleTimeOut.ToString(), "600"}, // 10 mins
 
@@ -849,7 +850,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
             {GlobalSettingsKeys.VOXMode.ToString(), "3" },
             {GlobalSettingsKeys.VOXMinimumTime.ToString(), "300" },
             {GlobalSettingsKeys.VOXMinimumDB.ToString(), "-59.0" },
-
+            {GlobalSettingsKeys.VOXAttackTimeMs.ToString(), "100"},
 
             {GlobalSettingsKeys.AllowXInputController.ToString(), "false"},
 
@@ -1058,9 +1059,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Settings
                 {
                     _configuration.SaveToFile(Path + ConfigFileName);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Logger.Error("Unable to save settings!");
+                    Logger.Error(e, "Unable to save settings!");
                 }
             }
         }

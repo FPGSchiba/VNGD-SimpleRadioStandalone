@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     public struct ClientListExport
     {

@@ -1,76 +1,164 @@
-﻿<Page x:Class="Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.WelcomePage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      mc:Ignorable="d" 
-      d:DesignHeight="340"
-      d:DesignWidth="600"
-      Width="600"
-      Height="340"
-      Title="WelcomePage">
+<Page
+    Height="340"
+    Title="WelcomePage"
+    Width="600"
+    d:DesignHeight="340"
+    d:DesignWidth="600"
+    mc:Ignorable="d"
+    x:Class="Vanguard.VCS.Client.UI.ClientWindow.WelcomePages.WelcomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="White" />
         </Grid.Background>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1.3*" />
             <RowDefinition Height="70" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="90" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        
-        <StackPanel Grid.Row="0" VerticalAlignment="Bottom">
-            <Label  Content="Vanguard Communications System" HorizontalAlignment="Center" FontWeight="Heavy" FontSize="24" />
-            <Label Content="powered by SRS" HorizontalAlignment="Center" FontSize="16" />
+
+        <!-- Row 0: Header -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Label
+                Content="Vanguard Communications System"
+                FontSize="24"
+                FontWeight="Heavy"
+                HorizontalAlignment="Center"
+                Padding="0" />
+            <Label
+                Content="powered by SRS"
+                FontSize="16"
+                HorizontalAlignment="Center"
+                Padding="0" />
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom"  HorizontalAlignment="Center">
-            <!-- Login is not yet implemented via vngd.net, so we're using the Guest button for now
-            <Button
-                Width="90"
-                Height="30"
-                Content="LOGIN"
-                x:Name="Login"
-                materialDesign:ButtonAssist.CornerRadius="15"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                Click="Login_Click"
-            />
-            -->
-            <!-- Change this to Guest in the future -->
-            <Button
-                Width="90"
-                Height="30"
-                Content="LOGIN" 
-                x:Name="Guest"
-                materialDesign:ButtonAssist.CornerRadius="15"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-                Margin="0,0,0,0"
-                Click="Guest_Click"
-            />
+        <!-- Row 1: Server info card -->
+        <Border
+            x:Name="ServerInfoCard"
+            Grid.Row="1"
+            Background="#f0f7f0"
+            BorderBrush="#c3dfc3"
+            BorderThickness="1"
+            CornerRadius="6"
+            Margin="20,8"
+            Padding="16,8">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock
+                    x:Name="ServerAddressText"
+                    Text="● Connected"
+                    Foreground="#2e6b2e"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- Row 2: Subtitle -->
+        <TextBlock
+            Grid.Row="2"
+            Text="How would you like to connect?"
+            Foreground="#888"
+            FontSize="10"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center" />
+
+        <!-- Row 3: Auth choice cards -->
+        <Grid Grid.Row="3" Margin="20,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LOGIN card -->
+            <Border
+                x:Name="LoginCard"
+                Grid.Column="0"
+                BorderBrush="#333"
+                BorderThickness="1.5"
+                CornerRadius="6"
+                Background="White"
+                Padding="10"
+                Cursor="Hand"
+                MouseLeftButtonDown="LoginCard_Click">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock
+                        Text="LOGIN"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#111"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Text="profile.vngd.net"
+                        FontSize="9"
+                        Foreground="#888"
+                        TextAlignment="Center"
+                        Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- GUEST card -->
+            <Border
+                x:Name="GuestCard"
+                Grid.Column="2"
+                BorderBrush="#333"
+                BorderThickness="1.5"
+                CornerRadius="6"
+                Background="White"
+                Padding="10"
+                Cursor="Hand"
+                MouseLeftButtonDown="GuestCard_Click">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock
+                        Text="GUEST"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#111"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Text="No account needed"
+                        FontSize="9"
+                        Foreground="#888"
+                        TextAlignment="Center"
+                        Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Row 4: Error panel + footer -->
+        <StackPanel Grid.Row="4" VerticalAlignment="Top">
+            <Border
+                x:Name="ErrorPanel"
+                Background="#2a1a1a"
+                BorderBrush="#ef4444"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="10,8"
+                Margin="20,4"
+                Visibility="Collapsed">
+                <TextBlock
+                    x:Name="ErrorText"
+                    Foreground="#ef4444"
+                    FontSize="11"
+                    TextWrapping="Wrap" />
+            </Border>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-            <Button
-                x:Name="EasterEgg"
-                Width="10"
-                Height="10"
-                Opacity="0"
-                Click="EasterEgg_Click"
-            />
-            <Label VerticalContentAlignment="Center">
-                <TextBlock TextWrapping="WrapWithOverflow" TextAlignment="Center">
+        <Label Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" Padding="4">
+            <TextBlock
+                TextAlignment="Center"
+                Foreground="#aaa"
+                FontSize="9"
+                TextWrapping="WrapWithOverflow">
                 Disclaimer: Vanguard is an organization in the Star Citizen universe and gaming community.
                 We are not affiliated with Roberts Space Industries, Star Citizen, or any other entity.
-                </TextBlock>
-            </Label>
-        </StackPanel>
+            </TextBlock>
+        </Label>
     </Grid>
 </Page>

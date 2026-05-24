@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using NLog;
 using Open.Nat;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Server.Network
+namespace Vanguard.VCS.Server.Network
 {
     public class NatHandler
     {

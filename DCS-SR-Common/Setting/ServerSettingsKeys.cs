@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
+namespace Vanguard.VCS.Common.Setting
 {
     public enum ServerSettingsKeys
     {
@@ -59,7 +59,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.SPECTATORS_AUDIO_DISABLED.ToString(), "false" },
             { ServerSettingsKeys.CLIENT_EXPORT_FILE_PATH.ToString(), "clients-list.json" },
             { ServerSettingsKeys.CHECK_FOR_BETA_UPDATES.ToString(), "false" },
-            { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "true" },
+            { ServerSettingsKeys.ALLOW_RADIO_ENCRYPTION.ToString(), "false" },
             { ServerSettingsKeys.TEST_FREQUENCIES.ToString(), "247.2,120.3" },
             { ServerSettingsKeys.SHOW_TUNED_COUNT.ToString(), "true" },
             { ServerSettingsKeys.GLOBAL_LOBBY_FREQUENCIES.ToString(), "248.22" },
@@ -67,7 +67,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Setting
             { ServerSettingsKeys.LOTATC_EXPORT_PORT.ToString(), "10712" },
             { ServerSettingsKeys.LOTATC_EXPORT_IP.ToString(), "127.0.0.1" },
             { ServerSettingsKeys.UPNP_ENABLED.ToString(), "true" },
-            { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "false" },
+            { ServerSettingsKeys.SHOW_TRANSMITTER_NAME.ToString(), "true" },
             { ServerSettingsKeys.RETRANSMISSION_NODE_LIMIT.ToString(), "0" },
             { ServerSettingsKeys.STRICT_RADIO_ENCRYPTION.ToString(), "false" },
             { ServerSettingsKeys.TRANSMISSION_LOG_ENABLED.ToString(), "false" },

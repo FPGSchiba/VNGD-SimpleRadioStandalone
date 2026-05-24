@@ -1,13 +1,12 @@
-﻿using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow;
-using NAudio.Wave;
+﻿using Vanguard.VCS.Client.Settings;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using NAudio.CoreAudioApi;
+using Vanguard.VCS.Client.UI.ClientWindow;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
+namespace Vanguard.VCS.Client.Singletons
 {
     public class AudioInputSingleton
     {

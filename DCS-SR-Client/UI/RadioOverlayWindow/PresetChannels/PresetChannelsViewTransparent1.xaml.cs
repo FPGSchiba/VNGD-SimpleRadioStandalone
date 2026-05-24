@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow.PresetChannels
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow.PresetChannels
 {
     /// <summary>
     /// Interaction logic for PresetChannelsViewTransparent1.xaml

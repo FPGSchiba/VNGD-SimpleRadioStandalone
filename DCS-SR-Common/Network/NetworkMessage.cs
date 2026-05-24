@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Helpers;
+using Vanguard.VCS.Common.Helpers;
 using Newtonsoft.Json;
 using NLog.Layouts;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Network
+namespace Vanguard.VCS.Common.Network
 {
     public class NetworkMessage
     {

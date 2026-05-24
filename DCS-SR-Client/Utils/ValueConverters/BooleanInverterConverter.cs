@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Utils.ValueConverters
+namespace Vanguard.VCS.Client.Utils.ValueConverters
 {
 	class BooleanInverterConverter : IValueConverter
     {

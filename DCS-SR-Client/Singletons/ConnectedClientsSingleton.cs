@@ -3,19 +3,21 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Setting;
+using Google.Protobuf.Collections;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Common.DCSState;
+using Vanguard.VCS.Common.Network;
+using Vanguard.VCS.Common.Setting;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
+namespace Vanguard.VCS.Client.Singletons
 {
     public sealed class ConnectedClientsSingleton : INotifyPropertyChanged
     {
-        private readonly ConcurrentDictionary<string, SRClient> _clients = new ConcurrentDictionary<string, SRClient>();
+        private readonly ConcurrentDictionary<Guid, SRClient> _clients = new ConcurrentDictionary<Guid, SRClient>();
         private static volatile ConnectedClientsSingleton _instance;
         private static object _lock = new Object();
-        private readonly string _guid = ClientStateSingleton.Instance.ShortGUID;
+        private readonly Guid _guid = ClientStateSingleton.Instance.ClientId;
         private readonly SyncedServerSettings _serverSettings = SyncedServerSettings.Instance;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -49,7 +51,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             NotifyPropertyChanged("Total");
         }
 
-        public SRClient this[string key]
+        public SRClient this[Guid key]
         {
             get
             {
@@ -78,7 +80,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
         }
 
-        public bool TryRemove(string key, out SRClient value)
+        public bool TryRemove(Guid key, out SRClient value)
         {
             bool result = _clients.TryRemove(key, out value);
             if (result)
@@ -94,12 +96,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             NotifyPropertyChanged("Total");
         }
 
-        public bool TryGetValue(string key, out SRClient value)
+        public bool TryGetValue(Guid key, out SRClient value)
         {
             return _clients.TryGetValue(key, out value);
         }
 
-        public bool ContainsKey(string key)
+        public bool ContainsKey(Guid key)
         {
             return _clients.ContainsKey(key);
         }
@@ -110,8 +112,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             {
                 return 0;
             }
-            var currentClientPos = ClientStateSingleton.Instance.PlayerCoaltionLocationMetadata;
-            var currentUnitId = ClientStateSingleton.Instance.DcsPlayerRadioInfo.unitId;
             var coalitionSecurity = SyncedServerSettings.Instance.GetSettingAsBool(ServerSettingsKeys.COALITION_AUDIO_SECURITY);
             var globalFrequencies = _serverSettings.GlobalFrequencies;
             var global = globalFrequencies.Contains(freq);
@@ -121,8 +121,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             {
                 if (!client.Key.Equals(_guid))
                 {
-                    // check that either coalition radio security is disabled OR the coalitions match
-                    if (global|| (!coalitionSecurity || (client.Value.Coalition == currentClientPos.side)))
+                    // check that either coalition radio security is disabled OR coalition security is off
+                    if (global || !coalitionSecurity)
                     {
 
                         var radioInfo = client.Value.RadioInfo;
@@ -130,15 +130,9 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
                         if (radioInfo != null)
                         {
                             RadioReceivingState radioReceivingState = null;
-                            bool decryptable;
                             var receivingRadio = radioInfo.CanHearTransmission(freq,
                                 modulation,
-                                0,
-                                false,
-                                currentUnitId,
-                                new List<int>(),
-                                out radioReceivingState,
-                                out decryptable);
+                                out radioReceivingState);
 
                             //only send if we can hear!
                             if (receivingRadio != null)
@@ -151,6 +145,38 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons
             }
 
             return count;
+        }
+
+        public void DecodeVcs(MapField<string, ClientInfo> clients, MapField<string, RadioInfo> radios)
+        {
+            foreach (var clientId in clients.Keys)
+            {
+                var clientGuid = Guid.Parse(clientId);
+                var clientInfo = clients[clientId];
+                var srClient = new SRClient()
+                {
+                    ClientGuid = clientGuid,
+                    Name = clientInfo.Name,
+                    Coalition = 0, // Default to 0, will be set later as we refactor coalition handling
+                    AllowRecord = true,
+                    Muted = radios[clientId].Muted,
+                    LastUpdate = clientInfo.LastUpdate,
+                    Seat = 0,
+                    RadioInfo = new DCSPlayerRadioInfo()
+                    {
+                        radios = radios[clientId].Radios.Select(r => new RadioInformation
+                        {
+                            freq = r.Frequency,
+                            modulation = r.Enabled ? RadioInformation.Modulation.DISABLED : r.IsIntercom ? RadioInformation.Modulation.INTERCOM : RadioInformation.Modulation.AM,
+                            name = r.Name,
+                            enc = false,
+                            freqMax = 9999999999,
+                            freqMin = 1,
+                        }).ToArray()
+                    }
+                };
+                _clients.AddOrUpdate(clientGuid, srClient, (_, _) => srClient);
+            }
         }
     }
 }

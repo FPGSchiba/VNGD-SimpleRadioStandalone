@@ -1,25 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Threading;
-using Ciribob.DCS.SimpleRadio.Standalone.Client;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Network;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Singletons;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.RadioOverlayWindow;
 using NLog;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
-using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.AwacsRadioOverlayWindow;
-using MessageBox = System.Windows.Forms.MessageBox;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Singletons;
+using Vanguard.VCS.Client.UI.AwacsRadioOverlayWindow;
+using Vanguard.VCS.Client.UI.ClientWindow;
+using Vanguard.VCS.Client.UI.RadioOverlayWindow.Utils;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
+namespace Vanguard.VCS.Client.UI.RadioOverlayWindow
 {
     /// <summary>
     ///     Interaction logic for RadioOverlayWindow.xaml
@@ -101,8 +95,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void RadioRefresh(object sender, EventArgs eventArgs)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-
             foreach (var radio in radioControlGroup)
             {
                 radio.RepaintRadioStatus();
@@ -111,47 +103,7 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
             intercom.RepaintRadioStatus();
 
-            if ((dcsPlayerRadioInfo != null) && dcsPlayerRadioInfo.IsCurrent())
-            {
-                //reset when we switch planes
-                if (_lastUnitId != dcsPlayerRadioInfo.unitId)
-                {
-                    _lastUnitId = dcsPlayerRadioInfo.unitId;
-                }
-
-                var availableRadios = 0;
-
-                for (var i = 0; i < dcsPlayerRadioInfo.radios.Length; i++)
-                {
-                    if (dcsPlayerRadioInfo.radios[i].modulation != RadioInformation.Modulation.DISABLED)
-                    {
-                        availableRadios++;
-
-                    }
-                }
-
-                if (availableRadios > 1)
-                {
-                    if (dcsPlayerRadioInfo.control == DCSPlayerRadioInfo.RadioSwitchControls.HOTAS)
-                    {
-                        ControlText.Text = "1 Radio Panel";
-                    }
-                    else
-                    {
-                        ControlText.Text = "1 Radio Panel";
-                    }
-                }
-                else
-                {
-                    ControlText.Text = "1 Radio Panel (Disconnected)";
-
-                }
-            }
-            else
-            {
-                ResetHeight();
-                ControlText.Text = "1 Radio Panel (Disconnected)";
-            }
+            ControlText.Text = "1 Radio Panel";
 
             FocusDCS();
         }
@@ -327,24 +279,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Overlay
 
         private void ToggleGlobalSimultaneousTransmissionButton_Click(object sender, RoutedEventArgs e)
         {
-            var dcsPlayerRadioInfo = _clientStateSingleton.DcsPlayerRadioInfo;
-            if (dcsPlayerRadioInfo != null)
-            {
-                dcsPlayerRadioInfo.simultaneousTransmission = !dcsPlayerRadioInfo.simultaneousTransmission;
-
-                if (!dcsPlayerRadioInfo.simultaneousTransmission)
-                {
-                    foreach (var radio in dcsPlayerRadioInfo.radios)
-                    {
-                        radio.simul = false;
-                    }
-                }
-
-                foreach (var radio in radioControlGroup)
-                {
-                    radio.RepaintRadioStatus();
-                }
-            }
         }
 
         private void ShowOverlayMenuSelect_OnClick(object sender, RoutedEventArgs e)

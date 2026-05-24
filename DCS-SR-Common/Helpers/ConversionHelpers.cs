@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common.Helpers
 {
     public class ConversionHelpers
     {

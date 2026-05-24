@@ -1,7 +1,7 @@
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client.Input
 {
     static unsafe class Native
     {

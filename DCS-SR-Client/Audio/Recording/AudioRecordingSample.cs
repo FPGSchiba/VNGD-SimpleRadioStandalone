@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Models;
+﻿using System.Collections.Generic;
+using Vanguard.VCS.Client.Audio.Models;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Audio.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     //this holds all transmissions received in a single tick ready for processing on another thread to ensure we dont slow the other
     //processing loop

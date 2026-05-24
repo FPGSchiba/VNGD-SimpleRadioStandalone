@@ -1,4 +1,4 @@
-﻿namespace Ciribob.DCS.SimpleRadio.Standalone.Common
+namespace Vanguard.VCS.Common.DCSState
 {
     public struct DCSAircraftCapabilities
     {

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -8,8 +11,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
+using Easy.MessageHub;
+using Vanguard.VCS.Client.Events;
+using Vanguard.VCS.Client.Network;
+using Vanguard.VCS.Client.Settings;
+using Vanguard.VCS.Client.Stores;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -17,14 +25,21 @@ using NLog.Targets.Wrappers;
 using Sentry;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client
+namespace Vanguard.VCS.Client
 {
     /// <summary>
     ///     Interaction logic for App.xaml
     /// </summary>
-    public class App : Application
+    public partial class App : Application
     {
+        public static IEventBus EventBus { get; private set; }
+        public static ClientStateStore ClientStateStore { get; private set; }
+        public static ConnectedClientsStore ConnectedClientsStore { get; private set; }
+        public static ServerSettingsStore ServerSettingsStore { get; private set; }
+        public static RadioStateManager RadioStateManager { get; private set; }
+
         private NotifyIcon _notifyIcon;
         private bool _loggingReady;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -106,11 +121,11 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
                 if (GlobalSettingsStore.Instance.GetClientSettingBool(GlobalSettingsKeys.AllowMultipleInstances) || allowMultiple)
                 {
-                    Logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
+                    _logger.Warn("Another SRS instance is already running, allowing multiple instances due to config setting");
                 }
                 else
                 {
-                    Logger.Warn("Another SRS instance is already running, preventing second instance startup");
+                    _logger.Warn("Another SRS instance is already running, preventing second instance startup");
 
                     MessageBoxResult result = MessageBox.Show(
                     "Another instance of the SimpleRadio client is already running!\n\nThis one will now quit. Check your system tray for the SRS Icon",
@@ -126,8 +141,6 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 #endif
 
             RequireAdmin();
-
-            InitNotificationIcon();
         }
 
         private void ListArgs()
@@ -138,6 +151,12 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 _logger.Info(s);
             }
+        }
+
+        private static bool IsClientRunning()
+        {
+            var current = Process.GetCurrentProcess();
+            return Process.GetProcessesByName(current.ProcessName).Length > 1;
         }
 
         private void RequireAdmin()
@@ -240,7 +259,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             };
             var consoleWrapper = new AsyncTargetWrapper(consoleTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncConsoleTarget", consoleWrapper);
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, consoleWrapper));
+            // Reduce console verbosity: show Info and above
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, consoleWrapper));
 
             var fileTarget = new FileTarget
             {
@@ -254,9 +274,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
 
             var fileWrapper = new AsyncTargetWrapper(fileTarget, 5000, AsyncTargetWrapperOverflowAction.Discard);
             config.AddTarget("asyncFileTarget", fileWrapper);
-            
-            // Default Log Level for File Logging is: Warning (LogLevel.Warn)
-            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Warn, fileWrapper));
+            // Set file logging to Info and above to reduce debug noise while still capturing operational events
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, fileWrapper));
 
             config.AddSentry(options =>
             {
@@ -265,7 +284,8 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
                 options.BreadcrumbLayout = "${logger}: ${message}";
 
                 // Debug and higher are stored as breadcrumbs (default is Info)
-                options.MinimumBreadcrumbLevel = LogLevel.Debug;
+                // Reduce breadcrumbs noise: store Info and higher as breadcrumbs
+                options.MinimumBreadcrumbLevel = LogLevel.Info;
                 // Error and higher is sent as event (default is Error)
                 options.MinimumEventLevel = LogLevel.Error;
 
@@ -300,31 +320,32 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             {
                 return;
             }
-            MenuItem notifyIconContextMenuShow = new MenuItem
-            {
-                Index = 0,
-                Text = "Show"
-            };
-            notifyIconContextMenuShow.Click += NotifyIcon_Show;
-
-            MenuItem notifyIconContextMenuQuit = new MenuItem
-            {
-                Index = 1,
-                Text = "Quit"
-            };
-            notifyIconContextMenuQuit.Click += NotifyIcon_Quit;
-
-            ContextMenu notifyIconContextMenu = new ContextMenu();
-            notifyIconContextMenu.MenuItems.AddRange(new [] { notifyIconContextMenuShow, notifyIconContextMenuQuit });
 
             _notifyIcon = new NotifyIcon
             {
-                Icon = Ciribob.DCS.SimpleRadio.Standalone.Client.Properties.Resources.audio_headset,
+                Icon = Vanguard.VCS.Client.Properties.Resources.audio_headset,
                 Visible = true
             };
-            _notifyIcon.ContextMenu = notifyIconContextMenu;
             _notifyIcon.DoubleClick += NotifyIcon_Show;
+            _notifyIcon.MouseClick += OnNotifyIconMouseClick;
+        }
 
+        private void OnNotifyIconMouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button != System.Windows.Forms.MouseButtons.Right) return;
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                var menu = new System.Windows.Controls.ContextMenu();
+                var showItem = new System.Windows.Controls.MenuItem { Header = "Show" };
+                showItem.Click += (s, args) => NotifyIcon_Show(s, args);
+                var quitItem = new System.Windows.Controls.MenuItem { Header = "Quit" };
+                quitItem.Click += (s, args) => NotifyIcon_Quit(s, args);
+                menu.Items.Add(showItem);
+                menu.Items.Add(quitItem);
+                menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+                menu.IsOpen = true;
+            });
         }
 
         private void NotifyIcon_Show(object sender, EventArgs args)
@@ -340,8 +361,23 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
             MainWindow.Close();
         }
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            InitNotificationIcon();
+            EventBus = new EventBus(new MessageHub());
+            ClientStateStore = new ClientStateStore(EventBus);
+            ConnectedClientsStore = new ConnectedClientsStore(EventBus);
+            ServerSettingsStore = new ServerSettingsStore(EventBus);
+            RadioStateManager = new RadioStateManager(null, EventBus);
+        }
+
         protected override void OnExit(ExitEventArgs e)
         {
+            RadioStateManager?.Stop();
+            ClientStateStore?.Dispose();
+            ConnectedClientsStore?.Dispose();
+            ServerSettingsStore?.Dispose();
             if (_notifyIcon != null)
                 _notifyIcon.Visible = false;
             base.OnExit(e);
@@ -417,3 +453,4 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client
         internal static extern int FreeConsole();
     }
 }
+

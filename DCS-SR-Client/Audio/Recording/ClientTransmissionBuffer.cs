@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Vanguard.VCS.Client.Audio.Models;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
+namespace Vanguard.VCS.Client.Audio.Recording
 {
     internal class ClientTransmissionBuffer
     {
@@ -32,19 +31,19 @@ namespace Ciribob.DCS.SimpleRadio.Standalone.Client.Recording
                 {
                     var next = it.Next;
 
-                    if (it.Value.PacketNumber == clientAudio.PacketNumber)
+                    if (it.Value.Sequence == clientAudio.Sequence)
                     {
                         return;
                     }
 
-                    if (clientAudio.PacketNumber < it.Value.PacketNumber)
+                    if (clientAudio.Sequence < it.Value.Sequence)
                     {
                         currentLinkedList.AddBefore(it, clientAudio);
                         return;
                     }
 
-                    if ((clientAudio.PacketNumber > it.Value.PacketNumber) &&
-                        ((next == null) || (clientAudio.PacketNumber < next.Value.PacketNumber)))
+                    if ((clientAudio.Sequence > it.Value.Sequence) &&
+                        ((next == null) || (clientAudio.Sequence < next.Value.Sequence)))
                     {
                         currentLinkedList.AddAfter(it, clientAudio);
                         return;

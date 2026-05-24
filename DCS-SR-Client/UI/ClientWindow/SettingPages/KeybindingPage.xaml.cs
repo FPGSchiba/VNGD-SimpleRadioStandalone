@@ -1,15 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Input;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.Settings;
-using Ciribob.DCS.SimpleRadio.Standalone.Client.UI.Components;
-using InputBinding = Ciribob.DCS.SimpleRadio.Standalone.Client.Settings.InputBinding;
+using Vanguard.VCS.Client.Input;
+using Vanguard.VCS.Client.UI.Components;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Client.UI.ClientWindow.SettingPages
+namespace Vanguard.VCS.Client.UI.ClientWindow.SettingPages
 {
     public partial class KeybindingPage : Page
     {

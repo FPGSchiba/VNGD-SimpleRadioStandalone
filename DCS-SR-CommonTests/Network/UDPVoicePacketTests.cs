@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ciribob.DCS.SimpleRadio.Standalone.Common;
+using Vanguard.VCS.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ciribob.DCS.SimpleRadio.Standalone.Common.Network;
+using Vanguard.VCS.Common.Network;
 
-namespace Ciribob.DCS.SimpleRadio.Standalone.Common.Tests
+namespace Vanguard.VCS.Common.Tests.Network
 {
     [TestClass()]
     public class UDPVoicePacketTests
